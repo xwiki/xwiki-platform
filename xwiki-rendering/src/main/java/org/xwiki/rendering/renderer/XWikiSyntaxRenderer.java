@@ -343,9 +343,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see PrintRenderer#beginList(org.xwiki.rendering.listener.ListType)
+     * @see PrintRenderer#beginList(org.xwiki.rendering.listener.ListType, java.util.Map) 
      */
-    public void beginList(ListType listType)
+    public void beginList(ListType listType, Map<String, String> parameters)
     {
         if (this.isBeginListItemFound && !this.isEndListItemFound) {
             print("\n");
@@ -357,6 +357,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         } else {
             this.listStyle.append("1");
         }
+        printParameters(parameters);
+
         this.listDepth++;
         this.currentElement = Element.LIST;
     }
@@ -383,9 +385,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see PrintRenderer#endList(org.xwiki.rendering.listener.ListType)
+     * @see PrintRenderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map) 
      */
-    public void endList(ListType listType)
+    public void endList(ListType listType, Map<String, String> parameters)
     {
         this.listStyle.setLength(this.listStyle.length() - 1);
         this.listDepth--;

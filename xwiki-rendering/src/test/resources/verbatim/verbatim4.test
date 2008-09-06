@@ -7,11 +7,11 @@ before{{{abc{{{123}}}cde}}}after
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [before]
 onVerbatimInline: [abc{{{123}}}cde]
 onWord: [after]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

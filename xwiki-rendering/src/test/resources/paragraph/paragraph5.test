@@ -7,9 +7,9 @@ Paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [Paragraph]
-endParagraph
+endParagraph: []
 beginSection: [1]
 onWord: [Header]
 endSection: [1]

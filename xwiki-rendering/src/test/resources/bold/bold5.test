@@ -8,7 +8,7 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 beginBold
 onWord: [This]
 onSpace
@@ -24,7 +24,7 @@ onWord: [a]
 onSpace
 onWord: [list]
 endBold
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

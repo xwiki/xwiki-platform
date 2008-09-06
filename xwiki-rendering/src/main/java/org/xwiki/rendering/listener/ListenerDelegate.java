@@ -36,9 +36,9 @@ public class ListenerDelegate implements Listener
         this.listener.beginFormat(format);
     }
 
-    public void beginList(ListType listType)
+    public void beginList(ListType listType, Map<String, String> parameters)
     {
-        this.listener.beginList(listType);
+        this.listener.beginList(listType, parameters);
     }
 
     public void beginListItem()
@@ -76,9 +76,9 @@ public class ListenerDelegate implements Listener
         this.listener.endFormat(format);
     }
 
-    public void endList(ListType listType)
+    public void endList(ListType listType, Map<String, String> parameters)
     {
-        this.listener.endList(listType);
+        this.listener.endList(listType, parameters);
     }
 
     public void endListItem()

@@ -8,7 +8,7 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onSpecialSymbol: [*]
 onWord: [Not]
 onSpace
@@ -23,7 +23,7 @@ onSpace
 onWord: [a]
 onSpace
 onWord: [list]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

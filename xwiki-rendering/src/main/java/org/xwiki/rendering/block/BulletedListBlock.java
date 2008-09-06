@@ -20,6 +20,7 @@
 package org.xwiki.rendering.block;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -43,11 +44,11 @@ public class BulletedListBlock extends AbstractFatherBlock implements ListBLock
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(Block)
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List, java.util.Map) 
      */
-    public BulletedListBlock(Block childBlock)
+    public BulletedListBlock(List<Block> childrenBlocks, Map<String, String> parameters)
     {
-        super(childBlock);
+        super(childrenBlocks, parameters);
     }
 
     /**
@@ -56,7 +57,7 @@ public class BulletedListBlock extends AbstractFatherBlock implements ListBLock
      */
     public void before(Listener listener)
     {
-        listener.beginList(ListType.BULLETED);
+        listener.beginList(ListType.BULLETED, getParameters());
     }
 
     /**
@@ -65,6 +66,6 @@ public class BulletedListBlock extends AbstractFatherBlock implements ListBLock
      */
     public void after(Listener listener)
     {
-        listener.endList(ListType.BULLETED);
+        listener.endList(ListType.BULLETED, getParameters());
     }
 }

@@ -14,9 +14,9 @@ paragraph2
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [paragraph1]
-endParagraph
+endParagraph: []
 beginDefinitionList
 beginDefinitionTerm
 onWord: [title]
@@ -28,9 +28,9 @@ onWord: [definition2]
 endDefinitionDescription
 endDefinitionList
 onEmptyLines: [1]
-beginParagraph
+beginParagraph: []
 onWord: [paragraph2]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

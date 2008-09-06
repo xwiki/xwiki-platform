@@ -21,6 +21,8 @@ package org.xwiki.rendering.block;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Collections;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -33,6 +35,18 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 public abstract class AbstractBlock implements Block
 {
+    private Map<String, String> parameters;
+
+    public AbstractBlock()
+    {
+        // Nothing to do
+    }
+
+    public AbstractBlock(Map<String, String> parameters)
+    {
+        this.parameters = Collections.unmodifiableMap(parameters);
+    }
+
     /**
      * The Blocks this Block contains.
      */
@@ -119,6 +133,11 @@ public abstract class AbstractBlock implements Block
         return this.parentBlock;
     }
 
+    public Map<String, String> getParameters()
+    {
+        return this.parameters;
+    }
+    
     /**
      * {@inheritDoc}
      * 

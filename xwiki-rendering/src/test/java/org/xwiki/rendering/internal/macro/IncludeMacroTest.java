@@ -65,10 +65,10 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
     {
         String expected = "beginDocument\n"
             + "beginMacroMarker: [velocity] [] [$myvar]\n"
-            + "beginParagraph\n"
+            + "beginParagraph: []\n"
             + "onSpecialSymbol: [$]\n"
             + "onWord: [myvar]\n"
-            + "endParagraph\n"
+            + "endParagraph: []\n"
             + "endMacroMarker: [velocity] [] [$myvar]\n"
             + "endDocument";
 

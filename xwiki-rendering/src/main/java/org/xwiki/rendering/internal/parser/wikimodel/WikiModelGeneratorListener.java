@@ -111,9 +111,9 @@ public class WikiModelGeneratorListener implements Listener
         }
     }
 
-    public void beginList(ListType listType)
+    public void beginList(ListType listType, Map<String, String> parameters)
     {
-        this.wikimodelListener.beginList(null, false);
+        this.wikimodelListener.beginList(createWikiParameters(parameters), false);
     }
 
     public void beginListItem()
@@ -142,9 +142,9 @@ public class WikiModelGeneratorListener implements Listener
         // TODO: Find what to do... For now don't render XML elements
     }
 
-    public void endList(ListType listType)
+    public void endList(ListType listType, Map<String, String> parameters)
     {
-        this.wikimodelListener.endList(null, false);
+        this.wikimodelListener.endList(createWikiParameters(parameters), false);
     }
 
     public void endListItem()

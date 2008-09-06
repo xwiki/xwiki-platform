@@ -6,19 +6,19 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginList: [BULLETED]
+beginList: [BULLETED] []
 beginListItem
-beginList: [BULLETED]
+beginList: [BULLETED] []
 beginListItem
-beginList: [BULLETED]
+beginList: [BULLETED] []
 beginListItem
 onWord: [Item]
 endListItem
-endList: [BULLETED]
+endList: [BULLETED] []
 endListItem
-endList: [BULLETED]
+endList: [BULLETED] []
 endListItem
-endList: [BULLETED]
+endList: [BULLETED] []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

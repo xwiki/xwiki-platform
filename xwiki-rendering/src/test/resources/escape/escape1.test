@@ -6,13 +6,13 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onEscape: [*]
 onEscape: [*]
 onWord: [hello]
 onEscape: [*]
 onEscape: [*]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

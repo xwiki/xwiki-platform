@@ -48,7 +48,7 @@ onWord: [definition]
 endDefinitionTerm
 endDefinitionList
 onEmptyLines: [1]
-beginParagraph
+beginParagraph: []
 onSpecialSymbol: [;]
 onWord: [title]
 onSpecialSymbol: [:]
@@ -56,9 +56,9 @@ onSpace
 onWord: [not]
 onSpace
 onWord: [definition]
-endParagraph
+endParagraph: []
 onEmptyLines: [1]
-beginParagraph
+beginParagraph: []
 onWord: [not]
 onSpace
 onSpecialSymbol: [;]
@@ -66,7 +66,7 @@ onWord: [definition]
 onSpecialSymbol: [:]
 onSpace
 onWord: [something]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

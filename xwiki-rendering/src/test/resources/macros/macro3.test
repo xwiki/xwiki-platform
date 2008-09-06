@@ -8,9 +8,9 @@
 .#-----------------------------------------------------
 beginDocument
 onMacroStandalone: [macro] [] []
-beginParagraph
+beginParagraph: []
 onMacroInline: [macro] [] []
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xwiki

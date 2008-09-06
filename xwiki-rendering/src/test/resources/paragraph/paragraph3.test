@@ -8,13 +8,13 @@ world
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [hello]
-endParagraph
+endParagraph: []
 onHorizontalLine
-beginParagraph
+beginParagraph: []
 onWord: [world]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

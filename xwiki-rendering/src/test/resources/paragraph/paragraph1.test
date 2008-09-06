@@ -9,7 +9,7 @@ this is another one
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [this]
 onSpace
 onWord: [is]
@@ -17,9 +17,9 @@ onSpace
 onWord: [one]
 onLineBreak
 onWord: [paragraph]
-endParagraph
+endParagraph: []
 onEmptyLines: [1]
-beginParagraph
+beginParagraph: []
 onWord: [this]
 onSpace
 onWord: [is]
@@ -27,7 +27,7 @@ onSpace
 onWord: [another]
 onSpace
 onWord: [one]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

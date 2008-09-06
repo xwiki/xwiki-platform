@@ -6,7 +6,7 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [1]
 onSpecialSymbol: [.]
 onWord: [1Not]
@@ -14,7 +14,7 @@ onSpace
 onWord: [a]
 onSpace
 onWord: [header]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

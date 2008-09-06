@@ -17,14 +17,14 @@ beginMacroMarker: [velocity] [] [
 * $item
 #end
 ]
-beginList: [BULLETED]
+beginList: [BULLETED] []
 beginListItem
 onWord: [one]
 endListItem
 beginListItem
 onWord: [two]
 endListItem
-endList: [BULLETED]
+endList: [BULLETED] []
 endMacroMarker: [velocity] [] [
 #set ($list = ['one', 'two'])
 #foreach ($item in $list)

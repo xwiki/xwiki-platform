@@ -224,7 +224,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
         // TODO: remove this when LinkBlock will support children blocks as label
         link.setLabel(getLabelFromChildren(sectionBlock.getChildren()));
 
-        return new ListItemBlock(linkBlock);
+        return new ListItemBlock(Arrays.<Block>asList(linkBlock));
     }
 
     /**

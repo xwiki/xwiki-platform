@@ -92,7 +92,7 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.body();
     }
 
-    public void beginList(ListType listType)
+    public void beginList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
             this.sink.list();
@@ -146,7 +146,7 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.body_();
     }
 
-    public void endList(ListType listType)
+    public void endList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
             this.sink.list_();

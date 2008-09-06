@@ -2,7 +2,7 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [This]
 onSpace
 onWord: [is]
@@ -10,7 +10,7 @@ onSpace
 beginStrikedOut
 onWord: [strikedout]
 endStrikedOut
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0

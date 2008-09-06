@@ -42,15 +42,6 @@ public class ListItemBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(Block)
-     */
-    public ListItemBlock(Block childBlock)
-    {
-        super(childBlock);
-    }
-
-    /**
-     * {@inheritDoc}
      * @see AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)

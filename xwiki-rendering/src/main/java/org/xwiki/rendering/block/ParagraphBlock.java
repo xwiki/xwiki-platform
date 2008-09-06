@@ -23,7 +23,6 @@ import org.xwiki.rendering.listener.Listener;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 /**
  * @version $Id$
@@ -31,33 +30,14 @@ import java.util.Collections;
  */
 public class ParagraphBlock extends AbstractFatherBlock
 {
-    private Map<String, String> parameters;
-    
     public ParagraphBlock(List<Block> blocks) throws IllegalArgumentException
     {
-        this(blocks, Collections.<String, String> emptyMap());
-    }
-
-    public ParagraphBlock(Block childrenBlock)
-    {
-        this(childrenBlock, Collections.<String, String> emptyMap());
+        super(blocks);
     }
 
     public ParagraphBlock(List<Block> blocks, Map<String, String> parameters) throws IllegalArgumentException
     {
-        super(blocks);
-        this.parameters = Collections.unmodifiableMap(parameters);
-    }
-
-    public ParagraphBlock(Block childrenBlock, Map<String, String> parameters)
-    {
-        super(childrenBlock);
-        this.parameters = Collections.unmodifiableMap(parameters);
-    }
-
-    public Map<String, String> getParameters()
-    {
-        return this.parameters;        
+        super(blocks, parameters);
     }
 
     public void before(Listener listener)

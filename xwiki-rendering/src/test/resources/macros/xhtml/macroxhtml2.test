@@ -26,11 +26,11 @@ beginMacroMarker: [xhtml] [] [
 beginXMLElement: [table] []
 beginXMLElement: [tr] []
 beginXMLElement: [td] []
-beginList: [BULLETED]
+beginList: [BULLETED] []
 beginListItem
 onWord: [listitem]
 endListItem
-endList: [BULLETED]
+endList: [BULLETED] []
 endXMLElement: [td] []
 endXMLElement: [tr] []
 endXMLElement: [table] []

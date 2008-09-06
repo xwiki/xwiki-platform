@@ -9,11 +9,11 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [one]
 onSpace
 onWord: [two]
 onSpace
 onWord: [three]
-endParagraph
+endParagraph: []
 endDocument

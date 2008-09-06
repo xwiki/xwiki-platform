@@ -21,8 +21,9 @@ package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Collections;
 
 /**
  * Default implementation for {@link FatherBlock}.
@@ -39,17 +40,13 @@ public abstract class AbstractFatherBlock extends AbstractBlock implements Fathe
      */
     public AbstractFatherBlock(List<Block> childrenBlocks)
     {
-        addChildren(childrenBlocks);
+        this(childrenBlocks, Collections.<String, String> emptyMap());
     }
 
-    /**
-     * Helper constructor to construct a block with a single child block.
-     * 
-     * @param childBlock the single child block to add
-     */
-    public AbstractFatherBlock(Block childBlock)
+    public AbstractFatherBlock(List<Block> childrenBlocks, Map<String, String> parameters)
     {
-        this(Arrays.asList(childBlock));
+        super(parameters);
+        addChildren(childrenBlocks);
     }
 
     /**

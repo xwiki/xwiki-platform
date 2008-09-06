@@ -6,7 +6,7 @@ This is **bold ** not bold** bold
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [This]
 onSpace
 onWord: [is]
@@ -23,7 +23,7 @@ beginBold
 onSpace
 onWord: [bold]
 endBold
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -21,13 +21,8 @@ package org.xwiki.rendering.block;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.SectionBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.SectionLevel;
 
 import junit.framework.TestCase;
@@ -40,12 +35,10 @@ public class BlockTest extends TestCase
 {
     public void testGetBlocksByType()
     {
-        ParagraphBlock pb1 =
-            new ParagraphBlock(new SectionBlock(Arrays.asList(new Block[] {new WordBlock("title1")}),
-                SectionLevel.LEVEL1));
-        ParagraphBlock pb2 =
-            new ParagraphBlock(new SectionBlock(Arrays.asList(new Block[] {new WordBlock("title2")}),
-                SectionLevel.LEVEL2));
+        ParagraphBlock pb1 = new ParagraphBlock(Arrays.<Block>asList(new SectionBlock(Arrays.asList(new Block[] {
+            new WordBlock("title1")}), SectionLevel.LEVEL1)));
+        ParagraphBlock pb2 = new ParagraphBlock(Arrays.<Block>asList(new SectionBlock(Arrays.asList(new Block[] {
+            new WordBlock("title2")}), SectionLevel.LEVEL2)));
         ParagraphBlock pb3 = new ParagraphBlock(Arrays.asList(new Block[] {pb1, pb2}));
 
         List<SectionBlock> results = pb1.getChildrenByType(SectionBlock.class, true);

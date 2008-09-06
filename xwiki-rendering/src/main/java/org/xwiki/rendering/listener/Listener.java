@@ -84,9 +84,11 @@ public interface Listener
      * Start of a list.
      *
      * @param listType the type of list (bulleted, numbered, etc)
+     * @param parameters a generic list of parameters for the list.
+     *        Example: "style"/"background-color: blue"
      * @see ListType
      */
-    void beginList(ListType listType);
+    void beginList(ListType listType, Map<String, String> parameters);
 
     /**
      * Start of a definition list. For example in HTML this is the equivalent of &lt;dl&gt;.
@@ -98,9 +100,11 @@ public interface Listener
      * End of a list.
      *
      * @param listType the type of list (bulleted, numbered, etc)
+     * @param parameters a generic list of parameters for the list.
+     *        Example: "style"/"background-color: blue"
      * @see ListType
      */
-    void endList(ListType listType);
+    void endList(ListType listType, Map<String, String> parameters);
 
     /**
      * End of a definition list. For example in HTML this is the equivalent of &lt;/dl&gt;.

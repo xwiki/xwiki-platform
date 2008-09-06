@@ -6,7 +6,7 @@ This is ~~italic ~~ not italic~~ italic
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [This]
 onSpace
 onWord: [is]
@@ -23,7 +23,7 @@ beginItalic
 onSpace
 onWord: [italic]
 endItalic
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -35,11 +35,6 @@ public abstract class AbstractMacroBlock extends AbstractBlock implements MacroB
     private String name;
 
     /**
-     * The macro parameters.
-     */
-    private Map<String, String> parameters;
-
-    /**
      * The macro content for macro that have content. Otherwise it's null.
      */
     private String content;
@@ -64,8 +59,8 @@ public abstract class AbstractMacroBlock extends AbstractBlock implements MacroB
      */
     public AbstractMacroBlock(String name, Map<String, String> parameters, String content)
     {
+        super(parameters);
         this.name = name;
-        this.parameters = parameters;
         this.content = content;
     }
 
@@ -76,15 +71,6 @@ public abstract class AbstractMacroBlock extends AbstractBlock implements MacroB
     public String getName()
     {
         return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see MacroBlock#getParameters()
-     */
-    public Map<String, String> getParameters()
-    {
-        return this.parameters;
     }
 
     /**

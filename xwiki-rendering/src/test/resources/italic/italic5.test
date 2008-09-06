@@ -6,7 +6,7 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 beginItalic
 onSpace
 onWord: [This]
@@ -15,7 +15,7 @@ onWord: [is]
 onSpace
 onWord: [italic]
 endItalic
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

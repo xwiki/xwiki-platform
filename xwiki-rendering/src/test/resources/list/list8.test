@@ -1,39 +1,29 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
- >line
-
-one > two
+(% param1="value1" param2="value2" %)
+* item
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onSpace
-onSpecialSymbol: [>]
-onWord: [line]
-endParagraph: []
-onEmptyLines: [1]
-beginParagraph: []
-onWord: [one]
-onSpace
-onSpecialSymbol: [>]
-onSpace
-onWord: [two]
-endParagraph: []
+beginList: [BULLETED] [[param1]=[value1][param2]=[value2]]
+beginListItem
+onWord: [item]
+endListItem
+endList: [BULLETED] [[param1]=[value1][param2]=[value2]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p> &gt;line</p><p>one &gt; two</p>
+<ul class="star" param1="value1" param2="value2"><li>item</li></ul>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
- >line
-
-one > two
+(% param1="value1" param2="value2" %)
+* item
 .#-----------------------------------------------------
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
-.# TODO: Wikimodel bug, see http://code.google.com/p/wikimodel/issues/detail?id=48
-<html><p> &gt;line</p><p>one &gt; two</p></html>
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=39 
+<html><ul class="star" param1="value1" param2="value2"><li>item</li></ul></html>

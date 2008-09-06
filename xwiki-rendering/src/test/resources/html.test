@@ -6,7 +6,7 @@ This is <a href="url">some HTML</a>.
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [This]
 onSpace
 onWord: [is]
@@ -28,7 +28,7 @@ onSpecialSymbol: [/]
 onWord: [a]
 onSpecialSymbol: [>]
 onSpecialSymbol: [.]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

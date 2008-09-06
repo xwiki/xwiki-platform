@@ -42,15 +42,6 @@ public class DefinitionTermBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(Block)
-     */
-    public DefinitionTermBlock(Block childBlock)
-    {
-        super(childBlock);
-    }
-
-    /**
-     * {@inheritDoc}
      * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)

@@ -6,7 +6,7 @@ This is __underline__
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [This]
 onSpace
 onWord: [is]
@@ -14,7 +14,7 @@ onSpace
 beginUnderline
 onWord: [underline]
 endUnderline
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

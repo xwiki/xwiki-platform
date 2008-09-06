@@ -118,12 +118,12 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void beginParagraph(Map<String, String> parameters)
     {
-        printParameters("beginParagraph", parameters);
+        println("beginParagraph: [" + serializeParameters(parameters) + "]");
     }
 
     public void endParagraph(Map<String, String> parameters)
     {
-        printParameters("endParagraph", parameters);
+        println("endParagraph: [" + serializeParameters(parameters) + "]");
     }
 
     public void onLineBreak()
@@ -184,9 +184,9 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("onWord: [" + printableWord + "]");
     }
 
-    public void beginList(ListType listType)
+    public void beginList(ListType listType, Map<String, String> parameters)
     {
-        println("beginList: [" + listType + "]");
+        println("beginList: [" + listType + "] [" + serializeParameters(parameters) + "]");
     }
 
     public void beginListItem()
@@ -194,9 +194,9 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("beginListItem");
     }
 
-    public void endList(ListType listType)
+    public void endList(ListType listType, Map<String, String> parameters)
     {
-        println("endList: [" + listType + "]");
+        println("endList: [" + listType + "] [" + serializeParameters(parameters) + "]");
     }
 
     public void endListItem()
@@ -347,7 +347,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      */
     public void beginQuotation(Map<String, String> parameters)
     {
-        printParameters("beginQuotation", parameters);
+        println("beginQuotation: [" + serializeParameters(parameters) + "]");
     }
 
     /**
@@ -357,7 +357,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      */
     public void endQuotation(Map<String, String> parameters)
     {
-        printParameters("endQuotation", parameters);
+        println("endQuotation: [" + serializeParameters(parameters) + "]");
     }
 
     /**
@@ -406,16 +406,14 @@ public class EventsRenderer extends AbstractPrintRenderer
         println(eventName + ": [" + name + "] [" + buffer.toString() + "] [" + content + "]");
     }
 
-    private void printParameters(String prefix, Map<String, String> parameters)
+    private String serializeParameters(Map<String, String> parameters)
     {
-        StringBuffer buffer = new StringBuffer(prefix);
+        StringBuffer buffer = new StringBuffer();
         if (!parameters.isEmpty()) {
-            buffer.append(": [");
             for (String key: parameters.keySet()) {
                 buffer.append('[').append(key).append(']').append('=').append('[').append(parameters.get(key)).append(']');
             }
-            buffer.append(']');
         }
-        println(buffer.toString());
+        return buffer.toString();
     }
 }

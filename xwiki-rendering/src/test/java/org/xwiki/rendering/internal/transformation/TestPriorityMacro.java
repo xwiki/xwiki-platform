@@ -39,6 +39,6 @@ public class TestPriorityMacro extends AbstractNoParameterMacro
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return Arrays.asList(new Block[] {new ParagraphBlock(new WordBlock("word"))});
+        return Arrays.asList(new Block[] {new ParagraphBlock(Arrays.<Block>asList(new WordBlock("word")))});
     }
 }

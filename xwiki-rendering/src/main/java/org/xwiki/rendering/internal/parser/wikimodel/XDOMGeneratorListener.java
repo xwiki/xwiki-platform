@@ -233,9 +233,9 @@ public class XDOMGeneratorListener implements IWemListener
     {
         ListBLock listBlock;
         if (ordered) {
-            listBlock = new NumberedListBlock(generateListFromStack());
+            listBlock = new NumberedListBlock(generateListFromStack(), convertParameters(params));
         } else {
-            listBlock = new BulletedListBlock(generateListFromStack());
+            listBlock = new BulletedListBlock(generateListFromStack(), convertParameters(params));
         }
         this.stack.push(listBlock);
     }

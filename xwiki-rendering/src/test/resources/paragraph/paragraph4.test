@@ -7,9 +7,9 @@ paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [paragraph]
-endParagraph
+endParagraph: []
 onMacroStandalone: [macro] [] []
 endDocument
 .#-----------------------------------------------------

@@ -15,26 +15,26 @@ beginSection: [1]
 onWord: [Title1]
 endSection: [1]
 beginMacroMarker: [toc] [start=1|depth=6|numbered=false|scope=page] []
-beginList: [BULLETED]
+beginList: [BULLETED] []
 beginListItem
 onLink: [Label = [Title1] Anchor = [testid]]
 endListItem
-beginList: [BULLETED]
+beginList: [BULLETED] []
 beginListItem
 onLink: [Label = [Title1.1] Anchor = [testid]]
 endListItem
-beginList: [BULLETED]
-beginList: [BULLETED]
+beginList: [BULLETED] []
+beginList: [BULLETED] []
 beginListItem
 onLink: [Label = [Title1.1.1.1] Anchor = [testid]]
 endListItem
-endList: [BULLETED]
-endList: [BULLETED]
-endList: [BULLETED]
+endList: [BULLETED] []
+endList: [BULLETED] []
+endList: [BULLETED] []
 beginListItem
 onLink: [Label = [Title2] Anchor = [testid]]
 endListItem
-endList: [BULLETED]
+endList: [BULLETED] []
 endMacroMarker: [toc] [start=1|depth=6|numbered=false|scope=page] []
 onId: [testid]
 beginSection: [2]

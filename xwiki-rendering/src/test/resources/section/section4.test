@@ -14,11 +14,11 @@ onWord: [level]
 onSpace
 onWord: [1]
 endSection: [1]
-beginParagraph
+beginParagraph: []
 onWord: [Some]
 onSpace
 onWord: [paragraph]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

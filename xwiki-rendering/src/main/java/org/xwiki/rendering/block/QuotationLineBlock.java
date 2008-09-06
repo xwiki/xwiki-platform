@@ -36,11 +36,6 @@ public class QuotationLineBlock extends AbstractFatherBlock
         super(blocks);
     }
 
-    public QuotationLineBlock(Block childrenBlock)
-    {
-        super(childrenBlock);
-    }
-
     public void before(Listener listener)
     {
         listener.beginQuotationLine();

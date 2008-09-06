@@ -8,13 +8,13 @@ This is a paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginList: [BULLETED]
+beginList: [BULLETED] []
 beginListItem
 onWord: [Item]
 endListItem
-endList: [BULLETED]
+endList: [BULLETED] []
 onEmptyLines: [1]
-beginParagraph
+beginParagraph: []
 onWord: [This]
 onSpace
 onWord: [is]
@@ -22,7 +22,7 @@ onSpace
 onWord: [a]
 onSpace
 onWord: [paragraph]
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

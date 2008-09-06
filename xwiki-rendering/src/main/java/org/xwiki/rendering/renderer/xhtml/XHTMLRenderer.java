@@ -333,14 +333,14 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginList(org.xwiki.rendering.listener.ListType)
+     * @see org.xwiki.rendering.renderer.Renderer#beginList(org.xwiki.rendering.listener.ListType, java.util.Map)
      */
-    public void beginList(ListType listType)
+    public void beginList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
-            print("<ul class=\"star\">");
+            print("<ul class=\"star\"" + serializeParameters(parameters) + ">");
         } else {
-            print("<ol>");
+            print("<ol" + serializeParameters(parameters) + ">");
         }
     }
 
@@ -357,9 +357,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endList(org.xwiki.rendering.listener.ListType)
+     * @see org.xwiki.rendering.renderer.Renderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map) 
      */
-    public void endList(ListType listType)
+    public void endList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
             print("</ul>");

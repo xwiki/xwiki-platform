@@ -33,33 +33,14 @@ import java.util.Collections;
  */
 public class QuotationBlock extends AbstractFatherBlock
 {
-    private Map<String, String> parameters;
-
     public QuotationBlock(List<Block> blocks) throws IllegalArgumentException
     {
-        this(blocks, Collections.<String, String> emptyMap());
-    }
-
-    public QuotationBlock(Block childrenBlock)
-    {
-        this(childrenBlock, Collections.<String, String> emptyMap());
+        super(blocks, Collections.<String, String> emptyMap());
     }
 
     public QuotationBlock(List<Block> blocks, Map<String, String> parameters) throws IllegalArgumentException
     {
-        super(blocks);
-        this.parameters = Collections.unmodifiableMap(parameters);
-    }
-
-    public QuotationBlock(Block childrenBlock, Map<String, String> parameters)
-    {
-        super(childrenBlock);
-        this.parameters = Collections.unmodifiableMap(parameters);
-    }
-
-    public Map<String, String> getParameters()
-    {
-        return this.parameters;
+        super(blocks, parameters);
     }
 
     public void before(Listener listener)

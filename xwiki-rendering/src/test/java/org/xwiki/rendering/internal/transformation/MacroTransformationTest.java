@@ -57,9 +57,9 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     {
         String expected = "beginDocument\n"
         	+ "beginMacroMarker: [testsimplemacro] [] [null]\n"
-            + "beginParagraph\n"
+            + "beginParagraph: []\n"
             + "onWord: [simplemacro0]\n"
-            + "endParagraph\n"
+            + "endParagraph: []\n"
             + "endMacroMarker: [testsimplemacro] [] [null]\n"
             + "endDocument";
 
@@ -80,9 +80,9 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     {
         String expected = "beginDocument\n"
         	+ "beginMacroMarker: [testnestedmacro] [] [null]\n"
-            + "beginParagraph\n"
+            + "beginParagraph: []\n"
             + "onWord: [simplemacro0]\n"
-            + "endParagraph\n"
+            + "endParagraph: []\n"
             + "endMacroMarker: [testnestedmacro] [] [null]\n"
             + "endDocument";
 
@@ -124,14 +124,14 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     {
         String expected = "beginDocument\n"
         	+ "beginMacroMarker: [testsimplemacro] [] [null]\n"
-            + "beginParagraph\n"
+            + "beginParagraph: []\n"
             + "onWord: [simplemacro1]\n"
-            + "endParagraph\n"
+            + "endParagraph: []\n"
             + "endMacroMarker: [testsimplemacro] [] [null]\n"
             + "beginMacroMarker: [testprioritymacro] [] [null]\n"
-            + "beginParagraph\n"
+            + "beginParagraph: []\n"
             + "onWord: [word]\n"
-            + "endParagraph\n"
+            + "endParagraph: []\n"
             + "endMacroMarker: [testprioritymacro] [] [null]\n"
             + "endDocument";
 

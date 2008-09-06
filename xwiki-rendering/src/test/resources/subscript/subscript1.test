@@ -6,7 +6,7 @@ This is ,,subscript,,
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph: []
 onWord: [This]
 onSpace
 onWord: [is]
@@ -14,7 +14,7 @@ onSpace
 beginSubscript
 onWord: [subscript]
 endSubscript
-endParagraph
+endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -1,0 +1,29 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+(% param1="value1" param2="value2" %)
+>line
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginQuotation: [[param1]=[value1][param2]=[value2]]
+beginQuotationLine
+onWord: [line]
+endQuotationLine
+endQuotation: [[param1]=[value1][param2]=[value2]]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<blockquote param1="value1" param2="value2">line</blockquote>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+(% param1="value1" param2="value2" %)
+>line
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: Wikimodel bug, see http://code.google.com/p/wikimodel/issues/detail?id=48
+<html><blockquote param1="value1" param2="value2">line</blockquote></html>

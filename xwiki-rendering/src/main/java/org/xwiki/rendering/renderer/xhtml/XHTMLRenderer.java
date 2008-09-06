@@ -180,11 +180,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void beginParagraph(Map<String, String> parameters)
     {
         StringBuffer buffer = new StringBuffer("<p");
-        if (!parameters.isEmpty()) {
-            for (String key: parameters.keySet()) {
-                buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
-            }
-        }
+        buffer.append(serializeParameters(parameters));
         buffer.append('>');
         print(buffer.toString());
     }
@@ -513,7 +509,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     public void beginQuotation(Map<String, String> parameters)
     {
-        print("<blockquote>");
+        StringBuffer buffer = new StringBuffer("<blockquote");
+        buffer.append(serializeParameters(parameters));
+        buffer.append('>');
+        print(buffer.toString());
     }
 
     public void endQuotation(Map<String, String> parameters)
@@ -529,5 +528,16 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endQuotationLine()
     {
         // Nothing to do
+    }
+
+    private StringBuffer serializeParameters(Map<String, String> parameters)
+    {
+        StringBuffer buffer = new StringBuffer();
+        if (!parameters.isEmpty()) {
+            for (String key: parameters.keySet()) {
+                buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
+            }
+        }
+        return buffer;
     }
 }

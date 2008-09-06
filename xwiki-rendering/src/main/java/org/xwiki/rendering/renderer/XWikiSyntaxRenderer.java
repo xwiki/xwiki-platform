@@ -205,15 +205,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         {
             print("\n");
         }
-
-        if (!parameters.isEmpty()) {
-            StringBuffer buffer = new StringBuffer("(%");
-            for (String key: parameters.keySet()) {
-                buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
-            }
-            buffer.append(" %)\n");
-            print(buffer.toString());
-        }
+        printParameters(parameters);
 
         this.currentElement = Element.PARAGRAPH;
     }
@@ -625,6 +617,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             print("\n");
             this.isBeginQuotationLineFound = false;
         }
+        printParameters(parameters);
 
         this.quotationDepth++;
         this.currentElement = Element.QUOTATION;
@@ -680,6 +673,18 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             }
             this.needsNewLine = false;
             super.print(text);
+        }
+    }
+
+    private void printParameters(Map<String, String> parameters)
+    {
+        if (!parameters.isEmpty()) {
+            StringBuffer buffer = new StringBuffer("(%");
+            for (String key: parameters.keySet()) {
+                buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
+            }
+            buffer.append(" %)\n");
+            print(buffer.toString());
         }
     }
 }

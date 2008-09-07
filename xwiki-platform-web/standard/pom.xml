@@ -55,6 +55,13 @@
       <artifactId>xwiki-core-plexus</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- needed for slf4j clients such as QueryPlugin and JCRStore 
+         It is deployment time logging configuration, so it is here instead of xwiki-core. -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.3.0</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

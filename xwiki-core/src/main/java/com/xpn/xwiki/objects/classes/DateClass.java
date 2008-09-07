@@ -212,15 +212,16 @@ public class DateClass  extends PropertyClass
         buffer.append(input2.toString());
     }
 
-    public void fromSearchMap(XWikiQuery query, Map map) {
-        String[] data  = (String[])map.get("");
+    @Override
+    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map) {
+        String[] data  = map.get("");
         if ((data!=null)&&(data.length==1))
             query.setParam(getObject().getName() + "_" + getName(), fromString(data[0]).getValue());
         else {
-            data  = (String[])map.get("lessthan");
+            data  = map.get("lessthan");
             if ((data!=null)&&(data.length==1))
                 query.setParam(getObject().getName() + "_" + getName() + "_lessthan", fromString(data[0]).getValue());
-            data  = (String[])map.get("morethan");
+            data  = map.get("morethan");
             if ((data!=null)&&(data.length==1))
                 query.setParam(getObject().getName() + "_" + getName() + "_morethan", fromString(data[0]).getValue());
 

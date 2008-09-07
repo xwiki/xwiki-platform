@@ -497,7 +497,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     {
     }
 
-    public void fromSearchMap(XWikiQuery query, Map map)
+    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
     }
 

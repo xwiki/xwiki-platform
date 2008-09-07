@@ -364,9 +364,10 @@ public class BooleanClass extends PropertyClass
         return buffer.toString();
     }
 
-    public void fromSearchMap(XWikiQuery query, Map map)
+    @Override
+    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
-        String[] data = (String[]) map.get("");
+        String[] data = map.get("");
         if (data != null) {
             Object[] data2 = new Object[data.length];
             for (int i = 0; i < data.length; i++)

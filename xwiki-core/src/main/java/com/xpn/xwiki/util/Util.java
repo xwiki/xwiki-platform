@@ -210,9 +210,9 @@ public class Util
         return getSubMap(request.getParameterMap(), prefix);
     }
 
-    public static Map<String, String[]> getSubMap(Map<String, String[]> map, String prefix)
+    public static <T> Map<String, T> getSubMap(Map<String, T> map, String prefix)
     {
-        HashMap<String, String[]> result = new HashMap<String, String[]>();
+        HashMap<String, T> result = new HashMap<String, T>();
         for (String name : map.keySet()) {
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);

@@ -237,9 +237,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
         xpath.append("/*/*/obj/");
         xpath.append(className.replaceAll("\\.", "/"));
         String where= bclass.makeQuery(query);
-        if (where.equals(""))
-            xpath.append("/*");
-        else
+        if (!where.equals(""))
         {
             xpath.append("[");
             xpath.append(where);

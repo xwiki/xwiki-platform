@@ -171,9 +171,10 @@ public class StringClass extends PropertyClass
         }
     }
 
-    public void fromSearchMap(XWikiQuery query, Map map)
+    @Override
+    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
-        String[] data = (String[]) map.get("");
+        String[] data = map.get("");
         if ((data != null) && (data.length == 1)) {
             query.setParam(getObject().getName() + "_" + getName(), data[0]);
         }

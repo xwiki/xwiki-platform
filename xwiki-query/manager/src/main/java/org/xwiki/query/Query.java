@@ -81,10 +81,35 @@ public interface Query
     Query bindValue(String var, Object val);
 
     /**
+     * Bind positional parameter (?index in JPQL) with value val in query statement.
+     * It is recommended to use named parameters if it acceptable. see {@link #bindValue(String, Object)}
+     * @param index index of positional parameter. Index starting number is depends on store system.
+     *  According JPQL standard index should start from 1.
+     * @param val value of the variable.
+     * @return this query.
+     */
+    Query bindValue(int index, Object val);
+
+    /**
+     * Bind list of positional parameters values.
+     * values[i] became  i+1 positional parameter according JPQL. So it works only for "?index" parameters.
+     * @param values list of positional parameters values.
+     * @return this query.
+     * @see #bindValue(int, Object)
+     */
+    Query bindValues(List<Object> values);
+
+    /**
      * @return map from parameter name to value.
      * @see #bindValue(String, Object)
      */
-    Map<String, Object> getParameters();
+    Map<String, Object> getNamedParameters();
+
+    /**
+     * @return list of positional parameters values.
+     * @see #bindValue(int, Object)
+     */
+    Map<Integer, Object> getPositionalParameters();
 
     /**
      * @param limit limit of result list to set (so {@link #execute()}.size() will be <= limit).

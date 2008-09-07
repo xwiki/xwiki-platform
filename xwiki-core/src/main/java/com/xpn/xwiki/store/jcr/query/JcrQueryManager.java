@@ -156,11 +156,11 @@ public class JcrQueryManager extends AbstractQueryManager implements QueryExecut
      * @return clear query statement without parameters
      */
     protected String createNativeStatement(Query query) {
-        int n = query.getParameters().size();
+        int n = query.getNamedParameters().size();
         String[] vars = new String[n];
         String[] vals = new String[n];
         int count = 0;
-        for (Entry<String, Object> e : query.getParameters().entrySet()) {
+        for (Entry<String, Object> e : query.getNamedParameters().entrySet()) {
             vars[count] = ":{"+e.getKey()+"}";
             vals[count] = getValueAsString(e.getValue());
             ++count;

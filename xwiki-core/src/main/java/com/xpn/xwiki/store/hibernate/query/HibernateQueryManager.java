@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.store.hibernate.query;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -101,18 +102,8 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
                 @SuppressWarnings("unchecked")
                 public List<T> doInHibernate(Session session)
                 {
-                    org.hibernate.Query hquery =
-                        query.isNamed() ? session.getNamedQuery(query.getStatement()) : session.createQuery(query
-                            .getStatement());
-                    if (query.getOffset() > 0) {
-                        hquery.setFirstResult(query.getOffset());
-                    }
-                    if (query.getLimit() > 0) {
-                        hquery.setMaxResults(query.getLimit());
-                    }
-                    for (Entry<String, Object> e : query.getParameters().entrySet()) {
-                        hquery.setParameter(e.getKey(), e.getValue());
-                    }
+                    org.hibernate.Query hquery = createHibernateQuery(session, query);
+                    populateParameters(hquery, query);
                     return hquery.list();
                 }
             });
@@ -120,6 +111,50 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
             throw new QueryException("Exception while execute query", query, e);
         } finally {
             getContext().setDatabase(olddatabase);
+        }
+    }
+
+    /**
+     * @param session hibernate session
+     * @param query Query object
+     * @return hibernate query
+     */
+    protected org.hibernate.Query createHibernateQuery(Session session, Query query)
+    {
+        return query.isNamed()
+            ? session.getNamedQuery(query.getStatement())
+            : session.createQuery(query.getStatement());
+    }
+
+    /**
+     * @param hquery query to populate parameters
+     * @param query query from to populate.
+     */
+    protected void populateParameters(org.hibernate.Query hquery, Query query)
+    {
+        if (query.getOffset() > 0) {
+            hquery.setFirstResult(query.getOffset());
+        }
+        if (query.getLimit() > 0) {
+            hquery.setMaxResults(query.getLimit());
+        }
+        for (Entry<String, Object> e : query.getNamedParameters().entrySet()) {
+            hquery.setParameter(e.getKey(), e.getValue());
+        }
+        if (query.getPositionalParameters().size() > 0) {
+            int start = Collections.min(query.getPositionalParameters().keySet());
+            if (start == 0) {
+                // jdbc-style positional parameters. "?"
+                for (Entry<Integer, Object> e : query.getPositionalParameters().entrySet()) {
+                    hquery.setParameter(e.getKey(), e.getValue());
+                }
+            } else {
+                // jpql-style. "?index"
+                for (Entry<Integer, Object> e : query.getPositionalParameters().entrySet()) {
+                    // hack. hibernate assume "?1" is named parameter, so use string "1".
+                    hquery.setParameter("" + e.getKey(), e.getValue());
+                }
+            }
         }
     }
 

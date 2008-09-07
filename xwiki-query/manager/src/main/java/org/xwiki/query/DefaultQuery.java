@@ -48,7 +48,12 @@ public class DefaultQuery implements Query
     /**
      * map from query parameters to values.
      */
-    private Map<String, Object> parameters = new HashMap<String, Object>();
+    private Map<String, Object> namedParameters = new HashMap<String, Object>();
+
+    /**
+     * map from index to positional parameter value.
+     */
+    private Map<Integer, Object> positionalParameters = new HashMap<Integer, Object>();
 
     /**
      * field for {@link Query#setLimit(int)}.
@@ -141,7 +146,25 @@ public class DefaultQuery implements Query
      */
     public Query bindValue(String var, Object val)
     {
-        parameters.put(var, val);
+        namedParameters.put(var, val);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Query bindValue(int index, Object val) {
+        positionalParameters.put(index, val);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Query bindValues(List<Object> values) {
+        for (int i = 0; i < values.size(); i++) {
+            bindValue(i + 1, values.get(i));
+        }
         return this;
     }
 
@@ -182,9 +205,16 @@ public class DefaultQuery implements Query
     /**
      * {@inheritDoc}
      */
-    public Map<String, Object> getParameters()
+    public Map<String, Object> getNamedParameters()
     {
-        return parameters;
+        return namedParameters;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map<Integer, Object> getPositionalParameters() {
+        return positionalParameters;
     }
 
     /**

@@ -27,18 +27,18 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>17</version>
     <relativePath>../xwiki-platform-pom</relativePath>
   </parent>
   <artifactId>xwiki-core-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.5.1</version>
   <description>XWiki Platform - Core - Parent POM</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.5</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.5</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.5</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.5.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.5.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.5.1</url>
   </scm>
   <dependencies>
     <dependency>
@@ -50,7 +50,7 @@
   </dependencies>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <platform.tool.verification.version>1.12-SNAPSHOT</platform.tool.verification.version>
+    <platform.tool.verification.version>1.11</platform.tool.verification.version>
     <platform.tool.test.version>1.11</platform.tool.test.version>
   </properties>
   <modules>

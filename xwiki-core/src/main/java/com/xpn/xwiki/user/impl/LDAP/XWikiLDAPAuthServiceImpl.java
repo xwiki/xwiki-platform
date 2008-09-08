@@ -516,7 +516,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // flag if always sync or just on create of the user
             String syncmode = config.getLDAPParam("ldap_mode_group_sync", "", context);
 
-            if ((syncmode.equalsIgnoreCase("create") && createuser) || syncmode.equalsIgnoreCase("always")) {
+            if (!syncmode.equalsIgnoreCase("create") || createuser) {
                 syncGroupsMembership(xwikiUserName, userDN, groupMappings, ldapUtils, context);
             }
 

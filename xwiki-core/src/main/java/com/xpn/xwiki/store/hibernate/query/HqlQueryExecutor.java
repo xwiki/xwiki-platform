@@ -27,25 +27,24 @@ import org.hibernate.Session;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryExecutor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
-import org.xwiki.query.AbstractQueryManager;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryExecutor;
 import com.xpn.xwiki.util.Util;
 
 /**
- * QueryManager implementation for Hibernate Store.
+ * QueryExecutor implementation for Hibernate Store.
  * 
  * @version $Id$
  * @since 1.6M1
  */
-public class HibernateQueryManager extends AbstractQueryManager implements Initializable, QueryExecutor
+public class HqlQueryExecutor implements QueryExecutor, Initializable
 {
     /**
      * Session factory needed for register named queries mapping. Injected via component manager.
@@ -63,28 +62,11 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
     private Execution execution;
 
     /**
-     * Default constructor.
-     */
-    public HibernateQueryManager()
-    {
-        this.languages.add(Query.HQL);
-    }
-
-    /**
      * {@inheritDoc}
      */
     public void initialize() throws InitializationException
     {
         this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream(this.mappingPath));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected QueryExecutor getExecutor(String language)
-    {
-        return this;
     }
 
     /**

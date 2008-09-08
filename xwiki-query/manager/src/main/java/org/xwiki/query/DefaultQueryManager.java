@@ -20,28 +20,36 @@
 package org.xwiki.query;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * This is abstract QueryManager implementation.
+ * This is default QueryManager implementation.
+ * Languages are added via injecting {@link QueryExecutor} components with hint=language to {@link DefaultQueryManager#executors} field.
  * 
  * @version $Id$
  * @since 1.6M1
  */
-public abstract class AbstractQueryManager implements QueryManager
+public class DefaultQueryManager implements QueryManager
 {
     /**
-     * Field for supported languages.
+     * Map from query language to its QueryExecutor.
+     * injected.
      */
-    protected Set<String> languages = new HashSet<String>();
+    private Map<String, QueryExecutor> executors;
+
+    /**
+     * QueryExecutor for named queries.
+     * injected.
+     */
+    private QueryExecutor namedQueryExecutor;
 
     /**
      * {@inheritDoc}
      */
     public Set<String> getLanguages()
     {
-        return Collections.unmodifiableSet(this.languages);
+        return Collections.unmodifiableSet(this.executors.keySet());
     }
 
     /**
@@ -69,12 +77,23 @@ public abstract class AbstractQueryManager implements QueryManager
      */
     public Query getNamedQuery(String queryName) throws QueryException
     {
-        return new DefaultQuery(queryName, getExecutor(null));
+        return new DefaultQuery(queryName, getNamedQueryExecutor());
     }
 
     /**
      * @param language query language
-     * @return QueryExecutor for this language
+     * @return {@link QueryExecutor} for this language
      */
-    protected abstract QueryExecutor getExecutor(String language);
+    protected QueryExecutor getExecutor(String language)
+    {
+        return this.executors.get(language);
+    }
+
+    /**
+     * @return {@link QueryExecutor} for named queries.
+     */
+    protected QueryExecutor getNamedQueryExecutor()
+    {
+        return namedQueryExecutor;
+    }
 }

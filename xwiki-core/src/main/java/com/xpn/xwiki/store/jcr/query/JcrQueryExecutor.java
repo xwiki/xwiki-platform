@@ -21,7 +21,6 @@ package com.xpn.xwiki.store.jcr.query;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Map.Entry;
 
@@ -33,23 +32,22 @@ import javax.jcr.query.RowIterator;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.context.Execution;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryExecutor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.jcr.JcrUtil;
 import com.xpn.xwiki.store.jcr.XWikiJcrSession;
 import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import com.xpn.xwiki.store.jcr.XWikiJcrBaseStore.JcrCallBack;
-import org.xwiki.query.AbstractQueryManager;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryExecutor;
 
 /**
  * QueryManager implementation for Java Content Repository v1.0.
  * @version $Id$
  * @since 1.6M1
  */
-public class JcrQueryManager extends AbstractQueryManager implements QueryExecutor
+public class JcrQueryExecutor implements QueryExecutor
 {
     /**
      * Used for get named queries.
@@ -82,27 +80,6 @@ public class JcrQueryManager extends AbstractQueryManager implements QueryExecut
     protected XWikiContext getContext()
     {
         return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-    }
-
-    /**
-     * Default constructor.
-     */
-    public JcrQueryManager()
-    {
-        languages.add(Query.XPATH);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Query getNamedQuery(String queryName) throws QueryException
-    {
-        try {
-            String statement = this.queriesBundle.getString(queryName);
-            return createQuery(statement, Query.XPATH);
-        } catch (MissingResourceException e) {
-            throw new QueryException("Cannot find the query with name = ["+queryName+"]", null, e);
-        }
     }
 
     /**
@@ -156,6 +133,10 @@ public class JcrQueryManager extends AbstractQueryManager implements QueryExecut
      * @return clear query statement without parameters
      */
     protected String createNativeStatement(Query query) {
+        String statement = query.getStatement();
+        if (query.isNamed()) {
+            statement = this.queriesBundle.getString(statement);
+        }
         int n = query.getNamedParameters().size();
         String[] vars = new String[n];
         String[] vals = new String[n];
@@ -165,7 +146,7 @@ public class JcrQueryManager extends AbstractQueryManager implements QueryExecut
             vals[count] = getValueAsString(e.getValue());
             ++count;
         }
-        return StringUtils.replaceEach(query.getStatement(), vars, vals);
+        return StringUtils.replaceEach(statement, vars, vals);
     }
 
     protected String getValueAsString(Object val) {
@@ -175,11 +156,5 @@ public class JcrQueryManager extends AbstractQueryManager implements QueryExecut
     protected javax.jcr.query.Query createQuery(Query query, Session session) throws RepositoryException
     {
         return session.getWorkspace().getQueryManager().createQuery(createNativeStatement(query), query.getLanguage());
-    }
-
-    @Override
-    protected QueryExecutor getExecutor(String language)
-    {
-        return this;
     }
 }

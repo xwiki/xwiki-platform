@@ -41,7 +41,23 @@
     </component>
     <component>
       <role>org.xwiki.query.QueryManager</role>
-      <implementation>com.xpn.xwiki.store.hibernate.query.HibernateQueryManager</implementation>
+      <implementation>org.xwiki.query.DefaultQueryManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.query.QueryExecutor</role>
+          <field-name>executors</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.query.QueryExecutor</role>
+          <role-hint>hql</role-hint>
+          <field-name>namedQueryExecutor</field-name>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.query.QueryExecutor</role>
+      <role-hint>hql</role-hint>
+      <implementation>com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</implementation>
       <requirements>
         <requirement>
           <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>

@@ -69,7 +69,7 @@
     </dependency>
   </dependencies>
   <!-- build>
-    <plugin --s>
+    <plugins -->
       <!-- We need to generate the source JAR as it'll be needed by the GWT module that depends
            on this as the GWT compiler needs the sources to generate the JS files -->
       <!-- plugin>

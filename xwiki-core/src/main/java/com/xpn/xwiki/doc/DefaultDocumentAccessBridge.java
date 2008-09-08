@@ -140,7 +140,11 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         PropertyClass pc = xcontext.getWiki().getPropertyClassFromName(className+"_"+propertyName, xcontext);
-        return pc.newProperty().getClass().getName();
+        if (pc == null) {
+            return null;
+        } else {
+            return pc.newProperty().getClass().getName();
+        }
     }
 
     /**

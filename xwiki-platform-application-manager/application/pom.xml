@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-application-application-manager</artifactId>
   <name>XWiki Platform - Applications - Application Manager</name>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.5-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Manages creation and installation of XWiki Applications</description>
   <properties>

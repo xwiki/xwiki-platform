@@ -1,5 +1,5 @@
 This is simple Java Persistance Query Language (JPQL, part of EJB3 standard)
-parser, based on SableCC[1].
+parser with XWQL additions, based on SableCC[1].
 
 Support almost full features of select statement.
 Missed: enums, separation of fields types (collection, single valued, etc.

@@ -26,14 +26,14 @@ public class JPQLParserTest extends TestCase
 
     public void testObjectInWhere() throws Exception
     {
-        parser.parse("select doc from Document as doc where doc.object('XWiki.Test').some=1");
-        parser.parse("select doc from Document as doc where doc.object(XWiki.Test).some=1");
+        parser.parse("select doc from Document as doc where doc.object('XWiki.Test').prop=1");
+        parser.parse("select doc from Document as doc where doc.object(XWiki.Test).prop=1");
     }
 
     public void testOrderBy() throws Exception
     {
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number");
-        // TODO:
-        //parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number desc");
+        parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number desc");
+        parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number asc");
     }
 }

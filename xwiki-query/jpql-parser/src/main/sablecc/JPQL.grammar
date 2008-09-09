@@ -117,8 +117,7 @@ Tokens
     integer_literal = digit+;
     float_literal = digit+ '.' digit* ('e' ('+' | '-')? digit+)?;
     string_literal = sstring | dstring;
-
-    id = letter idtail*;
+    
     input_parameter = colon idtail+;
 
     aggregate_func = avg | max | min | sum;
@@ -129,6 +128,8 @@ Tokens
     mul_div = '*' | '/';
     functions_returning_datetime = current_date | current_time | current_timestamp;
     trim_specification = leading | trailing | both;
+
+    id = letter idtail*;
 
 Ignored Tokens
     white;

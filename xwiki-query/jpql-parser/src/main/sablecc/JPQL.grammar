@@ -1,0 +1,397 @@
+/*
+ * JPQL grammar with XWQL extensions for SableCC.
+ * Select statement.
+ * @version $Id$
+ */
+Package org.xwiki.query.jpql;
+
+Helpers
+    white = ' ' | '\t' | '\n' | '\r';
+    letter = ['A'..'Z'] | ['a'..'z'];
+    digit = ['0'..'9'];
+    anychar = [0..0xffff];
+    idtail = letter | digit | '_' | '.';
+    colon = ':';
+    squote = ''';
+    dquote = '"';
+    sstring = squote [anychar - squote]* squote;
+    dstring = dquote [anychar - dquote]* dquote;
+
+    // for case insensitive tokens
+    a = ['a' + 'A'];
+    b = ['b' + 'B'];
+    c = ['c' + 'C'];
+    d = ['d' + 'D'];
+    e = ['e' + 'E'];
+    f = ['f' + 'F'];
+    g = ['g' + 'G'];
+    h = ['h' + 'H'];
+    i = ['i' + 'I'];
+    j = ['j' + 'J'];
+    k = ['k' + 'K'];
+    l = ['l' + 'L'];
+    m = ['m' + 'M'];
+    n = ['n' + 'N'];
+    o = ['o' + 'O'];
+    p = ['p' + 'P'];
+    q = ['q' + 'Q'];
+    r = ['r' + 'R'];
+    s = ['s' + 'S'];
+    t = ['t' + 'T'];
+    u = ['u' + 'U'];
+    v = ['v' + 'V'];
+    w = ['w' + 'W'];
+    x = ['x' + 'X'];
+    y = ['y' + 'Y'];
+    z = ['z' + 'Z'];
+
+    // keywords
+    current_date = c u r r e n t '_' d a t e;
+    current_time = c u r r e n t '_' t i m e;
+    current_timestamp = c u r r e n t '_' t i m e s t a m p;
+    true = t r u e;
+    false = f a l s e;
+    avg = a v g;
+    max = m a x;
+    min = m i n;
+    sum = s u m;
+    asc = a s c;
+    desc = d e s c;
+    all = a l l;
+    any = a n y;
+    some = s o m e;
+    leading = l e a d i n g;
+    trailing = t r a i l i n g;
+    both = b o t h;
+
+Tokens
+    white = white+;
+    comma = ',';    
+    lbr = '(';
+    rbr = ')';
+    dot = '.';
+
+    // keywords
+    abs = a b s;
+    and = a n d;
+    as = a s;
+    between = b e t w e e n;
+    by = b y;
+    concat = c o n c a t;
+    count = c o u n t;
+    distinct = d i s t i n c t;
+    empty = e m p t y;
+    escape = e s c a p e;
+    exists = e x i s t s;
+    fetch = f e t c h;
+    from = f r o m;
+    group = g r o u p;
+    having = h a v i n g;
+    in = i n;
+    inner = i n n e r;
+    is = i s;
+    t_join = j o i n;
+    left = l e f t;
+    length = l e n g t h;
+    like = l i k e;
+    locate = l o c a t e;
+    lower = l o w e r;
+    member = m e m b e r;
+    mod = m o d;
+    not = n o t;
+    null = n u l l;
+    of = o f;
+    or = o r;
+    object = o b j e c t;
+    order = o r d e r;
+    outer = o u t e r;
+    select = s e l e c t;
+    size = s i z e;
+    sqrt = s q r t;
+    substring = s u b s t r i n g;
+    trim = t r i m;
+    upper = u p p e r;
+    where = w h e r e;
+
+    boolean_literal = true | false;
+    integer_literal = digit+;
+    float_literal = digit+ '.' digit* ('e' ('+' | '-')? digit+)?;
+    string_literal = sstring | dstring;
+
+    id = letter idtail*;
+    input_parameter = colon idtail+;
+
+    aggregate_func = avg | max | min | sum;
+    orderby_spec = asc | desc;
+    all_any_some = all | any | some;
+    comparison_operator = '=' | '>' | '>=' | '<' | '<=' | '<>';
+    add_sub = '+' | '-';
+    mul_div = '*' | '/';
+    functions_returning_datetime = current_date | current_time | current_timestamp;
+    trim_specification = leading | trailing | both;
+
+Ignored Tokens
+    white;
+
+Productions
+
+statement =
+    select_statement;
+
+select_statement = 
+    select_clause from_clause where_clause? groupby_clause? having_clause? orderby_clause?;
+
+from_clause =
+    from from_list;
+
+from_list =
+    {single} identification_variable_declaration |
+    identification_variable_declaration comma from_list |
+    {member} collection_member_declaration comma from_list;
+
+identification_variable_declaration =
+    range_variable_declaration join*;
+
+range_variable_declaration =
+    abstract_schema_name as? variable;
+
+join =
+    join_spec? t_join path as? variable |
+    {fetch} join_spec? t_join fetch path;
+
+join_spec =
+    {left} left outer? |
+    {inner} inner;
+
+collection_member_declaration =
+    in lbr path rbr as? variable;
+
+select_clause =
+    select distinct? select_list;
+
+select_list =
+    {single} select_expression |
+    select_expression comma select_list;
+
+select_expression =
+    {path} path |
+    {agr} aggregate_expression |
+    {object} object lbr path rbr;
+
+aggregate_expression =
+    {func} aggregate_func lbr distinct? path rbr |
+    {count} count lbr distinct? count_arg rbr;
+
+count_arg =
+    {path} path;
+
+where_clause =
+    where conditional_expression;
+
+groupby_clause =
+    group by groupby_list;
+
+groupby_list =
+    {single} groupby_item |
+    groupby_list comma groupby_item;
+
+groupby_item =
+    path;
+
+having_clause =
+    having conditional_expression;
+
+orderby_clause =
+    order by orderby_list;
+
+orderby_list =
+    {single} orderby_item |
+    orderby_item comma orderby_list;
+
+orderby_item =
+    path orderby_spec?;
+
+subquery =
+    simple_select_clause subquery_from_clause where_clause? groupby_clause? having_clause?;
+
+subquery_from_clause =
+    from subselect_from_list;
+
+subselect_from_list =
+    {single} subselect_identification_variable_declaration |
+    subselect_identification_variable_declaration comma subselect_from_list;
+
+subselect_identification_variable_declaration =
+    {path} path |
+    {as} path as? variable |
+    {member} collection_member_declaration;
+
+simple_select_clause =
+    select distinct? simple_select_expression;
+
+simple_select_expression =
+    {path} path |
+    {agr} aggregate_expression;
+
+conditional_expression =
+    {single} conditional_term |
+    conditional_expression or conditional_term;
+
+conditional_term =
+    {single} conditional_factor |
+    conditional_term and conditional_factor;
+
+conditional_factor =
+    not? conditional_primary;
+
+conditional_primary =
+    simple_cond_expression |
+    {br} lbr conditional_expression rbr;
+
+simple_cond_expression =
+    arithmetic_expression  simple_conditional_expression_remainder;
+
+simple_conditional_expression_remainder =
+    {cmp} comparison_expression |
+    {not} not? condition_with_not_expression |
+    {is} is not? is_expression;
+
+condition_with_not_expression =
+    {between} between_expression |
+    {like} like_expression |
+    {in} in_expression |
+    {member} collection_member_expression;
+
+between_expression =
+    between [a]:arithmetic_expression and [b]:arithmetic_expression;
+
+is_expression =
+    {null} null_comparison_expression |
+    {empty} empty_collection_comparison_expression;
+
+in_expression =
+    in lbr in_list rbr;
+
+in_list =
+    {single} in_item |
+    in_item comma in_list |
+    {subquery} subquery;
+
+in_item =
+    {lit} literal |
+    {param} input_parameter;
+
+like_expression =
+    not? like pattern_value escape_spec?;
+
+escape_spec =
+    escape escape_character;
+
+null_comparison_expression =
+    null;
+
+empty_collection_comparison_expression =
+    empty;
+
+collection_member_expression =
+    member of? path;
+
+exists_expression =
+    exists lbr subquery rbr;
+
+comparison_expression =
+    comparison_operator comparison_expression_right_operand;
+
+comparison_expression_right_operand =
+    {math} arithmetic_expression |
+    {aas} allany_expression;
+
+allany_expression =
+    all_any_some lbr subquery rbr;
+
+arithmetic_expression =
+    simple_arithmetic_expression |
+    {subquery} lbr subquery rbr;
+
+simple_arithmetic_expression =
+    {single} arithmetic_term |
+    arithmetic_term add_sub simple_arithmetic_expression;
+
+arithmetic_term =
+    {single} arithmetic_factor |
+    arithmetic_term  mul_div  arithmetic_factor;
+
+arithmetic_factor =
+    [sign]:add_sub? arithmetic_primary;
+
+arithmetic_primary =
+    {agr} aggregate_expression |
+    {path} path |
+    {funcnum} functions_returning_numerics |
+    {functime} functions_returning_datetime |
+    {funcstr} functions_returning_strings |
+    {param} input_parameter |
+    {constant} literal |
+    {br} lbr simple_arithmetic_expression rbr;
+
+functions_returning_numerics =
+    {length} length lbr string_primary rbr |
+    {locate} locate lbr [what]:string_primary comma [where]:string_primary start_spec? rbr |
+    {abs} abs lbr simple_arithmetic_expression rbr |
+    {sqrt} sqrt lbr simple_arithmetic_expression rbr |
+    {mod} mod lbr [dividend]:simple_arithmetic_expression comma [divisor]:simple_arithmetic_expression rbr |
+    {size} size lbr path rbr;
+
+string_primary =
+    {const} string_literal |
+    {func} functions_returning_strings |
+    {param} input_parameter |
+    {path} path;
+
+start_spec =
+    comma [start]:simple_arithmetic_expression;
+
+functions_returning_strings =
+    {concat} concat lbr [s1]:string_primary comma [s2]:string_primary rbr |
+    {substring} substring lbr string_primary [c1]:comma [start]:simple_arithmetic_expression [c2]:comma [length]:simple_arithmetic_expression rbr |
+    {trim} trim lbr trim_desc? string_primary rbr |
+    {lower} lower lbr string_primary rbr |
+    {upper} upper lbr string_primary rbr;
+
+trim_desc = trim_specification? trim_character? from;
+
+abstract_schema_name =
+    id |
+    {x} x_object_decl;
+
+x_object_decl =
+	id  lbr x_class_name rbr;
+
+x_class_name =
+	id |
+	{quoted} string_literal;
+
+variable =
+    id;
+
+path =
+    id |
+    {x} x_object_decl dot [property]:id;
+
+literal =
+    {num} numeric_literal |
+    {bool} boolean_literal |
+    {str} string_literal;
+
+numeric_literal =
+    {integer} integer_literal |
+    {float} float_literal;
+
+pattern_value =
+    string_literal;
+
+escape_character =
+    string_literal;
+
+trim_character =
+    string_literal;

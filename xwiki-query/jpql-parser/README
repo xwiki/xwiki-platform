@@ -1,0 +1,27 @@
+This is simple Java Persistance Query Language (JPQL, part of EJB3 standard)
+parser, based on SableCC[1].
+
+Support almost full features of select statement.
+Missed: enums, separation of fields types (collection, single valued, etc.
+ All fields considered as paths).
+
+Parser is useful for preprocess JPQL queries for some manipulations.
+Without dependencies.
+Any other JPQL parser for the moment is specialized, hard to use 
+outside its product or cannot used for preprocessing.
+
+SableCC provides good auto generated parse model (node package) 
+with visitor pattern support (analysis package) and toString.
+
+JPQL grammar based on JPA2[2] specification EBNF plus part of 
+eclipselink antlr grammar[3] for resolve ambiguity (expression rules) 
+
+Don't forget to add target/generated-sources/sablecc to build path, 
+if you use IDE for this project (or want to build project without maven2).
+
+Links:
+ [1] http://sablecc.org 
+ [2] http://jcp.org/en/jsr/detail?id=317
+ [3] http://fisheye2.atlassian.com/browse/eclipselink/trunk/foundation/org.eclipse.persistence.core/resource/org/eclipse/persistence/internal/jpa/parsing/jpql/antlr/JPQL.g
+
+@version $Id$

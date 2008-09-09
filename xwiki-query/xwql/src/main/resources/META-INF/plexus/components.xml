@@ -1,0 +1,25 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.xwiki.query.xwql.QueryTranslator</role>
+      <role-hint>hql</role-hint>
+      <implementation>org.xwiki.query.xwql.hql.XWQLtoHQLTranslator</implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.query.QueryExecutor</role>
+      <role-hint>xwql</role-hint>
+      <implementation>org.xwiki.query.xwql.XWQLQueryExecutor</implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.query.xwql.QueryTranslator</role>
+          <role-hint>hql</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

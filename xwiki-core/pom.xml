@@ -596,6 +596,12 @@
       <artifactId>xwiki-core-query-manager</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-query-xwql</artifactId>
+      <version>${pom.version}</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->

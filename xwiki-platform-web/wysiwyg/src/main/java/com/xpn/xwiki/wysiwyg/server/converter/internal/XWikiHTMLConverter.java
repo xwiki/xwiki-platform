@@ -31,7 +31,7 @@ import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRendererType;
-import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
+import org.xwiki.rendering.renderer.WysiwygEditorXHTMLRenderer;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.web.Utils;

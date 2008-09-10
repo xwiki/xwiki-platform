@@ -30,10 +30,10 @@ import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -54,8 +54,7 @@ public class WikiManagerTest extends MockObjectTestCase
 
     private Mock mockXWikiVersioningStore;
 
-    private Map<String, Map<String, XWikiDocument>> databases =
-        new HashMap<String, Map<String, XWikiDocument>>();
+    private Map<String, Map<String, XWikiDocument>> databases = new HashMap<String, Map<String, XWikiDocument>>();
 
     private static final String WIKI_NAME = "xwiki";
 
@@ -65,13 +64,15 @@ public class WikiManagerTest extends MockObjectTestCase
     protected void setUp() throws Exception
     {
         this.context = new XWikiContext();
-        this.xwiki = new XWiki(new XWikiConfig(), this.context);
+        this.xwiki = new XWiki();
+        this.xwiki.setNotificationManager(new XWikiNotificationManager());
+        this.context.setWiki(this.xwiki);
 
-        databases.put(WIKI_NAME, new HashMap<String, XWikiDocument>());
+        this.databases.put(WIKI_NAME, new HashMap<String, XWikiDocument>());
 
         this.mockXWikiStore =
-            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
-                new Object[] {this.xwiki, this.context});
+            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
+            this.context});
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
@@ -87,8 +88,7 @@ public class WikiManagerTest extends MockObjectTestCase
 
                     if (!databases.containsKey(database))
                         throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_UNKNOWN, "Database " + database
-                                + " does not exists.");
+                            XWikiException.ERROR_XWIKI_UNKNOWN, "Database " + database + " does not exists.");
 
                     Map<String, XWikiDocument> docs = databases.get(database);
 
@@ -114,8 +114,7 @@ public class WikiManagerTest extends MockObjectTestCase
 
                     if (!databases.containsKey(database))
                         throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_UNKNOWN, "Database " + database
-                                + " does not exists.");
+                            XWikiException.ERROR_XWIKI_UNKNOWN, "Database " + database + " does not exists.");
 
                     Map<String, XWikiDocument> docs = databases.get(database);
 
@@ -137,36 +136,25 @@ public class WikiManagerTest extends MockObjectTestCase
 
                     if (databases.containsKey(wikiName))
                         throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE,
-                            "Database " + wikiName + " already exists.");
+                            XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE, "Database " + wikiName
+                                + " already exists.");
 
                     databases.put(wikiName, new HashMap<String, XWikiDocument>());
 
                     return null;
                 }
             });
-        /*
-         * this.mockXWikiStore.stubs().method("deleteWiki").will( new CustomStub("Implements
-         * XWikiStoreInterface.deleteWiki") { public Object invoke(Invocation invocation) throws
-         * Throwable { String wikiName = (String) invocation.parameterValues.get(0); if
-         * (!databases.containsKey(wikiName)) throw new
-         * XWikiException(XWikiException.MODULE_XWIKI_STORE,
-         * XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETE_DATABASE, "Database " + wikiName + "
-         * does not exists."); databases.remove(wikiName); return null; } });
-         */
-        this.mockXWikiStore.stubs().method("getTranslationList").will(
-            returnValue(Collections.EMPTY_LIST));
+
+        this.mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
 
         this.mockXWikiVersioningStore =
-            mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class,
-            XWikiContext.class}, new Object[] {this.xwiki, this.context});
-        this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
-            returnValue(null));
+            mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
+            this.xwiki, this.context});
+        this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
         this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
 
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
-            .proxy());
+        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore.proxy());
     }
 
     // ///////////////////////////////////////////////////////////////////////////////////////:
@@ -202,8 +190,7 @@ public class WikiManagerTest extends MockObjectTestCase
 
         // ///
 
-        XWikiDocument doc =
-            WikiManager.getInstance().getDocument(TARGET_WIKI_NAME, DOCFULLNAME, context);
+        XWikiDocument doc = WikiManager.getInstance().getDocument(TARGET_WIKI_NAME, DOCFULLNAME, context);
 
         assertFalse(doc.isNew());
         assertEquals(WIKI_NAME, context.getDatabase());

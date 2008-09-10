@@ -37,10 +37,12 @@
     <!-- store components -->
     <component>
       <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
+      <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</implementation>
     </component>
     <component>
       <role>org.xwiki.query.QueryManager</role>
+      <role-hint>default</role-hint>
       <implementation>org.xwiki.query.DefaultQueryManager</implementation>
       <requirements>
         <requirement>
@@ -69,6 +71,7 @@
     </component>
     <component>
       <role>com.xpn.xwiki.store.XWikiStoreInterface</role>
+      <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.store.XWikiHibernateStore</implementation>
       <requirements>
         <requirement>
@@ -81,6 +84,7 @@
     </component>
     <component>
       <role>com.xpn.xwiki.store.XWikiVersioningStoreInterface</role>
+      <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.store.XWikiHibernateVersioningStore</implementation>
       <requirements>
         <requirement>
@@ -90,6 +94,7 @@
     </component>
     <component>
       <role>com.xpn.xwiki.store.XWikiAttachmentStoreInterface</role>
+      <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.store.XWikiHibernateAttachmentStore</implementation>
       <requirements>
         <requirement>
@@ -99,6 +104,7 @@
     </component>
     <component>
       <role>com.xpn.xwiki.store.AttachmentVersioningStore</role>
+      <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore</implementation>
       <requirements>
         <requirement>
@@ -122,6 +128,7 @@
     </component>
     <component>
       <role>com.xpn.xwiki.store.AttachmentRecycleBinStore</role>
+      <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore</implementation>
       <requirements>
         <requirement>

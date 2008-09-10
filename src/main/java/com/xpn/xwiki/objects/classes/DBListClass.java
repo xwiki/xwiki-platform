@@ -444,6 +444,14 @@ public class DBListClass extends ListClass
         String firstCol = returnCol(sql, true);
         String secondCol = returnCol(sql, false);
 
+        int i1 = sql.lastIndexOf("order by");
+        if (i1!=-1)
+         sql = sql.substring(0, i1);
+
+        int i1 = sql.lastIndexOf("order by");
+        if (i1!=-1)
+         sql = sql.substring(0, i1);
+
         String newsql = sql.substring(0, sql.indexOf(firstCol));
         newsql += secondCol + " ";
         newsql += sql.substring(sql.indexOf("from"));

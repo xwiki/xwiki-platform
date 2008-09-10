@@ -41,7 +41,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * Top level elements.
      */
-    private enum Element {
+    private enum Element
+    {
         DOCUMENT, PARAGRAPH, HORIZONTALLINE, LIST, MACRO, SECTION, DEFINITIONLIST, QUOTATION
     }
 
@@ -50,7 +51,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     private boolean needsNewLine = false;
 
     private Element currentElement;
-    
+
     private boolean isInsideMacroMarker = false;
 
     private boolean isBeginListItemFound = false;
@@ -70,7 +71,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     private int definitionListDepth = 0;
 
     private int quotationDepth = 0;
-    
+
     private XWikiMacroPrinter macroPrinter;
 
     public XWikiSyntaxRenderer(WikiPrinter printer)
@@ -81,6 +82,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#beginDocument()
      */
     public void beginDocument()
@@ -90,7 +92,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.PrintRenderer#endDocument() 
+     * 
+     * @see org.xwiki.rendering.renderer.PrintRenderer#endDocument()
      */
     public void endDocument()
     {
@@ -99,6 +102,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#onLink(org.xwiki.rendering.listener.Link)
      */
     public void onLink(Link link)
@@ -130,13 +134,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Renderer#beginFormat(org.xwiki.rendering.listener.Format)
      */
     public void beginFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 print("**");
                 break;
@@ -163,13 +166,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Renderer#endFormat(org.xwiki.rendering.listener.Format)
      */
     public void endFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 print("**");
                 break;
@@ -196,22 +198,25 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.PrintRenderer#beginParagraph(java.util.Map)
      */
     public void beginParagraph(Map<String, String> parameters)
     {
         if ((this.currentElement != Element.DOCUMENT) && (this.currentElement != Element.HORIZONTALLINE)
-            && (this.currentElement != Element.MACRO) && (this.currentElement != Element.SECTION))
-        {
+            && (this.currentElement != Element.MACRO) && (this.currentElement != Element.SECTION)) {
             print("\n");
         }
-        printParameters(parameters);
+        if (!parameters.isEmpty()) {
+            printParameters(parameters);
+        }
 
         this.currentElement = Element.PARAGRAPH;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.PrintRenderer#endParagraph(java.util.Map)
      */
     public void endParagraph(Map<String, String> parameters)
@@ -221,6 +226,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.PrintRenderer#onLineBreak()
      */
     public void onLineBreak()
@@ -230,6 +236,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.PrintRenderer#onNewLine()
      */
     public void onNewLine()
@@ -239,6 +246,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#onInlineMacro(String, java.util.Map, String)
      */
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
@@ -248,14 +256,14 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#onStandaloneMacro(String, java.util.Map, String)
      */
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
         if ((this.currentElement != Element.DOCUMENT)
-            // Don't print a new line since the paragraph already adds a new line by default after itself
-            && (this.currentElement != Element.PARAGRAPH))
-        {
+        // Don't print a new line since the paragraph already adds a new line by default after itself
+            && (this.currentElement != Element.PARAGRAPH)) {
             print("\n");
         }
         print(this.macroPrinter.print(name, parameters, content));
@@ -264,6 +272,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#beginSection(org.xwiki.rendering.listener.SectionLevel)
      */
     public void beginSection(SectionLevel level)
@@ -296,6 +305,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#endSection(org.xwiki.rendering.listener.SectionLevel)
      */
     public void endSection(SectionLevel level)
@@ -305,6 +315,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#onWord(String)
      */
     public void onWord(String word)
@@ -314,6 +325,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.PrintRenderer#onSpace()
      */
     public void onSpace()
@@ -323,6 +335,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#onSpecialSymbol(String)
      */
     public void onSpecialSymbol(String symbol)
@@ -332,6 +345,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#onEscape(String)
      */
     public void onEscape(String escapedString)
@@ -343,7 +357,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see PrintRenderer#beginList(org.xwiki.rendering.listener.ListType, java.util.Map) 
+     * 
+     * @see PrintRenderer#beginList(org.xwiki.rendering.listener.ListType, java.util.Map)
      */
     public void beginList(ListType listType, Map<String, String> parameters)
     {
@@ -357,7 +372,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         } else {
             this.listStyle.append("1");
         }
-        printParameters(parameters);
+        if (!parameters.isEmpty()) {
+            printParameters(parameters);
+        }
 
         this.listDepth++;
         this.currentElement = Element.LIST;
@@ -365,6 +382,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.PrintRenderer#beginListItem()
      */
     public void beginListItem()
@@ -385,7 +403,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see PrintRenderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map) 
+     * 
+     * @see PrintRenderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map)
      */
     public void endList(ListType listType, Map<String, String> parameters)
     {
@@ -400,6 +419,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.PrintRenderer#endListItem()
      */
     public void endListItem()
@@ -409,6 +429,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#beginXMLElement(String, java.util.Map)
      */
     public void beginXMLElement(String name, Map<String, String> attributes)
@@ -419,6 +440,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#endXMLElement(String, java.util.Map)
      */
     public void endXMLElement(String name, Map<String, String> attributes)
@@ -429,6 +451,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#beginMacroMarker(String, java.util.Map, String)
      */
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
@@ -440,7 +463,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see PrintRenderer#endMacroMarker(String, java.util.Map, String) 
+     * 
+     * @see PrintRenderer#endMacroMarker(String, java.util.Map, String)
      */
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
@@ -450,6 +474,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see PrintRenderer#onId(String)
      */
     public void onId(String name)
@@ -459,7 +484,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine() 
+     * 
+     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine()
      */
     public void onHorizontalLine()
     {
@@ -470,6 +496,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onVerbatimInline(String)
      */
     public void onVerbatimInline(String protectedString)
@@ -479,6 +506,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onVerbatimStandalone(String)
      */
     public void onVerbatimStandalone(String protectedString)
@@ -488,6 +516,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onEmptyLines(int)
      */
     public void onEmptyLines(int count)
@@ -501,6 +530,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
      * @since 1.6M2
      */
@@ -510,7 +540,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         // - the previous element was a defintion list
         if (this.currentElement == Element.DEFINITIONLIST) {
             print("\n");
-        // - we are inside an existing list
+            // - we are inside an existing list
         } else if (this.isBeginListItemFound && !this.isEndListItemFound) {
             print("\n");
             // - we are inside an existing definition list
@@ -525,6 +555,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
      * @since 1.6M2
      */
@@ -542,6 +573,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
      * @since 1.6M2
      */
@@ -566,6 +598,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
      * @since 1.6M2
      */
@@ -590,6 +623,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
      * @since 1.6M2
      */
@@ -600,7 +634,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription() 
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
      * @since 1.6M2
      */
     public void endDefinitionDescription()
@@ -610,6 +645,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
      * @since 1.6M2
      */
@@ -619,7 +655,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             print("\n");
             this.isBeginQuotationLineFound = false;
         }
-        printParameters(parameters);
+        if (!parameters.isEmpty()) {
+            printParameters(parameters);
+        }
 
         this.quotationDepth++;
         this.currentElement = Element.QUOTATION;
@@ -627,6 +665,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
      * @since 1.6M2
      */
@@ -642,6 +681,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
      * @since 1.6M2
      */
@@ -659,7 +699,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()  
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()
      * @since 1.6M2
      */
     public void endQuotationLine()
@@ -667,6 +708,82 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         this.isEndQuotationLineFound = true;
     }
 
+    public void beginTable(Map<String, String> parameters)
+    {
+        if (!parameters.isEmpty()) {
+            printParameters(parameters);
+        }
+    }
+
+    public void beginTableCell(Map<String, String> parameters)
+    {
+        print("|");
+        if (!parameters.isEmpty()) {
+            printParameters(parameters, false);
+        }
+    }
+
+    public void beginTableHeadCell(Map<String, String> parameters)
+    {
+        print("||");
+        if (!parameters.isEmpty()) {
+            printParameters(parameters, false);
+        }
+    }
+
+    public void beginTableRow(Map<String, String> parameters)
+    {
+        if (!parameters.isEmpty()) {
+            printParameters(parameters);
+        }
+    }
+
+    public void endTable(Map<String, String> parameters)
+    {
+
+    }
+
+    public void endTableCell(Map<String, String> parameters)
+    {
+
+    }
+
+    public void endTableHeadCell(Map<String, String> parameters)
+    {
+
+    }
+
+    public void endTableRow(Map<String, String> parameters)
+    {
+        print("\n");
+    }
+
+    protected void printParameters(Map<String, String> parameters)
+    {
+        printParameters(parameters, true);
+    }
+
+    protected void printParameters(Map<String, String> parameters, boolean newLine)
+    {
+        StringBuffer buffer = new StringBuffer("(%");
+        for (String key : parameters.keySet()) {
+            buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
+        }
+        buffer.append(" %)");
+        
+        if (newLine) {
+            buffer.append("\n");
+        }
+        
+        print(buffer.toString());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractPrintRenderer#print(java.lang.String)
+     */
+    @Override
     protected void print(String text)
     {
         if (!this.isInsideMacroMarker) {
@@ -675,18 +792,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             }
             this.needsNewLine = false;
             super.print(text);
-        }
-    }
-
-    private void printParameters(Map<String, String> parameters)
-    {
-        if (!parameters.isEmpty()) {
-            StringBuffer buffer = new StringBuffer("(%");
-            for (String key: parameters.keySet()) {
-                buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
-            }
-            buffer.append(" %)\n");
-            print(buffer.toString());
         }
     }
 }

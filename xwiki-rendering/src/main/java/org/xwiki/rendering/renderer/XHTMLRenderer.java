@@ -531,6 +531,46 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         // Nothing to do
     }
+    
+    public void beginTable(Map<String, String> parameters)
+    {
+        print("<table class=\"wiki-table\"><tbody>");
+    }
+
+    public void beginTableCell(Map<String, String> parameters)
+    {
+        print("<td>");
+    }
+
+    public void beginTableHeadCell(Map<String, String> parameters)
+    {
+        print("<th>");
+    }
+
+    public void beginTableRow(Map<String, String> parameters)
+    {
+        print("<tr>");
+    }
+
+    public void endTable(Map<String, String> parameters)
+    {
+        print("</tbody></table>");
+    }
+
+    public void endTableCell(Map<String, String> parameters)
+    {
+        print("</td>");
+    }
+
+    public void endTableHeadCell(Map<String, String> parameters)
+    {
+        print("</th>");
+    }
+
+    public void endTableRow(Map<String, String> parameters)
+    {
+        print("</tr>");
+    }
 
     private StringBuffer serializeParameters(Map<String, String> parameters)
     {

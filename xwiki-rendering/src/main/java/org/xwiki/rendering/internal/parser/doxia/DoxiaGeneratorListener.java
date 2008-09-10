@@ -403,4 +403,45 @@ public class DoxiaGeneratorListener implements Listener
     {
         // TODO: Doxia doesn't seem to have support for quotation... Find out what to do...
     }
+    
+    public void beginTable(Map<String, String> parameters)
+    {
+        this.sink.table();
+        
+    }
+
+    public void beginTableCell(Map<String, String> parameters)
+    {
+        this.sink.tableCell();
+    }
+
+    public void beginTableHeadCell(Map<String, String> parameters)
+    {
+        this.sink.tableHeaderCell();
+    }
+
+    public void beginTableRow(Map<String, String> parameters)
+    {
+        this.sink.tableRow();
+    }
+
+    public void endTable(Map<String, String> parameters)
+    {
+        this.sink.table_();
+    }
+
+    public void endTableCell(Map<String, String> parameters)
+    {
+        this.sink.tableCell_();
+    }
+
+    public void endTableHeadCell(Map<String, String> parameters)
+    {
+        this.sink.tableHeaderCell_();       
+    }
+
+    public void endTableRow(Map<String, String> parameters)
+    {
+        this.sink.tableRow_();
+    }
 }

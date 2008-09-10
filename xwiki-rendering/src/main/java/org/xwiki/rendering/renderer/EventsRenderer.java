@@ -57,13 +57,12 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Listener#beginFormat(org.xwiki.rendering.listener.Format)
      */
     public void beginFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 println("beginBold");
                 break;
@@ -90,13 +89,12 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Listener#endFormat(org.xwiki.rendering.listener.Format)
      */
     public void endFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 println("endBold");
                 break;
@@ -251,7 +249,8 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine() 
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine()
      */
     public void onHorizontalLine()
     {
@@ -260,7 +259,8 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)  
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)
      */
     public void onEmptyLines(int count)
     {
@@ -269,6 +269,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
      */
     public void onVerbatimInline(String protectedString)
@@ -278,6 +279,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String)
      */
     public void onVerbatimStandalone(String protectedString)
@@ -287,6 +289,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
      * @since 1.6M2
      */
@@ -297,6 +300,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
      * @since 1.6M2
      */
@@ -307,6 +311,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
      * @since 1.6M2
      */
@@ -317,6 +322,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
      * @since 1.6M2
      */
@@ -327,6 +333,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
      * @since 1.6M2
      */
@@ -337,7 +344,8 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription() 
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
      * @since 1.6M2
      */
     public void endDefinitionDescription()
@@ -347,6 +355,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
      * @since 1.6M2
      */
@@ -357,6 +366,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
      * @since 1.6M2
      */
@@ -367,6 +377,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
      * @since 1.6M2
      */
@@ -377,12 +388,53 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()  
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()
      * @since 1.6M2
      */
     public void endQuotationLine()
     {
         println("endQuotationLine");
+    }
+
+    public void beginTable(Map<String, String> parameters)
+    {
+        println("beginTable: [" + serializeParameters(parameters) + "]");
+    }
+
+    public void beginTableCell(Map<String, String> parameters)
+    {
+        println("beginTableCell: [" + serializeParameters(parameters) + "]");
+    }
+
+    public void beginTableHeadCell(Map<String, String> parameters)
+    {
+        println("beginTableHeadCell: [" + serializeParameters(parameters) + "]");
+    }
+
+    public void beginTableRow(Map<String, String> parameters)
+    {
+        println("beginTableRow: [" + serializeParameters(parameters) + "]");
+    }
+
+    public void endTable(Map<String, String> parameters)
+    {
+        println("endTable: [" + serializeParameters(parameters) + "]");
+    }
+
+    public void endTableCell(Map<String, String> parameters)
+    {
+        println("endTableCell: [" + serializeParameters(parameters) + "]");
+    }
+
+    public void endTableHeadCell(Map<String, String> parameters)
+    {
+        println("endTableHeadCell: [" + serializeParameters(parameters) + "]");
+    }
+
+    public void endTableRow(Map<String, String> parameters)
+    {
+        println("endTableRow: [" + serializeParameters(parameters) + "]");
     }
 
     private StringBuffer toStringXMLElement(Map<String, String> attributes)
@@ -415,8 +467,9 @@ public class EventsRenderer extends AbstractPrintRenderer
     {
         StringBuffer buffer = new StringBuffer();
         if (!parameters.isEmpty()) {
-            for (String key: parameters.keySet()) {
-                buffer.append('[').append(key).append(']').append('=').append('[').append(parameters.get(key)).append(']');
+            for (String key : parameters.keySet()) {
+                buffer.append('[').append(key).append(']').append('=').append('[').append(parameters.get(key)).append(
+                    ']');
             }
         }
         return buffer.toString();

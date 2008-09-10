@@ -46,7 +46,7 @@ import org.xwiki.url.serializer.DocumentNameSerializer;
 
 /**
  * Transforms WikiModel events into XWiki Rendering events.
- *
+ * 
  * @version $Id$
  * @since 1.5M1
  */
@@ -80,6 +80,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.wikimodel.wem.IWemListener#beginDefinitionDescription()
      */
     public void beginDefinitionDescription()
@@ -89,6 +90,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.wikimodel.wem.IWemListener#beginDefinitionList(org.wikimodel.wem.WikiParameters)
      */
     public void beginDefinitionList(WikiParameters params)
@@ -161,17 +163,17 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginTable(WikiParameters params)
     {
-        System.out.println("beginTable(" + params + ") (not handled yet)");
+        this.stack.push(this.marker);
     }
 
     public void beginTableCell(boolean tableHead, WikiParameters params)
     {
-        System.out.println("beginTableCell(" + tableHead + ", " + params + ") (not handled yet)");
+        this.stack.push(this.marker);
     }
 
     public void beginTableRow(WikiParameters params)
     {
-        System.out.println("beginTableRow(" + params + ") (not handled yet)");
+        this.stack.push(this.marker);
     }
 
     public void endDefinitionDescription()
@@ -273,29 +275,34 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endTable(WikiParameters params)
     {
-        System.out.println("endTable(" + params + ") (not handled yet)");
+        this.stack.push(new TableBlock(generateListFromStack(), convertParameters(params)));
     }
 
     public void endTableCell(boolean tableHead, WikiParameters params)
     {
-        System.out.println("endTableCell(" + tableHead + ", " + params + ") (not handled yet)");
+        if (tableHead) {
+            this.stack.push(new TableHeadCellBlock(generateListFromStack(), convertParameters(params)));
+        } else {
+            this.stack.push(new TableCellBlock(generateListFromStack(), convertParameters(params)));
+        }
     }
 
     public void endTableRow(WikiParameters params)
     {
-        System.out.println("endTableRow(" + params + ") (not handled yet)");
+        this.stack.push(new TableRowBlock(generateListFromStack(), convertParameters(params)));
     }
 
     /**
-     * Called by wikimodel when there are 2 or more empty lines between blocks. For example the following will
-     * generate a call to <code>onEmptyLines(2)</code>:
+     * Called by wikimodel when there are 2 or more empty lines between blocks. For example the following will generate
+     * a call to <code>onEmptyLines(2)</code>:
+     * <p>
      * <code><pre>
      * {{macro/}}
      * ... empty line 1...
      * ... empty line 2...
      * {{macro/}}
-     * </pre></code
-     *
+     * </pre></code>
+     * 
      * @param count the number of empty lines separating the two blocks
      */
     public void onEmptyLines(int count)
@@ -320,7 +327,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.wikimodel.wem.IWemListener#onHorizontalLine()
      */
     public void onHorizontalLine()
@@ -337,14 +344,14 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * A macro block was found and it's separated at least by one new line from the next block. If there's no
-     * new line with the next block then wikimodel calls
-     * {@link #onMacroInline(String, org.wikimodel.wem.WikiParameters, String)} instead.
-     * </p>
+     * A macro block was found and it's separated at least by one new line from the next block. If there's no new line
+     * with the next block then wikimodel calls {@link #onMacroInline(String, org.wikimodel.wem.WikiParameters, String)}
+     * instead.
+     * <p>
      * In wikimodel block elements can be:
      * <ul>
-     *   <li>at the very beginning  of the document (no "\n")</li>
-     *   <li>just after at least one "\n"</li>
+     * <li>at the very beginning of the document (no "\n")</li>
+     * <li>just after at least one "\n"</li>
      * </ul>
      */
     public void onMacroBlock(String macroName, WikiParameters params, String content)
@@ -369,8 +376,8 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * Called when WikiModel finds an reference such as a URI located directly in the text, as opposed to a link
-     * inside wiki link syntax delimiters.
+     * Called when WikiModel finds an reference such as a URI located directly in the text, as opposed to a link inside
+     * wiki link syntax delimiters.
      */
     public void onReference(String ref)
     {
@@ -388,7 +395,8 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     * @see org.wikimodel.wem.IWemListener#onReference(String) 
+     * 
+     * @see org.wikimodel.wem.IWemListener#onReference(String)
      */
     public void onReference(WikiReference ref)
     {
@@ -435,6 +443,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.wikimodel.wem.IWemListener#onSpace(String)
      */
     public void onSpace(String str)
@@ -444,7 +453,8 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     * @see org.wikimodel.wem.IWemListener#onSpecialSymbol(String)  
+     * 
+     * @see org.wikimodel.wem.IWemListener#onSpecialSymbol(String)
      */
     public void onSpecialSymbol(String symbol)
     {
@@ -453,6 +463,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.wikimodel.wem.IWemListener#onTableCaption(String)
      */
     public void onTableCaption(String str)
@@ -462,7 +473,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.wikimodel.wem.IWemListener#onVerbatimBlock(String)
      */
     public void onVerbatimBlock(String protectedString)
@@ -472,8 +483,8 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.wikimodel.wem.IWemListener#onVerbatimInline(String) 
+     * 
+     * @see org.wikimodel.wem.IWemListener#onVerbatimInline(String)
      */
     public void onVerbatimInline(String protectedString)
     {
@@ -482,8 +493,8 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.wikimodel.wem.IWemListener#onWord(String) 
+     * 
+     * @see org.wikimodel.wem.IWemListener#onWord(String)
      */
     public void onWord(String str)
     {
@@ -507,7 +518,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * Convert Wikimodel parameters to XWiki parameters format.
-     *
+     * 
      * @param params the wikimodel parameters to convert
      * @return the parameters in XWiki format
      */

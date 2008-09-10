@@ -120,6 +120,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("quote/quote1", false);
         suite.addTestsFromResource("quote/quote2", false);
         suite.addTestsFromResource("quote/quote3", false);
+        suite.addTestsFromResource("table/table1", false);
 
         return new PlexusTestSetup(suite);
     }

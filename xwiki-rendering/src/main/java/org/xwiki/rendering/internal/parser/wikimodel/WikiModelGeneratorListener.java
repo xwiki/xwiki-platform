@@ -63,13 +63,12 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Listener#beginFormat(org.xwiki.rendering.listener.Format)
      */
     public void beginFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRONG));
                 break;
@@ -88,13 +87,12 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Listener#endFormat(org.xwiki.rendering.listener.Format)
      */
     public void endFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG));
                 break;
@@ -229,7 +227,8 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine() 
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine()
      */
     public void onHorizontalLine()
     {
@@ -238,6 +237,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)
      */
     public void onEmptyLines(int count)
@@ -247,6 +247,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
      */
     public void onVerbatimInline(String protectedString)
@@ -256,6 +257,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String)
      */
     public void onVerbatimStandalone(String protectedString)
@@ -265,6 +267,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
      * @since 1.6M2
      */
@@ -275,6 +278,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
      * @since 1.6M2
      */
@@ -285,6 +289,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
      * @since 1.6M2
      */
@@ -295,6 +300,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
      * @since 1.6M2
      */
@@ -305,6 +311,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
      * @since 1.6M2
      */
@@ -315,6 +322,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
      * @since 1.6M2
      */
@@ -363,12 +371,52 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endQuotationLine();
     }
 
+    public void beginTable(Map<String, String> parameters)
+    {
+        this.wikimodelListener.beginTable(createWikiParameters(parameters));
+    }
+
+    public void beginTableCell(Map<String, String> parameters)
+    {
+        this.wikimodelListener.beginTableCell(false, createWikiParameters(parameters));
+    }
+
+    public void beginTableHeadCell(Map<String, String> parameters)
+    {
+        this.wikimodelListener.beginTableCell(true, createWikiParameters(parameters));
+    }
+
+    public void beginTableRow(Map<String, String> parameters)
+    {
+        this.wikimodelListener.beginTableRow(createWikiParameters(parameters));
+    }
+
+    public void endTable(Map<String, String> parameters)
+    {
+        this.wikimodelListener.endTable(createWikiParameters(parameters));
+    }
+
+    public void endTableCell(Map<String, String> parameters)
+    {
+        this.wikimodelListener.endTableCell(false, createWikiParameters(parameters));
+    }
+
+    public void endTableHeadCell(Map<String, String> parameters)
+    {
+        this.wikimodelListener.endTableCell(true, createWikiParameters(parameters));
+    }
+
+    public void endTableRow(Map<String, String> parameters)
+    {
+        this.wikimodelListener.endTableRow(createWikiParameters(parameters));
+    }
+
     private WikiParameters createWikiParameters(Map<String, String> parameters)
     {
         List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
-        for (String key: parameters.keySet()) {
+        for (String key : parameters.keySet()) {
             wikiParams.add(new WikiParameter(key, parameters.get(key)));
         }
-        return new WikiParameters(wikiParams);        
+        return new WikiParameters(wikiParams);
     }
 }

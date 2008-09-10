@@ -168,8 +168,8 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int) 
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)
      */
     public void onEmptyLines(int count)
     {
@@ -178,7 +178,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
      */
     public void onVerbatimInline(String protectedString)
@@ -188,7 +188,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String)
      */
     public void onVerbatimStandalone(String protectedString)
@@ -198,7 +198,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
      * @since 1.6M2
      */
@@ -209,7 +209,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
      * @since 1.6M2
      */
@@ -220,7 +220,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Listener#beginDefinitionTerm()
      * @since 1.6M2
      */
@@ -231,7 +231,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Listener#beginDefinitionDescription()
      * @since 1.6M2
      */
@@ -242,7 +242,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Listener#endDefinitionTerm()
      * @since 1.6M2
      */
@@ -253,8 +253,8 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
-     * @see Listener#endDefinitionDescription()   
+     * 
+     * @see Listener#endDefinitionDescription()
      * @since 1.6M2
      */
     public void endDefinitionDescription()
@@ -304,5 +304,45 @@ public class ListenerDelegate implements Listener
     public void endQuotationLine()
     {
         this.listener.endQuotationLine();
+    }
+
+    public void beginTable(Map<String, String> parameters)
+    {
+        this.listener.beginTable(parameters);
+    }
+
+    public void beginTableCell(Map<String, String> parameters)
+    {
+        this.listener.beginTableCell(parameters);
+    }
+
+    public void beginTableHeadCell(Map<String, String> parameters)
+    {
+        this.listener.beginTableHeadCell(parameters);
+    }
+
+    public void beginTableRow(Map<String, String> parameters)
+    {
+        this.listener.beginTableRow(parameters);
+    }
+
+    public void endTable(Map<String, String> parameters)
+    {
+        this.listener.endTable(parameters);
+    }
+
+    public void endTableCell(Map<String, String> parameters)
+    {
+        this.listener.endTableCell(parameters);
+    }
+
+    public void endTableHeadCell(Map<String, String> parameters)
+    {
+        this.listener.endTableHeadCell(parameters);
+    }
+
+    public void endTableRow(Map<String, String> parameters)
+    {
+        this.listener.endTableRow(parameters);
     }
 }

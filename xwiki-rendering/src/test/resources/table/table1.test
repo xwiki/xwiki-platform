@@ -1,0 +1,69 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+|| col1 || col2
+| cell1.1 | cell1.2
+| cell2.1 | cell2.2
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginTable: []
+beginTableRow: []
+beginTableHeadCell: []
+onSpace
+onWord: [col1]
+onSpace
+endTableHeadCell: []
+beginTableHeadCell: []
+onSpace
+onWord: [col2]
+endTableHeadCell: []
+endTableRow: []
+beginTableRow: []
+beginTableCell: []
+onSpace
+onWord: [cell1]
+onSpecialSymbol: [.]
+onWord: [1]
+onSpace
+endTableCell: []
+beginTableCell: []
+onSpace
+onWord: [cell1]
+onSpecialSymbol: [.]
+onWord: [2]
+endTableCell: []
+endTableRow: []
+beginTableRow: []
+beginTableCell: []
+onSpace
+onWord: [cell2]
+onSpecialSymbol: [.]
+onWord: [1]
+onSpace
+endTableCell: []
+beginTableCell: []
+onSpace
+onWord: [cell2]
+onSpecialSymbol: [.]
+onWord: [2]
+endTableCell: []
+endTableRow: []
+endTable: []
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<table class="wiki-table"><tbody><tr><th> col1 </th><th> col2</th></tr><tr><td> cell1.1 </td><td> cell1.2</td></tr><tr><td> cell2.1 </td><td> cell2.2</td></tr></tbody></table>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+|| col1 || col2
+| cell1.1 | cell1.2
+| cell2.1 | cell2.2
+
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+<html><table><tr><th> col1 </th><th> col2</th></tr><tr><td> cell1.1 </td><td> cell1.2</td></tr><tr><td> cell2.1 </td><td> cell2.2</td></tr></table></html>

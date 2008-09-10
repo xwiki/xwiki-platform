@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
-import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
-import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
+import org.xwiki.rendering.renderer.XHTMLRenderer;
+import org.xwiki.rendering.renderer.WysiwygEditorXHTMLRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererType;

@@ -30,6 +30,11 @@ import org.xwiki.rendering.listener.Format;
 import org.apache.commons.lang.StringUtils;
 
 /**
+ * Print names of events. Useful for debugging and tracing in general.
+ * 
+ * Note that this class is not located in the test source tree since it's currently used at runtime by the WYSIWYG
+ * editor for its runtime debug mode.
+ *
  * @version $Id$
  * @since 1.5M1
  */

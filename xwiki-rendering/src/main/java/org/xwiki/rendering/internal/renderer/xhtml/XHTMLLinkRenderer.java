@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer.xhtml;
+package org.xwiki.rendering.internal.renderer.xhtml;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
@@ -106,6 +106,9 @@ public class XHTMLLinkRenderer
     {
         String labelToPrint;
 
+        // If the usser has specified a label use it, if not then use the rendering configuration value to find out
+        // what should be printed.
+        
         if (link.getLabel() != null) {
             labelToPrint = link.getLabel();
         } else {

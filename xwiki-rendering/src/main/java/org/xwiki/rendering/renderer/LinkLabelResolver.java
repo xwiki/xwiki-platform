@@ -20,6 +20,9 @@
 package org.xwiki.rendering.renderer;
 
 /**
+ * Resolve configuration link format (see {@link org.xwiki.rendering.configuration.RenderingConfiguration}).
+ *
+ * @version $Id: $
  * @since 1.6M1
  */
 public class LinkLabelResolver

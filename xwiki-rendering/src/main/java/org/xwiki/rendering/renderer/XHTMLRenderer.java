@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer.xhtml;
+package org.xwiki.rendering.renderer;
 
 import java.util.Map;
 
@@ -32,6 +32,8 @@ import org.xwiki.rendering.renderer.AbstractPrintRenderer;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.WikiPrinter;
+import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
+import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
 
 /**
  * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.

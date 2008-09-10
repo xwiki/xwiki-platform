@@ -22,6 +22,8 @@ public interface Strings extends Constants
 
     String charmap();
 
+    String close();
+
     String code();
 
     String colorPicker();

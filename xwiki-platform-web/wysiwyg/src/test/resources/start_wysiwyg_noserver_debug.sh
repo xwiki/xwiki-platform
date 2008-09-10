@@ -16,6 +16,7 @@ $LIB_DIR/xwiki-web-wysiwyg-1.6-SNAPSHOT.jar:\
 $LIB_DIR/xwiki-web-wysiwyg-1.6-SNAPSHOT-sources.jar:\
 $LIB_DIR/xwiki-web-gwt-1.6-SNAPSHOT-sources.jar:\
 $LIB_DIR/junit-3.8.1.jar:\
+$LIB_DIR/incubator-glasspanel-r729.jar:\
 $GWT_HOME/gwt-dev-linux.jar:\
 $GWT_HOME/gwt-user.jar \
 com.google.gwt.dev.GWTShell \

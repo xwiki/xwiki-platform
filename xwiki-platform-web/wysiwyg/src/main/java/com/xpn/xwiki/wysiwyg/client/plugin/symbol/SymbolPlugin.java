@@ -126,6 +126,10 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
             String character = symbolPicker.getSymbol();
             if (character != null) {
                 getTextArea().getCommandManager().execute(Command.INSERT_HTML, character);
+            } else {
+                // We get here if the symbol picker has been closed by clicking the close button.
+                // In this case we return the focus to the text area.
+                getTextArea().setFocus(true);
             }
         }
     }

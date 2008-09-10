@@ -313,6 +313,8 @@ public class SymbolPicker extends XDialogBox implements ClickListener
     {
         if (sender == symbolPalette) {
             hide();
+        } else {
+            super.onClick(sender);
         }
     }
 

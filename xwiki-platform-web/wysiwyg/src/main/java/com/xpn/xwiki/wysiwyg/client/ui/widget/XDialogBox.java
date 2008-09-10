@@ -35,8 +35,9 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.widgetideas.client.GlassPanel;
 import com.xpn.xwiki.wysiwyg.client.ui.Images;
+import com.xpn.xwiki.wysiwyg.client.ui.Strings;
 
-public class XDialogBox extends PopupPanel implements HasHTML, MouseListener
+public class XDialogBox extends PopupPanel implements HasHTML, MouseListener, ClickListener
 {
     private final FlowPanel titleBar;
 
@@ -76,14 +77,8 @@ public class XDialogBox extends PopupPanel implements HasHTML, MouseListener
         caption.addStyleName("xCaption");
         caption.addMouseListener(this);
 
-        closeButton = new PushButton(Images.INSTANCE.close().createImage());
-        closeButton.addClickListener(new ClickListener()
-        {
-            public void onClick(Widget sender)
-            {
-                hide();
-            }
-        });
+        closeButton = new PushButton(Images.INSTANCE.close().createImage(), this);
+        closeButton.setTitle(Strings.INSTANCE.close());
 
         titleBar = new FlowPanel();
         titleBar.addStyleName("xTitleBar");
@@ -279,7 +274,19 @@ public class XDialogBox extends PopupPanel implements HasHTML, MouseListener
      */
     public void hide()
     {
-        super.hide();
         glassPanel.removeFromParent();
+        super.hide();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ClickListener#onClick(Widget)
+     */
+    public void onClick(Widget sender)
+    {
+        if (sender == closeButton) {
+            hide();
+        }
     }
 }

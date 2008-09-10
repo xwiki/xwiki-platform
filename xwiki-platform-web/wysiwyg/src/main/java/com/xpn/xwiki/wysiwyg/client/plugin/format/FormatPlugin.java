@@ -142,7 +142,7 @@ public class FormatPlugin extends StatefulPlugin implements ChangeListener
             String level = getTextArea().getCommandManager().getStringValue(Command.FORMAT_BLOCK);
             boolean failSafe = true;
             if (level != null) {
-                Integer index = INDEX.get(level);
+                Integer index = INDEX.get(level.toLowerCase());
                 if (index != null) {
                     levels.setSelectedIndex(index.intValue());
                     failSafe = false;

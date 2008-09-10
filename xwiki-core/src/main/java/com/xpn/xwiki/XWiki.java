@@ -143,7 +143,7 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl;
+import com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl;
 import com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
@@ -4634,7 +4634,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     if (isExo()) {
                         this.authService = new ExoAuthServiceImpl();
                     } else if (isLDAP()) {
-                        this.authService = new LDAPAuthServiceImpl();
+                        this.authService = new XWikiLDAPAuthServiceImpl();
                     } else {
                         this.authService = new XWikiAuthServiceImpl();
                     }

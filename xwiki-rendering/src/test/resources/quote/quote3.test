@@ -25,5 +25,5 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
-.# TODO: Wikimodel bug, see http://code.google.com/p/wikimodel/issues/detail?id=48
+.# TODO: Wikimodel bug, see http://code.google.com/p/wikimodel/issues/detail?id=39
 <html><blockquote param1="value1" param2="value2">line</blockquote></html>

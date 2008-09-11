@@ -169,6 +169,7 @@
             **/block/NewLineBlock.java
             **/block/MacroBlock.java
             **/block/XDOM.java
+            **/block/Table*.java
           </includes>
         </configuration>
       </plugin>

@@ -68,9 +68,9 @@ public class RenderingTestSuite extends TestSuite
         for (String parserId : data.inputs.keySet()) {
             for (PrintRendererType rendererType : data.expectations.keySet()) {
                 PrintRenderer renderer = this.rendererFactory.createRenderer(rendererType, new DefaultWikiPrinter());
-                RenderingTestCase testCase = new RenderingTestCase(computeTestName(testResourceName, parserId,
-                    renderer), data.inputs.get(parserId), data.expectations.get(rendererType), parserId, renderer,
-                    runTransformations);
+                RenderingTestCase testCase =
+                    new RenderingTestCase(computeTestName(testResourceName, parserId, renderer), data.inputs
+                        .get(parserId), data.expectations.get(rendererType), parserId, renderer, runTransformations);
                 addTest(testCase);
             }
         }
@@ -167,6 +167,8 @@ public class RenderingTestSuite extends TestSuite
         String rendererName = renderer.getClass().getName();
         String rendererShortName = rendererName.substring(rendererName.lastIndexOf(".") + 1);
 
-        return prefix + " (" + parserId + ", " + rendererShortName + ")";
+        // Note: For some reason the Eclipse JUnit test runner strips the information found in parenthesis. Thus we use
+        // square brackets instead.
+        return prefix + " [" + parserId + ", " + rendererShortName + "]";
     }
 }

@@ -102,6 +102,8 @@ public class JBossCacheLocalCacheEvictionsTest extends AbstractTestCache
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
         lec.setMaxEntries(1);
         lec.setTimeToLive(2);
+        // Force JBoss eviction interval to the minimum
+        lec.put(JBossCacheCacheConfiguration.CONFX_EVICTION_WAKEUPINTERVAL, 1);
         conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
 
         Cache<Object> cache = factory.newCache(conf);

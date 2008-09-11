@@ -72,9 +72,8 @@ public interface Listener
 
     /**
      * Start of a paragraph.
-     *
-     * @param parameters a generic list of parameters for the paragraph.
-     *        Example: "style"/"background-color: blue" 
+     * 
+     * @param parameters a generic list of parameters for the paragraph. Example: "style"/"background-color: blue"
      */
     void beginParagraph(Map<String, String> parameters);
 
@@ -87,8 +86,7 @@ public interface Listener
      * Start of a list.
      * 
      * @param listType the type of list (bulleted, numbered, etc)
-     * @param parameters a generic list of parameters for the list.
-     *        Example: "style"/"background-color: blue"
+     * @param parameters a generic list of parameters for the list. Example: "style"/"background-color: blue"
      * @see ListType
      */
     void beginList(ListType listType, Map<String, String> parameters);
@@ -104,8 +102,7 @@ public interface Listener
      * End of a list.
      * 
      * @param listType the type of list (bulleted, numbered, etc)
-     * @param parameters a generic list of parameters for the list.
-     *        Example: "style"/"background-color: blue"
+     * @param parameters a generic list of parameters for the list. Example: "style"/"background-color: blue"
      * @see ListType
      */
     void endList(ListType listType, Map<String, String> parameters);
@@ -155,21 +152,69 @@ public interface Listener
      */
     void endDefinitionDescription();
 
+    /**
+     * Start of a table.
+     * 
+     * @param parameters a generic list of parameters for the table.
+     * @since 1.6M2
+     */
     void beginTable(Map<String, String> parameters);
 
-    void beginTableCell(Map<String, String> parameters);
-
-    void beginTableHeadCell(Map<String, String> parameters);
-
+    /**
+     * Start of a table row.
+     * 
+     * @param parameters a generic list of parameters for the table row.
+     * @since 1.6M2
+     */
     void beginTableRow(Map<String, String> parameters);
 
+    /**
+     * Start of a table cell.
+     * 
+     * @param parameters a generic list of parameters for the table cell.
+     * @since 1.6M2
+     */
+    void beginTableCell(Map<String, String> parameters);
+
+    /**
+     * Start of a table head cell.
+     * 
+     * @param parameters a generic list of parameters for the table head cell.
+     * @since 1.6M2
+     */
+    void beginTableHeadCell(Map<String, String> parameters);
+
+    /**
+     * End of a table.
+     * 
+     * @param parameters a generic list of parameters for the table.
+     * @since 1.6M2
+     */
     void endTable(Map<String, String> parameters);
 
+    /**
+     * End of a table row.
+     * 
+     * @param parameters a generic list of parameters for the table row.
+     * @since 1.6M2
+     */
+    void endTableRow(Map<String, String> parameters);
+
+    /**
+     * End of a table cell.
+     * 
+     * @param parameters a generic list of parameters for the table cell.
+     * @since 1.6M2
+     */
     void endTableCell(Map<String, String> parameters);
 
+    /**
+     * End of a table head cell.
+     * 
+     * @param parameters a generic list of parameters for the table head cell.
+     * @since 1.6M2
+     */
     void endTableHeadCell(Map<String, String> parameters);
-
-    void endTableRow(Map<String, String> parameters);
 
     /**
      * Start of a section.
@@ -233,17 +278,15 @@ public interface Listener
 
     /**
      * Start of a quotation. There are one or several quotation lines inside a quotation block.
-     *
-     * @param parameters a generic list of parameters for the quotation.
-     *        Example: "style"/"background-color: blue"
+     * 
+     * @param parameters a generic list of parameters for the quotation. Example: "style"/"background-color: blue"
      */
     void beginQuotation(Map<String, String> parameters);
 
     /**
      * End of a quotation.
-     *
-     * @param parameters a generic list of parameters for the quotation.
-     *        Example: "style"/"background-color: blue"
+     * 
+     * @param parameters a generic list of parameters for the quotation. Example: "style"/"background-color: blue"
      */
     void endQuotation(Map<String, String> parameters);
 
@@ -256,11 +299,11 @@ public interface Listener
      * End of a quotation line.
      */
     void endQuotationLine();
-    
+
     /**
-     * An explicit line break specified in the wiki syntax. For example for XWiki this would be "\\". Note
-     * that this is different from a new line which is triggered when the new line character is found ("\n") and which
-     * generates an {@link #onNewLine()} event.
+     * An explicit line break specified in the wiki syntax. For example for XWiki this would be "\\". Note that this is
+     * different from a new line which is triggered when the new line character is found ("\n") and which generates an
+     * {@link #onNewLine()} event.
      */
     void onLineBreak();
 

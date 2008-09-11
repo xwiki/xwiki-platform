@@ -26,7 +26,7 @@ import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import com.xpn.xwiki.test.PlexusTestSetup;
 
 /**
- * All Rendering integration tests.
+ * All Rendering integration tests defined in text files using a special format.
  * 
  * @version $Id: $
  * @since 1.6M1

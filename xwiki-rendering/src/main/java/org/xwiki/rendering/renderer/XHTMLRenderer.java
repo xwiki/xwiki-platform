@@ -22,6 +22,7 @@ package org.xwiki.rendering.renderer;
 import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Format;
@@ -476,7 +477,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onEmptyLines(int count)
     {
-        // TODO: Don't know yet how to represent this in HTML...
+    	print(StringUtils.repeat("<br/>", count + 1));
     }
 
     public void beginDefinitionList()

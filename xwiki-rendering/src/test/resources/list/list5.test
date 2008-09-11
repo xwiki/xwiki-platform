@@ -27,7 +27,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<ul class="star"><li>Item</li></ul><p>This is a paragraph</p>
+<ul class="star"><li>Item</li></ul><br/><br/><p>This is a paragraph</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -35,7 +35,6 @@ endDocument
 
 This is a paragraph
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: Bug in wikimodel, see http://code.google.com/p/wikimodel/issues/detail?id=48 
-<html><ul class="star"><li>Item</li></ul><p>This is a paragraph</p></html>
+<html><ul class="star"><li>Item</li></ul><br/><br/><p>This is a paragraph</p></html>

@@ -25,7 +25,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p> &gt;line</p><p>one &gt; two</p>
+<p> &gt;line</p><br/><br/><p>one &gt; two</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -33,7 +33,6 @@ endDocument
 
 one > two
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: Wikimodel bug, see http://code.google.com/p/wikimodel/issues/detail?id=48
-<html><p> &gt;line</p><p>one &gt; two</p></html>
+<html><p> &gt;line</p><br/><br/><p>one &gt; two</p></html>

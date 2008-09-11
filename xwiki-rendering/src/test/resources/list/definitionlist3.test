@@ -35,7 +35,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><p>paragraph2</p>
+<p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><br/><br/><p>paragraph2</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -46,7 +46,6 @@ definition2
 
 paragraph2
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=48
-<html><p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><p>paragraph2</p></html>
+<html><p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><br/><br/><p>paragraph2</p></html>

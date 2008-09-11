@@ -133,7 +133,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
      */
     public void remove(String key)
     {
-        this.cache.removeNode(new Fqn<String>(ROOT_FQN, key));
+        this.cache.removeNode(Fqn.fromRelativeElements(ROOT_FQN, key));
     }
 
     /**
@@ -143,7 +143,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
      */
     public void set(String key, T obj)
     {
-        this.cache.put(new Fqn<String>(ROOT_FQN, key), DATA_KEY, obj);
+        this.cache.put(Fqn.fromRelativeElements(ROOT_FQN, key), DATA_KEY, obj);
 
         pushDisposableCacheValue(key, obj);
     }
@@ -155,7 +155,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
      */
     public T get(String key)
     {
-        return this.cache.get(new Fqn<String>(ROOT_FQN, key), DATA_KEY);
+        return this.cache.get(Fqn.fromRelativeElements(ROOT_FQN, key), DATA_KEY);
     }
 
     /**

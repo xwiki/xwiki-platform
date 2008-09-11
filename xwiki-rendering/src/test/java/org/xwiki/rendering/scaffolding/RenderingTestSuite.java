@@ -102,7 +102,10 @@ public class RenderingTestSuite extends TestSuite
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(".")) {
                     if (line.startsWith(".#")) {
-                        // Ignore comments
+                        // Ignore comments and print it to the stdout if it's a todo.
+                        if (line.toLowerCase().contains("todo")) {
+                            System.out.println(line);
+                        }
                     } else {
                         // If there's already some data, write it to the maps now.
                         if (map != null) {

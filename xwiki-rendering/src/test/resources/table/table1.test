@@ -2,8 +2,8 @@
 .input|xwiki/2.0
 .#-----------------------------------------------------
 || col1 || col2
-| cell1.1 | cell1.2
-| cell2.1 | cell2.2
+|| line1 | cell1.1 | cell1.2
+|| line2 | cell2.1 | cell2.2
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -21,6 +21,11 @@ onWord: [col2]
 endTableHeadCell: []
 endTableRow: []
 beginTableRow: []
+beginTableHeadCell: []
+onSpace
+onWord: [line1]
+onSpace
+endTableHeadCell: []
 beginTableCell: []
 onSpace
 onWord: [cell1]
@@ -36,6 +41,11 @@ onWord: [2]
 endTableCell: []
 endTableRow: []
 beginTableRow: []
+beginTableHeadCell: []
+onSpace
+onWord: [line2]
+onSpace
+endTableHeadCell: []
 beginTableCell: []
 onSpace
 onWord: [cell2]
@@ -55,15 +65,14 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<table class="wiki-table"><tbody><tr><th> col1 </th><th> col2</th></tr><tr><td> cell1.1 </td><td> cell1.2</td></tr><tr><td> cell2.1 </td><td> cell2.2</td></tr></tbody></table>
+<table class="wiki-table"><tbody><tr><th> col1 </th><th> col2</th></tr><tr><th> line1 </th><td> cell1.1 </td><td> cell1.2</td></tr><tr><th> line2 </th><td> cell2.1 </td><td> cell2.2</td></tr></tbody></table>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 || col1 || col2
-| cell1.1 | cell1.2
-| cell2.1 | cell2.2
-
+|| line1 | cell1.1 | cell1.2
+|| line2 | cell2.1 | cell2.2
 .#-----------------------------------------------------
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
-<html><table><tr><th> col1 </th><th> col2</th></tr><tr><td> cell1.1 </td><td> cell1.2</td></tr><tr><td> cell2.1 </td><td> cell2.2</td></tr></table></html>
+<html><table class="wiki-table"><tbody><tr><th> col1 </th><th> col2</th></tr><tr><th> line1 </th><td> cell1.1 </td><td> cell1.2</td></tr><tr><th> line2 </th><td> cell2.1 </td><td> cell2.2</td></tr></tbody></table></html>

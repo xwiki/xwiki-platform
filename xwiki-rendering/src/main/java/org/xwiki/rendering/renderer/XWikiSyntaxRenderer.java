@@ -20,6 +20,7 @@
 package org.xwiki.rendering.renderer;
 
 import java.util.Map;
+import java.util.Stack;
 
 import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
 import org.xwiki.rendering.listener.ListType;
@@ -71,6 +72,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     private int definitionListDepth = 0;
 
     private int quotationDepth = 0;
+
+    private Stack<Boolean> isEndTableRowFoundStack = new Stack<Boolean>();
 
     private XWikiMacroPrinter macroPrinter;
 
@@ -718,6 +721,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (!parameters.isEmpty()) {
             printParameters(parameters);
         }
+
+        this.isEndTableRowFoundStack.push(false);
     }
 
     /**
@@ -753,6 +758,10 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginTableRow(Map<String, String> parameters)
     {
+        if (this.isEndTableRowFoundStack.peek()) {
+            print("\n");
+        }
+
         if (!parameters.isEmpty()) {
             printParameters(parameters);
         }
@@ -765,7 +774,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endTable(Map<String, String> parameters)
     {
-
+        this.isEndTableRowFoundStack.pop();
     }
 
     /**
@@ -795,7 +804,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endTableRow(Map<String, String> parameters)
     {
-        print("\n");
+        this.isEndTableRowFoundStack.set(this.isEndTableRowFoundStack.size() - 1, true);
     }
 
     protected void printParameters(Map<String, String> parameters)
@@ -810,11 +819,11 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
         }
         buffer.append(" %)");
-        
+
         if (newLine) {
             buffer.append("\n");
         }
-        
+
         print(buffer.toString());
     }
 

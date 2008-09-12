@@ -75,7 +75,7 @@
 #if (!$xwiki.applicationmanager)
   #error($msg.get("xapp.pluginnotenabled"))
 #end
-#if(!$xwiki.isVirtual())
+#if(!$xwiki.isVirtualMode())
   #error($msg.get("wikimanager.notinvirtualmode"))
 #end
 ############################################################################################

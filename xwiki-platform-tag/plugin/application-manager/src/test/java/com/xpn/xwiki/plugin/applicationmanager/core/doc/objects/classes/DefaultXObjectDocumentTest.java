@@ -60,6 +60,12 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
     private Map<String, XWikiDocument> documents = new HashMap<String, XWikiDocument>();
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
     protected void setUp() throws XWikiException
     {
         this.context = new XWikiContext();

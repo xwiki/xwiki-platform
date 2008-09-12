@@ -1,6 +1,7 @@
-.#-----------------------------------------------------
+.#------------------------------------------------------------------------------
 .input|xwiki/2.0
-.#-----------------------------------------------------
+.# Verify that HTML entered directly in the syntax is "escaped" and not rendered 
+.#------------------------------------------------------------------------------
 This is <a href="url">some HTML</a>.
 .#-----------------------------------------------------
 .expect|event
@@ -39,8 +40,6 @@ endDocument
 .#-----------------------------------------------------
 This is <a href="url">some HTML</a>.
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: Quote is not considered as special symbol by WikiModel XHTML parser
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=37
 <html><p>This is &lt;a href=&quot;url&quot;&gt;some HTML&lt;/a&gt;.</p></html>

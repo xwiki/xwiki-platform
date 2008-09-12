@@ -69,18 +69,9 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
     protected void setUp() throws XWikiException
     {
         this.context = new XWikiContext();
-        this.xwiki = new XWiki(new XWikiConfig(), this.context)
-        {
-            @Override
-            public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context,
-                boolean noupdate) throws XWikiException
-            {
-                setConfig(config);
-                context.setWiki(this);
-
-                setNotificationManager(new XWikiNotificationManager());
-            }
-        };
+        this.xwiki = new XWiki();
+        this.xwiki.setNotificationManager(new XWikiNotificationManager());
+        this.context.setWiki(this.xwiki);
 
         // //////////////////////////////////////////////////
         // XWikiHibernateStore

@@ -56,12 +56,42 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     protected static final Log LOG = LogFactory.getLog(ImagePlugin.class);
 
-    public static final int TYPE_JPG = 1;
-
-    public static final int TYPE_PNG = 2;
-
-    public static final int TYPE_BMP = 3;
-
+    /**
+     * The image formats supported by the image plugin
+     */
+    public enum SupportedFormat {
+        JPG  ( 1, "image/jpg" ),
+        JPEG ( 1, "image/jpeg" ),
+        PNG  ( 2, "image/png" ),
+        GIF  ( 3, "image/gif" ),
+        BMP  ( 4, "image/bmp" );
+        
+        /**
+         * The mime type associated to the supported format
+         */
+        private String mimeType;
+        
+        /**
+         * A integer code used to generate the image cache key
+         */
+        private int code;
+        
+        SupportedFormat(int code, String mimeType) {
+            this.mimeType = mimeType;
+            this.code = code;
+        }
+        
+        public int getCode()
+        {
+            return this.code;
+        }
+        
+        public String getMimeType()
+        {
+            return this.mimeType;
+        }
+    }
+        
     /**
      * The name used for retrieving this plugin from the context.
      * 
@@ -168,7 +198,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
         int width = 0;
         XWikiAttachment attachmentClone = null;
 
-        if (!attachment.isImage(context)) {
+        if (!this.isSupportedImageFormat(attachment.getMimeType(context))) {
             return attachment;
         }
 
@@ -193,7 +223,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
             attachmentClone = (XWikiAttachment) attachment.clone();
             String key =
-                attachmentClone.getId() + "-" + attachmentClone.getVersion() + "-" + TYPE_PNG + "-" + width + "-"
+                attachmentClone.getId() + "-" + attachmentClone.getVersion() + "-" + SupportedFormat.PNG.getCode() + "-" + width + "-"
                     + height;
 
             if (imageCache != null) {
@@ -227,7 +257,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
         if (getType(attachment.getMimeType(context)) == 0) {
             throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Only JPG, PNG or BMP images are supported.");
+                "Only JPG, GIF, PNG or BMP images are supported.");
         }
 
         Image imgOri = getImage(attachment, context);
@@ -252,7 +282,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
         if (getType(attachment.getMimeType(context)) == 0) {
             throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Only JPG, PNG or BMP images are supported.");
+                "Only JPG, GIF, PNG or BMP images are supported.");
         }
 
         Image imgOri = getImage(attachment, context);
@@ -292,7 +322,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
         if (getType(attachment.getMimeType(context)) == 0) {
             throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Only JPG, PNG or BMP images are supported.");
+                "Only JPG, GIF, PNG or BMP images are supported.");
         }
 
         Image imgOri = getImage(attachment, context);
@@ -327,18 +357,34 @@ public class ImagePlugin extends XWikiDefaultPlugin
         attachment.setContent(bout.toByteArray());
     }
 
+    /**
+     * @return the type of the image, as an integer code, used in the generation of the key of the image cache
+     */
     public static int getType(String mimeType)
     {
-        if (mimeType.equals("image/jpg") || mimeType.equals("image/jpeg")) {
-            return TYPE_JPG;
-        }
-        if (mimeType.equals("image/png")) {
-            return TYPE_PNG;
-        }
-        if (mimeType.equals("image/bmp")) {
-            return TYPE_BMP;
+        for(SupportedFormat f : SupportedFormat.values())
+        {
+            if (f.getMimeType().equals(mimeType))
+            {
+                return f.getCode();
+            }
         }
         return 0;
+    }
+    
+    /**
+     * @return true if the passed mime type is supported by the plugin, false otherwise.
+     */
+    public boolean isSupportedImageFormat(String mimeType)
+    {
+        for(SupportedFormat f : SupportedFormat.values())
+        {
+            if (f.getMimeType().equals(mimeType))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getWidth(XWikiAttachment attachment, XWikiContext context) throws InterruptedException, XWikiException

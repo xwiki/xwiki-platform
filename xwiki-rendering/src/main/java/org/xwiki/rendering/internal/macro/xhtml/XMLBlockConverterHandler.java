@@ -151,7 +151,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
             // See http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html#package_description
             if (attributes instanceof Attributes2) {
                 Attributes2 attribute2 = (Attributes2) attributes;
-                // present in XHTML source file
+                // If the attribute is present in the XHTML source file then add it, otherwise skip it.
                 if (attribute2.isSpecified(i)) {
                     map.put(attributes.getQName(i), attributes.getValue(i));
                 }

@@ -59,39 +59,37 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * The image formats supported by the image plugin
      */
-    public enum SupportedFormat {
-        JPG  ( 1, "image/jpg" ),
-        JPEG ( 1, "image/jpeg" ),
-        PNG  ( 2, "image/png" ),
-        GIF  ( 3, "image/gif" ),
-        BMP  ( 4, "image/bmp" );
-        
+    public enum SupportedFormat
+    {
+        JPG(1, "image/jpg"), JPEG(1, "image/jpeg"), PNG(2, "image/png"), GIF(3, "image/gif"), BMP(4, "image/bmp");
+
         /**
          * The mime type associated to the supported format
          */
         private String mimeType;
-        
+
         /**
          * A integer code used to generate the image cache key
          */
         private int code;
-        
-        SupportedFormat(int code, String mimeType) {
+
+        SupportedFormat(int code, String mimeType)
+        {
             this.mimeType = mimeType;
             this.code = code;
         }
-        
+
         public int getCode()
         {
             return this.code;
         }
-        
+
         public String getMimeType()
         {
             return this.mimeType;
         }
     }
-        
+
     /**
      * The name used for retrieving this plugin from the context.
      * 
@@ -223,8 +221,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
             attachmentClone = (XWikiAttachment) attachment.clone();
             String key =
-                attachmentClone.getId() + "-" + attachmentClone.getVersion() + "-" + SupportedFormat.PNG.getCode() + "-" + width + "-"
-                    + height;
+                attachmentClone.getId() + "-" + attachmentClone.getVersion() + "-" + SupportedFormat.PNG.getCode()
+                    + "-" + width + "-" + height;
 
             if (imageCache != null) {
                 byte[] data = imageCache.get(key);
@@ -362,25 +360,21 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     public static int getType(String mimeType)
     {
-        for(SupportedFormat f : SupportedFormat.values())
-        {
-            if (f.getMimeType().equals(mimeType))
-            {
+        for (SupportedFormat f : SupportedFormat.values()) {
+            if (f.getMimeType().equals(mimeType)) {
                 return f.getCode();
             }
         }
         return 0;
     }
-    
+
     /**
      * @return true if the passed mime type is supported by the plugin, false otherwise.
      */
     public boolean isSupportedImageFormat(String mimeType)
     {
-        for(SupportedFormat f : SupportedFormat.values())
-        {
-            if (f.getMimeType().equals(mimeType))
-            {
+        for (SupportedFormat f : SupportedFormat.values()) {
+            if (f.getMimeType().equals(mimeType)) {
                 return true;
             }
         }

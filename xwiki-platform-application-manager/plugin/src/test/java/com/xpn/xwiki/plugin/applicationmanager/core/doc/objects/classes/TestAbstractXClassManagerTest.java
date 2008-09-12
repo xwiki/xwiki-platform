@@ -37,6 +37,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -72,7 +73,9 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
     protected void setUp() throws XWikiException
     {
         this.context = new XWikiContext();
-        this.xwiki = new XWiki(new XWikiConfig(), this.context);
+        this.xwiki = new XWiki();
+        this.xwiki.setNotificationManager(new XWikiNotificationManager());
+        this.context.setWiki(this.xwiki);
 
         // //////////////////////////////////////////////////
         // XWikiHibernateStore

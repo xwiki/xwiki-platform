@@ -42,7 +42,7 @@ public class ImagePluginTest extends org.jmock.cglib.MockObjectTestCase
     {
         XWikiContext context = new XWikiContext();
         Mock mockXWiki = mock(XWiki.class);
-        mockXWiki.stubs().method("getTempDirectory").will(returnValue(new File("/tmp")));
+        mockXWiki.stubs().method("getTempDirectory").will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
         mockXWiki.stubs().method("Param").will(returnValue("10"));
         Mock mockCacheFactory = mock(CacheFactory.class);
         mockCacheFactory.expects(once()).method("newCache");

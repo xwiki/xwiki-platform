@@ -602,8 +602,8 @@ public class XWikiApplication extends DefaultXObjectDocument
 
         String where = createHqlFilter(type, values, recurse, includeAppDesc);
 
-        return where.equals("") ? (Set<String>) Collections.EMPTY_SET : new HashSet<String>(context.getWiki()
-            .getStore().searchDocumentsNames(HQL_WHERE + " " + where, values, context));
+        return where.equals("") ? Collections.<String> emptySet() : new HashSet<String>(context.getWiki().getStore()
+            .searchDocumentsNames(HQL_WHERE + " " + where, values, context));
     }
 
     /**

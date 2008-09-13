@@ -40,7 +40,7 @@ public class XHTMLLinkRenderer
         this.configuration = configuration;
     }
 
-    public String renderLink(Link link)
+    public String renderLink(Link link, boolean isFreeStandingURI)
     {
         StringBuffer sb = new StringBuffer();
 
@@ -53,6 +53,9 @@ public class XHTMLLinkRenderer
                 sb.append(link.getReference());
             }
             sb.append("\"");
+            if (isFreeStandingURI) {
+                sb.append(" class=\"wikimodel-freestanding\"");
+            }
             if (link.getTarget() != null) {
                 // We prefix with "_" since a target can be any token and we need to differentiate with
                 // other valid rel tokens.
@@ -62,7 +65,7 @@ public class XHTMLLinkRenderer
             sb.append(getLinkLabelToPrint(link));
             sb.append("</a></span>");
         } else {
-            // This is a document link. Check for document existence.
+            // This is a link to a document. Check for the document existence.
             try {
                 if (link.getReference() == null || this.documentAccessBridge.exists(link.getReference())) {
                     sb.append("<span class=\"wikilink\">");

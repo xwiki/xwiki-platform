@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import java.util.Arrays;
+
 import org.wikimodel.wem.IWikiParser;
 import org.wikimodel.wem.xhtml.XhtmlParser;
 import org.xwiki.rendering.parser.Syntax;
@@ -48,6 +50,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
      */
     public IWikiParser createWikiModelParser()
     {
-        return new XhtmlParser();
+        // Pass reserved keywords that we want escaped by the XHTML parser.
+        return new XhtmlParser(Arrays.asList("**", "~~", "##", "--", "__", "^^", ",,"));
     }
 }

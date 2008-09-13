@@ -17,12 +17,12 @@ beginMacroMarker: [toc] [start=1|depth=6|numbered=false|scope=local] []
 beginList: [BULLETED] []
 beginList: [BULLETED] []
 beginListItem
-onLink: [Label = [Title1.1] Anchor = [testid]]
+onLink: [Label = [Title1.1] Anchor = [testid]] [false]
 endListItem
 beginList: [BULLETED] []
 beginList: [BULLETED] []
 beginListItem
-onLink: [Label = [Title1.1.1.1] Anchor = [testid]]
+onLink: [Label = [Title1.1.1.1] Anchor = [testid]] [false]
 endListItem
 endList: [BULLETED] []
 endList: [BULLETED] []

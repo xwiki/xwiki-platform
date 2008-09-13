@@ -223,8 +223,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see Renderer#onLink(Link)
      */
-    public void onLink(Link link)
+    public void onLink(Link link, boolean isFreeStandingURI)
     {
+        // TODO: How do we tell that it's a free-standing URI?
         print(this.linkRenderer.renderLink(link));
     }
 

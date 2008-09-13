@@ -139,9 +139,9 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("onNewLine");
     }
 
-    public void onLink(Link link)
+    public void onLink(Link link, boolean isFreeStandingURI)
     {
-        println("onLink: [" + link + "]");
+        println("onLink: [" + link + "] [" + isFreeStandingURI + "]");
     }
 
     public void onInlineMacro(String name, Map<String, String> parameters, String content)

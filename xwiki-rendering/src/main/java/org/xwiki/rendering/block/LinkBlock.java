@@ -36,13 +36,28 @@ public class LinkBlock extends AbstractBlock
     private Link link;
 
     /**
+     * If true then the link is a free standing URI directly in the text.
+     */
+    private boolean isFreeStandingURI;
+    
+    /**
      * @param link the link
      */
     public LinkBlock(Link link)
     {
-        this.link = link;
+        this(link, false);
     }
 
+    /**
+     * @param link the link
+     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
+     */
+    public LinkBlock(Link link, boolean isFreeStandingURI)
+    {
+        this.link = link;
+        this.isFreeStandingURI = isFreeStandingURI;
+    }
+    
     /**
      * @return the link
      * @see Link
@@ -53,11 +68,19 @@ public class LinkBlock extends AbstractBlock
     }
 
     /**
+     * @return true tif the link is a free standing URI directly in the text, false otherwise
+     */
+    public boolean isFreeStandingURI()
+    {
+        return this.isFreeStandingURI;
+    }
+    
+    /**
      * {@inheritDoc}
      * @see AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
      */
     public void traverse(Listener listener)
     {
-        listener.onLink(getLink());
+        listener.onLink(getLink(), isFreeStandingURI());
     }
 }

@@ -116,9 +116,9 @@ public class ListenerDelegate implements Listener
         this.listener.onLineBreak();
     }
 
-    public void onLink(Link link)
+    public void onLink(Link link, boolean isFreeStandingURI)
     {
-        this.listener.onLink(link);
+        this.listener.onLink(link, isFreeStandingURI);
     }
 
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)

@@ -206,7 +206,7 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.lineBreak();
     }
 
-    public void onLink(Link link)
+    public void onLink(Link link, boolean isFreeStandingURI)
     {
         // TODO: Finish the implementation
         this.sink.link(link.getReference());

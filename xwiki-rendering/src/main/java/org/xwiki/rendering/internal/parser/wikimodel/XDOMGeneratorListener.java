@@ -376,8 +376,8 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * Called when WikiModel finds an reference such as a URI located directly in the text, as opposed to a link inside
-     * wiki link syntax delimiters.
+     * Called when WikiModel finds an reference such as a URI located directly in the text (free-standing URI), 
+     * as opposed to a link inside wiki link syntax delimiters.
      */
     public void onReference(String ref)
     {
@@ -385,7 +385,7 @@ public class XDOMGeneratorListener implements IWemListener
         // TODO: Generate some output log
         if (this.linkParser != null) {
             try {
-                this.stack.push(new LinkBlock(this.linkParser.parse(ref)));
+                this.stack.push(new LinkBlock(this.linkParser.parse(ref), true));
             } catch (ParseException e) {
                 // TODO: Should we instead generate ErrorBlocks?
                 throw new RuntimeException("Failed to parse link [" + ref + "]", e);

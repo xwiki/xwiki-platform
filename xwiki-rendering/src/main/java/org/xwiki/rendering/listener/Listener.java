@@ -317,9 +317,10 @@ public interface Listener
      * A link.
      * 
      * @param link the link definition (label, reference, target, etc)
+     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      * @see Link
      */
-    void onLink(Link link);
+    void onLink(Link link, boolean isFreeStandingURI);
 
     /**
      * A {@link org.xwiki.rendering.macro.Macro} located inside another Block. For example a Macro inside a Paragraph

@@ -108,12 +108,14 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      * 
      * @see PrintRenderer#onLink(org.xwiki.rendering.listener.Link)
      */
-    public void onLink(Link link)
+    public void onLink(Link link, boolean isFreeStandingURI)
     {
-        print("[[");
-        if (link.getLabel() != null) {
-            print(link.getLabel());
-            print(">");
+        if (!isFreeStandingURI) {
+            print("[[");
+            if (link.getLabel() != null) {
+                print(link.getLabel());
+                print(">");
+            }
         }
         print(link.getReference());
         if (link.getAnchor() != null) {
@@ -128,11 +130,13 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             print("@");
             print(link.getInterWikiAlias());
         }
-        if (link.getTarget() != null) {
-            print(">");
-            print(link.getTarget());
+        if (!isFreeStandingURI) {
+            if (link.getTarget() != null) {
+                print(">");
+                print(link.getTarget());
+            }
+            print("]]");
         }
-        print("]]");
     }
 
     /**

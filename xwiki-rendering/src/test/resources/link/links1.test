@@ -13,19 +13,19 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph: []
-onLink: [Reference = [Space.ExistingPage]]
+onLink: [Reference = [Space.ExistingPage]] [false]
 onLineBreak
-onLink: [Reference = [Space.ExistingPage] QueryString = [param=value] Anchor = [anchor]]
+onLink: [Reference = [Space.ExistingPage] QueryString = [param=value] Anchor = [anchor]] [false]
 onLineBreak
-onLink: [Label = [label] Reference = [Space.UnknownPage]]
+onLink: [Label = [label] Reference = [Space.UnknownPage]] [false]
 onLineBreak
-onLink: [Label = [label] Reference = [http://xwiki.org]]
+onLink: [Label = [label] Reference = [http://xwiki.org]] [false]
 onLineBreak
-onLink: [Label = [label] Reference = [Space.ExistingPage] Target = [_target]]
+onLink: [Label = [label] Reference = [Space.ExistingPage] Target = [_target]] [false]
 onLineBreak
-onLink: [Reference = [mailto:john@doe.com]]
+onLink: [Reference = [mailto:john@doe.com]] [false]
 onLineBreak
-onLink: [Reference = [{{macro}}]]
+onLink: [Reference = [{{macro}}]] [false]
 endParagraph: []
 endDocument
 .#-----------------------------------------------------

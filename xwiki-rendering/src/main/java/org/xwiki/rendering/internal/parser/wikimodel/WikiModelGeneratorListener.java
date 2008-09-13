@@ -181,11 +181,15 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.onLineBreak();
     }
 
-    public void onLink(Link link)
+    public void onLink(Link link, boolean isFreeStandingURI)
     {
-        WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(),
-            createWikiParameters(Collections.<String, String>emptyMap()));
-        this.wikimodelListener.onReference(wikiReference);
+        if (isFreeStandingURI) {
+            this.wikimodelListener.onReference(link.getReference());
+        } else {
+            WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(),
+                createWikiParameters(Collections.<String, String>emptyMap()));
+            this.wikimodelListener.onReference(wikiReference);
+        }
     }
 
     public void onInlineMacro(String name, Map<String, String> parameters, String content)

@@ -42,7 +42,7 @@ endDefinitionTerm
 endDefinitionList
 beginDefinitionList
 beginDefinitionTerm
-onLink: [Reference = [uri:not]]
+onLink: [Reference = [uri:not]] [true]
 onSpace
 onWord: [definition]
 endDefinitionTerm
@@ -81,7 +81,7 @@ endDocument
 
 ; just term
 
-; [[uri:not]] definition
+; uri:not definition
 
 ;title: not definition
 

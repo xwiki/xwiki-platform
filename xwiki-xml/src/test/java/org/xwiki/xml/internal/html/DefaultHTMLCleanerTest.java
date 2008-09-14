@@ -32,8 +32,11 @@ import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
  */
 public class DefaultHTMLCleanerTest extends TestCase
 {
-    private static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-        + "<html><head /><body>";
+    public static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
+        + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
+    
+    private static final String HEADER_FULL = HEADER + "<html><head /><body>";
 
     private static final String FOOTER = "</body></html>\n";
 
@@ -43,6 +46,11 @@ public class DefaultHTMLCleanerTest extends TestCase
     {
         this.cleaner = new DefaultHTMLCleaner();
         this.cleaner.initialize();
+    }
+
+    public void testSpecialCharacters()
+    {
+        assertHTML("<p>//**((notbold&apos;**</p>", "<p>//**((notbold'**</p>");
     }
 
     public void testCloseUnbalancedTags()
@@ -82,6 +90,6 @@ public class DefaultHTMLCleanerTest extends TestCase
 
     private void assertHTML(String expected, String actual)
     {
-        assertEquals(HEADER + expected + FOOTER, XMLUtils.toString(this.cleaner.clean(actual)));
+        assertEquals(HEADER_FULL + expected + FOOTER, XMLUtils.toString(this.cleaner.clean(actual)));
     }
 }

@@ -40,6 +40,47 @@ import org.w3c.dom.NodeList;
 public final class XMLUtils
 {
     /**
+     * JDOM's XMLOutputter class converts reserved XML characters (<, >, ' , &, \r and \n) into their entity 
+     * format (&lt;, &gt; &apos; &amp; &#xD; and \r\n). However since clean XHTML will already have content
+     * such as &apos; for example this gets translated as &amp;apos; which isn't correct.
+     * Since we should always pass valid XHTML to this method we can disable escaping by extending the 
+     * XMLOutputter class.
+     */
+    public static class XWikiXMLOutputter extends XMLOutputter
+    {
+        /**
+         * {@inheritDoc}
+         * @see XMLOutputter#XMLOutputter(Format)
+         */
+        public XWikiXMLOutputter(Format format)
+        {
+            super(format);
+        }
+
+        /**
+         * {@inheritDoc}
+         * @see XMLOutputter#escapeElementEntities(String)
+         */
+        @Override
+        public String escapeElementEntities(String text)
+        {
+            // Do not escape the text
+            return text; 
+        }
+
+        /**
+         * {@inheritDoc}
+         * @see XMLOutputter#escapeAttributeEntities(String)
+         */
+        @Override
+        public String escapeAttributeEntities(String text)
+        {
+            // Do not escape the text
+            return text;
+        }
+    }
+
+    /**
      * Private constructor since this is a utility class that shouldn't be instantiated (all methods are static).
      */
     private XMLUtils()
@@ -62,8 +103,8 @@ public final class XMLUtils
         // Force newlines to use \n since otherwise the default is \n\r.
         // See http://www.jdom.org/docs/apidocs/org/jdom/output/Format.html#setLineSeparator(java.lang.String)
         format.setLineSeparator("\n");
-
-        XMLOutputter outputter = new XMLOutputter(format);
+        
+        XMLOutputter outputter = new XWikiXMLOutputter(format);
         return outputter.outputString(jdomDoc);
     }
 

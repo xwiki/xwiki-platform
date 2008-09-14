@@ -70,8 +70,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     public void initialize() throws InitializationException
     {
         this.filters = new ArrayList<CleaningFilter>();
-        // this.filters.add(new TagSwapCleaningFilter());
         this.filters.add(new ListCleaningFilter());
+        this.filters.add(new DocTypeCleaningFilter());
 
         // Initialize Cleaner objects once.
         this.cleaner = new HtmlCleaner();

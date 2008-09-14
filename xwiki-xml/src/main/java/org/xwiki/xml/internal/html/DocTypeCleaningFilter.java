@@ -16,29 +16,28 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package org.xwiki.xml;
+package org.xwiki.xml.internal.html;
 
-import junit.framework.TestCase;
-import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
-import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
-import org.w3c.dom.Document;
+import org.jdom.DocType;
+import org.jdom.Document;
 
 /**
- * Unit tests for {@link org.xwiki.xml.XMLUtils}.
+ * Sets the Document DOCTYPE to XHTML 1.0 strict.
  *
- * @version $Id: $
- * @since 1.6M1
+ * @version $Id$
+ * @since 1.6RC1
  */
-public class XMLUtilsTest extends TestCase
+public class DocTypeCleaningFilter implements CleaningFilter
 {
-    public void testStripHTMLEnvelope() throws Exception
+    /**
+     * {@inheritDoc}
+     * @see CleaningFilter#filter(org.jdom.Document)
+     */
+    public void filter(Document document)
     {
-        DefaultHTMLCleaner cleaner = new DefaultHTMLCleaner();
-        cleaner.initialize();
-        Document document = cleaner.clean("<html><head/><body><p>test1</p><p>test2</p></body></html>");
-        XMLUtils.stripHTMLEnvelope(document);
-        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", XMLUtils.toString(document));
+        DocType docType = new DocType("html", "-//W3C//DTD XHTML 1.0 Strict//EN", 
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
+        document.setDocType(docType);
     }
 }

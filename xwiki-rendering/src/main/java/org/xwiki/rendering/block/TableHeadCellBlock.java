@@ -27,7 +27,7 @@ import org.xwiki.rendering.listener.Listener;
 /**
  * Represents a head of a row or column of a table.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class TableHeadCellBlock extends TableCellBlock

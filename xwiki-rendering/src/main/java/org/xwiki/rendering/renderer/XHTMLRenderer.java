@@ -19,11 +19,23 @@
  */
 package org.xwiki.rendering.renderer;
 
+import java.awt.Color;
+import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
+import java.util.Formatter;
 import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.velocity.tools.struts.MessageTool;
 import org.codehaus.plexus.util.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.rendering.block.AbstractTableBlockParameters;
+import org.xwiki.rendering.block.TableBlockParameters;
+import org.xwiki.rendering.block.TableCellBlockParameters;
+import org.xwiki.rendering.block.TableHeadCellBlockParameters;
+import org.xwiki.rendering.block.TableRowBlockParameters;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Link;
@@ -35,6 +47,7 @@ import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
+import org.xwiki.rendering.internal.util.ColorConverter;
 
 /**
  * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
@@ -83,6 +96,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         this.documentAccessBridge = documentAccessBridge;
         this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, configuration);
         this.configuration = configuration;
+
+        // TODO: create a xwiki-converter component and move all BeanUtils related in it
+        ConvertUtils.register(ColorConverter.getInstance(), Color.class);
     }
 
     /**
@@ -177,7 +193,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Renderer#beginParagraph(java.util.Map)
      */
     public void beginParagraph(Map<String, String> parameters)
@@ -230,7 +246,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onInlineMacro(String, java.util.Map, String)
      */
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
@@ -241,7 +257,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onStandaloneMacro(String, java.util.Map, String)
      */
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
@@ -360,7 +376,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map) 
+     * @see org.xwiki.rendering.renderer.Renderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map)
      */
     public void endList(ListType listType, Map<String, String> parameters)
     {
@@ -447,7 +463,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onVerbatimInline(String)
      */
     public void onVerbatimInline(String protectedString)
@@ -462,7 +478,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onVerbatimStandalone(String)
      */
     public void onVerbatimStandalone(String protectedString)
@@ -472,12 +488,12 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onEmptyLines(int)
      */
     public void onEmptyLines(int count)
     {
-    	print(StringUtils.repeat("<br/>", count + 1));
+        print(StringUtils.repeat("<br/>", count + 1));
     }
 
     public void beginDefinitionList()
@@ -532,30 +548,75 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         // Nothing to do
     }
-    
+
     public void beginTable(Map<String, String> parameters)
     {
-        print("<table class=\"wiki-table\"><tbody>");
-    }
+        TableBlockParameters tbp = populateParameters(new TableBlockParameters(), parameters);
 
-    public void beginTableCell(Map<String, String> parameters)
-    {
-        print("<td>");
-    }
+        print("<table class=\"wiki-table\"");
 
-    public void beginTableHeadCell(Map<String, String> parameters)
-    {
-        print("<th>");
+        String style = serializeTableStyle(tbp);
+
+        if (style != null) {
+            print(" " + style);
+        }
+
+        print("><tbody>");
     }
 
     public void beginTableRow(Map<String, String> parameters)
     {
-        print("<tr>");
+        TableRowBlockParameters tbp = populateParameters(new TableRowBlockParameters(), parameters);
+
+        print("<tr");
+
+        String style = serializeTableStyle(tbp);
+
+        if (style != null) {
+            print(" " + style);
+        }
+
+        print(">");
+    }
+
+    public void beginTableCell(Map<String, String> parameters)
+    {
+        TableCellBlockParameters tbp = populateParameters(new TableCellBlockParameters(), parameters);
+
+        print("<td");
+
+        String style = serializeTableStyle(tbp);
+
+        if (style != null) {
+            print(" " + style);
+        }
+
+        print(">");
+    }
+
+    public void beginTableHeadCell(Map<String, String> parameters)
+    {
+        TableHeadCellBlockParameters tbp = populateParameters(new TableHeadCellBlockParameters(), parameters);
+
+        print("<th");
+
+        String style = serializeTableStyle(tbp);
+
+        if (style != null) {
+            print(" " + style);
+        }
+
+        print(">");
     }
 
     public void endTable(Map<String, String> parameters)
     {
         print("</tbody></table>");
+    }
+
+    public void endTableRow(Map<String, String> parameters)
+    {
+        print("</tr>");
     }
 
     public void endTableCell(Map<String, String> parameters)
@@ -568,16 +629,34 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         print("</th>");
     }
 
-    public void endTableRow(Map<String, String> parameters)
+    private <T> T populateParameters(T object, Map<String, String> parameters)
     {
-        print("</tr>");
+        try {
+            BeanUtils.populate(object, parameters);
+        } catch (Exception e) {
+            getLogger().error("Failed to load table parameters", e);
+        }
+
+        return object;
+    }
+
+    private String serializeTableStyle(AbstractTableBlockParameters tbp)
+    {
+        StringBuffer css = new StringBuffer();
+
+        if (tbp.getBgColor() != null) {
+            css.append(MessageFormat.format("background-color:rgb({0},{1},{2})", tbp.getBgColor().getRed(), tbp
+                .getBgColor().getGreen(), tbp.getBgColor().getBlue()));
+        }
+
+        return css.length() > 0 ? "style=\"" + css + "\"" : null;
     }
 
     private StringBuffer serializeParameters(Map<String, String> parameters)
     {
         StringBuffer buffer = new StringBuffer();
         if (!parameters.isEmpty()) {
-            for (String key: parameters.keySet()) {
+            for (String key : parameters.keySet()) {
                 buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
             }
         }

@@ -20,10 +20,12 @@
 package org.xwiki.rendering.block;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
 
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -35,7 +37,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 public abstract class AbstractBlock implements Block
 {
-    private Map<String, String> parameters;
+    private Map<String, String> parameters = new LinkedHashMap<String, String>();
 
     public AbstractBlock()
     {
@@ -44,7 +46,7 @@ public abstract class AbstractBlock implements Block
 
     public AbstractBlock(Map<String, String> parameters)
     {
-        this.parameters = Collections.unmodifiableMap(parameters);
+        this.parameters.putAll(parameters);
     }
 
     /**
@@ -135,9 +137,24 @@ public abstract class AbstractBlock implements Block
 
     public Map<String, String> getParameters()
     {
-        return this.parameters;
+        return Collections.unmodifiableMap(this.parameters);
     }
-    
+
+    public String getParameter(String name)
+    {
+        return this.parameters.get(name);
+    }
+
+    public void setParameter(String name, String value)
+    {
+        this.parameters.put(name, value);
+    }
+
+    public void setParameter(String name, Object value)
+    {
+        setParameter(name, ConvertUtils.convert(value));
+    }
+
     /**
      * {@inheritDoc}
      * 

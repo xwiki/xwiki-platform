@@ -27,7 +27,7 @@ import org.xwiki.rendering.listener.Listener;
 /**
  * Represents the row of a table. Contains {@link TableCellBlock} objects.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class TableRowBlock extends AbstractFatherBlock

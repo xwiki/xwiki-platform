@@ -19,45 +19,23 @@
  */
 package org.xwiki.rendering.block;
 
-import java.util.List;
-import java.util.Map;
-
-import org.xwiki.rendering.listener.Listener;
+import java.awt.Color;
 
 /**
- * Represents a cell of a table.
- * 
- * @version $Id$
- * @since 1.6M2
+ * @version $Id: $
+ * @since 1.6RC1
  */
-public class TableCellBlock extends AbstractFatherBlock
+public abstract class AbstractTableBlockParameters
 {
-    /**
-     * @param list the list of children blocks of the table head cell block.
-     * @param parameters the parameters of the table row.
-     */
-    public TableCellBlock(List<Block> list, Map<String, String> parameters)
+    private Color bgColor;
+
+    public Color getBgColor()
     {
-        super(list, parameters);
+        return this.bgColor;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
-     */
-    public void before(Listener listener)
+    public void setBgColor(Color bgColor)
     {
-        listener.beginTableCell(getParameters());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
-     */
-    public void after(Listener listener)
-    {
-        listener.endTableCell(getParameters());
+        this.bgColor = bgColor;
     }
 }

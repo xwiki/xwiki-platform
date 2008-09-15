@@ -1,0 +1,41 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+(% bgColor="255,0,0" %)
+|| col1 || col2
+|| line1 | cell1.2
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginTable: [[bgColor]=[255,0,0]]
+beginTableRow: []
+beginTableHeadCell: []
+onSpace
+onWord: [col1]
+onSpace
+endTableHeadCell: []
+beginTableHeadCell: []
+onSpace
+onWord: [col2]
+endTableHeadCell: []
+endTableRow: []
+beginTableRow: []
+beginTableHeadCell: []
+onSpace
+onWord: [line1]
+onSpace
+endTableHeadCell: []
+beginTableCell: []
+onSpace
+onWord: [cell1]
+onSpecialSymbol: [.]
+onWord: [2]
+endTableCell: []
+endTableRow: []
+endTable: [[bgColor]=[255,0,0]]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<table class="wiki-table" style="background-color:rgb(255,0,0)"><tbody><tr><th> col1 </th><th> col2</th></tr><tr><th> line1 </th><td> cell1.2</td></tr></tbody></table>

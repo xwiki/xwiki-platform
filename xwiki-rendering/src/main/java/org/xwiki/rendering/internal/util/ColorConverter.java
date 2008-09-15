@@ -34,11 +34,15 @@ public class ColorConverter extends AbstractConverter
 {
     private static final ColorConverter instance = new ColorConverter();
 
-    private static final String USAGE = "Color value should be in the form of '#xxxxxx' or 'x,y,z'";
+    private static final String USAGE = "Color value should be in the form of '#xxxxxx' or 'r,g,b'";
 
     public static ColorConverter getInstance()
     {
         return instance;
+    }
+
+    private ColorConverter()
+    {
     }
 
     /**
@@ -55,7 +59,19 @@ public class ColorConverter extends AbstractConverter
         }
 
         return color;
+    }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.apache.commons.beanutils.converters.AbstractConverter#convertToString(java.lang.Object)
+     */
+    @Override
+    protected String convertToString(Object value) throws Throwable
+    {
+        Color colorValue = (Color) value;
+
+        return colorValue.getRed() + "," + colorValue.getGreen() + "," + colorValue.getBlue();
     }
 
     /**
@@ -107,8 +123,7 @@ public class ColorConverter extends AbstractConverter
         int colorValue = 0;
         try {
             colorValue = Integer.parseInt(value.substring(1), 16);
-            java.awt.Color swingColor = new java.awt.Color(colorValue);
-            return new Color(swingColor.getRed(), swingColor.getGreen(), swingColor.getBlue());
+            return new Color(colorValue);
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException(value + "is not a valid Html color\n " + ex);
         }

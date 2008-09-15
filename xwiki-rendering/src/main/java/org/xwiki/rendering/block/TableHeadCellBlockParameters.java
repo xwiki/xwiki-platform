@@ -16,48 +16,15 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */package org.xwiki.rendering.renderer;
-
-import org.xwiki.component.logging.AbstractLogEnabled;
+ */
+package org.xwiki.rendering.block;
 
 /**
- * Common methods for all {@link org.xwiki.rendering.renderer.PrintRenderer} implementations.
+ * Contains valid parameters for table head cell.
  * 
  * @version $Id: $
- * @since 1.6M2
+ * @since 1.6RC1
  */
-public abstract class AbstractPrintRenderer extends AbstractLogEnabled implements PrintRenderer
+public class TableHeadCellBlockParameters extends TableCellBlockParameters
 {
-    private WikiPrinter printer;
-
-    public AbstractPrintRenderer(WikiPrinter printer)
-    {
-        this.printer = printer;
-    }
-
-    protected void print(String text)
-    {
-        getPrinter().print(text);
-    }
-
-    protected void println(String text)
-    {
-        getPrinter().println(text);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.PrintRenderer#getPrinter()
-     */
-    public WikiPrinter getPrinter()
-    {
-        return this.printer;
-    }
-
-    protected void setPrinter(WikiPrinter printer)
-    {
-        this.printer = printer;
-    }
-
 }

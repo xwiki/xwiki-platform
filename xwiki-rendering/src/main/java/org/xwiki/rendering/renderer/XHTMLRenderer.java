@@ -330,7 +330,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void onEscape(String escapedString)
     {
         // Print characters as is, except for special characters which need to be HTML-escaped.
-        onSpecialSymbol(escapedString);
+        print(StringEscapeUtils.escapeHtml(escapedString));
     }
 
     /**

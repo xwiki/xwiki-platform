@@ -51,6 +51,6 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     public IWikiParser createWikiModelParser()
     {
         // Pass reserved keywords that we want escaped by the XHTML parser.
-        return new XhtmlParser(Arrays.asList("**", "~~", "##", "--", "__", "^^", ",,"));
+        return new XhtmlParser(Arrays.asList("**", "~~", "##", "--", "__", "^^", ",,", "[[", "]]", "{{", "}}"));
     }
 }

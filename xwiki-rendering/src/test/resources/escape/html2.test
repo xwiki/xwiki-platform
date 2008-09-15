@@ -1,7 +1,8 @@
-.#------------------------------------------------------------------------------
+.#--------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.#------------------------------------------------------------------------------
-//\*\*((notbold'\*\*<notag>
+.# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax
+.#--------------------------------------------------------------------------------------------------------
+//((\[\[nolink\]\]\*\*notbold\*\*'<notag>\{\{nomacro\}\}
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -9,28 +10,38 @@ beginDocument
 beginParagraph: []
 onSpecialSymbol: [/]
 onSpecialSymbol: [/]
-onEscape: [*]
-onEscape: [*]
 onSpecialSymbol: [(]
 onSpecialSymbol: [(]
+onEscape: [[]
+onEscape: [[]
+onWord: [nolink]
+onEscape: []]
+onEscape: []]
+onEscape: [*]
+onEscape: [*]
 onWord: [notbold]
+onEscape: [*]
+onEscape: [*]
 onSpecialSymbol: [']
-onEscape: [*]
-onEscape: [*]
 onSpecialSymbol: [<]
 onWord: [notag]
 onSpecialSymbol: [>]
+onEscape: [{]
+onEscape: [{]
+onWord: [nomacro]
+onEscape: [}]
+onEscape: [}]
 endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>//**((notbold'**&lt;notag&gt;</p>
+<p>//(([[nolink]]**notbold**'&lt;notag&gt;{{nomacro}}</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-//\*\*((notbold'\*\*<notag>
+//((\[\[nolink\]\]\*\*notbold\*\*'<notag>\{\{nomacro\}\}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>//**((notbold'**&lt;notag&gt;</p></html>
+<html><p>//(([[nolink]]**notbold**'&lt;notag&gt;{{nomacro}}</p></html>

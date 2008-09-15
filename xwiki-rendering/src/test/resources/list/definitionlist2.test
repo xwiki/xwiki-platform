@@ -41,7 +41,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<ul class="star"><li>item1<dl><dt>title1</dt><dd>definition1</dd></dl></li></ul><ol><li>item2<dl><dt>title2</dt><dd>definition2</dd></dl></li></ol>
+<ul><li>item1<dl><dt>title1</dt><dd>definition1</dd></dl></li></ul><ol><li>item2<dl><dt>title2</dt><dd>definition2</dd></dl></li></ol>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -55,4 +55,4 @@ endDocument
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
 .# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=60
-<html><ul class="star"><li>item1<dl><dt>title1</dt><dd>definition1</dd></dl></li></ul><ol><li>item2<dl><dt>title2</dt><dd>definition2</dd></dl></li></ol></html>
+<html><ul><li>item1<dl><dt>title1</dt><dd>definition1</dd></dl></li></ul><ol><li>item2<dl><dt>title2</dt><dd>definition2</dd></dl></li></ol></html>

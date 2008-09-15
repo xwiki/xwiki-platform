@@ -16,7 +16,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<ul class="star" param1="value1" param2="value2"><li>item</li></ul>
+<ul param1="value1" param2="value2"><li>item</li></ul>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -26,4 +26,4 @@ endDocument
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
 .# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=39 
-<html><ul class="star" param1="value1" param2="value2"><li>item</li></ul></html>
+<html><ul param1="value1" param2="value2"><li>item</li></ul></html>

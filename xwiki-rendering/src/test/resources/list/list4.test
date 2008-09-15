@@ -26,7 +26,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<ul class="star"><li>Item<br/>This is not a paragraph</li></ul>
+<ul><li>Item<br/>This is not a paragraph</li></ul>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -35,4 +35,4 @@ This is not a paragraph
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><ul class="star"><li>Item<br/>This is not a paragraph</li></ul></html>
+<html><ul><li>Item<br/>This is not a paragraph</li></ul></html>

@@ -341,7 +341,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void beginList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
-            print("<ul class=\"star\"" + serializeParameters(parameters) + ">");
+            print("<ul" + serializeParameters(parameters) + ">");
         } else {
             print("<ol" + serializeParameters(parameters) + ">");
         }

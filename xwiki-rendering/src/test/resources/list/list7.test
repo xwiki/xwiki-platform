@@ -23,7 +23,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<ul class="star"><li><ul class="star"><li><ul class="star"><li>Item</li></ul></li></ul></li></ul>
+<ul><li><ul><li><ul><li>Item</li></ul></li></ul></li></ul>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -34,4 +34,4 @@ endDocument
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
 .# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=22
-<html><ul class="star"><li><ul class="star"><li><ul class="star"><li>Item</li></ul></li></ul></li></ul></html>
+<html><ul><li><ul><li><ul><li>Item</li></ul></li></ul></li></ul></html>

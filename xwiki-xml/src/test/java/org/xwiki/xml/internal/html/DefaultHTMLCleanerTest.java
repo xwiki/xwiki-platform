@@ -21,6 +21,9 @@
 package org.xwiki.xml.internal.html;
 
 import junit.framework.TestCase;
+
+import org.htmlcleaner.JDomSerializer;
+import org.jdom.Document;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 
@@ -50,7 +53,11 @@ public class DefaultHTMLCleanerTest extends TestCase
 
     public void testSpecialCharacters()
     {
-        assertHTML("<p>//**((notbold&apos;**</p>", "<p>//**((notbold'**</p>");
+        // TODO: We still have a problem I think in that if there are characters such as "&" or quote in the source
+        // text they are not escaped. This is because we have use "false" in DefaultHTMLCleaner here:
+        //     Document document = new JDomSerializer(this.cleanerProperties, false).createJDom(cleanedNode);
+        // See the problem described here: http://sourceforge.net/forum/forum.php?thread_id=2243880&forum_id=637246
+        assertHTML("<p>&quot;&amp;**notbold**&lt;notag&gt;</p>", "<p>&quot;&amp;**notbold**&lt;notag&gt;</p>");
     }
 
     public void testCloseUnbalancedTags()

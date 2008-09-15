@@ -99,7 +99,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             throw new RuntimeException("Unhandled error when cleaning HTML [" + originalHtmlContent + "]", e);
         }
 
-        Document document = new JDomSerializer(this.cleanerProperties).createJDom(cleanedNode);
+        Document document = new JDomSerializer(this.cleanerProperties, false).createJDom(cleanedNode);
 
         // Perform other cleaning operation this time using the W3C Document interface.
         for (CleaningFilter filter : this.filters) {

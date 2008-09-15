@@ -14,7 +14,7 @@ onId: [testid]
 beginSection: [1]
 onWord: [Title1]
 endSection: [1]
-beginMacroMarker: [toc] [start=1|depth=6|numbered=false|scope=page] []
+beginMacroMarker: [toc] [scope=page|start=1|numbered=false|depth=6] []
 beginList: [BULLETED] []
 beginListItem
 onLink: [Label = [Title1] Anchor = [testid]] [false]
@@ -35,7 +35,7 @@ beginListItem
 onLink: [Label = [Title2] Anchor = [testid]] [false]
 endListItem
 endList: [BULLETED] []
-endMacroMarker: [toc] [start=1|depth=6|numbered=false|scope=page] []
+endMacroMarker: [toc] [scope=page|start=1|numbered=false|depth=6] []
 onId: [testid]
 beginSection: [2]
 onWord: [Title1]

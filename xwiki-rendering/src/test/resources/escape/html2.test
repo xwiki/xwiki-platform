@@ -1,10 +1,11 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
 .# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
-.# Also verify that special XML symbols (<, >, ', ") are correctly handled.
+.# Also verify that special XML symbols (<, >, ", &) are correctly handled. Note that apostrophe (&apos;)
+.# is not a legal entity and thus isn't escaped.
 .#---------------------------------------------------------------------------------------------------------
 \*\*notbold\*\*
-<notag>"'
+<notag>"&'
 \[\[nolink\]\]
 \{\{nomacro\}\}
 \#\#nomono\#\#
@@ -28,6 +29,7 @@ onSpecialSymbol: [<]
 onWord: [notag]
 onSpecialSymbol: [>]
 onSpecialSymbol: ["]
+onSpecialSymbol: [&]
 onSpecialSymbol: [']
 onLineBreak
 onEscape: [[]
@@ -82,12 +84,12 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>**notbold**<br/>&lt;notag&gt;&quot;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>~~noitalic~~<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,</p>
+<p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>~~noitalic~~<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 \*\*notbold\*\*
-<notag>"'
+<notag>"&'
 \[\[nolink\]\]
 \{\{nomacro\}\}
 \#\#nomono\#\#
@@ -99,4 +101,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>**notbold**<br/>&lt;notag&gt;&quot;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>~~noitalic~~<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,</p></html>
+<html><p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>~~noitalic~~<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,</p></html>

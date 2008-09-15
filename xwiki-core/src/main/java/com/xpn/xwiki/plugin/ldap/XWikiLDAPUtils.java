@@ -281,7 +281,7 @@ public class XWikiLDAPUtils
             }
 
             if (!memberMap.containsKey(groupDN)) {
-                memberMap.put(groupDN, id == null ? "" : id);
+                memberMap.put(groupDN.toLowerCase(), id == null ? "" : id.toLowerCase());
             }
         } else {
             // remember this group

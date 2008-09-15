@@ -603,7 +603,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     protected void syncGroupMembership(String xwikiUserName, String userDN, String xwikiGroupName,
         Collection<String> userGroups, Map<String, String> groupMembers, XWikiContext context)
     {
-        if (groupMembers.containsKey(userDN)) {
+        if (groupMembers.containsKey(userDN.toLowerCase())) {
             // add to group if not there
             if (!userGroups.contains(xwikiGroupName)) {
                 addUserToXWikiGroup(xwikiUserName, xwikiGroupName, context);

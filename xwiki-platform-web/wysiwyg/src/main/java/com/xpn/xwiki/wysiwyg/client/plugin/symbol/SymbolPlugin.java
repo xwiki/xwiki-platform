@@ -20,8 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.PopupListener;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -32,10 +30,12 @@ import com.xpn.xwiki.wysiwyg.client.ui.Images;
 import com.xpn.xwiki.wysiwyg.client.ui.Strings;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.ui.widget.PopupListener;
+import com.xpn.xwiki.wysiwyg.client.ui.widget.SourcesPopupEvents;
 
 public class SymbolPlugin extends AbstractPlugin implements ClickListener, PopupListener
 {
-    private PushButton symbolsButton;
+    private PushButton symbolButton;
 
     private SymbolPicker symbolPicker;
 
@@ -51,17 +51,16 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
         super.init(wysiwyg, textArea, config);
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_HTML)) {
-            symbolsButton = new PushButton(Images.INSTANCE.charmap().createImage(), this);
-            symbolsButton.setTitle(Strings.INSTANCE.charmap());
+            symbolButton = new PushButton(Images.INSTANCE.charmap().createImage(), this);
+            symbolButton.setTitle(Strings.INSTANCE.charmap());
 
-            toolBarExtension.addFeature("symbol", symbolsButton);
+            toolBarExtension.addFeature("symbol", symbolButton);
 
             symbolPicker = new SymbolPicker();
             symbolPicker.addPopupListener(this);
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addClickListener(this);
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -73,10 +72,10 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
      */
     public void destroy()
     {
-        if (symbolsButton != null) {
-            symbolsButton.removeFromParent();
-            symbolsButton.removeClickListener(this);
-            symbolsButton = null;
+        if (symbolButton != null) {
+            symbolButton.removeFromParent();
+            symbolButton.removeClickListener(this);
+            symbolButton = null;
 
             symbolPicker.hide();
             symbolPicker.removeFromParent();
@@ -85,7 +84,6 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeClickListener(this);
             toolBarExtension.clearFeatures();
         }
 
@@ -99,19 +97,17 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
      */
     public void onClick(Widget sender)
     {
-        if (sender == symbolsButton) {
+        if (sender == symbolButton) {
             onSymbols(true);
-        } else if (sender == getTextArea()) {
-            symbolPicker.hide();
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see PopupListener#onPopupClosed(PopupPanel, boolean)
+     * @see PopupListener#onPopupClosed(SourcesPopupEvents, boolean)
      */
-    public void onPopupClosed(PopupPanel sender, boolean autoHide)
+    public void onPopupClosed(SourcesPopupEvents sender, boolean autoHide)
     {
         if (sender == symbolPicker && !autoHide) {
             onSymbols(false);

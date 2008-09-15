@@ -21,9 +21,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.ui.widget.XDialogBox;
+import com.xpn.xwiki.wysiwyg.client.ui.Strings;
+import com.xpn.xwiki.wysiwyg.client.ui.widget.CompositeDialog;
 
-public class SymbolPicker extends XDialogBox implements ClickListener
+public class SymbolPicker extends CompositeDialog implements ClickListener
 {
     public final static Object[][] SYMBOLS =
         {
@@ -296,12 +297,16 @@ public class SymbolPicker extends XDialogBox implements ClickListener
 
     public SymbolPicker()
     {
+        super(false, true);
+
+        getDialog().setText(Strings.INSTANCE.charmap());
+        getDialog().setAnimationEnabled(true);
+        getDialog().addStyleName("xSymbolPicker");
+
         symbolPalette = new SymbolPalette(SYMBOLS, SYMBOLS_PER_ROW, SYMBOLS_PER_COL);
         symbolPalette.addClickListener(this);
-        setText("Insert a special character");
-        setAnimationEnabled(true);
-        addStyleName("xSymbolPicker");
-        setWidget(symbolPalette);
+
+        initWidget(symbolPalette);
     }
 
     /**
@@ -313,8 +318,6 @@ public class SymbolPicker extends XDialogBox implements ClickListener
     {
         if (sender == symbolPalette) {
             hide();
-        } else {
-            super.onClick(sender);
         }
     }
 

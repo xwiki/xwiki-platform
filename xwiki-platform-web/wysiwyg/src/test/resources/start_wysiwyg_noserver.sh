@@ -2,7 +2,7 @@
 
 APP_DIR=`dirname $0`/webapps/xwiki;
 LIB_DIR=$APP_DIR/WEB-INF/lib;
-JAVA32_HOME=/usr/lib/jvm/ia32-java-1.5.0-sun-1.5.0.13/bin;
+JAVA32_HOME=/usr/lib/jvm/ia32-java-1.5.0-sun/bin;
 GWT_HOME=/tmp/xwiki/gwt/gwt-linux-1.5.0-rc1;
 
 $JAVA32_HOME/java \

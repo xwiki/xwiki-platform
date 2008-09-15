@@ -45,19 +45,19 @@ public class XDialogBox extends PopupPanel implements HasHTML, MouseListener, Cl
 
     private final PushButton closeButton;
 
-    private Widget child;
-
     private final Panel panelTemp;
+
+    private final FlowPanel mainPanel;
+
+    private final GlassPanel glassPanel;
+
+    private Widget child;
 
     private boolean dragging;
 
     private boolean startDragging;
 
     private int dragStartX, dragStartY;
-
-    private final FlowPanel mainPanel;
-
-    protected GlassPanel glassPanel;
 
     public XDialogBox()
     {
@@ -66,12 +66,13 @@ public class XDialogBox extends PopupPanel implements HasHTML, MouseListener, Cl
 
     public XDialogBox(boolean autoHide)
     {
-        this(autoHide, true);
+        this(autoHide, false);
     }
 
     public XDialogBox(boolean autoHide, boolean modal)
     {
-        super(autoHide, modal);
+        // We use our own modal mechanism, based on glass panel.
+        super(autoHide, false);
 
         caption = new HTML();
         caption.addStyleName("xCaption");
@@ -93,11 +94,15 @@ public class XDialogBox extends PopupPanel implements HasHTML, MouseListener, Cl
         mainPanel.add(titleBar);
 
         int zIndex = 100;
-        glassPanel = new GlassPanel(false);
-        glassPanel.getElement().getStyle().setProperty("zIndex", String.valueOf(zIndex));
+        if (modal) {
+            glassPanel = new GlassPanel(false);
+            glassPanel.getElement().getStyle().setProperty("zIndex", String.valueOf(zIndex++));
+        } else {
+            glassPanel = null;
+        }
 
         addStyleName("xDialogBox");
-        getElement().getStyle().setProperty("zIndex", String.valueOf(zIndex + 1));
+        getElement().getStyle().setProperty("zIndex", String.valueOf(zIndex));
         super.setWidget(mainPanel);
     }
 
@@ -263,7 +268,9 @@ public class XDialogBox extends PopupPanel implements HasHTML, MouseListener, Cl
      */
     public void show()
     {
-        RootPanel.get().add(glassPanel, 0, 0);
+        if (glassPanel != null) {
+            RootPanel.get().add(glassPanel, 0, 0);
+        }
         super.show();
     }
 
@@ -274,7 +281,9 @@ public class XDialogBox extends PopupPanel implements HasHTML, MouseListener, Cl
      */
     public void hide()
     {
-        glassPanel.removeFromParent();
+        if (glassPanel != null) {
+            glassPanel.removeFromParent();
+        }
         super.hide();
     }
 

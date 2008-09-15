@@ -151,7 +151,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
                 print("**");
                 break;
             case ITALIC:
-                print("~~");
+                print("//");
                 break;
             case STRIKEDOUT:
                 print("--");
@@ -183,7 +183,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
                 print("**");
                 break;
             case ITALIC:
-                print("~~");
+                print("//");
                 break;
             case STRIKEDOUT:
                 print("--");

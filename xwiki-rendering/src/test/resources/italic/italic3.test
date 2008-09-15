@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-This is ~~italic~~ but this is ~not~
+This is //italic// but this is /not/
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -21,20 +21,20 @@ onWord: [this]
 onSpace
 onWord: [is]
 onSpace
-onSpecialSymbol: [~]
+onSpecialSymbol: [/]
 onWord: [not]
-onSpecialSymbol: [~]
+onSpecialSymbol: [/]
 endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>This is <em class="italic">italic</em> but this is ~not~</p>
+<p>This is <em class="italic">italic</em> but this is /not/</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-This is ~~italic~~ but this is ~not~
+This is //italic// but this is /not/
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>This is <em class="italic">italic</em> but this is ~not~</p></html>
+<html><p>This is <em class="italic">italic</em> but this is /not/</p></html>

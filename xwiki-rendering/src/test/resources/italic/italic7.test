@@ -1,8 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# This is actually an empty italic (~~~~) which is discarded by WikiModel
+.# This is actually an empty italic (////) which is discarded by WikiModel
 .#-----------------------------------------------------
-This is ~~~~~ not italic
+This is ///// not italic
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -12,7 +12,7 @@ onWord: [This]
 onSpace
 onWord: [is]
 onSpace
-onSpecialSymbol: [~]
+onSpecialSymbol: [/]
 onSpace
 onWord: [not]
 onSpace
@@ -22,12 +22,12 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>This is ~ not italic</p>
+<p>This is / not italic</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-This is ~ not italic
+This is / not italic
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>This is ~ not italic</p></html>
+<html><p>This is / not italic</p></html>

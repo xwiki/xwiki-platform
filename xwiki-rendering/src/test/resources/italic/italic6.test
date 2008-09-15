@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-This is ~~~italic~~~
+This is ///italic///
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -12,21 +12,21 @@ onSpace
 onWord: [is]
 onSpace
 beginItalic
-onSpecialSymbol: [~]
+onSpecialSymbol: [/]
 onWord: [italic]
 endItalic
-onSpecialSymbol: [~]
+onSpecialSymbol: [/]
 endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>This is <em class="italic">~italic</em>~</p>
+<p>This is <em class="italic">/italic</em>/</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-This is ~~~italic~~~
+This is ///italic///
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>This is <em class="italic">~italic</em>~</p></html>
+<html><p>This is <em class="italic">/italic</em>/</p></html>

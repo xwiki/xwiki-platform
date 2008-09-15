@@ -17,35 +17,67 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter;
+package org.xwiki.rendering.internal.util;
 
 import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.beanutils.Converter;
+import org.apache.commons.beanutils.converters.AbstractConverter;
 
 /**
  * Bean Utils converter that converts a value into an enumeration class value.
- *
+ * 
  * @version $Id: $
- * @since 1.6M1
+ * @since 1.6M2
  */
-public class EnumConverter implements Converter
+public class EnumConverter extends AbstractConverter
 {
-    public Object convert(Class type, Object value)
+    Class< ? extends Enum> defaultType;
+
+    public EnumConverter(Class< ? extends Enum> defaultType)
+    {
+        this.defaultType = defaultType;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.apache.commons.beanutils.converters.AbstractConverter#convertToType(java.lang.Class, java.lang.Object)
+     */
+    @Override
+    protected Object convertToType(Class type, Object value) throws Throwable
     {
         Object[] enumValues = type.getEnumConstants();
 
+        String testValue = value.toString();
         for (Object enumValue : enumValues) {
-            if (enumValue.toString().equalsIgnoreCase(value.toString())) {
+            if (enumValue.toString().equalsIgnoreCase(testValue)) {
                 return enumValue;
             }
         }
 
-        throw new ConversionException(generateInvalidErrorMessage(enumValues, value));
+        throw new ConversionException(generateInvalidErrorMessage(enumValues, testValue));
     }
 
-    private String generateInvalidErrorMessage(Object[] enumValues, Object value)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.apache.commons.beanutils.converters.AbstractConverter#getDefaultType()
+     */
+    @Override
+    protected Class getDefaultType()
     {
-        StringBuffer errorMessage = new StringBuffer("Unable to convert value [" + value + "].");
+        return this.defaultType;
+    }
+
+    /**
+     * Generate error message to use in the {@link ConversionException}.
+     * 
+     * @param enumValues possible values of the enum.
+     * @param value the value to convert.
+     * @return the generated error message.
+     */
+    private String generateInvalidErrorMessage(Object[] enumValues, String testValue)
+    {
+        StringBuffer errorMessage = new StringBuffer("Unable to convert value [" + testValue + "].");
 
         errorMessage.append(" Allowed values are (case insensitive) ");
 

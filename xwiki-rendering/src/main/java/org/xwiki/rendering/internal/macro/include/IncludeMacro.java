@@ -29,12 +29,12 @@ import org.xwiki.context.ExecutionContextInitializerException;
 import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.util.EnumConverter;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
-import org.xwiki.rendering.macro.parameter.EnumConverter;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -80,7 +80,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     {
         super(new DefaultMacroDescriptor(DESCRIPTION, IncludeMacroParameters.class));
 
-        registerConverter(new EnumConverter(), Context.class);
+        registerConverter(new EnumConverter(Context.class), Context.class);
     }
 
     /**

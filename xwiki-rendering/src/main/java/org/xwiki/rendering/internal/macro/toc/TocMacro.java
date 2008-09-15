@@ -34,11 +34,11 @@ import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.internal.util.EnumConverter;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
-import org.xwiki.rendering.macro.parameter.EnumConverter;
 import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
 import org.xwiki.rendering.macro.toc.TocMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -69,7 +69,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
     {
         super(new DefaultMacroDescriptor(DESCRIPTION, TocMacroParameters.class));
 
-        registerConverter(new EnumConverter(), Scope.class);
+        registerConverter(new EnumConverter(Scope.class), Scope.class);
     }
 
     /**
@@ -224,7 +224,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
         // TODO: remove this when LinkBlock will support children blocks as label
         link.setLabel(getLabelFromChildren(sectionBlock.getChildren()));
 
-        return new ListItemBlock(Arrays.<Block>asList(linkBlock));
+        return new ListItemBlock(Arrays.<Block> asList(linkBlock));
     }
 
     /**

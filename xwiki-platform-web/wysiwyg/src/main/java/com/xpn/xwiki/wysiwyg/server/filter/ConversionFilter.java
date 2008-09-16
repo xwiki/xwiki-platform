@@ -67,26 +67,27 @@ public class ConversionFilter implements Filter
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
         ServletException
     {
-        String[] xRichTextAreas = req.getParameterValues("xRichTextAreas");
-        if (xRichTextAreas != null) {
+        String[] wysiwygNames = req.getParameterValues("wysiwyg");
+        if (wysiwygNames != null) {
             HTMLCleaner cleaner = (HTMLCleaner) Utils.getComponent(HTMLCleaner.ROLE);
-            HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, "xwiki/2.0");
             MutableServletRequestFactory mreqFactory =
                 (MutableServletRequestFactory) Utils.getComponent(MutableServletRequestFactory.ROLE, req.getProtocol());
             MutableServletRequest mreq = mreqFactory.newInstance(req);
-            for (int i = 0; i < xRichTextAreas.length; i++) {
-                String xRichTextArea = xRichTextAreas[i];
-                if (StringUtils.isEmpty(xRichTextArea)) {
+            for (int i = 0; i < wysiwygNames.length; i++) {
+                String wysiwygName = wysiwygNames[i];
+                if (StringUtils.isEmpty(wysiwygName)) {
                     continue;
                 }
-                String oldValue = req.getParameter(xRichTextArea);
+                String syntax = req.getParameter(wysiwygName + "_syntax");
+                HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax);
+                String oldValue = req.getParameter(wysiwygName);
                 String newValue = oldValue;
                 try {
                     newValue = converter.fromHTML(XMLUtils.toString(cleaner.clean(oldValue)));
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
                 }
-                mreq.setParameter(xRichTextArea, newValue);
+                mreq.setParameter(wysiwygName, newValue);
             }
             req = mreq;
         }

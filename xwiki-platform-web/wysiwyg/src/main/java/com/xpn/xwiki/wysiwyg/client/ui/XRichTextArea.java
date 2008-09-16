@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui;
 
+import com.google.gwt.user.client.ui.ChangeListener;
+import com.google.gwt.user.client.ui.ChangeListenerCollection;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.ClickListenerCollection;
 import com.google.gwt.user.client.ui.Composite;
@@ -34,6 +36,7 @@ import com.google.gwt.user.client.ui.KeyboardListenerCollection;
 import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.MouseListenerCollection;
 import com.google.gwt.user.client.ui.RichTextArea;
+import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.google.gwt.user.client.ui.SourcesClickEvents;
 import com.google.gwt.user.client.ui.SourcesFocusEvents;
 import com.google.gwt.user.client.ui.SourcesMouseEvents;
@@ -42,14 +45,13 @@ import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager;
 import com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea;
 
-public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEvents, SourcesClickEvents,
-    SourcesFocusEvents, HasFocus, ClickListener, FocusListener, KeyboardListener, MouseListener, HasName
+public class XRichTextArea extends Composite implements HasHTML, HasName, HasFocus, SourcesMouseEvents,
+    SourcesClickEvents, SourcesFocusEvents, SourcesChangeEvents, ClickListener, FocusListener, KeyboardListener,
+    MouseListener
 {
     protected final WrappedRichTextArea rta;
 
-    protected final Hidden xRichTextArea;
-
-    protected final Hidden xRichTextAreas;
+    protected final Hidden value;
 
     protected CommandManager cm;
 
@@ -61,6 +63,8 @@ public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEve
 
     protected final MouseListenerCollection mouseListeners = new MouseListenerCollection();
 
+    protected final ChangeListenerCollection changeListeners = new ChangeListenerCollection();
+
     public XRichTextArea()
     {
         rta = new WrappedRichTextArea();
@@ -69,18 +73,13 @@ public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEve
         rta.addKeyboardListener(this);
         rta.addMouseListener(this);
 
-        xRichTextArea = new Hidden();
-        xRichTextArea.setDefaultValue("");
-
-        xRichTextAreas = new Hidden();
-        xRichTextAreas.setName("xRichTextAreas");
-        xRichTextAreas.setDefaultValue("");
+        value = new Hidden();
+        value.setDefaultValue("");
 
         cm = new DefaultCommandManager(rta);
 
         FlowPanel container = new FlowPanel();
-        container.add(xRichTextArea);
-        container.add(xRichTextAreas);
+        container.add(value);
         container.add(rta);
         initWidget(container);
     }
@@ -114,7 +113,7 @@ public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEve
     public void setHTML(String html)
     {
         rta.setHTML(html);
-        xRichTextArea.setValue(rta.getHTML());
+        value.setValue(rta.getHTML());
     }
 
     /**
@@ -135,7 +134,7 @@ public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEve
     public void setText(String text)
     {
         rta.setText(text);
-        xRichTextArea.setValue(rta.getHTML());
+        value.setValue(rta.getHTML());
     }
 
     /**
@@ -346,7 +345,7 @@ public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEve
     public void onLostFocus(Widget sender)
     {
         if (sender == rta) {
-            xRichTextArea.setValue(rta.getHTML());
+            value.setValue(rta.getHTML());
             focusListeners.fireLostFocus(this);
         }
     }
@@ -454,7 +453,7 @@ public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEve
      */
     public String getName()
     {
-        return xRichTextArea.getName();
+        return value.getName();
     }
 
     /**
@@ -464,10 +463,11 @@ public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEve
      */
     public void setName(String name)
     {
-        xRichTextArea.setName(name);
-        xRichTextArea.setID(name);
-
-        xRichTextAreas.setValue(name);
+        if (name != value.getName() && (name == null || !name.equals(value.getName()))) {
+            value.setName(name);
+            value.setID(name);
+            changeListeners.fireChange(this);
+        }
     }
 
     /**
@@ -488,5 +488,25 @@ public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEve
     public void setHeight(String height)
     {
         rta.setHeight(height);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SourcesChangeEvents#addChangeListener(ChangeListener)
+     */
+    public void addChangeListener(ChangeListener listener)
+    {
+        changeListeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SourcesChangeEvents#removeChangeListener(ChangeListener)
+     */
+    public void removeChangeListener(ChangeListener listener)
+    {
+        changeListeners.remove(listener);
     }
 }

@@ -30,13 +30,17 @@ public class XRichTextEditor extends Composite
 
     protected XRichTextArea textArea;
 
+    protected HiddenConfig config;
+
     public XRichTextEditor()
     {
         toolbar = new XToolBar();
         textArea = new XRichTextArea();
+        config = new HiddenConfig();
         container = new FlowPanel();
         container.add(toolbar);
         container.add(textArea);
+        container.add(config);
         container.addStyleName("xRichTextEditor");
         initWidget(container);
     }
@@ -49,5 +53,10 @@ public class XRichTextEditor extends Composite
     public XRichTextArea getTextArea()
     {
         return textArea;
+    }
+
+    public HiddenConfig getConfig()
+    {
+        return config;
     }
 }

@@ -160,7 +160,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
             // Extract info from DOM
             String name = hook.getAttribute("name");
-            String value = hook.getAttribute("value");
+            String value = hook.getPropertyString("value");
             if (value == null) {
                 value = hook.getInnerHTML();
             }

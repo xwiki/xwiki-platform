@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.ui;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
@@ -37,7 +38,7 @@ import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 
-public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandListener
+public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandListener, ChangeListener
 {
     private static final String DEFAULT_SYNTAX = "xwiki/2.0";
 
@@ -60,12 +61,14 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
     public XWysiwygEditor(Wysiwyg wysiwyg, Config config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
     {
         ui = new XRichTextEditor();
+        ui.getConfig().addFlag("wysiwyg");
+        ui.getConfig().setParameter("syntax", config.getParameter("syntax", DEFAULT_SYNTAX));
         ui.getTextArea().addClickListener(this);
         ui.getTextArea().addKeyboardListener(this);
         ui.getTextArea().getCommandManager().addCommandListener(this);
+        ui.getTextArea().addChangeListener(this);
 
-        String syntax = config.getParameter("syntax", DEFAULT_SYNTAX);
-        sv = svm.getSyntaxValidator(syntax);
+        sv = svm.getSyntaxValidator(getSyntax());
 
         pm = new DefaultPluginManager(wysiwyg, ui.getTextArea(), config);
         pm.setPluginFactoryManager(pfm);
@@ -142,6 +145,18 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ChangeListener#onChange(Widget)
+     */
+    public void onChange(Widget sender)
+    {
+        if (sender == ui.getTextArea()) {
+            ui.getConfig().setNameSpace(ui.getTextArea().getName());
+        }
+    }
+
     public void onUpdate()
     {
         if (!loaded) {
@@ -168,6 +183,6 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
 
     public String getSyntax()
     {
-        return sv.getSyntax();
+        return ui.getConfig().getParameter("syntax");
     }
 }

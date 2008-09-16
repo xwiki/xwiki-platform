@@ -48,6 +48,11 @@ public class XWikiHibernateBaseStore implements Initializable
     private String hibpath = "/WEB-INF/hibernate.cfg.xml";
 
     /**
+     * Key in XWikiContext for access to current hibernate database name.
+     */
+    private static String currentDatabaseKey = "hibcurrentdatabase";
+
+    /**
      * THis allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
      * 
@@ -644,7 +649,7 @@ public class XWikiHibernateBaseStore implements Initializable
                             session.connection().setCatalog(schemaName);
                         }
                     }
-                    context.setOriginalDatabase(context.getDatabase());
+                    setCurrentDatabase(context, context.getDatabase());
                 }
             } catch (Exception e) {
                 Object[] args = {context.getDatabase()};
@@ -1034,7 +1039,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 bTransaction = beginTransaction(context);
             }
 
-            if (context.getDatabase() != null && !context.getDatabase().equals(context.getOriginalDatabase())) {
+            if (context.getDatabase() != null && !context.getDatabase().equals(getCurrentDatabase(context))) {
                 setDatabase(getSession(context), context);
             }
 
@@ -1091,5 +1096,21 @@ public class XWikiHibernateBaseStore implements Initializable
         throws XWikiException
     {
         return execute(context, bTransaction, true, cb);
+    }
+
+    /**
+     * @param context XWikiContext
+     * @return current hibernate database name
+     */
+    private String getCurrentDatabase(XWikiContext context) {
+        return (String) context.get(currentDatabaseKey);
+    }
+
+    /**
+     * @param context XWikiContext
+     * @param database current hibernate database name to set
+     */
+    private void setCurrentDatabase(XWikiContext context, String database) {
+        context.put(currentDatabaseKey, database);
     }
 }

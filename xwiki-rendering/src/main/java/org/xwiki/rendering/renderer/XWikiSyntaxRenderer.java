@@ -284,29 +284,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginSection(SectionLevel level)
     {
-        String prefix;
-
-        switch (level) {
-            case LEVEL1:
-                prefix = "1";
-                break;
-            case LEVEL2:
-                prefix = "1.1";
-                break;
-            case LEVEL3:
-                prefix = "1.1.1";
-                break;
-            case LEVEL4:
-                prefix = "1.1.1.1";
-                break;
-            case LEVEL5:
-                prefix = "1.1.1.1.1";
-                break;
-            default:
-                prefix = "1.1.1.1.1.1";
-                break;
-        }
-        print(prefix + " ");
+        print(StringUtils.repeat("=", level.getAsInt()) + " ");
         this.currentElement = Element.SECTION;
     }
 
@@ -317,6 +295,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endSection(SectionLevel level)
     {
+        print(" " + StringUtils.repeat("=", level.getAsInt()));
         this.needsNewLine = true;
     }
 

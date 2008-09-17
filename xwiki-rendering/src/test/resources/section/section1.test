@@ -1,12 +1,12 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-1 Title level 1
-1.1 Title level 2
-1.1.1 Title level 3
-1.1.1.1 Title level 4
-1.1.1.1.1 Title level 5
-1.1.1.1.1.1 Title level 6
+= Title level 1
+== Title level 2
+=== Title level 3
+==== Title level 4
+===== Title level 5
+====== Title level 6
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -61,12 +61,12 @@ endDocument
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-1 Title level 1
-1.1 Title level 2
-1.1.1 Title level 3
-1.1.1.1 Title level 4
-1.1.1.1.1 Title level 5
-1.1.1.1.1.1 Title level 6
+= Title level 1 =
+== Title level 2 ==
+=== Title level 3 ===
+==== Title level 4 ====
+===== Title level 5 =====
+====== Title level 6 ======
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------

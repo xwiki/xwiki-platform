@@ -1,42 +1,90 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-1.1.1.1.1.1.1 Not a header
+============== Title level 6
+= Title level 1=
+=Title level 1=
+=Title level 1 =
+=    Title level 1        =
+= Title level 1====
+= Title level 1 =some text
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [1]
-onSpecialSymbol: [.]
-onWord: [1]
-onSpecialSymbol: [.]
-onWord: [1]
-onSpecialSymbol: [.]
-onWord: [1]
-onSpecialSymbol: [.]
-onWord: [1]
-onSpecialSymbol: [.]
-onWord: [1]
-onSpecialSymbol: [.]
-onWord: [1]
+beginSection: [6]
+.# TODO: I think this space shouldn't be generated. Check wikimodel.
 onSpace
-onWord: [Not]
+onWord: [Title]
 onSpace
-onWord: [a]
+onWord: [level]
 onSpace
-onWord: [header]
-endParagraph: []
+onWord: [6]
+endSection: [6]
+beginSection: [1]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [1]
+endSection: [1]
+beginSection: [1]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [1]
+endSection: [1]
+beginSection: [1]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [1]
+endSection: [1]
+beginSection: [1]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [1]
+endSection: [1]
+beginSection: [1]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [1]
+endSection: [1]
+beginSection: [1]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+.# TODO: This is a problem in wikimodel. It should generate only 1 onWord event and not 2.
+onWord: [1]
+onWord: [some]
+onSpace
+onWord: [text]
+endSection: [1]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>1.1.1.1.1.1.1 Not a header</p>
+<h6 id="HTitlelevel6"><span> Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1sometext"><span>Title level 1some text</span></h1>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-1.1.1.1.1.1.1 Not a header
+.# TODO: Bug with wikimodel, see above. It generates an extra onSpace event.
+======  Title level 6 ======
+= Title level 1 =
+= Title level 1 =
+= Title level 1 =
+= Title level 1 =
+= Title level 1 =
+= Title level 1some text =
 .#-----------------------------------------------------
-.input|xhtml/1.0
+.input|xhtml/1.0|skip
 .#-----------------------------------------------------
-<html><p>1.1.1.1.1.1.1 Not a header</p></html>
+.# TODO: Problem in wikimodel above.
+<html><h6 id="HTitlelevel6"><span> Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1sometext"><span>Title level 1some text</span></h1></html>

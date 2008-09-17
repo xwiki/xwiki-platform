@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1191514175000</creationDate>
-<date>1211206726000</date>
-<contentUpdateDate>1211206726000</contentUpdateDate>
-<version>5.1</version>
+<date>1221579560000</date>
+<contentUpdateDate>1221579560000</contentUpdateDate>
+<version>19.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -55,7 +55,27 @@
 <tags/>
 </property>
 </object>
-<content>#set($WikiManager = $xwiki.wikimanager)
+<content>#############################################################################
+## Print the list of last modifications made on all wikis. Can be filtered by a provided user.
+##
+## Can use URL parameters :
+## -nb      : The maximum number of results to print. Default is 30.
+## -user    : Filter modification made by provided user. The modifications of any users are listed by default.
+## -userwiki: The wiki of the user to filter by. Current database is used by default.
+##
+#############################################################################
+#if ($request.nb)
+  #set($nb = $util.parseInt($request.nb))
+#end
+##
+#if ($request.user)
+  #set($usermodifications = $request.user)
+#end
+#if ($request.userwiki)
+  #set($usermodificationswiki = $request.userwiki)
+#end
+#############################################################################
+#set($WikiManager = $xwiki.wikimanager)
 #if(!$WikiManager)
   #error($msg.get("wikimanager.pluginnotenabled"))
 #end
@@ -116,5 +136,16 @@ $query.setMax($nb)
 ##
 #foreach ($item in $documentlist)
   #displaymodification("$item.wiki - $item.displayTitle in $item.space" $item.prefixedFullName $item.date $formatDate $item.author true)
+#end
+##
+#if (!$doc.name.equals("LastWikiModificationsCode"))
+  &lt;br/&gt;
+  #if ($usermodifications)
+    #set($filter = "user=${usermodifications}")
+    #if ($usermodificationswiki)
+      #set($filter = "${filter}&amp;userwiki=${usermodificationswiki}")
+    #end
+  #end
+  [See more&gt;WikiCode.LastWikiModificationsCode#if($filter)?$filter#end]
 #end</content>
 </xwikidoc>

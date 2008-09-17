@@ -103,4 +103,21 @@ public class DefaultXWikiRenderingEngineTest extends AbstractXWikiComponentTestC
         XWikiDocument document = new XWikiDocument();
         assertEquals(expectedText, engine.renderText(text, document, getContext()));
     }
+
+    /**
+     * Test that links are preserved after rendering.
+     * XWIKI-2672
+     */
+    public void testLinksAndCache() throws Exception
+    {
+        String link = "http://some:123/link";
+        String text =
+            "$context.setCacheDuration(1800)\n" +
+            link;
+        XWikiDocument document = new XWikiDocument();
+
+        Utils.enablePlaceholders(getContext());
+        String out = engine.renderText(text, document, getContext());
+        assertTrue( out.contains(link) );
+    }
 }

@@ -73,10 +73,10 @@ public class EditForm extends XWikiForm
         setLanguage(request.getParameter("language"));
         setTitle(request.getParameter("title"));
         setComment(request.getParameter("comment"));
-        setDefaultLanguage(request.getParameter("default_language"));
+        setDefaultLanguage(request.getParameter("defaultLanguage"));
         setTags(request.getParameterValues("tags"));
         setLockForce("1".equals(request.getParameter("force")));
-        setMinorEdit(request.getParameter("minor_edit") != null);
+        setMinorEdit(request.getParameter("minorEdit") != null);
         setSyntaxId(request.getParameter("syntaxId"));
     }
 

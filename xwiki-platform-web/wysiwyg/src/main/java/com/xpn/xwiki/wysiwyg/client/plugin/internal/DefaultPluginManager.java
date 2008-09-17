@@ -150,7 +150,7 @@ public class DefaultPluginManager implements PluginManager
      */
     public UIExtension getUIExtension(String role, String feature)
     {
-        return (UIExtension) getUIExtensions(role).get(feature);
+        return getUIExtensions(role).get(feature);
     }
 
     private Map<String, UIExtension> getUIExtensions(String role)

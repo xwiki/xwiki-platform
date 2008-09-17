@@ -54,55 +54,6 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     /**
      * {@inheritDoc}
      * 
-     * @see XWikiGWTDefaultApp#getTranslationPage()
-     */
-    public String getTranslationPage()
-    {
-        return getParam("translations", Constants.DEFAULT_TRANSLATIONS_PAGE);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiGWTDefaultApp#getLocale()
-     */
-    public String getLocale()
-    {
-        return getParam("locale", Constants.DEFAULT_LOCALE);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiGWTDefaultApp#getCSSPrefix()
-     */
-    public String getCSSPrefix()
-    {
-        return Constants.CSS_PREFIX;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiGWTDefaultApp#getSkinFile(String)
-     */
-    public String getSkinFile(String file)
-    {
-        String name = "wysiwyg-" + file;
-        if ("1".equals(getParam("useskin")))
-            return super.getSkinFile(name);
-        else {
-            String imagePath = getParam("resourcepath", "");
-            if (imagePath.equals(""))
-                return name;
-            else
-                return imagePath + "/" + name;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see EntryPoint#onModuleLoad()
      */
     public void onModuleLoad()
@@ -147,6 +98,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
         }
 
         // Launch the UI
+        setName("Wysiwyg");
         for (final Config config : getConfigs()) {
             String hookId = config.getParameter("hookId");
             if (hookId == null) {

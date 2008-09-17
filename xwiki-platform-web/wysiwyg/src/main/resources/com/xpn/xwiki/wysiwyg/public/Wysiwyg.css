@@ -182,9 +182,7 @@
   cursor:move;
 }
 .xDialogBox .xTitleBar {
-  position:relative;
   text-align:center;
-  width:100%;
 }
 
 .xDialogBox .xTitleBar .gwt-PushButton {

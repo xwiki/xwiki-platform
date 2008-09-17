@@ -30,6 +30,10 @@ import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
  */
 public class ToolBarSeparator extends AbstractSeparator
 {
+    public static final String VERTICAL_BAR = "|";
+
+    public static final String LINE_BREAK = "/";
+
     public ToolBarSeparator()
     {
         // The extension point is the tool bar
@@ -43,7 +47,7 @@ public class ToolBarSeparator extends AbstractSeparator
      */
     public String[] getFeatures()
     {
-        return new String[] {"|", "/"};
+        return new String[] {VERTICAL_BAR, LINE_BREAK};
     }
 
     /**

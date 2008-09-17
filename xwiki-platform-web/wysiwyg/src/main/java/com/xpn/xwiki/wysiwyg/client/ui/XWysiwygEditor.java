@@ -32,6 +32,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManager;
+import com.xpn.xwiki.wysiwyg.client.plugin.separator.ToolBarSeparator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
@@ -79,12 +80,62 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
         }
 
         final String[] toolBarFeatures = config.getParameter("toolbar", DEFAULT_TOOLBAR).split("\\s+");
+        boolean emptyGroup = true;
+        boolean emptyLine = true;
+        boolean uieNotFound = false;
+        UIExtension verticalBar = null;
+        UIExtension lineBreak = null;
         this.toolBarFeatures = new HashSet<String>();
         for (int i = 0; i < toolBarFeatures.length; i++) {
             UIExtension uie = pm.getUIExtension("toolbar", toolBarFeatures[i]);
             if (uie != null) {
-                ui.getToolbar().add((Widget) uie.getUIObject(toolBarFeatures[i]));
-                this.toolBarFeatures.add(toolBarFeatures[i]);
+                if (ToolBarSeparator.VERTICAL_BAR.equals(toolBarFeatures[i])) {
+                    if (emptyGroup && uieNotFound) {
+                        continue;
+                    } else {
+                        if (verticalBar != null) {
+                            ui.getToolbar().add((Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
+                            this.toolBarFeatures.add(ToolBarSeparator.VERTICAL_BAR);
+                        } else if (lineBreak != null) {
+                            ui.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
+                            this.toolBarFeatures.add(ToolBarSeparator.LINE_BREAK);
+                            lineBreak = null;
+                        }
+                        verticalBar = uie;
+                        emptyGroup = true;
+                        uieNotFound = false;
+                    }
+                } else if (ToolBarSeparator.LINE_BREAK.equals(toolBarFeatures[i])) {
+                    if (emptyLine && uieNotFound) {
+                        continue;
+                    } else {
+                        if (lineBreak != null) {
+                            ui.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
+                            this.toolBarFeatures.add(ToolBarSeparator.LINE_BREAK);
+                        }
+                        lineBreak = uie;
+                        verticalBar = null;
+                        emptyLine = true;
+                        emptyGroup = true;
+                        uieNotFound = false;
+                    }
+                } else {
+                    if (verticalBar != null) {
+                        ui.getToolbar().add((Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
+                        this.toolBarFeatures.add(ToolBarSeparator.VERTICAL_BAR);
+                        verticalBar = null;
+                    } else if (lineBreak != null) {
+                        ui.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
+                        this.toolBarFeatures.add(ToolBarSeparator.LINE_BREAK);
+                        lineBreak = null;
+                    }
+                    ui.getToolbar().add((Widget) uie.getUIObject(toolBarFeatures[i]));
+                    this.toolBarFeatures.add(toolBarFeatures[i]);
+                    emptyGroup = false;
+                    emptyLine = false;
+                }
+            } else {
+                uieNotFound = true;
             }
         }
     }

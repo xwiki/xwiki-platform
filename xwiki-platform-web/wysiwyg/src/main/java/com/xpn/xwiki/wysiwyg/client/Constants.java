@@ -23,13 +23,5 @@ public class Constants
 {
     public static final String WYSIWYG_DEFAULT_SERVICE = "/WysiwygService";
 
-    public static final String DEFAULT_LOCALE = "en";
-
-    public static final String WEBAPPNAME = "xwiki";
-
-    public static final String CSS_PREFIX = "wysiwyg";
-
-    public static final String DEFAULT_TRANSLATIONS_PAGE = "Wysiwyg.Translations";
-
     public static final int DEFAULT_SYNC_DELAY = 3000;
 }

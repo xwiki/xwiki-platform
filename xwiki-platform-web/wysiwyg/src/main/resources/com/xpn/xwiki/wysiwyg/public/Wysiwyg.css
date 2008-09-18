@@ -173,7 +173,8 @@
 .xDialogBox {
   border:1px solid black;
 }
-.xDialogBox .xCaption{
+
+.xDialogBox .xCaption {
   border-bottom:1px solid black;	
   padding-right:16px;
   background-color:#FFA500;
@@ -181,8 +182,14 @@
   line-height:16px;
   cursor:move;
 }
+
 .xDialogBox .xTitleBar {
   text-align:center;
+}
+
+* html .xDialogBox .xTitleBar {
+  /* IE6 */  
+  width:100%;
 }
 
 .xDialogBox .xTitleBar .gwt-PushButton {
@@ -193,12 +200,19 @@
   border-bottom: 1px solid black;
   background-color: #FF0000;
 }
+
 .xDialogBox .xTitleBar .gwt-PushButton .gwt-Image {
   vertical-align: middle;
 }
+
 .xDialogBox-dragging {
   background-color:#6666FF !important;
   border-style:dashed;
   filter:alpha(opacity = 50) !important; /* IE */
   opacity:0.5 !important; /* non-IE */	
+}
+
+* html .gwt-PopupPanel .popupContent {
+  /* IE6 */
+  width: 1px; 
 }

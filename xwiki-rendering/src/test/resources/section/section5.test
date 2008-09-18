@@ -3,7 +3,7 @@
 .#-----------------------------------------------------
 Not a == header ==
 .#-----------------------------------------------------
-.expect|event|skip
+.expect|event
 .#-----------------------------------------------------
 .# TODO: Wikimodel generates invalid events
 beginDocument
@@ -11,10 +11,14 @@ beginParagraph: []
 onWord: [Not]
 onSpace
 onWord: [a]
-onSpecialSymbol: [ ==]
+onSpace
+onSpecialSymbol: [=]
+onSpecialSymbol: [=]
 onSpace
 onWord: [header]
-onSpecialSymbol: [ ==]
+onSpace
+onSpecialSymbol: [=]
+onSpecialSymbol: [=]
 endParagraph: []
 endDocument
 .#-----------------------------------------------------

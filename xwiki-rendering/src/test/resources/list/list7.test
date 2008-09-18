@@ -31,7 +31,6 @@ endDocument
 ** 
 *** Item
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=22
 <html><ul><li><ul><li><ul><li>Item</li></ul></li></ul></li></ul></html>

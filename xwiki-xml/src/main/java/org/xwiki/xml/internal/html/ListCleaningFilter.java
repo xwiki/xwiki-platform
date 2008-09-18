@@ -121,7 +121,8 @@ public class ListCleaningFilter implements CleaningFilter
             // and we need to move the <ul> inside the <li>.
             Element previousElement = null;
             List contentList = parent.getContent();
-            for (int i = contentList.indexOf(element) - 1; i > -1; i--) {
+            int pos = contentList.indexOf(element);
+            for (int i = pos - 1; i > -1; i--) {
                 if ((previousElement == null)
                     && contentList.get(i).getClass().isAssignableFrom(Element.class))
                 {
@@ -134,7 +135,7 @@ public class ListCleaningFilter implements CleaningFilter
                 // This means we have <ul><ul>. We need to insert a <li> element.
                 Element li = new Element(LI);
                 li.addContent(element.detach());
-                parent.addContent(li);
+                parent.addContent(pos, li);
             } else {
                 // Move it inside the previous sibling
                 previousElement.addContent(element.detach());

@@ -19,9 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
+import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.user.client.IncrementalCommand;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.KeyboardListener;
@@ -38,9 +41,31 @@ import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
+import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdate;
 
-public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandListener, ChangeListener
+public class XWysiwygEditor implements DeferredUpdate, ClickListener, KeyboardListener, CommandListener, ChangeListener
 {
+    private class SyntaxValidationCommand implements IncrementalCommand
+    {
+        private final Iterator<Map.Entry<String, UIExtension>> iterator;
+
+        public SyntaxValidationCommand()
+        {
+            iterator = toolBarFeatures.entrySet().iterator();
+        }
+
+        public boolean execute()
+        {
+            if (iterator.hasNext()) {
+                Map.Entry<String, UIExtension> entry = iterator.next();
+                entry.getValue().setEnabled(entry.getKey(), sv.isValid(entry.getKey(), ui.getTextArea()));
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
     private static final String DEFAULT_SYNTAX = "xwiki/2.0";
 
     private static final String DEFAULT_PLUGINS =
@@ -55,9 +80,11 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
 
     private final SyntaxValidator sv;
 
-    private final Set<String> toolBarFeatures;
+    private final Map<String, UIExtension> toolBarFeatures;
 
     private boolean loaded = false;
+
+    private long updateIndex = -1;
 
     public XWysiwygEditor(Wysiwyg wysiwyg, Config config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
     {
@@ -85,7 +112,7 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
         boolean uieNotFound = false;
         UIExtension verticalBar = null;
         UIExtension lineBreak = null;
-        this.toolBarFeatures = new HashSet<String>();
+        this.toolBarFeatures = new HashMap<String, UIExtension>();
         for (int i = 0; i < toolBarFeatures.length; i++) {
             UIExtension uie = pm.getUIExtension("toolbar", toolBarFeatures[i]);
             if (uie != null) {
@@ -95,10 +122,10 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
                     } else {
                         if (verticalBar != null) {
                             ui.getToolbar().add((Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
-                            this.toolBarFeatures.add(ToolBarSeparator.VERTICAL_BAR);
+                            this.toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
                         } else if (lineBreak != null) {
                             ui.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
-                            this.toolBarFeatures.add(ToolBarSeparator.LINE_BREAK);
+                            this.toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                             lineBreak = null;
                         }
                         verticalBar = uie;
@@ -111,7 +138,7 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
                     } else {
                         if (lineBreak != null) {
                             ui.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
-                            this.toolBarFeatures.add(ToolBarSeparator.LINE_BREAK);
+                            this.toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                         }
                         lineBreak = uie;
                         verticalBar = null;
@@ -122,15 +149,15 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
                 } else {
                     if (verticalBar != null) {
                         ui.getToolbar().add((Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
-                        this.toolBarFeatures.add(ToolBarSeparator.VERTICAL_BAR);
+                        this.toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
                         verticalBar = null;
                     } else if (lineBreak != null) {
                         ui.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
-                        this.toolBarFeatures.add(ToolBarSeparator.LINE_BREAK);
+                        this.toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                         lineBreak = null;
                     }
                     ui.getToolbar().add((Widget) uie.getUIObject(toolBarFeatures[i]));
-                    this.toolBarFeatures.add(toolBarFeatures[i]);
+                    this.toolBarFeatures.put(toolBarFeatures[i], uie);
                     emptyGroup = false;
                     emptyLine = false;
                 }
@@ -148,7 +175,7 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
     public void onClick(Widget sender)
     {
         if (sender == ui.getTextArea()) {
-            onUpdate();
+            deferUpdate();
         }
     }
 
@@ -180,7 +207,7 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
     public void onKeyUp(Widget sender, char keyCode, int modifier)
     {
         if (sender == ui.getTextArea()) {
-            onUpdate();
+            deferUpdate();
         }
     }
 
@@ -192,7 +219,7 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (sender == ui.getTextArea().getCommandManager()) {
-            onUpdate();
+            deferUpdate();
         }
     }
 
@@ -208,6 +235,36 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DeferredUpdate#getUpdateIndex()
+     */
+    public long getUpdateIndex()
+    {
+        return updateIndex;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DeferredUpdate#incUpdateIndex()
+     */
+    public long incUpdateIndex()
+    {
+        return ++updateIndex;
+    }
+
+    private void deferUpdate()
+    {
+        DeferredCommand.addCommand(new UpdateCommand(this));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DeferredUpdate#onUpdate()
+     */
     public void onUpdate()
     {
         if (!loaded) {
@@ -221,10 +278,7 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
             getUI().getTextArea().getCommandManager().execute(Command.INSERT_BR_ON_RETURN, false);
         }
 
-        for (String feature : toolBarFeatures) {
-            UIExtension uie = pm.getUIExtension("toolbar", feature);
-            uie.setEnabled(feature, sv.isValid(feature, ui.getTextArea()));
-        }
+        DeferredCommand.addCommand(new SyntaxValidationCommand());
     }
 
     public XRichTextEditor getUI()

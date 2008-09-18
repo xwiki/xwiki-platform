@@ -188,9 +188,12 @@ public class TextPlugin extends StatefulPlugin
                     onItalic();
                 } else if (keyCode == underlineKey.getKeyCode()) {
                     onUnderline();
+                } else {
+                    super.onKeyUp(sender, keyCode, modifiers);
                 }
+            } else {
+                super.onKeyUp(sender, keyCode, modifiers);
             }
-            onUpdate();
         }
     }
 

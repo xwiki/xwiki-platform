@@ -19,18 +19,23 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
+import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdate;
 
 /**
  * An abstract kind of plug-in that listens to the changes in the state of the editor's text area.
  */
-public abstract class StatefulPlugin extends AbstractPlugin implements ClickListener, KeyboardListener, CommandListener
+public abstract class StatefulPlugin extends AbstractPlugin implements DeferredUpdate, ClickListener, KeyboardListener,
+    CommandListener
 {
+    private long updateIndex = -1;
+
     /**
      * {@inheritDoc}
      * 
@@ -39,7 +44,7 @@ public abstract class StatefulPlugin extends AbstractPlugin implements ClickList
     public void onClick(Widget sender)
     {
         if (sender == getTextArea()) {
-            onUpdate();
+            deferUpdate();
         }
     }
 
@@ -71,7 +76,7 @@ public abstract class StatefulPlugin extends AbstractPlugin implements ClickList
     public void onKeyUp(Widget sender, char keyCode, int modifiers)
     {
         if (sender == getTextArea()) {
-            onUpdate();
+            deferUpdate();
         }
     }
 
@@ -83,12 +88,35 @@ public abstract class StatefulPlugin extends AbstractPlugin implements ClickList
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (sender == getTextArea().getCommandManager()) {
-            onUpdate();
+            deferUpdate();
         }
     }
 
     /**
      * Called whenever the state of the editor's text area changes.
      */
-    public abstract void onUpdate();
+    private void deferUpdate()
+    {
+        DeferredCommand.addCommand(new UpdateCommand(this));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DeferredUpdate#getUpdateIndex()
+     */
+    public long getUpdateIndex()
+    {
+        return updateIndex;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DeferredUpdate#incUpdateIndex()
+     */
+    public long incUpdateIndex()
+    {
+        return ++updateIndex;
+    }
 }

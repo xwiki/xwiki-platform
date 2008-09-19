@@ -361,7 +361,7 @@ public interface Listener
      * 
      * @param symbol the symbol encountered
      */
-    void onSpecialSymbol(String symbol);
+    void onSpecialSymbol(char symbol);
 
     /**
      * A string that is escaped, ie which contains special characters that should not be transformed and that should be

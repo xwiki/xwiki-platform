@@ -210,7 +210,7 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("onSpace");
     }
 
-    public void onSpecialSymbol(String symbol)
+    public void onSpecialSymbol(char symbol)
     {
         println("onSpecialSymbol: [" + symbol + "]");
     }

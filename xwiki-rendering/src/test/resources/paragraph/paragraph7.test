@@ -1,0 +1,33 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+verify    spaces are honored
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph: []
+onWord: [verify]
+onSpace
+onSpace
+onSpace
+onSpace
+onWord: [spaces]
+onSpace
+onWord: [are]
+onSpace
+onWord: [honored]
+endParagraph: []
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>verify    spaces are honored</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+verify    spaces are honored
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>verify    spaces are honored</p></html>

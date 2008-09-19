@@ -43,6 +43,7 @@ import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.parser.LinkParser;
 
 /**
  * @version $Id$
@@ -50,6 +51,8 @@ import org.xwiki.rendering.listener.Format;
  */
 public class XDOMGeneratorSink implements Sink
 {
+    private LinkParser linkParser;
+
     private Stack<Block> stack = new Stack<Block>();
 
     private final MarkerBlock marker = new MarkerBlock();
@@ -62,6 +65,11 @@ public class XDOMGeneratorSink implements Sink
         public void traverse(Listener listener)
         {
         }
+    }
+
+    public XDOMGeneratorSink(LinkParser linkParser)
+    {
+        this.linkParser = linkParser;
     }
 
     public XDOM getDOM()
@@ -576,7 +584,7 @@ public class XDOMGeneratorSink implements Sink
                 if (symbol.equals(" ")) {
                     this.stack.push(SpaceBlock.SPACE_BLOCK);
                 } else {
-                    this.stack.push(new SpecialSymbolBlock(symbol));
+                    this.stack.push(new SpecialSymbolBlock(symbol.charAt(0)));
                 }
             }
         }

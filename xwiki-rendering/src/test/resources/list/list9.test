@@ -1,0 +1,34 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify that spaces before lists are allowed
+.#-----------------------------------------------------
+    * item1
+      ** item2
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginList: [BULLETED] []
+beginListItem
+onWord: [item1]
+beginList: [BULLETED] []
+beginListItem
+onWord: [item2]
+endListItem
+endList: [BULLETED] []
+endListItem
+endList: [BULLETED] []
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<ul><li>item1<ul><li>item2</li></ul></li></ul>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+* item1
+** item2
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><ul><li>item1<ul><li>item2</li></ul></li></ul></html>

@@ -330,9 +330,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onSpecialSymbol(String)
      */
-    public void onSpecialSymbol(String symbol)
+    public void onSpecialSymbol(char symbol)
     {
-        print(StringEscapeUtils.escapeHtml(symbol));
+        print(StringEscapeUtils.escapeHtml("" + symbol));
     }
 
     /**

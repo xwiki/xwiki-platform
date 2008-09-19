@@ -66,6 +66,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("paragraph/paragraph4", false);
         suite.addTestsFromResource("paragraph/paragraph5", false);
         suite.addTestsFromResource("paragraph/paragraph6", false);
+        suite.addTestsFromResource("paragraph/paragraph7", false);
         suite.addTestsFromResource("verbatim/verbatim1", false);
         suite.addTestsFromResource("verbatim/verbatim2", false);
         suite.addTestsFromResource("verbatim/verbatim3", false);
@@ -112,6 +113,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("list/list6", false);
         suite.addTestsFromResource("list/list7", false);
         suite.addTestsFromResource("list/list8", false);
+        suite.addTestsFromResource("list/list9", false);
         suite.addTestsFromResource("list/definitionlist1", false);
         suite.addTestsFromResource("list/definitionlist2", false);
         suite.addTestsFromResource("list/definitionlist3", false);
@@ -120,9 +122,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("list/definitionlist6", false);
         suite.addTestsFromResource("section/section1", false);
         suite.addTestsFromResource("section/section2", false);
-        suite.addTestsFromResource("section/section3", false);
+        suite.addTestsFromResource("section/section3", true);
         suite.addTestsFromResource("section/section4", false);
         suite.addTestsFromResource("section/section5", false);
+        suite.addTestsFromResource("section/section6", true);
         suite.addTestsFromResource("quote/quote1", false);
         suite.addTestsFromResource("quote/quote2", false);
         suite.addTestsFromResource("quote/quote3", false);

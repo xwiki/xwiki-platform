@@ -446,9 +446,12 @@ public class XDOMGeneratorListener implements IWemListener
      * 
      * @see org.wikimodel.wem.IWemListener#onSpace(String)
      */
-    public void onSpace(String str)
+    public void onSpace(String spaces)
     {
-        this.stack.push(SpaceBlock.SPACE_BLOCK);
+        // We want one space event per space. 
+        for (int i = 0; i < spaces.length(); i++) { 
+            this.stack.push(SpaceBlock.SPACE_BLOCK);
+        }
     }
 
     /**
@@ -458,7 +461,9 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onSpecialSymbol(String symbol)
     {
-        this.stack.push(new SpecialSymbolBlock(symbol));
+        for (int i = 0; i < symbol.length(); i++) { 
+            this.stack.push(new SpecialSymbolBlock(symbol.charAt(i)));
+        }
     }
 
     /**

@@ -27,14 +27,14 @@ import org.xwiki.rendering.listener.Listener;
  */
 public class SpecialSymbolBlock extends AbstractBlock
 {
-    private String symbol;
+    private char symbol;
     
-    public SpecialSymbolBlock(String symbol)
+    public SpecialSymbolBlock(char symbol)
     {
         this.symbol = symbol;
     }
 
-    public String getSymbol()
+    public char getSymbol()
     {
         return this.symbol;
     }

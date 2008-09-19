@@ -28,6 +28,12 @@
     <!-- Parsers -->
     <component>
       <role>org.xwiki.rendering.parser.LinkParser</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.GenericLinkParser</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.parser.LinkParser</role>
       <role-hint>xwiki/2.0</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.XWikiLinkParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
@@ -52,18 +58,33 @@
       <role-hint>mediawiki/1.0</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.WikiModelMediaWikiParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.LinkParser</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
       <role-hint>creole/1.0</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.WikiModelCreoleParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.LinkParser</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
       <role-hint>jspwiki/1.0</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.WikiModelJspWikiParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.LinkParser</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
@@ -85,12 +106,22 @@
       <role-hint>confluence/1.0</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.DoxiaConfluenceParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.LinkParser</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
       <role-hint>twiki/1.0</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.DoxiaTWikiParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.LinkParser</role>
+        </requirement>
+      </requirements>
     </component>
 
     <!-- Others -->

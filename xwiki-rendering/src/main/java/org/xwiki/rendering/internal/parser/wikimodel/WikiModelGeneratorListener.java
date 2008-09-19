@@ -214,9 +214,9 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.onSpace(" ");
     }
 
-    public void onSpecialSymbol(String symbol)
+    public void onSpecialSymbol(char symbol)
     {
-        this.wikimodelListener.onSpecialSymbol(symbol);
+        this.wikimodelListener.onSpecialSymbol("" + symbol);
     }
 
     public void onWord(String word)

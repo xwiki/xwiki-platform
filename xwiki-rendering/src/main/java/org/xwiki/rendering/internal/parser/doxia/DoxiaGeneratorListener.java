@@ -236,10 +236,10 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.rawText(" ");
     }
 
-    public void onSpecialSymbol(String symbol)
+    public void onSpecialSymbol(char symbol)
     {
         // Since there's no On Special Symbol event in Doxia we simply generate text
-        this.sink.rawText(symbol);
+        this.sink.rawText("" + symbol);
     }
 
     public void onWord(String word)

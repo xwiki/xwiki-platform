@@ -322,11 +322,11 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#onSpecialSymbol(String)
+     * @see PrintRenderer#onSpecialSymbol(char)
      */
-    public void onSpecialSymbol(String symbol)
+    public void onSpecialSymbol(char symbol)
     {
-        print(symbol);
+        print("" + symbol);
     }
 
     /**

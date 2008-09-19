@@ -141,7 +141,7 @@ public class ListenerDelegate implements Listener
         this.listener.onSpace();
     }
 
-    public void onSpecialSymbol(String symbol)
+    public void onSpecialSymbol(char symbol)
     {
         this.listener.onSpecialSymbol(symbol);
     }

@@ -17,37 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.doxia;
+package org.xwiki.rendering.internal.parser;
 
-import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.parser.doxia.XDOMGeneratorSink;
+import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 
-import java.io.Reader;
-
 /**
+ * Since we need to have wiki syntax-specific link parsers, this generic parser allows at least to the refernce
+ * displayed when using syntaxes other than XWiki (which has its specific link parser, see {@link XWikiLinkParser}),
+ * while waiting for specialized link parsers to be written.
+ *
  * @version $Id$
- * @since 1.5M2
+ * @since 1.6RC1
  */
-public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements Parser
+public class GenericLinkParser implements LinkParser
 {
-    private LinkParser linkParser;
-
-    public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();
-
-    public XDOM parse(Reader source) throws ParseException
+    /**
+     * {@inheritDoc}
+     * @see LinkParser#parse(String)
+     */
+    public Link parse(String rawLink) throws ParseException
     {
-        org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
-        XDOMGeneratorSink sink = new XDOMGeneratorSink(this.linkParser);
-
-        try {
-            parser.parse(source, sink);
-        } catch (org.apache.maven.doxia.parser.ParseException e) {
-            throw new ParseException("Failed to parse input source", e);
-        }
-        return sink.getDOM();
+        Link link = new Link();
+        link.setReference(rawLink);
+        return link;
     }
 }

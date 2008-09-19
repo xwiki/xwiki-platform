@@ -337,7 +337,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void onEscape(String escapedString)
     {
         for (int i = 0; i < escapedString.length(); i++) {
-            print("\\" + escapedString.charAt(i));
+            print("~" + escapedString.charAt(i));
         }
     }
 

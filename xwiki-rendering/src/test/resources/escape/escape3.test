@@ -1,0 +1,46 @@
+.#---------------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.#---------------------------------------------------------------------------------------------------------
+this is a single ~~ tilde
+this is a backslash \
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph: []
+onWord: [this]
+onSpace
+onWord: [is]
+onSpace
+onWord: [a]
+onSpace
+onWord: [single]
+onSpace
+onEscape: [~]
+onSpace
+onWord: [tilde]
+onLineBreak
+onWord: [this]
+onSpace
+onWord: [is]
+onSpace
+onWord: [a]
+onSpace
+onWord: [backslash]
+onSpace
+onSpecialSymbol: [\]
+endParagraph: []
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>this is a single ~ tilde<br/>this is a backslash \</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+this is a single ~~ tilde
+this is a backslash \
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>this is a single ~ tilde<br/>this is a backslash \</p></html>

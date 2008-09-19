@@ -4,18 +4,18 @@
 .# Also verify that special XML symbols (<, >, ", &) are correctly handled. Note that apostrophe (&apos;)
 .# is not a legal entity and thus isn't escaped.
 .#---------------------------------------------------------------------------------------------------------
-\*\*notbold\*\*
+~*~*notbold~*~*
 <notag>"&'
-\[\[nolink\]\]
-\{\{nomacro\}\}
-\#\#nomono\#\#
-\~\~noitalic\~\~
-\-\-notrike\-\-
-\_\_nounderscore\_\_
-\^\^nosuper\^\^
-\,\,nosub\,\,
-\* notlist
-\1\1\*\. notlist
+~[~[nolink~]~]
+~{~{nomacro~}~}
+~#~#nomono~#~#
+~/~/noitalic~/~/
+~-~-notrike~-~-
+~_~_nounderscore~_~_
+~^~^nosuper~^~^
+~,~,nosub~,~,
+~* notlist
+~1~1~*~. notlist
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -52,11 +52,11 @@ onWord: [nomono]
 onEscape: [#]
 onEscape: [#]
 onLineBreak
-onEscape: [~]
-onEscape: [~]
+onEscape: [/]
+onEscape: [/]
 onWord: [noitalic]
-onEscape: [~]
-onEscape: [~]
+onEscape: [/]
+onEscape: [/]
 onLineBreak
 onEscape: [-]
 onEscape: [-]
@@ -97,23 +97,23 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>~~noitalic~~<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist</p>
+<p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-\*\*notbold\*\*
+~*~*notbold~*~*
 <notag>"&'
-\[\[nolink\]\]
-\{\{nomacro\}\}
-\#\#nomono\#\#
-\~\~noitalic\~\~
-\-\-notrike\-\-
-\_\_nounderscore\_\_
-\^\^nosuper\^\^
-\,\,nosub\,\,
-\* notlist
-\1\1\*\. notlist
+~[~[nolink~]~]
+~{~{nomacro~}~}
+~#~#nomono~#~#
+~/~/noitalic~/~/
+~-~-notrike~-~-
+~_~_nounderscore~_~_
+~^~^nosuper~^~^
+~,~,nosub~,~,
+~* notlist
+~1~1~*~. notlist
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>~~noitalic~~<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist</p></html>
+<html><p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist</p></html>

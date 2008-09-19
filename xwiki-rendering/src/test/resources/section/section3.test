@@ -9,7 +9,7 @@
 = Title level 1====
 = Title level 1 =some text
 = unclosed header
-= key\=value =
+= key~=value =
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -95,7 +95,7 @@ endDocument
 = Title level 1 =
 some text
 = unclosed header =
-= key\=value =
+= key~=value =
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------

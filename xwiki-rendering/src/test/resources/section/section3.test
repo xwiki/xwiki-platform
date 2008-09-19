@@ -3,6 +3,7 @@
 .#-----------------------------------------------------
 ============== Title level 6
 = Title level 1=
+  = Title level 1 =
 =Title level 1=
 =Title level 1 =
 =    Title level 1        =
@@ -21,6 +22,13 @@ onWord: [level]
 onSpace
 onWord: [6]
 endSection: [6]
+beginSection: [1]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [1]
+endSection: [1]
 beginSection: [1]
 onWord: [Title]
 onSpace
@@ -82,11 +90,12 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<h6 id="HTitlelevel6"><span>Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1-5"><span>Title level 1</span></h1><p>some text</p><h1 id="Hunclosedheader"><span>unclosed header</span></h1><h1 id="Hkeyvalue"><span>key=value</span></h1>
+<h6 id="HTitlelevel6"><span>Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1-5"><span>Title level 1</span></h1><h1 id="HTitlelevel1-6"><span>Title level 1</span></h1><p>some text</p><h1 id="Hunclosedheader"><span>unclosed header</span></h1><h1 id="Hkeyvalue"><span>key=value</span></h1>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 ====== Title level 6 ======
+= Title level 1 =
 = Title level 1 =
 = Title level 1 =
 = Title level 1 =
@@ -99,4 +108,4 @@ some text
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><h6 id="HTitlelevel6"><span>Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1-5"><span>Title level 1</span></h1><p>some text</p><h1 id="Hunclosedheader"><span>unclosed header</span></h1><h1 id="Hkeyvalue"><span>key=value</span></h1></html>
+<html><h6 id="HTitlelevel6"><span>Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1-5"><span>Title level 1</span></h1><h1 id="HTitlelevel1-6"><span>Title level 1</span></h1><p>some text</p><h1 id="Hunclosedheader"><span>unclosed header</span></h1><h1 id="Hkeyvalue"><span>key=value</span></h1></html>

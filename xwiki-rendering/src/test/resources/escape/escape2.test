@@ -16,6 +16,7 @@
 ~,~,nosub~,~,
 ~* notlist
 ~1~1~*~. notlist
+~=~= notheader
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -92,12 +93,17 @@ onEscape: [*]
 onEscape: [.]
 onSpace
 onWord: [notlist]
+onLineBreak
+onEscape: [=]
+onEscape: [=]
+onSpace
+onWord: [notheader]
 endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist</p>
+<p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -113,7 +119,8 @@ endDocument
 ~,~,nosub~,~,
 ~* notlist
 ~1~1~*~. notlist
+~=~= notheader
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist</p></html>
+<html><p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader</p></html>

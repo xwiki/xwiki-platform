@@ -30,11 +30,9 @@ import org.xwiki.rendering.listener.Format;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Print names of events. Useful for debugging and tracing in general.
+ * Print names of events. Useful for debugging and tracing in general. Note that this class is not located in the test
+ * source tree since it's currently used at runtime by the WYSIWYG editor for its runtime debug mode.
  * 
- * Note that this class is not located in the test source tree since it's currently used at runtime by the WYSIWYG
- * editor for its runtime debug mode.
- *
  * @version $Id$
  * @since 1.5M1
  */
@@ -467,9 +465,9 @@ public class EventsRenderer extends AbstractPrintRenderer
     {
         StringBuffer buffer = new StringBuffer();
         if (!parameters.isEmpty()) {
-            for (String key : parameters.keySet()) {
-                buffer.append('[').append(key).append(']').append('=').append('[').append(parameters.get(key)).append(
-                    ']');
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                buffer.append('[').append(entry.getKey()).append(']').append('=').append('[').append(entry.getValue())
+                    .append(']');
             }
         }
         return buffer.toString();

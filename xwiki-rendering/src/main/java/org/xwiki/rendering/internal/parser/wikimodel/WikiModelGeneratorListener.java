@@ -418,9 +418,10 @@ public class WikiModelGeneratorListener implements Listener
     private WikiParameters createWikiParameters(Map<String, String> parameters)
     {
         List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
-        for (String key : parameters.keySet()) {
-            wikiParams.add(new WikiParameter(key, parameters.get(key)));
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            wikiParams.add(new WikiParameter(entry.getKey(), entry.getValue()));
         }
+        
         return new WikiParameters(wikiParams);
     }
 }

@@ -653,8 +653,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         StringBuffer buffer = new StringBuffer();
         if (!parameters.isEmpty()) {
-            for (String key : parameters.keySet()) {
-                buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(entry.getValue()).append(
+                    '\"');
             }
         }
         return buffer;

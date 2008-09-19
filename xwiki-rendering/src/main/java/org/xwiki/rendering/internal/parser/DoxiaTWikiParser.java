@@ -34,6 +34,7 @@ public class DoxiaTWikiParser extends AbstractDoxiaParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.parser.Parser#getSyntax()
      */
     public Syntax getSyntax()
@@ -43,8 +44,10 @@ public class DoxiaTWikiParser extends AbstractDoxiaParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.internal.parser.doxia.AbstractDoxiaParser#createDoxiaParser()
      */
+    @Override
     public org.apache.maven.doxia.parser.Parser createDoxiaParser()
     {
         return new TWikiParser();

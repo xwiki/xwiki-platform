@@ -37,6 +37,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.parser.Parser#getSyntax()
      */
     public Syntax getSyntax()
@@ -46,8 +47,10 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see AbstractWikiModelParser#createWikiModelParser()
      */
+    @Override
     public IWikiParser createWikiModelParser()
     {
         // Pass reserved keywords that we want escaped by the XHTML parser.

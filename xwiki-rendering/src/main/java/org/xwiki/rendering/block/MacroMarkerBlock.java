@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A special block that Macro Blocks generate when they are executed so that it's possible to reconstruct
- * the initial syntax even after Macros have been executed. For example this is important in a WYSWIYG editor
- * where you want to show the Macro's rendered result and also let users modify the macro content.
- *
+ * A special block that Macro Blocks generate when they are executed so that it's possible to reconstruct the initial
+ * syntax even after Macros have been executed. For example this is important in a WYSWIYG editor where you want to show
+ * the Macro's rendered result and also let users modify the macro content.
+ * 
  * @version $Id$
  * @since 1.5M2
  */
@@ -67,6 +67,7 @@ public class MacroMarkerBlock extends AbstractFatherBlock
         return this.name;
     }
 
+    @Override
     public Map<String, String> getParameters()
     {
         return this.parameters;
@@ -79,6 +80,7 @@ public class MacroMarkerBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
@@ -88,7 +90,8 @@ public class MacroMarkerBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)  
+     * 
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

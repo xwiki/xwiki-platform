@@ -20,15 +20,12 @@
 package org.xwiki.rendering.renderer;
 
 import java.awt.Color;
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-import java.util.Formatter;
 import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.velocity.tools.struts.MessageTool;
 import org.codehaus.plexus.util.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.AbstractTableBlockParameters;

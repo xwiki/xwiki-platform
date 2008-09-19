@@ -35,6 +35,7 @@ public class WikiModelJspWikiParser extends AbstractWikiModelParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.parser.Parser#getSyntax()
      */
     public Syntax getSyntax()
@@ -44,8 +45,10 @@ public class WikiModelJspWikiParser extends AbstractWikiModelParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#createWikiModelParser()
      */
+    @Override
     public IWikiParser createWikiModelParser()
     {
         return new JspWikiParser();

@@ -35,6 +35,7 @@ public class DoxiaConfluenceParser extends AbstractDoxiaParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see Parser#getSyntax()
      */
     public Syntax getSyntax()
@@ -44,8 +45,10 @@ public class DoxiaConfluenceParser extends AbstractDoxiaParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see AbstractDoxiaParser#createDoxiaParser()
      */
+    @Override
     public org.apache.maven.doxia.parser.Parser createDoxiaParser()
     {
         return new ConfluenceParser();

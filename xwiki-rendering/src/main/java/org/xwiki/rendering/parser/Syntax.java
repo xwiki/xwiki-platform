@@ -57,6 +57,7 @@ public class Syntax
      * 
      * @see Object#toString()
      */
+    @Override
     public String toString()
     {
         return getType().toString() + " " + getVersion();
@@ -67,6 +68,7 @@ public class Syntax
      * 
      * @see Object#hashCode()
      */
+    @Override
     public int hashCode()
     {
         // Random number. See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this
@@ -82,6 +84,7 @@ public class Syntax
      * 
      * @see Object#equals(Object)
      */
+    @Override
     public boolean equals(Object object)
     {
         boolean result;

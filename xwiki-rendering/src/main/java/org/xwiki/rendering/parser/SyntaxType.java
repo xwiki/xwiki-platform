@@ -40,6 +40,12 @@ public enum SyntaxType
         this.id = id;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Enum#toString()
+     */
+    @Override
     public String toString()
     {
         return this.id;

@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.macro.include;
 
-import org.xwiki.rendering.internal.util.EnumConverter;
-
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
  * 

@@ -21,7 +21,7 @@ package org.xwiki.rendering.renderer;
 
 /**
  * Printer using a {@link StringBuffer} as the underlying output target.
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
@@ -54,7 +54,8 @@ public class DefaultWikiPrinter implements WikiPrinter
 
     /**
      * {@inheritDoc}
-     * @see WikiPrinter#print(String) 
+     * 
+     * @see WikiPrinter#print(String)
      */
     public void print(String text)
     {
@@ -63,6 +64,7 @@ public class DefaultWikiPrinter implements WikiPrinter
 
     /**
      * {@inheritDoc}
+     * 
      * @see WikiPrinter#println(String)
      */
     public void println(String text)
@@ -72,8 +74,10 @@ public class DefaultWikiPrinter implements WikiPrinter
 
     /**
      * {@inheritDoc}
+     * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         return getBuffer().toString();

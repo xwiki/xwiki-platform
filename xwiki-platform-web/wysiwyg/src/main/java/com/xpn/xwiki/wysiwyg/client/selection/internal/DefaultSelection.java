@@ -24,24 +24,29 @@ import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
 import com.xpn.xwiki.wysiwyg.client.selection.Selection;
 
-public class DefaultSelection extends JavaScriptObject implements Selection
+public final class DefaultSelection extends AbstractSelection
 {
+    DefaultSelection(JavaScriptObject jsSelection)
+    {
+        super(jsSelection);
+    }
+
     /**
      * {@inheritDoc}
      * 
-     * @see Selection#addRange(Range)
+     * @see AbstractSelection#addRange(JavaScriptObject)
      */
-    public native void addRange(Range range) /*-{
-        this.addRange(range);
+    protected native void addRange(JavaScriptObject range) /*-{
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().addRange(range);
     }-*/;
 
     /**
      * {@inheritDoc}
      * 
-     * @see Selection#collapse(Node, long)
+     * @see Selection#collapse(Node, int)
      */
-    public native void collapse(Node parentNode, long offset) /*-{
-        this.collapse(parentNode, offset);
+    public native void collapse(Node parentNode, int offset) /*-{
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().collapse(parentNode, offset);
     }-*/;
 
     /**
@@ -50,7 +55,7 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * @see Selection#collapseToEnd()
      */
     public native void collapseToEnd() /*-{
-        this.collapseToEnd();
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().collapseToEnd();
     }-*/;
 
     /**
@@ -59,7 +64,7 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * @see Selection#collapseToStart()
      */
     public native void collapseToStart() /*-{
-        this.collapseToStart();
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().collapseToStart();
     }-*/;
 
     /**
@@ -77,16 +82,16 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * @see Selection#deleteFromDocument()
      */
     public native void deleteFromDocument() /*-{
-        this.deleteFromDocument();
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().deleteFromDocument();
     }-*/;
 
     /**
      * {@inheritDoc}
      * 
-     * @see Selection#extend(Node, long)
+     * @see Selection#extend(Node, int)
      */
-    public native void extend(Node parentNode, long offset) /*-{
-        this.extend(parentNode, offset);
+    public native void extend(Node parentNode, int offset) /*-{
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().extend(parentNode, offset);
     }-*/;
 
     /**
@@ -95,7 +100,7 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * @see Selection#getAnchorNode()
      */
     public native Node getAnchorNode() /*-{
-        return this.anchorNode;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().anchorNode;
     }-*/;
 
     /**
@@ -103,8 +108,8 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * 
      * @see Selection#getAnchorOffset()
      */
-    public native long getAnchorOffset() /*-{
-        return this.anchorOffset;
+    public native int getAnchorOffset() /*-{
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().anchorOffset;
     }-*/;
 
     /**
@@ -113,7 +118,7 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * @see Selection#getFocusNode()
      */
     public native Node getFocusNode() /*-{
-        return this.focusNode;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().focusNode;
     }-*/;
 
     /**
@@ -121,17 +126,22 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * 
      * @see Selection#getFocusOffset()
      */
-    public native long getFocusOffset() /*-{
-        return this.focusOffset;
+    public native int getFocusOffset() /*-{
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().focusOffset;
     }-*/;
 
     /**
      * {@inheritDoc}
      * 
-     * @see Selection#getRangeAt(long)
+     * @see Selection#getRangeAt(int)
      */
-    public native Range getRangeAt(long index) /*-{
-        return this.getRangeAt(index);
+    public Range getRangeAt(int index)
+    {
+        return new DefaultRange(getJSRangeAt(index));
+    }
+
+    protected native JavaScriptObject getJSRangeAt(int index) /*-{
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().getRangeAt(index);
     }-*/;
 
     /**
@@ -139,8 +149,8 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * 
      * @see Selection#getRangeCount()
      */
-    public native long getRangeCount() /*-{
-        return this.rangeCount;
+    public native int getRangeCount() /*-{
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().rangeCount;
     }-*/;
 
     /**
@@ -149,7 +159,7 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * @see Selection#isCollapsed()
      */
     public native boolean isCollapsed() /*-{
-        return this.isCollapsed;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().isCollapsed;
     }-*/;
 
     /**
@@ -158,16 +168,16 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * @see Selection#removeAllRanges()
      */
     public native void removeAllRanges() /*-{
-        this.removeAllRanges();
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().removeAllRanges();
     }-*/;
 
     /**
      * {@inheritDoc}
      * 
-     * @see Selection#removeRange(Range)
+     * @see AbstractSelection#removeRange(JavaScriptObject)
      */
-    public native void removeRange(Range range) /*-{
-        this.removeRange(range);
+    protected native void removeRange(JavaScriptObject range) /*-{
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().removeRange(range);
     }-*/;
 
     /**
@@ -176,7 +186,7 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * @see Selection#selectAllChildren(Node)
      */
     public native void selectAllChildren(Node parentNode) /*-{
-        this.selectAllChildren(parentNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().selectAllChildren(parentNode);
     }-*/;
 
     /**
@@ -185,6 +195,6 @@ public class DefaultSelection extends JavaScriptObject implements Selection
      * @see Selection#selectionLanguageChange(boolean)
      */
     public native void selectionLanguageChange(boolean langRTL) /*-{
-        this.selectionLanguageChange(langRTL);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelection::getJSSelection()().selectionLanguageChange(langRTL);
     }-*/;
 }

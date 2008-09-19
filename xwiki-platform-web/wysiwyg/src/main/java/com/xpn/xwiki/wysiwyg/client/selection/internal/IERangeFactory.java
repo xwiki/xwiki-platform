@@ -23,7 +23,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
 import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
 
-public final class DefaultRangeFactory implements RangeFactory
+public final class IERangeFactory implements RangeFactory
 {
     /**
      * {@inheritDoc}
@@ -32,10 +32,10 @@ public final class DefaultRangeFactory implements RangeFactory
      */
     public Range createRange()
     {
-        return new DefaultRange(createJSRange());
+        return new IERange(createJSRange());
     }
 
     protected native JavaScriptObject createJSRange() /*-{
-        return document.createRange();
+        return document.selection.createRange();
     }-*/;
 }

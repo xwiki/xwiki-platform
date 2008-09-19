@@ -19,6 +19,117 @@
  */
 package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
-public class IERange extends DefaultRange
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.selection.DocumentFragment;
+import com.xpn.xwiki.wysiwyg.client.selection.Range;
+
+public final class IERange extends AbstractRange
 {
+    IERange(JavaScriptObject jsRange)
+    {
+        super(jsRange);
+    }
+
+    public DocumentFragment cloneContents()
+    {
+        return null;
+    }
+
+    public Range cloneRange()
+    {
+        return null;
+    }
+
+    public void collapse(boolean toStart)
+    {
+    }
+
+    protected short compareBoundaryPoints(int how, JavaScriptObject sourceRange)
+    {
+        return 0;
+    }
+
+    public void deleteContents()
+    {
+    }
+
+    public void detach()
+    {
+    }
+
+    public DocumentFragment extractContents()
+    {
+        return null;
+    }
+
+    public Node getCommonAncestorContainer()
+    {
+        return null;
+    }
+
+    public Node getEndContainer()
+    {
+        return null;
+    }
+
+    public int getEndOffset()
+    {
+        return 0;
+    }
+
+    public Node getStartContainer()
+    {
+        return null;
+    }
+
+    public int getStartOffset()
+    {
+        return 0;
+    }
+
+    public void insertNode(Node newNode)
+    {
+    }
+
+    public boolean isCollapsed()
+    {
+        return false;
+    }
+
+    public void selectNode(Node refNode)
+    {
+    }
+
+    public void selectNodeContents(Node refNode)
+    {
+    }
+
+    public void setEnd(Node refNode, int offset)
+    {
+    }
+
+    public void setEndAfter(Node refNode)
+    {
+    }
+
+    public void setEndBefore(Node refNode)
+    {
+    }
+
+    public void setStart(Node refNode, int offset)
+    {
+    }
+
+    public void setStartAfter(Node refNode)
+    {
+    }
+
+    public void setStartBefore(Node refNode)
+    {
+    }
+
+    public void surroundContents(Node newParent)
+    {
+    }
 }

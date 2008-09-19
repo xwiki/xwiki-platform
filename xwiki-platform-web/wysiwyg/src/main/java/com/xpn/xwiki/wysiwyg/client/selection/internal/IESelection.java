@@ -19,6 +19,94 @@
  */
 package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
-public class IESelection extends DefaultSelection
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.selection.Range;
+
+public final class IESelection extends AbstractSelection
 {
+    IESelection(JavaScriptObject jsSelection)
+    {
+        super(jsSelection);
+    }
+
+    protected void addRange(JavaScriptObject range)
+    {
+    }
+
+    public void collapse(Node parentNode, int offset)
+    {
+    }
+
+    public void collapseToEnd()
+    {
+    }
+
+    public void collapseToStart()
+    {
+    }
+
+    public boolean containsNode(Node node, boolean partlyContained)
+    {
+        return false;
+    }
+
+    public void deleteFromDocument()
+    {
+    }
+
+    public void extend(Node parentNode, int offset)
+    {
+    }
+
+    public Node getAnchorNode()
+    {
+        return null;
+    }
+
+    public int getAnchorOffset()
+    {
+        return 0;
+    }
+
+    public Node getFocusNode()
+    {
+        return null;
+    }
+
+    public int getFocusOffset()
+    {
+        return 0;
+    }
+
+    public Range getRangeAt(int index)
+    {
+        return null;
+    }
+
+    public int getRangeCount()
+    {
+        return 0;
+    }
+
+    public boolean isCollapsed()
+    {
+        return false;
+    }
+
+    public void removeAllRanges()
+    {
+    }
+
+    protected void removeRange(JavaScriptObject range)
+    {
+    }
+
+    public void selectAllChildren(Node parentNode)
+    {
+    }
+
+    public void selectionLanguageChange(boolean langRTL)
+    {
+    }
 }

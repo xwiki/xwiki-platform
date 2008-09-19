@@ -21,21 +21,43 @@ package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
+import com.xpn.xwiki.wysiwyg.client.selection.Selection;
 
-public final class DefaultRangeFactory implements RangeFactory
+public abstract class AbstractSelection implements Selection
 {
+    private final JavaScriptObject jsSelection;
+
+    AbstractSelection(JavaScriptObject jsSelection)
+    {
+        this.jsSelection = jsSelection;
+    }
+
+    public final JavaScriptObject getJSSelection()
+    {
+        return this.jsSelection;
+    }
+
     /**
      * {@inheritDoc}
      * 
-     * @see RangeFactory#createRange()
+     * @see Selection#addRange(Range)
      */
-    public Range createRange()
+    public final void addRange(Range range)
     {
-        return new DefaultRange(createJSRange());
+        addRange(((AbstractRange) range).getJSRange());
     }
 
-    protected native JavaScriptObject createJSRange() /*-{
-        return document.createRange();
-    }-*/;
+    protected abstract void addRange(JavaScriptObject range);
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#removeRange(Range)
+     */
+    public final void removeRange(Range range)
+    {
+        removeRange(((AbstractRange) range).getJSRange());
+    }
+
+    protected abstract void removeRange(JavaScriptObject range);
 }

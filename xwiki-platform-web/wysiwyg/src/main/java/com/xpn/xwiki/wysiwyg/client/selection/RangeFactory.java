@@ -19,8 +19,13 @@
  */
 package com.xpn.xwiki.wysiwyg.client.selection;
 
+import com.google.gwt.core.client.GWT;
+import com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory;
+
 public interface RangeFactory
 {
+    RangeFactory INSTANCE = GWT.create(DefaultRangeFactory.class);
+
     /**
      * @return A new range.
      */

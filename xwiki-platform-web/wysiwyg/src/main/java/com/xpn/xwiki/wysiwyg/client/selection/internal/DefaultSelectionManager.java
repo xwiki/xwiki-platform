@@ -19,31 +19,23 @@
  */
 package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.xpn.xwiki.wysiwyg.client.selection.Selection;
 import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
 
-public class DefaultSelectionManager implements SelectionManager
+public final class DefaultSelectionManager implements SelectionManager
 {
-    private static DefaultSelectionManager instance;
-
-    private DefaultSelectionManager()
-    {
-    }
-
-    public static synchronized DefaultSelectionManager getInstance()
-    {
-        if (instance == null) {
-            instance = new DefaultSelectionManager();
-        }
-        return instance;
-    }
-
     /**
      * {@inheritDoc}
      * 
      * @see SelectionManager#getSelection()
      */
-    public native Selection getSelection() /*-{
+    public Selection getSelection()
+    {
+        return new DefaultSelection(getJSSelection());
+    }
+
+    protected native JavaScriptObject getJSSelection() /*-{
         return window.getSelection();
     }-*/;
 }

@@ -31,7 +31,7 @@ public interface Selection
     /**
      * @return The offset within the (text) node where the selection begins.
      */
-    long getAnchorOffset();
+    int getAnchorOffset();
 
     /**
      * @return The node in which the selection ends.
@@ -41,7 +41,7 @@ public interface Selection
     /**
      * @return The offset within the (text) node where the selection ends.
      */
-    long getFocusOffset();
+    int getFocusOffset();
 
     /**
      * @return true if the selection is collapsed.
@@ -51,12 +51,12 @@ public interface Selection
     /**
      * @return The number of ranges in the selection.
      */
-    long getRangeCount();
+    int getRangeCount();
 
     /**
      * @return The range at the specified index.
      */
-    Range getRangeAt(long index);
+    Range getRangeAt(int index);
 
     /**
      * Collapses the selection to a single point, at the specified offset in the given DOM node. When the selection is
@@ -65,7 +65,7 @@ public interface Selection
      * @param parentNode The given dom node where the selection will be set.
      * @param offset Where in given dom node to place the selection (the offset into the given node).
      */
-    void collapse(Node parentNode, long offset);
+    void collapse(Node parentNode, int offset);
 
     /**
      * Extends the selection by moving the selection end to the specified node and offset, preserving the selection
@@ -75,7 +75,7 @@ public interface Selection
      * @param parentNode The node where the selection will be extended to.
      * @param offset Where in node to place the offset in the new selection end.
      */
-    void extend(Node parentNode, long offset);
+    void extend(Node parentNode, int offset);
 
     /**
      * Collapses the whole selection to a single point at the start of the current selection (irrespective of

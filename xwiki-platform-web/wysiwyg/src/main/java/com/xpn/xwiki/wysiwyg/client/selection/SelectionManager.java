@@ -19,8 +19,13 @@
  */
 package com.xpn.xwiki.wysiwyg.client.selection;
 
+import com.google.gwt.core.client.GWT;
+import com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager;
+
 public interface SelectionManager
 {
+    SelectionManager INSTANCE = GWT.create(DefaultSelectionManager.class);
+
     /**
      * @return The current selection.
      */

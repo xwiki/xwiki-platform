@@ -1,41 +1,50 @@
 <module>
-	<inherits name='com.google.gwt.user.User' />
-	<inherits name="com.xpn.xwiki.gwt.api.Api" />
-	<inherits name="com.google.gwt.i18n.I18N" />
-	<inherits name="com.google.gwt.http.HTTP" />
-	<inherits name="com.google.gwt.junit.JUnit" />
-	<inherits name="com.google.gwt.widgetideas.GlassPanel" />
-	<servlet path="/WysiwygService"
-		class="com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService" />
-	<entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg" />
-	<stylesheet src="Wysiwyg.css" />
+  <inherits name='com.google.gwt.user.User' />
+  <inherits name="com.xpn.xwiki.gwt.api.Api" />
+  <inherits name="com.google.gwt.i18n.I18N" />
+  <inherits name="com.google.gwt.http.HTTP" />
+  <inherits name="com.google.gwt.junit.JUnit" />
+  <inherits name="com.google.gwt.widgetideas.GlassPanel" />
+  <servlet path="/WysiwygService" class="com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService" />
+  <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg" />
+  <stylesheet src="Wysiwyg.css" />
 
-	<replace-with
-		class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.BackColorExecutable">
-		<when-type-is
-			class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.BackColorExecutable" />
-	</replace-with>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory" />
+  </replace-with>
 
-	<replace-with
-		class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.HiliteColorExecutable">
-		<when-type-is
-			class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.BackColorExecutable" />
-		<any>
-			<when-property-is name="user.agent" value="gecko1_8" />
-			<when-property-is name="user.agent" value="gecko" />
-		</any>
-	</replace-with>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.IERangeFactory">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory" />
+    <when-property-is name="user.agent" value="ie6" />
+  </replace-with>
 
-	<replace-with
-		class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutable">
-		<when-type-is
-			class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutable" />
-	</replace-with>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager" />
+  </replace-with>
 
-	<replace-with
-		class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutableIE">
-		<when-type-is
-			class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutable" />
-		<when-property-is name="user.agent" value="ie6" />
-	</replace-with>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.IESelectionManager">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager" />
+    <when-property-is name="user.agent" value="ie6" />
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.BackColorExecutable">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.BackColorExecutable" />
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.HiliteColorExecutable">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.BackColorExecutable" />
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8" />
+      <when-property-is name="user.agent" value="gecko" />
+    </any>
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutable">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutable" />
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutableIE">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutable" />
+    <when-property-is name="user.agent" value="ie6" />
+  </replace-with>
 </module>

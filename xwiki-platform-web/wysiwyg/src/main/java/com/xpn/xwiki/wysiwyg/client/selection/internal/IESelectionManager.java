@@ -20,22 +20,22 @@
 package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
+import com.xpn.xwiki.wysiwyg.client.selection.Selection;
+import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
 
-public final class DefaultRangeFactory implements RangeFactory
+public final class IESelectionManager implements SelectionManager
 {
     /**
      * {@inheritDoc}
      * 
-     * @see RangeFactory#createRange()
+     * @see SelectionManager#getSelection()
      */
-    public Range createRange()
+    public Selection getSelection()
     {
-        return new DefaultRange(createJSRange());
+        return new IESelection(getJSSelection());
     }
 
-    protected native JavaScriptObject createJSRange() /*-{
-        return document.createRange();
+    protected native JavaScriptObject getJSSelection() /*-{
+        return document.selection;
     }-*/;
 }

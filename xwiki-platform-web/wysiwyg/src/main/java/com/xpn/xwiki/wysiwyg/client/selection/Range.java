@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.selection;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.xml.client.DocumentFragment;
 
 public interface Range
 {
@@ -32,7 +31,7 @@ public interface Range
     /**
      * @return Offset within the starting node of the Range.
      */
-    long getStartOffset();
+    int getStartOffset();
 
     /**
      * @return Node within which the Range ends.
@@ -42,7 +41,7 @@ public interface Range
     /**
      * @return Offset within the ending node of the Range.
      */
-    long getEndOffset();
+    int getEndOffset();
 
     /**
      * @return true if the Range is collapsed.
@@ -60,7 +59,7 @@ public interface Range
      * @param refNode The refNode value. This parameter must be different from null.
      * @param offset The startOffset value.
      */
-    void setStart(Node refNode, long offset);
+    void setStart(Node refNode, int offset);
 
     /**
      * Sets the attributes describing the end of a Range.
@@ -68,7 +67,7 @@ public interface Range
      * @param refNode The refNode value. This parameter must be different from null.
      * @param offset The endOffset value.
      */
-    void setEnd(Node refNode, long offset);
+    void setEnd(Node refNode, int offset);
 
     /**
      * Sets the start position to be before a node.

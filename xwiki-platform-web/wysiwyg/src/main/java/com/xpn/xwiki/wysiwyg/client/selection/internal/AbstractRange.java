@@ -21,21 +21,31 @@ package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
+import com.xpn.xwiki.wysiwyg.client.selection.RangeCompare;
 
-public final class DefaultRangeFactory implements RangeFactory
+public abstract class AbstractRange implements Range
 {
+    private final JavaScriptObject jsRange;
+
+    AbstractRange(JavaScriptObject jsRange)
+    {
+        this.jsRange = jsRange;
+    }
+
+    public final JavaScriptObject getJSRange()
+    {
+        return jsRange;
+    }
+
     /**
      * {@inheritDoc}
      * 
-     * @see RangeFactory#createRange()
+     * @see Range#compareBoundaryPoints(RangeCompare, Range)
      */
-    public Range createRange()
+    public final short compareBoundaryPoints(RangeCompare how, Range sourceRange)
     {
-        return new DefaultRange(createJSRange());
+        return compareBoundaryPoints(how.ordinal(), ((AbstractRange) sourceRange).getJSRange());
     }
 
-    protected native JavaScriptObject createJSRange() /*-{
-        return document.createRange();
-    }-*/;
+    protected abstract short compareBoundaryPoints(int how, JavaScriptObject sourceRange);
 }

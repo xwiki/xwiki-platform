@@ -21,19 +21,23 @@ package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.xml.client.DocumentFragment;
+import com.xpn.xwiki.wysiwyg.client.selection.DocumentFragment;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.RangeCompare;
 
-public class DefaultRange extends JavaScriptObject implements Range
+public class DefaultRange extends AbstractRange
 {
+    DefaultRange(JavaScriptObject jsRange)
+    {
+        super(jsRange);
+    }
+
     /**
      * {@inheritDoc}
      * 
      * @see Range#isCollapsed()
      */
     public native boolean isCollapsed() /*-{
-        return this.collapsed;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().collapsed;
     }-*/;
 
     /**
@@ -42,7 +46,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#getCommonAncestorContainer()
      */
     public native Node getCommonAncestorContainer() /*-{
-        return this.commonAncestorContainer;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().commonAncestorContainer;
     }-*/;
 
     /**
@@ -51,7 +55,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#getEndContainer()
      */
     public native Node getEndContainer() /*-{
-        return this.endContainer;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().endContainer;
     }-*/;
 
     /**
@@ -59,8 +63,8 @@ public class DefaultRange extends JavaScriptObject implements Range
      * 
      * @see Range#getEndOffset()
      */
-    public native long getEndOffset() /*-{
-        return this.endOffset;
+    public native int getEndOffset() /*-{
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().endOffset;
     }-*/;
 
     /**
@@ -69,7 +73,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#getStartContainer()
      */
     public native Node getStartContainer() /*-{
-        return this.startContainer;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().startContainer;
     }-*/;
 
     /**
@@ -77,26 +81,26 @@ public class DefaultRange extends JavaScriptObject implements Range
      * 
      * @see Range#getStartOffset()
      */
-    public native long getStartOffset() /*-{
-        return this.startOffset;
+    public native int getStartOffset() /*-{
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().startOffset;
     }-*/;
 
     /**
      * {@inheritDoc}
      * 
-     * @see Range#setStart(Node, long)
+     * @see Range#setStart(Node, int)
      */
-    public native void setStart(Node refNode, long offset) /*-{
-        this.setStart(refNode, offset);
+    public native void setStart(Node refNode, int offset) /*-{
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setStart(refNode, offset);
     }-*/;
 
     /**
      * {@inheritDoc}
      * 
-     * @see Range#setEnd(Node, long)
+     * @see Range#setEnd(Node, int)
      */
-    public native void setEnd(Node refNode, long offset) /*-{
-        this.setEnd(refNode, offset);
+    public native void setEnd(Node refNode, int offset) /*-{
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setEnd(refNode, offset);
     }-*/;
 
     /**
@@ -105,7 +109,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#setStartBefore(Node)
      */
     public native void setStartBefore(Node refNode) /*-{
-        this.setStartBefore(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setStartBefore(refNode);
     }-*/;
 
     /**
@@ -114,7 +118,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#setStartAfter(Node)
      */
     public native void setStartAfter(Node refNode) /*-{
-        this.setStartAfter(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setStartAfter(refNode);
     }-*/;
 
     /**
@@ -123,7 +127,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#setEndBefore(Node)
      */
     public native void setEndBefore(Node refNode) /*-{
-        this.setEndBefore(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setEndBefore(refNode);
     }-*/;
 
     /**
@@ -132,7 +136,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#setEndAfter(Node)
      */
     public native void setEndAfter(Node refNode) /*-{
-        this.setEndAfter(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setEndAfter(refNode);
     }-*/;
 
     /**
@@ -141,7 +145,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#selectNode(Node)
      */
     public native void selectNode(Node refNode) /*-{
-        this.selectNode(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().selectNode(refNode);
     }-*/;
 
     /**
@@ -150,7 +154,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#selectNodeContents(Node)
      */
     public native void selectNodeContents(Node refNode) /*-{
-        this.selectNodeContents(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().selectNodeContents(refNode);
     }-*/;
 
     /**
@@ -159,7 +163,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#collapse(boolean)
      */
     public native void collapse(boolean toStart) /*-{
-        this.collapse(toStart);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().collapse(toStart);
     }-*/;
 
     /**
@@ -168,7 +172,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#cloneContents()
      */
     public native DocumentFragment cloneContents() /*-{
-        return this.cloneContents();
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().cloneContents();
     }-*/;
 
     /**
@@ -177,7 +181,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#deleteContents()
      */
     public native void deleteContents() /*-{
-        this.deleteContents();
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().deleteContents();
     }-*/;
 
     /**
@@ -186,7 +190,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#extractContents()
      */
     public native DocumentFragment extractContents() /*-{
-        return this.extractContents();
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().extractContents();
     }-*/;
 
     /**
@@ -195,7 +199,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#insertNode(Node)
      */
     public native void insertNode(Node newNode) /*-{
-        this.insertNode(newNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().insertNode(newNode);
     }-*/;
 
     /**
@@ -204,21 +208,16 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#surroundContents(Node)
      */
     public native void surroundContents(Node newParent) /*-{
-        this.surroundContents(newParent);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().surroundContents(newParent);
     }-*/;
 
     /**
      * {@inheritDoc}
      * 
-     * @see Range#compareBoundaryPoints(RangeCompare, Range)
+     * @see AbstractRange#compareBoundaryPoints(int, JavaScriptObject)
      */
-    public short compareBoundaryPoints(RangeCompare how, Range sourceRange)
-    {
-        return compareBoundaryPoints(how.ordinal(), sourceRange);
-    }
-
-    private native short compareBoundaryPoints(int how, Range sourceRange) /*-{
-        return this.compareBoundaryPoints(how, sourceRange);
+    protected native short compareBoundaryPoints(int how, JavaScriptObject sourceRange) /*-{
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().compareBoundaryPoints(how, sourceRange);
     }-*/;
 
     /**
@@ -227,7 +226,7 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#cloneRange()
      */
     public native Range cloneRange() /*-{
-        return this.cloneRange();
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().cloneRange();
     }-*/;
 
     /**
@@ -236,6 +235,6 @@ public class DefaultRange extends JavaScriptObject implements Range
      * @see Range#detach()
      */
     public native void detach() /*-{
-        this.detach();
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().detach();
     }-*/;
 }

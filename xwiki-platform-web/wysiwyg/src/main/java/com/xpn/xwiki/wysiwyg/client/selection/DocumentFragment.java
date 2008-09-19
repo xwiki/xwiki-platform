@@ -17,25 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.selection.internal;
+package com.xpn.xwiki.wysiwyg.client.selection;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
+import com.google.gwt.dom.client.Node;
 
-public final class DefaultRangeFactory implements RangeFactory
+public final class DocumentFragment extends Node
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RangeFactory#createRange()
-     */
-    public Range createRange()
+    protected DocumentFragment()
     {
-        return new DefaultRange(createJSRange());
     }
-
-    protected native JavaScriptObject createJSRange() /*-{
-        return document.createRange();
-    }-*/;
 }

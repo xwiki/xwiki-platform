@@ -1,10 +1,11 @@
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .# Testing with a full XHTML header since apparently
-.# this was causing some problem.
+.# this was causing some problem. Also verify that <br>
+.# located in implicit paragraphs are correctly handled.
 .#-----------------------------------------------------
 <?xml version="1.0" encoding="UTF-8"?>
-<html><head /><body>one two three</body></html>
+<html><head /><body>one two three<br/><br/>hello</body></html>
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -16,4 +17,12 @@ onWord: [two]
 onSpace
 onWord: [three]
 endParagraph: []
+onEmptyLines: [1]
+beginParagraph: []
+onWord: [hello]
+endParagraph: []
 endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>one two three</p><br/><br/><p>hello</p>

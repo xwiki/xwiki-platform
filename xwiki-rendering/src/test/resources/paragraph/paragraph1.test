@@ -42,7 +42,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>first<br/>paragraph</p><p>second paragraph</p><div class="wikimodel-emptyline"/><p>third paragraph</p><div class="wikimodel-emptyline"/><div class="wikimodel-emptyline"/><p>fourth paragraph</p>
+<p>first<br/>paragraph</p><p>second paragraph</p><div class="wikimodel-emptyline"></div><p>third paragraph</p><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div><p>fourth paragraph</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -60,7 +60,7 @@ fourth paragraph
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>first<br/>paragraph</p><p>second paragraph</p><div class="wikimodel-emptyline"/><p>third paragraph</p><div class="wikimodel-emptyline"/><div class="wikimodel-emptyline"/><p>fourth paragraph</p></html>
+<html><p>first<br/>paragraph</p><p>second paragraph</p><div class="wikimodel-emptyline"></div><p>third paragraph</p><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div><p>fourth paragraph</p></html>
 .#-----------------------------------------------------
 .input|mediawiki/1.0|skip
 .#-----------------------------------------------------

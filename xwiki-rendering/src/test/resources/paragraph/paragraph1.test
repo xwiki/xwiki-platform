@@ -1,54 +1,78 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-this is one
+first
 paragraph
 
-this is another one
+second paragraph
+
+
+third paragraph
+
+
+
+fourth paragraph
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph: []
-onWord: [this]
-onSpace
-onWord: [is]
-onSpace
-onWord: [one]
+onWord: [first]
 onLineBreak
+onWord: [paragraph]
+endParagraph: []
+beginParagraph: []
+onWord: [second]
+onSpace
 onWord: [paragraph]
 endParagraph: []
 onEmptyLines: [1]
 beginParagraph: []
-onWord: [this]
+onWord: [third]
 onSpace
-onWord: [is]
+onWord: [paragraph]
+endParagraph: []
+onEmptyLines: [2]
+beginParagraph: []
+onWord: [fourth]
 onSpace
-onWord: [another]
-onSpace
-onWord: [one]
+onWord: [paragraph]
 endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>this is one<br/>paragraph</p><br/><br/><p>this is another one</p>
+<p>first<br/>paragraph</p><p>second paragraph</p><div class="wikimodel-emptyline"/><p>third paragraph</p><div class="wikimodel-emptyline"/><div class="wikimodel-emptyline"/><p>fourth paragraph</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-this is one
+first
 paragraph
 
-this is another one
+second paragraph
+
+
+third paragraph
+
+
+
+fourth paragraph
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>this is one<br/>paragraph</p><br/><br/><p>this is another one</p></html>
+<html><p>first<br/>paragraph</p><p>second paragraph</p><div class="wikimodel-emptyline"/><p>third paragraph</p><div class="wikimodel-emptyline"/><div class="wikimodel-emptyline"/><p>fourth paragraph</p></html>
 .#-----------------------------------------------------
 .input|mediawiki/1.0|skip
 .#-----------------------------------------------------
 .# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=59
-this is one
+first
 paragraph
 
-this is another one
+second paragraph
+
+
+third paragraph
+
+
+
+fourth paragraph

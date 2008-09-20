@@ -16,13 +16,12 @@ onSpace
 onWord: [two]
 onSpace
 onWord: [three]
-endParagraph: []
-onEmptyLines: [1]
-beginParagraph: []
+onLineBreak
+onLineBreak
 onWord: [hello]
 endParagraph: []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>one two three</p><br/><br/><p>hello</p>
+<p>one two three<br/><br/>hello</p>

@@ -75,6 +75,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     private Stack<Boolean> isEndTableRowFoundStack = new Stack<Boolean>();
 
+    private boolean onEmptyLinesCalled = false;
+    
     private XWikiMacroPrinter macroPrinter;
 
     public XWikiSyntaxRenderer(WikiPrinter printer)
@@ -211,7 +213,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void beginParagraph(Map<String, String> parameters)
     {
         if ((this.currentElement != Element.DOCUMENT) && (this.currentElement != Element.HORIZONTALLINE)
-            && (this.currentElement != Element.MACRO) && (this.currentElement != Element.SECTION)) {
+            && (this.currentElement != Element.MACRO) && (this.currentElement != Element.SECTION) 
+            && !onEmptyLinesCalled)
+        {
             print("\n");
         }
         if (!parameters.isEmpty()) {
@@ -219,6 +223,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         }
 
         this.currentElement = Element.PARAGRAPH;
+        this.onEmptyLinesCalled = false;
     }
 
     /**
@@ -269,7 +274,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
         if ((this.currentElement != Element.DOCUMENT)
-        // Don't print a new line since the paragraph already adds a new line by default after itself
+            // Don't print a new line since the paragraph already adds a new line by default after itself
             && (this.currentElement != Element.PARAGRAPH)) {
             print("\n");
         }
@@ -507,11 +512,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void onEmptyLines(int count)
     {
-        if (count > 1) {
-            for (int i = 0; i < count; i++) {
-                print("\n");
-            }
-        }
+        print(StringUtils.repeat("\n", count + 1));
+        this.onEmptyLinesCalled = true;        
     }
 
     /**
@@ -523,7 +525,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void beginDefinitionList()
     {
         // Print a new line when:
-        // - the previous element was a defintion list
+        // - the previous element was a definition list
         if (this.currentElement == Element.DEFINITIONLIST) {
             print("\n");
             // - we are inside an existing list

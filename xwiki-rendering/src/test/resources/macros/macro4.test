@@ -12,7 +12,7 @@
 .#-----------------------------------------------------
 beginDocument
 onMacroStandalone: [macro] [] []
-onEmptyLines: [3]
+onEmptyLines: [2]
 onMacroStandalone: [macro] [] []
 endDocument
 .#-----------------------------------------------------

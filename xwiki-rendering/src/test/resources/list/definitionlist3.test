@@ -27,7 +27,6 @@ onLineBreak
 onWord: [definition2]
 endDefinitionDescription
 endDefinitionList
-onEmptyLines: [1]
 beginParagraph: []
 onWord: [paragraph2]
 endParagraph: []
@@ -35,7 +34,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><br/><br/><p>paragraph2</p>
+<p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><p>paragraph2</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -48,4 +47,4 @@ paragraph2
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><br/><br/><p>paragraph2</p></html>
+<html><p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><p>paragraph2</p></html>

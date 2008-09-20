@@ -13,7 +13,6 @@ onSpace
 onSpecialSymbol: [>]
 onWord: [line]
 endParagraph: []
-onEmptyLines: [1]
 beginParagraph: []
 onWord: [one]
 onSpace
@@ -25,7 +24,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p> &gt;line</p><br/><br/><p>one &gt; two</p>
+<p> &gt;line</p><p>one &gt; two</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -35,4 +34,4 @@ one > two
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p> &gt;line</p><br/><br/><p>one &gt; two</p></html>
+<html><p> &gt;line</p><p>one &gt; two</p></html>

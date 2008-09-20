@@ -47,7 +47,6 @@ onSpace
 onWord: [definition]
 endDefinitionTerm
 endDefinitionList
-onEmptyLines: [1]
 beginParagraph: []
 onSpecialSymbol: [;]
 onWord: [title]
@@ -57,7 +56,6 @@ onWord: [not]
 onSpace
 onWord: [definition]
 endParagraph: []
-onEmptyLines: [1]
 beginParagraph: []
 onWord: [not]
 onSpace
@@ -71,7 +69,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><a class="wikicreatelink" href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext">uri:not</span><span class="wikicreatelinkqm">?</span></a> definition</dt></dl><br/><br/><p>;title: not definition</p><br/><br/><p>not ;definition: something</p>
+<dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><a class="wikicreatelink" href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext">uri:not</span><span class="wikicreatelinkqm">?</span></a> definition</dt></dl><p>;title: not definition</p><p>not ;definition: something</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -90,4 +88,4 @@ not ;definition: something
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
 .# TODO: There's a problem with the URI link. Fix it.
-<html><dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><a class="wikicreatelink" href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext">uri:not</span><span class="wikicreatelinkqm">?</span></a> definition</dt></dl><br/><br/><p>;title: not definition</p><br/><br/><p>not ;definition: something</p></html>
+<html><dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><a class="wikicreatelink" href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext">uri:not</span><span class="wikicreatelinkqm">?</span></a> definition</dt></dl><p>;title: not definition</p><p>not ;definition: something</p></html>

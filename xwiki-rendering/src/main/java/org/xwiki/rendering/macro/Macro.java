@@ -46,6 +46,13 @@ public interface Macro<P> extends Comparable<Macro< ? >>
 
     MacroDescriptor getDescriptor();
 
+    /**
+     * @return true if the macro can be inserted in some existing content such as a paragraph, a list item etc.
+     *         For example if I have <code>== hello {{velocity}}world{{/velocity}}</code> then the Velocity macro
+     *         must support the inline mode and not generate a paragraph.
+     */
+    boolean supportsInlineMode();
+    
     List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException;
 }

@@ -47,6 +47,11 @@ public class MacroTransformationContext
     private XDOM xdom;
 
     /**
+     * Whether the macro is called in inline mode or not.
+     */
+    private boolean isInlined;
+    
+    /**
      * Default constructor.
      */
     public MacroTransformationContext()
@@ -62,6 +67,7 @@ public class MacroTransformationContext
     {
         setCurrentMacroBlock(currentMacroBlock);
         setXDOM(xdom);
+        setInlined(false);
     }
 
     /**
@@ -94,5 +100,21 @@ public class MacroTransformationContext
     public XDOM getXDOM()
     {
         return this.xdom;
+    }
+
+    /**
+     * @param isInlined if true then the macro is called in inline mode
+     */
+    public void setInlined(boolean isInlined)
+    {
+        this.isInlined = isInlined;
+    }
+
+    /**
+     * @return true if the macro is called in inline mode (ie inside a paragraph, a list item, etc)
+     */
+    public boolean isInlined()
+    {
+        return this.isInlined;
     }
 }

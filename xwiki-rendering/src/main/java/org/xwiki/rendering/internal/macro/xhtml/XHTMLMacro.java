@@ -65,6 +65,16 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
+     */
+    public boolean supportsInlineMode()
+    {
+        return true;
+    }
+
+    /**
      * @param description the macro description.
      */
     protected XHTMLMacro(String description)

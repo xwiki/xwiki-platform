@@ -55,6 +55,16 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
     /**
      * {@inheritDoc}
      *
+     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
+     */
+    public boolean supportsInlineMode()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
     public List<Block> execute(IdMacroParameters parameters, String content, MacroTransformationContext context)

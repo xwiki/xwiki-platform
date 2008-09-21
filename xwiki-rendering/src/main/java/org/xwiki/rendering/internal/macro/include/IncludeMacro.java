@@ -84,6 +84,16 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
+     */
+    public boolean supportsInlineMode()
+    {
+        return true;
+    }
+
+    /**
      * Allows overriding the Document Access Bridge used (useful for unit tests).
      * 
      * @param documentAccessBridge the new Document Access Bridge to use

@@ -38,6 +38,16 @@ public class TestRecursiveMacro extends AbstractNoParameterMacro
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
+     */
+    public boolean supportsInlineMode()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.macro.Macro#execute(Object, String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */

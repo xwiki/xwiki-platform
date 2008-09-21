@@ -36,6 +36,16 @@ public class TestNestedMacro extends AbstractNoParameterMacro
         super("Nested Macro");
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
+     */
+    public boolean supportsInlineMode()
+    {
+        return false;
+    }
+
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {

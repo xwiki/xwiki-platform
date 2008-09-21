@@ -33,12 +33,12 @@ import org.xml.sax.ext.Attributes2;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.XMLBlock;
-import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.internal.macro.InlineBlockConverter;
 import org.xwiki.rendering.listener.Listener;
 import org.apache.commons.lang.StringUtils;
 
@@ -53,6 +53,8 @@ public class XMLBlockConverterHandler extends DefaultHandler
     private boolean escapeWikiSyntax;
 
     private Stack<Block> stack = new Stack<Block>();
+
+    private InlineBlockConverter inlineConverter = new InlineBlockConverter();
 
     /**
      * SAX parsers are allowed to call the characters() method several times in a row. Some parsers have a buffer of 8K
@@ -115,12 +117,9 @@ public class XMLBlockConverterHandler extends DefaultHandler
                 // Remove any paragraph that might have been added since we don't want paragraphs.
                 // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
                 List<Block> children = dom.getChildren();
-                // We only remove the paragraph if there's only one top level element and if it's a paragraph.
-                if ((children.size() == 1) && ParagraphBlock.class.isAssignableFrom(children.get(0).getClass())) {
-                    dom = new XDOM(children.get(0).getChildren());
-                }
+                this.inlineConverter.removeTopLevelParagraph(children);
 
-                for (Block block : dom.getChildren()) {
+                for (Block block : children) {
                     this.stack.push(block);
                 }
             }

@@ -76,7 +76,7 @@ public class QueryAnalizer extends DepthFirstAdapter
     @Override
     public void outAXPath(AXPath node)
     {
-        ObjectInfo obj = context.nodeToObject.get(node.getXObjectDecl());
+        ObjectInfo obj = context.getObject(node.getXObjectDecl());
         String path[] = splitPath(node.getProperty().toString());
         obj.addProperty(path[0], node);
         super.outAXPath(node);

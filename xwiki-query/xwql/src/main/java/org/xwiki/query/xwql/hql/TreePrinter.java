@@ -2,11 +2,7 @@ package org.xwiki.query.xwql.hql;
 
 import org.xwiki.query.jpql.analysis.DepthFirstAdapter;
 import org.xwiki.query.jpql.node.*;
-import org.xwiki.query.xwql.InvalidQueryException;
-import org.xwiki.query.xwql.QueryAnalizer;
 import org.xwiki.query.xwql.QueryContext;
-import org.xwiki.query.xwql.QueryContext.ObjectInfo;
-import org.xwiki.query.xwql.QueryContext.PropertyInfo;
 
 public class TreePrinter extends DepthFirstAdapter
 {
@@ -84,7 +80,6 @@ public class TreePrinter extends DepthFirstAdapter
     {
         String from = getPrinter().from.toString();
         if (from.length()>0) {
-            //from = from.substring(1); // skip ",";
             builder.append(' ').append( from );
         }
     }
@@ -97,44 +92,6 @@ public class TreePrinter extends DepthFirstAdapter
                 builder.append(" WHERE 1=1 ");
             }
             builder.append(getPrinter().where.toString());
-        }
-    }
-
-    @Override
-    public void caseAPath(APath node)
-    {
-        PropertyInfo prop = getContext().getProperty(node);
-        if (prop != null && prop.alias != null) {
-            builder.append(' ').append(prop.alias);
-            String path[] = QueryAnalizer.splitPath(node.toString());
-            if (path.length==2) {
-                builder.append(".").append(prop.defaultField);
-            } else {
-                for (int i=2; i<path.length; i++) {
-                    builder.append('.').append(path[i]);
-                }
-            }
-        } else {
-            super.caseAPath(node);
-        }
-    }
-
-    @Override
-    public void caseAXPath(AXPath node)
-    {
-        PropertyInfo prop = getContext().getProperty(node);
-        if (prop != null) {
-            builder.append(' ').append(prop.alias);
-            String path[] = QueryAnalizer.splitPath(node.getProperty().toString());
-            if (path.length==1) {
-                builder.append(".").append(prop.defaultField);
-            } else {
-                for (int i=1; i<path.length; i++) {
-                    builder.append('.').append(path[i]);
-                }
-            }
-        } else {
-            throw new InvalidQueryException("Impossible");
         }
     }
 }

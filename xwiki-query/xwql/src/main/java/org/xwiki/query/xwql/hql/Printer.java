@@ -51,7 +51,7 @@ public class Printer
             }
         }
         TreePrinter treePrinter = new TreePrinter(this);
-        context.tree.apply(treePrinter);
+        context.getTree().apply(treePrinter);
         return treePrinter.toString();
     }
 }

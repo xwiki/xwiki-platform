@@ -1,35 +1,55 @@
 package org.xwiki.query.xwql;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.fail;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.query.xwql.QueryContext;
-import org.xwiki.query.xwql.hql.Printer;
-import org.xwiki.query.xwql.hql.PropertyPrinter;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JMock;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.query.xwql.hql.XWQLtoHQLTranslator;
 
-public class XWQLtoHQLTranslatorTest extends TestCase
+@RunWith(JMock.class)
+public class XWQLtoHQLTranslatorTest
 {
+    Mockery context = new JUnit4Mockery();
+
+    DocumentAccessBridge dab = context.mock(DocumentAccessBridge.class);
+
     XWQLtoHQLTranslator translator = new XWQLtoHQLTranslator() {
         @Override
-        protected Printer getPrinter(QueryContext context) {
-            return new Printer(context, translator) {
-                @Override
-                public PropertyPrinter getPropertyPrinter() {
-                    return new PropertyPrinter() {
-                        @Override
-                        protected String getPropertyStoreClassName(String clas, String prop, Printer printer) {
-                            if ("number".equals(prop)) {
-                                return null;
-                            } else {
-                                return "StringProperty";
-                            }
-                        }
-                    };
-                }
-            };
+        public DocumentAccessBridge getDocumentAccessBridge()
+        {
+            return dab;
         }
     };
+
+    @Before
+    public void setUp() throws Exception {
+        context.checking(new Expectations() {{
+            allowing(dab).getPropertyType(with(any(String.class)), with(equal("number")));
+            will(returnValue(null));
+
+            allowing(dab).getPropertyType(with(any(String.class)), with(equal("category")));
+            will(returnValue("DBStringListProperty"));
+
+            allowing(dab).getPropertyType(with(any(String.class)), with(equal("stringlist")));
+            will(returnValue("StringListProperty"));
+
+            allowing(dab).getPropertyType(with(any(String.class)), with(any(String.class)));
+            will( returnValue("StringProperty") );
+
+            allowing(dab).isPropertyCustomMapped("Custom.Mapping", "cmprop");
+            will(returnValue(true));
+
+            allowing(dab).isPropertyCustomMapped(with(any(String.class)), with(any(String.class)));
+            will(returnValue(false));
+        }});
+    }
 
     void assertTranslate(String input, String expectedOutput) throws Exception
     {
@@ -45,12 +65,14 @@ public class XWQLtoHQLTranslatorTest extends TestCase
         }
     }
 
+    @Test
     public void testDocument() throws Exception
     {
         assertTranslate("select doc from Document as doc", "select doc from XWikiDocument as doc");
         assertTranslate("select doc from Document as doc where doc.title like '%test'", "select doc from XWikiDocument as doc where doc.title like '%test'");
     }
 
+    @Test
     public void testObject() throws Exception
     {
         assertTranslate("select doc from Document as doc, doc.object('XWiki.XWikiUsers') as user", 
@@ -58,6 +80,7 @@ public class XWQLtoHQLTranslatorTest extends TestCase
             "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers'");
     }
 
+    @Test
     public void testProperty() throws Exception
     {
         assertTranslate("select doc from Document as doc, doc.object('XWiki.XWikiUsers') as user where user.email = 'some'", 
@@ -65,6 +88,7 @@ public class XWQLtoHQLTranslatorTest extends TestCase
             "where ( user_email1.value = 'some' ) and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_email1.id.id=user.id and user_email1.id.name='email'");
     }
 
+    @Test
     public void testShort() throws Exception
     {
         assertTranslate("", "select doc.fullName from XWikiDocument as doc");
@@ -77,6 +101,7 @@ public class XWQLtoHQLTranslatorTest extends TestCase
             "where ( user_email1.value = 'some' ) and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_email1.id.id=user.id and user_email1.id.name='email'");
     }
 
+    @Test
     public void testObjDeclInWhere() throws Exception
     {
         assertTranslate("where doc.object('XWiki.XWikiUsers').email = 'some'",
@@ -84,6 +109,7 @@ public class XWQLtoHQLTranslatorTest extends TestCase
             "where ( _o1_email2.value = 'some' ) and doc.fullName=_o1.name and _o1.className='XWiki.XWikiUsers' and _o1_email2.id.id=_o1.id and _o1_email2.id.name='email'");
     }
 
+    @Test
     public void testOrderBy() throws Exception
     {
         assertTranslate("order by doc.fullName", 
@@ -93,10 +119,37 @@ public class XWQLtoHQLTranslatorTest extends TestCase
             "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_firstname1.id.id=user.id and user_firstname1.id.name='firstname' order by user_firstname1.value");
     }
 
+    @Test
     public void testInternalProperty() throws Exception
     {
         assertTranslate("select doc from Document as doc, doc.object('Blog.Categories') as c order by c.number", 
             "select doc from XWikiDocument as doc , BaseObject as c " +
             "where 1=1 and doc.fullName=c.name and c.className='Blog.Categories' order by c.number");
+    }
+
+    @Test
+    public void testLists() throws Exception
+    {
+        // DBStringListProperty
+        assertTranslate("from doc.object('XWiki.ArticleClass') as a where :cat member of a.category",
+            "select doc.fullName from XWikiDocument as doc , BaseObject as a , DBStringListProperty as a_category1" +
+            " where ( :cat member of a_category1.list ) and doc.fullName=a.name and a.className='XWiki.ArticleClass' and a_category1.id.id=a.id and a_category1.id.name='category'");
+        // StringListProperty
+        assertTranslate("from doc.object('XWiki.Class') as c where c.stringlist like '%some%'",
+            "select doc.fullName from XWikiDocument as doc , BaseObject as c , StringListProperty as c_stringlist1" +
+            " where ( c_stringlist1.textValue like '%some%' ) and doc.fullName=c.name and c.className='XWiki.Class' and c_stringlist1.id.id=c.id and c_stringlist1.id.name='stringlist'");
+    }
+
+    @Test
+    public void testCustomMapping() throws Exception
+    {
+        // one CM prop
+        assertTranslate("select doc from Document as doc, doc.object('Custom.Mapping') as c where c.cmprop='some'",
+            "select doc from XWikiDocument as doc , BaseObject as c , Custom.Mapping as cCM1 " +
+            "where ( cCM1.cmprop = 'some' ) and doc.fullName=c.name and c.id=cCM1.id");
+        // CM and standard props 
+        assertTranslate("select doc from Document as doc, doc.object('Custom.Mapping') as c where c.cmprop='some' and c.prop=1",
+            "select doc from XWikiDocument as doc , BaseObject as c , Custom.Mapping as cCM1, StringProperty as c_prop2 " +
+            "where ( cCM1.cmprop = 'some' and c_prop2.value = 1 ) and doc.fullName=c.name and c.id=cCM1.id and c_prop2.id.id=c.id and c_prop2.id.name='prop'");
     }
 }

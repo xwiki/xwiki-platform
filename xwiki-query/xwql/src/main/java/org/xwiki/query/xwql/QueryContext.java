@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.query.jpql.node.PPath;
 import org.xwiki.query.jpql.node.PXObjectDecl;
 import org.xwiki.query.jpql.node.Start;
@@ -19,23 +20,31 @@ public class QueryContext
     /**
      * Parse tree of a query.
      */
-    public Start tree;
+    private Start tree;
 
     /**
      * Set of document aliases.
      */
-    Map<String, DocumentInfo> documents = new HashMap<String, DocumentInfo>();
+    private Map<String, DocumentInfo> documents = new HashMap<String, DocumentInfo>();
 
     /**
      * Map from object alias to its description.
      */
-    Map<String, ObjectInfo> objects = new HashMap<String, ObjectInfo>();
+    private Map<String, ObjectInfo> objects = new HashMap<String, ObjectInfo>();
 
-    AliasGenerator aliasGenerator = new AliasGenerator();
+    private AliasGenerator aliasGenerator = new AliasGenerator();
 
-    public QueryContext(Start tree)
+    private DocumentAccessBridge documentAccessBridge;
+
+    public QueryContext(Start tree, DocumentAccessBridge documentAccessBridge)
     {
         this.tree = tree;
+        this.documentAccessBridge = documentAccessBridge;
+    }
+
+    public Start getTree()
+    {
+        return tree;
     }
 
     public AliasGenerator getAliasGenerator()
@@ -57,6 +66,7 @@ public class QueryContext
         public String docAlias;
         public String className;
         public String alias;
+        public String customMappingAlias;
         /**
          * Properties appeared in query
          */
@@ -76,8 +86,16 @@ public class QueryContext
                 properties.put(propname, prop);
             }
             prop.locations.add(location);
-            nodeToProperty.put(location, prop);
             return prop;
+        }
+
+        public boolean isCustomMapped() throws Exception {
+            for (PropertyInfo p : properties.values()) {
+                if (p.isCustomMapped()) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -85,7 +103,6 @@ public class QueryContext
         public ObjectInfo object;
         public String name;
         public String alias;
-        public String defaultField = "value";
 
         public PropertyInfo(String name, ObjectInfo object) {
             this.name = name;
@@ -93,14 +110,32 @@ public class QueryContext
         }
 
         public List<PPath> locations = new ArrayList<PPath>();
+
+        public String getType() throws Exception {
+            return documentAccessBridge.getPropertyType(object.className, name);
+        }
+
+        public boolean isCustomMapped() throws Exception {
+            return documentAccessBridge.isPropertyCustomMapped(object.className, name);
+        }
+
+        public String getValueField() throws Exception
+        {
+            String type = getType();
+            if (type.endsWith("DBStringListProperty")) {
+                return "list";
+            } else if (type.endsWith("StringListProperty")) {
+                return "textValue";
+            } else {
+                return "value";
+            }
+        }
     }
 
     /**
      * Map from tree node to object it represent.
      */
-    Map<PXObjectDecl, ObjectInfo> nodeToObject = new HashMap<PXObjectDecl, ObjectInfo>();
-
-    Map<PPath, PropertyInfo> nodeToProperty = new HashMap<PPath, PropertyInfo>();
+    private Map<PXObjectDecl, ObjectInfo> nodeToObject = new HashMap<PXObjectDecl, ObjectInfo>();
 
     public ObjectInfo addObject(String docAlias, String className, String objAlias, PXObjectDecl node) {
         DocumentInfo di = getDocument(docAlias);
@@ -136,10 +171,6 @@ public class QueryContext
 
     public ObjectInfo getObject(PXObjectDecl node) {
         return nodeToObject.get(node);
-    }
-
-    public PropertyInfo getProperty(PPath node) {
-        return nodeToProperty.get(node);
     }
 
     /**

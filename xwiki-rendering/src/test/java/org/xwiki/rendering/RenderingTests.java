@@ -38,7 +38,7 @@ public class RenderingTests extends TestCase
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
 
         // Text formatting
-        suite.addTestsFromResource("bold/bold1", false);
+        /*suite.addTestsFromResource("bold/bold1", false);
         suite.addTestsFromResource("bold/bold2", false);
         suite.addTestsFromResource("bold/bold3", false);
         suite.addTestsFromResource("bold/bold4", false);
@@ -70,14 +70,15 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("verbatim/verbatim1", false);
         suite.addTestsFromResource("verbatim/verbatim2", false);
         suite.addTestsFromResource("verbatim/verbatim3", false);
-        suite.addTestsFromResource("verbatim/verbatim4", false);
+        suite.addTestsFromResource("verbatim/verbatim4", false);*/
 
         // Table formatting
         suite.addTestsFromResource("table/table1", false);
-        suite.addTestsFromResource("table/bgcolor/bgcolor1", false);
+        //suite.addTestsFromResource("table/table2", false);
+        //suite.addTestsFromResource("table/bgcolor/bgcolor1", false);
 
         // Macros
-        suite.addTestsFromResource("macros/macro1", false);
+        /*suite.addTestsFromResource("macros/macro1", false);
         suite.addTestsFromResource("macros/macro2", false);
         suite.addTestsFromResource("macros/macro3", false);
         suite.addTestsFromResource("macros/macro4", false);
@@ -128,7 +129,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("section/section5", false);
         suite.addTestsFromResource("quote/quote1", false);
         suite.addTestsFromResource("quote/quote2", false);
-        suite.addTestsFromResource("quote/quote3", false);
+        suite.addTestsFromResource("quote/quote3", false);*/
 
         return new PlexusTestSetup(suite);
     }

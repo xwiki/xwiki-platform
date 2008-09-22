@@ -1,0 +1,34 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+
+
+| cell1.1
+
+
+
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+onEmptyLines: [2]
+beginTable: []
+beginTableRow: []
+beginTableCell: []
+onSpace
+onWord: [cell1]
+onSpecialSymbol: [.]
+onWord: [1]
+endTableCell: []
+endTableRow: []
+endTable: []
+onEmptyLines: [3]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<br/><br/><table class="wiki-table"><tbody><tr><td> cell1.1</td></tr></tbody></table><br/><br/>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+| cell1.1

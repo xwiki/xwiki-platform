@@ -1,14 +1,14 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-(% bgColor="255,0,0" %)
+(% style="background-color:rgb(255,0,0)" %)
 || col1 || col2
 || line1 | cell1.2
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginTable: [[bgColor]=[255,0,0]]
+beginTable: [[style]=[background-color:rgb(255,0,0)]]
 beginTableRow: []
 beginTableHeadCell: []
 onSpace
@@ -33,7 +33,7 @@ onSpecialSymbol: [.]
 onWord: [2]
 endTableCell: []
 endTableRow: []
-endTable: [[bgColor]=[255,0,0]]
+endTable: [[style]=[background-color:rgb(255,0,0)]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -20,7 +20,6 @@
 package org.xwiki.rendering.renderer;
 
 import java.awt.Color;
-import java.text.MessageFormat;
 import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -28,11 +27,6 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.rendering.block.AbstractTableBlockParameters;
-import org.xwiki.rendering.block.TableBlockParameters;
-import org.xwiki.rendering.block.TableCellBlockParameters;
-import org.xwiki.rendering.block.TableHeadCellBlockParameters;
-import org.xwiki.rendering.block.TableRowBlockParameters;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Link;
@@ -402,9 +396,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
         print("<" + name);
-        for (Map.Entry<String, String> entry : attributes.entrySet()) {
-            print(" " + entry.getKey() + "=\"" + entry.getValue() + "\"");
-        }
+        print(serializeParameters(attributes).toString());
         print(">");
     }
 
@@ -495,36 +487,71 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         print(StringUtils.repeat("<div class=\"wikimodel-emptyline\"></div>", count));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     */
     public void beginDefinitionList()
     {
         print("<dl>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
+     */
     public void endDefinitionList()
     {
         print("</dl>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
+     */
     public void beginDefinitionTerm()
     {
         print("<dt>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
+     */
     public void beginDefinitionDescription()
     {
         print("<dd>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
+     */
     public void endDefinitionTerm()
     {
         print("</dt>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
+     */
     public void endDefinitionDescription()
     {
         print("</dd>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
+     */
     public void beginQuotation(Map<String, String> parameters)
     {
         StringBuffer buffer = new StringBuffer("<blockquote");
@@ -533,122 +560,114 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         print(buffer.toString());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
+     */
     public void endQuotation(Map<String, String> parameters)
     {
         print("</blockquote>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
+     */
     public void beginQuotationLine()
     {
         // Nothing to do
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()
+     */
     public void endQuotationLine()
     {
         // Nothing to do
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginTable(java.util.Map)
+     */
     public void beginTable(Map<String, String> parameters)
     {
-        TableBlockParameters tbp = populateParameters(new TableBlockParameters(), parameters);
-
-        print("<table class=\"wiki-table\"");
-
-        String style = serializeTableStyle(tbp);
-
-        if (style != null) {
-            print(" " + style);
-        }
-
-        print("><tbody>");
+        print("<table" + serializeParameters(parameters) + "><tbody>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginTableRow(java.util.Map)
+     */
     public void beginTableRow(Map<String, String> parameters)
     {
-        TableRowBlockParameters tbp = populateParameters(new TableRowBlockParameters(), parameters);
-
-        print("<tr");
-
-        String style = serializeTableStyle(tbp);
-
-        if (style != null) {
-            print(" " + style);
-        }
-
-        print(">");
+        print("<tr" + serializeParameters(parameters) + ">");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginTableCell(java.util.Map)
+     */
     public void beginTableCell(Map<String, String> parameters)
     {
-        TableCellBlockParameters tbp = populateParameters(new TableCellBlockParameters(), parameters);
-
-        print("<td");
-
-        String style = serializeTableStyle(tbp);
-
-        if (style != null) {
-            print(" " + style);
-        }
-
-        print(">");
+        print("<td" + serializeParameters(parameters) + ">");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginTableHeadCell(java.util.Map)
+     */
     public void beginTableHeadCell(Map<String, String> parameters)
     {
-        TableHeadCellBlockParameters tbp = populateParameters(new TableHeadCellBlockParameters(), parameters);
-
-        print("<th");
-
-        String style = serializeTableStyle(tbp);
-
-        if (style != null) {
-            print(" " + style);
-        }
-
-        print(">");
+        print("<th" + serializeParameters(parameters) + ">");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endTable(java.util.Map)
+     */
     public void endTable(Map<String, String> parameters)
     {
         print("</tbody></table>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endTableRow(java.util.Map)
+     */
     public void endTableRow(Map<String, String> parameters)
     {
         print("</tr>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endTableCell(java.util.Map)
+     */
     public void endTableCell(Map<String, String> parameters)
     {
         print("</td>");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endTableHeadCell(java.util.Map)
+     */
     public void endTableHeadCell(Map<String, String> parameters)
     {
         print("</th>");
-    }
-
-    private <T> T populateParameters(T object, Map<String, String> parameters)
-    {
-        try {
-            BeanUtils.populate(object, parameters);
-        } catch (Exception e) {
-            getLogger().error("Failed to load table parameters", e);
-        }
-
-        return object;
-    }
-
-    private String serializeTableStyle(AbstractTableBlockParameters tbp)
-    {
-        StringBuffer css = new StringBuffer();
-
-        if (tbp.getBgColor() != null) {
-            css.append(MessageFormat.format("background-color:rgb({0},{1},{2})", tbp.getBgColor().getRed(), tbp
-                .getBgColor().getGreen(), tbp.getBgColor().getBlue()));
-        }
-
-        return css.length() > 0 ? "style=\"" + css + "\"" : null;
     }
 
     private StringBuffer serializeParameters(Map<String, String> parameters)
@@ -660,6 +679,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
                     '\"');
             }
         }
+
         return buffer;
     }
 }

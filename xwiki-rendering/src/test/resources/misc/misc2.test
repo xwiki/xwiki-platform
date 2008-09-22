@@ -1,0 +1,32 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0|skip
+.# Test empty lines before paragraph at beginning of document and at the end of the document
+.#-----------------------------------------------------
+.# TODO: Bug see http://code.google.com/p/wikimodel/issues/detail?id=78
+paragraph
+
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+onEmptyLines: [1]
+beginParagraph: []
+onWord: [paragraph]
+endParagraph: []
+onEmptyLines: [1]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<div class="wikimodel-emptyline"></div><p>paragraph</p><div class="wikimodel-emptyline"></div>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+
+paragraph
+
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: Bug see http://code.google.com/p/wikimodel/issues/detail?id=78
+<html><div class="wikimodel-emptyline"></div><p>paragraph</p><div class="wikimodel-emptyline"></div></html>

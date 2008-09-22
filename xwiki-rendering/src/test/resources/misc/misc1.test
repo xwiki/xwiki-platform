@@ -1,0 +1,29 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0|skip
+.# Test empty document with only new lines
+.#-----------------------------------------------------
+.# TODO: Bug see http://code.google.com/p/wikimodel/issues/detail?id=78
+
+
+
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+onEmptyLines: [3]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+
+
+
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: Bug see http://code.google.com/p/wikimodel/issues/detail?id=78
+<html><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div></html>

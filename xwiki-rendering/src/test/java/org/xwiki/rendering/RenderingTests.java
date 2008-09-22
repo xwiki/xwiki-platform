@@ -75,6 +75,8 @@ public class RenderingTests extends TestCase
 
         // Table formatting
         suite.addTestsFromResource("table/table1", false);
+        suite.addTestsFromResource("table/table2", false);
+        suite.addTestsFromResource("table/table3", false);
         suite.addTestsFromResource("table/style/style1", false);
 
         // Macros

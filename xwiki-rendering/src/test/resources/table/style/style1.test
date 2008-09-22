@@ -38,4 +38,4 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<table class="wiki-table" style="background-color:rgb(255,0,0)"><tbody><tr><th> col1 </th><th> col2</th></tr><tr><th> line1 </th><td> cell1.2</td></tr></tbody></table>
+<table style="background-color:rgb(255,0,0)"><tbody><tr><th> col1 </th><th> col2</th></tr><tr><th> line1 </th><td> cell1.2</td></tr></tbody></table>

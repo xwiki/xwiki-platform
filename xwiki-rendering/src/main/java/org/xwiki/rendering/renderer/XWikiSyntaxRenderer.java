@@ -748,7 +748,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         }
 
         if (!parameters.isEmpty()) {
-            printParameters(parameters);
+            printParameters(parameters, false);
         }
     }
 

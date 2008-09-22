@@ -8,7 +8,12 @@
 <div>
 <div class="hidden">
 <input type="hidden" name="template" value="$!request.template" />
-<input type="hidden" name="xcontinue" value="$doc.getURL("edit", "editor=wysiwyg")"/>
+#if($request.section && $request.section!="")
+ #set($xcontinue=$doc.getURL("edit", "editor=wysiwyg&section=$request.section"))
+#else
+ #set($xcontinue=$doc.getURL("edit", "editor=wysiwyg"))
+#end
+<input type="hidden" name="xcontinue" value="$xcontinue"/>
 <input type="hidden" name="xredirect" value="$!xredirect" />
 <input type="hidden" name="language" value="$!tdoc.realLanguage" />
 ## <input type="hidden" id="xwikidoctitleinput" name="title" value="$!tdoc.title"/>

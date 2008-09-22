@@ -17,26 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.selection.internal;
+package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.IFrameElement;
-import com.xpn.xwiki.wysiwyg.client.selection.Selection;
-import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
+import com.google.gwt.user.client.Element;
 
-public final class DefaultSelectionManager implements SelectionManager
+public class IEFormatBlockExecutable extends FormatBlockExecutable
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionManager#getSelection(IFrameElement)
-     */
-    public Selection getSelection(IFrameElement iframe)
+    public boolean execute(Element target, String parameter)
     {
-        return new DefaultSelection(getJSSelection(iframe));
+        return super.execute(target, parameter);
     }
 
-    protected native JavaScriptObject getJSSelection(IFrameElement iframe) /*-{
-        return iframe.contentWindow.getSelection();
-    }-*/;
+    public String getParameter(Element target)
+    {
+        return super.getParameter(target);
+    }
 }

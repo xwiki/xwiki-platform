@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.selection;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.IFrameElement;
 import com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory;
 
 public interface RangeFactory
@@ -27,7 +28,8 @@ public interface RangeFactory
     RangeFactory INSTANCE = GWT.create(DefaultRangeFactory.class);
 
     /**
-     * @return A new range.
+     * @param iframe An in-line frame DOM element.
+     * @return A new range bound to the document of the given in-line frame.
      */
-    Range createRange();
+    Range createRange(IFrameElement iframe);
 }

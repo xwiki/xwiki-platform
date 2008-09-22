@@ -9,6 +9,7 @@
   <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg" />
   <stylesheet src="Wysiwyg.css" />
 
+  <!-- RangeFactory -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory">
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory" />
   </replace-with>
@@ -18,6 +19,7 @@
     <when-property-is name="user.agent" value="ie6" />
   </replace-with>
 
+  <!-- SelectionManager -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager">
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager" />
   </replace-with>
@@ -27,6 +29,17 @@
     <when-property-is name="user.agent" value="ie6" />
   </replace-with>
 
+  <!-- DOMUtils -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.util.internal.MozillaDOMUtils">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.DOMUtils" />
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.util.internal.IEDOMUtils">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.DOMUtils" />
+    <when-property-is name="user.agent" value="ie6" />
+  </replace-with>
+
+  <!-- BackColorExecutable -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.BackColorExecutable">
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.BackColorExecutable" />
   </replace-with>
@@ -39,11 +52,12 @@
     </any>
   </replace-with>
 
+  <!-- FormatBlockExecutable -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutable">
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutable" />
   </replace-with>
 
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutableIE">
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.IEFormatBlockExecutable">
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.FormatBlockExecutable" />
     <when-property-is name="user.agent" value="ie6" />
   </replace-with>

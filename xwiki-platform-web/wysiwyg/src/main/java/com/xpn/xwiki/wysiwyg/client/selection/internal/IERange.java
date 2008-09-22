@@ -21,8 +21,8 @@ package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.selection.DocumentFragment;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
+import com.xpn.xwiki.wysiwyg.client.util.DocumentFragment;
 
 public final class IERange extends AbstractRange
 {

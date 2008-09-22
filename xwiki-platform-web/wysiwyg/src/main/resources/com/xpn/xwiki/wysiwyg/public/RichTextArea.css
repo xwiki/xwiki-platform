@@ -5,17 +5,6 @@ body {
   color: #222222;
 }
 
-pre {
-  background-color: #F1F7FF;
-  border: 1px dotted #555555;
-  float: left;
-  margin: 0pt;
-  overflow: auto;
-  padding: 10px;
-  position: relative;
-  white-space: pre;
-}
-
 h1,h2,h3,h4 {
   background-color: inherit;
   border-bottom: 1px solid #CCCCCC;
@@ -63,4 +52,12 @@ h5 {
   font-weight: normal;
   line-height: 1.1em;
   left: 0pt;
+}
+
+em.italic {
+  font-style: italic;
+}
+
+span.underline {
+  text-decoration: underline;
 }

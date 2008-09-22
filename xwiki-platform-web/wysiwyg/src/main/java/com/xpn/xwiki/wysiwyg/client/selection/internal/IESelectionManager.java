@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.IFrameElement;
 import com.xpn.xwiki.wysiwyg.client.selection.Selection;
 import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
 
@@ -28,14 +29,14 @@ public final class IESelectionManager implements SelectionManager
     /**
      * {@inheritDoc}
      * 
-     * @see SelectionManager#getSelection()
+     * @see SelectionManager#getSelection(IFrameElement)
      */
-    public Selection getSelection()
+    public Selection getSelection(IFrameElement iframe)
     {
-        return new IESelection(getJSSelection());
+        return new IESelection(getJSSelection(iframe));
     }
 
-    protected native JavaScriptObject getJSSelection() /*-{
-        return document.selection;
+    protected native JavaScriptObject getJSSelection(IFrameElement iframe) /*-{
+        return iframe.contentDocument.selection;
     }-*/;
 }

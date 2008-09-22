@@ -39,7 +39,7 @@ public class DefaultCommandManager extends AbstractCommandManager
     static {
         EXECUTABLES = new HashMap<Command, Executable>();
         EXECUTABLES.put(Command.BACK_COLOR, (Executable) GWT.create(BackColorExecutable.class));
-        EXECUTABLES.put(Command.BOLD, new DefaultExecutable(Command.BOLD.toString()));
+        EXECUTABLES.put(Command.BOLD, new BoldExecutable());
         EXECUTABLES.put(Command.FONT_NAME, new DefaultExecutable(Command.FONT_NAME.toString()));
         EXECUTABLES.put(Command.FONT_SIZE, new DefaultExecutable(Command.FONT_SIZE.toString()));
         EXECUTABLES.put(Command.FORE_COLOR, new DefaultExecutable(Command.FORE_COLOR.toString()));
@@ -53,7 +53,8 @@ public class DefaultCommandManager extends AbstractCommandManager
         EXECUTABLES.put(Command.INSERT_ORDERED_LIST, new DefaultExecutable(Command.INSERT_ORDERED_LIST.toString()));
         EXECUTABLES.put(Command.INSERT_PARAGRAPH, new DefaultExecutable(Command.INSERT_PARAGRAPH.toString()));
         EXECUTABLES.put(Command.INSERT_UNORDERED_LIST, new DefaultExecutable(Command.INSERT_UNORDERED_LIST.toString()));
-        EXECUTABLES.put(Command.ITALIC, new DefaultExecutable(Command.ITALIC.toString()));
+        EXECUTABLES.put(Command.ITALIC, new StyleExecutable("em", "italic", "font-style", "italic", Command.ITALIC
+            .toString()));
         EXECUTABLES.put(Command.JUSTIFY_CENTER, new DefaultExecutable(Command.JUSTIFY_CENTER.toString()));
         EXECUTABLES.put(Command.JUSTIFY_FULL, new DefaultExecutable(Command.JUSTIFY_FULL.toString()));
         EXECUTABLES.put(Command.JUSTIFY_LEFT, new DefaultExecutable(Command.JUSTIFY_LEFT.toString()));
@@ -61,11 +62,19 @@ public class DefaultCommandManager extends AbstractCommandManager
         EXECUTABLES.put(Command.OUTDENT, new DefaultExecutable(Command.OUTDENT.toString()));
         EXECUTABLES.put(Command.REDO, new DefaultExecutable(Command.REDO.toString()));
         EXECUTABLES.put(Command.REMOVE_FORMAT, new DefaultExecutable(Command.REMOVE_FORMAT.toString()));
-        EXECUTABLES.put(Command.STRIKE_THROUGH, new DefaultExecutable(Command.STRIKE_THROUGH.toString()));
-        EXECUTABLES.put(Command.STYLE_WITH_CSS, (Executable) GWT.create(StyleWithCssExecutable.class));
+        EXECUTABLES.put(Command.STRIKE_THROUGH, new StyleExecutable("del",
+            null,
+            "text-decoration",
+            "line-through",
+            Command.STRIKE_THROUGH.toString()));
+        EXECUTABLES.put(Command.STYLE_WITH_CSS, new StyleWithCssExecutable());
         EXECUTABLES.put(Command.SUB_SCRIPT, new DefaultExecutable(Command.SUB_SCRIPT.toString()));
         EXECUTABLES.put(Command.SUPER_SCRIPT, new DefaultExecutable(Command.SUPER_SCRIPT.toString()));
-        EXECUTABLES.put(Command.UNDERLINE, new DefaultExecutable(Command.UNDERLINE.toString()));
+        EXECUTABLES.put(Command.UNDERLINE, new StyleExecutable("span",
+            "underline",
+            "text-decoration",
+            "underline",
+            Command.UNDERLINE.toString()));
         EXECUTABLES.put(Command.UNDO, new DefaultExecutable(Command.UNDO.toString()));
     }
 

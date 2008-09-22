@@ -19,17 +19,38 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Element;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
 
-public class FormatBlockExecutableIE extends FormatBlockExecutable
+public class BoldExecutable extends StyleExecutable
 {
-    public boolean execute(Element target, String parameter)
+    public BoldExecutable()
     {
-        return super.execute(target, parameter);
+        super("strong", null, "font-weight", "bold", Command.BOLD.toString());
     }
 
-    public String getParameter(Element target)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see StyleExecutable#matchesStyle(Node)
+     */
+    protected boolean matchesStyle(Node node)
     {
-        return super.getParameter(target);
+        if (node.getNodeType() == Node.TEXT_NODE) {
+            node = node.getParentNode();
+        }
+        String fontWeight = DOMUtils.getInstance().getComputedStyleProperty((Element) node, "font-weight");
+        if ("bold".equalsIgnoreCase(fontWeight) || "bolder".equalsIgnoreCase(fontWeight)) {
+            return true;
+        } else {
+            try {
+                int iFontWeight = Integer.parseInt(fontWeight);
+                return iFontWeight > 400;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
     }
 }

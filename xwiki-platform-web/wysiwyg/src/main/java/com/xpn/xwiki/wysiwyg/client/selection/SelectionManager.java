@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.selection;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.IFrameElement;
 import com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager;
 
 public interface SelectionManager
@@ -27,7 +28,8 @@ public interface SelectionManager
     SelectionManager INSTANCE = GWT.create(DefaultSelectionManager.class);
 
     /**
-     * @return The current selection.
+     * @param iframe An in-line frame DOM element.
+     * @return The current selection associated with the given in-line frame.
      */
-    Selection getSelection();
+    Selection getSelection(IFrameElement iframe);
 }

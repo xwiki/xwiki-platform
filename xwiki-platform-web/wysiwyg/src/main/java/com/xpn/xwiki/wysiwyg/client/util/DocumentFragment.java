@@ -17,26 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.selection.internal;
+package com.xpn.xwiki.wysiwyg.client.util;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.IFrameElement;
-import com.xpn.xwiki.wysiwyg.client.selection.Selection;
-import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
+import com.google.gwt.dom.client.Node;
 
-public final class DefaultSelectionManager implements SelectionManager
+public final class DocumentFragment extends Node
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionManager#getSelection(IFrameElement)
-     */
-    public Selection getSelection(IFrameElement iframe)
+    protected DocumentFragment()
     {
-        return new DefaultSelection(getJSSelection(iframe));
     }
-
-    protected native JavaScriptObject getJSSelection(IFrameElement iframe) /*-{
-        return iframe.contentWindow.getSelection();
-    }-*/;
 }

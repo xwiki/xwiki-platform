@@ -21,8 +21,8 @@ package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.selection.DocumentFragment;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
+import com.xpn.xwiki.wysiwyg.client.util.DocumentFragment;
 
 public class DefaultRange extends AbstractRange
 {
@@ -37,7 +37,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#isCollapsed()
      */
     public native boolean isCollapsed() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().collapsed;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().collapsed;
     }-*/;
 
     /**
@@ -46,7 +46,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#getCommonAncestorContainer()
      */
     public native Node getCommonAncestorContainer() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().commonAncestorContainer;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().commonAncestorContainer;
     }-*/;
 
     /**
@@ -55,7 +55,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#getEndContainer()
      */
     public native Node getEndContainer() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().endContainer;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().endContainer;
     }-*/;
 
     /**
@@ -64,7 +64,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#getEndOffset()
      */
     public native int getEndOffset() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().endOffset;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().endOffset;
     }-*/;
 
     /**
@@ -73,7 +73,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#getStartContainer()
      */
     public native Node getStartContainer() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().startContainer;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().startContainer;
     }-*/;
 
     /**
@@ -82,7 +82,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#getStartOffset()
      */
     public native int getStartOffset() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().startOffset;
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().startOffset;
     }-*/;
 
     /**
@@ -91,7 +91,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#setStart(Node, int)
      */
     public native void setStart(Node refNode, int offset) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setStart(refNode, offset);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().setStart(refNode, offset);
     }-*/;
 
     /**
@@ -100,7 +100,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#setEnd(Node, int)
      */
     public native void setEnd(Node refNode, int offset) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setEnd(refNode, offset);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().setEnd(refNode, offset);
     }-*/;
 
     /**
@@ -109,7 +109,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#setStartBefore(Node)
      */
     public native void setStartBefore(Node refNode) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setStartBefore(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().setStartBefore(refNode);
     }-*/;
 
     /**
@@ -118,7 +118,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#setStartAfter(Node)
      */
     public native void setStartAfter(Node refNode) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setStartAfter(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().setStartAfter(refNode);
     }-*/;
 
     /**
@@ -127,7 +127,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#setEndBefore(Node)
      */
     public native void setEndBefore(Node refNode) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setEndBefore(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().setEndBefore(refNode);
     }-*/;
 
     /**
@@ -136,7 +136,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#setEndAfter(Node)
      */
     public native void setEndAfter(Node refNode) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().setEndAfter(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().setEndAfter(refNode);
     }-*/;
 
     /**
@@ -145,7 +145,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#selectNode(Node)
      */
     public native void selectNode(Node refNode) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().selectNode(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().selectNode(refNode);
     }-*/;
 
     /**
@@ -154,7 +154,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#selectNodeContents(Node)
      */
     public native void selectNodeContents(Node refNode) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().selectNodeContents(refNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().selectNodeContents(refNode);
     }-*/;
 
     /**
@@ -163,7 +163,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#collapse(boolean)
      */
     public native void collapse(boolean toStart) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().collapse(toStart);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().collapse(toStart);
     }-*/;
 
     /**
@@ -172,7 +172,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#cloneContents()
      */
     public native DocumentFragment cloneContents() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().cloneContents();
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().cloneContents();
     }-*/;
 
     /**
@@ -181,7 +181,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#deleteContents()
      */
     public native void deleteContents() /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().deleteContents();
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().deleteContents();
     }-*/;
 
     /**
@@ -190,7 +190,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#extractContents()
      */
     public native DocumentFragment extractContents() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().extractContents();
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().extractContents();
     }-*/;
 
     /**
@@ -199,7 +199,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#insertNode(Node)
      */
     public native void insertNode(Node newNode) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().insertNode(newNode);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().insertNode(newNode);
     }-*/;
 
     /**
@@ -208,7 +208,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#surroundContents(Node)
      */
     public native void surroundContents(Node newParent) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().surroundContents(newParent);
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().surroundContents(newParent);
     }-*/;
 
     /**
@@ -217,7 +217,7 @@ public class DefaultRange extends AbstractRange
      * @see AbstractRange#compareBoundaryPoints(int, JavaScriptObject)
      */
     protected native short compareBoundaryPoints(int how, JavaScriptObject sourceRange) /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().compareBoundaryPoints(how, sourceRange);
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().compareBoundaryPoints(how, sourceRange);
     }-*/;
 
     /**
@@ -226,7 +226,7 @@ public class DefaultRange extends AbstractRange
      * @see Range#cloneRange()
      */
     public native Range cloneRange() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().cloneRange();
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().cloneRange();
     }-*/;
 
     /**
@@ -235,6 +235,6 @@ public class DefaultRange extends AbstractRange
      * @see Range#detach()
      */
     public native void detach() /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRange::getJSRange()().detach();
+        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().detach();
     }-*/;
 }

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.IFrameElement;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
 import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
 
@@ -28,14 +29,14 @@ public final class IERangeFactory implements RangeFactory
     /**
      * {@inheritDoc}
      * 
-     * @see RangeFactory#createRange()
+     * @see RangeFactory#createRange(IFrameElement)
      */
-    public Range createRange()
+    public Range createRange(IFrameElement iframe)
     {
-        return new IERange(createJSRange());
+        return new IERange(createJSRange(iframe));
     }
 
-    protected native JavaScriptObject createJSRange() /*-{
-        return document.selection.createRange();
+    protected native JavaScriptObject createJSRange(IFrameElement iframe) /*-{
+        return iframe.contentDocument.selection.createRange();
     }-*/;
 }

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.selection;
 
 import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.util.DocumentFragment;
 
 public interface Range
 {

@@ -17,13 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.selection;
+package com.xpn.xwiki.wysiwyg.client.util;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 
-public final class DocumentFragment extends Node
+public abstract class DOMUtils
 {
-    protected DocumentFragment()
+    private static final DOMUtils instance = GWT.create(DOMUtils.class);
+
+    public static synchronized DOMUtils getInstance()
     {
+        return instance;
+    }
+
+    public abstract String getComputedStyleProperty(Element el, String propertyName);
+
+    public Node getNextLeaf(Node node)
+    {
+        while (node != null && node.getNextSibling() == null) {
+            node = node.getParentNode();
+        }
+        if (node == null) {
+            return null;
+        }
+        node = node.getNextSibling();
+        while (node.hasChildNodes()) {
+            node = node.getFirstChild();
+        }
+        return node;
     }
 }

@@ -422,7 +422,7 @@ public interface XWikiStoreInterface
 
     boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
-    List getCustomMappingPropertyList(BaseClass bclass);
+    List<String> getCustomMappingPropertyList(BaseClass bclass);
 
     void injectCustomMappings(XWikiContext context) throws XWikiException;
 

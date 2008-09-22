@@ -78,6 +78,11 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
         return null;
     }
 
+    public boolean isPropertyCustomMapped(String className, String propertyName) throws Exception
+    {
+        return false;
+    }
+
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
         return null;

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.util.List;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 
@@ -145,6 +147,21 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         } else {
             return pc.newProperty().getClass().getName();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#isPropertyCustomMapped(String, String)
+     */
+    public boolean isPropertyCustomMapped(String className, String property) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        if (!xcontext.getWiki().hasCustomMappings()) {
+            return false;
+        }
+        List<String> lst = xcontext.getWiki().getClass(className, xcontext).getCustomMappingPropertyList(xcontext);
+        return lst != null && lst.contains(property);
     }
 
     /**

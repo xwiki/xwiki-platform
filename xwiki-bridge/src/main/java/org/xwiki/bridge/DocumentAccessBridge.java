@@ -104,6 +104,14 @@ public interface DocumentAccessBridge
     String getPropertyType(String className, String propertyName) throws Exception;
 
     /**
+     * @param className The name of the class.
+     * @param propertyName The name of the property of the class.
+     * @return is the property stored in a special custom mapped class.
+     * @throws Exception if class cannot be accessed
+     */
+    boolean isPropertyCustomMapped(String className, String propertyName) throws Exception;
+
+    /**
      * Returns the content of a document attachment.
      * 
      * @param documentName The name of the document to access.

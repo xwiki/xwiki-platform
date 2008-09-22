@@ -591,12 +591,12 @@ public class BaseClass extends BaseCollection implements ClassInterface {
           return true;
     }
 
-    public List getCustomMappingPropertyList(XWikiContext context) {
+    public List<String> getCustomMappingPropertyList(XWikiContext context) {
         String custommapping1 = getCustomMapping();
         if ((custommapping1!=null)&&(custommapping1.trim().length()>0))
           return context.getWiki().getStore().getCustomMappingPropertyList(this);
         else
-          return new ArrayList();
+          return new ArrayList<String>();
     }
 
     public void setCustomClass(String customClass) {

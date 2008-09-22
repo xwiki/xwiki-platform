@@ -65,7 +65,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<table class="wiki-table"><tbody><tr><th> col1 </th><th> col2</th></tr><tr><th> line1 </th><td> cell1.1 </td><td> cell1.2</td></tr><tr><th> line2 </th><td> cell2.1 </td><td> cell2.2</td></tr></tbody></table>
+<table><tbody><tr><th> col1 </th><th> col2</th></tr><tr><th> line1 </th><td> cell1.1 </td><td> cell1.2</td></tr><tr><th> line2 </th><td> cell2.1 </td><td> cell2.2</td></tr></tbody></table>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -75,4 +75,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
-<html><table class="wiki-table"><tbody><tr><th> col1 </th><th> col2</th></tr><tr><th> line1 </th><td> cell1.1 </td><td> cell1.2</td></tr><tr><th> line2 </th><td> cell2.1 </td><td> cell2.2</td></tr></tbody></table></html>
+<html><table><tbody><tr><th> col1 </th><th> col2</th></tr><tr><th> line1 </th><td> cell1.1 </td><td> cell1.2</td></tr><tr><th> line2 </th><td> cell2.1 </td><td> cell2.2</td></tr></tbody></table></html>

@@ -45,6 +45,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("bold/bold5", false);
         suite.addTestsFromResource("bold/bold6", false);
         suite.addTestsFromResource("bold/bold7", false);
+        suite.addTestsFromResource("bold/bold8", false);
         suite.addTestsFromResource("italic/italic1", false);
         suite.addTestsFromResource("italic/italic2", false);
         suite.addTestsFromResource("italic/italic3", false);

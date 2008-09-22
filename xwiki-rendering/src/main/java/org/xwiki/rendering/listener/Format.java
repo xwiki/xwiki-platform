@@ -33,5 +33,6 @@ public enum Format
     STRIKEDOUT,
     SUPERSCRIPT,
     SUBSCRIPT,
-    MONOSPACE
+    MONOSPACE,
+    NONE
 }

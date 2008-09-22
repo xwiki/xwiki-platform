@@ -1,0 +1,36 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+This is **bold and //italic//**
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph: []
+onWord: [This]
+onSpace
+onWord: [is]
+onSpace
+beginBold
+onWord: [bold]
+onSpace
+onWord: [and]
+onSpace
+beginItalic
+onWord: [italic]
+endItalic
+endBold
+endParagraph: []
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>This is <strong>bold and <em class="italic">italic</em></strong></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+This is **bold and //italic//**
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>This is <strong>bold and <em class="italic">italic</em></strong></p></html>

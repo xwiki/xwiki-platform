@@ -20,8 +20,10 @@
 package org.xwiki.rendering.internal.parser.wikimodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
 import java.util.Collections;
@@ -32,6 +34,7 @@ import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
+import org.wikimodel.wem.WikiStyle;
 import org.xwiki.rendering.block.*;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Listener;
@@ -198,29 +201,37 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endFormat(WikiFormat format)
     {
-        if (format.hasStyle(IWemConstants.STRONG)) {
-            this.stack.push(new FormatBlock(generateListFromStack(), Format.BOLD));
-        } else if (format.hasStyle(IWemConstants.EM)) {
-            this.stack.push(new FormatBlock(generateListFromStack(), Format.ITALIC));
-        } else if (format.hasStyle(IWemConstants.STRIKE)) {
-            this.stack.push(new FormatBlock(generateListFromStack(), Format.STRIKEDOUT));
-        } else if (format.hasStyle(IWemConstants.INS)) {
-            this.stack.push(new FormatBlock(generateListFromStack(), Format.UNDERLINED));
-        } else if (format.hasStyle(IWemConstants.SUP)) {
-            this.stack.push(new FormatBlock(generateListFromStack(), Format.SUPERSCRIPT));
-        } else if (format.hasStyle(IWemConstants.SUB)) {
-            this.stack.push(new FormatBlock(generateListFromStack(), Format.SUBSCRIPT));
-        } else if (format.hasStyle(IWemConstants.MONO)) {
-            this.stack.push(new FormatBlock(generateListFromStack(), Format.MONOSPACE));
+        List<WikiStyle> styles = format.getStyles();
+        if (styles.size() > 0) {
+
+            FormatBlock block = new FormatBlock(generateListFromStack(), convertFormat(styles.get(styles.size() - 1)));
+            if (styles.size() > 1) {
+                ListIterator<WikiStyle> it = styles.listIterator(styles.size() - 1);
+                while (it.hasPrevious()) {
+                    block = new FormatBlock(Arrays.asList((Block) block), convertFormat(it.previous()));
+                }
+            }
+
+            // If the previous block is also a format block and it's the same style as the current
+            // block then merge them.
+            Block previous = this.stack.peek();
+            if (FormatBlock.class.isAssignableFrom(previous.getClass())
+                && (((FormatBlock) previous).getFormat() == block.getFormat()))
+            {
+                previous.addChildren(block.getChildren());
+            } else {
+                this.stack.push(block);
+            }
+
         } else {
-            // WikiModel generate begin/endFormat events even for simple text with no style
-            // so we need to remove our marker
+            // WikiModel generate begin/endFormat events even for simple text with no style so we need to remove our 
+            // marker
             for (Block block : generateListFromStack()) {
                 this.stack.push(block);
             }
         }
     }
-
+    
     public void endHeader(int level, WikiParameters params)
     {
         this.stack.push(new SectionBlock(generateListFromStack(), SectionLevel.parseInt(level)));
@@ -535,5 +546,28 @@ public class XDOMGeneratorListener implements IWemListener
         }
 
         return xwikiParams;
+    }
+
+    private Format convertFormat(WikiStyle style)
+    {
+        Format result;
+        if (style == IWemConstants.STRONG) {
+            result = Format.BOLD;
+        } else if (style == IWemConstants.EM) {
+            result = Format.ITALIC;
+        } else if (style == IWemConstants.STRIKE) {
+            result = Format.STRIKEDOUT;
+        } else if (style == IWemConstants.INS) {
+            result = Format.UNDERLINED;
+        } else if (style == IWemConstants.SUP) {
+            result = Format.SUPERSCRIPT;
+        } else if (style == IWemConstants.SUB) {
+            result = Format.SUBSCRIPT;
+        } else if (style == IWemConstants.MONO) {
+            result = Format.MONOSPACE;
+        } else {
+            result = Format.NONE;
+        }
+        return result;
     }
 }

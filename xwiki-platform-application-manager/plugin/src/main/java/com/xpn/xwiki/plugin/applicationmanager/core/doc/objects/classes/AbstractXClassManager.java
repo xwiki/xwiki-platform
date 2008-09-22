@@ -42,8 +42,8 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
  * This class has to be extended with at least :
  * <ul>
  * <li>overload {@link #updateBaseClass(BaseClass)}
- * <li>in constructor call AbstractXClassManager constructor with a name that will be used to generate all the documents
- * and spaces needed.
+ * <li>in constructor call AbstractXClassManager constructor with a name that will be used to generate all the
+ * documents and spaces needed.
  * </ul>
  * 
  * @param <T> the item class extending {@link XObjectDocument}.
@@ -802,7 +802,8 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
     {
         StringBuffer from = new StringBuffer(", BaseObject as obj");
 
-        StringBuffer where = new StringBuffer(" where doc.fullName=obj.name and obj.className=" + HQL_PARAMETER_STRING);
+        StringBuffer where =
+            new StringBuffer(" where doc.fullName=obj.name and obj.className=" + HQL_PARAMETER_STRING);
         parameterValues.add(getClassFullName());
 
         where.append(" and obj.name<>" + HQL_PARAMETER_STRING);

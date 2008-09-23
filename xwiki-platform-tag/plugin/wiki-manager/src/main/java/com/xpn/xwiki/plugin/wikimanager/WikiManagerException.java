@@ -25,7 +25,7 @@ import com.xpn.xwiki.plugin.PluginException;
 /**
  * Wiki Manager plugin base exception.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class WikiManagerException extends PluginException
 {

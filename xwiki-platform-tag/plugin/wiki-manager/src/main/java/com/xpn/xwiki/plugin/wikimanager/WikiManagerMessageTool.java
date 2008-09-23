@@ -32,7 +32,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageToo
  * The main use of this class is construct {@link XWikiPluginMessageTool} with the correct
  * {@link java.util.ResourceBundle} and to list all the message keys used internally in the plugin.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class WikiManagerMessageTool extends XWikiPluginMessageTool
 {

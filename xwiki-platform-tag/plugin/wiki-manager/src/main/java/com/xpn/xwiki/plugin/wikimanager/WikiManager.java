@@ -49,7 +49,7 @@ import com.xpn.xwiki.util.Util;
 /**
  * Hidden toolkit use by the plugin API that make all the plugins actions.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 final class WikiManager
 {
@@ -228,14 +228,22 @@ final class WikiManager
         List<Object> parameterValues = new ArrayList<Object>();
 
         String wheresql = XWikiServerClass.getInstance(context).createWhereClause(null, parameterValues);
-        List<XWikiDocument> documents =
-            context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
 
-        for (XWikiDocument document : documents) {
-            wikiList.add(new Wiki(document, context));
+        String database = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainXWiki());
+
+            List<XWikiDocument> documents =
+                context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
+
+            for (XWikiDocument document : documents) {
+                wikiList.add(new Wiki(document, context));
+            }
+
+            return wikiList;
+        } finally {
+            context.setDatabase(database);
         }
-
-        return wikiList;
     }
 
     /**
@@ -253,7 +261,8 @@ final class WikiManager
 
         // Get applications manger
         ApplicationManagerPluginApi appmanager =
-            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME, context);
+            (ApplicationManagerPluginApi) context.getWiki()
+                .getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME, context);
 
         if (appmanager == null) {
             return null;
@@ -687,7 +696,8 @@ final class WikiManager
      *             </ul>
      * @since 1.1
      */
-    public void deleteWiki(String wikiNameToDelete, boolean deleteDatabase, XWikiContext context) throws XWikiException
+    public void deleteWiki(String wikiNameToDelete, boolean deleteDatabase, XWikiContext context)
+        throws XWikiException
     {
         Wiki wiki = getWikiFromName(wikiNameToDelete, context);
 

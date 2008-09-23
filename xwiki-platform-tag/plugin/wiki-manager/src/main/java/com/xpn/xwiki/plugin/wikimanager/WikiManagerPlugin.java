@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Entry point of the Wiki Manager plugin.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class WikiManagerPlugin extends XWikiDefaultPlugin
 {

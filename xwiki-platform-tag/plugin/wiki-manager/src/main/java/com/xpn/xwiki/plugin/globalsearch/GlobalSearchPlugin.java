@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Entry point of the Global Search plugin.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class GlobalSearchPlugin extends XWikiDefaultPlugin
 {

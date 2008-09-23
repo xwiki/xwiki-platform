@@ -25,7 +25,7 @@ import com.xpn.xwiki.plugin.PluginException;
 /**
  * Global Search plugin base exception.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class GlobalSearchException extends PluginException
 {

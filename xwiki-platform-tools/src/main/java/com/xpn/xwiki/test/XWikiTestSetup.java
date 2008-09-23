@@ -31,9 +31,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * JUnit TestSetup extension that starts/stops XWiki using a script passed using System Properties.
- * These properties are meant to be passed by the underlying build system. This class is meant to
- * wrap a JUnit TestSuite. For example:
+ * JUnit TestSetup extension that starts/stops XWiki using a script passed using System Properties. These properties are
+ * meant to be passed by the underlying build system. This class is meant to wrap a JUnit TestSuite. For example:
  * 
  * <pre><code>
  * public static Test suite()
@@ -44,16 +43,15 @@ import java.net.URL;
  * </code></pre>
  * 
  * <p>
- * Note: We could start XWiki using Java directly but we're using a script so that we can test the
- * exact same script used by XWiki users who download the standalone distribution.
+ * Note: We could start XWiki using Java directly but we're using a script so that we can test the exact same script
+ * used by XWiki users who download the standalone distribution.
  * </p>
  * 
  * @version $Id: $
  */
 public class XWikiTestSetup extends TestSetup
 {
-    private static final String EXECUTION_DIRECTORY =
-        System.getProperty("xwikiExecutionDirectory");
+    private static final String EXECUTION_DIRECTORY = System.getProperty("xwikiExecutionDirectory");
 
     private static final String START_COMMAND = System.getProperty("xwikiExecutionStartCommand");
 
@@ -61,8 +59,7 @@ public class XWikiTestSetup extends TestSetup
 
     private static final String PORT = System.getProperty("xwikiPort", "8080");
 
-    private static final boolean DEBUG =
-        System.getProperty("debug", "false").equalsIgnoreCase("true");
+    private static final boolean DEBUG = System.getProperty("debug", "false").equalsIgnoreCase("true");
 
     private static final int TIMEOUT_SECONDS = 120;
 
@@ -77,6 +74,12 @@ public class XWikiTestSetup extends TestSetup
         this.project.addBuildListener(new AntBuildListener(DEBUG));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.extensions.TestSetup#setUp()
+     */
+    @Override
     protected void setUp() throws Exception
     {
         startXWikiInSeparateThread();
@@ -125,6 +128,7 @@ public class XWikiTestSetup extends TestSetup
         } else {
             throw new Exception("Invalid directory from where to stop XWiki [" + EXECUTION_DIRECTORY + "]");
         }
+
         return execTask;
     }
 
@@ -142,8 +146,8 @@ public class XWikiTestSetup extends TestSetup
                 connection.connect();
                 int responseCode = connection.getResponseCode();
                 if (DEBUG) {
-                    System.out.println("Result of pinging [" + url + "] = [" + responseCode
-                        + "], Message = [" + connection.getResponseMessage() + "]");
+                    System.out.println("Result of pinging [" + url + "] = [" + responseCode + "], Message = ["
+                        + connection.getResponseMessage() + "]");
                 }
                 // check the http response code is either not an error, either "unauthorized"
                 // (which is the case for products that deny view for guest, for example).
@@ -162,6 +166,12 @@ public class XWikiTestSetup extends TestSetup
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.extensions.TestSetup#tearDown()
+     */
+    @Override
     protected void tearDown() throws Exception
     {
         // Stop XWiki

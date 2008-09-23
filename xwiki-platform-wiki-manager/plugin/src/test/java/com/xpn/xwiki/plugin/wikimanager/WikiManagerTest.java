@@ -20,8 +20,8 @@
 
 package com.xpn.xwiki.plugin.wikimanager;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jmock.Mock;
@@ -33,128 +33,149 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
+import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.wikimanager.WikiManager}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class WikiManagerTest extends MockObjectTestCase
 {
     private XWikiContext context;
 
-    private XWiki xwiki;
-
-    private Mock mockXWikiStore;
-
-    private Mock mockXWikiVersioningStore;
-
     private Map<String, Map<String, XWikiDocument>> databases = new HashMap<String, Map<String, XWikiDocument>>();
 
-    private static final String WIKI_NAME = "xwiki";
+    private static final String MAIN_WIKI_NAME = "xwiki";
 
     private static final String TARGET_WIKI_NAME = "wikitosave";
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.framework.TestCase#setUp()
+     */
     @Override
     protected void setUp() throws Exception
     {
         this.context = new XWikiContext();
-        this.xwiki = new XWiki();
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
-        this.context.setWiki(this.xwiki);
+        this.context.setDatabase(MAIN_WIKI_NAME);
+        this.context.setMainXWiki(MAIN_WIKI_NAME);
 
-        this.databases.put(WIKI_NAME, new HashMap<String, XWikiDocument>());
+        this.databases.put(MAIN_WIKI_NAME, new HashMap<String, XWikiDocument>());
 
-        this.mockXWikiStore =
-            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
-            this.context});
-        this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
+        Mock mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        mockXWiki.stubs().method("Param").will(returnValue(""));
+
+        Mock mockXWikiStore =
+            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
+            mockXWiki.proxy(), this.context});
+
+        Mock mockXWikiRightService = mock(XWikiRightServiceImpl.class, new Class[] {}, new Object[] {});
+
+        mockXWiki.stubs().method("getDocument").will(new CustomStub("Implements XWiki.getDocument")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
             {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
-                    XWikiContext context = (XWikiContext) invocation.parameterValues.get(1);
+                String docFullName = (String) invocation.parameterValues.get(0);
+                XWikiDocument shallowDoc = new XWikiDocument();
+                shallowDoc.setFullName(docFullName);
 
-                    String database = context.getDatabase();
+                String database = shallowDoc.getDatabase();
 
-                    if (database == null || database.length() == 0)
-                        database = WIKI_NAME;
-
-                    if (!databases.containsKey(database))
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_UNKNOWN, "Database " + database + " does not exists.");
-
-                    Map<String, XWikiDocument> docs = databases.get(database);
-
-                    if (docs.containsKey(shallowDoc.getFullName())) {
-                        return docs.get(shallowDoc.getFullName());
-                    } else {
-                        return shallowDoc;
-                    }
+                if (database == null) {
+                    database = context.getDatabase();
                 }
-            });
-        this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
+
+                if (database == null || database.length() == 0)
+                    database = MAIN_WIKI_NAME;
+
+                if (!databases.containsKey(database))
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                        "Database " + database + " does not exists.");
+
+                Map<String, XWikiDocument> docs = databases.get(database);
+
+                if (docs.containsKey(shallowDoc.getFullName())) {
+                    return docs.get(shallowDoc.getFullName());
+                } else {
+                    return shallowDoc;
+                }
+            }
+        });
+        mockXWiki.stubs().method("saveDocument").will(new CustomStub("Implements XWiki.saveDocument")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
             {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
-                    XWikiContext context = (XWikiContext) invocation.parameterValues.get(1);
+                XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
 
-                    String database = context.getDatabase();
+                String database = document.getDatabase();
 
-                    if (database == null || database.length() == 0)
-                        database = WIKI_NAME;
-
-                    if (!databases.containsKey(database))
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_UNKNOWN, "Database " + database + " does not exists.");
-
-                    Map<String, XWikiDocument> docs = databases.get(database);
-
-                    document.setNew(false);
-                    document.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-                    document.setDatabase(context.getDatabase());
-
-                    docs.put(document.getFullName(), document);
-
-                    return null;
+                if (database == null) {
+                    database = context.getDatabase();
                 }
-            });
-        this.mockXWikiStore.stubs().method("createWiki").will(
-            new CustomStub("Implements XWikiStoreInterface.createWiki")
+
+                if (database == null || database.length() == 0)
+                    database = MAIN_WIKI_NAME;
+
+                if (!databases.containsKey(database))
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                        "Database " + database + " does not exists.");
+
+                Map<String, XWikiDocument> docs = databases.get(database);
+
+                document.setNew(false);
+                document.setDatabase(context.getDatabase());
+
+                docs.put(document.getFullName(), document);
+
+                return null;
+            }
+        });
+        mockXWiki.stubs().method("getClass").will(new CustomStub("Implements XWiki.getClass")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
             {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    String wikiName = (String) invocation.parameterValues.get(0);
+                String classFullName = (String) invocation.parameterValues.get(0);
+                XWikiContext context = (XWikiContext) invocation.parameterValues.get(1);
 
-                    if (databases.containsKey(wikiName))
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE, "Database " + wikiName
-                                + " already exists.");
+                XWikiDocument doc = context.getWiki().getDocument(classFullName, context);
 
-                    databases.put(wikiName, new HashMap<String, XWikiDocument>());
+                return doc.getxWikiClass();
+            }
+        });
+        mockXWiki.stubs().method("clearName").will(new CustomStub("Implements XWiki.clearName")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                return invocation.parameterValues.get(0);
+            }
+        });
+        mockXWiki.stubs().method("getStore").will(returnValue(mockXWikiStore.proxy()));
+        mockXWiki.stubs().method("getRightService").will(returnValue(mockXWikiRightService.proxy()));
 
-                    return null;
-                }
-            });
+        this.context.setWiki((XWiki) mockXWiki.proxy());
 
-        this.mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
+        mockXWikiStore.stubs().method("createWiki").will(new CustomStub("Implements XWikiStoreInterface.createWiki")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                String wikiName = (String) invocation.parameterValues.get(0);
 
-        this.mockXWikiVersioningStore =
-            mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
-            this.xwiki, this.context});
-        this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
-        this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
+                if (databases.containsKey(wikiName))
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE, "Database " + wikiName
+                            + " already exists.");
 
-        this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore.proxy());
+                databases.put(wikiName, new HashMap<String, XWikiDocument>());
+
+                return null;
+            }
+        });
+
+        mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
     }
 
     // ///////////////////////////////////////////////////////////////////////////////////////:
@@ -168,7 +189,7 @@ public class WikiManagerTest extends MockObjectTestCase
 
     public void testSaveDocument() throws XWikiException
     {
-        context.setDatabase(WIKI_NAME);
+        context.setDatabase(MAIN_WIKI_NAME);
 
         databases.clear();
         databases.put(TARGET_WIKI_NAME, new HashMap<String, XWikiDocument>());
@@ -179,7 +200,7 @@ public class WikiManagerTest extends MockObjectTestCase
 
         WikiManager.getInstance().saveDocument(TARGET_WIKI_NAME, doc, "", context);
 
-        assertEquals(WIKI_NAME, context.getDatabase());
+        assertEquals(MAIN_WIKI_NAME, context.getDatabase());
         assertTrue(databases.containsKey(TARGET_WIKI_NAME)
             && databases.get(TARGET_WIKI_NAME).containsKey(doc.getFullName()));
     }
@@ -193,61 +214,60 @@ public class WikiManagerTest extends MockObjectTestCase
         XWikiDocument doc = WikiManager.getInstance().getDocument(TARGET_WIKI_NAME, DOCFULLNAME, context);
 
         assertFalse(doc.isNew());
-        assertEquals(WIKI_NAME, context.getDatabase());
+        assertEquals(MAIN_WIKI_NAME, context.getDatabase());
     }
 
-    public void testSearchDocuments()
+    public void testGetWikiFromNameWhenInAnotherWiki() throws XWikiException
     {
+        XWikiDocument doc = new XWikiDocument();
+        databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
 
+        context.setDatabase("anotherwiki");
+
+        Wiki wiki = WikiManager.getInstance().getWikiFromName("WikInamE", context);
+
+        assertSame(doc, wiki.getDocument());
     }
 
-    public void testCreateNewWikiFromPackage()
+    public void testGetWikiAliasWhenDocumentDoesNorExists() throws XWikiException
     {
+        try {
+            WikiManager.getInstance().getWikiAlias("WikInamE", 0, true, context);
 
+            fail("getWikiAlias should throw WikiManagerException when alias document does not exists");
+        } catch (WikiManagerException expected) {
+            // getWikiAlias should throw WikiManagerException when alias document does not exists
+            assertEquals(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, expected.getCode());
+        }
     }
 
-    public void testCreateNewWikiFromTemplate()
+    public void testGetWikiAliasWhenDocumentDoesNotContainsClass() throws XWikiException
     {
+        XWikiDocument doc = new XWikiDocument();
+        databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
+        
+        try {
+            WikiManager.getInstance().getWikiAlias("WikInamE", 0, true, context);
 
+            fail("getWikiAlias should throw XObjectDocumentDoesNotExistException when alias document does not exists");
+        } catch (WikiManagerException expected) {
+            // getWikiAlias should throw XObjectDocumentDoesNotExistException when alias document does not exists
+            assertEquals(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, expected.getCode());
+        }
     }
-
-    public void testCreateNewWiki()
+    
+    public void testGetWikiAlias() throws XWikiException
     {
+        XWikiDocument doc = new XWikiDocument();
+        databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
+        
+        try {
+            WikiManager.getInstance().getWikiAlias("WikInamE", 0, true, context);
 
-    }
-
-    public void testDeleteWiki()
-    {
-
-    }
-
-    public void testGetWiki()
-    {
-
-    }
-
-    public void testGetWikiDocumentList()
-    {
-
-    }
-
-    public void testIsWikiExist()
-    {
-
-    }
-
-    public void testGetWikiTemplate()
-    {
-
-    }
-
-    public void testGetWikiTemplateList()
-    {
-
-    }
-
-    public void testCreateWikiTemplate()
-    {
-
+            fail("getWikiAlias should throw XObjectDocumentDoesNotExistException when alias document does not exists");
+        } catch (WikiManagerException expected) {
+            // getWikiAlias should throw XObjectDocumentDoesNotExistException when alias document does not exists
+            assertEquals(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, expected.getCode());
+        }
     }
 }

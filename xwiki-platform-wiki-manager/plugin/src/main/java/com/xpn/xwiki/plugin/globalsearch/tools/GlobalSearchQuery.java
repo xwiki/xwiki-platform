@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Contains all parameters for a global search query.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class GlobalSearchQuery
 {

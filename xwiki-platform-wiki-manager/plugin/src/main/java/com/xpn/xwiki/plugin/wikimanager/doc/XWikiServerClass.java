@@ -20,6 +20,8 @@
 
 package com.xpn.xwiki.plugin.wikimanager.doc;
 
+import java.util.List;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -33,7 +35,7 @@ import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
  * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager} implementation for
  * XWiki.XWikiServerClass class.
  * 
- * @version $Id: $
+ * @version $Id$
  * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager
  */
 public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
@@ -270,6 +272,24 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
     /**
      * {@inheritDoc}
      * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#check(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    protected void check(XWikiContext context) throws XWikiException
+    {
+        String database = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainXWiki());
+
+            super.check(context);
+        } finally {
+            context.setDatabase(database);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.util.AbstractXClassManager#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
      */
     @Override
@@ -317,6 +337,44 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         needsUpdate |= updateDocBooleanValue(doc, FIELD_ISWIKITEMPLATE, DEFAULT_ISWIKITEMPLATE);
 
         return needsUpdate;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Make sure it return main wiki document.
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#getItemDocumentDefaultFullName(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     * @since 1.5
+     */
+    @Override
+    public String getItemDocumentDefaultFullName(String itemName, XWikiContext context)
+    {
+        return context.getMainXWiki() + ":" + super.getItemDocumentDefaultFullName(itemName, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Make sure it return main wiki documents.
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#searchXObjectDocumentsByFields(java.lang.Object[][],
+     *      com.xpn.xwiki.XWikiContext)
+     * @since 1.5
+     */
+    @Override
+    public List<XWikiServer> searchXObjectDocumentsByFields(Object[][] fieldDescriptors, XWikiContext context)
+        throws XWikiException
+    {
+        String database = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainXWiki());
+
+            return super.searchXObjectDocumentsByFields(fieldDescriptors, context);
+        } finally {
+            context.setDatabase(database);
+        }
     }
 
     /**

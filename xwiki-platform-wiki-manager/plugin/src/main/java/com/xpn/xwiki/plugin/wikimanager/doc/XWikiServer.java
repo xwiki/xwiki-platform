@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * This class manage an XWiki document containing XWiki.XWikiServerClass object. It add some specifics methods, getters
  * and setters for this type of object and fields.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiServer extends DefaultXObjectDocument
 {

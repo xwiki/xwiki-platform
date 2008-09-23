@@ -19,7 +19,7 @@ import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 /**
  * This class manage wiki document descriptor.
  * 
- * @version $Id: $
+ * @version $Id$
  * @future XA2 : create a Wiki interface to implement here and rename.
  */
 public class Wiki extends Document
@@ -62,8 +62,8 @@ public class Wiki extends Document
         String wikiName = getWikiName();
 
         if (wikiName.equals(this.context.getMainXWiki())) {
-            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool.getDefault(
-                this.context).get(WikiManagerMessageTool.ERROR_DELETEMAINWIKI, wikiName));
+            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool
+                .getDefault(this.context).get(WikiManagerMessageTool.ERROR_DELETEMAINWIKI, wikiName));
         }
 
         if (hasAdminRights()) {
@@ -74,8 +74,8 @@ public class Wiki extends Document
             }
             this.context.getWiki().getVirtualWikiList().remove(wikiName);
         } else {
-            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool.getDefault(
-                this.context).get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
+            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool
+                .getDefault(this.context).get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
         }
 
         super.delete();
@@ -174,7 +174,7 @@ public class Wiki extends Document
         Collection<BaseObject> objects =
             this.doc.getObjects(XWikiServerClass.getInstance(this.context).getClassFullName());
 
-        return getWikiAlias(objects.iterator().next().getNumber());
+        return objects != null && objects.size() > 0 ? getWikiAlias(objects.iterator().next().getNumber()) : null;
     }
 
     /**

@@ -9,7 +9,7 @@ import java.util.Iterator;
 /**
  * Contains one query result line.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class GlobalSearchResult extends HashMap<String, Object>
 {

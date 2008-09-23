@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * API for managing wikis (create wiki, delete wiki, create wiki from template, etc).
  * 
- * @version $Id: $
+ * @version $Id$
  * @see com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin
  */
 public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>

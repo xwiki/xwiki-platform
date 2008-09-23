@@ -20,7 +20,7 @@ import com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchResult;
 /**
  * Tool to be able to make and merge multi wikis search queries.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 final class GlobalSearch
 {

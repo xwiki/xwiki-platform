@@ -21,7 +21,6 @@
 package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,20 +31,13 @@ import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager}.
@@ -58,10 +50,6 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
     private XWiki xwiki;
 
-    private Mock mockXWikiStore;
-
-    private Mock mockXWikiVersioningStore;
-
     private Map<String, XWikiDocument> documents = new HashMap<String, XWikiDocument>();
 
     /**
@@ -73,91 +61,57 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
     protected void setUp() throws XWikiException
     {
         this.context = new XWikiContext();
-        this.xwiki = new XWiki();
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
-        this.context.setWiki(this.xwiki);
 
-        // //////////////////////////////////////////////////
-        // XWikiHibernateStore
-
-        this.mockXWikiStore =
-            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
-            this.context});
-        this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
-            {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
-
-                    if (documents.containsKey(shallowDoc.getFullName())) {
-                        return documents.get(shallowDoc.getFullName());
-                    } else {
-                        return shallowDoc;
-                    }
-                }
-            });
-        this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
-            {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
-
-                    document.setNew(false);
-                    document.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-                    documents.put(document.getFullName(), document);
-
-                    return null;
-                }
-            });
-        this.mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
-
-        this.mockXWikiVersioningStore =
-            mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
-            this.xwiki, this.context});
-        this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
-        this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
-
-        this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore.proxy());
-
-        // ////////////////////////////////////////////////////////////////////////////////
-        // XWikiRightService
-
-        this.xwiki.setRightService(new XWikiRightService()
+        Mock mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        mockXWiki.stubs().method("getDocument").will(new CustomStub("Implements XWiki.getDocument")
         {
-            public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
+            public Object invoke(Invocation invocation) throws Throwable
             {
-                return true;
-            }
+                String docFullName = (String) invocation.parameterValues.get(0);
+                XWikiDocument shallowDoc = new XWikiDocument();
+                shallowDoc.setFullName(docFullName);
 
-            public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
-                throws XWikiException
-            {
-                return true;
-            }
-
-            public boolean hasAdminRights(XWikiContext context)
-            {
-                return true;
-            }
-
-            public boolean hasProgrammingRights(XWikiContext context)
-            {
-                return true;
-            }
-
-            public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
-            {
-                return true;
-            }
-
-            public List listAllLevels(XWikiContext context) throws XWikiException
-            {
-                return Collections.EMPTY_LIST;
+                if (documents.containsKey(shallowDoc.getFullName())) {
+                    return documents.get(shallowDoc.getFullName());
+                } else {
+                    return shallowDoc;
+                }
             }
         });
+        mockXWiki.stubs().method("saveDocument").will(new CustomStub("Implements XWiki.saveDocument")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
+
+                document.setNew(false);
+                documents.put(document.getFullName(), document);
+
+                return null;
+            }
+        });
+        mockXWiki.stubs().method("getClass").will(new CustomStub("Implements XWiki.getClass")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                String classFullName = (String) invocation.parameterValues.get(0);
+                XWikiContext context = (XWikiContext) invocation.parameterValues.get(1);
+
+                XWikiDocument doc = context.getWiki().getDocument(classFullName, context);
+
+                return doc.getxWikiClass();
+            }
+        });
+        mockXWiki.stubs().method("clearName").will(new CustomStub("Implements XWiki.clearName")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                return invocation.parameterValues.get(0);
+            }
+        });
+
+        this.xwiki = (XWiki) mockXWiki.proxy();
+        this.context.setWiki(this.xwiki);
     }
 
     // ///////////////////////////////////////////////////////////////////////////////////////:
@@ -588,12 +542,6 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
     {
         assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(context).getItemDocumentDefaultName(
             DEFAULT_ITEM_NAME, context));
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(context).getItemDocumentDefaultName(
-            DEFAULT_ITEM_NAME + " ", context));
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(context).getItemDocumentDefaultName(
-            DEFAULT_ITEM_NAME + "\t", context));
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(context).getItemDocumentDefaultName(
-            DEFAULT_ITEM_NAME + ".", context));
     }
 
     public void testGetItemDocumentDefaultNameNoDispatch() throws XWikiException

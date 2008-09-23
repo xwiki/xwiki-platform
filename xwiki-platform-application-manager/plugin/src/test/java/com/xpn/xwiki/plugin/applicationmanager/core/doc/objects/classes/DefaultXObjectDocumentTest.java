@@ -21,7 +21,6 @@
 package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -31,7 +30,6 @@ import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.XWikiEngineContext;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;

@@ -12,7 +12,7 @@
     <br/><br/>
     #if($exp)
     $msg.get("detailedinformation"):<br/>
-    <pre>
+    <pre class="xwikierror">
         $exp.getFullMessage()
     </pre>
     #end

@@ -61,6 +61,9 @@ sup {}
 /* End of 9.2 */
 p {}
 pre {
+  font-family: "Arial", "Lucida", "Trebuchet MS", "Luxi Sans", "Helvetica", sans-serif;
+}
+pre.xwikierror {
   font-family: "Bitstream Vera Sans Mono", "Courier New", Monaco, Courier, monospace;  /* [3] */
   overflow: auto;
   background-color: #EEE;
@@ -133,6 +136,9 @@ applet {}
 /* Section 15: Alignment, font styles, and horizontal rules */
 /* 15.2: Fonts "[...] their use is discouraged in favor of style sheets." */
 tt {}
+tt.wikimodel-verbatim {
+  font-family: "Arial", "Lucida", "Trebuchet MS", "Luxi Sans", "Helvetica", sans-serif;
+}
 i {}
 b {}
 big {}

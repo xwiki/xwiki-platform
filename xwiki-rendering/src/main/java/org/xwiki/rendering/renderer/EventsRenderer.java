@@ -164,25 +164,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void onWord(String word)
     {
-        String printableWord;
-
-        // If the word has any non printable character use the "(((char value)))" notation
-        if (StringUtils.isAsciiPrintable(word)) {
-            printableWord = word;
-        } else {
-            StringBuffer buffer = new StringBuffer();
-            for (int i = 0; i < word.length(); i++) {
-                char c = word.charAt(i);
-                if (c > 126) {
-                    buffer.append("(((").append((int) c).append(")))");
-                } else {
-                    buffer.append(c);
-                }
-            }
-            printableWord = buffer.toString();
-        }
-
-        println("onWord: [" + printableWord + "]");
+        println("onWord: [" + getEscaped(word) + "]");
     }
 
     public void beginList(ListType listType, Map<String, String> parameters)
@@ -435,6 +417,28 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("endTableRow: [" + serializeParameters(parameters) + "]");
     }
 
+    public String getEscaped(String str)
+    {
+        String printableStr;
+
+        if (StringUtils.isAsciiPrintable(str)) {
+            printableStr = str;
+        } else {
+            StringBuffer buffer = new StringBuffer();
+            for (int i = 0; i < str.length(); i++) {
+                char c = str.charAt(i);
+                if (c > 126) {
+                    buffer.append("(((").append((int) c).append(")))");
+                } else {
+                    buffer.append(c);
+                }
+            }
+            printableStr = buffer.toString();
+        }
+
+        return printableStr;
+    }
+
     private StringBuffer toStringXMLElement(Map<String, String> attributes)
     {
         StringBuffer buffer = new StringBuffer();
@@ -466,8 +470,8 @@ public class EventsRenderer extends AbstractPrintRenderer
         StringBuffer buffer = new StringBuffer();
         if (!parameters.isEmpty()) {
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                buffer.append('[').append(entry.getKey()).append(']').append('=').append('[').append(entry.getValue())
-                    .append(']');
+                buffer.append('[').append(getEscaped(entry.getKey())).append(']').append('=').append('[').append(
+                    getEscaped(entry.getValue())).append(']');
             }
         }
         return buffer.toString();

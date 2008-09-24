@@ -1,6 +1,5 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Test when there's no linebreak between macros
 .#-----------------------------------------------------
 {{macro/}}{{macro/}}
 .#-----------------------------------------------------
@@ -8,11 +7,11 @@
 .#-----------------------------------------------------
 beginDocument
 onMacroStandalone: [macro] [] []
-beginParagraph: []
-onMacroInline: [macro] [] []
-endParagraph: []
+onMacroStandalone: [macro] [] []
 endDocument
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-{{macro/}}{{macro/}}
+{{macro/}}
+
+{{macro/}}

@@ -1,32 +1,36 @@
-.#-----------------------------------------------------
+.#-----------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.#-----------------------------------------------------
+.# Verify that 3 empty lines at beginning and 4 at the end of the document are taken into account
+.#-----------------------------------------------------------------------------------------------
+
+
+
 paragraph
-* Item
+
+
+
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
+onEmptyLines: [1]
 beginParagraph: []
 onWord: [paragraph]
 endParagraph: []
-beginList: [BULLETED] []
-beginListItem
-onWord: [Item]
-endListItem
-endList: [BULLETED] []
+onEmptyLines: [2]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>paragraph</p><ul><li>Item</li></ul>
+<div class="wikimodel-emptyline"></div><p>paragraph</p><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
+
 paragraph
 
-* Item
+
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>paragraph</p><ul><li>Item</li></ul></html>
+<html><div class="wikimodel-emptyline"></div><p>paragraph</p><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div></html>

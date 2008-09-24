@@ -48,6 +48,7 @@ endDocument
 * item1
 *; title1
 *: definition1
+
 1. item2
 1.; title2
 1.: definition2

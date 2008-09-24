@@ -72,6 +72,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("verbatim/verbatim2", false);
         suite.addTestsFromResource("verbatim/verbatim3", false);
         suite.addTestsFromResource("verbatim/verbatim4", false);
+        suite.addTestsFromResource("verbatim/verbatim5", false);
 
         // Table formatting
         suite.addTestsFromResource("table/table1", false);
@@ -134,6 +135,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("quote/quote3", false);
         suite.addTestsFromResource("misc/misc1", false);
         suite.addTestsFromResource("misc/misc2", false);
+        suite.addTestsFromResource("misc/misc3", false);
+        suite.addTestsFromResource("misc/misc4", false);
+        suite.addTestsFromResource("misc/misc5", false);
         
         return new PlexusTestSetup(suite);
     }

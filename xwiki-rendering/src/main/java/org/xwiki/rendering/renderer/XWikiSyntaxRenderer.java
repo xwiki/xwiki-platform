@@ -39,19 +39,9 @@ import org.apache.commons.lang.StringUtils;
  */
 public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 {
-    /**
-     * Top level elements.
-     */
-    private enum Element
-    {
-        DOCUMENT, PARAGRAPH, HORIZONTALLINE, LIST, MACRO, SECTION, DEFINITIONLIST, QUOTATION
-    }
-
+    private boolean isFirstElementRendered = false;
+    
     private StringBuffer listStyle = new StringBuffer();
-
-    private boolean needsNewLine = false;
-
-    private Element currentElement;
 
     private boolean isInsideMacroMarker = false;
 
@@ -74,8 +64,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     private int quotationDepth = 0;
 
     private Stack<Boolean> isEndTableRowFoundStack = new Stack<Boolean>();
-
-    private boolean onEmptyLinesCalled = false;
     
     private XWikiMacroPrinter macroPrinter;
 
@@ -92,7 +80,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginDocument()
     {
-        this.currentElement = Element.DOCUMENT;
+        // Nothing to do
     }
 
     /**
@@ -212,18 +200,11 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginParagraph(Map<String, String> parameters)
     {
-        if ((this.currentElement != Element.DOCUMENT) && (this.currentElement != Element.HORIZONTALLINE)
-            && (this.currentElement != Element.MACRO) && (this.currentElement != Element.SECTION) 
-            && !onEmptyLinesCalled)
-        {
-            print("\n");
-        }
+        printNewLine();
+
         if (!parameters.isEmpty()) {
             printParameters(parameters);
         }
-
-        this.currentElement = Element.PARAGRAPH;
-        this.onEmptyLinesCalled = false;
     }
 
     /**
@@ -233,7 +214,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endParagraph(Map<String, String> parameters)
     {
-        this.needsNewLine = true;
+        // Nothing to do
     }
 
     /**
@@ -273,13 +254,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
-        if ((this.currentElement != Element.DOCUMENT)
-            // Don't print a new line since the paragraph already adds a new line by default after itself
-            && (this.currentElement != Element.PARAGRAPH)) {
-            print("\n");
-        }
+        printNewLine();
         print(this.macroPrinter.print(name, parameters, content));
-        this.currentElement = Element.MACRO;
     }
 
     /**
@@ -289,8 +265,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginSection(SectionLevel level)
     {
+        printNewLine();
         print(StringUtils.repeat("=", level.getAsInt()) + " ");
-        this.currentElement = Element.SECTION;
     }
 
     /**
@@ -301,7 +277,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void endSection(SectionLevel level)
     {
         print(" " + StringUtils.repeat("=", level.getAsInt()));
-        this.needsNewLine = true;
     }
 
     /**
@@ -356,6 +331,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (this.isBeginListItemFound && !this.isEndListItemFound) {
             print("\n");
             this.isBeginListItemFound = false;
+        } else {
+            printNewLine();
         }
 
         if (listType == ListType.BULLETED) {
@@ -368,7 +345,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         }
 
         this.listDepth++;
-        this.currentElement = Element.LIST;
     }
 
     /**
@@ -378,11 +354,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginListItem()
     {
-        if (this.isEndListItemFound && (this.currentElement != Element.DEFINITIONLIST)) {
+        if (this.isEndListItemFound) {
             print("\n");
             this.isEndListItemFound = false;
             this.isBeginListItemFound = false;
         }
+        
         this.isBeginListItemFound = true;
 
         print(this.listStyle.toString());
@@ -404,7 +381,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (this.listDepth == 0) {
             this.isBeginListItemFound = false;
             this.isEndListItemFound = false;
-            this.needsNewLine = true;
         }
     }
 
@@ -480,9 +456,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void onHorizontalLine()
     {
+        printNewLine();
         print("----");
-        this.needsNewLine = true;
-        this.currentElement = Element.HORIZONTALLINE;
     }
 
     /**
@@ -502,6 +477,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void onVerbatimStandalone(String protectedString)
     {
+        printNewLine();
         onVerbatimInline(protectedString);
     }
 
@@ -512,8 +488,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void onEmptyLines(int count)
     {
-        print(StringUtils.repeat("\n", count + 1));
-        this.onEmptyLinesCalled = true;        
+        print(StringUtils.repeat("\n", count));
     }
 
     /**
@@ -524,21 +499,17 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginDefinitionList()
     {
-        // Print a new line when:
-        // - the previous element was a definition list
-        if (this.currentElement == Element.DEFINITIONLIST) {
-            print("\n");
-            // - we are inside an existing list
-        } else if (this.isBeginListItemFound && !this.isEndListItemFound) {
+        if (this.isBeginListItemFound && !this.isEndListItemFound) {
             print("\n");
             // - we are inside an existing definition list
         } else if (this.isBeginDefinitionListItemFound && !this.isEndDefinitionListItemFound) {
             print("\n");
             this.isBeginDefinitionListItemFound = false;
+        } else {
+            printNewLine();
         }
 
         this.definitionListDepth++;
-        this.currentElement = Element.DEFINITIONLIST;
     }
 
     /**
@@ -553,7 +524,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (this.definitionListDepth == 0) {
             this.isBeginDefinitionListItemFound = false;
             this.isEndDefinitionListItemFound = false;
-            this.needsNewLine = true;
             this.isBeginListItemFound = false;
             this.isEndDefinitionListItemFound = false;
         }
@@ -642,13 +612,15 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (this.isBeginQuotationLineFound && !this.isEndQuotationLineFound) {
             print("\n");
             this.isBeginQuotationLineFound = false;
+        } else {
+            printNewLine();
         }
+
         if (!parameters.isEmpty()) {
             printParameters(parameters);
         }
 
         this.quotationDepth++;
-        this.currentElement = Element.QUOTATION;
     }
 
     /**
@@ -663,7 +635,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (this.quotationDepth == 0) {
             this.isBeginQuotationLineFound = false;
             this.isEndQuotationLineFound = false;
-            this.needsNewLine = true;
         }
     }
 
@@ -703,6 +674,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginTable(Map<String, String> parameters)
     {
+        printNewLine();
         if (!parameters.isEmpty()) {
             printParameters(parameters);
         }
@@ -821,11 +793,16 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     protected void print(String text)
     {
         if (!this.isInsideMacroMarker) {
-            if (this.needsNewLine) {
-                super.print("\n");
-            }
-            this.needsNewLine = false;
             super.print(text);
+        }
+    }
+    
+    private void printNewLine()
+    {
+        if (this.isFirstElementRendered) {
+            print("\n\n");
+        } else {
+            this.isFirstElementRendered = true;
         }
     }
 }

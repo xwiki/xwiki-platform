@@ -48,6 +48,7 @@ endDocument
 .expect|xwiki
 .#-----------------------------------------------------
 paragraph
+
 >line1
 line1bis
 >>line2

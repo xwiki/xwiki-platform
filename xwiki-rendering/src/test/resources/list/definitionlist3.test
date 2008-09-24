@@ -39,6 +39,7 @@ endDocument
 .expect|xwiki
 .#-----------------------------------------------------
 paragraph1
+
 ; title
 : definition1
 definition2

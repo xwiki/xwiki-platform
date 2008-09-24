@@ -1,32 +1,29 @@
 .#-----------------------------------------------------
-.input|xwiki/2.0|skip
-.# Test empty lines before paragraph at beginning of document and at the end of the document
+.input|xwiki/2.0
+.# Test empty document with more than 2 new lines.
+.# Only the first line is discarded.
 .#-----------------------------------------------------
-.# TODO: Bug see http://code.google.com/p/wikimodel/issues/detail?id=78
-paragraph
+
+
+
 
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-onEmptyLines: [1]
-beginParagraph: []
-onWord: [paragraph]
-endParagraph: []
-onEmptyLines: [1]
+onEmptyLines: [2]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<div class="wikimodel-emptyline"></div><p>paragraph</p><div class="wikimodel-emptyline"></div>
+<div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 
-paragraph
+
 
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: Bug see http://code.google.com/p/wikimodel/issues/detail?id=78
-<html><div class="wikimodel-emptyline"></div><p>paragraph</p><div class="wikimodel-emptyline"></div></html>
+<html><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div></html>

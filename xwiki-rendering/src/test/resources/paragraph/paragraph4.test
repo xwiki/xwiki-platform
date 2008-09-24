@@ -20,4 +20,5 @@ endDocument
 .expect|xwiki
 .#-----------------------------------------------------
 paragraph
+
 {{macro/}}

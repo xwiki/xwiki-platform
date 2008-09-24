@@ -1,0 +1,27 @@
+.#------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify that accented characters HTML entered directly in the syntax is "escaped" and not rendered 
+.#------------------------------------------------------------------------------
+(% param1="valüe" %)
+sôme äccénted chàracters
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph: [[param1]=[val(((252)))e]]
+onWord: [s(((244)))me]
+onSpace
+onWord: [(((228)))cc(((233)))nted]
+onSpace
+onWord: [ch(((224)))racters]
+endParagraph: [[param1]=[val(((252)))e]]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p param1="val&#252;e">s&#244;me &#228;cc&#233;nted ch&#224;racters</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+(% param1="valüe" %)
+sôme äccénted chàracters

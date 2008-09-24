@@ -8,7 +8,7 @@ content
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-onMacroStandalone: [testsimplemacro] [param1=value1|param2=value2] [
+onMacroStandalone [testsimplemacro] [param1=value1|param2=value2] [
 content
 ]
 endDocument

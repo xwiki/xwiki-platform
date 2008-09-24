@@ -7,14 +7,14 @@ paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [paragraph]
-endParagraph: []
-beginList: [BULLETED] []
+beginParagraph
+onWord [paragraph]
+endParagraph
+beginList [BULLETED]
 beginListItem
-onWord: [Item]
+onWord [Item]
 endListItem
-endList: [BULLETED] []
+endList [BULLETED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

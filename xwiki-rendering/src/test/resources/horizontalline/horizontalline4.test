@@ -6,11 +6,11 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
+beginParagraph
 beginStrikedOut
-onSpecialSymbol: [-]
+onSpecialSymbol [-]
 endStrikedOut
-endParagraph: []
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

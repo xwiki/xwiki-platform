@@ -12,14 +12,14 @@
 beginDocument
 beginDefinitionList
 beginDefinitionDescription
-onWord: [indent1]
+onWord [indent1]
 endDefinitionDescription
 endDefinitionList
 beginDefinitionList
 beginDefinitionDescription
 beginDefinitionList
 beginDefinitionDescription
-onWord: [indent2]
+onWord [indent2]
 endDefinitionDescription
 endDefinitionList
 endDefinitionDescription
@@ -30,7 +30,7 @@ beginDefinitionList
 beginDefinitionDescription
 beginDefinitionList
 beginDefinitionDescription
-onWord: [indent3]
+onWord [indent3]
 endDefinitionDescription
 endDefinitionList
 endDefinitionDescription

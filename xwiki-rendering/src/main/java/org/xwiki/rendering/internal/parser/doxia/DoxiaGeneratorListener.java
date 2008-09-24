@@ -255,9 +255,9 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine()
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine(Map)
      */
-    public void onHorizontalLine()
+    public void onHorizontalLine(Map<String, String> parameters)
     {
         this.sink.horizontalRule();
     }

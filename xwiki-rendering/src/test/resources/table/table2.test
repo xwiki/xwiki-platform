@@ -7,14 +7,14 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginTable: [[a]=[b]]
-beginTableRow: [[c]=[d]]
-beginTableHeadCell: [[e]=[f]]
+beginTable [[a]=[b]]
+beginTableRow [[c]=[d]]
+beginTableHeadCell [[e]=[f]]
 onSpace
-onWord: [cell]
-endTableHeadCell: [[e]=[f]]
-endTableRow: [[c]=[d]]
-endTable: [[a]=[b]]
+onWord [cell]
+endTableHeadCell [[e]=[f]]
+endTableRow [[c]=[d]]
+endTable [[a]=[b]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -6,15 +6,15 @@ This is ##monospace##
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
 beginMonospace
-onWord: [monospace]
+onWord [monospace]
 endMonospace
-endParagraph: []
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

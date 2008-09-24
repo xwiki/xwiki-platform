@@ -7,21 +7,21 @@ This is not a paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginList: [BULLETED] []
+beginList [BULLETED]
 beginListItem
-onWord: [Item]
+onWord [Item]
 onLineBreak
-onWord: [This]
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
-onWord: [not]
+onWord [not]
 onSpace
-onWord: [a]
+onWord [a]
 onSpace
-onWord: [paragraph]
+onWord [paragraph]
 endListItem
-endList: [BULLETED] []
+endList [BULLETED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

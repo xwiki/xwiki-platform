@@ -6,16 +6,16 @@ Two inline {{macro/}}{{macro/}} macros
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [Two]
+beginParagraph
+onWord [Two]
 onSpace
-onWord: [inline]
+onWord [inline]
 onSpace
-onMacroInline: [macro] [] []
-onMacroInline: [macro] [] []
+onMacroInline [macro] [] []
+onMacroInline [macro] [] []
 onSpace
-onWord: [macros]
-endParagraph: []
+onWord [macros]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xwiki

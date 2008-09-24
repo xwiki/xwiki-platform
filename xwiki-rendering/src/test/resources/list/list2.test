@@ -8,22 +8,22 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onSpecialSymbol: [*]
-onWord: [Not]
+beginParagraph
+onSpecialSymbol [*]
+onWord [Not]
 onSpace
-onWord: [a]
+onWord [a]
 onSpace
-onWord: [list]
+onWord [list]
 onLineBreak
-onWord: [1]
-onSpecialSymbol: [.]
-onWord: [Not]
+onWord [1]
+onSpecialSymbol [.]
+onWord [Not]
 onSpace
-onWord: [a]
+onWord [a]
 onSpace
-onWord: [list]
-endParagraph: []
+onWord [list]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

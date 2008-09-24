@@ -7,13 +7,13 @@ Some URL http://server/path/~user
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [Some]
+beginParagraph
+onWord [Some]
 onSpace
-onWord: [URL]
+onWord [URL]
 onSpace
-onLink: [Reference = [http://server/path/~user]] [true]
-endParagraph: []
+onLink [Reference = [http://server/path/~user]] [true]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

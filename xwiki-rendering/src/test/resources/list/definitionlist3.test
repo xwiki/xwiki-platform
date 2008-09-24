@@ -14,22 +14,22 @@ paragraph2
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [paragraph1]
-endParagraph: []
+beginParagraph
+onWord [paragraph1]
+endParagraph
 beginDefinitionList
 beginDefinitionTerm
-onWord: [title]
+onWord [title]
 endDefinitionTerm
 beginDefinitionDescription
-onWord: [definition1]
+onWord [definition1]
 onLineBreak
-onWord: [definition2]
+onWord [definition2]
 endDefinitionDescription
 endDefinitionList
-beginParagraph: []
-onWord: [paragraph2]
-endParagraph: []
+beginParagraph
+onWord [paragraph2]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

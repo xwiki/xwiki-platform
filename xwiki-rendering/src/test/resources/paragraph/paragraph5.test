@@ -7,12 +7,12 @@ Paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [Paragraph]
-endParagraph: []
-beginSection: [1]
-onWord: [Header]
-endSection: [1]
+beginParagraph
+onWord [Paragraph]
+endParagraph
+beginSection [1]
+onWord [Header]
+endSection [1]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

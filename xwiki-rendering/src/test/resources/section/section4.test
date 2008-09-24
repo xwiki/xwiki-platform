@@ -7,18 +7,18 @@ Some paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginSection: [1]
-onWord: [Title]
+beginSection [1]
+onWord [Title]
 onSpace
-onWord: [level]
+onWord [level]
 onSpace
-onWord: [1]
-endSection: [1]
-beginParagraph: []
-onWord: [Some]
+onWord [1]
+endSection [1]
+beginParagraph
+onWord [Some]
 onSpace
-onWord: [paragraph]
-endParagraph: []
+onWord [paragraph]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

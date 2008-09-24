@@ -7,17 +7,17 @@ This is ///// not italic
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
-onSpecialSymbol: [/]
+onSpecialSymbol [/]
 onSpace
-onWord: [not]
+onWord [not]
 onSpace
-onWord: [italic]
-endParagraph: []
+onWord [italic]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

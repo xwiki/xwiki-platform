@@ -9,11 +9,11 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker: [xhtml] [escapeWikiSyntax=true] [
+beginMacroMarker [xhtml] [escapeWikiSyntax=true] [
 **some escaped text**
 ]
-onWord: [**some escaped text**]
-endMacroMarker: [xhtml] [escapeWikiSyntax=true] [
+onWord [**some escaped text**]
+endMacroMarker [xhtml] [escapeWikiSyntax=true] [
 **some escaped text**
 ]
 endDocument

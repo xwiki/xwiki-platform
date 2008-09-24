@@ -8,21 +8,21 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginList: [BULLETED] []
+beginList [BULLETED]
 beginListItem
-onSpecialSymbol: [*]
+onSpecialSymbol [*]
 onSpace
-onWord: [item]
+onWord [item]
 endListItem
-endList: [BULLETED] []
-beginList: [NUMBERED] []
+endList [BULLETED]
+beginList [NUMBERED]
 beginListItem
-onWord: [1]
-onSpecialSymbol: [.]
+onWord [1]
+onSpecialSymbol [.]
 onSpace
-onWord: [item]
+onWord [item]
 endListItem
-endList: [NUMBERED] []
+endList [NUMBERED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

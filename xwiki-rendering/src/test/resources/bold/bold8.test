@@ -6,21 +6,21 @@ This is **bold and //italic//**
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
 beginBold
-onWord: [bold]
+onWord [bold]
 onSpace
-onWord: [and]
+onWord [and]
 onSpace
 beginItalic
-onWord: [italic]
+onWord [italic]
 endItalic
 endBold
-endParagraph: []
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

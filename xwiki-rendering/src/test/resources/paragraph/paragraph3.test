@@ -26,34 +26,34 @@ world
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [hello]
-endParagraph: []
+beginParagraph
+onWord [hello]
+endParagraph
 onHorizontalLine
-beginParagraph: []
-onWord: [world]
-endParagraph: []
-beginParagraph: []
-onWord: [hello]
-endParagraph: []
+beginParagraph
+onWord [world]
+endParagraph
+beginParagraph
+onWord [hello]
+endParagraph
 onHorizontalLine
-beginParagraph: []
-onWord: [world]
-endParagraph: []
-beginParagraph: []
-onWord: [hello]
-endParagraph: []
+beginParagraph
+onWord [world]
+endParagraph
+beginParagraph
+onWord [hello]
+endParagraph
 onHorizontalLine
-beginParagraph: []
-onWord: [world]
-endParagraph: []
-beginParagraph: []
-onWord: [hello]
-endParagraph: []
+beginParagraph
+onWord [world]
+endParagraph
+beginParagraph
+onWord [hello]
+endParagraph
 onHorizontalLine
-beginParagraph: []
-onWord: [world]
-endParagraph: []
+beginParagraph
+onWord [world]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

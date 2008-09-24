@@ -7,29 +7,29 @@ This is <a href="url">some HTML</a>.
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
-onSpecialSymbol: [<]
-onWord: [a]
+onSpecialSymbol [<]
+onWord [a]
 onSpace
-onWord: [href]
-onSpecialSymbol: [=]
-onSpecialSymbol: ["]
-onWord: [url]
-onSpecialSymbol: ["]
-onSpecialSymbol: [>]
-onWord: [some]
+onWord [href]
+onSpecialSymbol [=]
+onSpecialSymbol ["]
+onWord [url]
+onSpecialSymbol ["]
+onSpecialSymbol [>]
+onWord [some]
 onSpace
-onWord: [HTML]
-onSpecialSymbol: [<]
-onSpecialSymbol: [/]
-onWord: [a]
-onSpecialSymbol: [>]
-onSpecialSymbol: [.]
-endParagraph: []
+onWord [HTML]
+onSpecialSymbol [<]
+onSpecialSymbol [/]
+onWord [a]
+onSpecialSymbol [>]
+onSpecialSymbol [.]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

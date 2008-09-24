@@ -385,9 +385,10 @@ public interface Listener
     /**
      * Represents an horizontal line.
      * 
+     * @param parameters a generic list of parameters for the paragraph. Example: "style"/"background-color: blue"
      * @since 1.6M1
      */
-    void onHorizontalLine();
+    void onHorizontalLine(Map<String, String> parameters);
 
     /**
      * Represents an empty line between 2 standalone Blocks. A standalone block is block that is not included in another

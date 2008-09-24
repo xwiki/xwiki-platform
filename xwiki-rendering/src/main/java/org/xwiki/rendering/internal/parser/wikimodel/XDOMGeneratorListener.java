@@ -341,9 +341,9 @@ public class XDOMGeneratorListener implements IWemListener
      * 
      * @see org.wikimodel.wem.IWemListener#onHorizontalLine()
      */
-    public void onHorizontalLine()
+    public void onHorizontalLine(WikiParameters params)
     {
-        this.stack.push(HorizontalLineBlock.HORIZONTAL_LINE_BLOCK);
+        this.stack.push(new HorizontalLineBlock(convertParameters(params)));
     }
 
     /**

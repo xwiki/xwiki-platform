@@ -201,10 +201,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void beginParagraph(Map<String, String> parameters)
     {
         printNewLine();
-
-        if (!parameters.isEmpty()) {
-            printParameters(parameters);
-        }
+        printParameters(parameters);
     }
 
     /**
@@ -452,11 +449,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine()
+     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine(Map)
      */
-    public void onHorizontalLine()
+    public void onHorizontalLine(Map<String, String> parameters)
     {
         printNewLine();
+        printParameters(parameters);
         print("----");
     }
 
@@ -690,9 +688,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void beginTableCell(Map<String, String> parameters)
     {
         print("|");
-        if (!parameters.isEmpty()) {
-            printParameters(parameters, false);
-        }
+        printParameters(parameters, false);
     }
 
     /**
@@ -703,9 +699,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void beginTableHeadCell(Map<String, String> parameters)
     {
         print("||");
-        if (!parameters.isEmpty()) {
-            printParameters(parameters, false);
-        }
+        printParameters(parameters, false);
     }
 
     /**
@@ -719,9 +713,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             print("\n");
         }
 
-        if (!parameters.isEmpty()) {
-            printParameters(parameters, false);
-        }
+        printParameters(parameters, false);
     }
 
     /**
@@ -771,17 +763,19 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     protected void printParameters(Map<String, String> parameters, boolean newLine)
     {
-        StringBuffer buffer = new StringBuffer("(%");
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(entry.getValue()).append('\"');
+        if (!parameters.isEmpty()) {
+	    	StringBuffer buffer = new StringBuffer("(%");
+	        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+	            buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(entry.getValue()).append('\"');
+	        }
+	        buffer.append(" %)");
+	
+	        if (newLine) {
+	            buffer.append("\n");
+	        }
+	
+	        print(buffer.toString());
         }
-        buffer.append(" %)");
-
-        if (newLine) {
-            buffer.append("\n");
-        }
-
-        print(buffer.toString());
     }
 
     /**

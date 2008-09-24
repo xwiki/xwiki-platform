@@ -15,77 +15,77 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginSection: [6]
-onWord: [Title]
+beginSection [6]
+onWord [Title]
 onSpace
-onWord: [level]
+onWord [level]
 onSpace
-onWord: [6]
-endSection: [6]
-beginSection: [1]
-onWord: [Title]
+onWord [6]
+endSection [6]
+beginSection [1]
+onWord [Title]
 onSpace
-onWord: [level]
+onWord [level]
 onSpace
-onWord: [1]
-endSection: [1]
-beginSection: [1]
-onWord: [Title]
+onWord [1]
+endSection [1]
+beginSection [1]
+onWord [Title]
 onSpace
-onWord: [level]
+onWord [level]
 onSpace
-onWord: [1]
-endSection: [1]
-beginSection: [1]
-onWord: [Title]
+onWord [1]
+endSection [1]
+beginSection [1]
+onWord [Title]
 onSpace
-onWord: [level]
+onWord [level]
 onSpace
-onWord: [1]
-endSection: [1]
-beginSection: [1]
-onWord: [Title]
+onWord [1]
+endSection [1]
+beginSection [1]
+onWord [Title]
 onSpace
-onWord: [level]
+onWord [level]
 onSpace
-onWord: [1]
-endSection: [1]
-beginSection: [1]
-onWord: [Title]
+onWord [1]
+endSection [1]
+beginSection [1]
+onWord [Title]
 onSpace
-onWord: [level]
+onWord [level]
 onSpace
-onWord: [1]
-endSection: [1]
-beginSection: [1]
-onWord: [Title]
+onWord [1]
+endSection [1]
+beginSection [1]
+onWord [Title]
 onSpace
-onWord: [level]
+onWord [level]
 onSpace
-onWord: [1]
-endSection: [1]
-beginSection: [1]
-onWord: [Title]
+onWord [1]
+endSection [1]
+beginSection [1]
+onWord [Title]
 onSpace
-onWord: [level]
+onWord [level]
 onSpace
-onWord: [1]
-endSection: [1]
-beginParagraph: []
-onWord: [some]
+onWord [1]
+endSection [1]
+beginParagraph
+onWord [some]
 onSpace
-onWord: [text]
-endParagraph: []
-beginSection: [1]
-onWord: [unclosed]
+onWord [text]
+endParagraph
+beginSection [1]
+onWord [unclosed]
 onSpace
-onWord: [header]
-endSection: [1]
-beginSection: [1]
-onWord: [key]
-onEscape: [=]
-onWord: [value]
-endSection: [1]
+onWord [header]
+endSection [1]
+beginSection [1]
+onWord [key]
+onEscape [=]
+onWord [value]
+endSection [1]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

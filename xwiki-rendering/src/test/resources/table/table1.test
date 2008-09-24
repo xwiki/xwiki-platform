@@ -8,59 +8,59 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginTable: []
-beginTableRow: []
-beginTableHeadCell: []
+beginTable
+beginTableRow
+beginTableHeadCell
 onSpace
-onWord: [col1]
+onWord [col1]
 onSpace
-endTableHeadCell: []
-beginTableHeadCell: []
+endTableHeadCell
+beginTableHeadCell
 onSpace
-onWord: [col2]
-endTableHeadCell: []
-endTableRow: []
-beginTableRow: []
-beginTableHeadCell: []
+onWord [col2]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableHeadCell
 onSpace
-onWord: [line1]
+onWord [line1]
 onSpace
-endTableHeadCell: []
-beginTableCell: []
+endTableHeadCell
+beginTableCell
 onSpace
-onWord: [cell1]
-onSpecialSymbol: [.]
-onWord: [1]
+onWord [cell1]
+onSpecialSymbol [.]
+onWord [1]
 onSpace
-endTableCell: []
-beginTableCell: []
+endTableCell
+beginTableCell
 onSpace
-onWord: [cell1]
-onSpecialSymbol: [.]
-onWord: [2]
-endTableCell: []
-endTableRow: []
-beginTableRow: []
-beginTableHeadCell: []
+onWord [cell1]
+onSpecialSymbol [.]
+onWord [2]
+endTableCell
+endTableRow
+beginTableRow
+beginTableHeadCell
 onSpace
-onWord: [line2]
+onWord [line2]
 onSpace
-endTableHeadCell: []
-beginTableCell: []
+endTableHeadCell
+beginTableCell
 onSpace
-onWord: [cell2]
-onSpecialSymbol: [.]
-onWord: [1]
+onWord [cell2]
+onSpecialSymbol [.]
+onWord [1]
 onSpace
-endTableCell: []
-beginTableCell: []
+endTableCell
+beginTableCell
 onSpace
-onWord: [cell2]
-onSpecialSymbol: [.]
-onWord: [2]
-endTableCell: []
-endTableRow: []
-endTable: []
+onWord [cell2]
+onSpecialSymbol [.]
+onWord [2]
+endTableCell
+endTableRow
+endTable
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

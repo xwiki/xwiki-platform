@@ -8,16 +8,16 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginList: [BULLETED] []
+beginList [BULLETED]
 beginListItem
-onWord: [item1]
-beginList: [BULLETED] []
+onWord [item1]
+beginList [BULLETED]
 beginListItem
-onWord: [item2]
+onWord [item2]
 endListItem
-endList: [BULLETED] []
+endList [BULLETED]
 endListItem
-endList: [BULLETED] []
+endList [BULLETED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

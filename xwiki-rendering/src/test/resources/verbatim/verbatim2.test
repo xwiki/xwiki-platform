@@ -8,7 +8,7 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-onVerbatimStandalone: [
+onVerbatimStandalone [
 **verbatim**
 ]
 endDocument

@@ -1,39 +1,24 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-This is **bold ** not bold** bold
+(% param="value" %)
+----
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
-onWord [This]
-onSpace
-onWord [is]
-onSpace
-beginBold
-onWord [bold]
-onSpace
-endBold
-onSpace
-onWord [not]
-onSpace
-onWord [bold]
-beginBold
-onSpace
-onWord [bold]
-endBold
-endParagraph
+onHorizontalLine [[param]=[value]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>This is <strong>bold </strong> not bold<strong> bold</strong></p>
+<hr param="value"/>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-This is **bold ** not bold** bold**
+(% param="value" %)
+----
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>This is <strong>bold </strong> not bold<strong> bold</strong></p></html>
+<html><hr param="value"/></html>

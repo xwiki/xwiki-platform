@@ -7,9 +7,9 @@ paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: [[param1]=[value1][param2]=[value2]]
-onWord: [paragraph]
-endParagraph: [[param1]=[value1][param2]=[value2]]
+beginParagraph [[param1]=[value1][param2]=[value2]]
+onWord [paragraph]
+endParagraph [[param1]=[value1][param2]=[value2]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -16,73 +16,73 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginList: [NUMBERED] []
+beginList [NUMBERED]
 beginListItem
-onWord: [Item]
+onWord [Item]
 onSpace
-onWord: [1]
-beginList: [NUMBERED] []
+onWord [1]
+beginList [NUMBERED]
 beginListItem
-onWord: [Item]
+onWord [Item]
 onSpace
-onWord: [2]
-beginList: [BULLETED] []
+onWord [2]
+beginList [BULLETED]
 beginListItem
-onWord: [Item]
+onWord [Item]
 onSpace
-onWord: [3]
+onWord [3]
 endListItem
-endList: [BULLETED] []
-endListItem
-beginListItem
-onWord: [Item]
-onSpace
-onWord: [4]
-endListItem
-endList: [NUMBERED] []
+endList [BULLETED]
 endListItem
 beginListItem
-onWord: [Item]
+onWord [Item]
 onSpace
-onWord: [5]
+onWord [4]
 endListItem
-endList: [NUMBERED] []
-beginList: [BULLETED] []
-beginListItem
-onWord: [Item]
-onSpace
-onWord: [1]
-beginList: [BULLETED] []
-beginListItem
-onWord: [Item]
-onSpace
-onWord: [2]
-beginList: [BULLETED] []
-beginListItem
-onWord: [Item]
-onSpace
-onWord: [3]
-endListItem
-endList: [BULLETED] []
+endList [NUMBERED]
 endListItem
 beginListItem
-onWord: [Item]
+onWord [Item]
 onSpace
-onWord: [4]
+onWord [5]
 endListItem
-endList: [BULLETED] []
+endList [NUMBERED]
+beginList [BULLETED]
+beginListItem
+onWord [Item]
+onSpace
+onWord [1]
+beginList [BULLETED]
+beginListItem
+onWord [Item]
+onSpace
+onWord [2]
+beginList [BULLETED]
+beginListItem
+onWord [Item]
+onSpace
+onWord [3]
+endListItem
+endList [BULLETED]
 endListItem
 beginListItem
-onWord: [Item]
+onWord [Item]
 onSpace
-onWord: [5]
+onWord [4]
+endListItem
+endList [BULLETED]
 endListItem
 beginListItem
-onWord: [Item]
+onWord [Item]
 onSpace
-onWord: [6]
+onWord [5]
 endListItem
-endList: [BULLETED] []
+beginListItem
+onWord [Item]
+onSpace
+onWord [6]
+endListItem
+endList [BULLETED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

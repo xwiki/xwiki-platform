@@ -7,19 +7,19 @@ Not a == header ==
 .#-----------------------------------------------------
 .# TODO: Wikimodel generates invalid events
 beginDocument
-beginParagraph: []
-onWord: [Not]
+beginParagraph
+onWord [Not]
 onSpace
-onWord: [a]
+onWord [a]
 onSpace
-onSpecialSymbol: [=]
-onSpecialSymbol: [=]
+onSpecialSymbol [=]
+onSpecialSymbol [=]
 onSpace
-onWord: [header]
+onWord [header]
 onSpace
-onSpecialSymbol: [=]
-onSpecialSymbol: [=]
-endParagraph: []
+onSpecialSymbol [=]
+onSpecialSymbol [=]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

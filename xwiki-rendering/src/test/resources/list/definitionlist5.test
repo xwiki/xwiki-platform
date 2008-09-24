@@ -18,53 +18,53 @@ not ;definition: something
 beginDocument
 beginDefinitionList
 beginDefinitionTerm
-onWord: [title]
-onSpecialSymbol: [:]
+onWord [title]
+onSpecialSymbol [:]
 onSpace
-onWord: [not]
+onWord [not]
 onSpace
-onWord: [definition]
+onWord [definition]
 endDefinitionTerm
 endDefinitionList
 beginDefinitionList
 beginDefinitionDescription
-onWord: [empty]
+onWord [empty]
 onSpace
-onWord: [definition]
+onWord [definition]
 endDefinitionDescription
 endDefinitionList
 beginDefinitionList
 beginDefinitionTerm
-onWord: [just]
+onWord [just]
 onSpace
-onWord: [term]
+onWord [term]
 endDefinitionTerm
 endDefinitionList
 beginDefinitionList
 beginDefinitionTerm
-onLink: [Reference = [uri:not]] [true]
+onLink [Reference = [uri:not]] [true]
 onSpace
-onWord: [definition]
+onWord [definition]
 endDefinitionTerm
 endDefinitionList
-beginParagraph: []
-onSpecialSymbol: [;]
-onWord: [title]
-onSpecialSymbol: [:]
+beginParagraph
+onSpecialSymbol [;]
+onWord [title]
+onSpecialSymbol [:]
 onSpace
-onWord: [not]
+onWord [not]
 onSpace
-onWord: [definition]
-endParagraph: []
-beginParagraph: []
-onWord: [not]
+onWord [definition]
+endParagraph
+beginParagraph
+onWord [not]
 onSpace
-onSpecialSymbol: [;]
-onWord: [definition]
-onSpecialSymbol: [:]
+onSpecialSymbol [;]
+onWord [definition]
+onSpecialSymbol [:]
 onSpace
-onWord: [something]
-endParagraph: []
+onWord [something]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

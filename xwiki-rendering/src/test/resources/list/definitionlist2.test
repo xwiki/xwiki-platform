@@ -11,32 +11,32 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginList: [BULLETED] []
+beginList [BULLETED]
 beginListItem
-onWord: [item1]
+onWord [item1]
 beginDefinitionList
 beginDefinitionTerm
-onWord: [title1]
+onWord [title1]
 endDefinitionTerm
 beginDefinitionDescription
-onWord: [definition1]
+onWord [definition1]
 endDefinitionDescription
 endDefinitionList
 endListItem
-endList: [BULLETED] []
-beginList: [NUMBERED] []
+endList [BULLETED]
+beginList [NUMBERED]
 beginListItem
-onWord: [item2]
+onWord [item2]
 beginDefinitionList
 beginDefinitionTerm
-onWord: [title2]
+onWord [title2]
 endDefinitionTerm
 beginDefinitionDescription
-onWord: [definition2]
+onWord [definition2]
 endDefinitionDescription
 endDefinitionList
 endListItem
-endList: [NUMBERED] []
+endList [NUMBERED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

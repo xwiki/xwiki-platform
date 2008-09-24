@@ -11,9 +11,9 @@ paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [paragraph]
-endParagraph: []
+beginParagraph
+onWord [paragraph]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

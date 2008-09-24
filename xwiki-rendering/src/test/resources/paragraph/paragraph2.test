@@ -10,16 +10,16 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [one]
+beginParagraph
+onWord [one]
 onSpace
-onWord: [two]
+onWord [two]
 onSpace
-onWord: [three]
+onWord [three]
 onLineBreak
 onLineBreak
-onWord: [hello]
-endParagraph: []
+onWord [hello]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -14,7 +14,7 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker: [xhtml] [] [
+beginMacroMarker [xhtml] [] [
 <table>
 <tr>
 <td>
@@ -23,18 +23,18 @@ beginMacroMarker: [xhtml] [] [
 </tr>
 </table>
 ]
-beginXMLElement: [table] []
-beginXMLElement: [tr] []
-beginXMLElement: [td] []
-beginList: [BULLETED] []
+beginXMLElement [table] []
+beginXMLElement [tr] []
+beginXMLElement [td] []
+beginList [BULLETED]
 beginListItem
-onWord: [listitem]
+onWord [listitem]
 endListItem
-endList: [BULLETED] []
-endXMLElement: [td] []
-endXMLElement: [tr] []
-endXMLElement: [table] []
-endMacroMarker: [xhtml] [] [
+endList [BULLETED]
+endXMLElement [td] []
+endXMLElement [tr] []
+endXMLElement [table] []
+endMacroMarker [xhtml] [] [
 <table>
 <tr>
 <td>

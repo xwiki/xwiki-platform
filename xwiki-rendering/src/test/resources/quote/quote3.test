@@ -7,11 +7,11 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginQuotation: [[param1]=[value1][param2]=[value2]]
+beginQuotation [[param1]=[value1][param2]=[value2]]
 beginQuotationLine
-onWord: [line]
+onWord [line]
 endQuotationLine
-endQuotation: [[param1]=[value1][param2]=[value2]]
+endQuotation [[param1]=[value1][param2]=[value2]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

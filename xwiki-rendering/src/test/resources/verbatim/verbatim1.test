@@ -6,13 +6,13 @@ This is {{{**verbatim**}}}
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
-onVerbatimInline: [**verbatim**]
-endParagraph: []
+onVerbatimInline [**verbatim**]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -8,23 +8,23 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
+beginParagraph
 beginBold
-onWord: [This]
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
-onWord: [bold]
+onWord [bold]
 onSpace
-onWord: [and]
+onWord [and]
 onSpace
-onWord: [not]
+onWord [not]
 onSpace
-onWord: [a]
+onWord [a]
 onSpace
-onWord: [list]
+onWord [list]
 endBold
-endParagraph: []
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

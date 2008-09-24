@@ -7,11 +7,11 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginList: [BULLETED] [[param1]=[value1][param2]=[value2]]
+beginList [BULLETED] [[param1]=[value1][param2]=[value2]]
 beginListItem
-onWord: [item]
+onWord [item]
 endListItem
-endList: [BULLETED] [[param1]=[value1][param2]=[value2]]
+endList [BULLETED] [[param1]=[value1][param2]=[value2]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

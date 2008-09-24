@@ -440,11 +440,11 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine()
+     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine(Map)
      */
-    public void onHorizontalLine()
+    public void onHorizontalLine(Map<String, String> parameters)
     {
-        print("<hr/>");
+        print("<hr" + serializeParameters(parameters) + "/>");
     }
 
     /**

@@ -12,21 +12,21 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onLink: [Reference = [Space.ExistingPage]] [false]
+beginParagraph
+onLink [Reference = [Space.ExistingPage]] [false]
 onLineBreak
-onLink: [Reference = [Space.ExistingPage] QueryString = [param=value] Anchor = [anchor]] [false]
+onLink [Reference = [Space.ExistingPage] QueryString = [param=value] Anchor = [anchor]] [false]
 onLineBreak
-onLink: [Label = [label] Reference = [Space.UnknownPage]] [false]
+onLink [Label = [label] Reference = [Space.UnknownPage]] [false]
 onLineBreak
-onLink: [Label = [label] Reference = [http://xwiki.org]] [false]
+onLink [Label = [label] Reference = [http://xwiki.org]] [false]
 onLineBreak
-onLink: [Label = [label] Reference = [Space.ExistingPage] Target = [_target]] [false]
+onLink [Label = [label] Reference = [Space.ExistingPage] Target = [_target]] [false]
 onLineBreak
-onLink: [Reference = [mailto:john@doe.com]] [false]
+onLink [Reference = [mailto:john@doe.com]] [false]
 onLineBreak
-onLink: [Reference = [{{macro}}]] [false]
-endParagraph: []
+onLink [Reference = [{{macro}}]] [false]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

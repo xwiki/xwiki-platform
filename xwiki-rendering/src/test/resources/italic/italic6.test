@@ -6,17 +6,17 @@ This is ///italic///
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
 beginItalic
-onSpecialSymbol: [/]
-onWord: [italic]
+onSpecialSymbol [/]
+onWord [italic]
 endItalic
-onSpecialSymbol: [/]
-endParagraph: []
+onSpecialSymbol [/]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

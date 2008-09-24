@@ -12,10 +12,10 @@ beginDocument
 onHorizontalLine
 beginDefinitionList
 beginDefinitionTerm
-onWord: [title1]
+onWord [title1]
 endDefinitionTerm
 beginDefinitionDescription
-onWord: [definition1]
+onWord [definition1]
 endDefinitionDescription
 endDefinitionList
 onHorizontalLine

@@ -13,11 +13,11 @@ paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-onEmptyLines: [1]
-beginParagraph: []
-onWord: [paragraph]
-endParagraph: []
-onEmptyLines: [2]
+onEmptyLines [1]
+beginParagraph
+onWord [paragraph]
+endParagraph
+onEmptyLines [2]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

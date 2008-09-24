@@ -6,17 +6,17 @@ This is ***bold***
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
 beginBold
-onSpecialSymbol: [*]
-onWord: [bold]
+onSpecialSymbol [*]
+onWord [bold]
 endBold
-onSpecialSymbol: [*]
-endParagraph: []
+onSpecialSymbol [*]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

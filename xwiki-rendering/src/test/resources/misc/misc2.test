@@ -11,7 +11,7 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-onEmptyLines: [2]
+onEmptyLines [2]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

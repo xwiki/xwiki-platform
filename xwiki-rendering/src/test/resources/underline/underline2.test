@@ -2,15 +2,15 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
 beginUnderline
-onWord: [underline]
+onWord [underline]
 endUnderline
-endParagraph: []
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0

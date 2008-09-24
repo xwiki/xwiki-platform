@@ -6,24 +6,24 @@ This is //italic // not italic// italic
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
 beginItalic
-onWord: [italic]
+onWord [italic]
 onSpace
 endItalic
 onSpace
-onWord: [not]
+onWord [not]
 onSpace
-onWord: [italic]
+onWord [italic]
 beginItalic
 onSpace
-onWord: [italic]
+onWord [italic]
 endItalic
-endParagraph: []
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

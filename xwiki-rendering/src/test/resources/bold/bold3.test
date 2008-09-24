@@ -6,25 +6,25 @@ This is **bold** but this is *not*
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
 beginBold
-onWord: [bold]
+onWord [bold]
 endBold
 onSpace
-onWord: [but]
+onWord [but]
 onSpace
-onWord: [this]
+onWord [this]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
-onSpecialSymbol: [*]
-onWord: [not]
-onSpecialSymbol: [*]
-endParagraph: []
+onSpecialSymbol [*]
+onWord [not]
+onSpecialSymbol [*]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -13,24 +13,24 @@
 beginDocument
 beginDefinitionList
 beginDefinitionTerm
-onWord: [title1]
+onWord [title1]
 endDefinitionTerm
 beginDefinitionDescription
-onWord: [definition1]
+onWord [definition1]
 beginDefinitionList
 beginDefinitionTerm
-onWord: [title2]
+onWord [title2]
 endDefinitionTerm
 beginDefinitionDescription
-onWord: [definition2]
+onWord [definition2]
 endDefinitionDescription
 endDefinitionList
 endDefinitionDescription
 beginDefinitionTerm
-onWord: [title3]
+onWord [title3]
 endDefinitionTerm
 beginDefinitionDescription
-onWord: [definition3]
+onWord [definition3]
 endDefinitionDescription
 endDefinitionList
 endDocument

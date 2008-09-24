@@ -159,11 +159,11 @@ public class ListenerDelegate implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine()
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine(Map)
      */
-    public void onHorizontalLine()
+    public void onHorizontalLine(Map<String, String> parameters)
     {
-        this.listener.onHorizontalLine();
+        this.listener.onHorizontalLine(parameters);
     }
 
     /**

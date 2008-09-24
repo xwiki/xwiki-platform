@@ -10,11 +10,11 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker: [xhtml] [] [
+beginMacroMarker [xhtml] [] [
 &nbsp;
 ]
-onWord: [(((160)))]
-endMacroMarker: [xhtml] [] [
+onWord [(((160)))]
+endMacroMarker [xhtml] [] [
 &nbsp;
 ]
 endDocument

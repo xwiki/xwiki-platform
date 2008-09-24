@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.block;
 
+import java.util.Map;
+
 import org.xwiki.rendering.listener.Listener;
 
 /**
@@ -30,17 +32,21 @@ import org.xwiki.rendering.listener.Listener;
 public class HorizontalLineBlock extends AbstractBlock
 {
     /**
-     * The single instance for a horizontal block. There's no need for more than one instance since there's
-     * no state in the horizontal block.
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractBlock#AbstractBlock()
      */
-    public static final HorizontalLineBlock HORIZONTAL_LINE_BLOCK = new HorizontalLineBlock();
+    public HorizontalLineBlock()
+    {
+        super();
+    }
 
     /**
-     * Private constructor to prevent instantiation. Instead use {@link #HORIZONTAL_LINE_BLOCK}.
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractBlock#AbstractBlock(Map)
      */
-    private HorizontalLineBlock()
+    public HorizontalLineBlock(Map<String, String> parameters)
     {
-        // Voluntarily empty
+        super(parameters);
     }
 
     /**
@@ -49,6 +55,6 @@ public class HorizontalLineBlock extends AbstractBlock
      */
     public void traverse(Listener listener)
     {
-        listener.onHorizontalLine();
+        listener.onHorizontalLine(getParameters());
     }
 }

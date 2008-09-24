@@ -8,32 +8,32 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginTable: [[style]=[background-color:rgb(255,0,0)]]
-beginTableRow: []
-beginTableHeadCell: []
+beginTable [[style]=[background-color:rgb(255,0,0)]]
+beginTableRow
+beginTableHeadCell
 onSpace
-onWord: [col1]
+onWord [col1]
 onSpace
-endTableHeadCell: []
-beginTableHeadCell: []
+endTableHeadCell
+beginTableHeadCell
 onSpace
-onWord: [col2]
-endTableHeadCell: []
-endTableRow: []
-beginTableRow: []
-beginTableHeadCell: []
+onWord [col2]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableHeadCell
 onSpace
-onWord: [line1]
+onWord [line1]
 onSpace
-endTableHeadCell: []
-beginTableCell: []
+endTableHeadCell
+beginTableCell
 onSpace
-onWord: [cell1]
-onSpecialSymbol: [.]
-onWord: [2]
-endTableCell: []
-endTableRow: []
-endTable: [[style]=[background-color:rgb(255,0,0)]]
+onWord [cell1]
+onSpecialSymbol [.]
+onWord [2]
+endTableCell
+endTableRow
+endTable [[style]=[background-color:rgb(255,0,0)]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

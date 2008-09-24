@@ -6,17 +6,17 @@ This is a mailto:content element
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [This]
+beginParagraph
+onWord [This]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
-onWord: [a]
+onWord [a]
 onSpace
-onLink: [Reference = [mailto:content]] [true]
+onLink [Reference = [mailto:content]] [true]
 onSpace
-onWord: [element]
-endParagraph: []
+onWord [element]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

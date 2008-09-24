@@ -244,7 +244,7 @@ public class XDOMGeneratorSink implements Sink
      */
     public void horizontalRule()
     {
-        this.stack.push(HorizontalLineBlock.HORIZONTAL_LINE_BLOCK);
+        this.stack.push(new HorizontalLineBlock());
     }
 
     public void italic()

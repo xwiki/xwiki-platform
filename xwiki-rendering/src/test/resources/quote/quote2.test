@@ -8,18 +8,18 @@ one > two
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
+beginParagraph
 onSpace
-onSpecialSymbol: [>]
-onWord: [line]
-endParagraph: []
-beginParagraph: []
-onWord: [one]
+onSpecialSymbol [>]
+onWord [line]
+endParagraph
+beginParagraph
+onWord [one]
 onSpace
-onSpecialSymbol: [>]
+onSpecialSymbol [>]
 onSpace
-onWord: [two]
-endParagraph: []
+onWord [two]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

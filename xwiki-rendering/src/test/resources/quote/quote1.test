@@ -13,32 +13,32 @@ paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [paragraph]
-endParagraph: []
-beginQuotation: []
+beginParagraph
+onWord [paragraph]
+endParagraph
+beginQuotation
 beginQuotationLine
-onWord: [line1]
+onWord [line1]
 onLineBreak
-onWord: [line1bis]
-beginQuotation: []
+onWord [line1bis]
+beginQuotation
 beginQuotationLine
-onWord: [line2]
-beginQuotation: []
+onWord [line2]
+beginQuotation
 beginQuotationLine
-onWord: [line3]
+onWord [line3]
 endQuotationLine
-endQuotation: []
+endQuotation
 endQuotationLine
 beginQuotationLine
-onWord: [line4]
+onWord [line4]
 endQuotationLine
-endQuotation: []
+endQuotation
 endQuotationLine
-endQuotation: []
-beginParagraph: []
-onWord: [paragraph]
-endParagraph: []
+endQuotation
+beginParagraph
+onWord [paragraph]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

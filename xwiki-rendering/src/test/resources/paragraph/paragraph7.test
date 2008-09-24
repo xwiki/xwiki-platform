@@ -6,18 +6,18 @@ verify    spaces are honored
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [verify]
+beginParagraph
+onWord [verify]
 onSpace
 onSpace
 onSpace
 onSpace
-onWord: [spaces]
+onWord [spaces]
 onSpace
-onWord: [are]
+onWord [are]
 onSpace
-onWord: [honored]
-endParagraph: []
+onWord [honored]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

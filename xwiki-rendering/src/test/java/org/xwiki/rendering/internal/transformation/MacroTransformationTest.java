@@ -56,11 +56,11 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     public void testSimpleMacroTransform() throws Exception
     {
         String expected = "beginDocument\n"
-        	+ "beginMacroMarker: [testsimplemacro] [] [null]\n"
-            + "beginParagraph: []\n"
-            + "onWord: [simplemacro0]\n"
-            + "endParagraph: []\n"
-            + "endMacroMarker: [testsimplemacro] [] [null]\n"
+        	+ "beginMacroMarker [testsimplemacro] [] [null]\n"
+            + "beginParagraph\n"
+            + "onWord [simplemacro0]\n"
+            + "endParagraph\n"
+            + "endMacroMarker [testsimplemacro] [] [null]\n"
             + "endDocument";
 
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroStandaloneBlock("testsimplemacro",
@@ -79,11 +79,11 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     public void testNestedMacroTransform() throws Exception
     {
         String expected = "beginDocument\n"
-        	+ "beginMacroMarker: [testnestedmacro] [] [null]\n"
-            + "beginParagraph: []\n"
-            + "onWord: [simplemacro0]\n"
-            + "endParagraph: []\n"
-            + "endMacroMarker: [testnestedmacro] [] [null]\n"
+        	+ "beginMacroMarker [testnestedmacro] [] [null]\n"
+            + "beginParagraph\n"
+            + "onWord [simplemacro0]\n"
+            + "endParagraph\n"
+            + "endMacroMarker [testnestedmacro] [] [null]\n"
             + "endDocument";
 
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroStandaloneBlock("testnestedmacro",
@@ -102,9 +102,9 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     public void testInfiniteRecursionMacroTransform() throws Exception
     {
         String expected = "beginDocument\n"
-        	+ "beginMacroMarker: [testrecursivemacro] [] [null]\n"
-            + "onMacroStandalone: [testrecursivemacro] [] [null]\n"
-            + "endMacroMarker: [testrecursivemacro] [] [null]\n"
+        	+ "beginMacroMarker [testrecursivemacro] [] [null]\n"
+            + "onMacroStandalone [testrecursivemacro] [] [null]\n"
+            + "endMacroMarker [testrecursivemacro] [] [null]\n"
             + "endDocument";
         
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroStandaloneBlock("testrecursivemacro",
@@ -123,16 +123,16 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     public void testPrioritiesMacroTransform() throws Exception
     {
         String expected = "beginDocument\n"
-        	+ "beginMacroMarker: [testsimplemacro] [] [null]\n"
-            + "beginParagraph: []\n"
-            + "onWord: [simplemacro1]\n"
-            + "endParagraph: []\n"
-            + "endMacroMarker: [testsimplemacro] [] [null]\n"
-            + "beginMacroMarker: [testprioritymacro] [] [null]\n"
-            + "beginParagraph: []\n"
-            + "onWord: [word]\n"
-            + "endParagraph: []\n"
-            + "endMacroMarker: [testprioritymacro] [] [null]\n"
+        	+ "beginMacroMarker [testsimplemacro] [] [null]\n"
+            + "beginParagraph\n"
+            + "onWord [simplemacro1]\n"
+            + "endParagraph\n"
+            + "endMacroMarker [testsimplemacro] [] [null]\n"
+            + "beginMacroMarker [testprioritymacro] [] [null]\n"
+            + "beginParagraph\n"
+            + "onWord [word]\n"
+            + "endParagraph\n"
+            + "endMacroMarker [testprioritymacro] [] [null]\n"
             + "endDocument";
 
         XDOM dom = new XDOM(Arrays.asList(

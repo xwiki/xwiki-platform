@@ -7,29 +7,29 @@ this is a backslash \
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [this]
+beginParagraph
+onWord [this]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
-onWord: [a]
+onWord [a]
 onSpace
-onWord: [single]
+onWord [single]
 onSpace
-onEscape: [~]
+onEscape [~]
 onSpace
-onWord: [tilde]
+onWord [tilde]
 onLineBreak
-onWord: [this]
+onWord [this]
 onSpace
-onWord: [is]
+onWord [is]
 onSpace
-onWord: [a]
+onWord [a]
 onSpace
-onWord: [backslash]
+onWord [backslash]
 onSpace
-onSpecialSymbol: [\]
-endParagraph: []
+onSpecialSymbol [\]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

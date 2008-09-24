@@ -7,10 +7,10 @@ paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [paragraph]
-endParagraph: []
-onMacroStandalone: [macro] [] []
+beginParagraph
+onWord [paragraph]
+endParagraph
+onMacroStandalone [macro] [] []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

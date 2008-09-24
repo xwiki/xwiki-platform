@@ -16,28 +16,28 @@ fourth paragraph
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph: []
-onWord: [first]
+beginParagraph
+onWord [first]
 onLineBreak
-onWord: [paragraph]
-endParagraph: []
-beginParagraph: []
-onWord: [second]
+onWord [paragraph]
+endParagraph
+beginParagraph
+onWord [second]
 onSpace
-onWord: [paragraph]
-endParagraph: []
-onEmptyLines: [1]
-beginParagraph: []
-onWord: [third]
+onWord [paragraph]
+endParagraph
+onEmptyLines [1]
+beginParagraph
+onWord [third]
 onSpace
-onWord: [paragraph]
-endParagraph: []
-onEmptyLines: [2]
-beginParagraph: []
-onWord: [fourth]
+onWord [paragraph]
+endParagraph
+onEmptyLines [2]
+beginParagraph
+onWord [fourth]
 onSpace
-onWord: [paragraph]
-endParagraph: []
+onWord [paragraph]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

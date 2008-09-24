@@ -119,12 +119,12 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void beginParagraph(Map<String, String> parameters)
     {
-        println("beginParagraph: [" + serializeParameters(parameters) + "]");
+        println("beginParagraph" + serializeParameters(parameters));
     }
 
     public void endParagraph(Map<String, String> parameters)
     {
-        println("endParagraph: [" + serializeParameters(parameters) + "]");
+        println("endParagraph" + serializeParameters(parameters));
     }
 
     public void onLineBreak()
@@ -139,7 +139,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void onLink(Link link, boolean isFreeStandingURI)
     {
-        println("onLink: [" + link + "] [" + isFreeStandingURI + "]");
+        println("onLink [" + link + "] [" + isFreeStandingURI + "]");
     }
 
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
@@ -154,22 +154,22 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void beginSection(SectionLevel level)
     {
-        println("beginSection: [" + level + "]");
+        println("beginSection [" + level + "]");
     }
 
     public void endSection(SectionLevel level)
     {
-        println("endSection: [" + level + "]");
+        println("endSection [" + level + "]");
     }
 
     public void onWord(String word)
     {
-        println("onWord: [" + getEscaped(word) + "]");
+        println("onWord [" + getEscaped(word) + "]");
     }
 
     public void beginList(ListType listType, Map<String, String> parameters)
     {
-        println("beginList: [" + listType + "] [" + serializeParameters(parameters) + "]");
+        println("beginList [" + listType + "]" + serializeParameters(parameters));
     }
 
     public void beginListItem()
@@ -179,7 +179,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void endList(ListType listType, Map<String, String> parameters)
     {
-        println("endList: [" + listType + "] [" + serializeParameters(parameters) + "]");
+        println("endList [" + listType + "]" + serializeParameters(parameters));
     }
 
     public void endListItem()
@@ -194,22 +194,22 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void onSpecialSymbol(char symbol)
     {
-        println("onSpecialSymbol: [" + symbol + "]");
+        println("onSpecialSymbol [" + symbol + "]");
     }
 
     public void onEscape(String escapedString)
     {
-        println("onEscape: [" + escapedString + "]");
+        println("onEscape [" + escapedString + "]");
     }
 
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
-        println("beginXMLElement: [" + name + "] [" + toStringXMLElement(attributes) + "]");
+        println("beginXMLElement [" + name + "] [" + toStringXMLElement(attributes) + "]");
     }
 
     public void endXMLElement(String name, Map<String, String> attributes)
     {
-        println("endXMLElement: [" + name + "] [" + toStringXMLElement(attributes) + "]");
+        println("endXMLElement [" + name + "] [" + toStringXMLElement(attributes) + "]");
     }
 
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
@@ -224,17 +224,17 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void onId(String name)
     {
-        println("onId: [" + name + "]");
+        println("onId [" + name + "]");
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine()
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine(Map)
      */
-    public void onHorizontalLine()
+    public void onHorizontalLine(Map<String, String> parameters)
     {
-        println("onHorizontalLine");
+        println("onHorizontalLine" + serializeParameters(parameters));
     }
 
     /**
@@ -244,7 +244,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      */
     public void onEmptyLines(int count)
     {
-        println("onEmptyLines: [" + count + "]");
+        println("onEmptyLines [" + count + "]");
     }
 
     /**
@@ -254,7 +254,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      */
     public void onVerbatimInline(String protectedString)
     {
-        println("onVerbatimInline: [" + protectedString + "]");
+        println("onVerbatimInline [" + protectedString + "]");
     }
 
     /**
@@ -264,7 +264,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      */
     public void onVerbatimStandalone(String protectedString)
     {
-        println("onVerbatimStandalone: [" + protectedString + "]");
+        println("onVerbatimStandalone [" + protectedString + "]");
     }
 
     /**
@@ -341,7 +341,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      */
     public void beginQuotation(Map<String, String> parameters)
     {
-        println("beginQuotation: [" + serializeParameters(parameters) + "]");
+        println("beginQuotation" + serializeParameters(parameters));
     }
 
     /**
@@ -352,7 +352,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      */
     public void endQuotation(Map<String, String> parameters)
     {
-        println("endQuotation: [" + serializeParameters(parameters) + "]");
+        println("endQuotation" + serializeParameters(parameters));
     }
 
     /**
@@ -379,42 +379,42 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void beginTable(Map<String, String> parameters)
     {
-        println("beginTable: [" + serializeParameters(parameters) + "]");
+        println("beginTable" + serializeParameters(parameters));
     }
 
     public void beginTableCell(Map<String, String> parameters)
     {
-        println("beginTableCell: [" + serializeParameters(parameters) + "]");
+        println("beginTableCell" + serializeParameters(parameters));
     }
 
     public void beginTableHeadCell(Map<String, String> parameters)
     {
-        println("beginTableHeadCell: [" + serializeParameters(parameters) + "]");
+        println("beginTableHeadCell" + serializeParameters(parameters));
     }
 
     public void beginTableRow(Map<String, String> parameters)
     {
-        println("beginTableRow: [" + serializeParameters(parameters) + "]");
+        println("beginTableRow" + serializeParameters(parameters));
     }
 
     public void endTable(Map<String, String> parameters)
     {
-        println("endTable: [" + serializeParameters(parameters) + "]");
+        println("endTable" + serializeParameters(parameters));
     }
 
     public void endTableCell(Map<String, String> parameters)
     {
-        println("endTableCell: [" + serializeParameters(parameters) + "]");
+        println("endTableCell" + serializeParameters(parameters));
     }
 
     public void endTableHeadCell(Map<String, String> parameters)
     {
-        println("endTableHeadCell: [" + serializeParameters(parameters) + "]");
+        println("endTableHeadCell" + serializeParameters(parameters));
     }
 
     public void endTableRow(Map<String, String> parameters)
     {
-        println("endTableRow: [" + serializeParameters(parameters) + "]");
+        println("endTableRow" + serializeParameters(parameters));
     }
 
     public String getEscaped(String str)
@@ -462,17 +462,19 @@ public class EventsRenderer extends AbstractPrintRenderer
                 buffer.append("|");
             }
         }
-        println(eventName + ": [" + name + "] [" + buffer.toString() + "] [" + content + "]");
+        println(eventName + " [" + name + "] [" + buffer.toString() + "] [" + content + "]");
     }
 
     private String serializeParameters(Map<String, String> parameters)
     {
         StringBuffer buffer = new StringBuffer();
         if (!parameters.isEmpty()) {
+        	buffer.append(' ').append('[');
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
                 buffer.append('[').append(getEscaped(entry.getKey())).append(']').append('=').append('[').append(
                     getEscaped(entry.getValue())).append(']');
             }
+            buffer.append(']');
         }
         return buffer.toString();
     }

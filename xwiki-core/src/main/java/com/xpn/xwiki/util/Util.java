@@ -648,7 +648,7 @@ public class Util
 
         return "<a href=\"\" onclick=\"document.getElementById('xwikierror" + id
             + "').style.display='block'; return false;\">" + title + "</a><div id=\"xwikierror" + id
-            + "\" style=\"display: none;\"><pre>\n" + text + "</pre></div>";
+            + "\" style=\"display: none;\"><pre class=\"xwikierror\">\n" + text + "</pre></div>";
     }
 
     public static String secureLaszloCode(String laszlocode) throws XWikiException

@@ -205,7 +205,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             text = com.xpn.xwiki.XWiki.getFormEncoded(xe.getFullMessage());
 
             return "<a href=\"\" onclick=\"document.getElementById('xwikierror').style.display='block'; return false;\">"
-                + title + "</a><div id=\"xwikierror\" style=\"display: none;\"><pre>\n" + text + "</pre></div>";
+                + title + "</a><div id=\"xwikierror\" style=\"display: none;\"><pre class=\"xwikierror\">\n" + text + "</pre></div>";
         }
     }
 

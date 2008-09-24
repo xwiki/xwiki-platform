@@ -126,15 +126,13 @@ public class XHTMLRenderer extends AbstractPrintRenderer
                 print("<strong>");
                 break;
             case ITALIC:
-                print("<em class=\"italic\">");
+                print("<em>");
                 break;
             case STRIKEDOUT:
                 print("<del>");
                 break;
             case UNDERLINED:
-                // Note: XHTML has deprecated the usage of <u> in favor of style sheets.
-                // Thus we use a class instead so that it can be styled using CSS.
-                print("<span class=\"underline\">");
+                print("<ins>");
                 break;
             case SUPERSCRIPT:
                 print("<sup>");
@@ -166,9 +164,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
                 print("</del>");
                 break;
             case UNDERLINED:
-                // Note: XHTML has deprecated the usage of <u> in favor of style sheets.
-                // Thus we use a class instead so that it can be styled using CSS.
-                print("</span>");
+                print("</ins>");
                 break;
             case SUPERSCRIPT:
                 print("</sup>");

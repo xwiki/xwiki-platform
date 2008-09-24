@@ -28,7 +28,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>This is <em class="italic">italic </em> not italic<em class="italic"> italic</em></p>
+<p>This is <em>italic </em> not italic<em> italic</em></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -36,4 +36,4 @@ This is //italic // not italic// italic//
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>This is <em class="italic">italic </em> not italic<em class="italic"> italic</em></p></html>
+<html><p>This is <em>italic </em> not italic<em> italic</em></p></html>

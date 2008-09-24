@@ -25,7 +25,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>This is <strong>bold and <em class="italic">italic</em></strong></p>
+<p>This is <strong>bold and <em>italic</em></strong></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -33,4 +33,4 @@ This is **bold and //italic//**
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>This is <strong>bold and <em class="italic">italic</em></strong></p></html>
+<html><p>This is <strong>bold and <em>italic</em></strong></p></html>

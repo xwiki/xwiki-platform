@@ -127,7 +127,7 @@ a img {
     border: none;
 }
 
-pre {
+pre.xwikierror {
     background-color: #F1F7FF;
     border: 1px dotted #555555;
     float: left;
@@ -144,6 +144,10 @@ pre {
 
 tt {
     font-family: monospace;
+}
+
+tt.wikimodel-verbatim {
+    font-family: sans-serif;
 }
 
 em {

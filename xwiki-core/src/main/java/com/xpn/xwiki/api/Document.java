@@ -660,7 +660,7 @@ public class Document extends Api
                         if (prop == null || prop.getValue() == null) {
                             continue;
                         }
-                        if (value.equals(prop.getValue())) {
+                        if (value.equals(prop.getValue().toString())) {
                             result.add(newObjectApi(obj, getXWikiContext()));
                         }
                     }

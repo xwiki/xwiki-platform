@@ -481,6 +481,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         // We need to use a special tag for empty lines since in XHTML the BR tag cannot be used outside of content
         // tags.
+    	// Note: We're using <div><div/> and not <div/> since some browsers do not support the <div/> syntax (FF3)
+    	// when the content type is set to HTML instead of XHTML.
         print(StringUtils.repeat("<div class=\"wikimodel-emptyline\"></div>", count));
     }
 

@@ -1,0 +1,29 @@
+.#--------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify we can put URLs direclty in the text and that ~ character is not escaped
+.#--------------------------------------------------------------------------------
+Some URL http://server/path/~user
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph: []
+onWord: [Some]
+onSpace
+onWord: [URL]
+onSpace
+onLink: [Reference = [http://server/path/~user]] [true]
+endParagraph: []
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>Some URL <span class="wikiexternallink"><a href="http://server/path/~user" class="wikimodel-freestanding">http://server/path/~user</a></span></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+Some URL http://server/path/~user
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>Some URL <span class="wikiexternallink"><a href="http://server/path/~user" class="wikimodel-freestanding">http://server/path/~user</a></span></p></html>

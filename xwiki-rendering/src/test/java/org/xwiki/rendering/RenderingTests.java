@@ -110,6 +110,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("horizontalline/horizontalline4", false);
         suite.addTestsFromResource("link/links1", false);
         suite.addTestsFromResource("link/links2", false);
+        suite.addTestsFromResource("link/links3", false);
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("list/list2", false);
         suite.addTestsFromResource("list/list3", false);

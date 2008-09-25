@@ -4,8 +4,13 @@ $response.setContentType("application/x-json")
 #set( $limit = $util.parseInt( $request.get( "limit" ) ) )
 
 #set( $rm = $xwiki.rightsmanager )
-#set( $countm  = $rm.countAllMembersNamesForGroup($doc.fullName))
-#set( $members = $rm.getAllMembersNamesForGroup($doc.fullName, $limit, $off))
+#if($request.member && !$request.member.trim().equals(""))
+ #set( $countm = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, 0, 0, false).size())
+ #set( $members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, $limit, $off, false))
+#else
+ #set( $countm  = $rm.countAllMembersNamesForGroup($doc.fullName))
+ #set( $members = $rm.getAllMembersNamesForGroup($doc.fullName, $limit, $off))
+#end
 
 {
 "totalrows": $countm,

@@ -56,7 +56,7 @@
 </property>
 </object>
 <content>{table}
-workstream.title=Welcome on the wiki's Workstream
+workstream.title=Welcome to the Workstream
 workstream.whatareyouworkingon=What are you working on?
 workstream.statustoolong=Status messages should not exceed {0} chars.
 workstream.submit=Update my status!

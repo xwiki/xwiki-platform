@@ -19,25 +19,22 @@
  */
 package org.xwiki.rendering.renderer;
 
-import java.awt.Color;
+import java.io.Writer;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.codehaus.plexus.util.StringUtils;
+import org.dom4j.io.XMLWriter;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
-import org.xwiki.rendering.renderer.AbstractPrintRenderer;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
-import org.xwiki.rendering.internal.util.ColorConverter;
 
 /**
  * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
@@ -45,7 +42,7 @@ import org.xwiki.rendering.internal.util.ColorConverter;
  * @version $Id$
  * @since 1.5M2
  */
-public class XHTMLRenderer extends AbstractPrintRenderer
+public class XHTMLRenderer extends AbstractXMLRenderer
 {
     private DocumentAccessBridge documentAccessBridge;
 
@@ -87,9 +84,12 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         this.documentAccessBridge = documentAccessBridge;
         this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, configuration);
         this.configuration = configuration;
+    }
 
-        // TODO: create a xwiki-converter component and move all BeanUtils related in it
-        ConvertUtils.register(ColorConverter.getInstance(), Color.class);
+    @Override
+    protected XMLWriter createNewXMLWriter(Writer writer) throws Exception
+    {
+        return new XHTMLWriter(writer);
     }
 
     /**
@@ -123,25 +123,25 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         switch (format) {
             case BOLD:
-                print("<strong>");
+                printXMLStartElement("strong");
                 break;
             case ITALIC:
-                print("<em>");
+                printXMLStartElement("em");
                 break;
             case STRIKEDOUT:
-                print("<del>");
+                printXMLStartElement("del");
                 break;
             case UNDERLINED:
-                print("<ins>");
+                printXMLStartElement("ins");
                 break;
             case SUPERSCRIPT:
-                print("<sup>");
+                printXMLStartElement("sup");
                 break;
             case SUBSCRIPT:
-                print("<sub>");
+                printXMLStartElement("sub");
                 break;
             case MONOSPACE:
-                print("<tt>");
+                printXMLStartElement("tt");
                 break;
         }
     }
@@ -155,25 +155,25 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         switch (format) {
             case BOLD:
-                print("</strong>");
+                printXMLEndElement("strong");
                 break;
             case ITALIC:
-                print("</em>");
+                printXMLEndElement("em");
                 break;
             case STRIKEDOUT:
-                print("</del>");
+                printXMLEndElement("del");
                 break;
             case UNDERLINED:
-                print("</ins>");
+                printXMLEndElement("ins");
                 break;
             case SUPERSCRIPT:
-                print("</sup>");
+                printXMLEndElement("sup");
                 break;
             case SUBSCRIPT:
-                print("</sub>");
+                printXMLEndElement("sub");
                 break;
             case MONOSPACE:
-                print("</tt>");
+                printXMLEndElement("tt");
                 break;
         }
     }
@@ -185,10 +185,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginParagraph(Map<String, String> parameters)
     {
-        StringBuffer buffer = new StringBuffer("<p");
-        buffer.append(serializeParameters(parameters));
-        buffer.append('>');
-        print(buffer.toString());
+        printXMLStartElement("p", parameters);
     }
 
     /**
@@ -198,7 +195,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endParagraph(Map<String, String> parameters)
     {
-        print("</p>");
+        printXMLEndElement("p");
     }
 
     /**
@@ -208,7 +205,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onLineBreak()
     {
-        print("<br/>");
+        printXMLElement("br");
     }
 
     /**
@@ -228,7 +225,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onLink(Link link, boolean isFreeStandingURI)
     {
-        print(this.linkRenderer.renderLink(link, isFreeStandingURI));
+        this.linkRenderer.renderLink(this.xmlWriter, link, isFreeStandingURI);
     }
 
     /**
@@ -271,12 +268,16 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     private void processBeginSection(SectionLevel level, String sectionTitle, Map<String, String> parameters)
     {
+        Map<String, String> attributes = new LinkedHashMap<String, String>();
+
+        attributes.put("id", this.idGenerator.generateUniqueId(sectionTitle));
+        attributes.putAll(parameters);
+
         int levelAsInt = level.getAsInt();
-        print("<h" + levelAsInt + " id=\"" + this.idGenerator.generateUniqueId(sectionTitle) + "\""
-            + serializeParameters(parameters) + ">");
+        printXMLStartElement("h" + levelAsInt, attributes);
         // We generate a span so that CSS rules have a hook to perform some magic that wouldn't work on just a H
         // element. Like some IE6 magic and others.
-        print("<span>");
+        printXMLStartElement("span");
     }
 
     /**
@@ -292,8 +293,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         print(sectionTitle);
 
         int levelAsInt = level.getAsInt();
-        print("</span>");
-        print("</h" + levelAsInt + ">");
+        printXMLEndElement("span");
+        printXMLEndElement("h" + levelAsInt);
     }
 
     /**
@@ -303,7 +304,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onWord(String word)
     {
-        print(StringEscapeUtils.escapeXml(word));
+        printXML(word);
     }
 
     /**
@@ -313,7 +314,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onSpace()
     {
-        print(" ");
+        printXML(" ");
     }
 
     /**
@@ -323,7 +324,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onSpecialSymbol(char symbol)
     {
-        print(StringEscapeUtils.escapeHtml("" + symbol));
+        printXML("" + symbol);
+        // print(StringEscapeUtils.escapeHtml("" + symbol));
     }
 
     /**
@@ -334,7 +336,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void onEscape(String escapedString)
     {
         // Print characters as is, except for special characters which need to be HTML-escaped.
-        print(StringEscapeUtils.escapeHtml(escapedString));
+        printXML(escapedString);
+        // print(StringEscapeUtils.escapeHtml(escapedString));
     }
 
     /**
@@ -345,9 +348,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void beginList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
-            print("<ul" + serializeParameters(parameters) + ">");
+            printXMLStartElement("ul", parameters);
         } else {
-            print("<ol" + serializeParameters(parameters) + ">");
+            printXMLStartElement("ol", parameters);
         }
     }
 
@@ -358,7 +361,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginListItem()
     {
-        print("<li>");
+        printXMLStartElement("li");
     }
 
     /**
@@ -369,9 +372,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
-            print("</ul>");
+            printXMLEndElement("ul");
         } else {
-            print("</ol>");
+            printXMLEndElement("ol");
         }
     }
 
@@ -382,7 +385,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endListItem()
     {
-        print("</li>");
+        printXMLEndElement("li");
     }
 
     /**
@@ -392,9 +395,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
-        print("<" + StringEscapeUtils.escapeXml(name));
-        print(serializeParameters(attributes).toString());
-        print(">");
+        printXMLStartElement(name, attributes);
     }
 
     /**
@@ -404,7 +405,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endXMLElement(String name, Map<String, String> attributes)
     {
-        print("</" + StringEscapeUtils.escapeXml(name) + ">");
+        printXMLEndElement(name);
     }
 
     /**
@@ -434,8 +435,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onId(String name)
     {
-        print("<a id=\"" + StringEscapeUtils.escapeXml(name) + "\" name=\"" + StringEscapeUtils.escapeXml(name)
-            + "\"></a>");
+        // Note: We're using <a><a/> and not <a/> since some browsers do not support the <a/> syntax (FF3)
+        // when the content type is set to HTML instead of XHTML.
+        printXMLStartElement("a", new String[][] { {"id", name}, {"name", name}});
+        printXMLEndElement("a");
     }
 
     /**
@@ -445,7 +448,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onHorizontalLine(Map<String, String> parameters)
     {
-        print("<hr" + serializeParameters(parameters) + "/>");
+        printXMLElement("hr", parameters);
     }
 
     /**
@@ -460,7 +463,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         // tt is the closed to pre for inline.
         // The class is what is expected by wikimodel to understand the tt as meaning a verbatim and not a Monospace
         // element.
-        print("<tt class=\"wikimodel-verbatim\">" + protectedString + "</tt>");
+        printXMLStartElement("tt", new String[][] {{"class", "wikimodel-verbatim"}});
+        printXML(protectedString);
+        printXMLEndElement("tt");
     }
 
     /**
@@ -470,7 +475,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onVerbatimStandalone(String protectedString)
     {
-        print("<pre>" + protectedString + "</pre>");
+        printXMLStartElement("pre");
+        printXML(protectedString);
+        printXMLEndElement("pre");
     }
 
     /**
@@ -482,9 +489,12 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         // We need to use a special tag for empty lines since in XHTML the BR tag cannot be used outside of content
         // tags.
-    	// Note: We're using <div><div/> and not <div/> since some browsers do not support the <div/> syntax (FF3)
-    	// when the content type is set to HTML instead of XHTML.
-        print(StringUtils.repeat("<div class=\"wikimodel-emptyline\"></div>", count));
+        // Note: We're using <div><div/> and not <div/> since some browsers do not support the <div/> syntax (FF3)
+        // when the content type is set to HTML instead of XHTML.
+        for (int i = 0; i < count; ++i) {
+            printXMLStartElement("div", new String[][] {{"class", "wikimodel-emptyline"}});
+            printXMLEndElement("div");
+        }
     }
 
     /**
@@ -494,7 +504,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginDefinitionList()
     {
-        print("<dl>");
+        printXMLStartElement("dl");
     }
 
     /**
@@ -504,7 +514,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endDefinitionList()
     {
-        print("</dl>");
+        printXMLEndElement("dl");
     }
 
     /**
@@ -514,7 +524,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginDefinitionTerm()
     {
-        print("<dt>");
+        printXMLStartElement("dt");
     }
 
     /**
@@ -524,7 +534,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginDefinitionDescription()
     {
-        print("<dd>");
+        printXMLStartElement("dd");
     }
 
     /**
@@ -534,7 +544,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endDefinitionTerm()
     {
-        print("</dt>");
+        printXMLEndElement("dt");
     }
 
     /**
@@ -544,7 +554,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endDefinitionDescription()
     {
-        print("</dd>");
+        printXMLEndElement("dd");
     }
 
     /**
@@ -554,10 +564,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginQuotation(Map<String, String> parameters)
     {
-        StringBuffer buffer = new StringBuffer("<blockquote");
-        buffer.append(serializeParameters(parameters));
-        buffer.append('>');
-        print(buffer.toString());
+        printXMLStartElement("blockquote", parameters);
     }
 
     /**
@@ -567,7 +574,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endQuotation(Map<String, String> parameters)
     {
-        print("</blockquote>");
+        printXMLEndElement("blockquote");
     }
 
     /**
@@ -597,7 +604,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginTable(Map<String, String> parameters)
     {
-        print("<table" + serializeParameters(parameters) + "><tbody>");
+        printXMLStartElement("table", parameters);
+        printXMLStartElement("tbody");
     }
 
     /**
@@ -607,7 +615,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginTableRow(Map<String, String> parameters)
     {
-        print("<tr" + serializeParameters(parameters) + ">");
+        printXMLStartElement("tr", parameters);
     }
 
     /**
@@ -617,7 +625,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginTableCell(Map<String, String> parameters)
     {
-        print("<td" + serializeParameters(parameters) + ">");
+        printXMLStartElement("td", parameters);
     }
 
     /**
@@ -627,7 +635,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginTableHeadCell(Map<String, String> parameters)
     {
-        print("<th" + serializeParameters(parameters) + ">");
+        printXMLStartElement("th", parameters);
     }
 
     /**
@@ -637,7 +645,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endTable(Map<String, String> parameters)
     {
-        print("</tbody></table>");
+        printXMLEndElement("tbody");
+        printXMLEndElement("table");
     }
 
     /**
@@ -647,7 +656,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endTableRow(Map<String, String> parameters)
     {
-        print("</tr>");
+        printXMLEndElement("tr");
     }
 
     /**
@@ -657,7 +666,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endTableCell(Map<String, String> parameters)
     {
-        print("</td>");
+        printXMLEndElement("td");
     }
 
     /**
@@ -667,19 +676,6 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endTableHeadCell(Map<String, String> parameters)
     {
-        print("</th>");
-    }
-
-    private StringBuffer serializeParameters(Map<String, String> parameters)
-    {
-        StringBuffer buffer = new StringBuffer();
-        if (!parameters.isEmpty()) {
-            for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                buffer.append(' ').append(StringEscapeUtils.escapeXml(entry.getKey())).append('=').append('\"')
-                    .append(StringEscapeUtils.escapeXml(entry.getValue())).append('\"');
-            }
-        }
-
-        return buffer;
+        printXMLEndElement("th");
     }
 }

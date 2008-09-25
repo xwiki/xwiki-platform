@@ -19,6 +19,15 @@
  */
 package org.xwiki.rendering.internal.renderer.xhtml;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.dom4j.Attribute;
+import org.dom4j.Element;
+import org.dom4j.QName;
+import org.dom4j.io.XMLWriter;
+import org.dom4j.tree.DefaultAttribute;
+import org.dom4j.tree.DefaultElement;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Link;
@@ -40,69 +49,84 @@ public class XHTMLLinkRenderer
         this.configuration = configuration;
     }
 
-    public String renderLink(Link link, boolean isFreeStandingURI)
+    public void renderLink(XMLWriter xmlWriter, Link link, boolean isFreeStandingURI)
     {
-        StringBuffer sb = new StringBuffer();
+        try {
+            List<Element> elements = createDOM4JLink(link, isFreeStandingURI);
+            xmlWriter.write(elements);
+        } catch (Exception e) {
+            // TODO add error log
+        }
+    }
 
+    public List<Element> createDOM4JLink(Link link, boolean isFreeStandingURI) throws Exception
+    {
+        List<Element> elements = new ArrayList<Element>();
+
+        // span element
+        DefaultElement spanElement = new DefaultElement("span");
+        Attribute spanClassAttribute = new DefaultAttribute(new QName("class"));
+
+        // a element
+        DefaultElement aElement = new DefaultElement("a");
+        Attribute aHrefAttribute = new DefaultAttribute(new QName("href"));
+
+        // add a element to span element
+        spanElement.add(aElement);
+
+        // add span element to element list
+        elements.add(spanElement);
+
+        Element labelContainer = aElement;
         if (link.isExternalLink()) {
-            sb.append("<span class=\"wikiexternallink\">");
-            sb.append("<a href=\"");
+            spanClassAttribute.setValue("wikiexternallink");
+
+            if (isFreeStandingURI) {
+                aElement.add(new DefaultAttribute("class", "wikimodel-freestanding"));
+            }
+
+            // href attribute
             if (link.getType() == LinkType.INTERWIKI) {
                 // TODO: Resolve the Interwiki link
             } else {
-                sb.append(link.getReference());
+                aHrefAttribute.setValue(link.getReference());
             }
-            sb.append("\"");
-            if (isFreeStandingURI) {
-                sb.append(" class=\"wikimodel-freestanding\"");
-            }
-            if (link.getTarget() != null) {
-                // We prefix with "_" since a target can be any token and we need to differentiate with
-                // other valid rel tokens.
-                sb.append(" rel=\"_").append(link.getTarget()).append("\"");
-            }
-            sb.append(">");
-            sb.append(getLinkLabelToPrint(link));
-            sb.append("</a></span>");
         } else {
             // This is a link to a document. Check for the document existence.
-            try {
-                if (link.getReference() == null || this.documentAccessBridge.exists(link.getReference())) {
-                    sb.append("<span class=\"wikilink\">");
-                    sb.append("<a href=\"");
-                    sb.append(this.documentAccessBridge.getURL(link.getReference(), "view", link.getQueryString(), link
-                        .getAnchor()));
-                    sb.append("\"");
-                    if (link.getTarget() != null) {
-                        // We prefix with "_" since a target can be any token and we need to differentiate with
-                        // other valid rel tokens.
-                        sb.append(" rel=\"_").append(link.getTarget()).append("\"");
-                    }
-                    sb.append(">");
-                    sb.append(getLinkLabelToPrint(link));
-                    sb.append("</a></span>");
-                } else {
-                    sb.append("<a class=\"wikicreatelink\" href=\"");
-                    sb.append(this.documentAccessBridge.getURL(link.getReference(), "edit", link.getQueryString(), link
-                        .getAnchor()));
-                    sb.append("\"");
-                    if (link.getTarget() != null) {
-                        // We prefix with "_" since a target can be any token and we need to differentiate with
-                        // other valid rel tokens.
-                        sb.append(" rel=\"_").append(link.getTarget()).append("\"");
-                    }
-                    sb.append(">");
-                    sb.append("<span class=\"wikicreatelinktext\">");
-                    sb.append(getLinkLabelToPrint(link));
-                    sb.append("</span><span class=\"wikicreatelinkqm\">?</span></a>");
-                }
-            } catch (Exception e) {
-                // An exception occurred, don't render any XHTML but raise an error in the logs
-                // TODO: Log error
+            if (link.getReference() == null || this.documentAccessBridge.exists(link.getReference())) {
+                spanClassAttribute.setValue("wikilink");
+                aHrefAttribute.setValue(this.documentAccessBridge.getURL(link.getReference(), "view", link
+                    .getQueryString(), link.getAnchor()));
+            } else {
+                spanClassAttribute.setValue("wikicreatelink");
+                aHrefAttribute.setValue(this.documentAccessBridge.getURL(link.getReference(), "edit", link
+                    .getQueryString(), link.getAnchor()));
+
+                labelContainer = new DefaultElement("span");
+                labelContainer.add(new DefaultAttribute("class", "wikicreatelinktext"));
+
+                aElement.add(labelContainer);
+
+                DefaultElement qmElement = new DefaultElement("span");
+                qmElement.add(new DefaultAttribute("class", "wikicreatelinkqm"));
+                qmElement.addText("?");
+
+                aElement.add(qmElement);
             }
         }
 
-        return sb.toString();
+        spanElement.add(spanClassAttribute);
+
+        aElement.add(aHrefAttribute);
+        if (link.getTarget() != null) {
+            // We prefix with "_" since a target can be any token and we need to differentiate with
+            // other valid rel tokens.
+            aElement.add(new DefaultAttribute("rel", "_" + link.getTarget()));
+        }
+
+        labelContainer.addText(getLinkLabelToPrint(link));
+
+        return elements;
     }
 
     private String getLinkLabelToPrint(Link link)
@@ -111,7 +135,7 @@ public class XHTMLLinkRenderer
 
         // If the usser has specified a label use it, if not then use the rendering configuration value to find out
         // what should be printed.
-        
+
         if (link.getLabel() != null) {
             labelToPrint = link.getLabel();
         } else {

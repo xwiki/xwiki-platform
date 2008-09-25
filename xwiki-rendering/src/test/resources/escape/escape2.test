@@ -103,7 +103,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader</p>
+<p>**notbold**<br/>&lt;notag&gt;"&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -123,4 +123,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>**notbold**<br/>&lt;notag&gt;&quot;&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader</p></html>
+<html><p>**notbold**<br/>&lt;notag&gt;"&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader</p></html>

@@ -34,7 +34,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>This is &lt;a href=&quot;url&quot;&gt;some HTML&lt;/a&gt;.</p>
+<p>This is &lt;a href="url"&gt;some HTML&lt;/a&gt;.</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -42,4 +42,4 @@ This is <a href="url">some HTML</a>.
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>This is &lt;a href=&quot;url&quot;&gt;some HTML&lt;/a&gt;.</p></html>
+<html><p>This is &lt;a href="url"&gt;some HTML&lt;/a&gt;.</p></html>

@@ -59,6 +59,14 @@ h1, h2, h3, h4, h5, h6 {
   clear: both;
 }
 
+blockquote { 
+    padding: 0.3em 0 0 1em;
+    quotes: none;
+    background:#FAFAF6 none repeat scroll 0 0;
+    border-left:2px solid #DDDDCC;
+    display:block;
+}
+
 .quote {
   font-style: italic;
   color: inherit;

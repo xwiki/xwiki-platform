@@ -325,7 +325,6 @@ public class XHTMLRenderer extends AbstractXMLRenderer
     public void onSpecialSymbol(char symbol)
     {
         printXML("" + symbol);
-        // print(StringEscapeUtils.escapeHtml("" + symbol));
     }
 
     /**
@@ -335,9 +334,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void onEscape(String escapedString)
     {
-        // Print characters as is, except for special characters which need to be HTML-escaped.
         printXML(escapedString);
-        // print(StringEscapeUtils.escapeHtml(escapedString));
     }
 
     /**

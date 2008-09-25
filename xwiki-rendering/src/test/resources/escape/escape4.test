@@ -1,7 +1,8 @@
 .#------------------------------------------------------------------------------
-.input|xwiki/2.0
+.input|xwiki/2.0|skip
 .# Verify that accented characters HTML entered directly in the syntax is "escaped" and not rendered 
 .#------------------------------------------------------------------------------
+.# TODO: Support escaping in test framework to be able to enter non ASCII characters in test files
 (% param1="valüe" %)
 sôme äccénted chàracters
 .#-----------------------------------------------------

@@ -104,8 +104,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("escape/escape1", false);
         suite.addTestsFromResource("escape/escape2", false);
         suite.addTestsFromResource("escape/escape3", false);
-        // TODO: Support escaping in test framework to be able to enter non ASCII characters in test files
-        // suite.addTestsFromResource("escape/escape4", false);
+        suite.addTestsFromResource("escape/escape4", false);
         suite.addTestsFromResource("horizontalline/horizontalline1", false);
         suite.addTestsFromResource("horizontalline/horizontalline2", false);
         suite.addTestsFromResource("horizontalline/horizontalline3", false);

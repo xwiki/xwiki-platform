@@ -73,7 +73,7 @@ public interface Listener
     /**
      * Start of a paragraph.
      * 
-     * @param parameters a generic list of parameters for the paragraph. Example: "style"/"background-color: blue"
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
     void beginParagraph(Map<String, String> parameters);
 
@@ -220,17 +220,19 @@ public interface Listener
      * Start of a section.
      * 
      * @param level the section level (1, 2, 3, etc).
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see org.xwiki.rendering.listener.SectionLevel
      */
-    void beginSection(SectionLevel level);
+    void beginSection(SectionLevel level, Map<String, String> parameters);
 
     /**
      * End of a section.
      * 
      * @param level the section level (1, 2, 3, etc).
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see org.xwiki.rendering.listener.SectionLevel
      */
-    void endSection(SectionLevel level);
+    void endSection(SectionLevel level, Map<String, String> parameters);
 
     /**
      * Start of an XML tag. We use this type of event whenever there's no other equivalent event. For example for a bold
@@ -385,7 +387,7 @@ public interface Listener
     /**
      * Represents an horizontal line.
      * 
-     * @param parameters a generic list of parameters for the paragraph. Example: "style"/"background-color: blue"
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @since 1.6M1
      */
     void onHorizontalLine(Map<String, String> parameters);

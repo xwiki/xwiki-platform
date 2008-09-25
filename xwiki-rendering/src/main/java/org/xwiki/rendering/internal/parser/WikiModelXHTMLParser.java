@@ -19,12 +19,17 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.wikimodel.wem.IWikiParser;
 import org.wikimodel.wem.xhtml.XhtmlParser;
+import org.wikimodel.wem.xhtml.handler.TagHandler;
 import org.wikimodel.wem.xwiki.XWikiXhtmlEscapeHandler;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
+import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiHeaderTagHandler;
 
 /**
  * @version $Id$
@@ -52,6 +57,16 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     @Override
     public IWikiParser createWikiModelParser()
     {
-        return new XhtmlParser(new XWikiXhtmlEscapeHandler());
+    	// Override some of the WikiModel XHTML parser tag handlers to introduce our own logic.
+    	Map<String, TagHandler> handlers = new HashMap<String, TagHandler>();
+    	XWikiHeaderTagHandler handler = new XWikiHeaderTagHandler();
+    	handlers.put("h1", handler);
+    	handlers.put("h2", handler);
+    	handlers.put("h3", handler);
+    	handlers.put("h4", handler);
+    	handlers.put("h5", handler);
+    	handlers.put("h6", handler);
+
+    	return new XhtmlParser(handlers, new XWikiXhtmlEscapeHandler());
     }
 }

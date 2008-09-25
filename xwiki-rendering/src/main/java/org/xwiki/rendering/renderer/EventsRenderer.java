@@ -152,14 +152,14 @@ public class EventsRenderer extends AbstractPrintRenderer
         printMacroData("onMacroStandalone", name, parameters, content);
     }
 
-    public void beginSection(SectionLevel level)
+    public void beginSection(SectionLevel level, Map<String, String> parameters)
     {
-        println("beginSection [" + level + "]");
+        println("beginSection [" + level + "]" + serializeParameters(parameters));
     }
 
-    public void endSection(SectionLevel level)
+    public void endSection(SectionLevel level, Map<String, String> parameters)
     {
-        println("endSection [" + level + "]");
+        println("endSection [" + level + "]" + serializeParameters(parameters));
     }
 
     public void onWord(String word)

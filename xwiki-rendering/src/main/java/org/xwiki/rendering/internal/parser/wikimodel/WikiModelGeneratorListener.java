@@ -130,9 +130,9 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.beginParagraph(createWikiParameters(parameters));
     }
 
-    public void beginSection(SectionLevel level)
+    public void beginSection(SectionLevel level, Map<String, String> parameters)
     {
-        this.wikimodelListener.beginHeader(level.getAsInt(), null);
+        this.wikimodelListener.beginHeader(level.getAsInt(), createWikiParameters(parameters));
     }
 
     public void beginXMLElement(String name, Map<String, String> attributes)
@@ -161,9 +161,9 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endParagraph(createWikiParameters(parameters));
     }
 
-    public void endSection(SectionLevel level)
+    public void endSection(SectionLevel level, Map<String, String> parameters)
     {
-        this.wikimodelListener.endHeader(level.getAsInt(), null);
+        this.wikimodelListener.endHeader(level.getAsInt(), createWikiParameters(parameters));
     }
 
     public void endXMLElement(String name, Map<String, String> attributes)

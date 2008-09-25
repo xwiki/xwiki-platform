@@ -20,6 +20,7 @@
 package org.xwiki.rendering.block;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
@@ -37,7 +38,13 @@ public class SectionBlock extends AbstractFatherBlock
         super(childBlocks);
         this.level = level;
     }
-    
+
+    public SectionBlock(List<Block> childBlocks, SectionLevel level, Map<String, String> parameters)
+    {
+        super(childBlocks,  parameters);
+        this.level = level;
+    }
+
     public SectionLevel getLevel()
     {
         return this.level;
@@ -45,11 +52,11 @@ public class SectionBlock extends AbstractFatherBlock
 
     public void before(Listener listener)
     {
-        listener.beginSection(getLevel());
+        listener.beginSection(getLevel(), getParameters());
     }
 
     public void after(Listener listener)
     {
-        listener.endSection(getLevel());
+        listener.endSection(getLevel(), getParameters());
     }
 }

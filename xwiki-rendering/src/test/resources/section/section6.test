@@ -1,34 +1,27 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Test parametrized sections
 .#-----------------------------------------------------
-Not a == header ==
+(% param="value" %)
+= header
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
-onWord [Not]
-onSpace
-onWord [a]
-onSpace
-onSpecialSymbol [=]
-onSpecialSymbol [=]
-onSpace
+beginSection [1] [[param]=[value]]
 onWord [header]
-onSpace
-onSpecialSymbol [=]
-onSpecialSymbol [=]
-endParagraph
+endSection [1] [[param]=[value]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>Not a == header ==</p>
+<h1 id="Hheader" param="value"><span>header</span></h1>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-Not a == header ==
+(% param="value" %)
+= header =
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Not a == header ==</p></html>
+<html><h1 id="Hheader" param="value"><span>header</span></h1></html>

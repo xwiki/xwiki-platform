@@ -56,9 +56,9 @@ public class ListenerDelegate implements Listener
         this.listener.beginParagraph(parameters);
     }
 
-    public void beginSection(SectionLevel level)
+    public void beginSection(SectionLevel level, Map<String, String> parameters)
     {
-        this.listener.beginSection(level);
+        this.listener.beginSection(level, parameters);
     }
 
     public void beginXMLElement(String name, Map<String, String> attributes)
@@ -96,9 +96,9 @@ public class ListenerDelegate implements Listener
         this.listener.endParagraph(parameters);
     }
 
-    public void endSection(SectionLevel level)
+    public void endSection(SectionLevel level, Map<String, String> parameters)
     {
-        this.listener.endSection(level);
+        this.listener.endSection(level, parameters);
     }
 
     public void endXMLElement(String name, Map<String, String> attributes)

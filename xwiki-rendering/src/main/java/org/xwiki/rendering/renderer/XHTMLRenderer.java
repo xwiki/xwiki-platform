@@ -256,9 +256,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginSection(org.xwiki.rendering.listener.SectionLevel)
+     * @see org.xwiki.rendering.renderer.Renderer#beginSection(SectionLevel, Map)
      */
-    public void beginSection(SectionLevel level)
+    public void beginSection(SectionLevel level, Map<String, String> parameters)
     {
         // Don't output anything yet since we need the section title to generate the unique XHTML id attribute.
         // Thus we're doing the output in the endSection() event.
@@ -269,10 +269,11 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         this.setPrinter(this.sectionTitlePrinter);
     }
 
-    private void processBeginSection(SectionLevel level, String sectionTitle)
+    private void processBeginSection(SectionLevel level, String sectionTitle, Map<String, String> parameters)
     {
         int levelAsInt = level.getAsInt();
-        print("<h" + levelAsInt + " id=\"" + this.idGenerator.generateUniqueId(sectionTitle) + "\">");
+        print("<h" + levelAsInt + " id=\"" + this.idGenerator.generateUniqueId(sectionTitle) + "\""
+            + serializeParameters(parameters) + ">");
         // We generate a span so that CSS rules have a hook to perform some magic that wouldn't work on just a H
         // element. Like some IE6 magic and others.
         print("<span>");
@@ -281,13 +282,13 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endSection(org.xwiki.rendering.listener.SectionLevel)
+     * @see org.xwiki.rendering.renderer.Renderer#endSection(SectionLevel, Map)
      */
-    public void endSection(SectionLevel level)
+    public void endSection(SectionLevel level, Map<String, String> parameters)
     {
         String sectionTitle = this.sectionTitlePrinter.toString();
         setPrinter(this.originalPrinter);
-        processBeginSection(level, sectionTitle);
+        processBeginSection(level, sectionTitle, parameters);
         print(sectionTitle);
 
         int levelAsInt = level.getAsInt();

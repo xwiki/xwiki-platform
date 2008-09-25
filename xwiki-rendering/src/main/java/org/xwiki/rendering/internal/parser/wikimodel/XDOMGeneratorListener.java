@@ -234,7 +234,8 @@ public class XDOMGeneratorListener implements IWemListener
     
     public void endHeader(int level, WikiParameters params)
     {
-        this.stack.push(new SectionBlock(generateListFromStack(), SectionLevel.parseInt(level)));
+        this.stack.push(new SectionBlock(generateListFromStack(), SectionLevel.parseInt(level), 
+            convertParameters(params)));
     }
 
     public void endInfoBlock(char infoType, WikiParameters params)

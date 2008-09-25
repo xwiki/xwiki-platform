@@ -258,20 +258,21 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#beginSection(org.xwiki.rendering.listener.SectionLevel)
+     * @see PrintRenderer#beginSection(SectionLevel, Map)
      */
-    public void beginSection(SectionLevel level)
+    public void beginSection(SectionLevel level, Map<String, String> parameters)
     {
         printNewLine();
+        printParameters(parameters);
         print(StringUtils.repeat("=", level.getAsInt()) + " ");
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#endSection(org.xwiki.rendering.listener.SectionLevel)
+     * @see PrintRenderer#endSection(SectionLevel, Map)
      */
-    public void endSection(SectionLevel level)
+    public void endSection(SectionLevel level, Map<String, String> parameters)
     {
         print(" " + StringUtils.repeat("=", level.getAsInt()));
     }

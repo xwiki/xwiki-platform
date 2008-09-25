@@ -62,6 +62,9 @@
         &lt;td&gt;$msg.get("rightsmanager.members")&lt;/td&gt;
         #if($context.action == "inline")&lt;td class="hmanage"&gt;$msg.get("rightsmanager.manage")&lt;/td&gt;#end
         &lt;/tr&gt;
+        &lt;tr id="table-filters"&gt;
+          &lt;td&gt;&lt;input name="member" type="text"/&gt;&lt;/td&gt;
+        &lt;/tr&gt;
        &lt;/thead&gt;
        &lt;tbody id="display1"&gt;&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
       &lt;/table&gt;

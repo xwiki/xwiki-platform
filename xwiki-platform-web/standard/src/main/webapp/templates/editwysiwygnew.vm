@@ -33,7 +33,7 @@ $xwiki.getTextArea($tdoc.content)
       hookId: 'content',
       syntax: "$doc.syntaxId",
       plugins: 'separator text valign list indent undo format symbol',
-      toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol',
+      toolbar: 'bold italic underline strikethrough teletype | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol',
       debug: #if($request.debug)'true'#else'false'#end
     };
 //]]>

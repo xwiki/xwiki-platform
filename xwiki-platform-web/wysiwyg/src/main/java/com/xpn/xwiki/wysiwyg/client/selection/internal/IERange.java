@@ -24,7 +24,7 @@ import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
 import com.xpn.xwiki.wysiwyg.client.util.DocumentFragment;
 
-public final class IERange extends AbstractRange
+public class IERange extends AbstractRange
 {
     IERange(JavaScriptObject jsRange)
     {

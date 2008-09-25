@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.undo;
 
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -31,21 +30,17 @@ import com.xpn.xwiki.wysiwyg.client.ui.Images;
 import com.xpn.xwiki.wysiwyg.client.ui.Strings;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextEditor;
-import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
-import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKeyFactory;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 
 /**
  * {@link XRichTextEditor} plug-in for undoing and redoing the past actions. It installs two push buttons on the tool
  * bar and updates their status depending on the current cursor position.
  */
-public class UndoPlugin extends AbstractPlugin implements ClickListener, KeyboardListener
+public class UndoPlugin extends AbstractPlugin implements ClickListener
 {
     private PushButton undo;
 
     private PushButton redo;
-
-    private XShortcutKey redoKey;
 
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
@@ -67,13 +62,10 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener, Keyboar
         if (getTextArea().getCommandManager().isSupported(Command.REDO)) {
             redo = new PushButton(Images.INSTANCE.redo().createImage(), this);
             redo.setTitle(Strings.INSTANCE.redo());
-            redoKey = XShortcutKeyFactory.createCtrlShortcutKey('Y');
-            getTextArea().addShortcutKey(redoKey);
             toolBarExtension.addFeature("redo", redo);
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addKeyboardListener(this);
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -95,13 +87,9 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener, Keyboar
             redo.removeFromParent();
             redo.removeClickListener(this);
             redo = null;
-            getTextArea().removeShortcutKey(redoKey);
         }
 
-        if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeKeyboardListener(this);
-            toolBarExtension.clearFeatures();
-        }
+        toolBarExtension.clearFeatures();
 
         super.destroy();
     }
@@ -116,39 +104,6 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener, Keyboar
         if (sender == undo) {
             onUndo();
         } else if (sender == redo) {
-            onRedo();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyDown(Widget, char, int)
-     */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyPress(Widget, char, int)
-     */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyUp(Widget, char, int)
-     */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
-    {
-        if (sender == getTextArea() && (modifiers & KeyboardListener.MODIFIER_CTRL) != 0
-            && keyCode == redoKey.getKeyCode()) {
             onRedo();
         }
     }

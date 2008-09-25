@@ -72,7 +72,7 @@ public class XWysiwygEditor implements DeferredUpdate, ClickListener, KeyboardLi
         "separator sync text valign justify list indent undo format font color symbol";
 
     private static final String DEFAULT_TOOLBAR =
-        "bold italic underline strikethrough | subscript superscript | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | sync";
+        "bold italic underline strikethrough teletype | subscript superscript | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | sync";
 
     private final XRichTextEditor ui;
 

@@ -60,6 +60,8 @@ public class TextPlugin extends StatefulPlugin
 
     private ToggleButton strikeThrough;
 
+    private ToggleButton teletype;
+
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
@@ -99,6 +101,12 @@ public class TextPlugin extends StatefulPlugin
             strikeThrough = new ToggleButton(Images.INSTANCE.strikeThrough().createImage(), this);
             strikeThrough.setTitle(Strings.INSTANCE.strikeThrough());
             toolBarExtension.addFeature("strikethrough", strikeThrough);
+        }
+
+        if (getTextArea().getCommandManager().isSupported(Command.TELETYPE)) {
+            teletype = new ToggleButton(Images.INSTANCE.teletype().createImage(), this);
+            teletype.setTitle(Strings.INSTANCE.teletype());
+            toolBarExtension.addFeature("teletype", teletype);
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
@@ -143,6 +151,12 @@ public class TextPlugin extends StatefulPlugin
             strikeThrough = null;
         }
 
+        if (teletype != null) {
+            teletype.removeFromParent();
+            teletype.removeClickListener(this);
+            teletype = null;
+        }
+
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().removeClickListener(this);
             getTextArea().removeKeyboardListener(this);
@@ -168,6 +182,8 @@ public class TextPlugin extends StatefulPlugin
             onUnderline();
         } else if (sender == strikeThrough) {
             onStrikeThrough();
+        } else if (sender == teletype) {
+            onTeletype();
         } else {
             super.onClick(sender);
         }
@@ -225,6 +241,13 @@ public class TextPlugin extends StatefulPlugin
         }
     }
 
+    public void onTeletype()
+    {
+        if (teletype.isEnabled()) {
+            getTextArea().getCommandManager().execute(Command.TELETYPE);
+        }
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -243,6 +266,9 @@ public class TextPlugin extends StatefulPlugin
         }
         if (strikeThrough != null) {
             strikeThrough.setDown(getTextArea().getCommandManager().isExecuted(Command.STRIKE_THROUGH));
+        }
+        if (teletype != null) {
+            teletype.setDown(getTextArea().getCommandManager().isExecuted(Command.TELETYPE));
         }
     }
 }

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui;
 
+import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ChangeListenerCollection;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -41,8 +42,13 @@ import com.google.gwt.user.client.ui.SourcesClickEvents;
 import com.google.gwt.user.client.ui.SourcesFocusEvents;
 import com.google.gwt.user.client.ui.SourcesMouseEvents;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.history.History;
+import com.xpn.xwiki.wysiwyg.client.history.internal.DefaultHistory;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.RedoExecutable;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.UndoExecutable;
 import com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea;
 
 public class XRichTextArea extends Composite implements HasHTML, HasName, HasFocus, SourcesMouseEvents,
@@ -54,6 +60,8 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
     protected final Hidden value;
 
     protected CommandManager cm;
+
+    protected History history;
 
     protected final ClickListenerCollection clickListeners = new ClickListenerCollection();
 
@@ -76,7 +84,12 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
         value = new Hidden();
         value.setDefaultValue("");
 
-        cm = new DefaultCommandManager(rta);
+        DefaultCommandManager cm = new DefaultCommandManager(rta);
+        this.cm = cm;
+
+        history = new DefaultHistory(this, 10);
+        cm.registerCommand(Command.UNDO, new UndoExecutable(history));
+        cm.registerCommand(Command.REDO, new RedoExecutable(history));
 
         FlowPanel container = new FlowPanel();
         container.add(value);
@@ -508,5 +521,10 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
     public void removeChangeListener(ChangeListener listener)
     {
         changeListeners.remove(listener);
+    }
+
+    public IFrameElement getIFrameElement()
+    {
+        return IFrameElement.as(rta.getElement());
     }
 }

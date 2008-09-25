@@ -60,7 +60,6 @@ public class DefaultCommandManager extends AbstractCommandManager
         EXECUTABLES.put(Command.JUSTIFY_LEFT, new DefaultExecutable(Command.JUSTIFY_LEFT.toString()));
         EXECUTABLES.put(Command.JUSTIFY_RIGHT, new DefaultExecutable(Command.JUSTIFY_RIGHT.toString()));
         EXECUTABLES.put(Command.OUTDENT, new DefaultExecutable(Command.OUTDENT.toString()));
-        EXECUTABLES.put(Command.REDO, new DefaultExecutable(Command.REDO.toString()));
         EXECUTABLES.put(Command.REMOVE_FORMAT, new DefaultExecutable(Command.REMOVE_FORMAT.toString()));
         EXECUTABLES.put(Command.STRIKE_THROUGH, new StyleExecutable("del",
             null,
@@ -70,12 +69,13 @@ public class DefaultCommandManager extends AbstractCommandManager
         EXECUTABLES.put(Command.STYLE_WITH_CSS, new StyleWithCssExecutable());
         EXECUTABLES.put(Command.SUB_SCRIPT, new DefaultExecutable(Command.SUB_SCRIPT.toString()));
         EXECUTABLES.put(Command.SUPER_SCRIPT, new DefaultExecutable(Command.SUPER_SCRIPT.toString()));
+        EXECUTABLES.put(Command.TELETYPE, new StyleExecutable("tt", null, "font-family", "monospace", Command.TELETYPE
+            .toString()));
         EXECUTABLES.put(Command.UNDERLINE, new StyleExecutable("span",
             "underline",
             "text-decoration",
             "underline",
             Command.UNDERLINE.toString()));
-        EXECUTABLES.put(Command.UNDO, new DefaultExecutable(Command.UNDO.toString()));
     }
 
     public DefaultCommandManager(FocusWidget widget)
@@ -86,7 +86,7 @@ public class DefaultCommandManager extends AbstractCommandManager
     public DefaultCommandManager(FocusWidget widget, Map<Command, Executable> executables)
     {
         this.widget = widget;
-        this.executables = executables;
+        this.executables = new HashMap<Command, Executable>(executables);
     }
 
     /**
@@ -166,5 +166,15 @@ public class DefaultCommandManager extends AbstractCommandManager
         }
         widget.setFocus(true);
         return executable.getParameter(widget.getElement());
+    }
+
+    public Executable registerCommand(Command command, Executable executable)
+    {
+        return executables.put(command, executable);
+    }
+
+    public Executable unregisterCommand(Command command)
+    {
+        return executables.remove(command);
     }
 }

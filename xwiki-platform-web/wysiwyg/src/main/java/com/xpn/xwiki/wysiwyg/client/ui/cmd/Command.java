@@ -176,6 +176,13 @@ public class Command
     public static final Command SUPER_SCRIPT = new Command("superscript");
 
     /**
+     * If there is no selection, the insertion point will be set to teletype for subsequently typed characters.<br/> If
+     * there is a selection and all of the characters have already teletype style, the teletype will be removed.
+     * Otherwise, all selected characters will become teletype.
+     */
+    public static final Command TELETYPE = new Command("tt");
+
+    /**
      * If there is no selection, the insertion point will set underline for subsequently typed characters.<br/>If there
      * is a selection and all of the characters are already underlined, the underline will be removed. Otherwise, all
      * selected characters will become underlined.

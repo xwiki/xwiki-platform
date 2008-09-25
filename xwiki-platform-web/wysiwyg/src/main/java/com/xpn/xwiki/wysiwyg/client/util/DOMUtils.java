@@ -22,13 +22,17 @@ package com.xpn.xwiki.wysiwyg.client.util;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.Text;
 
 public abstract class DOMUtils
 {
-    private static final DOMUtils instance = GWT.create(DOMUtils.class);
+    private static DOMUtils instance = GWT.create(DOMUtils.class);
 
     public static synchronized DOMUtils getInstance()
     {
+        if (instance == null) {
+            instance = GWT.create(DOMUtils.class);
+        }
         return instance;
     }
 
@@ -47,5 +51,50 @@ public abstract class DOMUtils
             node = node.getFirstChild();
         }
         return node;
+    }
+
+    public int getNodeIndex(Node node)
+    {
+        int index = 0;
+        while (node.getPreviousSibling() != null) {
+            index++;
+            node = node.getPreviousSibling();
+        }
+        return index;
+    }
+
+    public TextFragment normalize(Text text)
+    {
+        StringBuffer leftText = new StringBuffer();
+        Node leftSibling = text.getPreviousSibling();
+        while (leftSibling != null && leftSibling.getNodeType() == Node.TEXT_NODE) {
+            leftText.insert(0, leftSibling.getNodeValue());
+            leftSibling.getParentNode().removeChild(leftSibling);
+            leftSibling = text.getPreviousSibling();
+        }
+
+        StringBuffer rightText = new StringBuffer();
+        Node rightSibling = text.getNextSibling();
+        while (rightSibling != null && rightSibling.getNodeType() == Node.TEXT_NODE) {
+            rightText.append(rightSibling.getNodeValue());
+            rightSibling.getParentNode().removeChild(rightSibling);
+            rightSibling = text.getNextSibling();
+        }
+
+        int startIndex = leftText.length();
+        int endIndex = startIndex + text.getLength();
+        text.setData(leftText.toString() + text.getData() + rightText.toString());
+        return new TextFragment(text, startIndex, endIndex);
+    }
+
+    public int getOffset(Text text)
+    {
+        int offset = 0;
+        Node leftSibling = text.getPreviousSibling();
+        while (leftSibling != null && leftSibling.getNodeType() == Node.TEXT_NODE) {
+            offset += leftSibling.getNodeValue().length();
+            leftSibling = leftSibling.getPreviousSibling();
+        }
+        return offset;
     }
 }

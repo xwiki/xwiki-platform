@@ -69,35 +69,16 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
                 public void onSuccess(Object result)
                 {
                     super.onSuccess(result);
-                    onModuleLoad(false);
+                    loadUI();
                 }
             });
         } else {
-            onModuleLoad(false);
+            loadUI();
         }
     }
 
-    public void onModuleLoad(boolean translationDone)
+    private void loadUI()
     {
-        if (!translationDone) {
-            checkTranslator(new XWikiAsyncCallback(this)
-            {
-                public void onFailure(Throwable caught)
-                {
-                    super.onFailure(caught);
-                    onModuleLoad(true);
-                }
-
-                public void onSuccess(Object result)
-                {
-                    super.onSuccess(result);
-                    onModuleLoad(true);
-                }
-            });
-            return;
-        }
-
-        // Launch the UI
         setName("Wysiwyg");
         for (final Config config : getConfigs()) {
             String hookId = config.getParameter("hookId");

@@ -19,14 +19,20 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.Text;
 import com.google.gwt.user.client.Element;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
+import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
 import com.xpn.xwiki.wysiwyg.client.selection.Selection;
 import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Executable;
 import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.util.TextFragment;
 
 public class StyleExecutable extends DefaultExecutable
 {
@@ -75,7 +81,230 @@ public class StyleExecutable extends DefaultExecutable
      */
     public boolean execute(Element target, String parameter)
     {
-        return super.execute(target, parameter);
+        boolean executed = isExecuted(target);
+        IFrameElement iframe = IFrameElement.as(target);
+        Selection selection = SelectionManager.INSTANCE.getSelection(iframe);
+        if (selection.getRangeCount() > 0) {
+            List<Range> ranges = new ArrayList<Range>();
+            for (int i = 0; i < selection.getRangeCount(); i++) {
+                if (executed) {
+                    ranges.add(removeStyle(iframe, selection.getRangeAt(i)));
+                } else {
+                    ranges.add(addStyle(iframe, selection.getRangeAt(i)));
+                }
+            }
+            selection.removeAllRanges();
+            for (Range range : ranges) {
+                selection.addRange(range);
+            }
+            return true;
+        } else {
+            // This should be removed after we implement the Selection and Range for IE.
+            return super.execute(target, parameter);
+        }
+    }
+
+    protected Range addStyle(IFrameElement iframe, Range range)
+    {
+        Range newRange = RangeFactory.INSTANCE.createRange(iframe);
+        if (range.getCommonAncestorContainer().getNodeType() == Node.TEXT_NODE) {
+            Text text = Text.as(range.getCommonAncestorContainer());
+            addStyle(text, range.getStartOffset(), range.getEndOffset());
+            newRange.selectNodeContents(text);
+        } else if (range.isCollapsed()) {
+            com.google.gwt.dom.client.Element leafElement =
+                Element.as(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
+            assert (!leafElement.hasChildNodes());
+            Text text = leafElement.getOwnerDocument().createTextNode("");
+            leafElement.getParentNode().insertBefore(text, leafElement);
+            addStyle(text, 0, 0);
+            newRange.selectNodeContents(text);
+        } else {
+            Text firstText = Text.as(range.getStartContainer());
+            Text lastText = Text.as(range.getEndContainer());
+            if (!matchesStyle(firstText)) {
+                addStyle(firstText, range.getStartOffset(), firstText.getLength());
+                newRange.setStart(firstText, 0);
+            } else {
+                newRange.setStart(firstText, range.getStartOffset());
+            }
+
+            Node node = DOMUtils.getInstance().getNextLeaf(firstText);
+            while (node != null && node != lastText) {
+                if (node.getNodeType() == Node.TEXT_NODE && !matchesStyle(node)) {
+                    Text text = Text.as(node);
+                    addStyle(text, 0, text.getLength());
+                }
+                node = DOMUtils.getInstance().getNextLeaf(node);
+            }
+
+            if (node == lastText && !matchesStyle(lastText)) {
+                addStyle(lastText, 0, range.getEndOffset());
+                newRange.setEnd(lastText, lastText.getLength());
+            } else {
+                newRange.setEnd(lastText, range.getEndOffset());
+            }
+        }
+        return newRange;
+    }
+
+    protected void addStyle(Text text, int beginIndex, int endIndex)
+    {
+        if (beginIndex > 0) {
+            String leftData = text.getData().substring(0, beginIndex);
+            Text left = text.getOwnerDocument().createTextNode(leftData);
+            text.getParentNode().insertBefore(left, text);
+            text.setData(text.getData().substring(beginIndex));
+            endIndex -= beginIndex;
+            beginIndex = 0;
+        }
+
+        if (endIndex < text.getLength()) {
+            String rightData = text.getData().substring(endIndex);
+            Text right = text.getOwnerDocument().createTextNode(rightData);
+            if (text.getNextSibling() != null) {
+                text.getParentNode().insertBefore(right, text.getNextSibling());
+            } else {
+                text.getParentNode().appendChild(right);
+            }
+            text.setData(text.getData().substring(beginIndex, endIndex));
+        }
+
+        com.google.gwt.dom.client.Element styleElement = text.getOwnerDocument().createElement(tagName);
+        if (className != null) {
+            styleElement.setClassName(className);
+        }
+
+        Node ancestor = text;
+        while (ancestor.getParentNode() != null && ancestor.getPreviousSibling() == null
+            && ancestor.getNextSibling() == null && isInline(ancestor.getParentNode())) {
+            ancestor = ancestor.getParentNode();
+        }
+        ancestor.getParentNode().replaceChild(styleElement, ancestor);
+        styleElement.appendChild(ancestor);
+    }
+
+    protected Range removeStyle(IFrameElement iframe, Range range)
+    {
+        Range newRange = RangeFactory.INSTANCE.createRange(iframe);
+        if (range.getCommonAncestorContainer().getNodeType() == Node.TEXT_NODE) {
+            Text text = Text.as(range.getCommonAncestorContainer());
+            removeStyle(text, range.getStartOffset(), range.getEndOffset());
+
+            TextFragment fragment = DOMUtils.getInstance().normalize(text);
+            newRange.setStart(fragment.getText(), fragment.getStartIndex());
+            newRange.setEnd(fragment.getText(), fragment.getEndIndex());
+        } else if (range.isCollapsed()) {
+            com.google.gwt.dom.client.Element leafElement =
+                Element.as(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
+            assert (!leafElement.hasChildNodes());
+            Text text = leafElement.getOwnerDocument().createTextNode("");
+            leafElement.getParentNode().insertBefore(text, leafElement);
+            removeStyle(text, 0, 0);
+
+            TextFragment fragment = DOMUtils.getInstance().normalize(text);
+            newRange.setStart(fragment.getText(), fragment.getStartIndex());
+            newRange.setEnd(fragment.getText(), fragment.getEndIndex());
+        } else {
+            Text firstText = Text.as(range.getStartContainer());
+            Text lastText = Text.as(range.getEndContainer());
+            removeStyle(firstText, range.getStartOffset(), firstText.getLength());
+
+            Node node = DOMUtils.getInstance().getNextLeaf(firstText);
+            while (node != null && node != lastText) {
+                if (node.getNodeType() == Node.TEXT_NODE) {
+                    Text text = Text.as(node);
+                    removeStyle(text, 0, text.getLength());
+                }
+                node = DOMUtils.getInstance().getNextLeaf(node);
+            }
+
+            if (node == lastText) {
+                removeStyle(lastText, 0, range.getEndOffset());
+                int lastTextOffset = DOMUtils.getInstance().getOffset(lastText);
+
+                TextFragment firstFragment = DOMUtils.getInstance().normalize(firstText);
+                newRange.setStart(firstFragment.getText(), firstFragment.getStartIndex());
+                if (lastText.getParentNode() != null) {
+                    TextFragment lastFragment = DOMUtils.getInstance().normalize(lastText);
+                    newRange.setEnd(lastFragment.getText(), lastFragment.getEndIndex());
+                } else {
+                    newRange.setEnd(firstFragment.getText(), lastTextOffset + lastText.getLength());
+                }
+            } else {
+                TextFragment firstFragment = DOMUtils.getInstance().normalize(firstText);
+                newRange.setStart(firstFragment.getText(), firstFragment.getStartIndex());
+                newRange.setEnd(firstFragment.getText(), firstFragment.getStartIndex());
+            }
+        }
+        return newRange;
+    }
+
+    protected void removeStyle(Text text, int beginIndex, int endIndex)
+    {
+        if (beginIndex > 0) {
+            String leftData = text.getData().substring(0, beginIndex);
+            Text left = text.getOwnerDocument().createTextNode(leftData);
+            text.getParentNode().insertBefore(left, text);
+            text.setData(text.getData().substring(beginIndex));
+            endIndex -= beginIndex;
+            beginIndex = 0;
+        }
+
+        if (endIndex < text.getLength()) {
+            String rightData = text.getData().substring(endIndex);
+            Text right = text.getOwnerDocument().createTextNode(rightData);
+            if (text.getNextSibling() != null) {
+                text.getParentNode().insertBefore(right, text.getNextSibling());
+            } else {
+                text.getParentNode().appendChild(right);
+            }
+            text.setData(text.getData().substring(beginIndex, endIndex));
+        }
+
+        Node child = text;
+        Node parent = child.getParentNode();
+        while (parent != null && matchesStyle(parent) && isInline(parent) && split(parent, child)) {
+            child = child.getParentNode();
+            parent = child.getParentNode();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Executable#getParameter(Element)
+     */
+    public String getParameter(Element target)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Executable#isEnabled(Element)
+     */
+    public boolean isEnabled(Element target)
+    {
+        Selection selection = SelectionManager.INSTANCE.getSelection(IFrameElement.as(target));
+        if (selection.getRangeCount() > 0) {
+            for (int i = 0; i < selection.getRangeCount(); i++) {
+                if (!isEnabled(selection.getRangeAt(i))) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            // This should be removed after we implement the Selection and Range for IE.
+            return super.isEnabled(target);
+        }
+    }
+
+    private boolean isEnabled(Range range)
+    {
+        return range.isCollapsed()
+            || (range.getStartContainer().getNodeType() == Node.TEXT_NODE && range.getEndContainer().getNodeType() == Node.TEXT_NODE);
     }
 
     /**
@@ -85,28 +314,48 @@ public class StyleExecutable extends DefaultExecutable
      */
     public boolean isExecuted(Element target)
     {
-        Selection sel = SelectionManager.INSTANCE.getSelection(IFrameElement.as(target));
-        if (sel.getRangeCount() > 0) {
-            Range range = sel.getRangeAt(0);
-            if (range.isCollapsed() || range.getCommonAncestorContainer().getNodeType() == Node.TEXT_NODE
-                || range.getStartContainer() == range.getEndContainer()) {
-                return matchesStyle(range.getCommonAncestorContainer());
-            } else {
-                Node node = range.getStartContainer();
+        Selection selection = SelectionManager.INSTANCE.getSelection(IFrameElement.as(target));
+        if (selection.getRangeCount() > 0) {
+            for (int i = 0; i < selection.getRangeCount(); i++) {
+                if (!isExecuted(selection.getRangeAt(i))) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            // This should be removed after we implement the Selection and Range for IE.
+            return super.isExecuted(target);
+        }
+    }
+
+    private boolean isExecuted(Range range)
+    {
+        if (range.isCollapsed() || range.getCommonAncestorContainer().getNodeType() == Node.TEXT_NODE
+            || range.getStartContainer() == range.getEndContainer()) {
+            return matchesStyle(range.getCommonAncestorContainer());
+        } else {
+            Node node = range.getStartContainer();
+            if (!matchesStyle(node)) {
+                return false;
+            }
+            while (node != range.getEndContainer()) {
+                node = DOMUtils.getInstance().getNextLeaf(node);
                 if (!matchesStyle(node)) {
                     return false;
                 }
-                while (node != range.getEndContainer()) {
-                    node = DOMUtils.getInstance().getNextLeaf(node);
-                    if (!matchesStyle(node)) {
-                        return false;
-                    }
-                }
-                return true;
             }
-        } else {
-            return super.isExecuted(target);
+            return true;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Executable#isSupported(Element)
+     */
+    public boolean isSupported(Element target)
+    {
+        return true;
     }
 
     protected boolean matchesStyle(Node node)
@@ -116,5 +365,57 @@ public class StyleExecutable extends DefaultExecutable
         }
         return DOMUtils.getInstance().getComputedStyleProperty((Element) node, propertyName).equalsIgnoreCase(
             propertyValue);
+    }
+
+    private boolean isInline(Node node)
+    {
+        switch (node.getNodeType()) {
+            case Node.TEXT_NODE:
+                return true;
+            case Node.ELEMENT_NODE:
+                return "inline".equalsIgnoreCase(DOMUtils.getInstance().getComputedStyleProperty((Element) node,
+                    "display"));
+            default:
+                return false;
+        }
+    }
+
+    private boolean split(Node parent, Node child)
+    {
+        assert (child.getParentNode() == parent);
+        Node grandParent = parent.getParentNode();
+        if (grandParent == null) {
+            return false;
+        }
+        if (child.getPreviousSibling() != null) {
+            Node leftClone = parent.cloneNode(false);
+            Node leftSibling = child.getPreviousSibling();
+            leftClone.appendChild(leftSibling);
+            leftSibling = child.getPreviousSibling();
+            while (leftSibling != null) {
+                leftClone.insertBefore(leftSibling, leftClone.getFirstChild());
+                leftSibling = child.getPreviousSibling();
+            }
+            grandParent.insertBefore(leftClone, parent);
+        }
+        if (child.getNextSibling() != null) {
+            Node rightClone = parent.cloneNode(false);
+            Node rightSibling = child.getNextSibling();
+            while (rightSibling != null) {
+                rightClone.appendChild(rightSibling);
+                rightSibling = child.getNextSibling();
+            }
+            if (parent.getNextSibling() != null) {
+                grandParent.insertBefore(rightClone, parent.getNextSibling());
+            } else {
+                grandParent.appendChild(rightClone);
+            }
+        }
+        if (!matchesStyle(grandParent)) {
+            grandParent.replaceChild(child, parent);
+            return false;
+        } else {
+            return true;
+        }
     }
 }

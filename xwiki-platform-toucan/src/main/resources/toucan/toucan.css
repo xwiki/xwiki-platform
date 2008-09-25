@@ -72,14 +72,12 @@ caption, th, td {
     border-width: 1px;
 }
 
-/* Remove possible quote marks (") from <q>, <blockquote>. */
-blockquote:before, blockquote:after,
-    q:before, q:after {
-    content: "";
-}
-
-blockquote, q {
-    quotes: "" "";
+blockquote { 
+    padding: 0.3em 0 0 1em;
+    quotes: none;
+    background:#FAFAF6 none repeat scroll 0 0;
+    border-left:2px solid #DDDDCC;
+    display:block;
 }
 
 .clearfloats {

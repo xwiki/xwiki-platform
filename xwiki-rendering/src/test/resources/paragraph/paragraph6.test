@@ -2,25 +2,32 @@
 .input|xwiki/2.0
 .#-----------------------------------------------------
 (% param1="value1" param2="value2" %)
-paragraph
+paragraph1
+
+paragraph2
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph [[param1]=[value1][param2]=[value2]]
-onWord [paragraph]
+onWord [paragraph1]
 endParagraph [[param1]=[value1][param2]=[value2]]
+beginParagraph
+onWord [paragraph2]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p param1="value1" param2="value2">paragraph</p>
+<p param1="value1" param2="value2">paragraph1</p><p>paragraph2</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 (% param1="value1" param2="value2" %)
-paragraph
+paragraph1
+
+paragraph2
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p param1="value1" param2="value2">paragraph</p></html>
+<html><p param1="value1" param2="value2">paragraph1</p><p>paragraph2</p></html>

@@ -36,6 +36,6 @@ public class BooleanChartParam extends AbstractChartParam
     @Override
     public Object convert(String value)
     {
-        return value;
+        return Boolean.valueOf(value);
     }
 }

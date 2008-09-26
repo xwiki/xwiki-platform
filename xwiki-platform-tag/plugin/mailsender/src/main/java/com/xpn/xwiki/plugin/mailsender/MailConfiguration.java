@@ -63,6 +63,9 @@ public class MailConfiguration
             setHost(smtpServer);
         }
 
+        int port = xwiki.getXWikiPreferenceAsInt("smtp_port", 25);
+        setPort(port);
+
         String from = xwiki.getXWikiPreference("smtp_from");
         if (!StringUtils.isBlank(from)) {
             setFrom(from);

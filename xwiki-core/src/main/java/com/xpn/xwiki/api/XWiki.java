@@ -337,25 +337,26 @@ public class XWiki extends Api
     /**
      * API allowing to search for document names matching a query. Examples:
      * <ul>
-     * <li>Query: <code>where doc.space='Main' order by doc.creationDate desc</code>. Result: All the documents in space 'Main' ordered by the creation date from
-     * the most recent</li>
-     * <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>. Result: All the documents containing 'sport' in their name ordered by
-     * document name</li>
-     * <li>Query: <code>where doc.content like '%sport%' order by doc.author</code> Result: All the documents containing 'sport' in their content ordered by
-     * the author</li>
+     * <li>Query: <code>where doc.space='Main' order by doc.creationDate desc</code>. Result: All the documents in
+     * space 'Main' ordered by the creation date from the most recent</li>
+     * <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>. Result: All the documents
+     * containing 'sport' in their name ordered by document name</li>
+     * <li>Query: <code>where doc.content like '%sport%' order by doc.author</code> Result: All the documents
+     * containing 'sport' in their content ordered by the author</li>
      * <li>Query: <code>where doc.creator = 'XWiki.LudovicDubost' order by doc.creationDate
-     *       desc</code>. Result: All the documents with creator LudovicDubost ordered by the creation date
-     * from the most recent</li>
-     * <li>Query: <code>where doc.author = 'XWiki.LudovicDubost' order by doc.date desc</code>. Result: All the documents with last author LudovicDubost ordered by the
-     * last modification date from the most recent.</li>
+     *       desc</code>. Result: All
+     * the documents with creator LudovicDubost ordered by the creation date from the most recent</li>
+     * <li>Query: <code>where doc.author = 'XWiki.LudovicDubost' order by doc.date desc</code>. Result: All the
+     * documents with last author LudovicDubost ordered by the last modification date from the most recent.</li>
      * <li>Query: <code>,BaseObject as obj where doc.fullName=obj.name and
-     *       obj.className='XWiki.XWikiComments' order by doc.date desc</code>. Result: All the documents with at least one comment ordered by the last modification date
-     * from the most recent</li>
+     *       obj.className='XWiki.XWikiComments' order by doc.date desc</code>.
+     * Result: All the documents with at least one comment ordered by the last modification date from the most recent</li>
      * <li>Query: <code>,BaseObject as obj, StringProperty as prop where
      *       doc.fullName=obj.name and obj.className='XWiki.XWikiComments' and obj.id=prop.id.id
      *       and prop.id.name='author' and prop.value='XWiki.LudovicDubost' order by doc.date
-     *       desc</code>. Result: All the documents with at least one comment from
-     * LudovicDubost ordered by the last modification date from the most recent</li>
+     *       desc</code>.
+     * Result: All the documents with at least one comment from LudovicDubost ordered by the last modification date from
+     * the most recent</li>
      * </ul>
      * 
      * @param wheresql Query to be run (either starting with ", BaseObject as obj where.." or by "where ..."
@@ -395,7 +396,8 @@ public class XWiki extends Api
      * @return List of Object[] with the column values of the matching rows
      * @throws XWikiException
      */
-    public List<String> searchDocuments(String wheresql, int nb, int start, String selectColumns) throws XWikiException
+    public List<String> searchDocuments(String wheresql, int nb, int start, String selectColumns)
+        throws XWikiException
     {
         if (hasProgrammingRights()) {
             return this.xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, getXWikiContext());
@@ -430,8 +432,8 @@ public class XWiki extends Api
     public List<Document> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start)
         throws XWikiException
     {
-        return convert(this.xwiki.getStore()
-            .searchDocuments(wheresql, distinctbylanguage, nb, start, getXWikiContext()));
+        return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylanguage, nb, start,
+            getXWikiContext()));
     }
 
     /**
@@ -477,7 +479,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Search documents in the provided by passing HQL where clause values as parameters. See
+     * Search documents in the provided wiki by passing HQL where clause values as parameters. See
      * {@link #searchDocuments(String, int, int, java.util.List)} for more details.
      * 
      * @param wikiName the name of the wiki where to search.
@@ -502,6 +504,26 @@ public class XWiki extends Api
         } finally {
             this.context.setDatabase(database);
         }
+    }
+
+    /**
+     * Search spaces by passing HQL where clause values as parameters. See
+     * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
+     * 
+     * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
+     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
+     * @param nb the number of rows to return. If 0 then all rows are returned
+     * @param start the number of rows to skip. If 0 don't skip any row
+     * @param parameterValues the where clause values that replace the question marks (?)
+     * @return a list of spaces names.
+     * @throws XWikiException in case of error while performing the query
+     */
+    public List<String> searchSpacesNames(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues)
+        throws XWikiException
+    {
+        return this.xwiki.getStore().search(
+            "select distinct doc.space from XWikiDocument doc " + parametrizedSqlClause, nb, start, parameterValues,
+            this.context);
     }
 
     /**
@@ -624,8 +646,8 @@ public class XWiki extends Api
 
     /**
      * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
-     * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the
-     * "parent skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
+     * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
+     * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
      * 
      * @param filename Filename to be looked up in the skin (logo.gif, style.css)
      * @return URL to access this file
@@ -637,8 +659,8 @@ public class XWiki extends Api
 
     /**
      * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
-     * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the
-     * "parent skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
+     * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
+     * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
      * 
      * @param filename Filename to be looked up in the skin (logo.gif, style.css)
      * @param forceSkinAction true to make sure that static files are retrieved through the skin action, to allow
@@ -1057,8 +1079,8 @@ public class XWiki extends Api
      * @return Success of Failure code (0 for success, -1 for missing programming rights, > 0 for other errors
      * @throws XWikiException
      */
-    public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName, boolean failOnExist)
-        throws XWikiException
+    public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName,
+        boolean failOnExist) throws XWikiException
     {
         return createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, "", null, failOnExist);
     }

@@ -96,7 +96,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
      * @see MailSender#sendTextMessage(String, String, String, String, String, String, java.util.List)
      */
     public int sendTextMessage(String from, String to, String cc, String bcc, String subject, String message,
-        List attachments)
+        List<Attachment> attachments)
     {
         Mail email = new Mail();
         email.setSubject(subject);

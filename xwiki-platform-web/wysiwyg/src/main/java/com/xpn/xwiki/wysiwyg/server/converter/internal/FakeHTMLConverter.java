@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.server.converter.internal;
 
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
-import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverterException;
 
 /**
  * Fake HTML converter that doesn't change the input string at all.
@@ -32,7 +31,7 @@ public class FakeHTMLConverter implements HTMLConverter
      * 
      * @see HTMLConverter#fromHTML(String)
      */
-    public String fromHTML(String html) throws HTMLConverterException
+    public String fromHTML(String html)
     {
         return html;
     }
@@ -42,7 +41,7 @@ public class FakeHTMLConverter implements HTMLConverter
      * 
      * @see HTMLConverter#toHTML(String)
      */
-    public String toHTML(String source) throws HTMLConverterException
+    public String toHTML(String source)
     {
         return source;
     }

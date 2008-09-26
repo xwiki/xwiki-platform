@@ -21,8 +21,12 @@ package com.xpn.xwiki.wysiwyg.client.ui;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.LoadListener;
+import com.google.gwt.user.client.ui.LoadListenerCollection;
+import com.google.gwt.user.client.ui.SourcesLoadEvents;
+import com.google.gwt.user.client.ui.Widget;
 
-public class XRichTextEditor extends Composite
+public class XRichTextEditor extends Composite implements SourcesLoadEvents
 {
     protected FlowPanel container;
 
@@ -31,6 +35,8 @@ public class XRichTextEditor extends Composite
     protected XRichTextArea textArea;
 
     protected HiddenConfig config;
+
+    private final LoadListenerCollection loadListeners = new LoadListenerCollection();
 
     public XRichTextEditor()
     {
@@ -58,5 +64,36 @@ public class XRichTextEditor extends Composite
     public HiddenConfig getConfig()
     {
         return config;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Widget#onLoad()
+     */
+    protected void onLoad()
+    {
+        super.onLoad();
+        loadListeners.fireLoad(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SourcesLoadEvents#addLoadListener(LoadListener)
+     */
+    public void addLoadListener(LoadListener listener)
+    {
+        loadListeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SourcesLoadEvents#removeLoadListener(LoadListener)
+     */
+    public void removeLoadListener(LoadListener listener)
+    {
+        loadListeners.remove(listener);
     }
 }

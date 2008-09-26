@@ -28,9 +28,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.Dictionary;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.xpn.xwiki.gwt.api.client.XWikiServiceAsync;
+import com.xpn.xwiki.gwt.api.client.XWikiService;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
 import com.xpn.xwiki.wysiwyg.client.plugin.Config;
@@ -44,22 +43,12 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     /**
      * {@inheritDoc}
      * 
-     * @see XWikiGWTDefaultApp#getXWikiServiceInstance()
-     */
-    public XWikiServiceAsync getXWikiServiceInstance()
-    {
-        return WysiwygService.Singleton.getInstance();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see EntryPoint#onModuleLoad()
      */
     public void onModuleLoad()
     {
         if (!GWT.isScript()) {
-            WysiwygService.Singleton.getInstance().login("Admin", "admin", true, new XWikiAsyncCallback(this)
+            XWikiService.App.getInstance().login("Admin", "admin", true, new XWikiAsyncCallback(this)
             {
                 public void onFailure(Throwable caught)
                 {
@@ -107,31 +96,18 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
             // Create the WYSIWYG Editor
             final XWysiwygEditor editor = XWysiwygEditorFactory.getInstance().newEditor(config, this);
+            editor.getUI().getTextArea().setHTML(value);
             editor.getUI().getTextArea().setHeight(height);
             if (name != null) {
                 editor.getUI().getTextArea().setName(name);
             }
 
-            // Fill the initial content
-            WysiwygService.Singleton.getInstance().toHTML(value, editor.getSyntax(), new AsyncCallback<String>()
-            {
-                public void onFailure(Throwable t)
-                {
-                    Wysiwyg.this.showError(t);
-                }
-
-                public void onSuccess(String result)
-                {
-                    editor.getUI().getTextArea().setHTML(result);
-
-                    // Insert the WYSIWYG Editor
-                    if ("true".equals(config.getParameter("debug", "false"))) {
-                        RootPanel.get(containerId).add(new XWysiwygEditorDebugger(editor));
-                    } else {
-                        RootPanel.get(containerId).add(editor.getUI());
-                    }
-                }
-            });
+            // Insert the WYSIWYG Editor
+            if ("true".equals(config.getParameter("debug", "false"))) {
+                RootPanel.get(containerId).add(new XWysiwygEditorDebugger(editor));
+            } else {
+                RootPanel.get(containerId).add(editor.getUI());
+            }
         }
     }
 

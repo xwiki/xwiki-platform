@@ -25,11 +25,11 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.renderer.EventsRenderer;
+import org.xwiki.rendering.renderer.WikiPrinter;
+
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
-import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverterException;
 
 public class EventsHTMLConverter implements HTMLConverter
 {
@@ -38,7 +38,7 @@ public class EventsHTMLConverter implements HTMLConverter
      * 
      * @see HTMLConverter#fromHTML(String)
      */
-    public String fromHTML(String html) throws HTMLConverterException
+    public String fromHTML(String html)
     {
         try {
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xhtml/1.0");
@@ -48,7 +48,7 @@ public class EventsHTMLConverter implements HTMLConverter
             dom.traverse(eventsRenderer);
             return printer.toString();
         } catch (ParseException e) {
-            throw new HTMLConverterException("Exception while parsing HTML", e);
+            throw new RuntimeException("Exception while parsing HTML", e);
         }
     }
 
@@ -57,7 +57,7 @@ public class EventsHTMLConverter implements HTMLConverter
      * 
      * @see HTMLConverter#toHTML(String)
      */
-    public String toHTML(String source) throws HTMLConverterException
+    public String toHTML(String source)
     {
         return null;
     }

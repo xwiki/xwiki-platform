@@ -20,11 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.gwt.api.client.XWikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
-public interface WysiwygServiceAsync extends XWikiServiceAsync
+public interface WysiwygServiceAsync
 {
     void fromHTML(String html, String syntax, AsyncCallback<String> async);
 

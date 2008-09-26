@@ -27,16 +27,15 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.WikiPrinter;
-import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRendererType;
+import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.renderer.WysiwygEditorXHTMLRenderer;
+import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
-import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverterException;
 
 public class XWikiHTMLConverter implements HTMLConverter
 {
@@ -45,7 +44,7 @@ public class XWikiHTMLConverter implements HTMLConverter
      * 
      * @see HTMLConverter#fromHTML(String)
      */
-    public String fromHTML(String html) throws HTMLConverterException
+    public String fromHTML(String html)
     {
         try {
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xhtml/1.0");
@@ -55,7 +54,7 @@ public class XWikiHTMLConverter implements HTMLConverter
             dom.traverse(renderer);
             return printer.toString();
         } catch (ParseException e) {
-            throw new HTMLConverterException("Exception while parsing HTML", e);
+            throw new RuntimeException("Exception while parsing HTML", e);
         }
     }
 
@@ -64,7 +63,7 @@ public class XWikiHTMLConverter implements HTMLConverter
      * 
      * @see HTMLConverter#toHTML(String)
      */
-    public String toHTML(String source) throws HTMLConverterException
+    public String toHTML(String source)
     {
         try {
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xwiki/2.0");
@@ -75,13 +74,13 @@ public class XWikiHTMLConverter implements HTMLConverter
 
             WikiPrinter printer = new DefaultWikiPrinter();
             PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
-            WysiwygEditorXHTMLRenderer renderer = (WysiwygEditorXHTMLRenderer) factory.createRenderer(
-                PrintRendererType.WYSIWYG, printer);
+            WysiwygEditorXHTMLRenderer renderer =
+                (WysiwygEditorXHTMLRenderer) factory.createRenderer(PrintRendererType.WYSIWYG, printer);
             dom.traverse(renderer);
 
             return printer.toString();
         } catch (Throwable t) {
-            throw new HTMLConverterException("Exception while parsing XWiki", t);
+            throw new RuntimeException("Exception while parsing XWiki", t);
         }
     }
 }

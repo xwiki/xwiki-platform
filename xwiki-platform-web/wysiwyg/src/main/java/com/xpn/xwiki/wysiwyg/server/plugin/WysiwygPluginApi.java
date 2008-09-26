@@ -72,4 +72,12 @@ public class WysiwygPluginApi extends Api
             return false;
         }
     }
+
+    /**
+     * @see HTMLConverter#toHTML(String)
+     */
+    public String toHTML(String source, String syntax)
+    {
+        return ((HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax)).toHTML(source);
+    }
 }

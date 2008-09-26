@@ -23,7 +23,7 @@ public interface HTMLConverter
 {
     String ROLE = HTMLConverter.class.getName();
 
-    String toHTML(String source) throws HTMLConverterException;
+    String toHTML(String source);
 
-    String fromHTML(String html) throws HTMLConverterException;
+    String fromHTML(String html);
 }

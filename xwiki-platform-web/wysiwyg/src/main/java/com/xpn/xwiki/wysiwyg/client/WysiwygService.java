@@ -20,14 +20,13 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
-import com.xpn.xwiki.gwt.api.client.XWikiService;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTAppConstants;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
-public interface WysiwygService extends XWikiService
+public interface WysiwygService extends RemoteService
 {
     public static final class Singleton
     {
@@ -53,11 +52,11 @@ public interface WysiwygService extends XWikiService
         }
     }
 
-    String fromHTML(String html, String syntax) throws XWikiGWTException;
+    String fromHTML(String html, String syntax);
 
-    String toHTML(String source, String syntax) throws XWikiGWTException;
+    String toHTML(String source, String syntax);
 
-    String cleanHTML(String dirtyHTML) throws XWikiGWTException;
+    String cleanHTML(String dirtyHTML);
 
-    SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version) throws XWikiGWTException;
+    SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version);
 }

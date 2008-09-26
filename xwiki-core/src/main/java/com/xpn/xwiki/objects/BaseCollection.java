@@ -580,20 +580,19 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
                 if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
-                    BaseClass bclass = getxWikiClass(context);
+                    BaseClass bclass = oldCollection.getxWikiClass(context);
                     PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                                : ((PropertyClass) getxWikiClass(context).getField(propertyName)).displayView(
-                                    propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed", propertyName,
-                            oldPropertyValue, ""));
+                                : pclass.displayView(propertyName, oldCollection, context);
+                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(),
+                            "removed", propertyName, oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed", propertyName, oldProperty
-                            .toText(), ""));
+                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(),
+                            "removed", propertyName, oldProperty.toText(), ""));
                     }
                 }
             }

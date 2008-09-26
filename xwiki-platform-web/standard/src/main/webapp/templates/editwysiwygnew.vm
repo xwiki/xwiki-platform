@@ -26,14 +26,14 @@
 <link rel="stylesheet" href="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.css" />
 <script type="text/javascript" src="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
 <iframe src="javascript:''" id="__gwt_historyFrame" style="width:0;height:0;border:0"></iframe>
-$xwiki.getTextArea($tdoc.content)
+$xwiki.getTextArea($xwiki.wysiwyg.toHTML($tdoc.content, $doc.syntaxId))
 <script type="text/javascript">
 //<![CDATA[
     var Wysiwyg0 = {
       hookId: 'content',
       syntax: "$doc.syntaxId",
       plugins: 'separator text valign list indent undo format symbol',
-      toolbar: 'bold italic underline strikethrough teletype | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol',
+      toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol',
       debug: #if($request.debug)'true'#else'false'#end
     };
 //]]>

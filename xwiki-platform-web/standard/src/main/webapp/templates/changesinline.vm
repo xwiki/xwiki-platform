@@ -2,6 +2,25 @@
 <div id="changescontent" class="xwikiintracontent">
 #set($rev1= $request.get("rev1"))
 #set($rev2= $request.get("rev2"))
+#if (!$rev1 && !$rev2)
+ #set($rev2 = $tdoc.version)
+ #set($rev1 = $tdoc.previousVersion)
+#else
+ #set($revcrit = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria())
+ #set($revcrit.includeMinorVersions = true)
+ #set($lst = $tdoc.getRevisions($revcrit)) 
+ #if (!$rev1)
+  #set($ind = $lst.indexOf($rev2) - 1)
+  #if ($ind >= 0)
+   #set($rev1 = $lst.get($ind))
+  #end
+ #elseif (!$rev2) 
+  #set($ind = $lst.indexOf($rev1) + 1)
+  #if ($ind < $lst.size())
+   #set($rev2 = $lst.get($ind))
+  #end
+ #end
+#end
 #if($request.get("type"))
 #set($type= $request.get("type"))
 #else
@@ -14,6 +33,12 @@
 #end
 #set($origdoc = $xwiki.getDocument($tdoc, $rev1))
 #set($newdoc = $xwiki.getDocument($tdoc, $rev2))
+#if (!$rev1)
+ #set($rev1 = "0")
+#end
+#if (!$rev2)
+ #set($rev2 = "0")
+#end
 #template("changesdoc.vm")
 <br /><br />
 </div>

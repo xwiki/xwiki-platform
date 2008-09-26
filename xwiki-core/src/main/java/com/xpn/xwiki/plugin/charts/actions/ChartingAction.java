@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki.plugin.charts.actions;
 
+import java.io.IOException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.charts.ChartingPluginApi;
@@ -27,20 +29,20 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiAction;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import java.io.IOException;
-
-public class ChartingAction extends XWikiAction {
-	public String render(XWikiContext context) throws XWikiException {
+public class ChartingAction extends XWikiAction
+{
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
         XWikiRequest request = context.getRequest();
         String path = request.getRequestURI();
-        String filename = Util.decodeURI(path.substring(path.lastIndexOf("/")+1),context);
+        String filename = Util.decodeURI(path.substring(path.lastIndexOf("/") + 1), context);
         try {
-           ((ChartingPluginApi)context.getWiki().getPluginApi("charting",context)).outputFile(filename, context);
+            ((ChartingPluginApi) context.getWiki().getPluginApi("charting", context)).outputFile(filename, context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                    "Exception while sending response", e);
+                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
         }
         return null;
-	}
+    }
 }

@@ -20,18 +20,24 @@
  */
 package com.xpn.xwiki.plugin.charts.actions;
 
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.charts.RadeoxHelper;
 import com.xpn.xwiki.web.XWikiAction;
-import org.apache.velocity.VelocityContext;
 
 /**
  * This clas generates the tables for the new datasource wizard.
+ * 
+ * @version $Id$
  */
-public class GetTablesAction extends XWikiAction{
-    public String render(XWikiContext context) throws XWikiException {
-        VelocityContext vcontext = (VelocityContext)context.get("vcontext");
+public class GetTablesAction extends XWikiAction
+{
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         vcontext.put("rhelper", new RadeoxHelper(context.getDoc(), context));
         return "gettables";
     }

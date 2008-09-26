@@ -20,31 +20,37 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
+import java.util.Map;
+
 import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
-import java.util.Map;
+public class MapChartParam extends AbstractChartParam
+{
+    public MapChartParam(String name)
+    {
+        super(name);
+    }
 
-public class MapChartParam extends AbstractChartParam {
+    public MapChartParam(String name, boolean optional)
+    {
+        super(name, optional);
+    }
 
-	public MapChartParam(String name) {
-		super(name);
-	}
+    @Override
+    public Class getType()
+    {
+        return Map.class;
+    }
 
-	public MapChartParam(String name, boolean optional) {
-		super(name, optional);
-	}
-
-	public Class getType() {
-		return Map.class;
-	}
-
-	public Object convert(String value) throws ParamException {
-		try {
-			return parseMap(value);
-		} catch (InvalidArgumentException e) {
-			throw new InvalidParamException(e);
-		}
-	}
+    @Override
+    public Object convert(String value) throws ParamException
+    {
+        try {
+            return parseMap(value);
+        } catch (InvalidArgumentException e) {
+            throw new InvalidParamException(e);
+        }
+    }
 }

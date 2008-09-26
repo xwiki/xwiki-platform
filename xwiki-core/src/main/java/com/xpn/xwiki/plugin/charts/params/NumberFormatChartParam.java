@@ -20,77 +20,89 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
-import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
-
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Map;
 
-public class NumberFormatChartParam extends LocaleChartParam {
-	public static final String TYPE = "type";
-	public static final String GENERAL = "general";
-	public static final String NUMBER = "number";
-	public static final String INTEGER = "integer";
-	public static final String CURRENCY = "currency";
-	public static final String PERCENT = "percent";
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
-	public NumberFormatChartParam(String name) {
-		super(name);
-	}
+public class NumberFormatChartParam extends LocaleChartParam
+{
+    public static final String TYPE = "type";
 
-	public NumberFormatChartParam(String name, boolean optional) {
-		super(name, optional);
-	}
-	
-	public Class getType() {
-		return NumberFormat.class;
-	}
+    public static final String GENERAL = "general";
 
-	public Object convert(String value) throws ParamException {
-		Map map = parseMap(value);
-		String type = getStringArg(map, TYPE);
-		Locale locale;
-		try {
-			locale = (Locale)super.convert(value);
-		} catch (MissingArgumentException e) {
-			locale = null;
-		}
-		
-		if (type.equals(GENERAL)) {
-			if (locale != null) {
-				return NumberFormat.getInstance(locale);
-			} else {
-				return NumberFormat.getInstance();
-			}
-		} else if (type.equals(NUMBER)) {
-			if (locale != null) {
-				return NumberFormat.getNumberInstance(locale);
-			} else {
-				return NumberFormat.getNumberInstance();
-			}			
-		} else if (type.equals(INTEGER)) {
-			if (locale != null) {
-				return NumberFormat.getIntegerInstance(locale);
-			} else {
-				return NumberFormat.getIntegerInstance();
-			}			
-		} else if (type.equals(CURRENCY)) {
-			if (locale != null) {
-				return NumberFormat.getCurrencyInstance(locale);
-			} else {
-				return NumberFormat.getCurrencyInstance();
-			}			
-		} else if (type.equals(PERCENT)) {
-			if (locale != null) {
-				return NumberFormat.getPercentInstance(locale);
-			} else {
-				return NumberFormat.getPercentInstance();
-			}			
-		} else {
-			throw new InvalidArgumentException("Invalid value for parameter "
-					+ getName() + ": Unexpected value for type argument: " + type);
-		}
-	}
+    public static final String NUMBER = "number";
+
+    public static final String INTEGER = "integer";
+
+    public static final String CURRENCY = "currency";
+
+    public static final String PERCENT = "percent";
+
+    public NumberFormatChartParam(String name)
+    {
+        super(name);
+    }
+
+    public NumberFormatChartParam(String name, boolean optional)
+    {
+        super(name, optional);
+    }
+
+    @Override
+    public Class getType()
+    {
+        return NumberFormat.class;
+    }
+
+    @Override
+    public Object convert(String value) throws ParamException
+    {
+        Map map = parseMap(value);
+        String type = getStringArg(map, TYPE);
+        Locale locale;
+        try {
+            locale = (Locale) super.convert(value);
+        } catch (MissingArgumentException e) {
+            locale = null;
+        }
+
+        if (type.equals(GENERAL)) {
+            if (locale != null) {
+                return NumberFormat.getInstance(locale);
+            } else {
+                return NumberFormat.getInstance();
+            }
+        } else if (type.equals(NUMBER)) {
+            if (locale != null) {
+                return NumberFormat.getNumberInstance(locale);
+            } else {
+                return NumberFormat.getNumberInstance();
+            }
+        } else if (type.equals(INTEGER)) {
+            if (locale != null) {
+                return NumberFormat.getIntegerInstance(locale);
+            } else {
+                return NumberFormat.getIntegerInstance();
+            }
+        } else if (type.equals(CURRENCY)) {
+            if (locale != null) {
+                return NumberFormat.getCurrencyInstance(locale);
+            } else {
+                return NumberFormat.getCurrencyInstance();
+            }
+        } else if (type.equals(PERCENT)) {
+            if (locale != null) {
+                return NumberFormat.getPercentInstance(locale);
+            } else {
+                return NumberFormat.getPercentInstance();
+            }
+        } else {
+            throw new InvalidArgumentException("Invalid value for parameter " + getName()
+                + ": Unexpected value for type argument: " + type);
+        }
+    }
 }

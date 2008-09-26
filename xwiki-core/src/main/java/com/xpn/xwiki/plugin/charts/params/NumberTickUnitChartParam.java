@@ -20,35 +20,42 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
-import org.jfree.chart.axis.NumberTickUnit;
-
 import java.text.NumberFormat;
 import java.util.Map;
 
-public class NumberTickUnitChartParam extends NumberFormatChartParam {
-	
-	public NumberTickUnitChartParam(String name) {
-		super(name);
-	}
+import org.jfree.chart.axis.NumberTickUnit;
 
-	public NumberTickUnitChartParam(String name, boolean optional) {
-		super(name, optional);
-	}
+import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
-	public Class getType() {
-		return NumberTickUnit.class;
-	}
+public class NumberTickUnitChartParam extends NumberFormatChartParam
+{
+    public NumberTickUnitChartParam(String name)
+    {
+        super(name);
+    }
 
-	public Object convert(String value) throws ParamException {
-		Map map = parseMap(value);
-		double size = getDoubleArg(map, "size");
-		try {
-			NumberFormat format = (NumberFormat)super.convert(value);
-			return new NumberTickUnit(size, format);
-		} catch (MissingArgumentException e) {
-			return new NumberTickUnit(size);
-		}
-	}
+    public NumberTickUnitChartParam(String name, boolean optional)
+    {
+        super(name, optional);
+    }
+
+    @Override
+    public Class getType()
+    {
+        return NumberTickUnit.class;
+    }
+
+    @Override
+    public Object convert(String value) throws ParamException
+    {
+        Map map = parseMap(value);
+        double size = getDoubleArg(map, "size");
+        try {
+            NumberFormat format = (NumberFormat) super.convert(value);
+            return new NumberTickUnit(size, format);
+        } catch (MissingArgumentException e) {
+            return new NumberTickUnit(size);
+        }
+    }
 }

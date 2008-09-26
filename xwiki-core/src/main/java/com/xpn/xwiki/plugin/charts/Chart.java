@@ -22,20 +22,22 @@ package com.xpn.xwiki.plugin.charts;
 
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 
-public interface Chart {
-	/**
-	 * Each chart should have a title.
-	 * @return The chart title.
-	 */
-	public String getTitle();
+public interface Chart
+{
+    /**
+     * Each chart should have a title.
+     * 
+     * @return The chart title.
+     */
+    public String getTitle();
 
-	/**
-	 * @return The location of the generated image
-	 */
-	public String getImageURL();
+    /**
+     * @return The location of the generated image
+     */
+    public String getImageURL();
 
-	public String getPageURL();
+    public String getPageURL();
 
-	public ChartParams getParameters();
+    public ChartParams getParameters();
 
 }

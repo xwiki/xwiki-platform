@@ -61,7 +61,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -241,16 +240,13 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
      * @param mpart Multipart message
      * @param attachments List of attachments
      */
-    public void addAttachments(Multipart mpart, List attachments, XWikiContext context) throws XWikiException,
-        IOException, MessagingException
+    public void addAttachments(Multipart mpart, List<Attachment> attachments, XWikiContext context)
+        throws XWikiException, IOException, MessagingException
     {
         if (attachments != null) {
-            Iterator attachmentIt = attachments.iterator();
-            while (attachmentIt.hasNext()) {
-                Attachment at = (Attachment) attachmentIt.next();
-                XWikiAttachment att = at.getAttachment();
-                String name = att.getFilename();
-                byte[] stream = att.getContent(context);
+            for (Attachment at : attachments) {
+                String name = at.getFilename();
+                byte[] stream = at.getContent();
                 File temp = File.createTempFile("tmpfile", ".tmp");
                 FileOutputStream fos = new FileOutputStream(temp);
                 fos.write(stream);
@@ -334,7 +330,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     public Multipart createMimeMultipart(Mail mail, XWikiContext context) throws MessagingException, XWikiException,
         IOException
     {
-
         if (mail.getHtmlPart() == null && mail.getAttachments() != null) {
 
             Multipart multipart = new MimeMultipart("mixed");
@@ -344,7 +339,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             addAttachments(multipart, mail.getAttachments(), context);
             return multipart;
         } else {
-
             Multipart alternativeMultipart = new MimeMultipart("alternative");
 
             BodyPart part;
@@ -518,7 +512,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     public boolean sendMail(Mail mailItem, MailConfiguration mailConfiguration, XWikiContext context)
         throws MessagingException, UnsupportedEncodingException
     {
-        ArrayList mailList = new ArrayList();
+        ArrayList<Mail> mailList = new ArrayList<Mail>();
         mailList.add(mailItem);
         return sendMails(mailList, mailConfiguration, context);
     }
@@ -529,7 +523,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
      * @param emails Mail Collection
      * @return True in any case (TODO ?)
      */
-    public boolean sendMails(Collection emails, XWikiContext context) throws MessagingException,
+    public boolean sendMails(Collection<Mail> emails, XWikiContext context) throws MessagingException,
         UnsupportedEncodingException
     {
         // TODO: Fix the need to instantiate a new XWiki API object
@@ -543,7 +537,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
      * @param emails Mail Collection
      * @return True in any case (TODO ?)
      */
-    public boolean sendMails(Collection emails, MailConfiguration mailConfiguration, XWikiContext context)
+    public boolean sendMails(Collection<Mail> emails, MailConfiguration mailConfiguration, XWikiContext context)
         throws MessagingException, UnsupportedEncodingException
     {
         Session session = null;
@@ -552,10 +546,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         int count = 0;
         int sendFailedCount = 0;
         try {
-            for (Iterator emailIt = emails.iterator(); emailIt.hasNext();) {
+            for (Iterator<Mail> emailIt = emails.iterator(); emailIt.hasNext();) {
                 count++;
 
-                Mail mail = (Mail) emailIt.next();
+                Mail mail = emailIt.next();
                 LOG.info("Sending email: " + mail.toString());
 
                 if ((transport == null) || (session == null)) {

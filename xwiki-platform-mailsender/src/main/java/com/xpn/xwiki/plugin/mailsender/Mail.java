@@ -19,9 +19,11 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
-import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+
+import com.xpn.xwiki.api.Attachment;
 
 /**
  * The variables to, cc, bcc can contain several email addresses, separated by commas.
@@ -42,7 +44,7 @@ public class Mail
 
     private String htmlPart;
 
-    private List attachments;
+    private List<Attachment> attachments;
 
     private Map<String, String> headers;
 
@@ -54,7 +56,7 @@ public class Mail
     public Mail(String from, String to, String cc, String bcc, String subject, String textPart, String htmlPart)
     {
         this();
-        
+
         this.from = from;
         this.to = to;
         this.cc = cc;
@@ -64,12 +66,12 @@ public class Mail
         this.htmlPart = htmlPart;
     }
 
-    public List getAttachments()
+    public List<Attachment> getAttachments()
     {
         return attachments;
     }
 
-    public void setAttachments(List attachments)
+    public void setAttachments(List<Attachment> attachments)
     {
         this.attachments = attachments;
     }
@@ -134,6 +136,7 @@ public class Mail
         this.textPart = message;
     }
 
+    @Override
     public String toString()
     {
         StringBuffer buffer = new StringBuffer();
@@ -176,7 +179,7 @@ public class Mail
     private String toStringHeaders()
     {
         StringBuffer buffer = new StringBuffer();
-        for(Map.Entry<String,String> header : getHeaders().entrySet()) {
+        for (Map.Entry<String, String> header : getHeaders().entrySet()) {
             buffer.append("[" + header.getKey() + "] = [" + header.getValue() + "]");
         }
         return buffer.toString();

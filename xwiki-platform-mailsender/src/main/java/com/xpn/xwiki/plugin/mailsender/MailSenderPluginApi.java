@@ -19,24 +19,24 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.XWiki;
-import com.xpn.xwiki.plugin.PluginApi;
-import org.apache.velocity.VelocityContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.plugin.PluginApi;
+
 /**
- * Plugin that brings powerful mailing capabilities.
- *
- * This is the wrapper accessible from in-document scripts.
- *
+ * Plugin that brings powerful mailing capabilities. This is the wrapper accessible from in-document scripts.
+ * 
  * @see MailSender
  * @version $Id$
  */
-public class MailSenderPluginApi extends PluginApi implements MailSender
+public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements MailSender
 {
     /**
      * Log object to log messages in this class.
@@ -45,7 +45,7 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
 
     /**
      * API constructor.
-     *
+     * 
      * @param plugin The wrapped plugin object.
      * @param context Context of the request.
      * @see PluginApi#PluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,XWikiContext)
@@ -56,21 +56,12 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
     }
 
     /**
-     * Get the MailSenderPlugin
-     *
-     * @return The MailSenderPlugin
-     */
-    private MailSenderPlugin getMailSenderPlugin()
-    {
-        return (MailSenderPlugin) getProtectedPlugin();
-    }
-
-    /**
      * {@inheritDoc}
-     * @see MailSender#sendHtmlMessage(String, String, String, String, String, String, String, java.util.List) 
+     * 
+     * @see MailSender#sendHtmlMessage(String, String, String, String, String, String, String, java.util.List)
      */
-    public int sendHtmlMessage(String from, String to, String cc, String bcc, String subject,
-        String body, String alternative, List attachments)
+    public int sendHtmlMessage(String from, String to, String cc, String bcc, String subject, String body,
+        String alternative, List<Attachment> attachments)
     {
         Mail email = new Mail();
         email.setSubject(subject);
@@ -86,7 +77,8 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
 
     /**
      * {@inheritDoc}
-     * @see MailSender#sendTextMessage(String, String, String, String)  
+     * 
+     * @see MailSender#sendTextMessage(String, String, String, String)
      */
     public int sendTextMessage(String from, String to, String subject, String message)
     {
@@ -100,10 +92,11 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
 
     /**
      * {@inheritDoc}
-     * @see MailSender#sendTextMessage(String, String, String, String, String, String, java.util.List)   
+     * 
+     * @see MailSender#sendTextMessage(String, String, String, String, String, String, java.util.List)
      */
-    public int sendTextMessage(String from, String to, String cc, String bcc, String subject,
-        String message, List attachments)
+    public int sendTextMessage(String from, String to, String cc, String bcc, String subject, String message,
+        List attachments)
     {
         Mail email = new Mail();
         email.setSubject(subject);
@@ -118,14 +111,15 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
 
     /**
      * {@inheritDoc}
-     * @see MailSender#sendMessageFromTemplate(String, String, String, String, String, String, VelocityContext)   
+     * 
+     * @see MailSender#sendMessageFromTemplate(String, String, String, String, String, String, VelocityContext)
      */
-    public int sendMessageFromTemplate(String from, String to, String cc, String bcc,
-        String language, String documentFullName, VelocityContext vcontext)
+    public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
+        String documentFullName, VelocityContext vcontext)
     {
         try {
-            return getMailSenderPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc,
-                language, vcontext, context);
+            return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, vcontext,
+                context);
         } catch (Exception e) {
             context.put("error", e.getMessage());
             LOG.error("sendMessageFromTemplate", e);
@@ -135,7 +129,8 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
 
     /**
      * {@inheritDoc}
-     * @see MailSender#createMail()   
+     * 
+     * @see MailSender#createMail()
      */
     public Mail createMail()
     {
@@ -144,13 +139,14 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
 
     /**
      * {@inheritDoc}
-     * @see MailSender#sendMail(Mail)  
+     * 
+     * @see MailSender#sendMail(Mail)
      */
     public int sendMail(Mail mail)
     {
         int result = 0;
         try {
-            getMailSenderPlugin().sendMail(mail, context);
+            getProtectedPlugin().sendMail(mail, context);
         } catch (Exception e) {
             context.put("error", e.getMessage());
             LOG.error("Failed to send email [" + mail.toString() + "]", e);
@@ -162,6 +158,7 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
 
     /**
      * {@inheritDoc}
+     * 
      * @see MailSender#createMailConfiguration(com.xpn.xwiki.api.XWiki)
      */
     public MailConfiguration createMailConfiguration(XWiki xwiki)
@@ -171,13 +168,14 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
 
     /**
      * {@inheritDoc}
-     * @see MailSender#sendMail(Mail, MailConfiguration)  
+     * 
+     * @see MailSender#sendMail(Mail, MailConfiguration)
      */
     public int sendMail(Mail mail, MailConfiguration mailConfiguration)
     {
         int result = 0;
         try {
-            getMailSenderPlugin().sendMail(mail, mailConfiguration, context);
+            getProtectedPlugin().sendMail(mail, mailConfiguration, context);
         } catch (Exception e) {
             context.put("error", e.getMessage());
             LOG.error("Failed to send email [" + mail.toString() + "] using mail configuration ["

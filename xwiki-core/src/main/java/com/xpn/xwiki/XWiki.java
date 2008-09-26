@@ -796,7 +796,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             String database = context.getDatabase();
 
             try {
-                List wikilist = getVirtualWikiList();
+                List<String> wikilist = getVirtualWikiList();
                 context.setDatabase(appname);
                 if (!wikilist.contains(appname)) {
                     wikilist.add(appname);

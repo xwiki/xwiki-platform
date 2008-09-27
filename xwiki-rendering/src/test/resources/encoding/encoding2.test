@@ -1,0 +1,15 @@
+.#-------------------------------------------------------------------------------------
+.input|xhtml/1.0
+.# Verify that HTML entities can be parsed by the XHTML parser and are encoded properly
+.#-------------------------------------------------------------------------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><p>&nbsp;</p></html>
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [(((160)))]
+endParagraph
+endDocument

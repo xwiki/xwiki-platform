@@ -66,6 +66,7 @@ public class SsxAction extends XWikiAction
      * 
      * @see XWikiAction#render(XWikiContext)
      */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -87,16 +88,14 @@ public class SsxAction extends XWikiAction
                 int parse = sxObj.getIntValue("parse");
                 try {
                     CachePolicies cache =
-                        CachePolicies.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(
-                            sxObj.getStringValue("cache"), "LONG")));
+                        CachePolicies.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(sxObj
+                            .getStringValue("cache"), "LONG")));
                     if (cache.compareTo(finalCache) > 0) {
                         finalCache = cache;
                     }
                 } catch (Exception ex) {
-                    LOG.warn(String.format(
-                        "JSX object [%s#%s] has an invalid cache policy: [%s]",
-                        doc.getFullName(), sxObj.getStringValue("name"), sxObj
-                            .getStringValue("cache")));
+                    LOG.warn(String.format("JSX object [%s#%s] has an invalid cache policy: [%s]", doc.getFullName(),
+                        sxObj.getStringValue("name"), sxObj.getStringValue("cache")));
                 }
 
                 if (parse == 1) {
@@ -130,8 +129,7 @@ public class SsxAction extends XWikiAction
                 compressor.compress(out, -1);
                 result = out.toString();
             } catch (IOException ex) {
-                LOG.warn(String.format("Exception compressing the SSX code for [%s]", doc
-                    .getFullName()), ex);
+                LOG.warn(String.format("Exception compressing the SSX code for [%s]", doc.getFullName()), ex);
             }
         }
         try {

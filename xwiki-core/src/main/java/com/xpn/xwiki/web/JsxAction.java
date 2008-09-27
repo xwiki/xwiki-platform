@@ -68,6 +68,7 @@ public class JsxAction extends XWikiAction
      * 
      * @see XWikiAction#render(XWikiContext)
      */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -95,11 +96,10 @@ public class JsxAction extends XWikiAction
                         finalCache = cache;
                     }
                 } catch (Exception ex) {
-                    LOG.warn(String.format("JSX object [%s#%s] has an invalid cache policy: [%s]",
-                        doc.getFullName(), sxObj.getStringValue("name"), sxObj
-                            .getStringValue("cache")));
+                    LOG.warn(String.format("JSX object [%s#%s] has an invalid cache policy: [%s]", doc.getFullName(),
+                        sxObj.getStringValue("name"), sxObj.getStringValue("cache")));
                 }
-    
+
                 if (parse == 1) {
                     sxContent = xwiki.getRenderingEngine().interpretText(sxContent, doc, context);
                 }
@@ -129,21 +129,18 @@ public class JsxAction extends XWikiAction
                 JavaScriptCompressor compressor =
                     new JavaScriptCompressor(new StringReader(result), new ErrorReporter()
                     {
-                        public void error(String arg0, String arg1, int arg2, String arg3,
-                            int arg4)
+                        public void error(String arg0, String arg1, int arg2, String arg3, int arg4)
                         {
                             LOG.warn("Error minimizing JSX object");
                         }
 
-                        public EvaluatorException runtimeError(String arg0, String arg1,
-                            int arg2, String arg3, int arg4)
+                        public EvaluatorException runtimeError(String arg0, String arg1, int arg2, String arg3, int arg4)
                         {
                             // TODO Auto-generated method stub
                             return null;
                         }
 
-                        public void warning(String arg0, String arg1, int arg2, String arg3,
-                            int arg4)
+                        public void warning(String arg0, String arg1, int arg2, String arg3, int arg4)
                         {
                             // TODO Auto-generated method stub
                         }

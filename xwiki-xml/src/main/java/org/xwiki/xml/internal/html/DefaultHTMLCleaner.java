@@ -71,7 +71,10 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     {
         this.filters = new ArrayList<CleaningFilter>();
         this.filters.add(new ListCleaningFilter());
-        this.filters.add(new DocTypeCleaningFilter());
+        // TODO: See http://jira.xwiki.org/jira/browse/XWIKI-2668
+        // Commenting for now to prevent WikiModel XHTML parser from going to the internet to get the DTD
+        // Need to specify a local DTD instead (somehow).
+        // this.filters.add(new DocTypeCleaningFilter());
 
         // Initialize Cleaner objects once.
         this.cleaner = new HtmlCleaner();

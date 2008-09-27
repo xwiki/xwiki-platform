@@ -22,8 +22,6 @@ package org.xwiki.xml.internal.html;
 
 import junit.framework.TestCase;
 
-import org.htmlcleaner.JDomSerializer;
-import org.jdom.Document;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 
@@ -35,9 +33,11 @@ import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
  */
 public class DefaultHTMLCleanerTest extends TestCase
 {
-    public static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-        + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-        + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
+	// TODO: Commenting for now. See http://jira.xwiki.org/jira/browse/XWIKI-2668
+	//    public static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	//        + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
+	//        + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
+    public static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     
     private static final String HEADER_FULL = HEADER + "<html><head /><body>";
 

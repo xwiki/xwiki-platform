@@ -24,12 +24,12 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.PluginApi;
 
 /**
- * Api for the XmlPlugin.
+ * API for the SkinExtension Plugin.
  * 
  * @see PluginApi
  * @see SkinExtensionPlugin
  */
-public class SkinExtensionPluginApi extends PluginApi
+public class SkinExtensionPluginApi extends PluginApi<SkinExtensionPlugin>
 {
     public SkinExtensionPluginApi(SkinExtensionPlugin plugin, XWikiContext context)
     {
@@ -37,18 +37,13 @@ public class SkinExtensionPluginApi extends PluginApi
         setPlugin(plugin);
     }
 
-    protected SkinExtensionPlugin getSkinExtensionPlugin()
-    {
-        return (SkinExtensionPlugin) getProtectedPlugin();
-    }
-
     public void use(String skinFile)
     {
-        this.getSkinExtensionPlugin().use(skinFile, getXWikiContext());
+        this.getProtectedPlugin().use(skinFile, getXWikiContext());
     }
 
     public String getImportString()
     {
-        return this.getSkinExtensionPlugin().getImportString(getXWikiContext());
+        return this.getProtectedPlugin().getImportString(getXWikiContext());
     }
 }

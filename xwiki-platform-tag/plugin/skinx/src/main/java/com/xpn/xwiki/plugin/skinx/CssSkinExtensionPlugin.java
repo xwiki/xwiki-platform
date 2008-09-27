@@ -53,6 +53,11 @@ public class CssSkinExtensionPlugin extends SkinExtensionPlugin
         getSsxClass(context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SkinExtensionPlugin#getLink(String, XWikiContext)
+     */
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
@@ -92,12 +97,9 @@ public class CssSkinExtensionPlugin extends SkinExtensionPlugin
 
             needsUpdate |= bclass.addTextField("name", "Name", 30);
             needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20);
-            needsUpdate |=
-                bclass.addStaticListField("use", "Use this extension",
-                    "onDemand=On demand|always=Always");
+            needsUpdate |= bclass.addStaticListField("use", "Use this extension", "onDemand=On demand|always=Always");
             needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
-            needsUpdate |=
-                bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
+            needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
 
             if (StringUtils.isBlank(doc.getAuthor())) {
                 needsUpdate = true;

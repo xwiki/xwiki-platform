@@ -109,7 +109,7 @@ public class SsxAction extends XWikiAction
 
         String result = resultBuilder.toString();
 
-        response.setContentType("text/css");
+        response.setContentType("text/css; charset=UTF-8");
         response.setDateHeader("Last-Modified", doc.getDate().getTime());
         if (finalCache != CachePolicies.FORBID) {
             response.setHeader("Cache-Control", "public");

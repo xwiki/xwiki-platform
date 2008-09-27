@@ -111,7 +111,7 @@ public class JsxAction extends XWikiAction
 
         String result = resultBuilder.toString();
 
-        response.setContentType("text/javascript");
+        response.setContentType("text/javascript; charset=UTF-8");
         response.setDateHeader("Last-Modified", doc.getDate().getTime());
         if (finalCache != CachePolicies.FORBID) {
             response.setHeader("Cache-Control", "public");

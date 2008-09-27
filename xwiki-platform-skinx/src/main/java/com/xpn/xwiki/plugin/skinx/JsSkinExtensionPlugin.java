@@ -57,7 +57,8 @@ public class JsSkinExtensionPlugin extends SkinExtensionPlugin
     public String getLink(String documentName, XWikiContext context)
     {
         try {
-            return "<script type='text/javascript' src='" + context.getWiki().getURL(documentName, "jsx", context)
+            return "<script type='text/javascript' src='"
+                + context.getWiki().getURL(documentName, "jsx", "lang=" + context.getLanguage(), context)
                 + "'></script>";
         } catch (XWikiException e) {
             LOG.warn("Cannot link to JS extension: " + documentName);

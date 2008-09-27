@@ -113,7 +113,9 @@ public class JsxAction extends XWikiAction
 
         response.setContentType("text/javascript");
         response.setDateHeader("Last-Modified", doc.getDate().getTime());
-        response.setHeader("Cache-Control", "public");
+        if (finalCache != CachePolicies.FORBID) {
+            response.setHeader("Cache-Control", "public");
+        }
 
         if (finalCache == CachePolicies.LONG) {
             // Cache for one month (30 days)
@@ -122,7 +124,7 @@ public class JsxAction extends XWikiAction
             // Cache for one day
             response.setDateHeader("Expires", (new Date()).getTime() + SHORT_CACHE_DURATION);
         } else if (finalCache == CachePolicies.FORBID) {
-            response.setHeader("Cache-Control", "no-cache");
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         }
         if (BooleanUtils.toBoolean(StringUtils.defaultIfEmpty(request.get("minify"), "true"))) {
             try {

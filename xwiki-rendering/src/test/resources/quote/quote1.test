@@ -57,7 +57,6 @@ line1bis
 
 paragraph
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=64
 <html><p>paragraph</p><blockquote>line1<br/>line1bis<blockquote>line2<blockquote>line3</blockquote>line4</blockquote></blockquote><p>paragraph</p></html>

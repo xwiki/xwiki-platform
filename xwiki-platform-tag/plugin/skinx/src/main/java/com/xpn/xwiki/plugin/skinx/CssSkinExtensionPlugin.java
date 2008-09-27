@@ -63,7 +63,7 @@ public class CssSkinExtensionPlugin extends SkinExtensionPlugin
     {
         try {
             return "<link rel='stylesheet' type='text/css' href='"
-                + context.getWiki().getURL(documentName, "ssx", context) + "'/>";
+                + context.getWiki().getURL(documentName, "ssx", "lang=" + context.getLanguage(), context) + "'/>";
         } catch (XWikiException e) {
             LOG.warn("Cannot link to CSS extension: " + documentName);
             return "";

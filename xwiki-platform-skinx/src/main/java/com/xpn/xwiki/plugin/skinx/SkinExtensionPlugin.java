@@ -33,15 +33,14 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
  * <p>
- * Skin Extensions base plugin. It allows templates and document content to pull required skin files
- * in the generated XHTML (or whatever XML) content.
+ * Skin Extensions base plugin. It allows templates and document content to pull required skin files in the generated
+ * XHTML (or whatever XML) content.
  * </p>
  * <p>
- * The API provides a method {@link SkinExtensionPluginApi#use(String)}, which, when called, marks
- * an extension as used in the current result. Later on, all the used extensions are inserted in the
- * content, by replacing the first occurence of the following string:
- * <tt>&lt;!-- cannonical.plugin.classname --&gt;</tt>, where the actual extension type classname
- * is used. For example, JS extensions are inserted in place of
+ * The API provides a method {@link SkinExtensionPluginApi#use(String)}, which, when called, marks an extension as used
+ * in the current result. Later on, all the used extensions are inserted in the content, by replacing the first
+ * occurence of the following string: <tt>&lt;!-- canonical.plugin.classname --&gt;</tt>, where the actual extension
+ * type classname is used. For example, JS extensions are inserted in place of
  * <tt>&lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin --&gt;</tt>.
  * </p>
  * 
@@ -54,6 +53,16 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
     /** Log object to log messages in this class. */
     private static final Log LOG = LogFactory.getLog(SkinExtensionPlugin.class);
 
+    /**
+     * Abstract method for obtaining a link that points to the actual pulled resource. Each type of resource has its own
+     * format for the link, for example Javascript uses <code>&lt;script src="/path/to/Document"&gt;</code>, while CSS
+     * uses <code>&lt;link rel="stylesheet" href="/path/to/Document"&gt;</code> (the actual syntax is longer, this is
+     * just a simplified example).
+     * 
+     * @param documentName the name of the wiki document holding the resource.
+     * @param context the current request context, needed to access the URLFactory.
+     * @return A <code>String</code> representation of the linking element that should be printed in the generated HTML.
+     */
     public abstract String getLink(String documentName, XWikiContext context);
 
     /**
@@ -85,7 +94,7 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Mark a skin extension document qs used in the current result.
+     * Mark a skin extension document as used in the current result.
      * 
      * @param skinFile
      */
@@ -110,8 +119,7 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#startRenderingHandler(java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#startRenderingHandler(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     @Override
     public void beginParsing(XWikiContext context)
@@ -124,8 +132,7 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#endRenderingHandler(java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#endRenderingHandler(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     @Override
     public String endParsing(String content, XWikiContext context)

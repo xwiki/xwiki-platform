@@ -57,8 +57,8 @@ public class JsSkinExtensionPlugin extends SkinExtensionPlugin
     public String getLink(String documentName, XWikiContext context)
     {
         try {
-            return "<script type='text/javascript' src='"
-                + context.getWiki().getURL(documentName, "jsx", context) + "'></script>";
+            return "<script type='text/javascript' src='" + context.getWiki().getURL(documentName, "jsx", context)
+                + "'></script>";
         } catch (XWikiException e) {
             LOG.warn("Cannot link to JS extension: " + documentName);
             return "";
@@ -92,12 +92,9 @@ public class JsSkinExtensionPlugin extends SkinExtensionPlugin
 
             needsUpdate |= bclass.addTextField("name", "Name", 30);
             needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20);
-            needsUpdate |=
-                bclass.addStaticListField("use", "Use this extension",
-                    "onDemand=On demand|always=Always");
+            needsUpdate |= bclass.addStaticListField("use", "Use this extension", "onDemand=On demand|always=Always");
             needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
-            needsUpdate |=
-                bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
+            needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
 
             if (StringUtils.isBlank(doc.getAuthor())) {
                 needsUpdate = true;

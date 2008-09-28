@@ -104,13 +104,15 @@
 #if(($tdoc.language=="")&amp;&amp;($xwiki.isMultiLingual()))
 &lt;dt&gt;&lt;label for="xwikidoclanguageinput2"&gt;$msg.get("panels.documentInformation.defaultLanguage")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;&lt;/dd&gt;
 #end
-#if ($hasAdmin)
+#if ($xwiki.getConfiguredSyntaxes().size() > 1)
 &lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;Page Syntax&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;
 &lt;select name="syntaxId"&gt;
 &lt;option value="xwiki/1.0"#if($tdoc.getSyntaxId().equalsIgnoreCase("xwiki/1.0")) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
 #foreach ($syntax in $syntaxFactory.getAvailableSyntaxes())
-&lt;option value="$syntax.toIdString()"#if($tdoc.getSyntaxId().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
+  #if ($xwiki.getConfiguredSyntaxes().contains($syntax.toIdString()))
+    &lt;option value="$syntax.toIdString()"#if($tdoc.getSyntaxId().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
+  #end  
 #end
 &lt;/select&gt;
 &lt;/dd&gt;

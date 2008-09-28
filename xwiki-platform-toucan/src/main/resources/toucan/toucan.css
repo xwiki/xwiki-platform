@@ -476,6 +476,16 @@ ol.ALPHA {
     list-style-type: upper-alpha;
 }
 
+ol.greek { list-style-type: lower-greek; }
+ol.GREEK { list-style-type: lower-greek; }
+/* Disabled until they become valid CSS (in 3.0)
+ol.hiragana { list-style-type: hiragana; }
+ol.HIRAGANA { list-style-type: hiragana-iroha; }
+ol.katakana { list-style-type: katakana; }
+ol.KATAKANA { list-style-type: katakana-iroha; }
+ol.HEBREW { list-style-type: hebrew; }
+*/
+
 .wikicreatelink {
     text-decoration: none;
 }

@@ -13,6 +13,12 @@ xwiki.monitor=1
 # List of active plugins.
 xwiki.plugins=$xwikiCfgPlugins
 
+# [Since 1.6RC1] Defines the list of supported syntaxes
+# Available syntaxes are: 
+#    xwiki/1.0, xwiki/2.0, confluence/1.0, jspwiki/1.0, creole/1.0, 
+#    mediawiki/1.0, xhtml/1.0, twiki/1.0
+xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0
+
 # This parameter allows XWiki to operate in Hosting mode allowing to create
 # multiple wikis having their own database and responding to different URLs
 xwiki.virtual=$xwikiCfgVirtual
@@ -110,7 +116,7 @@ xwiki.authentication.ldap.validate_password=0
 #-# otherwise only users that are found after searching starting from the base_DN
 # xwiki.authentication.ldap.user_group=cn=developers,ou=groups,o=MegaNova,c=US
 
-#-# [SINCE 1.5RC1, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.5RC1, XWikiLDAPAuthServiceImpl]
 #-# only users not member of the following group can autheticate
 # xwiki.authentication.ldap.exclude_group=cn=admin,ou=groups,o=MegaNova,c=US
 
@@ -120,15 +126,15 @@ xwiki.authentication.ldap.base_DN=
 #-# Specifies the LDAP attribute containing the identifier to be used as the XWiki name (default=cn)
 # xwiki.authentication.ldap.UID_attr=cn
 
-#-# [SINCE 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# Specifies the LDAP attribute containing the password to be used "when xwiki.authentication.ldap.validate_password" is set to 1
 # xwiki.authentication.ldap.password_field=userPassword
 
-#-# [SINCE 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# The potential LDAP groups classes. Separated by commas.
 # xwiki.authentication.ldap.group_classes=group,groupOfNames,groupOfUniqueNames,dynamicGroup,dynamicGroupAux,groupWiseDistributionList
 
-#-# [SINCE 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# The potential names of the LDAP groups fields containings the members. Separated by commas. 
 # xwiki.authentication.ldap.group_memberfields=member,uniqueMember
 
@@ -136,39 +142,39 @@ xwiki.authentication.ldap.base_DN=
 #-# ldap_dn=dn  -- dn is set by class, caches dn in XWiki.user object for faster access
 xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,fullname=fullName,email=mail,ldap_dn=dn
 
-#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# on every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.
 xwiki.authentication.ldap.update_user=1
 
-#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# mapps XWiki groups to LDAP groups, separator is "|"
 # xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=MegaNova,c=US|\
 #                                         XWiki.Organisation=cn=testers,ou=groups,o=MegaNova,c=US
 
-#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# time in s after which the list of members in a group is refreshed from LDAP (default=3600*6)
 # xwiki.authentication.ldap.groupcache_expiration=21800
 
-#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# - create : synchronize group membership only when the user is first created
 #-# - always: synchronize on every login
 # xwiki.authentication.ldap.mode_group_sync=always
 
-#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# if ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
 xwiki.authentication.ldap.trylocal=1
 
-#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# SSL connection to LDAP server
 #-# 0: normal
 #-# 1: SSL
 # xwiki.authentication.ldap.ssl=0
 
-#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# The keystore file to use in SSL connection
 # xwiki.authentication.ldap.ssl.keystore=
 
-#-# [SINCE 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# The java secure provider used in SSL connection
 # xwiki.authentication.ldap.ssl.secure_provider=com.sun.net.ssl.internal.ssl.Provider
 
@@ -176,12 +182,12 @@ xwiki.authentication.ldap.trylocal=1
 # Cache
 #-------------------------------------------------------------------------------------
 
-#-# [SINCE 1.5M2]
+#-# [Since 1.5M2]
 #-# The cache component implementation to use as "normal" (can be local or distributed depending on the implementation)
 #-# cache component.
 # xwiki.cache.cachefactory.hint=jbosscache
 
-#-# [SINCE 1.5M2]
+#-# [Since 1.5M2]
 #-# The cache component to use as local cache component. 
 # xwiki.cache.cachefactory.local.hint=jbosscache/local
 
@@ -228,11 +234,11 @@ xwiki.defaultbaseskin=$xwikiCfgDefaultBaseSkin
 # xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer
 # xwiki.plugins.lucene.indexinterval=20
 
-#-# [SINCE 1.6M1]
+#-# [Since 1.6M1]
 #-# Force the database name for the main wiki in virtual mode and for the wiki itself in non virtual mode 
 # xwiki.db=xwiki
 
-#-# [SINCE 1.6M1]
+#-# [Since 1.6M1]
 #-# Add a prefix to all databases names of the wikis in virtual mode and to the wiki name in non virtual mode
 # xwiki.db.prefix=
 

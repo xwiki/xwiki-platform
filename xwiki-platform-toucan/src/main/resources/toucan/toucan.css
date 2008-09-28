@@ -477,7 +477,7 @@ ol.ALPHA {
 }
 
 ol.greek { list-style-type: lower-greek; }
-ol.GREEK { list-style-type: lower-greek; }
+ol.GREEK { list-style-type: upper-greek; }
 /* Disabled until they become valid CSS (in 3.0)
 ol.hiragana { list-style-type: hiragana; }
 ol.HIRAGANA { list-style-type: hiragana-iroha; }

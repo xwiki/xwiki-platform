@@ -2536,4 +2536,12 @@ public class XWiki extends Api
     {
         return this.criteriaService;
     }
+
+    /**
+     * @return the ids of configured syntaxes for this wiki (eg "xwiki/1.0", "xwiki/2.0", "mediawiki/1.0", etc)
+     */
+    public List<String> getConfiguredSyntaxes()
+    {
+    	return this.xwiki.getConfiguredSyntaxes();
+    }
 }

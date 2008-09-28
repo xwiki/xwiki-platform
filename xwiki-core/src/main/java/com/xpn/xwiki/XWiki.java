@@ -267,6 +267,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     private static File tempDir = null;
 
+    /**
+     * List of configured syntax ids.
+     */
+    private List<String> configuredSyntaxes;
+    
     private static String getConfigPath() throws NamingException
     {
         if (configPath == null) {
@@ -750,6 +755,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         String ro = Param("xwiki.readonly", "no");
         this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
+        
+        // Save the configured syntaxes
+        String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
+    	this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
     }
 
     public XWikiStoreInterface getNotCacheStore()
@@ -6360,5 +6369,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         saveDocument(rolledbackDoc, context.getMessageTool().get("core.comment.rollback", params), context);
         return rolledbackDoc;
+    }
+
+    /**
+     * @return the ids of configured syntaxes for this wiki (eg "xwiki/1.0", "xwiki/2.0", "mediawiki/1.0", etc)
+     */
+    public List<String> getConfiguredSyntaxes()
+    {
+    	return this.configuredSyntaxes;
     }
 }

@@ -109,6 +109,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
         OPEN_LIST.put('a', "<ol class=\"alpha\">\n");
         OPEN_LIST.put('A', "<ol class=\"ALPHA\">\n");
         OPEN_LIST.put('g', "<ol class=\"greek\">\n");
+        OPEN_LIST.put('G', "<ol class=\"GREEK\">\n");
         OPEN_LIST.put('h', "<ol class=\"hiragana\">\n");
         OPEN_LIST.put('H', "<ol class=\"HIRAGANA\">\n");
         OPEN_LIST.put('k', "<ol class=\"katakana\">\n");

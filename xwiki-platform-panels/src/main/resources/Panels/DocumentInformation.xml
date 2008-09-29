@@ -107,7 +107,7 @@
 #if ($xwiki.getConfiguredSyntaxes().size() &gt; 1)
 &lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;Page Syntax&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;
-&lt;select name="syntaxId"&gt;
+&lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
 &lt;option value="xwiki/1.0"#if($tdoc.getSyntaxId().equalsIgnoreCase("xwiki/1.0")) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
 #foreach ($syntax in $syntaxFactory.getAvailableSyntaxes())
   #if ($xwiki.getConfiguredSyntaxes().contains($syntax.toIdString()))

@@ -31,11 +31,12 @@ public class AppServerTrustedAuthServiceImpl extends XWikiAuthServiceImpl
             user = "XWiki." + user;
         }
         context.setUser(user);
+
         return new XWikiUser(user);
     }
 
     /**
-     * We cannot authenticate locally since we need to trust the app server for authentication
+     * We cannot authenticate locally since we need to trust the app server for authentication.
      */
     @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)

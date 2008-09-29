@@ -104,7 +104,7 @@
 #if(($tdoc.language=="")&amp;&amp;($xwiki.isMultiLingual()))
 &lt;dt&gt;&lt;label for="xwikidoclanguageinput2"&gt;$msg.get("panels.documentInformation.defaultLanguage")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;&lt;/dd&gt;
 #end
-#if ($xwiki.getConfiguredSyntaxes().size() > 1)
+#if ($xwiki.getConfiguredSyntaxes().size() &gt; 1)
 &lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;Page Syntax&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;
 &lt;select name="syntaxId"&gt;

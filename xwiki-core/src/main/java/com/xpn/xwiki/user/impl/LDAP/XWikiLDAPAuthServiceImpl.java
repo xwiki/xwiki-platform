@@ -412,7 +412,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         int lsize = attributeNameList.size();
         if (lsize > 0) {
-            attributeNameTable = (String[]) attributeNameList.toArray(new String[lsize]);
+            attributeNameTable = attributeNameList.toArray(new String[lsize]);
         }
 
         return attributeNameTable;
@@ -725,7 +725,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         Map<String, String> map = new HashMap<String, String>();
         for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
-            String key = (String) userMappings.get(lattr.name);
+            String key = userMappings.get(lattr.name);
             if (key == null || userClass.get(key) == null) {
                 continue;
             }
@@ -764,7 +764,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         Map<String, String> map = new HashMap<String, String>();
         for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
             String lval = lattr.value;
-            String xattr = (String) userMappings.get(lattr.name);
+            String xattr = userMappings.get(lattr.name);
             if (xattr == null) {
                 continue;
             }
@@ -776,7 +776,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         map.put("active", "1");
 
         context.getWiki().createUser(xwikiUserName, map, userClass.getName(),
-            "#includeForm(\"XWiki.XWikiUserTemplate\")", "edit", context);
+            "#includeForm(\"XWiki.XWikiUserSheet\")", "edit", context);
     }
 
     /**

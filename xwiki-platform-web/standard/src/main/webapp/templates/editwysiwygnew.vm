@@ -25,12 +25,16 @@
 ## We should definitely find a better way of including the style sheet and the JavaScript code!
 <link rel="stylesheet" href="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.css" />
 <script type="text/javascript" src="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
-<iframe src="javascript:''" id="__gwt_historyFrame" style="width:0;height:0;border:0"></iframe>
-$xwiki.getTextArea($xwiki.wysiwyg.toHTML($tdoc.content, $doc.syntaxId))
+## The editor will replace the following text area with its own widget.
+## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
+$xwiki.getTextArea($tdoc.content)
+## We separated the hook of the editor (the previous HTML text area) from editor's input source (the following hidden input)
+<input type="hidden" id="htmlContent" value="${xwiki.wysiwyg.toHTML($tdoc.content, $doc.syntaxId)}" disabled="disabled" />
 <script type="text/javascript">
 //<![CDATA[
     var Wysiwyg0 = {
       hookId: 'content',
+      inputId: 'htmlContent',
       syntax: "$doc.syntaxId",
       plugins: 'separator text valign list indent undo format symbol',
       toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol',

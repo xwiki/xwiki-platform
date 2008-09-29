@@ -55,9 +55,6 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
             symbolButton.setTitle(Strings.INSTANCE.charmap());
 
             toolBarExtension.addFeature("symbol", symbolButton);
-
-            symbolPicker = new SymbolPicker();
-            symbolPicker.addPopupListener(this);
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
@@ -77,10 +74,12 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
             symbolButton.removeClickListener(this);
             symbolButton = null;
 
-            symbolPicker.hide();
-            symbolPicker.removeFromParent();
-            symbolPicker.removePopupListener(this);
-            symbolPicker = null;
+            if (symbolPicker != null) {
+                symbolPicker.hide();
+                symbolPicker.removeFromParent();
+                symbolPicker.removePopupListener(this);
+                symbolPicker = null;
+            }
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
@@ -109,7 +108,7 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
      */
     public void onPopupClosed(SourcesPopupEvents sender, boolean autoHide)
     {
-        if (sender == symbolPicker && !autoHide) {
+        if (sender == getSymbolPicker() && !autoHide) {
             onSymbols(false);
         }
     }
@@ -117,9 +116,9 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
     public void onSymbols(boolean show)
     {
         if (show) {
-            symbolPicker.center();
+            getSymbolPicker().center();
         } else {
-            String character = symbolPicker.getSymbol();
+            String character = getSymbolPicker().getSymbol();
             if (character != null) {
                 getTextArea().getCommandManager().execute(Command.INSERT_HTML, character);
             } else {
@@ -128,5 +127,14 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
                 getTextArea().setFocus(true);
             }
         }
+    }
+
+    private SymbolPicker getSymbolPicker()
+    {
+        if (symbolPicker == null) {
+            symbolPicker = new SymbolPicker();
+            symbolPicker.addPopupListener(this);
+        }
+        return symbolPicker;
     }
 }

@@ -80,11 +80,18 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
                 continue;
             }
 
+            Element input = hook;
+            String inputId = config.getParameter("inputId");
+            if (inputId != null) {
+                input = DOM.getElementById(inputId);
+                input = input == null ? hook : input;
+            }
+
             // Extract info from DOM
             String name = hook.getAttribute("name");
-            String value = hook.getPropertyString("value");
+            String value = input.getPropertyString("value");
             if (value == null) {
-                value = hook.getInnerHTML();
+                value = input.getInnerHTML();
             }
             String height = String.valueOf(Math.max(hook.getOffsetHeight(), 100)) + "px";
 

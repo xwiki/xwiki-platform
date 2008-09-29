@@ -23,18 +23,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Executable;
 
-public class DefaultCommandManager extends AbstractCommandManager
+public class DefaultCommandManager extends AbstractCommandManager implements FocusListener
 {
-    protected FocusWidget widget;
+    public final static Map<Command, Executable> EXECUTABLES;
+
+    private final FocusWidget widget;
 
     private final Map<Command, Executable> executables;
 
-    public final static Map<Command, Executable> EXECUTABLES;
+    private boolean focused;
 
     static {
         EXECUTABLES = new HashMap<Command, Executable>();
@@ -86,6 +90,8 @@ public class DefaultCommandManager extends AbstractCommandManager
     public DefaultCommandManager(FocusWidget widget, Map<Command, Executable> executables)
     {
         this.widget = widget;
+        widget.addFocusListener(this);
+
         this.executables = new HashMap<Command, Executable>(executables);
     }
 
@@ -100,7 +106,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return false;
         }
-        widget.setFocus(true);
+        focusWidget();
         boolean success = executable.execute(widget.getElement(), param);
         if (success) {
             commandListeners.fireCommand(this, cmd, param);
@@ -119,7 +125,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return false;
         }
-        widget.setFocus(true);
+        focusWidget();
         return executable.isEnabled(widget.getElement());
     }
 
@@ -134,7 +140,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return false;
         }
-        widget.setFocus(true);
+        focusWidget();
         return executable.isExecuted(widget.getElement());
     }
 
@@ -149,7 +155,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return false;
         }
-        widget.setFocus(true);
+        focusWidget();
         return executable.isSupported(widget.getElement());
     }
 
@@ -164,7 +170,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return null;
         }
-        widget.setFocus(true);
+        focusWidget();
         return executable.getParameter(widget.getElement());
     }
 
@@ -176,5 +182,36 @@ public class DefaultCommandManager extends AbstractCommandManager
     public Executable unregisterCommand(Command command)
     {
         return executables.remove(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see FocusListener#onFocus(Widget)
+     */
+    public void onFocus(Widget sender)
+    {
+        if (sender == widget) {
+            focused = true;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see FocusListener#onLostFocus(Widget)
+     */
+    public void onLostFocus(Widget sender)
+    {
+        if (sender == widget) {
+            focused = false;
+        }
+    }
+
+    private void focusWidget()
+    {
+        if (!focused) {
+            widget.setFocus(true);
+        }
     }
 }

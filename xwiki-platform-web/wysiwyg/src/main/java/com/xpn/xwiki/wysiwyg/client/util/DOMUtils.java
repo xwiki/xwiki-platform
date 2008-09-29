@@ -97,4 +97,16 @@ public abstract class DOMUtils
         }
         return offset;
     }
+
+    public boolean isInline(Node node)
+    {
+        switch (node.getNodeType()) {
+            case Node.TEXT_NODE:
+                return true;
+            case Node.ELEMENT_NODE:
+                return "inline".equalsIgnoreCase(getComputedStyleProperty((Element) node, "display"));
+            default:
+                return false;
+        }
+    }
 }

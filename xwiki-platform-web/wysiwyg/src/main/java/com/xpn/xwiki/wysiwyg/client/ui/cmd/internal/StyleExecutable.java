@@ -177,7 +177,7 @@ public class StyleExecutable extends DefaultExecutable
 
         Node ancestor = text;
         while (ancestor.getParentNode() != null && ancestor.getPreviousSibling() == null
-            && ancestor.getNextSibling() == null && isInline(ancestor.getParentNode())) {
+            && ancestor.getNextSibling() == null && DOMUtils.getInstance().isInline(ancestor.getParentNode())) {
             ancestor = ancestor.getParentNode();
         }
         ancestor.getParentNode().replaceChild(styleElement, ancestor);
@@ -264,7 +264,8 @@ public class StyleExecutable extends DefaultExecutable
 
         Node child = text;
         Node parent = child.getParentNode();
-        while (parent != null && matchesStyle(parent) && isInline(parent) && split(parent, child)) {
+        while (parent != null && matchesStyle(parent) && DOMUtils.getInstance().isInline(parent)
+            && split(parent, child)) {
             child = child.getParentNode();
             parent = child.getParentNode();
         }
@@ -365,19 +366,6 @@ public class StyleExecutable extends DefaultExecutable
         }
         return DOMUtils.getInstance().getComputedStyleProperty((Element) node, propertyName).equalsIgnoreCase(
             propertyValue);
-    }
-
-    private boolean isInline(Node node)
-    {
-        switch (node.getNodeType()) {
-            case Node.TEXT_NODE:
-                return true;
-            case Node.ELEMENT_NODE:
-                return "inline".equalsIgnoreCase(DOMUtils.getInstance().getComputedStyleProperty((Element) node,
-                    "display"));
-            default:
-                return false;
-        }
     }
 
     private boolean split(Node parent, Node child)

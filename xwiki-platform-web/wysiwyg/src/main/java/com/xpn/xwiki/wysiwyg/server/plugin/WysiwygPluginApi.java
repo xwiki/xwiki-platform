@@ -19,6 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.server.plugin;
 
+import org.apache.ecs.Filter;
+import org.apache.ecs.filter.CharacterFilter;
+import org.apache.ecs.xhtml.input;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.web.Utils;
@@ -74,10 +78,29 @@ public class WysiwygPluginApi extends Api
     }
 
     /**
-     * @see HTMLConverter#toHTML(String)
+     * Creates an HTML input hidden that could serve as the input for a WYSIWYG editor instance. The editor instance
+     * should be configured to have its inputId parameter equal to the id passed to this method.
+     * 
+     * @param id The id of the generated HTML input.
+     * @param source The text that will be converted to HTML and then filled in the value attribute.
+     * @param syntax The syntax of the source text.
+     * @return The HTML to be included in a page in order to use the input.
      */
-    public String toHTML(String source, String syntax)
+    public String getInput(String id, String source, String syntax)
     {
-        return ((HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax)).toHTML(source);
+        String value = ((HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax)).toHTML(source);
+
+        Filter filter = new CharacterFilter();
+        filter.removeAttribute("'");
+        String svalue = filter.process(value);
+
+        input hidden = new input();
+        hidden.setType(input.hidden);
+        hidden.setFilter(filter);
+        hidden.setID(id);
+        hidden.setDisabled(true);
+        hidden.setValue(svalue);
+
+        return hidden.toString();
     }
 }

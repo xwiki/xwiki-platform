@@ -62,7 +62,7 @@ public class IncludeMacroParameters
 
     /**
      * @return defines whether the included page is executed in its separated execution context or whether it's executed
-     *         in the contex of the current page.
+     *         in the context of the current page.
      */
     public Context getContext()
     {

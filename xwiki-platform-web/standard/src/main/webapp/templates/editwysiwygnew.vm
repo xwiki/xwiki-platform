@@ -28,7 +28,7 @@
 ## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
 $xwiki.getTextArea($tdoc.content)
 ## We separated the hook of the editor (the previous HTML text area) from editor's input source (the following hidden input)
-<input type="hidden" id="htmlContent" value="${xwiki.wysiwyg.toHTML($tdoc.content, $doc.syntaxId)}" disabled="disabled" />
+$xwiki.wysiwyg.getInput("htmlContent", $tdoc.content, $doc.syntaxId)
 <script type="text/javascript">
 //<![CDATA[
     var Wysiwyg0 = {

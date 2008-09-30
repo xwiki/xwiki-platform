@@ -143,14 +143,6 @@
     <servlet-class>com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService</servlet-class>
   </servlet>
 
-  <!-- This is needed for debuging the new WYSIWYG in hosted mode -->
-  <servlet>
-    <servlet-name>
-      com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService/com.xpn.xwiki.wysiwyg.Wysiwyg/WysiwygService
-    </servlet-name>
-    <servlet-class>com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService</servlet-class>
-  </servlet>
-
   <!-- Unused mapping for now. In the future the correct mapping will be /* when the action servlet
        will be decommissioned in favor of the XWiki Action component --> 
   <servlet-mapping>
@@ -191,13 +183,6 @@
   <servlet-mapping>
     <servlet-name>WysiwygService</servlet-name>
     <url-pattern>/WysiwygService</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>
-      com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService/com.xpn.xwiki.wysiwyg.Wysiwyg/WysiwygService
-    </servlet-name>
-    <url-pattern>/com.xpn.xwiki.wysiwyg.Wysiwyg/WysiwygService</url-pattern>
   </servlet-mapping>
 
   <!-- We override the mime type definition for javascript and css files, as some containers don't

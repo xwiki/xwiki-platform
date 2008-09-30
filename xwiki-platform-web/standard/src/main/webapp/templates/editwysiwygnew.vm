@@ -22,8 +22,7 @@
 <div id="xwikitext">
 <div id="xwikieditcontent">
 #if($xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
-## We should definitely find a better way of including the style sheet and the JavaScript code!
-<link rel="stylesheet" href="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.css" />
+## We should find a better way of including the JavaScript code of the editor!
 <script type="text/javascript" src="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
 ## The editor will replace the following text area with its own widget.
 ## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.

@@ -21,7 +21,5 @@ package com.xpn.xwiki.wysiwyg.client;
 
 public class Constants
 {
-    public static final String WYSIWYG_DEFAULT_SERVICE = "/WysiwygService";
-
     public static final int DEFAULT_SYNC_DELAY = 3000;
 }

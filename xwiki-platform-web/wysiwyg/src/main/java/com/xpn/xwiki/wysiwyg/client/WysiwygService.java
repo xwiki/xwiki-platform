@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.xpn.xwiki.gwt.api.client.app.XWikiGWTAppConstants;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
@@ -35,18 +34,11 @@ public interface WysiwygService extends RemoteService
         public static synchronized WysiwygServiceAsync getInstance()
         {
             if (instance == null) {
+                String moduleBaseURL = GWT.getModuleBaseURL();
+                String baseURL = moduleBaseURL.substring(0, moduleBaseURL.indexOf(GWT.getModuleName()));
+
                 instance = (WysiwygServiceAsync) GWT.create(WysiwygService.class);
-                String baseURL;
-                if (GWT.isScript()) {
-                    baseURL = XWikiGWTAppConstants.XWIKI_DEFAULT_BASE_URL;
-                } else {
-                    baseURL = GWT.getModuleBaseURL();
-                    if (baseURL.endsWith("/")) {
-                        baseURL = baseURL.substring(0, baseURL.length() - 1);
-                    }
-                }
-                String serviceEntryPoint = baseURL + Constants.WYSIWYG_DEFAULT_SERVICE;
-                ((ServiceDefTarget) instance).setServiceEntryPoint(serviceEntryPoint);
+                ((ServiceDefTarget) instance).setServiceEntryPoint(baseURL + "WysiwygService");
             }
             return instance;
         }

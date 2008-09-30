@@ -21,6 +21,10 @@ package com.xpn.xwiki.wysiwyg.client.selection;
 
 import com.google.gwt.dom.client.Node;
 
+/**
+ * A selection object represents the ranges that the user has selected, or the cursor position when the user didn't
+ * select any range. It is the only was to get access to the current DOM nodes being edited with the WYSIWYG editor.
+ */
 public interface Selection
 {
     /**

@@ -29,7 +29,6 @@ import com.google.gwt.i18n.client.Dictionary;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.xpn.xwiki.gwt.api.client.XWikiService;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
 import com.xpn.xwiki.wysiwyg.client.plugin.Config;
@@ -48,7 +47,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     public void onModuleLoad()
     {
         if (!GWT.isScript()) {
-            XWikiService.App.getInstance().login("Admin", "admin", true, new XWikiAsyncCallback(this)
+            getXWikiServiceInstance().login("Admin", "admin", true, new XWikiAsyncCallback(this)
             {
                 public void onFailure(Throwable caught)
                 {
@@ -69,6 +68,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     private void loadUI()
     {
         setName("Wysiwyg");
+        int i = 0;
         for (final Config config : getConfigs()) {
             String hookId = config.getParameter("hookId");
             if (hookId == null) {
@@ -97,7 +97,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
             // Prepare the DOM
             Element container = DOM.createDiv();
-            final String containerId = hookId + "_container";
+            String containerId = hookId + "_container";
             container.setId(containerId);
             hook.getParentElement().replaceChild(container, hook);
 

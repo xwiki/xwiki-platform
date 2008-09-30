@@ -22,6 +22,10 @@ package com.xpn.xwiki.wysiwyg.client.selection;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.util.DocumentFragment;
 
+/**
+ * The {@link Range} object represents a fragment of a document that can contain nodes and parts of text nodes in a
+ * given document.
+ */
 public interface Range
 {
     /**

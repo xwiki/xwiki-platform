@@ -1,13 +1,13 @@
 <module>
   <inherits name='com.google.gwt.user.User' />
-  <inherits name="com.xpn.xwiki.gwt.api.Api" />
   <inherits name="com.google.gwt.i18n.I18N" />
   <inherits name="com.google.gwt.http.HTTP" />
   <inherits name="com.google.gwt.junit.JUnit" />
   <inherits name="com.google.gwt.widgetideas.GlassPanel" />
-  <servlet path="/WysiwygService" class="com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService" />
-  <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg" />
+  <inherits name="com.xpn.xwiki.gwt.api.Api" />
+
   <stylesheet src="Wysiwyg.css" />
+  <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg" />
 
   <!-- RangeFactory -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory">

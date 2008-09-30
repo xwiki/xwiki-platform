@@ -527,4 +527,14 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
     {
         return IFrameElement.as(rta.getElement());
     }
+
+    public String getStyleSheetURL()
+    {
+        return rta.getStyleSheetURL();
+    }
+
+    public void setStyleSheetURL(String styleSheetURL)
+    {
+        rta.setStyleSheetURL(styleSheetURL);
+    }
 }

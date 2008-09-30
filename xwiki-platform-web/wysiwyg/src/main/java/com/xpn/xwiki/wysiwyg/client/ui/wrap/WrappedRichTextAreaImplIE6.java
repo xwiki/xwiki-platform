@@ -21,8 +21,30 @@ package com.xpn.xwiki.wysiwyg.client.ui.wrap;
 
 import com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6;
 
-public class WrappedRichTextAreaImplIE6 extends RichTextAreaImplIE6
+public class WrappedRichTextAreaImplIE6 extends RichTextAreaImplIE6 implements HasStyleSheet
 {
+    private String styleSheetURL;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasStyleSheet#getStyleSheetURL()
+     */
+    public String getStyleSheetURL()
+    {
+        return styleSheetURL;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasStyleSheet#setStyleSheetURL(String)
+     */
+    public void setStyleSheetURL(String styleSheetURL)
+    {
+        this.styleSheetURL = styleSheetURL;
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -37,7 +59,7 @@ public class WrappedRichTextAreaImplIE6 extends RichTextAreaImplIE6
             } 
             var elem = _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
             var doc = elem.contentWindow.document;
-            var cssURL = @com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea::STYLESHEET;
+            var cssURL = _this.@com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextAreaImplIE6::getStyleSheetURL()();
             doc.write('<html><head><link rel="stylesheet" type="text/css" href="' + cssURL + '" /></head><body CONTENTEDITABLE="true"></body></html>');
 
             // Send notification that the iframe has reached design mode.

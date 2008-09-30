@@ -22,8 +22,30 @@ package com.xpn.xwiki.wysiwyg.client.ui.wrap;
 import com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera;
 import com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari;
 
-public class WrappedRichTextAreaImplSafari extends RichTextAreaImplSafari
+public class WrappedRichTextAreaImplSafari extends RichTextAreaImplSafari implements HasStyleSheet
 {
+    private String styleSheetURL;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasStyleSheet#getStyleSheetURL()
+     */
+    public String getStyleSheetURL()
+    {
+        return styleSheetURL;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasStyleSheet#setStyleSheetURL(String)
+     */
+    public void setStyleSheetURL(String styleSheetURL)
+    {
+        this.styleSheetURL = styleSheetURL;
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -44,7 +66,7 @@ public class WrappedRichTextAreaImplSafari extends RichTextAreaImplSafari
             var head = idoc.getElementsByTagName('head')[0];
             var link = idoc.createElement('link');
             link.setAttribute('rel', 'stylesheet');
-            link.setAttribute('href', @com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea::STYLESHEET);
+            link.setAttribute('href', _this.@com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextAreaImplSafari::getStyleSheetURL()());
             link.setAttribute('type', 'text/css');
             head.appendChild(link); 
 

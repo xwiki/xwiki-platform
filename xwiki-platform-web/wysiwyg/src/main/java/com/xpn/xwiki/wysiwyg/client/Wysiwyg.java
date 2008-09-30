@@ -103,6 +103,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
             // Create the WYSIWYG Editor
             final XWysiwygEditor editor = XWysiwygEditorFactory.getInstance().newEditor(config, this);
+            editor.getUI().getTextArea().setStyleSheetURL(config.getParameter("stylesheet"));
             editor.getUI().getTextArea().setHTML(value);
             editor.getUI().getTextArea().setHeight(height);
             if (name != null) {

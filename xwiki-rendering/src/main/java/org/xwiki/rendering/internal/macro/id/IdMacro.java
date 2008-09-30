@@ -31,9 +31,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Allows putting a reference/location in a page. In HTML for example this is called an Anchor. It allows pointing
- * to that location, for example in links.
- *
+ * Allows putting a reference/location in a page. In HTML for example this is called an Anchor. It allows pointing to
+ * that location, for example in links.
+ * 
  * @version $Id$
  * @since 1.6M1
  */
@@ -42,7 +42,9 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
     /**
      * The description of the macro.
      */
-    private static final String DESCRIPTION = "Include other pages into the current page.";
+    private static final String DESCRIPTION =
+        "Allows putting a reference/location in a page." + " In HTML for example this is called an Anchor."
+            + " It allows pointing to that location, for example in links.";
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -54,7 +56,7 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()
@@ -64,7 +66,7 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
     public List<Block> execute(IdMacroParameters parameters, String content, MacroTransformationContext context)

@@ -78,7 +78,7 @@ public class DefaultObservationManager implements ObservationManager
      * @todo Should we allow event inheritance?
      */
     private Map<String, List<RegisteredListener>> listeners = 
-    	new ConcurrentHashMap<String, List<RegisteredListener>>();
+        new ConcurrentHashMap<String, List<RegisteredListener>>();
 
     /**
      * {@inheritDoc}

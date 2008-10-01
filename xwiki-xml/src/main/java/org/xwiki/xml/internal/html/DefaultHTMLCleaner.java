@@ -61,6 +61,21 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         this.filters = new ArrayList<CleaningFilter>();
         this.filters.add(new ListCleaningFilter());
         this.filters.add(new DocTypeCleaningFilter());
+        
+        // The clean method below is thread safe. However it seems that DOMOutputter.output() is not
+        // fully thread safe since it causes the following exception on the first time it's called
+        // from different threads:
+        //   Caused by: org.jdom.JDOMException: Reflection failed while creating new JAXP document: 
+        //       duplicate class definition: org/apache/xerces/jaxp/DocumentBuilderFactoryImpl
+        //   at org.jdom.adapters.JAXPDOMAdapter.createDocument(JAXPDOMAdapter.java:191)
+        //   at org.jdom.adapters.AbstractDOMAdapter.createDocument(AbstractDOMAdapter.java:133)
+        //   at org.jdom.output.DOMOutputter.createDOMDocument(DOMOutputter.java:208)
+        //   at org.jdom.output.DOMOutputter.output(DOMOutputter.java:127)
+        // Since this only happens once, we call it first here at initialization time (since there's
+        // no thread contention at that time).
+        // Note: This email thread seems to say it's thread safe but that's not what we see here:
+        //   http://osdir.com/ml/text.xml.xforms.chiba.devel/2006-09/msg00025.html
+        clean("<p>dummy</p>");
     }
 
     /**

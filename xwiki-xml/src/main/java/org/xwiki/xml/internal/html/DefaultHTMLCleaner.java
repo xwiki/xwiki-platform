@@ -20,7 +20,6 @@
  */
 package org.xwiki.xml.internal.html;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,16 +52,6 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     private List<CleaningFilter> filters;
 
     /**
-     * The HTML Cleaner instance we used for cleaning HTML.
-     */
-    private HtmlCleaner cleaner;
-
-    /**
-     * The HTML Cleaner properties we use for each cleaning.
-     */
-    private CleanerProperties cleanerProperties;
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.component.phase.Initializable#initialize()
@@ -75,13 +64,6 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         // Commenting for now to prevent WikiModel XHTML parser from going to the internet to get the DTD
         // Need to specify a local DTD instead (somehow).
         // this.filters.add(new DocTypeCleaningFilter());
-
-        // Initialize Cleaner objects once.
-        this.cleaner = new HtmlCleaner();
-        this.cleaner.setTransformations(getCleaningTransformations());
-        this.cleanerProperties = this.cleaner.getProperties();
-        this.cleanerProperties.setOmitUnknownTags(true);
-        this.cleanerProperties.setPruneTags("script,style");
     }
 
     /**
@@ -93,16 +75,26 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     {
         org.w3c.dom.Document result;
 
+        // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise
+        // we would need to synchronize this clean() method which would slow down the whole system by
+        // queuing up cleaning requests.
+        // See http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=903699
+        HtmlCleaner cleaner = new HtmlCleaner();
+        cleaner.setTransformations(getCleaningTransformations());
+        CleanerProperties cleanerProperties = cleaner.getProperties();
+        cleanerProperties.setOmitUnknownTags(true);
+        cleanerProperties.setPruneTags("script,style");
+
         TagNode cleanedNode;
         try {
-            cleanedNode = this.cleaner.clean(originalHtmlContent);
-        } catch (IOException e) {
+            cleanedNode = cleaner.clean(originalHtmlContent);
+        } catch (Exception e) {
             // This shouldn't happen since we're not doing any IO... I consider this a flaw in the
             // design of HTML Cleaner.
             throw new RuntimeException("Unhandled error when cleaning HTML [" + originalHtmlContent + "]", e);
         }
 
-        Document document = new JDomSerializer(this.cleanerProperties, false).createJDom(cleanedNode);
+        Document document = new JDomSerializer(cleanerProperties, false).createJDom(cleanedNode);
 
         // Perform other cleaning operation this time using the W3C Document interface.
         for (CleaningFilter filter : this.filters) {

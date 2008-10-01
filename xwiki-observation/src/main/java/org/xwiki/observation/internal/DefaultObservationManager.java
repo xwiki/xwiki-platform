@@ -21,10 +21,10 @@
 package org.xwiki.observation.internal;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -33,12 +33,13 @@ import org.xwiki.observation.event.Event;
 /**
  * Default implementation of the {@link ObservationManager}.
  * 
- * @todo Check how threadsafe this implementation is...
  * @version $Id$
  */
 public class DefaultObservationManager implements ObservationManager
 {
-    /** Internal class for holding an (Event, EventListener) pair. Too bad there's no simple Pair class in the JDK. */
+    /**
+     * Internal class for holding an (Event, EventListener) pair. Too bad there's no simple Pair class in the JDK. 
+     */
     protected static class RegisteredListener
     {
         /** The event for which this listener is registered. */
@@ -76,7 +77,8 @@ public class DefaultObservationManager implements ObservationManager
      * 
      * @todo Should we allow event inheritance?
      */
-    private Map<String, List<RegisteredListener>> listeners = new HashMap<String, List<RegisteredListener>>();
+    private Map<String, List<RegisteredListener>> listeners = 
+    	new ConcurrentHashMap<String, List<RegisteredListener>>();
 
     /**
      * {@inheritDoc}

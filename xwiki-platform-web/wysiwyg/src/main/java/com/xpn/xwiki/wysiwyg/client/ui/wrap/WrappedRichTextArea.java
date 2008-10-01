@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.ui.wrap;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.dom.client.Node;
@@ -37,8 +38,10 @@ import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKeyFactory;
 import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
 
-public class WrappedRichTextArea extends RichTextArea
+public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
 {
+    public static final String STYLESHEET = GWT.getModuleBaseURL() + "RichTextArea.css";
+
     private List<XShortcutKey> shortcutKeys = new ArrayList<XShortcutKey>();
 
     public void addShortcutKey(XShortcutKey shortcutKey)
@@ -53,6 +56,11 @@ public class WrappedRichTextArea extends RichTextArea
         shortcutKeys.remove(shortcutKey);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasStyleSheet#getStyleSheetURL()
+     */
     public String getStyleSheetURL()
     {
         BasicFormatter basic = getBasicFormatter();
@@ -63,6 +71,11 @@ public class WrappedRichTextArea extends RichTextArea
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasStyleSheet#setStyleSheetURL(String)
+     */
     public void setStyleSheetURL(String styleSheetURL)
     {
         BasicFormatter basic = getBasicFormatter();

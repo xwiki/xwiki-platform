@@ -60,14 +60,20 @@ public class WrappedRichTextAreaImplOpera extends RichTextAreaImplOpera implemen
             // Turn on design mode.
             _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem.contentWindow.document.designMode = 'On';
 
-            // Add stylesheet declaration
             var idoc = _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem.contentWindow.document;
             var head = idoc.getElementsByTagName('head')[0];
+
+            // Add stylesheet declaration
             var link = idoc.createElement('link');
             link.setAttribute('rel', 'stylesheet');
             link.setAttribute('href', _this.@com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextAreaImplOpera::getStyleSheetURL()());
             link.setAttribute('type', 'text/css');
-            head.appendChild(link); 
+            head.appendChild(link);
+
+            // Add global stylesheet declaration
+            link = link.cloneNode(false);
+            link.setAttribute('href', @com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea::STYLESHEET);
+            head.appendChild(link);
 
             // Send notification that the iframe has reached design mode.
             _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();

@@ -62,13 +62,19 @@ public class WrappedRichTextAreaImplMozilla extends RichTextAreaImplMozilla impl
             // designMode, so let's avoid doing it more than once.
             iframe.onload = null;
             
-            // Add stylesheet declaration
             var idoc = iframe.contentWindow.document;
             var head = idoc.getElementsByTagName('head')[0];
+            
+            // Add stylesheet declaration
             var link = idoc.createElement('link');
             link.setAttribute('rel', 'stylesheet');
             link.setAttribute('href', _this.@com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextAreaImplMozilla::getStyleSheetURL()());
             link.setAttribute('type', 'text/css');
+            head.appendChild(link);
+
+            // Add global stylesheet declaration
+            link = link.cloneNode(false);
+            link.setAttribute('href', @com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea::STYLESHEET);
             head.appendChild(link);
 
             // Send notification that the iframe has finished loading.

@@ -45,8 +45,13 @@ public abstract class DOMUtils
         }
         if (node == null) {
             return null;
+        } else {
+            return getFirstLeaf(node.getNextSibling());
         }
-        node = node.getNextSibling();
+    }
+
+    public Node getFirstLeaf(Node node)
+    {
         while (node.hasChildNodes()) {
             node = node.getFirstChild();
         }

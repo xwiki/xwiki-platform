@@ -132,4 +132,9 @@ public class IERange extends AbstractRange
     public void surroundContents(Node newParent)
     {
     }
+
+    public String toString()
+    {
+        return super.toString();
+    }
 }

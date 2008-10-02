@@ -109,4 +109,9 @@ public final class IESelection extends AbstractSelection
     public void selectionLanguageChange(boolean langRTL)
     {
     }
+
+    public String toString()
+    {
+        return super.toString();
+    }
 }

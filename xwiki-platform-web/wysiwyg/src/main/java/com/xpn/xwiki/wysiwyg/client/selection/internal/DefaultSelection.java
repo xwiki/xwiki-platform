@@ -197,4 +197,13 @@ public final class DefaultSelection extends AbstractSelection
     public native void selectionLanguageChange(boolean langRTL) /*-{
         this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()().selectionLanguageChange(langRTL);
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#toString()
+     */
+    public native String toString() /*-{
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()().toString();
+    }-*/;
 }

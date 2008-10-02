@@ -133,4 +133,9 @@ public interface Selection
      * @param langRTL is true if the new language is right-to-left or false if the new language is left-to-right.
      */
     void selectionLanguageChange(boolean langRTL);
+
+    /**
+     * @return A string currently being represented by the selection object, i.e. the currently selected text.
+     */
+    String toString();
 }

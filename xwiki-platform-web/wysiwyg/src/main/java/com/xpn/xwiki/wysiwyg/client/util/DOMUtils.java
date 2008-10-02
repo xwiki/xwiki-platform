@@ -23,6 +23,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.Text;
+import com.xpn.xwiki.wysiwyg.client.selection.Range;
 
 public abstract class DOMUtils
 {
@@ -50,10 +51,30 @@ public abstract class DOMUtils
         }
     }
 
+    public Node getPreviousLeaf(Node node)
+    {
+        while (node != null && node.getPreviousSibling() == null) {
+            node = node.getParentNode();
+        }
+        if (node == null) {
+            return null;
+        } else {
+            return getLastLeaf(node.getPreviousSibling());
+        }
+    }
+
     public Node getFirstLeaf(Node node)
     {
         while (node.hasChildNodes()) {
             node = node.getFirstChild();
+        }
+        return node;
+    }
+
+    public Node getLastLeaf(Node node)
+    {
+        while (node.hasChildNodes()) {
+            node = node.getLastChild();
         }
         return node;
     }
@@ -112,6 +133,43 @@ public abstract class DOMUtils
                 return "inline".equalsIgnoreCase(getComputedStyleProperty((Element) node, "display"));
             default:
                 return false;
+        }
+    }
+
+    public Range getTextRange(Range range)
+    {
+        if (range.isCollapsed()) {
+            return range.cloneRange();
+        } else if ("".equals(range.toString())) {
+            Range textRange = range.cloneRange();
+            if (textRange.getStartContainer().getNodeType() == Node.TEXT_NODE) {
+                textRange.collapse(true);
+            } else {
+                textRange.collapse(false);
+            }
+            return textRange;
+        } else {
+            Range textRange = range.cloneRange();
+
+            // Find the first text node in the range and start the range there
+            if (range.getStartContainer().getNodeType() != Node.TEXT_NODE) {
+                Node leaf = getFirstLeaf(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
+                while (leaf.getNodeType() != Node.TEXT_NODE) {
+                    leaf = getNextLeaf(leaf);
+                }
+                textRange.setStart(leaf, 0);
+            }
+
+            // Find the last text node in the range and end the range there
+            if (range.getEndContainer().getNodeType() != Node.TEXT_NODE) {
+                Node leaf = getLastLeaf(range.getEndContainer().getChildNodes().getItem(range.getEndOffset()));
+                while (leaf.getNodeType() != Node.TEXT_NODE) {
+                    leaf = getPreviousLeaf(leaf);
+                }
+                textRange.setEnd(leaf, leaf.getNodeValue().length());
+            }
+
+            return textRange;
         }
     }
 }

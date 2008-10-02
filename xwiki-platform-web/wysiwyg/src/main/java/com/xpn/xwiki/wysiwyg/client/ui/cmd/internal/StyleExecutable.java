@@ -88,9 +88,9 @@ public class StyleExecutable extends DefaultExecutable
             List<Range> ranges = new ArrayList<Range>();
             for (int i = 0; i < selection.getRangeCount(); i++) {
                 if (executed) {
-                    ranges.add(removeStyle(iframe, selection.getRangeAt(i)));
+                    ranges.add(removeStyle(iframe, DOMUtils.getInstance().getTextRange(selection.getRangeAt(i))));
                 } else {
-                    ranges.add(addStyle(iframe, selection.getRangeAt(i)));
+                    ranges.add(addStyle(iframe, DOMUtils.getInstance().getTextRange(selection.getRangeAt(i))));
                 }
             }
             selection.removeAllRanges();
@@ -304,8 +304,8 @@ public class StyleExecutable extends DefaultExecutable
 
     private boolean isEnabled(Range range)
     {
-        return range.isCollapsed()
-            || (range.getStartContainer().getNodeType() == Node.TEXT_NODE && range.getEndContainer().getNodeType() == Node.TEXT_NODE);
+        // Right now this executable is not restricted. We'll add here future restrictions.
+        return true;
     }
 
     /**
@@ -318,7 +318,7 @@ public class StyleExecutable extends DefaultExecutable
         Selection selection = SelectionManager.INSTANCE.getSelection(IFrameElement.as(target));
         if (selection.getRangeCount() > 0) {
             for (int i = 0; i < selection.getRangeCount(); i++) {
-                if (!isExecuted(selection.getRangeAt(i))) {
+                if (!isExecuted(DOMUtils.getInstance().getTextRange(selection.getRangeAt(i)))) {
                     return false;
                 }
             }

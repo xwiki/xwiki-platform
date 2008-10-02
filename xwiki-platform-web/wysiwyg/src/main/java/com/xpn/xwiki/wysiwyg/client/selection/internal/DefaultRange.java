@@ -225,7 +225,12 @@ public class DefaultRange extends AbstractRange
      * 
      * @see Range#cloneRange()
      */
-    public native Range cloneRange() /*-{
+    public Range cloneRange()
+    {
+        return new DefaultRange(cloneJSRange());
+    }
+
+    protected native JavaScriptObject cloneJSRange() /*-{
         return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().cloneRange();
     }-*/;
 
@@ -236,5 +241,14 @@ public class DefaultRange extends AbstractRange
      */
     public native void detach() /*-{
         this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().detach();
+    }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#toString()
+     */
+    public native String toString() /*-{
+        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().toString();
     }-*/;
 }

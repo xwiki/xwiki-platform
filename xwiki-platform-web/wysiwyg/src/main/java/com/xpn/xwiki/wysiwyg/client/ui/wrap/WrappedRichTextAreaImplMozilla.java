@@ -77,6 +77,10 @@ public class WrappedRichTextAreaImplMozilla extends RichTextAreaImplMozilla impl
             link.setAttribute('href', @com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea::STYLESHEET);
             head.appendChild(link);
 
+            // Set the class and id attributes on body
+            idoc.body.className = 'main';
+            idoc.body.id = 'body';
+
             // Send notification that the iframe has finished loading.
             _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
 

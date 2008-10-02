@@ -61,7 +61,7 @@ public class WrappedRichTextAreaImplIE6 extends RichTextAreaImplIE6 implements H
             var doc = elem.contentWindow.document;
             var cssURL = _this.@com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextAreaImplIE6::getStyleSheetURL()();
             var globalCssURL = @com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea::STYLESHEET;
-            doc.write('<html><head><link rel="stylesheet" type="text/css" href="' + cssURL + '" /><link rel="stylesheet" type="text/css" href="' + globalCssURL + '" /></head><body CONTENTEDITABLE="true"></body></html>');
+            doc.write('<html><head><link rel="stylesheet" type="text/css" href="' + cssURL + '" /><link rel="stylesheet" type="text/css" href="' + globalCssURL + '" /></head><body id="body" class="main" CONTENTEDITABLE="true"></body></html>');
 
             // Send notification that the iframe has reached design mode.
             _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();

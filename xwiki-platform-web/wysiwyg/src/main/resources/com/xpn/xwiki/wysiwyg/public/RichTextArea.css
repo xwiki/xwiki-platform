@@ -1,3 +1,15 @@
 body {
   background-image: none !important;
 }
+
+body.main {
+  position: static !important;
+  padding: 0px !important;
+  margin: 0px !important;
+  height: auto !important;
+  min-height: 0px !important;
+  max-height: none !important;
+  width: auto !important;
+  min-width: 0px !important;
+  max-width: none !important;
+}

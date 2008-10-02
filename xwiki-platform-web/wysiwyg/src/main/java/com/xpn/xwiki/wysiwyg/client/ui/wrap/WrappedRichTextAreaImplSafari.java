@@ -74,7 +74,11 @@ public class WrappedRichTextAreaImplSafari extends RichTextAreaImplSafari implem
             // Add global stylesheet declaration
             link = link.cloneNode(false);
             link.setAttribute('href', @com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea::STYLESHEET);
-            head.appendChild(link); 
+            head.appendChild(link);
+
+            // Set the class and id attributes on body
+            idoc.body.className = 'main';
+            idoc.body.id = 'body';
 
             // Send notification that the iframe has reached design mode.
             _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();

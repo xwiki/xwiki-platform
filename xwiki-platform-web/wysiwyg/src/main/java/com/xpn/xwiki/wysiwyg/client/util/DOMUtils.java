@@ -126,13 +126,18 @@ public abstract class DOMUtils
 
     public boolean isInline(Node node)
     {
+        return "inline".equalsIgnoreCase(getDisplay(node));
+    }
+
+    public String getDisplay(Node node)
+    {
         switch (node.getNodeType()) {
             case Node.TEXT_NODE:
-                return true;
+                return "inline";
             case Node.ELEMENT_NODE:
-                return "inline".equalsIgnoreCase(getComputedStyleProperty((Element) node, "display"));
+                return getComputedStyleProperty((Element) node, "display");
             default:
-                return false;
+                return null;
         }
     }
 

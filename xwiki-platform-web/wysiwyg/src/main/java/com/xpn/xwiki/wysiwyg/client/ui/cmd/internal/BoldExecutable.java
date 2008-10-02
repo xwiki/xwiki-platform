@@ -28,7 +28,7 @@ public class BoldExecutable extends StyleExecutable
 {
     public BoldExecutable()
     {
-        super("strong", null, "font-weight", "bold", Command.BOLD.toString());
+        super("strong", null, "font-weight", "bold", true, Command.BOLD.toString());
     }
 
     /**

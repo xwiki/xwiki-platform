@@ -44,7 +44,10 @@ public class StyleExecutable extends DefaultExecutable
 
     private final String propertyValue;
 
-    public StyleExecutable(String tagName, String className, String propertyName, String propertyValue, String command)
+    private final boolean inheritable;
+
+    public StyleExecutable(String tagName, String className, String propertyName, String propertyValue,
+        boolean inheritable, String command)
     {
         super(command);
 
@@ -52,6 +55,7 @@ public class StyleExecutable extends DefaultExecutable
         this.className = className;
         this.propertyName = propertyName;
         this.propertyValue = propertyValue;
+        this.inheritable = inheritable;
     }
 
     public String getTagName()
@@ -364,8 +368,20 @@ public class StyleExecutable extends DefaultExecutable
         if (node.getNodeType() == Node.TEXT_NODE) {
             node = node.getParentNode();
         }
-        return DOMUtils.getInstance().getComputedStyleProperty((Element) node, propertyName).equalsIgnoreCase(
-            propertyValue);
+        if (inheritable) {
+            return DOMUtils.getInstance().getComputedStyleProperty((Element) node, propertyName).equalsIgnoreCase(
+                propertyValue);
+        } else {
+            while (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+                if (DOMUtils.getInstance().getComputedStyleProperty(element, propertyName).equalsIgnoreCase(
+                    propertyValue)) {
+                    return true;
+                }
+                node = node.getParentNode();
+            }
+            return false;
+        }
     }
 
     private boolean split(Node parent, Node child)

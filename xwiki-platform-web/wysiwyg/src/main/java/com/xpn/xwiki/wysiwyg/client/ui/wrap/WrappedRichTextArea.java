@@ -122,32 +122,37 @@ public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
         if (ancestor == null) {
             // This shouln't happen!
             return;
-        } else if ("p".equalsIgnoreCase(ancestor.getNodeName())) {
-            Element paragraph = Element.as(ancestor);
-            if (paragraph.getInnerText().length() == 0) {
-                // We are inside an empty paragraph. We'll behave as if the use pressed Shift+Return.
-                event.preventDefault();
+        }
+        String display = DOMUtils.getInstance().getDisplay(ancestor);
+        if ("list-item".equalsIgnoreCase(display)) {
+            // ignore
+        } else if ("block".equalsIgnoreCase(display) && !"body".equalsIgnoreCase(ancestor.getNodeName())) {
+            if ("p".equalsIgnoreCase(ancestor.getNodeName())) {
+                Element paragraph = Element.as(ancestor);
+                if (paragraph.getInnerText().length() == 0) {
+                    // We are inside an empty paragraph. We'll behave as if the use pressed Shift+Return.
+                    event.preventDefault();
 
-                // Delete the text from the first range and leave the text of the other ranges untouched.
-                range.deleteContents();
+                    // Delete the text from the first range and leave the text of the other ranges untouched.
+                    range.deleteContents();
 
-                // Create the line break and insert it before the current range.
-                Element br = iframe.getContentDocument().createBRElement();
-                Node refNode = range.getStartContainer();
-                if (refNode.hasChildNodes()) {
-                    refNode = refNode.getChildNodes().getItem(range.getStartOffset());
+                    // Create the line break and insert it before the current range.
+                    Element br = iframe.getContentDocument().createBRElement();
+                    Node refNode = range.getStartContainer();
+                    if (refNode.hasChildNodes()) {
+                        refNode = refNode.getChildNodes().getItem(range.getStartOffset());
+                    }
+                    refNode.getParentNode().insertBefore(br, refNode);
+
+                    // Update the current range
+                    selection.removeAllRanges();
+                    range = RangeFactory.INSTANCE.createRange(iframe);
+                    range.setStartBefore(refNode);
+                    range.setEndBefore(refNode);
+                    selection.addRange(range);
+                } else {
+                    // The selection starts inside a non-empty paragraph so we leave the default behavior.
                 }
-                refNode.getParentNode().insertBefore(br, refNode);
-
-                // Update the current range
-                selection.removeAllRanges();
-                range = RangeFactory.INSTANCE.createRange(iframe);
-                range.setStartBefore(refNode);
-                range.setEndBefore(refNode);
-                selection.addRange(range);
-            } else {
-                // The selection starts inside a non-empty paragraph so we leave the default behavior.
-                return;
             }
         } else {
             // We are not inside a paragraph so we change the default behavior.

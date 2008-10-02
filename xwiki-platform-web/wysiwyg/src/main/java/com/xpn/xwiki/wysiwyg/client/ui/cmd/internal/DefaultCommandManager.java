@@ -57,7 +57,7 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES.put(Command.INSERT_ORDERED_LIST, new DefaultExecutable(Command.INSERT_ORDERED_LIST.toString()));
         EXECUTABLES.put(Command.INSERT_PARAGRAPH, new DefaultExecutable(Command.INSERT_PARAGRAPH.toString()));
         EXECUTABLES.put(Command.INSERT_UNORDERED_LIST, new DefaultExecutable(Command.INSERT_UNORDERED_LIST.toString()));
-        EXECUTABLES.put(Command.ITALIC, new StyleExecutable("em", null, "font-style", "italic", Command.ITALIC
+        EXECUTABLES.put(Command.ITALIC, new StyleExecutable("em", null, "font-style", "italic", true, Command.ITALIC
             .toString()));
         EXECUTABLES.put(Command.JUSTIFY_CENTER, new DefaultExecutable(Command.JUSTIFY_CENTER.toString()));
         EXECUTABLES.put(Command.JUSTIFY_FULL, new DefaultExecutable(Command.JUSTIFY_FULL.toString()));
@@ -69,16 +69,22 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
             null,
             "text-decoration",
             "line-through",
+            false,
             Command.STRIKE_THROUGH.toString()));
         EXECUTABLES.put(Command.STYLE_WITH_CSS, new StyleWithCssExecutable());
         EXECUTABLES.put(Command.SUB_SCRIPT, new DefaultExecutable(Command.SUB_SCRIPT.toString()));
         EXECUTABLES.put(Command.SUPER_SCRIPT, new DefaultExecutable(Command.SUPER_SCRIPT.toString()));
-        EXECUTABLES.put(Command.TELETYPE, new StyleExecutable("tt", null, "font-family", "monospace", Command.TELETYPE
-            .toString()));
+        EXECUTABLES.put(Command.TELETYPE, new StyleExecutable("tt",
+            null,
+            "font-family",
+            "monospace",
+            true,
+            Command.TELETYPE.toString()));
         EXECUTABLES.put(Command.UNDERLINE, new StyleExecutable("ins",
             null,
             "text-decoration",
             "underline",
+            false,
             Command.UNDERLINE.toString()));
     }
 

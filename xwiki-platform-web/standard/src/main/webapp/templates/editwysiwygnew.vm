@@ -35,6 +35,8 @@ $xwiki.wysiwyg.getInput("htmlContent", $tdoc.content, $doc.syntaxId)
       hookId: 'content',
       inputId: 'htmlContent',
       syntax: "$doc.syntaxId",
+      // TODO: The style sheet configuration is commented out for now because it affects the behavior of the new WYSIWYG editor in a very bad way. 
+      // This is temporary. See http://jira.xwiki.org/jira/browse/XWIKI-2721
       // stylesheet: "${request.getRequestURL().substring(0, $request.getRequestURL().indexOf("/", 9))}${xwiki.getSkinFile("style.css")}",
       plugins: 'separator text valign list indent undo format symbol',
       toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol',

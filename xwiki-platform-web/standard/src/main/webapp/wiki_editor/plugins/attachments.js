@@ -44,7 +44,7 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
         var contextPathImage = tinyMCE.getParam("wiki_images_path").toString();
         href = contextPathImage.substring(0, contextPathImage.indexOf("/",2)) +
                "/bin/" + href.substring(href.indexOf("/",3) + 1);
-        var imgname_reg = new RegExp(this.getImagePath() + "(.*)", "i");
+        var imgname_reg = new RegExp(this.getImagePath().replace('+', '\\+') + "(.*)", "i");
         var r = imgname_reg.exec(href);
         if(r) {
             var imgname = unescape(r[1]);       

@@ -27,17 +27,17 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>11-SNAPSHOT</version>
+    <version>11</version>
   </parent>
   <artifactId>xwiki-plugin-mailsender</artifactId>
   <name>XWiki Platform - Plugins - Mail Sender</name>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.5</version>
   <description>XWiki Platform - Plugins - Mail Sender</description>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.5.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -73,4 +73,10 @@
       </releases>
     </repository>
   </repositories>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-mailsender-1.5</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-mailsender-1.5</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-mailsender-1.5</url>
+  </scm>
 </project>

@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
-<date>1215606731000</date>
-<contentUpdateDate>1215606731000</contentUpdateDate>
-<version>13.1</version>
+<date>1223296940000</date>
+<contentUpdateDate>1223296940000</contentUpdateDate>
+<version>17.1</version>
 <title>Translations</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -98,6 +98,7 @@ wikimanager.title.createwiki.desc=Wiki description
 wikimanager.title.createwiki.datafrom=Create wiki from
 wikimanager.title.createwiki.members=Initial global members
 wikimanager.title.createwiki.summary=Summary
+wikimanager.wikiname.force=Force
 ##
 # WIDGETS
 ##
@@ -144,6 +145,8 @@ wikimanager.listwikiempty=There are no open wikis.
 wikimanager.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
 wikimanager.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
 wikimanager.wikiname.error.empty=Identifier can't be empty
+wikimanager.wikiname.error.databasealreadyexists=A database with this identifier already exists
+wikimanager.wikiname.error.wikialreadyexists=A wiki with this identifier already exists
 wikimanager.wikiname.error.alreadyused=This identifier is already used
 wikimanager.wikiname.info.valid=You can use this name as new wiki identifier
 ##

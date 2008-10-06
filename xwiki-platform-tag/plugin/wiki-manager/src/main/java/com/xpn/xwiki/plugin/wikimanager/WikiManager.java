@@ -572,7 +572,7 @@ final class WikiManager
 
             // clear entry in virtual wiki cache
             if (!wikiSuperDocToSave.getServer().equals(userWikiSuperDoc.getServer())) {
-                xwiki.getVirtualWikiMap().flushEntry(userWikiSuperDoc.getServer());
+                xwiki.getVirtualWikiCache().remove(userWikiSuperDoc.getServer());
             }
 
             wikiSuperDocToSave.mergeObject(userWikiSuperDoc);

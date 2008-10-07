@@ -20,17 +20,15 @@
 package org.xwiki.rendering.renderer;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.dom4j.Element;
-import org.dom4j.io.HTMLWriter;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultElement;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.xwiki.rendering.renderer.AbstractPrintRenderer;
 import org.xwiki.rendering.renderer.WikiPrinter;
 
 /**
@@ -38,7 +36,7 @@ import org.xwiki.rendering.renderer.WikiPrinter;
  * 
  * @version $Id$
  */
-public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
+public class XHTMLWikiPrinter
 {
     protected WikiWriter wikiWriter;
 
@@ -48,49 +46,31 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
      * @param printer the object to which to write the XHTML output to
      * @param documentAccessBridge see {@link #documentAccessBridge}
      */
-    public AbstractXMLRenderer(WikiPrinter printer)
+    public XHTMLWikiPrinter(WikiPrinter printer)
     {
-        super(printer);
-
         this.wikiWriter = new WikiWriter(printer);
 
         try {
-            this.xmlWriter = createNewXMLWriter(this.wikiWriter);
-        } catch (Exception e) {
-            this.xmlWriter = createDefaultXMLWriter(this.wikiWriter);
+            this.xmlWriter = new XHTMLWriter(this.wikiWriter);
+        } catch (UnsupportedEncodingException e) {
+            // TODO: add error log "should not append"
         }
     }
 
-    /**
-     * Override to be able to use a different {@link XMLWriter} (like {@link HTMLWriter}, etc.).
-     */
-    protected XMLWriter createNewXMLWriter(Writer writer) throws Exception
+    public XMLWriter getXMLWriter()
     {
-        return createDefaultXMLWriter(writer);
+        return this.xmlWriter;
     }
 
-    private XMLWriter createDefaultXMLWriter(Writer writer)
+    public void setWikiPrinter(WikiPrinter printer)
     {
-        return new XMLWriter(writer);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.AbstractPrintRenderer#setPrinter(org.xwiki.rendering.renderer.WikiPrinter)
-     */
-    @Override
-    protected void setPrinter(WikiPrinter printer)
-    {
-        super.setPrinter(printer);
-
         this.wikiWriter.setWikiPrinter(printer);
     }
 
     /**
      * Print provided text. Takes care of xml escaping.
      */
-    protected void printXML(String str)
+    public void printXML(String str)
     {
         try {
             this.xmlWriter.write(str);
@@ -102,7 +82,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Print the xml element. In the form <name/>.
      */
-    protected void printXMLElement(String name)
+    public void printXMLElement(String name)
     {
         printXMLElement(name, (String[][]) null);
     }
@@ -110,7 +90,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Print the xml element. In the form <name att1="value1" att2="value2"/>.
      */
-    protected void printXMLElement(String name, String[][] attributes)
+    public void printXMLElement(String name, String[][] attributes)
     {
         Element element = new DefaultElement(name);
 
@@ -130,7 +110,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Print the xml element. In the form <name att1="value1" att2="value2"/>.
      */
-    protected void printXMLElement(String name, Map<String, String> attributes)
+    public void printXMLElement(String name, Map<String, String> attributes)
     {
         Element element = new DefaultElement(name);
 
@@ -150,7 +130,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Print the start tag of xml element. In the form <name>.
      */
-    protected void printXMLStartElement(String name)
+    public void printXMLStartElement(String name)
     {
         printXMLStartElement(name, new AttributesImpl());
     }
@@ -158,7 +138,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Print the start tag of xml element. In the form <name att1="value1" att2="value2">.
      */
-    protected void printXMLStartElement(String name, String[][] attributes)
+    public void printXMLStartElement(String name, String[][] attributes)
     {
         printXMLStartElement(name, createAttributes(attributes));
     }
@@ -166,7 +146,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Print the start tag of xml element. In the form <name att1="value1" att2="value2">.
      */
-    protected void printXMLStartElement(String name, Map<String, String> attributes)
+    public void printXMLStartElement(String name, Map<String, String> attributes)
     {
         printXMLStartElement(name, createAttributes(attributes));
     }
@@ -174,7 +154,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Print the start tag of xml element. In the form <name att1="value1" att2="value2">.
      */
-    protected void printXMLStartElement(String name, Attributes attributes)
+    public void printXMLStartElement(String name, Attributes attributes)
     {
         try {
             this.xmlWriter.startElement("", name, name, attributes);
@@ -186,7 +166,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Print the end tag of xml element. In the form </name>.
      */
-    protected void printXMLEndElement(String name)
+    public void printXMLEndElement(String name)
     {
         try {
             this.xmlWriter.endElement("", name, name);
@@ -198,7 +178,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Convert provided table into {@link Attributes} to use in xml writer.
      */
-    protected Attributes createAttributes(String[][] parameters)
+    public Attributes createAttributes(String[][] parameters)
     {
         AttributesImpl attributes = new AttributesImpl();
 
@@ -214,7 +194,7 @@ public abstract class AbstractXMLRenderer extends AbstractPrintRenderer
     /**
      * Convert provided map into {@link Attributes} to use in xml writer.
      */
-    protected Attributes createAttributes(Map<String, String> parameters)
+    public Attributes createAttributes(Map<String, String> parameters)
     {
         AttributesImpl attributes = new AttributesImpl();
 

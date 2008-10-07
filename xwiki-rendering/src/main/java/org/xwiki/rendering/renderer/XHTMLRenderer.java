@@ -19,11 +19,9 @@
  */
 package org.xwiki.rendering.renderer;
 
-import java.io.Writer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.dom4j.io.XMLWriter;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Format;
@@ -42,7 +40,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
  * @version $Id$
  * @since 1.5M2
  */
-public class XHTMLRenderer extends AbstractXMLRenderer
+public class XHTMLRenderer extends AbstractPrintRenderer
 {
     private DocumentAccessBridge documentAccessBridge;
 
@@ -57,6 +55,8 @@ public class XHTMLRenderer extends AbstractXMLRenderer
     private XHTMLLinkRenderer linkRenderer;
 
     private XHTMLIdGenerator idGenerator;
+
+    private XHTMLWikiPrinter xhtmlWikiPrinter;
 
     /**
      * Used to save the original Printer when we redirect all outputs to a new Printer to compute a section title. We
@@ -84,12 +84,25 @@ public class XHTMLRenderer extends AbstractXMLRenderer
         this.documentAccessBridge = documentAccessBridge;
         this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, configuration);
         this.configuration = configuration;
+        this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractPrintRenderer#setPrinter(org.xwiki.rendering.renderer.WikiPrinter)
+     */
     @Override
-    protected XMLWriter createNewXMLWriter(Writer writer) throws Exception
+    public void setPrinter(WikiPrinter printer)
     {
-        return new XHTMLWriter(writer);
+        super.setPrinter(printer);
+
+        this.xhtmlWikiPrinter.setWikiPrinter(printer);
+    }
+
+    protected XHTMLWikiPrinter getXHTMLWikiPrinter()
+    {
+        return this.xhtmlWikiPrinter;
     }
 
     /**
@@ -123,25 +136,25 @@ public class XHTMLRenderer extends AbstractXMLRenderer
     {
         switch (format) {
             case BOLD:
-                printXMLStartElement("strong");
+                getXHTMLWikiPrinter().printXMLStartElement("strong");
                 break;
             case ITALIC:
-                printXMLStartElement("em");
+                getXHTMLWikiPrinter().printXMLStartElement("em");
                 break;
             case STRIKEDOUT:
-                printXMLStartElement("del");
+                getXHTMLWikiPrinter().printXMLStartElement("del");
                 break;
             case UNDERLINED:
-                printXMLStartElement("ins");
+                getXHTMLWikiPrinter().printXMLStartElement("ins");
                 break;
             case SUPERSCRIPT:
-                printXMLStartElement("sup");
+                getXHTMLWikiPrinter().printXMLStartElement("sup");
                 break;
             case SUBSCRIPT:
-                printXMLStartElement("sub");
+                getXHTMLWikiPrinter().printXMLStartElement("sub");
                 break;
             case MONOSPACE:
-                printXMLStartElement("tt");
+                getXHTMLWikiPrinter().printXMLStartElement("tt");
                 break;
         }
     }
@@ -155,25 +168,25 @@ public class XHTMLRenderer extends AbstractXMLRenderer
     {
         switch (format) {
             case BOLD:
-                printXMLEndElement("strong");
+                getXHTMLWikiPrinter().printXMLEndElement("strong");
                 break;
             case ITALIC:
-                printXMLEndElement("em");
+                getXHTMLWikiPrinter().printXMLEndElement("em");
                 break;
             case STRIKEDOUT:
-                printXMLEndElement("del");
+                getXHTMLWikiPrinter().printXMLEndElement("del");
                 break;
             case UNDERLINED:
-                printXMLEndElement("ins");
+                getXHTMLWikiPrinter().printXMLEndElement("ins");
                 break;
             case SUPERSCRIPT:
-                printXMLEndElement("sup");
+                getXHTMLWikiPrinter().printXMLEndElement("sup");
                 break;
             case SUBSCRIPT:
-                printXMLEndElement("sub");
+                getXHTMLWikiPrinter().printXMLEndElement("sub");
                 break;
             case MONOSPACE:
-                printXMLEndElement("tt");
+                getXHTMLWikiPrinter().printXMLEndElement("tt");
                 break;
         }
     }
@@ -185,7 +198,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginParagraph(Map<String, String> parameters)
     {
-        printXMLStartElement("p", parameters);
+        getXHTMLWikiPrinter().printXMLStartElement("p", parameters);
     }
 
     /**
@@ -195,7 +208,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endParagraph(Map<String, String> parameters)
     {
-        printXMLEndElement("p");
+        getXHTMLWikiPrinter().printXMLEndElement("p");
     }
 
     /**
@@ -205,7 +218,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void onLineBreak()
     {
-        printXMLElement("br");
+        getXHTMLWikiPrinter().printXMLElement("br");
     }
 
     /**
@@ -225,7 +238,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void onLink(Link link, boolean isFreeStandingURI)
     {
-        this.linkRenderer.renderLink(this.xmlWriter, link, isFreeStandingURI);
+        this.linkRenderer.renderLink(getXHTMLWikiPrinter().getXMLWriter(), link, isFreeStandingURI);
     }
 
     /**
@@ -274,10 +287,10 @@ public class XHTMLRenderer extends AbstractXMLRenderer
         attributes.putAll(parameters);
 
         int levelAsInt = level.getAsInt();
-        printXMLStartElement("h" + levelAsInt, attributes);
+        getXHTMLWikiPrinter().printXMLStartElement("h" + levelAsInt, attributes);
         // We generate a span so that CSS rules have a hook to perform some magic that wouldn't work on just a H
         // element. Like some IE6 magic and others.
-        printXMLStartElement("span");
+        getXHTMLWikiPrinter().printXMLStartElement("span");
     }
 
     /**
@@ -293,8 +306,8 @@ public class XHTMLRenderer extends AbstractXMLRenderer
         print(sectionTitle);
 
         int levelAsInt = level.getAsInt();
-        printXMLEndElement("span");
-        printXMLEndElement("h" + levelAsInt);
+        getXHTMLWikiPrinter().printXMLEndElement("span");
+        getXHTMLWikiPrinter().printXMLEndElement("h" + levelAsInt);
     }
 
     /**
@@ -304,7 +317,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void onWord(String word)
     {
-        printXML(word);
+        getXHTMLWikiPrinter().printXML(word);
     }
 
     /**
@@ -314,7 +327,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void onSpace()
     {
-        printXML(" ");
+        getXHTMLWikiPrinter().printXML(" ");
     }
 
     /**
@@ -324,7 +337,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void onSpecialSymbol(char symbol)
     {
-        printXML("" + symbol);
+        getXHTMLWikiPrinter().printXML("" + symbol);
     }
 
     /**
@@ -334,7 +347,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void onEscape(String escapedString)
     {
-        printXML(escapedString);
+        getXHTMLWikiPrinter().printXML(escapedString);
     }
 
     /**
@@ -345,9 +358,9 @@ public class XHTMLRenderer extends AbstractXMLRenderer
     public void beginList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
-            printXMLStartElement("ul", parameters);
+            getXHTMLWikiPrinter().printXMLStartElement("ul", parameters);
         } else {
-            printXMLStartElement("ol", parameters);
+            getXHTMLWikiPrinter().printXMLStartElement("ol", parameters);
         }
     }
 
@@ -358,7 +371,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginListItem()
     {
-        printXMLStartElement("li");
+        getXHTMLWikiPrinter().printXMLStartElement("li");
     }
 
     /**
@@ -369,9 +382,9 @@ public class XHTMLRenderer extends AbstractXMLRenderer
     public void endList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
-            printXMLEndElement("ul");
+            getXHTMLWikiPrinter().printXMLEndElement("ul");
         } else {
-            printXMLEndElement("ol");
+            getXHTMLWikiPrinter().printXMLEndElement("ol");
         }
     }
 
@@ -382,7 +395,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endListItem()
     {
-        printXMLEndElement("li");
+        getXHTMLWikiPrinter().printXMLEndElement("li");
     }
 
     /**
@@ -392,7 +405,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
-        printXMLStartElement(name, attributes);
+        getXHTMLWikiPrinter().printXMLStartElement(name, attributes);
     }
 
     /**
@@ -402,7 +415,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endXMLElement(String name, Map<String, String> attributes)
     {
-        printXMLEndElement(name);
+        getXHTMLWikiPrinter().printXMLEndElement(name);
     }
 
     /**
@@ -434,8 +447,8 @@ public class XHTMLRenderer extends AbstractXMLRenderer
     {
         // Note: We're using <a><a/> and not <a/> since some browsers do not support the <a/> syntax (FF3)
         // when the content type is set to HTML instead of XHTML.
-        printXMLStartElement("a", new String[][] { {"id", name}, {"name", name}});
-        printXMLEndElement("a");
+        getXHTMLWikiPrinter().printXMLStartElement("a", new String[][] { {"id", name}, {"name", name}});
+        getXHTMLWikiPrinter().printXMLEndElement("a");
     }
 
     /**
@@ -445,7 +458,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void onHorizontalLine(Map<String, String> parameters)
     {
-        printXMLElement("hr", parameters);
+        getXHTMLWikiPrinter().printXMLElement("hr", parameters);
     }
 
     /**
@@ -460,9 +473,9 @@ public class XHTMLRenderer extends AbstractXMLRenderer
         // tt is the closed to pre for inline.
         // The class is what is expected by wikimodel to understand the tt as meaning a verbatim and not a Monospace
         // element.
-        printXMLStartElement("tt", new String[][] {{"class", "wikimodel-verbatim"}});
-        printXML(protectedString);
-        printXMLEndElement("tt");
+        getXHTMLWikiPrinter().printXMLStartElement("tt", new String[][] {{"class", "wikimodel-verbatim"}});
+        getXHTMLWikiPrinter().printXML(protectedString);
+        getXHTMLWikiPrinter().printXMLEndElement("tt");
     }
 
     /**
@@ -472,9 +485,9 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void onVerbatimStandalone(String protectedString)
     {
-        printXMLStartElement("pre");
-        printXML(protectedString);
-        printXMLEndElement("pre");
+        getXHTMLWikiPrinter().printXMLStartElement("pre");
+        getXHTMLWikiPrinter().printXML(protectedString);
+        getXHTMLWikiPrinter().printXMLEndElement("pre");
     }
 
     /**
@@ -489,8 +502,8 @@ public class XHTMLRenderer extends AbstractXMLRenderer
         // Note: We're using <div><div/> and not <div/> since some browsers do not support the <div/> syntax (FF3)
         // when the content type is set to HTML instead of XHTML.
         for (int i = 0; i < count; ++i) {
-            printXMLStartElement("div", new String[][] {{"class", "wikimodel-emptyline"}});
-            printXMLEndElement("div");
+            getXHTMLWikiPrinter().printXMLStartElement("div", new String[][] {{"class", "wikimodel-emptyline"}});
+            getXHTMLWikiPrinter().printXMLEndElement("div");
         }
     }
 
@@ -501,7 +514,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginDefinitionList()
     {
-        printXMLStartElement("dl");
+        getXHTMLWikiPrinter().printXMLStartElement("dl");
     }
 
     /**
@@ -511,7 +524,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endDefinitionList()
     {
-        printXMLEndElement("dl");
+        getXHTMLWikiPrinter().printXMLEndElement("dl");
     }
 
     /**
@@ -521,7 +534,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginDefinitionTerm()
     {
-        printXMLStartElement("dt");
+        getXHTMLWikiPrinter().printXMLStartElement("dt");
     }
 
     /**
@@ -531,7 +544,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginDefinitionDescription()
     {
-        printXMLStartElement("dd");
+        getXHTMLWikiPrinter().printXMLStartElement("dd");
     }
 
     /**
@@ -541,7 +554,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endDefinitionTerm()
     {
-        printXMLEndElement("dt");
+        getXHTMLWikiPrinter().printXMLEndElement("dt");
     }
 
     /**
@@ -551,7 +564,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endDefinitionDescription()
     {
-        printXMLEndElement("dd");
+        getXHTMLWikiPrinter().printXMLEndElement("dd");
     }
 
     /**
@@ -561,7 +574,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginQuotation(Map<String, String> parameters)
     {
-        printXMLStartElement("blockquote", parameters);
+        getXHTMLWikiPrinter().printXMLStartElement("blockquote", parameters);
     }
 
     /**
@@ -571,7 +584,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endQuotation(Map<String, String> parameters)
     {
-        printXMLEndElement("blockquote");
+        getXHTMLWikiPrinter().printXMLEndElement("blockquote");
     }
 
     /**
@@ -601,8 +614,8 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginTable(Map<String, String> parameters)
     {
-        printXMLStartElement("table", parameters);
-        printXMLStartElement("tbody");
+        getXHTMLWikiPrinter().printXMLStartElement("table", parameters);
+        getXHTMLWikiPrinter().printXMLStartElement("tbody");
     }
 
     /**
@@ -612,7 +625,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginTableRow(Map<String, String> parameters)
     {
-        printXMLStartElement("tr", parameters);
+        getXHTMLWikiPrinter().printXMLStartElement("tr", parameters);
     }
 
     /**
@@ -622,7 +635,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginTableCell(Map<String, String> parameters)
     {
-        printXMLStartElement("td", parameters);
+        getXHTMLWikiPrinter().printXMLStartElement("td", parameters);
     }
 
     /**
@@ -632,7 +645,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void beginTableHeadCell(Map<String, String> parameters)
     {
-        printXMLStartElement("th", parameters);
+        getXHTMLWikiPrinter().printXMLStartElement("th", parameters);
     }
 
     /**
@@ -642,8 +655,8 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endTable(Map<String, String> parameters)
     {
-        printXMLEndElement("tbody");
-        printXMLEndElement("table");
+        getXHTMLWikiPrinter().printXMLEndElement("tbody");
+        getXHTMLWikiPrinter().printXMLEndElement("table");
     }
 
     /**
@@ -653,7 +666,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endTableRow(Map<String, String> parameters)
     {
-        printXMLEndElement("tr");
+        getXHTMLWikiPrinter().printXMLEndElement("tr");
     }
 
     /**
@@ -663,7 +676,7 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endTableCell(Map<String, String> parameters)
     {
-        printXMLEndElement("td");
+        getXHTMLWikiPrinter().printXMLEndElement("td");
     }
 
     /**
@@ -673,6 +686,6 @@ public class XHTMLRenderer extends AbstractXMLRenderer
      */
     public void endTableHeadCell(Map<String, String> parameters)
     {
-        printXMLEndElement("th");
+        getXHTMLWikiPrinter().printXMLEndElement("th");
     }
 }

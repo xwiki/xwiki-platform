@@ -90,31 +90,7 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
         String syntaxId = matcher.group(1);
         String version = matcher.group(2);
 
-        SyntaxType syntaxType;
-        if (syntaxId.equalsIgnoreCase(SyntaxType.XWIKI.toIdString())) {
-            syntaxType = SyntaxType.XWIKI;
-        } else if (syntaxId.equalsIgnoreCase(SyntaxType.CONFLUENCE.toIdString())) {
-            syntaxType = SyntaxType.CONFLUENCE;
-        } else if (syntaxId.equalsIgnoreCase(SyntaxType.CREOLE.toIdString())) {
-            syntaxType = SyntaxType.CREOLE;
-        } else if (syntaxId.equalsIgnoreCase(SyntaxType.JSPWIKI.toIdString())) {
-            syntaxType = SyntaxType.JSPWIKI;
-        } else if (syntaxId.equalsIgnoreCase(SyntaxType.MEDIAWIKI.toIdString())) {
-            syntaxType = SyntaxType.MEDIAWIKI;
-        } else if (syntaxId.equalsIgnoreCase(SyntaxType.TWIKI.toIdString())) {
-            syntaxType = SyntaxType.TWIKI;
-        } else if (syntaxId.equalsIgnoreCase(SyntaxType.XHTML.toIdString())) {
-            syntaxType = SyntaxType.XHTML;
-        } else {
-            StringBuffer sb = new StringBuffer();
-            sb.append("Unknown Syntax id [").append(syntaxId).append("]. Valid syntaxes are [xwiki]");
-            for (SyntaxType type : SyntaxType.values()) {
-                if (type != SyntaxType.XWIKI) {
-                    sb.append(", [").append(type.toIdString()).append("]");
-                }
-            }
-            throw new ParseException(sb.toString());
-        }
+        SyntaxType syntaxType = SyntaxType.getSyntaxType(syntaxId);
 
         return new Syntax(syntaxType, version);
     }

@@ -19,21 +19,50 @@
  */
 package org.xwiki.rendering.parser;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @version $Id$
- * @since 1.5M2
+ * @since 1.7M1
  */
-public enum SyntaxType
+public class SyntaxType
 {
-    XWIKI("XWiki"),
-    CONFLUENCE("Confluence"),
-    MEDIAWIKI("MediaWiki"),
-    CREOLE("Creole"),
-    JSPWIKI("JSPWiki"),
-    TWIKI("TWiki"),
-    XHTML("XHTML");
+    public static final SyntaxType XWIKI = getSyntaxType("XWiki");
+
+    public static final SyntaxType CONFLUENCE = getSyntaxType("Confluence");
+
+    public static final SyntaxType MEDIAWIKI = getSyntaxType("MediaWiki");
+
+    public static final SyntaxType CREOLE = getSyntaxType("Creole");
+
+    public static final SyntaxType JSPWIKI = getSyntaxType("JSPWiki");
+
+    public static final SyntaxType TWIKI = getSyntaxType("TWiki");
+
+    public static final SyntaxType XHTML = getSyntaxType("XHTML");
+
+    private static Map<String, SyntaxType> syntaxTypeMap;
 
     private String id;
+
+    public static SyntaxType getSyntaxType(String id)
+    {
+        String lowerId = id.toLowerCase();
+
+        if (syntaxTypeMap == null) {
+            syntaxTypeMap = new ConcurrentHashMap<String, SyntaxType>();
+        }
+
+        SyntaxType syntaxType = syntaxTypeMap.get(lowerId);
+
+        if (syntaxType == null) {
+            syntaxType = new SyntaxType(id);
+            syntaxTypeMap.put(lowerId, syntaxType);
+        }
+
+        return syntaxType;
+    }
 
     private SyntaxType(String id)
     {
@@ -43,7 +72,7 @@ public enum SyntaxType
     /**
      * {@inheritDoc}
      * 
-     * @see java.lang.Enum#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString()

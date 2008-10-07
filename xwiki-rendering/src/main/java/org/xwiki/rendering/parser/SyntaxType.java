@@ -84,4 +84,29 @@ public class SyntaxType
     {
         return this.id.toLowerCase();
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        // no need to call id's equals method as SyntaxType for an id should be unique
+        return this == obj;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        // use the default implementation based on internal address of the object as SyntaxType for an id should be
+        // unique
+        return super.hashCode();
+    }
 }

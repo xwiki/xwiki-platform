@@ -25,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentProperty;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -148,13 +150,8 @@ public class PlexusComponentManager implements ComponentManager
         return this.plexusContainer.hasComponent(role, roleHint);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.manager.ComponentManager#registerComponentDescriptor(org.xwiki.component.descriptor.ComponentDescriptor)
-     */
-    public void registerComponentDescriptor(ComponentDescriptor componentDescriptor)
-        throws ComponentRepositoryException
+    private org.codehaus.plexus.component.repository.ComponentDescriptor createPlexusComponentDescriptor(
+        ComponentDescriptor componentDescriptor)
     {
         org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
             new org.codehaus.plexus.component.repository.ComponentDescriptor();
@@ -174,6 +171,29 @@ public class PlexusComponentManager implements ComponentManager
             }
             pcd.setConfiguration(xpc);
         }
+
+        Collection<ComponentDependency> componentDependencies = componentDescriptor.getComponentDependencies();
+        if (!componentConfiguration.isEmpty()) {
+            ComponentSetDescriptor csd = new ComponentSetDescriptor();
+            for (ComponentDependency dependency : componentDependencies) {
+                csd.addComponentDescriptor(createPlexusComponentDescriptor(dependency));
+            }
+            pcd.setComponentSetDescriptor(csd);
+        }
+
+        return pcd;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#registerComponentDescriptor(org.xwiki.component.descriptor.ComponentDescriptor)
+     */
+    public void registerComponentDescriptor(ComponentDescriptor componentDescriptor)
+        throws ComponentRepositoryException
+    {
+        org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
+            createPlexusComponentDescriptor(componentDescriptor);
 
         try {
             this.plexusContainer.addComponentDescriptor(pcd);

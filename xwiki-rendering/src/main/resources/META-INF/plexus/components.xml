@@ -99,6 +99,9 @@
         <requirement>
           <role>org.xwiki.url.XWikiURLFactory</role>
         </requirement>
+        <requirement>
+          <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>        
+        </requirement>
       </requirements>
     </component>
     <component>

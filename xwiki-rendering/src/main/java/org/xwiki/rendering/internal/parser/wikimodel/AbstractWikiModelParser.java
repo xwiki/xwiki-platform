@@ -36,9 +36,9 @@ import java.io.Reader;
  */
 public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser
 {
-    private LinkParser linkParser;
+    protected LinkParser linkParser;
 
-    private XWikiURLFactory urlFactory;
+    protected XWikiURLFactory urlFactory;
 
     public abstract IWikiParser createWikiModelParser();
 
@@ -47,7 +47,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
         IWikiParser parser = createWikiModelParser();
 
         // We pass the LinkParser corresponding to the syntax.
-        XDOMGeneratorListener listener = new XDOMGeneratorListener(this.linkParser, this.urlFactory);
+        XDOMGeneratorListener listener = new XDOMGeneratorListener(this, this.linkParser, this.urlFactory);
 
         try {
             parser.parse(source, listener);

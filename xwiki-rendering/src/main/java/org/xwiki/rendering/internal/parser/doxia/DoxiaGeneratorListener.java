@@ -206,12 +206,6 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.lineBreak();
     }
 
-    public void onLink(Link link, boolean isFreeStandingURI)
-    {
-        // TODO: Finish the implementation
-        this.sink.link(link.getReference());
-    }
-
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
     {
         // Don't do anything since macros have already been transformed so this method
@@ -407,7 +401,6 @@ public class DoxiaGeneratorListener implements Listener
     public void beginTable(Map<String, String> parameters)
     {
         this.sink.table();
-        
     }
 
     public void beginTableCell(Map<String, String> parameters)
@@ -443,5 +436,27 @@ public class DoxiaGeneratorListener implements Listener
     public void endTableRow(Map<String, String> parameters)
     {
         this.sink.tableRow_();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginLink(Link, boolean)  
+     * @since 1.7M1
+     */
+    public void beginLink(Link link, boolean isFreeStandingURI)
+    {
+        this.sink.link(link.getReference());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endLink(Link, boolean)  
+     * @since 1.7M1
+     */
+    public void endLink(Link link, boolean isFreeStandingURI)
+    {
+        this.sink.link_();
     }
 }

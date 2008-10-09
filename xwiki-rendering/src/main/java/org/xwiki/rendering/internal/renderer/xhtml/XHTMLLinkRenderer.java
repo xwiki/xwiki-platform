@@ -19,21 +19,19 @@
  */
 package org.xwiki.rendering.internal.renderer.xhtml;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.io.XMLWriter;
-import org.dom4j.tree.DefaultAttribute;
-import org.dom4j.tree.DefaultElement;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.renderer.XHTMLWikiPrinter;
 
 /**
+ * Renders a XWiki Link into XHTML.
+ * 
  * @version $Id: $
  * @since 1.5RC1
  */
@@ -43,107 +41,104 @@ public class XHTMLLinkRenderer
 
     private RenderingConfiguration configuration;
 
+    private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
+    
     public XHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, RenderingConfiguration configuration)
     {
         this.documentAccessBridge = documentAccessBridge;
         this.configuration = configuration;
+        this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
     }
 
-    public void renderLink(XMLWriter xmlWriter, Link link, boolean isFreeStandingURI)
+    public void beginRenderLink(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI)
     {
         try {
-            List<Element> elements = createDOM4JLink(link, isFreeStandingURI);
-            xmlWriter.write(elements);
+            beginRenderLinkInternal(printer, link, isFreeStandingURI);
         } catch (Exception e) {
-            // TODO add error log
+            // TODO: Handle error
         }
     }
 
-    public List<Element> createDOM4JLink(Link link, boolean isFreeStandingURI) throws Exception
+    public void endRenderLink(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, boolean generateLinkContent)
     {
-        List<Element> elements = new ArrayList<Element>();
+        try {
+            endRenderLinkInternal(printer, link, isFreeStandingURI, generateLinkContent);
+        } catch (Exception e) {
+            // TODO: Handle error
+        }
+    }
 
-        // span element
-        DefaultElement spanElement = new DefaultElement("span");
-        Attribute spanClassAttribute = new DefaultAttribute(new QName("class"));
+    private void beginRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI)
+        throws Exception
+    {
+        // Add an XML comment as a placeholder so that the XHTML parser can find the document name. 
+        // Otherwise it would be too difficult to transform a URL into a document name especially since 
+        // a link can refer to an external URL.
+        printer.printXMLComment("startwikilink:" + this.xwikiSyntaxLinkRenderer.renderLinkReference(link));
 
-        // a element
-        DefaultElement aElement = new DefaultElement("a");
-        Attribute aHrefAttribute = new DefaultAttribute(new QName("href"));
-
-        // add a element to span element
-        spanElement.add(aElement);
-
-        // add span element to element list
-        elements.add(spanElement);
-
-        Element labelContainer = aElement;
+        Map<String, String> spanAttributes = new LinkedHashMap<String, String>();
+        Map<String, String> aAttributes = new LinkedHashMap<String, String>();
+        
         if (link.isExternalLink()) {
-            spanClassAttribute.setValue("wikiexternallink");
-
+            spanAttributes.put("class", "wikiexternallink");
             if (isFreeStandingURI) {
-                aElement.add(new DefaultAttribute("class", "wikimodel-freestanding"));
+                aAttributes.put("class", "wikimodel-freestanding");
             }
 
             // href attribute
             if (link.getType() == LinkType.INTERWIKI) {
                 // TODO: Resolve the Interwiki link
             } else {
-                aHrefAttribute.setValue(link.getReference());
+                aAttributes.put("href", link.getReference());
             }
+
+            printer.printXMLStartElement("span", spanAttributes);
+            printer.printXMLStartElement("a", aAttributes);
         } else {
-            // This is a link to a document. Check for the document existence.
+            // This is a link to a document.
+
+            // Check for the document existence.
             if (link.getReference() == null || this.documentAccessBridge.exists(link.getReference())) {
-                spanClassAttribute.setValue("wikilink");
-                aHrefAttribute.setValue(this.documentAccessBridge.getURL(link.getReference(), "view", link
+                spanAttributes.put("class", "wikilink");
+                aAttributes.put("href", this.documentAccessBridge.getURL(link.getReference(), "view", link
                     .getQueryString(), link.getAnchor()));
+                printer.printXMLStartElement("span", spanAttributes);
+                printer.printXMLStartElement("a", aAttributes);
             } else {
-                spanClassAttribute.setValue("wikicreatelink");
-                aHrefAttribute.setValue(this.documentAccessBridge.getURL(link.getReference(), "edit", link
+                spanAttributes.put("class", "wikicreatelink");
+                aAttributes.put("href", this.documentAccessBridge.getURL(link.getReference(), "edit", link
                     .getQueryString(), link.getAnchor()));
 
-                labelContainer = new DefaultElement("span");
-                labelContainer.add(new DefaultAttribute("class", "wikicreatelinktext"));
-
-                aElement.add(labelContainer);
-
-                DefaultElement qmElement = new DefaultElement("span");
-                qmElement.add(new DefaultAttribute("class", "wikicreatelinkqm"));
-                qmElement.addText("?");
-
-                aElement.add(qmElement);
+                printer.printXMLStartElement("span", spanAttributes);
+                printer.printXMLStartElement("a", aAttributes);
+                printer.printXMLStartElement("span", new String[][] {{"class", "wikicreatelinktext"}});
             }
-        }
-
-        spanElement.add(spanClassAttribute);
-
-        aElement.add(aHrefAttribute);
-        if (link.getTarget() != null) {
-            // We prefix with "_" since a target can be any token and we need to differentiate with
-            // other valid rel tokens.
-            aElement.add(new DefaultAttribute("rel", "_" + link.getTarget()));
-        }
-
-        labelContainer.addText(getLinkLabelToPrint(link));
-
-        return elements;
+        }        
     }
 
-    private String getLinkLabelToPrint(Link link)
+    public void endRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, 
+        boolean generateLinkContent) throws Exception
     {
-        String labelToPrint;
-
-        // If the usser has specified a label use it, if not then use the rendering configuration value to find out
-        // what should be printed.
-
-        if (link.getLabel() != null) {
-            labelToPrint = link.getLabel();
-        } else {
-            // TODO we need to use a DocumentName and DocumentNameFactory to transform a reference as a String
-            // Then use the LinkLabelResolver
-            labelToPrint = link.getReference();
+        // If there was no link content then generate it based on the passed reference
+        if (generateLinkContent) {
+            printer.printXMLStartElement("span", new String[][] {{"class", "wikigeneratedlinkcontent"}});
+            printer.printXML(link.getReference());
+            printer.printXMLEndElement("span");
+        }
+        
+        if (!link.isExternalLink()) {
+            if (link.getReference() != null && !this.documentAccessBridge.exists(link.getReference())) {
+                printer.printXMLEndElement("span");
+                printer.printXMLStartElement("span", new String[][] {{"class", "wikicreatelinkqm"}});
+                printer.printXML("?");
+                printer.printXMLEndElement("span");
+            }
         }
 
-        return labelToPrint;
+        printer.printXMLEndElement("a");
+        printer.printXMLEndElement("span");
+        
+        // Add a XML comment to signify the end of the link.
+        printer.printXMLComment("stopwikilink");
     }
 }

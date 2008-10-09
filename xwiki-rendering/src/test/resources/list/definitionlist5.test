@@ -42,7 +42,8 @@ endDefinitionTerm
 endDefinitionList
 beginDefinitionList
 beginDefinitionTerm
-onLink [Reference = [uri:not]] [true]
+beginLink [Reference = [uri:not]] [true]
+endLink [Reference = [uri:not]] [true]
 onSpace
 onWord [definition]
 endDefinitionTerm
@@ -69,7 +70,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><span class="wikicreatelink"><a href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext">uri:not</span><span class="wikicreatelinkqm">?</span></a></span> definition</dt></dl><p>;title: not definition</p><p>not ;definition: something</p>
+<dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><!--startwikilink:uri:not--><span class="wikicreatelink"><a href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">uri:not</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--> definition</dt></dl><p>;title: not definition</p><p>not ;definition: something</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -88,4 +89,4 @@ not ;definition: something
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
 .# TODO: There's a problem with the URI link. Fix it.
-<html><dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><span class="wikicreatelink"><a href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext">uri:not</span><span class="wikicreatelinkqm">?</span></a></span> definition</dt></dl><p>;title: not definition</p><p>not ;definition: something</p></html>
+<html><dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><!--startwikilink:uri:not--><span class="wikicreatelink"><a href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">uri:not</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--> definition</dt></dl><p>;title: not definition</p><p>not ;definition: something</p></html>

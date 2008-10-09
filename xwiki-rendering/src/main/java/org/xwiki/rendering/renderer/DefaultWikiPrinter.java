@@ -82,4 +82,12 @@ public class DefaultWikiPrinter implements WikiPrinter
     {
         return getBuffer().toString();
     }
+    
+    /**
+     * Removes the buffer's content which allows the printer to be reused.
+     */
+    public void clear()
+    {
+        getBuffer().setLength(0);
+    }
 }

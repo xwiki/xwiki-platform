@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
+import org.dom4j.tree.DefaultComment;
 import org.dom4j.tree.DefaultElement;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -35,6 +36,7 @@ import org.xwiki.rendering.renderer.WikiPrinter;
  * Base toolkit class for all xml based renderers.
  * 
  * @version $Id$
+ * @since 1.7M1
  */
 public class XHTMLWikiPrinter
 {
@@ -171,6 +173,21 @@ public class XHTMLWikiPrinter
         try {
             this.xmlWriter.endElement("", name, name);
         } catch (SAXException e) {
+            // TODO: add error log here
+        }
+    }
+
+    /**
+     * Print a XML comment.
+     * 
+     * @param content the comment content
+     */
+    public void printXMLComment(String content)
+    {
+        try {
+            DefaultComment commentElement = new DefaultComment(content);
+            this.xmlWriter.write(commentElement);
+        } catch (IOException e) {
             // TODO: add error log here
         }
     }

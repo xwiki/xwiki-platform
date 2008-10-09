@@ -28,8 +28,12 @@ import org.wikimodel.wem.xhtml.handler.TagHandler;
 import org.wikimodel.wem.xwiki.XWikiXhtmlEscapeHandler;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
+import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiCommentHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiHeaderTagHandler;
+import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiReferenceTagHandler;
+import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiSpanTagHandler;
 
 /**
  * @version $Id$
@@ -39,6 +43,8 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XHTML, "1.0");
 
+    private PrintRendererFactory printRendererFactory;
+    
     /**
      * {@inheritDoc}
      * 
@@ -59,14 +65,21 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     {
     	// Override some of the WikiModel XHTML parser tag handlers to introduce our own logic.
     	Map<String, TagHandler> handlers = new HashMap<String, TagHandler>();
-    	XWikiHeaderTagHandler handler = new XWikiHeaderTagHandler();
+    	TagHandler handler = new XWikiHeaderTagHandler();
     	handlers.put("h1", handler);
     	handlers.put("h2", handler);
     	handlers.put("h3", handler);
     	handlers.put("h4", handler);
     	handlers.put("h5", handler);
     	handlers.put("h6", handler);
-
-    	return new XhtmlParser(handlers, new XWikiXhtmlEscapeHandler());
+    	handlers.put("a", new XWikiReferenceTagHandler());
+    	handlers.put("span", new XWikiSpanTagHandler());
+    	
+    	XhtmlParser parser = new XhtmlParser();
+    	parser.setExtraHandlers(handlers);
+    	parser.setEscapeHandler(new XWikiXhtmlEscapeHandler());
+    	parser.setCommentHandler(
+    	    new XWikiCommentHandler(this, this.linkParser, this.urlFactory, this.printRendererFactory));
+    	return parser;
     }
 }

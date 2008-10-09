@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.block;
 
+import java.util.List;
+
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.Link;
 
@@ -28,7 +30,7 @@ import org.xwiki.rendering.listener.Link;
  * @version $Id$
  * @since 1.5M2
  */
-public class LinkBlock extends AbstractBlock
+public class LinkBlock extends AbstractFatherBlock
 {
     /**
      * A link. See {@link Link} for more details.
@@ -39,21 +41,24 @@ public class LinkBlock extends AbstractBlock
      * If true then the link is a free standing URI directly in the text.
      */
     private boolean isFreeStandingURI;
-    
+
     /**
+     * @param childrenBlocks the nested children blocks
      * @param link the link
      */
-    public LinkBlock(Link link)
+    public LinkBlock(List<Block> childrenBlocks, Link link)
     {
-        this(link, false);
+        this(childrenBlocks, link, false);
     }
 
     /**
+     * @param childrenBlocks the nested children blocks
      * @param link the link
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      */
-    public LinkBlock(Link link, boolean isFreeStandingURI)
+    public LinkBlock(List<Block> childrenBlocks, Link link, boolean isFreeStandingURI)
     {
+        super(childrenBlocks);
         this.link = link;
         this.isFreeStandingURI = isFreeStandingURI;
     }
@@ -68,19 +73,28 @@ public class LinkBlock extends AbstractBlock
     }
 
     /**
-     * @return true tif the link is a free standing URI directly in the text, false otherwise
+     * @return true if the link is a free standing URI directly in the text, false otherwise
      */
     public boolean isFreeStandingURI()
     {
         return this.isFreeStandingURI;
     }
-    
+
     /**
      * {@inheritDoc}
-     * @see AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
      */
-    public void traverse(Listener listener)
+    public void before(Listener listener)
     {
-        listener.onLink(getLink(), isFreeStandingURI());
+        listener.beginLink(getLink(), isFreeStandingURI());
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)  
+     */
+    public void after(Listener listener)
+    {
+        listener.endLink(getLink(), isFreeStandingURI());
     }
 }

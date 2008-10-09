@@ -29,7 +29,6 @@ import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
-import org.wikimodel.wem.WikiReference;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -181,15 +180,16 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.onLineBreak();
     }
 
-    public void onLink(Link link, boolean isFreeStandingURI)
+    public void beginLink(Link link, boolean isFreeStandingURI)
     {
-        if (isFreeStandingURI) {
-            this.wikimodelListener.onReference(link.getReference());
-        } else {
-            WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(),
-                createWikiParameters(Collections.<String, String>emptyMap()));
-            this.wikimodelListener.onReference(wikiReference);
-        }
+        // TODO wait for WikiModel to support wiki syntax in links
+        // See http://code.google.com/p/wikimodel/issues/detail?id=87
+    }
+
+    public void endLink(Link link, boolean isFreeStandingURI)
+    {
+        // TODO wait for WikiModel to support wiki syntax in links
+        // See http://code.google.com/p/wikimodel/issues/detail?id=87
     }
 
     public void onInlineMacro(String name, Map<String, String> parameters, String content)

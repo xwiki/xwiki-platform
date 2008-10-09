@@ -38,7 +38,7 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.internal.macro.InlineBlockConverter;
+import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.rendering.listener.Listener;
 import org.apache.commons.lang.StringUtils;
 
@@ -54,7 +54,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
 
     private Stack<Block> stack = new Stack<Block>();
 
-    private InlineBlockConverter inlineConverter = new InlineBlockConverter();
+    private ParserUtils inlineConverter = new ParserUtils();
 
     /**
      * SAX parsers are allowed to call the characters() method several times in a row. Some parsers have a buffer of 8K

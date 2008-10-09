@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.parser.ParseException;
 
 /**
  * @version $Id$
@@ -31,98 +30,18 @@ import org.xwiki.rendering.parser.ParseException;
  */
 public class XWikiLinkParserTest extends TestCase
 {
-    public void testParseLinkWhenOnlyReferenceIsSpecified() throws Exception
-    {
-        LinkParser parser = new XWikiLinkParser();
-        Link link = parser.parse("reference");
-
-        assertNull(link.getLabel());
-        assertEquals("reference", link.getReference());
-        assertEquals(LinkType.DOCUMENT, link.getType());
-        assertEquals("Reference = [reference]", link.toString());
-    }
-
-    public void testParseLinkWhenValidLabelSpecified() throws Exception
-    {
-        LinkParser parser = new XWikiLinkParser();
-        Link link = parser.parse("label|reference");
-
-        assertEquals("label", link.getLabel());
-        assertEquals("reference", link.getReference());
-        assertEquals(LinkType.DOCUMENT, link.getType());
-        assertEquals("Label = [label] Reference = [reference]", link.toString());
-
-        link = parser.parse("label>reference");
-
-        assertEquals("label", link.getLabel());
-        assertEquals("reference", link.getReference());
-        assertEquals(LinkType.DOCUMENT, link.getType());
-        assertEquals("Label = [label] Reference = [reference]", link.toString());
-    }
-
-    public void testParseLinkWhenTargetSpecified() throws Exception
-    {
-        LinkParser parser = new XWikiLinkParser();
-        Link link = parser.parse("reference|_target");
-
-        assertNull(link.getLabel());
-        assertEquals("_target", link.getTarget());
-        assertEquals("Reference = [reference] Target = [_target]", link.toString());
-
-        link = parser.parse("reference>_target");
-
-        assertNull(link.getLabel());
-        assertEquals("_target", link.getTarget());
-        assertEquals("Reference = [reference] Target = [_target]", link.toString());
-    }
-
-    public void testParseLinkWithInvalidTarget()
-    {
-        LinkParser parser = new XWikiLinkParser();
-        try {
-            parser.parse("label|reference|target");
-            fail("Should have thrown an exception here");
-        } catch (ParseException expected) {
-            assertEquals("Invalid link format. The target element must start with an underscore, "
-                + "got [target]", expected.getMessage());
-        }
-    }
-
-    public void testParseLinkWhenMailUriSpecified() throws Exception
-    {
-        LinkParser parser = new XWikiLinkParser();
-        Link link = parser.parse("mailto:john@smith.com");
-
-        assertEquals("mailto:john@smith.com", link.getReference());
-        assertEquals(LinkType.URI, link.getType());
-        assertEquals("Reference = [mailto:john@smith.com]", link.toString());
-    }
-
-    public void testParseLinkVariations() throws Exception
+    public void testParseLink() throws Exception
     {
         LinkParser parser = new XWikiLinkParser();
 
         Link link = parser.parse("");
-        assertNull(link.getLabel());
         assertEquals("", link.getReference());
         assertEquals("Reference = []", link.toString());
 
         link = parser.parse("Hello World");
-        assertNull(link.getLabel());
         assertEquals("Hello World", link.getReference());
+        assertEquals(LinkType.DOCUMENT, link.getType());
         assertEquals("Reference = [Hello World]", link.toString());
-
-        link = parser.parse("Hello World>HelloWorld");
-        assertEquals("Hello World", link.getLabel());
-        assertEquals("HelloWorld", link.getReference());
-        assertEquals("Label = [Hello World] Reference = [HelloWorld]", link.toString());
-
-        link = parser.parse("Hello World>HelloWorld>_target");
-        assertEquals("Hello World", link.getLabel());
-        assertEquals("HelloWorld", link.getReference());
-        assertEquals("_target", link.getTarget());
-        assertEquals("Label = [Hello World] Reference = [HelloWorld] Target = [_target]",
-            link.toString());
 
         link = parser.parse("HelloWorld#anchor?param1=1&param2=2@wikipedia");
         assertEquals("HelloWorld", link.getReference());
@@ -135,26 +54,17 @@ public class XWikiLinkParserTest extends TestCase
         link = parser.parse("Hello World?xredirect=../whatever");
         assertEquals("Hello World", link.getReference());
         assertEquals("xredirect=../whatever", link.getQueryString());
-        assertEquals("Reference = [Hello World] QueryString = [xredirect=../whatever]",
-            link.toString());
-
-        link = parser.parse("Hello World>http://xwiki.org");
-        assertEquals("Hello World", link.getLabel());
-        assertEquals("http://xwiki.org", link.getReference());
-        assertEquals("Label = [Hello World] Reference = [http://xwiki.org]",
-            link.toString());
+        assertEquals("Reference = [Hello World] QueryString = [xredirect=../whatever]", link.toString());
 
         // We consider that myxwiki is the wiki name and http://xwiki.org is the page name
         link = parser.parse("mywiki:http://xwiki.org");
         assertEquals("mywiki:http://xwiki.org", link.getReference());
         assertEquals("Reference = [mywiki:http://xwiki.org]", link.toString());
 
-        link = parser.parse("Hello World>HelloWorld?xredirect=http://xwiki.org");
-        assertEquals("Hello World", link.getLabel());
+        link = parser.parse("HelloWorld?xredirect=http://xwiki.org");
         assertEquals("HelloWorld", link.getReference());
         assertEquals("xredirect=http://xwiki.org", link.getQueryString());
-        assertEquals("Label = [Hello World] Reference = [HelloWorld] "
-            + "QueryString = [xredirect=http://xwiki.org]", link.toString());
+        assertEquals("Reference = [HelloWorld] QueryString = [xredirect=http://xwiki.org]", link.toString());
 
         link = parser.parse("http://xwiki.org");
         assertEquals("http://xwiki.org", link.getReference());
@@ -170,7 +80,9 @@ public class XWikiLinkParserTest extends TestCase
         assertEquals("anchor", link.getAnchor());
         assertEquals("Reference = [Hello] Anchor = [anchor]", link.toString());
 
-        link = parser.parse("[label]>Doc");
-        assertEquals("[label]", link.getLabel());
+        link = parser.parse("mailto:john@smith.com");
+        assertEquals("mailto:john@smith.com", link.getReference());
+        assertEquals(LinkType.URI, link.getType());
+        assertEquals("Reference = [mailto:john@smith.com]", link.toString());
     }
 }

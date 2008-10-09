@@ -3,47 +3,82 @@
 .#-----------------------------------------------------
 [[Space.ExistingPage]]
 [[Space.ExistingPage#anchor?param=value]]
-[[label>Space.UnknownPage]]
-[[label>http://xwiki.org]]
-[[label>Space.ExistingPage>_target]]
+[[label>>Space.UnknownPage]]
+[[label||Space.UnknownPage]]
+[[label>>http://xwiki.org]]
 [[mailto:john@doe.com]]
 [[{{macro}}]]
+[[Page>Name]]
+[[Page|Name]]
+[[**hello**>>Page]]
+[[= notheader>>Page]]
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onLink [Reference = [Space.ExistingPage]] [false]
+beginLink [Reference = [Space.ExistingPage]] [false]
+endLink [Reference = [Space.ExistingPage]] [false]
 onLineBreak
-onLink [Reference = [Space.ExistingPage] QueryString = [param=value] Anchor = [anchor]] [false]
+beginLink [Reference = [Space.ExistingPage] QueryString = [param=value] Anchor = [anchor]] [false]
+endLink [Reference = [Space.ExistingPage] QueryString = [param=value] Anchor = [anchor]] [false]
 onLineBreak
-onLink [Label = [label] Reference = [Space.UnknownPage]] [false]
+beginLink [Reference = [Space.UnknownPage]] [false]
+onWord [label]
+endLink [Reference = [Space.UnknownPage]] [false]
 onLineBreak
-onLink [Label = [label] Reference = [http://xwiki.org]] [false]
+beginLink [Reference = [Space.UnknownPage]] [false]
+onWord [label]
+endLink [Reference = [Space.UnknownPage]] [false]
 onLineBreak
-onLink [Label = [label] Reference = [Space.ExistingPage] Target = [_target]] [false]
+beginLink [Reference = [http://xwiki.org]] [false]
+onWord [label]
+endLink [Reference = [http://xwiki.org]] [false]
 onLineBreak
-onLink [Reference = [mailto:john@doe.com]] [false]
+beginLink [Reference = [mailto:john@doe.com]] [false]
+endLink [Reference = [mailto:john@doe.com]] [false]
 onLineBreak
-onLink [Reference = [{{macro}}]] [false]
+beginLink [Reference = [{{macro}}]] [false]
+endLink [Reference = [{{macro}}]] [false]
+onLineBreak
+beginLink [Reference = [Page>Name]] [false]
+endLink [Reference = [Page>Name]] [false]
+onLineBreak
+beginLink [Reference = [Page|Name]] [false]
+endLink [Reference = [Page|Name]] [false]
+onLineBreak
+beginLink [Reference = [Page]] [false]
+beginBold
+onWord [hello]
+endBold
+endLink [Reference = [Page]] [false]
+onLineBreak
+beginLink [Reference = [Page]] [false]
+onSpecialSymbol [=]
+onSpace
+onWord [notheader]
+endLink [Reference = [Page]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage">Space.ExistingPage</a></span><br/><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value">Space.ExistingPage</a></span><br/><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage"><span class="wikicreatelinktext">label</span><span class="wikicreatelinkqm">?</span></a></span><br/><span class="wikiexternallink"><a href="http://xwiki.org">label</a></span><br/><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage" rel="__target">label</a></span><br/><span class="wikiexternallink"><a href="mailto:john@doe.com">mailto:john@doe.com</a></span><br/><span class="wikicreatelink"><a href="/xwiki/bin/view/{{macro}}"><span class="wikicreatelinktext">{{macro}}</span><span class="wikicreatelinkqm">?</span></a></span></p>
+<p><!--startwikilink:Space.ExistingPage--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--><br/><!--startwikilink:Space.ExistingPage#anchor?param=value--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--><br/><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage"><span class="wikicreatelinktext">label</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage"><span class="wikicreatelinktext">label</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org">label</a></span><!--stopwikilink--><br/><!--startwikilink:mailto:john@doe.com--><span class="wikiexternallink"><a href="mailto:john@doe.com"><span class="wikigeneratedlinkcontent">mailto:john@doe.com</span></a></span><!--stopwikilink--><br/><!--startwikilink:{{macro}}--><span class="wikicreatelink"><a href="/xwiki/bin/view/{{macro}}"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">{{macro}}</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page>Name--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page&gt;Name"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">Page&gt;Name</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page|Name--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page|Name"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">Page|Name</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><strong>hello</strong></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext">= notheader</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 [[Space.ExistingPage]]
 [[Space.ExistingPage#anchor?param=value]]
-[[label>Space.UnknownPage]]
-[[label>http://xwiki.org]]
-[[label>Space.ExistingPage>_target]]
+[[label>>Space.UnknownPage]]
+[[label>>Space.UnknownPage]]
+[[label>>http://xwiki.org]]
 [[mailto:john@doe.com]]
 [[{{macro}}]]
+[[Page>Name]]
+[[Page|Name]]
+[[**hello**>>Page]]
+[[= notheader>>Page]]
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: Make it work!
-<html><p><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage">Space.ExistingPage</a></span><br/><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value">Space.ExistingPage</a></span><br/><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage"><span class="wikicreatelinktext">label</span><span class="wikicreatelinkqm">?</span></a></span><br/><span class="wikiexternallink"><a href="http://xwiki.org">label</a></span><br/><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage" rel="__target">label</a></span><br/><span class="wikiexternallink"><a href="mailto:john@doe.com">mailto:john@doe.com</a></span><br/><span class="wikicreatelink"><a href="/xwiki/bin/view/{{macro}}"><span class="wikicreatelinktext">{{macro}}</span><span class="wikicreatelinkqm">?</span></a></span></p></html>
+<html><p><!--startwikilink:Space.ExistingPage--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--><br/><!--startwikilink:Space.ExistingPage#anchor?param=value--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--><br/><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage"><span class="wikicreatelinktext">label</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage"><span class="wikicreatelinktext">label</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org">label</a></span><!--stopwikilink--><br/><!--startwikilink:mailto:john@doe.com--><span class="wikiexternallink"><a href="mailto:john@doe.com"><span class="wikigeneratedlinkcontent">mailto:john@doe.com</span></a></span><!--stopwikilink--><br/><!--startwikilink:{{macro}}--><span class="wikicreatelink"><a href="/xwiki/bin/view/{{macro}}"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">{{macro}}</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page>Name--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page&gt;Name"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">Page&gt;Name</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page|Name--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page|Name"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">Page|Name</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><strong>hello</strong></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext">= notheader</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--></p></html>

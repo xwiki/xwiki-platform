@@ -25,12 +25,12 @@ import java.io.StringReader;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.macro.InlineBlockConverter;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
 
@@ -50,7 +50,7 @@ public class VelocityMacro extends AbstractNoParameterMacro
      */
     private VelocityManager velocityManager;
 
-    private InlineBlockConverter inlineConverter = new InlineBlockConverter();
+    private ParserUtils parserUtils = new ParserUtils();
 
     /**
      * Injected by the Component Manager.
@@ -105,7 +105,7 @@ public class VelocityMacro extends AbstractNoParameterMacro
         // 3) If in inline mode remove any top level paragraph
         List<Block> result = parsedDom.getChildren();
         if (context.isInlined()) {
-            this.inlineConverter.removeTopLevelParagraph(result);
+            this.parserUtils.removeTopLevelParagraph(result);
         }
 
         return result; 

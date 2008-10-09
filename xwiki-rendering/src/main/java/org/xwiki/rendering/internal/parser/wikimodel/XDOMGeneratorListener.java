@@ -42,6 +42,8 @@ import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.url.XWikiURLFactory;
 import org.xwiki.url.XWikiURL;
 import org.xwiki.url.InvalidURLException;
@@ -59,6 +61,8 @@ public class XDOMGeneratorListener implements IWemListener
 
     private final MarkerBlock marker = new MarkerBlock();
 
+    private Parser parser;
+    
     private LinkParser linkParser;
 
     private XWikiURLFactory urlFactory;
@@ -70,8 +74,11 @@ public class XDOMGeneratorListener implements IWemListener
         }
     }
 
-    public XDOMGeneratorListener(LinkParser linkParser, XWikiURLFactory urlFactory)
+    // TODO: Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links.
+    // See http://code.google.com/p/wikimodel/issues/detail?id=87
+    public XDOMGeneratorListener(Parser parser, LinkParser linkParser, XWikiURLFactory urlFactory)
     {
+        this.parser = parser;
         this.linkParser = linkParser;
         this.urlFactory = urlFactory;
     }
@@ -397,7 +404,7 @@ public class XDOMGeneratorListener implements IWemListener
         // TODO: Generate some output log
         if (this.linkParser != null) {
             try {
-                this.stack.push(new LinkBlock(this.linkParser.parse(ref), true));
+                this.stack.push(new LinkBlock(Collections.<Block>emptyList(), this.linkParser.parse(ref), true));
             } catch (ParseException e) {
                 // TODO: Should we instead generate ErrorBlocks?
                 throw new RuntimeException("Failed to parse link [" + ref + "]", e);
@@ -422,34 +429,39 @@ public class XDOMGeneratorListener implements IWemListener
                 // TODO: Should we instead generate ErrorBlocks?
                 throw new RuntimeException("Failed to parse link [" + ref.getLink() + "]", e);
             }
-            link.setLabel(ref.getLabel());
-
-            // Right now WikiModel puts any target element as the first element of the WikiParameters
-            if (ref.getParameters().getSize() > 0) {
-                link.setTarget(ref.getParameters().getParameter(0).getKey());
+            
+            // TODO: Remove the need to parse the label passed by WikiModel when it implements support for wiki syntax 
+            // in links. See http://code.google.com/p/wikimodel/issues/detail?id=87
+            List<Block> linkedBlocks = Collections.<Block>emptyList();
+            if ((ref.getLabel() != null) && (ref.getLabel().length() > 0)) {
+                try {
+                    // TODO: Use an inline parser. See http://jira.xwiki.org/jira/browse/XWIKI-2748
+                    ParserUtils parserUtils = new ParserUtils();
+                    linkedBlocks = parserUtils.parseInline(this.parser, ref.getLabel());
+                } catch (ParseException e) {
+                    // TODO: Handle errors
+                }
             }
-
+            
             // Check if the reference in the link is an relative URI. If that's the case transform it into
-            // a document name sincce all relative URIs should point to wiki documents.
+            // a document name since all relative URIs should point to wiki documents.
+            //
+            // Note that we don't modify URLs since it's impossible for us to know whether it's an internal URL
+            // or some external URL. Thus to handle all cases we generate an XHTML placeholder when outputting
+            // a link to XHTML and the XHMTL parser knows about this placeholder and can transform it back into
+            // a document name without having to parse any URI/URL. We still need this handling below in cases
+            // where the placeholder would not have been generated.
             if (link.getReference().startsWith("/")) {
                 try {
                     XWikiURL url = this.urlFactory.createURL(link.getReference());
                     link.setReference(new DocumentNameSerializer().serialize(url));
-
-                    // If the label is the same as the reference then remove it. This to prevent having the following
-                    // use case: [[Space.Page]] --HTML--> <a href="/xwiki/bin/view/Space/Page>Space.Page</a>
-                    // --XWIKI--> [[Space.Page>Space.Page]]
-                    if (link.getLabel().equalsIgnoreCase(link.getReference())) {
-                        link.setLabel(null);
-                    }
-
                 } catch (InvalidURLException e) {
                     // If it fails it means this was not a link pointing to a xwiki document after all so we just
                     // leave it as is.
                 }
             }
 
-            this.stack.push(new LinkBlock(link));
+            this.stack.push(new LinkBlock(linkedBlocks, link));
         }
     }
 

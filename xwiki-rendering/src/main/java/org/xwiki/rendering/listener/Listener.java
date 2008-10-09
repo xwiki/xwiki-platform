@@ -303,6 +303,26 @@ public interface Listener
     void endQuotationLine();
 
     /**
+     * Start of a link.
+     * 
+     * @param link the link definition (the reference)
+     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
+     * @see Link
+     * @since 1.7M1
+     */
+    void beginLink(Link link, boolean isFreeStandingURI);
+
+    /**
+     * End of a link.
+     * 
+     * @param link the link definition (the reference)
+     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
+     * @see Link
+     * @since 1.7M1
+     */
+    void endLink(Link link, boolean isFreeStandingURI);
+
+    /**
      * An explicit line break specified in the wiki syntax. For example for XWiki this would be "\\". Note that this is
      * different from a new line which is triggered when the new line character is found ("\n") and which generates an
      * {@link #onNewLine()} event.
@@ -314,15 +334,6 @@ public interface Listener
      * line break which is explicitely specified in wiki syntax, and which generates a {@link #onLineBreak()} event.
      */
     void onNewLine();
-
-    /**
-     * A link.
-     * 
-     * @param link the link definition (label, reference, target, etc)
-     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
-     * @see Link
-     */
-    void onLink(Link link, boolean isFreeStandingURI);
 
     /**
      * A {@link org.xwiki.rendering.macro.Macro} located inside another Block. For example a Macro inside a Paragraph

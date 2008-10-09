@@ -36,7 +36,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-
         
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);
@@ -145,7 +144,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("misc/misc5", false);
         suite.addTestsFromResource("encoding/encoding1", false);
         suite.addTestsFromResource("encoding/encoding2", false);
-        
+
         return new PlexusTestSetup(suite);
     }
 }

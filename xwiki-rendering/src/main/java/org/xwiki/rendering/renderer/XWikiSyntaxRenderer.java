@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
+import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
@@ -39,6 +40,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 {
+    private XWikiSyntaxLinkRenderer linkRenderer;
+    
     private boolean isFirstElementRendered = false;
     
     private StringBuffer listStyle = new StringBuffer();
@@ -67,10 +70,14 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     
     private XWikiMacroPrinter macroPrinter;
 
+    private Stack<WikiPrinter> originalPrinters = new Stack<WikiPrinter>();
+    private WikiPrinter linkBlocksPrinter; 
+    
     public XWikiSyntaxRenderer(WikiPrinter printer)
     {
         super(printer);
         this.macroPrinter = new XWikiMacroPrinter();
+        this.linkRenderer = new XWikiSyntaxLinkRenderer();
     }
 
     /**
@@ -96,35 +103,30 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#onLink(org.xwiki.rendering.listener.Link)
+     * @see PrintRenderer#beginLink(Link, boolean)
      */
-    public void onLink(Link link, boolean isFreeStandingURI)
+    public void beginLink(Link link, boolean isFreeStandingURI)
     {
         if (!isFreeStandingURI) {
             print("[[");
-            if (link.getLabel() != null) {
-                print(link.getLabel());
-                print(">");
-            }
         }
-        print(link.getReference());
-        if (link.getAnchor() != null) {
-            print("#");
-            print(link.getAnchor());
-        }
-        if (link.getQueryString() != null) {
-            print("?");
-            print(link.getQueryString());
-        }
-        if (link.getInterWikiAlias() != null) {
-            print("@");
-            print(link.getInterWikiAlias());
-        }
+        this.originalPrinters.push(getPrinter());
+        this.linkBlocksPrinter = new DefaultWikiPrinter();
+        this.setPrinter(this.linkBlocksPrinter);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see PrintRenderer#endLink(Link, boolean)
+     */
+    public void endLink(Link link, boolean isFreeStandingURI)
+    {
+        String content = this.linkBlocksPrinter.toString();
+        setPrinter(this.originalPrinters.pop());
+
+        print(this.linkRenderer.renderLink(content, link));
         if (!isFreeStandingURI) {
-            if (link.getTarget() != null) {
-                print(">");
-                print(link.getTarget());
-            }
             print("]]");
         }
     }

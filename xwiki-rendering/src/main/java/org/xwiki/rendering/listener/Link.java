@@ -28,19 +28,9 @@ package org.xwiki.rendering.listener;
 public class Link
 {
     /**
-     * @see #getLabel()
-     */
-    private String label;
-
-    /**
      * @see #getInterWikiAlias()
      */
     private String interWikiAlias;
-
-    /**
-     * @see #getTarget()
-     */
-    private String target;
 
     /**
      * @see #getReference()
@@ -90,41 +80,6 @@ public class Link
     public void setType(LinkType type)
     {
         this.type = type;
-    }
-
-    /**
-     * @return the string which will be displayed to the user when the link is rendered or null if no label has been
-     *         specified (in that case the page name or the URI will be displayed. Example: "My Page"
-     */
-    public String getLabel()
-    {
-        return this.label;
-    }
-
-    /**
-     * @param label see {@link #getLabel()}
-     */
-    public void setLabel(String label)
-    {
-        this.label = label;
-    }
-
-    /**
-     * @return the browser window in which the link should be opened into or null if not defined. This element
-     *         corresponds to the HTML <code>target</code> attribute for the <code>a</code> element. It is used when
-     *         rendering the link and defauts to opening the link in the current page. Example: "_self", "_blank".
-     */
-    public String getTarget()
-    {
-        return this.target;
-    }
-
-    /**
-     * @param target see {@link #getTarget()}
-     */
-    public void setTarget(String target)
-    {
-        this.target = target;
     }
 
     /**
@@ -197,10 +152,6 @@ public class Link
     {
         boolean shouldAddSpace = false;
         StringBuffer sb = new StringBuffer();
-        if (getLabel() != null) {
-            sb.append("Label = [").append(getLabel()).append("]");
-            shouldAddSpace = true;
-        }
         if (getReference() != null) {
             sb.append(shouldAddSpace ? " " : "");
             sb.append("Reference = [").append(getReference()).append("]");
@@ -220,10 +171,6 @@ public class Link
             sb.append(shouldAddSpace ? " " : "");
             sb.append("InterWikiAlias = [").append(getInterWikiAlias()).append("]");
             shouldAddSpace = true;
-        }
-        if (getTarget() != null) {
-            sb.append(shouldAddSpace ? " " : "");
-            sb.append("Target = [").append(getTarget()).append("]");
         }
 
         return sb.toString();

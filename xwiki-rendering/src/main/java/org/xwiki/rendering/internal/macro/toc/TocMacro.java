@@ -31,9 +31,6 @@ import org.xwiki.rendering.block.ListBLock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.SectionBlock;
-import org.xwiki.rendering.block.SpaceBlock;
-import org.xwiki.rendering.block.SpecialSymbolBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.internal.util.EnumConverter;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -141,27 +138,6 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
     }
 
     /**
-     * @param blocks the block to convert.
-     * @return a merge of the provided list of blocks as String.
-     */
-    // TODO: remove this when LinkBlock will support children blocks as label
-    private String getLabelFromChildren(List<Block> blocks)
-    {
-        StringBuffer label = new StringBuffer();
-        for (Block block : blocks) {
-            if (block instanceof WordBlock) {
-                label.append(((WordBlock) block).getWord());
-            } else if (block instanceof SpaceBlock) {
-                label.append(' ');
-            } else if (block instanceof SpecialSymbolBlock) {
-                label.append(((SpecialSymbolBlock) block).getSymbol());
-            }
-        }
-
-        return label.toString();
-    }
-
-    /**
      * Convert sections into list block tree.
      * 
      * @param sections the sections to convert.
@@ -216,7 +192,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
     }
 
     /**
-     * Create a new toc list itam based on section title.
+     * Create a new toc list item based on section title.
      * 
      * @param sectionBlock the {@link SectionBlock}.
      * @return the new list item block.
@@ -228,11 +204,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
 
         Link link = new Link();
         link.setAnchor(idBlock.getName());
-        LinkBlock linkBlock = new LinkBlock(link);
-
-        linkBlock.addChildren(sectionBlock.getChildren());
-        // TODO: remove this when LinkBlock will support children blocks as label
-        link.setLabel(getLabelFromChildren(sectionBlock.getChildren()));
+        LinkBlock linkBlock = new LinkBlock(sectionBlock.getChildren(), link);
 
         return new ListItemBlock(Arrays.<Block> asList(linkBlock));
     }

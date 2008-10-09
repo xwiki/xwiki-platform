@@ -32,7 +32,7 @@ import java.util.regex.Matcher;
 
 /**
  * Parses the content of XWiki links. The format is as follows:
- * <code>(alias[|>])(link)(@interWikiAlias)(|target)</code>, where:
+ * <code>(alias[|>])(link)(@interWikiAlias)(|parameters)</code>, where:
  * <ul>
  *   <li><code>alias</code>: An optional string which will be displayed to the user as the link
  *       name when rendered. Example: "My Page".</li>
@@ -52,15 +52,16 @@ import java.util.regex.Matcher;
  *   <li><code>interWikiAlias</code>: An optional
  *       <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias as defined in the
  *       InterWiki Map. Example: "wikipedia"</li>
- *   <li><code>target</code>: An optional string corresponding to the HTML <code>target</code>
- *       attribute for a <code>a</code> element. This element is used when rendering the link. It
- *       defaults to opening the link in the current page. Example: "_self", "_blank"</li>
+ *   <li><code>parameters</code>: An optional parameters list using the following format:
+ *       <code>param1=value1 param2=value2 ... paramN=valueN</code>. For example this can be used
+ *       to set the HTML target attribute for a <code>a</code> element (Example: target=_self,
+ *       target=_blank</li>
  * </ul>
  * Examples of valid wiki links:
  * <ul>
  *   <li>Hello World</li>
  *   <li>Hello World>HelloWorld</li>
- *   <li>Hello World>HelloWorld>_blank</li>
+ *   <li>Hello World>HelloWorld>target=_blank</li>
  *   <li>Hello World>http://myserver.com/HelloWorld</li>
  *   <li>Hello World>HelloWorld#Anchor</li>
  *   <li>http://myserver.com</li>
@@ -86,16 +87,6 @@ public class XWikiLinkParser implements LinkParser
 
     private static final String MAILTO_URI_PREFIX = "mailto:";
     
-    /**
-     * Preferred separator for separating link parts (label, link and target).
-     */
-    private static final String LINK_SEPARATOR_GREATERTHAN = ">";
-
-    /**
-     * Other allowed separator for separating link parts (label, link and target).
-     */
-    private static final String LINK_SEPARATOR_PIPE = "|";
-
     public Link parse(String rawLink) throws ParseException
     {
         StringBuffer content = new StringBuffer(rawLink.trim());
@@ -105,11 +96,6 @@ public class XWikiLinkParser implements LinkParser
         // Let's default the link to be a document link. If instead it's a link to a URI or to
         // an interwiki location it'll be overriden.
         link.setType(LinkType.DOCUMENT);
-
-        // Note: It's important to parse the label and the target in that order. See
-        // {@link #parseLabel} for more details as to why.
-        link.setLabel(parseLabel(content));
-        link.setTarget(parseTarget(content));
 
         // Parse the link reference itself.
         String uri = parseURI(content);
@@ -145,77 +131,6 @@ public class XWikiLinkParser implements LinkParser
         }
 
         return link;
-    }
-
-    /**
-     * Find out the label part of the full link.
-     *
-     * <p>Note: As it's possible to specify a target we need a way to differentiate the following
-     * 2 links:
-     * <ul>
-     *   <li>[Web Home>_blank]  -> label = null, link = "Web Home", target = "_blank"</li>
-     *   <li>[Web Home>WebHome] -> label = "Web Home", link = "WebHome", target = null</li>
-     * </ul>
-     * The rule we have chosen is to force targets to start with an underscore character ("_").
-     * </p>
-     *
-     * @param content the string to parse. This parameter will be modified by the method to remove
-     *                the parsed content.
-     * @return the parsed label or null if no label was specified
-     */
-    protected String parseLabel(StringBuffer content)
-    {
-        String label = null;
-
-        // A label only exists if there's a separator ("|" or ">").
-        int separatorIndex = content.indexOf(LINK_SEPARATOR_PIPE);
-        if (separatorIndex == -1) {
-            separatorIndex = content.indexOf(LINK_SEPARATOR_GREATERTHAN);
-        }
-
-        if (separatorIndex != -1) {
-            String text = content.substring(0, separatorIndex).trim();
-
-            // Have we discovered a link or an label?
-            if (content.charAt(separatorIndex + 1) != '_') {
-                label = text;
-                content.delete(0, separatorIndex + 1);
-            }
-        }
-
-        return label;
-    }
-
-    /**
-     * Find out the target part of the full link.
-     *
-     * <p>Note: The target element must start with an underscore ("_"). See
-     * {@link #parseLabel(StringBuffer)} for more details as to why.</p>
-     *
-     * @param content the string to parse. This parameter will be modified by the method to remove
-     *                the parsed content.
-     * @return the parsed target or null if no target was specified
-     * @throws ParseException if the target does not start with an underscore
-     */
-    protected String parseTarget(StringBuffer content) throws ParseException
-    {
-        String target = null;
-
-        int separatorIndex = content.lastIndexOf(LINK_SEPARATOR_PIPE);
-        if (separatorIndex == -1) {
-            separatorIndex = content.lastIndexOf(LINK_SEPARATOR_GREATERTHAN);
-        }
-
-        if (separatorIndex != -1) {
-            target = content.substring(separatorIndex + 1).trim();
-            if (!target.startsWith("_")) {
-                throw new ParseException("Invalid link format. The target element must start with "
-                    + "an underscore, got [" + target + "]");
-            }
-            content.delete(separatorIndex, content.length());
-        }
-
-        return target;
     }
 
     /**

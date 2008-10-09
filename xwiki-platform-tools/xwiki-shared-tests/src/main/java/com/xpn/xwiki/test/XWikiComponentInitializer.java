@@ -66,8 +66,7 @@ public class XWikiComponentInitializer
             DefaultContainerConfiguration configuration = new DefaultContainerConfiguration();
             configuration.setContainerConfiguration("/plexus.xml");
             DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
-            PlexusContainerLocator locator = new PlexusContainerLocator(container);
-            this.componentManager = new PlexusComponentManager(locator);
+            this.componentManager = new PlexusComponentManager(container);
         }
 
         return this.componentManager;

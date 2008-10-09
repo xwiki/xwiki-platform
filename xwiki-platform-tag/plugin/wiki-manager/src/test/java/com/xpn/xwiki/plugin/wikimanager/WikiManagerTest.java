@@ -51,6 +51,48 @@ public class WikiManagerTest extends MockObjectTestCase
 
     private static final String TARGET_WIKI_NAME = "wikitosave";
 
+    private Map<String, XWikiDocument> getDocuments(String database, boolean create) throws XWikiException
+    {
+        if (database == null) {
+            database = this.context.getDatabase();
+        }
+
+        if (database == null || database.length() == 0) {
+            database = MAIN_WIKI_NAME;
+        }
+
+        if (!this.databases.containsKey(database)) {
+            if (create) {
+                this.databases.put(database, new HashMap<String, XWikiDocument>());
+            } else {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Database " + database + " does not exists.");
+            }
+        }
+
+        return this.databases.get(database);
+    }
+
+    private XWikiDocument getDocument(String documentFullName) throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument();
+        document.setFullName(documentFullName);
+
+        Map<String, XWikiDocument> docs = getDocuments(document.getDatabase(), false);
+
+        if (docs.containsKey(document.getFullName())) {
+            return docs.get(document.getFullName());
+        } else {
+            return document;
+        }
+    }
+
+    private void saveDocument(XWikiDocument document) throws XWikiException
+    {
+        document.setNew(false);
+        getDocuments(document.getDatabase(), true).put(document.getFullName(), document);
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -78,57 +120,14 @@ public class WikiManagerTest extends MockObjectTestCase
         {
             public Object invoke(Invocation invocation) throws Throwable
             {
-                String docFullName = (String) invocation.parameterValues.get(0);
-                XWikiDocument shallowDoc = new XWikiDocument();
-                shallowDoc.setFullName(docFullName);
-
-                String database = shallowDoc.getDatabase();
-
-                if (database == null) {
-                    database = context.getDatabase();
-                }
-
-                if (database == null || database.length() == 0)
-                    database = MAIN_WIKI_NAME;
-
-                if (!databases.containsKey(database))
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                        "Database " + database + " does not exists.");
-
-                Map<String, XWikiDocument> docs = databases.get(database);
-
-                if (docs.containsKey(shallowDoc.getFullName())) {
-                    return docs.get(shallowDoc.getFullName());
-                } else {
-                    return shallowDoc;
-                }
+                return getDocument((String) invocation.parameterValues.get(0));
             }
         });
         mockXWiki.stubs().method("saveDocument").will(new CustomStub("Implements XWiki.saveDocument")
         {
             public Object invoke(Invocation invocation) throws Throwable
             {
-                XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
-
-                String database = document.getDatabase();
-
-                if (database == null) {
-                    database = context.getDatabase();
-                }
-
-                if (database == null || database.length() == 0)
-                    database = MAIN_WIKI_NAME;
-
-                if (!databases.containsKey(database))
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                        "Database " + database + " does not exists.");
-
-                Map<String, XWikiDocument> docs = databases.get(database);
-
-                document.setNew(false);
-                document.setDatabase(context.getDatabase());
-
-                docs.put(document.getFullName(), document);
+                saveDocument((XWikiDocument) invocation.parameterValues.get(0));
 
                 return null;
             }
@@ -244,7 +243,7 @@ public class WikiManagerTest extends MockObjectTestCase
     {
         XWikiDocument doc = new XWikiDocument();
         databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
-        
+
         try {
             WikiManager.getInstance().getWikiAlias("WikInamE", 0, true, context);
 
@@ -254,12 +253,12 @@ public class WikiManagerTest extends MockObjectTestCase
             assertEquals(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, expected.getCode());
         }
     }
-    
+
     public void testGetWikiAlias() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
         databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
-        
+
         try {
             WikiManager.getInstance().getWikiAlias("WikInamE", 0, true, context);
 

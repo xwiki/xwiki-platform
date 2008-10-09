@@ -59,17 +59,28 @@
 ##
 ## Redirect to force right and left panels layout
 ##
-#set($redirecturl = "")
-#if($xwiki.exists("XWiki.AdminSheet"))
-   #set($requestquery = "$!{request.queryString}&amp;forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant")
-   #set($redirecturl = $doc.getURL("admin", $requestquery))
-   #set($currSpace = $request.getParameter("space"))
-#else ## no admin application
-  #set($redirecturl = $doc.getURL("view", "forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant"))
+#set($mustRedirect = false)
+#set($redirectQuery = '')
+#set($redirectDoc = $doc.fullName)
+#set($redirectMode = 'view')
+#if($xwiki.exists('XWiki.AdminSheet'))
+  ## The new administration interface, use XWiki.XWikiPreferences as the container document, and this as an included sheet
+  #set($currSpace = $request.getParameter("space"))
+  #set($redirectQuery = "$!{request.queryString}&amp;forceLeftPanels=1&amp;forceRightPanels=1&amp;section=Panels.PanelWizard&amp;$docvariant")
+  #set($redirectMode = 'admin')
+  #if($doc.name != 'XWikiPreferences' &amp;&amp; $doc.name != 'WebPreferences')
+    #set($redirectDoc = 'XWiki.XWikiPreferences')
+    #set($mustRedirect = true)
+  #end
+#else ## No admin application, use this as the container document
+  #set($redirectQuery = "$!{request.queryString}&amp;forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant")
 #end
 #if(!$request.getParameter("forceLeftPanels") || !$request.getParameter("forceRightPanels"))
-  $response.sendRedirect($redirecturl)
+  #set($mustRedirect = true)
 #end
+#if($mustRedirect)
+  $response.sendRedirect($xwiki.getDocument($redirectDoc).getURL($redirectMode, $redirectQuery))
+#else ## No redirect needed, display the wizard
 #set($showdata = 0)
 #set($showEmptyPanels = 1)
 #if("$!{currSpace}" != "")
@@ -276,5 +287,6 @@
   $msg.get("panelwizard.needadminright")
   #xwikimessageboxend()
 #end
+#end ## redirect
 {/pre}</content>
 </xwikidoc>

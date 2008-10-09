@@ -14,6 +14,11 @@ import org.xwiki.configuration.ConfigurationSourceCollection;
  */
 public class ConfigurationSourceCollectionMock implements ConfigurationSourceCollection
 {
+    /**
+     * Create and return a descriptor for this component.
+     * 
+     * @return the descriptor of the component.
+     */
     public static ComponentDescriptor getComponentDescriptor()
     {
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();

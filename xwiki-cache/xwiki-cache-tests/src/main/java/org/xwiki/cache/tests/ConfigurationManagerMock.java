@@ -36,10 +36,23 @@ import org.xwiki.configuration.ConfigurationSource;
  */
 public class ConfigurationManagerMock extends AbstractLogEnabled implements ConfigurationManager
 {
+    /**
+     * The cache hint.
+     */
     private String cache;
 
+    /**
+     * The local cache hint.
+     */
     private String localCache;
 
+    /**
+     * Create and return a descriptor for this component.
+     * 
+     * @param cache the cache hint.
+     * @param localCache the local cache hint.
+     * @return the descriptor of the component.
+     */
     public static ComponentDescriptor getComponentDescriptor(String cache, String localCache)
     {
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();

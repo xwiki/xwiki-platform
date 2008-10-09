@@ -379,7 +379,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     }
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("Bypass object because wrong allow/deny" + i);
+                        log.debug("Bypass object " + i + " because wrong allow/deny");
                     }
                 }
             }
@@ -548,6 +548,13 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
+                    try {
+                        deny = checkRight(name, xwikidoc, "register", user, false, true, context);
+                        if (deny) {
+                            return false;
+                        }
+                    } catch (XWikiRightNotFoundException e1) {
+                    }
                 }
                 logAllow(name, resourceKey, accessLevel, "register level (no right found)");
                 return true;

@@ -38,12 +38,12 @@ public class FormatBlock extends AbstractFatherBlock
     private Format format;
 
     /**
-     * @param childBlocks the nested children blocks
+     * @param childrenBlocks the nested children blocks
      * @param format the formatting to apply to the children blocks
      */
-    public FormatBlock(List<Block> childBlocks, Format format)
+    public FormatBlock(List<Block> childrenBlocks, Format format)
     {
-        super(childBlocks);
+        super(childrenBlocks);
         this.format = format;
     }
 

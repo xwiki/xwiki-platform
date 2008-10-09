@@ -25,17 +25,12 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
 
 /**
- * DEfault implementation of {@link CacheFactory}.
+ * Default implementation of {@link CacheFactory}.
  * 
  * @version $Id: $
  */
 public class DefaultCacheFactory implements CacheFactory
 {
-    /**
-     * This component's role hint, used when code needs to look it up.
-     */
-    public static final String ROLEHINT = "default";
-
     /**
      * {@inheritDoc}
      * 

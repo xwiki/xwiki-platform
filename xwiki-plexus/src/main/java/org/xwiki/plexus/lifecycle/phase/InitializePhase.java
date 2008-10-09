@@ -29,10 +29,17 @@ import org.xwiki.component.phase.InitializationException;
 
 public class InitializePhase extends AbstractPhase
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.codehaus.plexus.lifecycle.phase.AbstractPhase#execute(java.lang.Object,
+     *      org.codehaus.plexus.component.manager.ComponentManager, org.codehaus.plexus.classworlds.realm.ClassRealm)
+     */
+    @Override
     public void execute(Object object, ComponentManager componentManager, ClassRealm classRealm)
         throws PhaseExecutionException
     {
-        if ( object instanceof Initializable) {
+        if (object instanceof Initializable) {
             try {
                 ((Initializable) object).initialize();
             } catch (InitializationException e) {

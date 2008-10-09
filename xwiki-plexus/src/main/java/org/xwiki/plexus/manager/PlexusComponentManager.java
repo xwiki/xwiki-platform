@@ -20,87 +20,165 @@
  */
 package org.xwiki.plexus.manager;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.ServiceLocator;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.ComponentProperty;
 import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.ComponentRepositoryException;
 
+/**
+ * @version $Id$
+ */
 public class PlexusComponentManager implements ComponentManager
 {
-    private ServiceLocator serviceLocator;
+    private PlexusContainer plexusContainer;
 
-    public PlexusComponentManager(ServiceLocator serviceLocator)
+    public PlexusComponentManager(PlexusContainer plexusContainer)
     {
-        this.serviceLocator = serviceLocator;
+        this.plexusContainer = plexusContainer;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#lookup(java.lang.String)
+     */
     public Object lookup(String role) throws ComponentLookupException
     {
         Object result;
         try {
-            result = this.serviceLocator.lookup(role);
+            result = this.plexusContainer.lookup(role);
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
-            throw new ComponentLookupException("Failed to lookup component role ["
-                + role + "]", e);
+            throw new ComponentLookupException("Failed to lookup component role [" + role + "]", e);
         }
-        return result; 
+
+        return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#lookup(java.lang.String, java.lang.String)
+     */
     public Object lookup(String role, String roleHint) throws ComponentLookupException
     {
         Object result;
         try {
-            result = this.serviceLocator.lookup(role, roleHint);
+            result = this.plexusContainer.lookup(role, roleHint);
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
-            throw new ComponentLookupException("Failed to lookup component role ["
-                + role + "] for hint [" + roleHint + "]", e);
+            throw new ComponentLookupException("Failed to lookup component role [" + role + "] for hint [" + roleHint
+                + "]", e);
         }
+
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#lookupMap(java.lang.String)
+     */
     public Map lookupMap(String role) throws ComponentLookupException
     {
         Map result;
         try {
-            result = this.serviceLocator.lookupMap(role);
+            result = this.plexusContainer.lookupMap(role);
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
-            throw new ComponentLookupException("Failed to lookup components for role [" 
-                + role + "]", e);
+            throw new ComponentLookupException("Failed to lookup components for role [" + role + "]", e);
         }
+
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#lookupList(java.lang.String)
+     */
     public List lookupList(String role) throws ComponentLookupException
     {
         List result;
         try {
-            result = this.serviceLocator.lookupList(role);
+            result = this.plexusContainer.lookupList(role);
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
-            throw new ComponentLookupException("Failed to lookup components for role [" 
-                + role + "]", e);
+            throw new ComponentLookupException("Failed to lookup components for role [" + role + "]", e);
         }
+
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#release(java.lang.Object)
+     */
     public void release(Object component) throws ComponentLifecycleException
     {
         try {
-            this.serviceLocator.release(component);
+            this.plexusContainer.release(component);
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLifecycleException e) {
             throw new ComponentLifecycleException("Failed to release component [" + component + "]", e);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#hasComponent(java.lang.String)
+     */
     public boolean hasComponent(String role)
     {
-        return this.serviceLocator.hasComponent(role);
+        return this.plexusContainer.hasComponent(role);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#hasComponent(java.lang.String, java.lang.String)
+     */
     public boolean hasComponent(String role, String roleHint)
     {
-        return this.serviceLocator.hasComponent(role, roleHint);
+        return this.plexusContainer.hasComponent(role, roleHint);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#registerComponentDescriptor(org.xwiki.component.descriptor.ComponentDescriptor)
+     */
+    public void registerComponentDescriptor(ComponentDescriptor componentDescriptor)
+        throws ComponentRepositoryException
+    {
+        org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
+            new org.codehaus.plexus.component.repository.ComponentDescriptor();
+
+        pcd.setRole(componentDescriptor.getRole());
+        pcd.setRoleHint(componentDescriptor.getRoleHint());
+        pcd.setImplementation(componentDescriptor.getImplementation());
+        pcd.setInstantiationStrategy(componentDescriptor.getInstantiationStrategy());
+
+        Collection<ComponentProperty> componentConfiguration = componentDescriptor.getComponentConfiguration();
+        if (!componentConfiguration.isEmpty()) {
+            XmlPlexusConfiguration xpc = new XmlPlexusConfiguration("");
+            for (ComponentProperty property : componentConfiguration) {
+                XmlPlexusConfiguration pc = new XmlPlexusConfiguration(property.getName());
+                pc.setValue(property.getValue());
+                xpc.addChild(pc);
+            }
+            pcd.setConfiguration(xpc);
+        }
+
+        try {
+            this.plexusContainer.addComponentDescriptor(pcd);
+        } catch (org.codehaus.plexus.component.repository.exception.ComponentRepositoryException e) {
+            throw new ComponentRepositoryException("Failed add component descriptor [" + componentDescriptor + "]", e);
+        }
     }
 }

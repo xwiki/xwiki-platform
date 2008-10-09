@@ -31,19 +31,25 @@ import org.xwiki.plexus.logging.PlexusLogger;
 
 public class LogEnablePhase extends AbstractPhase
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.codehaus.plexus.lifecycle.phase.AbstractPhase#execute(java.lang.Object,
+     *      org.codehaus.plexus.component.manager.ComponentManager, org.codehaus.plexus.classworlds.realm.ClassRealm)
+     */
+    @Override
     public void execute(Object object, ComponentManager componentManager, ClassRealm classRealm)
         throws PhaseExecutionException
     {
-        if ( object instanceof LogEnabled)
-        {
+        if (object instanceof LogEnabled) {
             LoggerManager loggerManager = componentManager.getContainer().getLoggerManager();
 
             ComponentDescriptor descriptor = componentManager.getComponentDescriptor();
 
             org.codehaus.plexus.logging.Logger logger =
-                loggerManager.getLoggerForComponent( descriptor.getRole(), descriptor.getRoleHint() );
+                loggerManager.getLoggerForComponent(descriptor.getRole(), descriptor.getRoleHint());
 
-            ( (LogEnabled) object ).enableLogging( new PlexusLogger(logger) );
+            ((LogEnabled) object).enableLogging(new PlexusLogger(logger));
         }
     }
 }

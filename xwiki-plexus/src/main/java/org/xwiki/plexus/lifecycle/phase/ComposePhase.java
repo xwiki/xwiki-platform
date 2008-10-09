@@ -24,19 +24,28 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.manager.ComponentManager;
 import org.codehaus.plexus.lifecycle.phase.AbstractPhase;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.PhaseExecutionException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 
+/**
+ * @version $Id$
+ */
 public class ComposePhase extends AbstractPhase
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.codehaus.plexus.lifecycle.phase.AbstractPhase#execute(java.lang.Object,
+     *      org.codehaus.plexus.component.manager.ComponentManager, org.codehaus.plexus.classworlds.realm.ClassRealm)
+     */
+    @Override
     public void execute(Object object, ComponentManager componentManager, ClassRealm classRealm)
         throws PhaseExecutionException
     {
         if (object instanceof Composable) {
-            org.xwiki.component.manager.ComponentManager xwikiManager = new PlexusComponentManager(
-                new PlexusContainerLocator(componentManager.getContainer()));
+            org.xwiki.component.manager.ComponentManager xwikiManager =
+                new PlexusComponentManager(componentManager.getContainer());
             ((Composable) object).compose(xwikiManager);
-        }    
+        }
     }
 }

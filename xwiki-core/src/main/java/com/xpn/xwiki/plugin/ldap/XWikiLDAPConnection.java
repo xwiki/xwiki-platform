@@ -164,11 +164,9 @@ public class XWikiLDAPConnection
                 this.connection = new LDAPConnection();
             }
 
-            // connect to the server
-            this.connection.connect(ldapHost, port);
+            connect(ldapHost, port);
 
-            // authenticate to the server
-            this.connection.bind(ldapVersion, loginDN, password.getBytes("UTF8"));
+            bind(loginDN, password);
 
             succeed =
                 this.connection.isConnected() && this.connection.isConnectionAlive() && this.connection.isBound();
@@ -179,6 +177,41 @@ public class XWikiLDAPConnection
         }
 
         return succeed;
+    }
+
+    /**
+     * Connect to server.
+     * 
+     * @param ldapHost the host of the server to connect to.
+     * @param port the port of the server to connect to.
+     * @throws LDAPException error when trying to connect.
+     */
+    private void connect(String ldapHost, int port) throws LDAPException
+    {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Connection to LDAP server [" + ldapHost + ":" + port + "]");
+        }
+
+        // connect to the server
+        this.connection.connect(ldapHost, port);
+    }
+
+    /**
+     * Bind to LDAP server.
+     * 
+     * @param loginDN the user DN to connect to LDAP server.
+     * @param password the password to connect to LDAP server.
+     * @throws UnsupportedEncodingException error when converting provided password to UTF-8 table.
+     * @throws LDAPException error when trying to bind.
+     */
+    private void bind(String loginDN, String password) throws UnsupportedEncodingException, LDAPException
+    {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Binding to LDAP server with credentials login=[" + loginDN + "] password=[" + password + "]");
+        }
+
+        // authenticate to the server
+        this.connection.bind(LDAPConnection.LDAP_V3, loginDN, password.getBytes("UTF8"));
     }
 
     /**

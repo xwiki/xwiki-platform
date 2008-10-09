@@ -164,8 +164,17 @@ public class XWikiLDAPConnection
                 this.connection = new LDAPConnection();
             }
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Connection to LDAP server [" + ldapHost + ":" + port + "]");
+            }
+
             // connect to the server
             this.connection.connect(ldapHost, port);
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Binding to LDAP server with credentials login=[" + loginDN + "] password=[" + password
+                    + "]");
+            }
 
             // authenticate to the server
             this.connection.bind(ldapVersion, loginDN, password.getBytes("UTF8"));

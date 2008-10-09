@@ -53,18 +53,4 @@ public class DefaultSyntaxFactoryTest extends AbstractRenderingTestCase
         Syntax syntax2 = new Syntax(SyntaxType.XWIKI, "2.0");
         assertEquals(syntax2, syntaxFactory.createSyntaxFromIdString("xwiki/2.0"));
     }
-
-    public void testCreateSyntaxFromSyntaxIdStringWhenInvalidSyntaxSpecified() throws Exception
-    {
-        SyntaxFactory syntaxFactory = (SyntaxFactory) getComponentManager().lookup(SyntaxFactory.ROLE);
-
-        try {
-            syntaxFactory.createSyntaxFromIdString("invalidSyntax/1.0");
-            fail("Should have thrown an exception here");
-        } catch (ParseException expected) {
-            assertEquals("Unknown Syntax id [invalidSyntax]. Valid syntaxes are [xwiki], [confluence], [mediawiki], "
-                + "[creole], [jspwiki], [twiki], [xhtml]", expected.getMessage());
-        }
-    }
-
 }

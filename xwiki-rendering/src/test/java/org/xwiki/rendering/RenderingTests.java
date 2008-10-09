@@ -146,8 +146,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("encoding/encoding1", false);
         suite.addTestsFromResource("encoding/encoding2", false);
         
-        //suite.addTestsFromResource("macros/code/macrocode1", true);
-        
         return new PlexusTestSetup(suite);
     }
 }

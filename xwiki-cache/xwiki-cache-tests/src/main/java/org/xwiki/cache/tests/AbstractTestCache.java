@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
@@ -76,9 +77,25 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        getComponentManager().registerComponentDescriptor(
+            ConfigurationManagerMock.getComponentDescriptor(this.roleHint, null));
+        getComponentManager().registerComponentDescriptor(ConfigurationSourceCollectionMock.getComponentDescriptor());
+    }
+
+    /**
      * @return the component manager to get a cache component.
      * @throws Exception error when initializing component manager.
      */
+    @Override
     public ComponentManager getComponentManager() throws Exception
     {
         ComponentManager cm = super.getComponentManager();
@@ -118,7 +135,9 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
      */
     public CacheFactory getCacheFactory() throws Exception
     {
-        CacheFactory factory = (CacheFactory) getComponentManager().lookup(CacheFactory.ROLE, this.roleHint);
+        CacheManager cacheManager = (CacheManager) getComponentManager().lookup(CacheManager.ROLE, "default");
+
+        CacheFactory factory = cacheManager.getCacheFactory();
 
         assertNotNull(factory);
 

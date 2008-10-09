@@ -19,9 +19,9 @@
  */
 package org.xwiki.configuration;
 
-import org.xwiki.component.phase.InitializationException;
-
 import java.util.List;
+
+import org.xwiki.component.phase.InitializationException;
 
 /**
  * @version $Id: $
@@ -29,6 +29,11 @@ import java.util.List;
  */
 public interface ConfigurationManager
 {
-    void initializeConfiguration(Object configurationBean, List<ConfigurationSource> sources,
-        String namespace) throws InitializationException;
+    /**
+     * This component's role, used when code needs to look it up.
+     */
+    String ROLE = ConfigurationManager.class.getName();
+
+    void initializeConfiguration(Object configurationBean, List<ConfigurationSource> sources, String namespace)
+        throws InitializationException;
 }

@@ -177,7 +177,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         } catch (Exception e) {
             // continue
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Local LDAP authentication failed.");
+                LOG.debug("Local LDAP authentication failed.", e);
             }
         }
 
@@ -192,7 +192,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 } catch (Exception e) {
                     // continue
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Global LDAP authentication failed.");
+                        LOG.debug("Global LDAP authentication failed.", e);
                     }
                 }
             } finally {

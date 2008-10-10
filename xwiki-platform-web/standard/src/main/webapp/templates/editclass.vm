@@ -19,7 +19,7 @@ $response.sendRedirect($doc.getURL($context.action, "editor=class"))
 #foreach ($classprop in $field.xWikiClass.propertyNames)
 #set($propDef = $field.xWikiClass.get("$classprop"))
 #if($propDef.type.indexOf("Boolean") != -1)
-<dt><label>$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</label></dt>
+<dt>$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</dt>
 #else
 <dt><label for="${field.name}_$classprop">$propDef.getPrettyName():</label></dt>
 <dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>

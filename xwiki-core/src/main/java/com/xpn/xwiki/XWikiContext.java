@@ -75,11 +75,19 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private String orig_database;
 
+    private static final String ORIGINAL_WIKI_KEY = "originalWiki";
+
     private String database;
+
+    private static final String WIKI_KEY = "wiki";
 
     private XWikiUser user;
 
+    private static final String USER_KEY = "user";
+
     private String language;
+
+    private static final String LANGUAGE_KEY = "language";
 
     private String interfaceLanguage;
 
@@ -181,8 +189,14 @@ public class XWikiContext extends Hashtable<Object, Object>
     public void setDatabase(String database)
     {
         this.database = database;
+        if (database == null) {
+            remove(WIKI_KEY);
+        } else {
+            put(WIKI_KEY, database);
+        }
         if (orig_database == null) {
             orig_database = database;
+            put(ORIGINAL_WIKI_KEY, database);
         }
     }
 
@@ -194,6 +208,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     public void setOriginalDatabase(String database)
     {
         this.orig_database = database;
+        if (database == null) {
+            remove(ORIGINAL_WIKI_KEY);
+        } else {
+            put(ORIGINAL_WIKI_KEY, database);
+        }
     }
 
     /**
@@ -227,6 +246,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     public void setUser(String user, boolean main)
     {
         this.user = new XWikiUser(user, main);
+        if (user == null) {
+            remove(USER_KEY);
+        } else {
+            put(USER_KEY, user);
+        }
     }
 
     public void setUser(String user)
@@ -262,6 +286,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     public void setLanguage(String language)
     {
         this.language = language;
+        if (language == null) {
+            remove(LANGUAGE_KEY);
+        } else {
+            put(LANGUAGE_KEY, language);
+        }
     }
 
     public String getInterfaceLanguage()

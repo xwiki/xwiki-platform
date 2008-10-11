@@ -420,6 +420,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setContent(String content)
     {
+        if (content == null) {
+            content = "";
+        }
         if (!content.equals(this.content)) {
             setContentDirty(true);
             setWikiNode(null);

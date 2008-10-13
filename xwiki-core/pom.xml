@@ -626,6 +626,9 @@
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
+            <!-- We must have an ID here, as otherwise the configuration is used for generating the normal jar, too.
+                 See XWIKI-2757 -->
+            <id>build-test-jar</id>
             <goals>
               <goal>test-jar</goal>
             </goals>

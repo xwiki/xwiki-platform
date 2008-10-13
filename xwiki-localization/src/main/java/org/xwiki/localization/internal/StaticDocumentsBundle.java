@@ -174,7 +174,7 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
                 }
                 properties.putAll(getDocumentBundle(fullDocumentName, language));
             } catch (Exception ex) {
-                getLogger().warn("Exception loading a document bundle");
+                getLogger().warn("Exception loading a document bundle: " + fullDocumentName);
             }
         }
         // Also watch the preferences for this wiki, in case the list of documents is changed.
@@ -203,7 +203,9 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
                     this.documentAccessBridge.getProperty(wiki + WikiInformation.WIKI_PREFIX_SEPARATOR
                         + WikiInformation.PREFERENCES_DOCUMENT_NAME, WikiInformation.PREFERENCES_CLASS_NAME,
                         DOCUMENT_BUNDLE_PROPERTY);
-                result = bundles.split("[,|]\\s*");
+                if (!StringUtils.isBlank(bundles)) {
+                    result = bundles.split("[,|]\\s*");
+                }
             } catch (Exception ex) {
                 getLogger().warn("Cannot access a wiki setting", ex);
             }

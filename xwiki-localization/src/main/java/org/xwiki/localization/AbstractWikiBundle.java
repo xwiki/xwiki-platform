@@ -63,7 +63,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
     /**
      * Caching the default language for each wiki.
      */
-    protected Map<String, String> defaultWikiLanguage;
+    protected Map<String, String> defaultWikiLanguage = new HashMap<String, String>();
 
     /**
      * <p>

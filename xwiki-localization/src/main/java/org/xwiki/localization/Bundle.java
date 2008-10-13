@@ -19,7 +19,6 @@
  */
 package org.xwiki.localization;
 
-
 /**
  * A collection of translation properties.
  * 

@@ -34,7 +34,7 @@ import org.xwiki.localization.WikiInformation;
  * 
  * @version $Id$
  */
-class DefaultWikiInformation extends AbstractLogEnabled implements WikiInformation
+public class DefaultWikiInformation extends AbstractLogEnabled implements WikiInformation
 {
     /** The default wiki name to use when the context does not define one. */
     private static final String DEFAULT_WIKI = "xwiki";

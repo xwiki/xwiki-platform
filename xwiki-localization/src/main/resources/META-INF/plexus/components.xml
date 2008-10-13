@@ -8,6 +8,7 @@
       <requirements>
         <requirement>
           <role>org.xwiki.localization.Bundle</role>
+          <field-name>bundles</field-name>
         </requirement>
         <requirement>
           <role>org.xwiki.localization.WikiInformation</role>

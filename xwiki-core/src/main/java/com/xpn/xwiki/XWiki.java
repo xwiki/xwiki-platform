@@ -43,7 +43,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -271,7 +270,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * List of configured syntax ids.
      */
     private List<String> configuredSyntaxes;
-    
+
     private static String getConfigPath() throws NamingException
     {
         if (configPath == null) {
@@ -700,8 +699,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
 
         if (hasAttachmentRecycleBin(context)) {
-            setAttachmentRecycleBinStore((AttachmentRecycleBinStore) Utils.getComponent(AttachmentRecycleBinStore.ROLE,
-                Param("xwiki.store.attachment.recyclebin.hint")));
+            setAttachmentRecycleBinStore((AttachmentRecycleBinStore) Utils.getComponent(
+                AttachmentRecycleBinStore.ROLE, Param("xwiki.store.attachment.recyclebin.hint")));
         }
 
         // Run migrations
@@ -755,10 +754,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         String ro = Param("xwiki.readonly", "no");
         this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
-        
+
         // Save the configured syntaxes
         String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
-    	this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
+        this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
     }
 
     public XWikiStoreInterface getNotCacheStore()
@@ -934,8 +933,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     this.virtualWikiMap.set(host, wikiserver);
                 } catch (XWikiException e) {
                     LOG.warn("Error when searching for wiki name from URL host [" + host + "]", e);
-
-                    wikiserver = null;
                 }
             }
 
@@ -2708,7 +2705,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
-        needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
+        needsUpdate |=
+            bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
 
         // Only used by LDAP authentication service
@@ -2763,9 +2761,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the required configuration
-     * properties to make XWiki work properly. If some properties are missing they are created and saved in the
-     * database.
+     * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the required
+     * configuration properties to make XWiki work properly. If some properties are missing they are created and saved
+     * in the database.
      * 
      * @param context the XWiki Context
      * @return the XWiki Base Class object containing the properties
@@ -2855,7 +2853,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
         needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
-        needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
+        needsUpdate |=
+            bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
         needsUpdate |= bclass.addTextField("convertmail", "convert email type", 1);
         needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
@@ -3045,8 +3044,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         bclass.setName("XWiki.XWikiComments");
         /*
-         * if (!"internal".equals(bclass.getCustomMapping())) { needsUpdate = true; bclass.setCustomMapping("internal");
-         * }
+         * if (!"internal".equals(bclass.getCustomMapping())) { needsUpdate = true; bclass.setCustomMapping("internal"); }
          */
         needsUpdate |= bclass.addTextField("author", "Author", 30);
         needsUpdate |= bclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
@@ -3226,7 +3224,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public boolean createEmptyUser(String xwikiname, String userRights, XWikiContext context) throws XWikiException
     {
-        HashMap map = new HashMap();
+        Map<String, String> map = new HashMap<String, String>();
         map.put("active", "1");
         map.put("first_name", xwikiname);
         String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
@@ -4649,7 +4647,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
 
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Initialized AuthService " + this.authService.getClass().getName() + " using 'new'.");
+                        LOG
+                            .debug("Initialized AuthService " + this.authService.getClass().getName()
+                                + " using 'new'.");
                     }
 
                 }
@@ -4694,9 +4694,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     this.rightService = new XWikiRightServiceImpl();
 
                     if (LOG.isDebugEnabled()) {
-                        LOG
-                            .debug("Initialized RightService " + this.authService.getClass().getName()
-                                + " using 'new'.");
+                        LOG.debug("Initialized RightService " + this.authService.getClass().getName()
+                            + " using 'new'.");
                     }
 
                 }
@@ -4741,7 +4740,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                             }
                             factoryService =
                                 (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass).getConstructor(
-                                    new Class[] {XWiki.class}).newInstance(new Object[] {this});
+                                    new Class< ? >[] {XWiki.class}).newInstance(new Object[] {this});
                         } catch (Exception e) {
                             factoryService = null;
                             LOG.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
@@ -4794,8 +4793,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             return manager.getComponentInstanceOfType(Class.forName(className));
         } catch (Exception e) {
             Object[] args = {className};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND,
-                "Service {0} not found", e, args);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND, "Service {0} not found", e, args);
         }
     }
 
@@ -4824,8 +4823,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             return manager.getComponentInstanceOfType(Class.forName(className));
         } catch (Exception e) {
             Object[] args = {className};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND,
-                "Service {0} not found", e, args);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND, "Service {0} not found", e, args);
         }
     }
 
@@ -4939,7 +4938,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 return userdoc.getName();
             }
 
-            Set proplist = userobj.getPropertyList();
+            Set<String> proplist = userobj.getPropertyList();
             String text;
 
             if (format == null) {
@@ -4949,8 +4948,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
             } else {
                 VelocityContext vcontext = new VelocityContext();
-                for (Iterator it = proplist.iterator(); it.hasNext();) {
-                    String propname = (String) it.next();
+                for (String propname : proplist) {
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }
                 text =
@@ -5137,13 +5135,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public XWikiPluginInterface getPlugin(String name, XWikiContext context)
     {
         XWikiPluginManager plugins = getPluginManager();
-        Vector pluginlist = plugins.getPlugins();
-        for (int i = 0; i < pluginlist.size(); i++) {
-            String pluginname = (String) pluginlist.get(i);
+        Vector<String> pluginlist = plugins.getPlugins();
+        for (String pluginname : pluginlist) {
             if (pluginname.equals(name)) {
                 return plugins.getPlugin(pluginname);
             }
         }
+
         return null;
     }
 
@@ -5221,7 +5219,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return content;
     }
 
-    public String getURLContent(String surl, String username, String password, XWikiContext context) throws IOException
+    public String getURLContent(String surl, String username, String password, XWikiContext context)
+        throws IOException
     {
         return getURLContent(surl, username, password, getHttpTimeout(context), getHttpUserAgent(context));
     }
@@ -5337,7 +5336,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public List<String> getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
     {
         try {
-            return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName).execute();
+            return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName)
+                .execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
@@ -5802,7 +5802,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         temp = temp.replaceAll("[\u00d0\u010e\u0110]", "D");
         temp = temp.replaceAll("[\u00f0\u010f\u0111]", "d");
         temp = temp.replaceAll("[\u00c8\u00c9\u00ca\u00cb\u0112\u0114\u0116\u0118\u011a\u0204\u0206\u0228]", "E");
-        temp = temp.replaceAll("[\u00e8\u00e9\u00ea\u00eb\u0113\u0115\u0117\u0119\u011b\u01dd\u0205\u0207\u0229]", "e");
+        temp =
+            temp.replaceAll("[\u00e8\u00e9\u00ea\u00eb\u0113\u0115\u0117\u0119\u011b\u01dd\u0205\u0207\u0229]", "e");
         temp = temp.replaceAll("[\u011c\u011e\u0120\u0122\u01e4\u01e6\u01f4]", "G");
         temp = temp.replaceAll("[\u011d\u011f\u0121\u0123\u01e5\u01e7\u01f5]", "g");
         temp = temp.replaceAll("[\u0124\u0126\u021e]", "H");
@@ -5946,6 +5947,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (query == null) {
             query = new XWikiQuery();
         }
+
         return bclass.displaySearchOrder(className + "_" + prefix, query, context);
     }
 
@@ -5955,6 +5957,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (qp == null) {
             return null;
         }
+
         return qp.search(query);
     }
 
@@ -5969,13 +5972,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (qp == null) {
             return null;
         }
-        List list = qp.search(query);
+
+        List<String> list = qp.search(query);
         String result = "{table}\r\n";
         List<String> headerColumns = new ArrayList<String>();
-        List displayProperties = query.getDisplayProperties();
-        Iterator displayListIt = displayProperties.iterator();
-        while (displayListIt.hasNext()) {
-            String propname = (String) displayListIt.next();
+        List<String> displayProperties = query.getDisplayProperties();
+        for (String propname : displayProperties) {
             PropertyClass pclass = getPropertyClassFromName(propname, context);
             if (pclass != null) {
                 headerColumns.add(pclass.getPrettyName());
@@ -5990,14 +5992,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         }
         result += StringUtils.join(headerColumns.toArray(), " | ") + "\r\n";
-        Iterator resultIt = list.iterator();
-        while (resultIt.hasNext()) {
+        for (String docname : list) {
             List<String> rowColumns = new ArrayList<String>();
-            String docname = (String) resultIt.next();
             XWikiDocument doc = getDocument(docname, context);
-            displayListIt = displayProperties.iterator();
-            while (displayListIt.hasNext()) {
-                String propname = (String) displayListIt.next();
+            for (String propname : displayProperties) {
                 PropertyClass pclass = getPropertyClassFromName(propname, context);
                 if (pclass == null) {
                     if (propname.startsWith("doc.")) {
@@ -6013,6 +6011,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             result += StringUtils.join(rowColumns.toArray(), " | ") + "\r\n";
         }
         result += "{table}\r\n";
+
         return result;
     }
 
@@ -6072,6 +6071,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         buffer.append("');\">");
         buffer.append(html);
         buffer.append("</span>");
+
         return buffer.toString();
     }
 
@@ -6082,6 +6082,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         buffer.append(getSkinFile("ajax/wzToolTip.js", context));
         buffer.append("\"></script>");
         // buffer.append("<div id=\"dhtmltooltip\"></div>");
+
         return buffer.toString();
     }
 
@@ -6116,6 +6117,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(fullName, context);
+
         return doc.getExternalAttachmentURL(filename, "download", context);
     }
 
@@ -6204,6 +6206,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (!fdir.exists()) {
             fdir.mkdir();
         }
+
         return fdir;
     }
 
@@ -6346,8 +6349,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     context.getWiki().getAttachmentStore().saveAttachmentContent(newAttach, false, context, true);
                     attachmentTreated++;
                 } catch (XWikiException e) {
-                    LOG.error("Error rolling back attachment " + entry.getKey() + " in document rollback for document "
-                        + tdoc.getFullName());
+                    LOG.error("Error rolling back attachment " + entry.getKey()
+                        + " in document rollback for document " + tdoc.getFullName());
                     // If we have already treated an attachment it's better to continue and leave
                     // only one attachment in bad state
                     // this is better then leaving the whole document in bad state...
@@ -6376,6 +6379,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public List<String> getConfiguredSyntaxes()
     {
-    	return this.configuredSyntaxes;
+        return this.configuredSyntaxes;
     }
 }

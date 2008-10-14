@@ -67,14 +67,14 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRendererType;
+import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.XWiki;
@@ -540,7 +540,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see DocumentModelBridge#getWikiName()
      */
     public String getWikiName()
@@ -841,8 +841,8 @@ public class XWikiDocument implements DocumentModelBridge
     public String getAttachmentRevisionURL(String filename, String revision, String querystring, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, querystring,
-                getDatabase(), context);
+            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision,
+                querystring, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -874,7 +874,8 @@ public class XWikiDocument implements DocumentModelBridge
     public String getURL(String action, String querystring, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createURL(getSpace(), getName(), action, querystring, null, getDatabase(), context);
+            context.getURLFactory()
+                .createURL(getSpace(), getName(), action, querystring, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -889,8 +890,8 @@ public class XWikiDocument implements DocumentModelBridge
     public String getExternalURL(String action, XWikiContext context)
     {
         URL url =
-            context.getURLFactory()
-                .createExternalURL(getSpace(), getName(), action, null, null, getDatabase(), context);
+            context.getURLFactory().createExternalURL(getSpace(), getName(), action, null, null, getDatabase(),
+                context);
         return url.toString();
     }
 
@@ -907,8 +908,8 @@ public class XWikiDocument implements DocumentModelBridge
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(getParent(), context);
         URL url =
-            context.getURLFactory()
-                .createURL(doc.getSpace(), doc.getName(), "view", null, null, getDatabase(), context);
+            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), "view", null, null, getDatabase(),
+                context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -1068,8 +1069,7 @@ public class XWikiDocument implements DocumentModelBridge
                 if (criteria.getAuthor().equals("") || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
                     // Date range matching
                     if (nodeinfo.getDate().after(criteria.getMinDate())
-                        && nodeinfo.getDate().before(criteria.getMaxDate()))
-                    {
+                        && nodeinfo.getDate().before(criteria.getMaxDate())) {
                         results.add(nodeinfo.getVersion().toString());
                     }
                 }
@@ -1080,8 +1080,8 @@ public class XWikiDocument implements DocumentModelBridge
         if (nodeinfo != null) {
             if (criteria.getAuthor().equals("") || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
                 // Date range matching
-                if (nodeinfo.getDate().after(criteria.getMinDate()) && nodeinfo.getDate().before(criteria.getMaxDate()))
-                {
+                if (nodeinfo.getDate().after(criteria.getMinDate())
+                    && nodeinfo.getDate().before(criteria.getMaxDate())) {
                     results.add(nodeinfo.getVersion().toString());
                 }
             }
@@ -1650,8 +1650,8 @@ public class XWikiDocument implements DocumentModelBridge
                     String name = (String) it.next();
                     vcontext.put(name, display(name, object, context));
                 }
-                result
-                    .append(XWikiVelocityRenderer.evaluate(format, context.getDoc().getFullName(), vcontext, context));
+                result.append(XWikiVelocityRenderer
+                    .evaluate(format, context.getDoc().getFullName(), vcontext, context));
                 if (linebreak) {
                     result.append("\n");
                 }
@@ -1747,8 +1747,7 @@ public class XWikiDocument implements DocumentModelBridge
         String creator = eform.getCreator();
         if ((creator != null) && (!creator.equals(getCreator()))) {
             if ((getCreator().equals(context.getUser()))
-                || (context.getWiki().getRightService().hasAdminRights(context)))
-            {
+                || (context.getWiki().getRightService().hasAdminRights(context))) {
                 setCreator(creator);
             }
         }
@@ -2896,8 +2895,7 @@ public class XWikiDocument implements DocumentModelBridge
                     // Let's get rid of anything that's not a real link
                     if (name.trim().equals("") || (name.indexOf("$") != -1) || (name.indexOf("://") != -1)
                         || (name.indexOf("\"") != -1) || (name.indexOf("\'") != -1) || (name.indexOf("..") != -1)
-                        || (name.indexOf(":") != -1) || (name.indexOf("=") != -1))
-                    {
+                        || (name.indexOf(":") != -1) || (name.indexOf("=") != -1)) {
                         continue;
                     }
 
@@ -3412,7 +3410,8 @@ public class XWikiDocument implements DocumentModelBridge
         return list;
     }
 
-    public List<MetaDataDiff> getMetaDataDiff(String fromRev, String toRev, XWikiContext context) throws XWikiException
+    public List<MetaDataDiff> getMetaDataDiff(String fromRev, String toRev, XWikiContext context)
+        throws XWikiException
     {
         XWikiDocument fromDoc = context.getWiki().getDocument(this, fromRev, context);
         XWikiDocument toDoc = context.getWiki().getDocument(this, toRev, context);
@@ -3668,9 +3667,11 @@ public class XWikiDocument implements DocumentModelBridge
                     getSpace());
 
             backlinkDocument.setContent((String) result.getModifiedContent());
-            context.getWiki().saveDocument(backlinkDocument,
-                context.getMessageTool().get("core.comment.renameLink", Arrays.asList(new String[] {newDocumentName})),
-                true, context);
+            context.getWiki()
+                .saveDocument(
+                    backlinkDocument,
+                    context.getMessageTool().get("core.comment.renameLink",
+                        Arrays.asList(new String[] {newDocumentName})), true, context);
         }
 
         // Step 3: Delete the old document
@@ -3955,7 +3956,8 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     // This functions adds an object from an new object creation form
-    public BaseObject addObjectFromRequest(String className, String prefix, XWikiContext context) throws XWikiException
+    public BaseObject addObjectFromRequest(String className, String prefix, XWikiContext context)
+        throws XWikiException
     {
         return addObjectFromRequest(className, prefix, 0, context);
     }
@@ -4101,11 +4103,11 @@ public class XWikiDocument implements DocumentModelBridge
     public boolean isProgrammaticContent()
     {
         String[] matches =
-            {"<%", "\\$xwiki.xWiki", "$context.context", "$doc.document", "$xwiki.getXWiki()", "$context.getContext()",
-            "$doc.getDocument()", "WithProgrammingRights(", "/* Programmatic content */", "## Programmatic content",
-            "$xwiki.search(", "$xwiki.createUser", "$xwiki.createNewWiki", "$xwiki.addToAllGroup",
-            "$xwiki.sendMessage", "$xwiki.copyDocument", "$xwiki.copyWikiWeb", "$xwiki.parseGroovyFromString",
-            "$doc.toXML()", "$doc.toXMLDocument()",};
+            {"<%", "\\$xwiki.xWiki", "$context.context", "$doc.document", "$xwiki.getXWiki()",
+            "$context.getContext()", "$doc.getDocument()", "WithProgrammingRights(", "/* Programmatic content */",
+            "## Programmatic content", "$xwiki.search(", "$xwiki.createUser", "$xwiki.createNewWiki",
+            "$xwiki.addToAllGroup", "$xwiki.sendMessage", "$xwiki.copyDocument", "$xwiki.copyWikiWeb",
+            "$xwiki.parseGroovyFromString", "$doc.toXML()", "$doc.toXMLDocument()",};
         String content2 = this.content.toLowerCase();
         for (int i = 0; i < matches.length; i++) {
             if (content2.indexOf(matches[i].toLowerCase()) != -1) {

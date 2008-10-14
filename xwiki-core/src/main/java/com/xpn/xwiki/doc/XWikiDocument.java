@@ -117,6 +117,9 @@ public class XWikiDocument implements DocumentModelBridge
 {
     private static final Log log = LogFactory.getLog(XWikiDocument.class);
 
+    /** THe default wiki name to use when one isn't specified. */
+    private static final String DEFAULT_WIKI_NAME = "xwiki";
+
     /**
      * Regex Pattern to recognize if there's HTML code in a XWiki page.
      */
@@ -344,8 +347,28 @@ public class XWikiDocument implements DocumentModelBridge
         this("Main", "WebHome");
     }
 
-    public XWikiDocument(String web, String name)
+    /**
+     * Constructor that specifies the local document identifier: space name, document name. {@link #setDatabase(String)}
+     * must be called afterwards to specify the wiki name.
+     * 
+     * @param web The space this document belongs to.
+     * @param name The name of the document.
+     */
+    public XWikiDocument(String space, String name)
     {
+        this(null, space, name);
+    }
+
+    /**
+     * Constructor that specifies the full document identifier: wiki name, space name, document name.
+     * 
+     * @param wiki The wiki this document belongs to.
+     * @param web The space this document belongs to.
+     * @param name The name of the document.
+     */
+    public XWikiDocument(String wiki, String web, String name)
+    {
+        setDatabase(wiki);
         setSpace(web);
 
         int i1 = name.indexOf(".");
@@ -545,7 +568,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getWikiName()
     {
-        return getDatabase();
+        return StringUtils.isEmpty(getDatabase()) ? DEFAULT_WIKI_NAME : getDatabase();
     }
 
     public String getTitle()

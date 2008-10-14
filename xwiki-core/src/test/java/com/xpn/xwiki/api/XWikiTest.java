@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 
@@ -40,6 +39,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
@@ -48,7 +48,7 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
  * 
  * @version $Id$
  */
-public class XWikiTest extends MockObjectTestCase
+public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 {
     public static final Random rand = new Random(Calendar.getInstance().getTimeInMillis());
 
@@ -68,8 +68,10 @@ public class XWikiTest extends MockObjectTestCase
 
     private Map docs = new HashMap();
 
-    protected void setUp() throws XWikiException
+    @Override
+    protected void setUp() throws Exception
     {
+        super.setUp();
         this.context = new XWikiContext();
         this.xwiki = new com.xpn.xwiki.XWiki();
         this.context.setWiki(this.xwiki);
@@ -87,8 +89,8 @@ public class XWikiTest extends MockObjectTestCase
                 public java.lang.Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
-                    if (docs.containsKey(shallowDoc.getName())) {
-                        return (XWikiDocument) docs.get(shallowDoc.getName());
+                    if (XWikiTest.this.docs.containsKey(shallowDoc.getName())) {
+                        return XWikiTest.this.docs.get(shallowDoc.getName());
                     } else {
                         return shallowDoc;
                     }
@@ -101,9 +103,9 @@ public class XWikiTest extends MockObjectTestCase
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
                     document.setNew(false);
-                    document.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
+                    document.setStore((XWikiStoreInterface) XWikiTest.this.mockXWikiStore.proxy());
                     document.setId(rand.nextLong());
-                    docs.put(document.getName(), document);
+                    XWikiTest.this.docs.put(document.getName(), document);
                     return null;
                 }
             });
@@ -121,9 +123,9 @@ public class XWikiTest extends MockObjectTestCase
         this.mockXWikiRightService.stubs().method("hasAccessLevel").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
-        this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore.proxy());
-        this.xwiki.setRightService((XWikiRightService) mockXWikiRightService.proxy());
+        this.xwiki.setStore((XWikiStoreInterface) this.mockXWikiStore.proxy());
+        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) this.mockXWikiVersioningStore.proxy());
+        this.xwiki.setRightService((XWikiRightService) this.mockXWikiRightService.proxy());
 
         this.context.setUser("Redtail");
         this.apiDocument = new Document(new XWikiDocument("MilkyWay", "Fidis"), this.context);

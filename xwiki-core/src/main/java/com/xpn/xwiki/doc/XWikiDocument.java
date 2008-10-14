@@ -538,6 +538,16 @@ public class XWikiDocument implements DocumentModelBridge
         setFullName(name, null);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see DocumentModelBridge#getWikiName()
+     */
+    public String getWikiName()
+    {
+        return getDatabase();
+    }
+
     public String getTitle()
     {
         return (this.title != null) ? this.title : "";

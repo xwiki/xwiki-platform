@@ -19,25 +19,25 @@
  */
 package org.xwiki.configuration.internal;
 
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.internal.commons.CommonsConfigurationSource;
-import org.xwiki.configuration.ConfigurationSourceCollection;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.container.Container;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.net.URL;
-import java.net.MalformedURLException;
+import java.util.List;
+
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.ConfigurationSourceCollection;
+import org.xwiki.configuration.internal.commons.CommonsConfigurationSource;
+import org.xwiki.container.Container;
 
 /**
  * Default list of {@link org.xwiki.configuration.ConfigurationSource}s that contain the default global XWiki
  * configuration file (xwiki.properties).
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
@@ -49,7 +49,7 @@ public class DefaultConfigurationSourceCollection implements ConfigurationSource
      * Injected by the Component Manager.
      */
     private Container container;
-    
+
     private List<ConfigurationSource> sources;
 
     public void initialize() throws InitializationException
@@ -64,12 +64,10 @@ public class DefaultConfigurationSourceCollection implements ConfigurationSource
         } catch (MalformedURLException e) {
             throw new InitializationException("Failed to locate property file [" + XWIKI_PROPERTIES_FILE + "]", e);
         }
-
         try {
             this.sources.add(new CommonsConfigurationSource(new PropertiesConfiguration(xwikiPropertiesUrl)));
         } catch (ConfigurationException e) {
-            throw new InitializationException("Failed to load property file ["
-                + XWIKI_PROPERTIES_FILE + "]", e);
+            throw new InitializationException("Failed to load property file [" + XWIKI_PROPERTIES_FILE + "]", e);
         }
     }
 

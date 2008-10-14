@@ -194,9 +194,13 @@ public class XWikiContext extends Hashtable<Object, Object>
         } else {
             put(WIKI_KEY, database);
         }
-        if (orig_database == null) {
-            orig_database = database;
-            put(ORIGINAL_WIKI_KEY, database);
+        if (this.orig_database == null) {
+            this.orig_database = database;
+            if (database == null) {
+                remove(ORIGINAL_WIKI_KEY);
+            } else {
+                put(ORIGINAL_WIKI_KEY, database);
+            }
         }
     }
 

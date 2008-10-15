@@ -38,7 +38,7 @@ import org.xwiki.observation.event.Event;
 public class DefaultObservationManager implements ObservationManager
 {
     /**
-     * Internal class for holding an (Event, EventListener) pair. Too bad there's no simple Pair class in the JDK. 
+     * Internal class for holding an (Event, EventListener) pair. Too bad there's no simple Pair class in the JDK.
      */
     protected static class RegisteredListener
     {
@@ -77,8 +77,7 @@ public class DefaultObservationManager implements ObservationManager
      * 
      * @todo Should we allow event inheritance?
      */
-    private Map<String, List<RegisteredListener>> listeners = 
-        new ConcurrentHashMap<String, List<RegisteredListener>>();
+    private Map<String, List<RegisteredListener>> listeners = new ConcurrentHashMap<String, List<RegisteredListener>>();
 
     /**
      * {@inheritDoc}

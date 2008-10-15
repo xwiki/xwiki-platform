@@ -24,8 +24,8 @@ import org.xwiki.observation.event.Event;
 
 /**
  * The main orchestrator for event notification. You register {@link EventListener}s against this manager, create
- * {@link Event}s and pass them to this manager, and it notifies the right event listeners of the events they
- * registered for.
+ * {@link Event}s and pass them to this manager, and it notifies the right event listeners of the events they registered
+ * for.
  * 
  * @version $Id$
  */

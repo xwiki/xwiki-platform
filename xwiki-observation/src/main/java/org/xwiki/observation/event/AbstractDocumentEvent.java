@@ -35,8 +35,8 @@ public abstract class AbstractDocumentEvent implements Event
     private EventFilter eventFilter;
 
     /**
-     * Constructor initializing the event filter with an {@link AlwaysMatchingEventFilter}, meaning that this event
-     * will match any other document event of the same type.
+     * Constructor initializing the event filter with an {@link AlwaysMatchingEventFilter}, meaning that this event will
+     * match any other document event of the same type.
      */
     public AbstractDocumentEvent()
     {
@@ -44,8 +44,8 @@ public abstract class AbstractDocumentEvent implements Event
     }
 
     /**
-     * Constructor initializing the event filter with a {@link FixedNameEventFilter}, meaning that this event will
-     * match only events of the same type affecting the same document.
+     * Constructor initializing the event filter with a {@link FixedNameEventFilter}, meaning that this event will match
+     * only events of the same type affecting the same document.
      * 
      * @param documentName the name of the document related to this event
      */

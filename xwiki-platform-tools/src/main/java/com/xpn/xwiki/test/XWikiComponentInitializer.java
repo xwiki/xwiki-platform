@@ -19,14 +19,14 @@
  */
 package com.xpn.xwiki.test;
 
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.Container;
+import org.xwiki.plexus.manager.PlexusComponentManager;
+import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextInitializerManager;
-import org.xwiki.plexus.manager.PlexusComponentManager;
+import org.codehaus.plexus.DefaultContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
 
 public class XWikiComponentInitializer
 {
@@ -57,8 +57,8 @@ public class XWikiComponentInitializer
     }
 
     /**
-     * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) which can
-     *         then be put in the XWiki Context for testing.
+     * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory)
+     *         which can then be put in the XWiki Context for testing.
      */
     public ComponentManager getComponentManager() throws Exception
     {
@@ -67,10 +67,6 @@ public class XWikiComponentInitializer
             configuration.setContainerConfiguration("/plexus.xml");
             DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
             this.componentManager = new PlexusComponentManager(container);
-
-            // Set a simple application context, as some components fail to start without one.
-            Container c = (Container) this.componentManager.lookup(Container.ROLE);
-            c.setApplicationContext(new TestApplicationContext());
         }
 
         return this.componentManager;

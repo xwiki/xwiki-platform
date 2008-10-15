@@ -180,6 +180,7 @@ xwiki.authentication.ldap.trylocal=1
 
 #-------------------------------------------------------------------------------------
 # Cache
+# [DEPRECATED since 1.7M1: this way to configure cache provider is deprecated, you should use xwiki.properties instead.]
 #-------------------------------------------------------------------------------------
 
 #-# [Since 1.5M2]

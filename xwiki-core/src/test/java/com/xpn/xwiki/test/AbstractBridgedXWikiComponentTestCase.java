@@ -20,23 +20,26 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
+
 /**
- * Extension of {@link com.xpn.xwiki.test.AbstractXWikiComponentTestCase} that sets up a bridge between
- * the new Execution Context and the old XWikiContext. This allows code that uses XWikiContext to be
- * tested using this Test Case class.
- *
+ * Extension of {@link com.xpn.xwiki.test.AbstractXWikiComponentTestCase} that sets up a bridge between the new
+ * Execution Context and the old XWikiContext. This allows code that uses XWikiContext to be tested using this Test Case
+ * class.
+ * 
  * @version $Id: AbstractBridgedXWikiComponentTestCase.java 11544 2008-07-29 14:43:19Z amelentev $
- * @since 1.6M1 
+ * @since 1.6M1
  */
 public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWikiComponentTestCase
 {
     private XWikiContext context;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -53,8 +56,13 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         // Bridge with old XWiki Context, required for old code.
         Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
         execution.getContext().setProperty("xwikicontext", this.context);
+
+        // Set a simple application context, as some components fail to start without one.
+        Container c = (Container) getComponentManager().lookup(Container.ROLE);
+        c.setApplicationContext(new TestApplicationContext());
     }
 
+    @Override
     protected void tearDown() throws Exception
     {
         Utils.setComponentManager(null);

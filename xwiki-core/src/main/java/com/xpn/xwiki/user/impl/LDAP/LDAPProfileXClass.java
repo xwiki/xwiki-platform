@@ -81,7 +81,7 @@ public class LDAPProfileXClass
     {
         String dn = ldapObject.getStringValue(LDAP_XFIELD_DN);
 
-        return dn.isEmpty() ? null : dn;
+        return dn.length() == 0 ? null : dn;
     }
 
     /**
@@ -103,7 +103,7 @@ public class LDAPProfileXClass
     {
         String uid = ldapObject.getStringValue(LDAP_XFIELD_UID);
 
-        return uid.isEmpty() ? null : uid;
+        return uid.length() == 0 ? null : uid;
     }
 
     /**

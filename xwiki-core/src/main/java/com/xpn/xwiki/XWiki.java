@@ -81,12 +81,15 @@ import org.securityfilter.filter.URLPatternMatcher;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
@@ -158,7 +161,6 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
-import org.xwiki.query.QueryException;
 
 public class XWiki implements XWikiDocChangeNotificationInterface
 {
@@ -5161,23 +5163,53 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /**
      * @return the cache factory.
      * @since 1.5M2.
+     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(String)}.
      */
+    @Deprecated
     public CacheFactory getCacheFactory()
     {
-        String cacheHint = Param("xwiki.cache.cachefactory.hint", "jbosscache");
+        CacheFactory cacheFactory;
 
-        return (CacheFactory) Utils.getComponent(CacheFactory.ROLE, cacheHint);
+        String cacheHint = Param("xwiki.cache.cachefactory.hint", null);
+
+        if (cacheHint == null) {
+            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.ROLE, "default");
+            try {
+                cacheFactory = cacheManager.getCacheFactory();
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Failed to get cache factory component", e);
+            }
+        } else {
+            cacheFactory = (CacheFactory) Utils.getComponent(CacheFactory.ROLE, cacheHint);
+        }
+
+        return cacheFactory;
     }
 
     /**
      * @return the cache factory creating local caches.
      * @since 1.5M2.
+     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(String)}.
      */
+    @Deprecated
     public CacheFactory getLocalCacheFactory()
     {
-        String localCacheHint = Param("xwiki.cache.cachefactory.local.hint", "jbosscache/local");
+        CacheFactory localCacheFactory;
 
-        return (CacheFactory) Utils.getComponent(CacheFactory.ROLE, localCacheHint);
+        String localCacheHint = Param("xwiki.cache.cachefactory.local.hint", null);
+
+        if ((CacheFactory) Utils.getComponent(CacheFactory.ROLE, localCacheHint) == null) {
+            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.ROLE, "default");
+            try {
+                localCacheFactory = cacheManager.getLocalCacheFactory();
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Failed to get local cache factory component", e);
+            }
+        } else {
+            localCacheFactory = (CacheFactory) Utils.getComponent(CacheFactory.ROLE, localCacheHint);
+        }
+
+        return localCacheFactory;
     }
 
     public int getHttpTimeout(XWikiContext context)

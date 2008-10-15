@@ -24,7 +24,7 @@ import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link RegexXWikiURLFactory}.
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
@@ -32,6 +32,7 @@ public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
 {
     private XWikiURLFactory factory;
 
+    @Override
     protected void setUp() throws Exception
     {
         this.factory = (XWikiURLFactory) getComponentManager().lookup(XWikiURLFactory.ROLE);
@@ -47,7 +48,7 @@ public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
         assertEquals("fr", url.getParameterValue("language"));
     }
 
-    public void testCreateURLWhenURI() throws Exception
+    public void testCreateURLFromPath() throws Exception
     {
         XWikiURL url = this.factory.createURL("/xwiki/bin/view/Main/WebHome");
         assertEquals("view", url.getAction());

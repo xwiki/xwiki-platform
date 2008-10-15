@@ -19,12 +19,14 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
-import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.xpn.xwiki.XWikiContext;
-
 import java.security.Principal;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.securityfilter.realm.SimplePrincipal;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.user.api.XWikiAuthService;
 
 /**
  * Common methods useful to all Authentication services implementations.
@@ -33,6 +35,11 @@ import org.securityfilter.realm.SimplePrincipal;
  */
 public abstract class AbstractXWikiAuthService implements XWikiAuthService
 {
+    /**
+     * Logging tool.
+     */
+    private static final Log LOG = LogFactory.getLog(AbstractXWikiAuthService.class);
+
     /**
      * The Superadmin username.
      */
@@ -66,6 +73,10 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
      */
     protected Principal authenticateSuperAdmin(String password, XWikiContext context)
     {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Authenticate superadmin");
+        }
+
         Principal principal;
 
         // Security check: only decide that the passed user is the super admin if the

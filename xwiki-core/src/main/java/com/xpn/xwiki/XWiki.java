@@ -2709,9 +2709,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
 
-        // Only used by LDAP authentication service
-        needsUpdate |= bclass.addTextField("ldap_dn", "LDAP DN", 80);
-
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
@@ -2721,6 +2718,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (needsUpdate) {
             saveDocument(doc, context);
         }
+
         return bclass;
     }
 

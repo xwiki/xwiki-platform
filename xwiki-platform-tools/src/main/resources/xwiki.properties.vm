@@ -3,3 +3,15 @@
 # As time progresses more and more component will get their configurations from
 # this file.
 
+#-------------------------------------------------------------------------------------
+# Cache
+#-------------------------------------------------------------------------------------
+
+#-# [Since 1.7M1]
+#-# The cache component implementation to use as "normal" (can be local or distributed depending on the implementation)
+#-# cache component.
+# cacheHint=jbosscache
+
+#-# [Since 1.7M1]
+#-# The cache component to use as local cache component. 
+# localCacheHint=jbosscache/local

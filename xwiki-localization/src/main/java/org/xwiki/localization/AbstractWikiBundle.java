@@ -100,6 +100,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
 
             Properties result = loadDocumentBundle(documentName, language);
             this.documentBundles.get(documentName).put(language, result);
+            watchDocument(documentName);
             return result;
         }
     }

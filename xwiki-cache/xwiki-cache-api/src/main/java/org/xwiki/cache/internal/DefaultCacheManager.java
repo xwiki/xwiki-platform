@@ -43,6 +43,16 @@ import org.xwiki.configuration.ConfigurationSourceCollection;
 public class DefaultCacheManager implements CacheManager, Initializable, Composable
 {
     /**
+     * The default cache implementation.
+     */
+    private static final String DEFAULT_CACHE_HINT = "jbosscache";
+
+    /**
+     * The default local cache implementation.
+     */
+    private static final String DEFAULT_LOCALCACHE_HINT = "jbosscache/local";
+
+    /**
      * The component manager to use to find cache components.
      */
     private ComponentManager componentManager;
@@ -60,12 +70,12 @@ public class DefaultCacheManager implements CacheManager, Initializable, Composa
     /**
      * The role hint of configured default cache component.
      */
-    private String cacheHint;
+    private String cacheHint = DEFAULT_CACHE_HINT;
 
     /**
      * The role hint of configured default local cache component.
      */
-    private String localCacheHint;
+    private String localCacheHint = DEFAULT_LOCALCACHE_HINT;
 
     /**
      * {@inheritDoc}

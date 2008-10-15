@@ -83,6 +83,10 @@
       </requirements>
       <configuration>
         <priority>400</priority>
+        <staticBundles>
+          <String>ApplicationResources</String>
+          <String>CoreResources</String>
+        </staticBundles>
       </configuration>
     </component>
     <component>

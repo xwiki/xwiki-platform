@@ -1,0 +1,4 @@
+content	foxwiki	jar:chrome/foxwiki-core-${pom.version}.jar!/content/
+overlay	chrome://browser/content/browser.xul	chrome://foxwiki/content/browser.xul
+
+locale	foxwiki	en-UK	jar:chrome/foxwiki-core-${pom.version}.jar!/locale/en-UK/

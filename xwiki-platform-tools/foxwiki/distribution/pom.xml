@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.xpn.xwiki.platform.tools</groupId>
+		<artifactId>foxwiki</artifactId>
+		<version>1.0</version>
+	</parent>
+	<artifactId>foxwiki-distribution</artifactId>
+	<packaging>pom</packaging>
+	<name>FoXWiki - Distribution</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.xwiki.foxwiki</groupId>
+			<artifactId>foxwiki-core</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+      			<plugin>
+			        <groupId>org.apache.maven.plugins</groupId>
+			        <artifactId>maven-assembly-plugin</artifactId>
+			        <configuration>
+					<descriptors>
+						<descriptor>src/assemble/distribution.xml</descriptor>
+					</descriptors>
+					<finalName>foxwiki-distribution-${pom.version}</finalName>
+					<!-- 
+						This will generate a warning with maven-assembly-pluign 2.2-beta2 version.
+						Once 2.2-beta3 is out, we need to upgrade into that version.
+					-->
+					<appendAssemblyId>false</appendAssemblyId>
+			        </configuration>
+				<executions>
+					<execution>
+					<phase>package</phase>
+					<goals>
+						<goal>single</goal>
+					</goals>
+			            	</execution>
+				</executions>
+		      	</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<move file="target/foxwiki-distribution-${pom.version}.zip" tofile="target/foxwiki-distribution-${pom.version}.xpi"/>
+							</tasks>
+						</configuration>
+            					<goals>
+							<goal>run</goal>
+						</goals>
+          				</execution>
+        			</executions>
+      			</plugin>	
+			<plugin>
+			        <groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.1</version>
+			        <executions>
+					<execution>
+						<id>attach-artifacts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>target/foxwiki-distribution-${pom.version}.xpi</file>
+									<type>xpi</type>			
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>		
+		</plugins>
+	</build>
+</project>

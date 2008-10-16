@@ -1,0 +1,33 @@
+<assembly>
+	<id>distribution</id> 
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<files>
+		<file>
+			<source>src/main/resources/chrome.manifest</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>chrome.manifest</destName>
+			<filtered>true</filtered>
+		</file>
+		<file>
+			<source>src/main/resources/install.rdf</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>install.rdf</destName>
+			<filtered>true</filtered>
+		</file>
+	</files>
+	<fileSets>
+		<fileSet>
+			<directory>src/main/resources/defaults</directory>
+			<outputDirectory>/defaults</outputDirectory>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<outputDirectory>/chrome</outputDirectory>
+		</dependencySet>
+	</dependencySets>
+</assembly>

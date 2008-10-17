@@ -22,7 +22,7 @@ package org.xwiki.cache.tests;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.CacheManagerConfiguration;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -75,11 +75,11 @@ public class ConfigurationManagerMock extends AbstractLogEnabled implements Conf
     public void initializeConfiguration(Object configurationBean, List<ConfigurationSource> sources, String namespace)
         throws InitializationException
     {
-        CacheManager cacheManager = (CacheManager) configurationBean;
+        CacheManagerConfiguration cacheManagerConfiguration = (CacheManagerConfiguration) configurationBean;
 
         try {
-            BeanUtils.setProperty(cacheManager, "defaultCache", cache);
-            BeanUtils.setProperty(cacheManager, "defaultLocalCache", localCache);
+            BeanUtils.setProperty(cacheManagerConfiguration, "defaultCache", cache);
+            BeanUtils.setProperty(cacheManagerConfiguration, "defaultLocalCache", localCache);
         } catch (Exception e) {
             getLogger().error("Failed to set CacheManager configuration", e);
         }

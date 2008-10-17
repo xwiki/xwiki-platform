@@ -30,12 +30,22 @@
       <implementation>org.xwiki.cache.internal.DefaultCacheFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
-  </components>
-  <components>
     <component>
       <role>org.xwiki.cache.CacheManager</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.cache.internal.DefaultCacheManager</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.cache.CacheManagerConfiguration</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.cache.CacheManagerConfiguration</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.cache.internal.DefaultCacheManagerConfiguration</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>

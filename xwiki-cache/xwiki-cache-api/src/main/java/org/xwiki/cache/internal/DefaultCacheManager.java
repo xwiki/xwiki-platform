@@ -24,14 +24,11 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.CacheManagerConfiguration;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationManager;
-import org.xwiki.configuration.ConfigurationSourceCollection;
 
 /**
  * The default implementation of CacheManager. It uses ConfigurationManager to find the cache an local cache hints to
@@ -40,42 +37,17 @@ import org.xwiki.configuration.ConfigurationSourceCollection;
  * @version $Id$
  * @since 1.7M1
  */
-public class DefaultCacheManager implements CacheManager, Initializable, Composable
+public class DefaultCacheManager implements CacheManager, Composable
 {
     /**
-     * The default cache implementation.
-     */
-    private static final String DEFAULT_CACHE_HINT = "jbosscache";
-
-    /**
-     * The default local cache implementation.
-     */
-    private static final String DEFAULT_LOCALCACHE_HINT = "jbosscache/local";
-
-    /**
-     * The component manager to use to find cache components.
+     * The component manager to use to find cache components. Injected by component manager.
      */
     private ComponentManager componentManager;
 
     /**
-     * Injected by the Component Manager.
+     * The configuration component for {@link CacheManager}. Injected by component manager.
      */
-    private ConfigurationManager configurationManager;
-
-    /**
-     * Injected by the Component Manager.
-     */
-    private ConfigurationSourceCollection sourceCollection;
-
-    /**
-     * The role hint of configured default cache component.
-     */
-    private String cacheHint = DEFAULT_CACHE_HINT;
-
-    /**
-     * The role hint of configured default local cache component.
-     */
-    private String localCacheHint = DEFAULT_LOCALCACHE_HINT;
+    private CacheManagerConfiguration configuration;
 
     /**
      * {@inheritDoc}
@@ -90,22 +62,11 @@ public class DefaultCacheManager implements CacheManager, Initializable, Composa
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        this.configurationManager.initializeConfiguration(this, this.sourceCollection.getConfigurationSources(),
-            "cache");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.cache.CacheManager#getCacheFactory()
      */
     public CacheFactory getCacheFactory() throws ComponentLookupException
     {
-        return getCacheFactory(this.cacheHint);
+        return getCacheFactory(this.configuration.getDefaultCache());
     }
 
     /**
@@ -115,7 +76,7 @@ public class DefaultCacheManager implements CacheManager, Initializable, Composa
      */
     public CacheFactory getLocalCacheFactory() throws ComponentLookupException
     {
-        return getCacheFactory(this.localCacheHint);
+        return getCacheFactory(this.configuration.getDefaultLocalCache());
     }
 
     /**
@@ -137,7 +98,7 @@ public class DefaultCacheManager implements CacheManager, Initializable, Composa
      */
     public <T> Cache<T> createNewCache(CacheConfiguration config) throws CacheException, ComponentLookupException
     {
-        return createNewCache(config, this.cacheHint);
+        return createNewCache(config, this.configuration.getDefaultCache());
     }
 
     /**
@@ -147,7 +108,7 @@ public class DefaultCacheManager implements CacheManager, Initializable, Composa
      */
     public <T> Cache<T> createNewLocalCache(CacheConfiguration config) throws CacheException, ComponentLookupException
     {
-        return createNewCache(config, this.localCacheHint);
+        return createNewCache(config, this.configuration.getDefaultLocalCache());
     }
 
     /**
@@ -166,37 +127,5 @@ public class DefaultCacheManager implements CacheManager, Initializable, Composa
         CacheFactory cacheFactory = (CacheFactory) this.componentManager.lookup(CacheFactory.ROLE, cacheHint);
 
         return cacheFactory.newCache(config);
-    }
-
-    /**
-     * @return the role hint of configured default cache component.
-     */
-    public String getDefaultCache()
-    {
-        return this.cacheHint;
-    }
-
-    /**
-     * @param cacheHint the role hint of configured default cache component.
-     */
-    public void setDefaultCache(String cacheHint)
-    {
-        this.cacheHint = cacheHint;
-    }
-
-    /**
-     * @return the role hint of configured default local cache component.
-     */
-    public String getLocalDefaultCache()
-    {
-        return this.localCacheHint;
-    }
-
-    /**
-     * @param localCacheHint the role hint of configured default local cache component.
-     */
-    public void setLocalDefaultCache(String localCacheHint)
-    {
-        this.localCacheHint = localCacheHint;
     }
 }

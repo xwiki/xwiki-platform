@@ -29,6 +29,7 @@ import org.wikimodel.wem.xwiki.XWikiXhtmlEscapeHandler;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiCommentHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiHeaderTagHandler;
@@ -36,6 +37,8 @@ import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiReferenceTagHand
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiSpanTagHandler;
 
 /**
+ * Parses XHTML and generate a {@link XDOM} object.
+ * 
  * @version $Id$
  * @since 1.5M2
  */

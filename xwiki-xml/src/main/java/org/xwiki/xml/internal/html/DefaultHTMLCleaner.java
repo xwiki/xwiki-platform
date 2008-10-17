@@ -20,6 +20,8 @@
  */
 package org.xwiki.xml.internal.html;
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +77,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         // no thread contention at that time).
         // Note: This email thread seems to say it's thread safe but that's not what we see here:
         //   http://osdir.com/ml/text.xml.xforms.chiba.devel/2006-09/msg00025.html
-        clean("<p>dummy</p>");
+        clean(new StringReader("<p>dummy</p>"));
     }
 
     /**
@@ -83,7 +85,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      * 
      * @see org.xwiki.xml.html.HTMLCleaner#clean(String)
      */
-    public org.w3c.dom.Document clean(String originalHtmlContent)
+    public org.w3c.dom.Document clean(Reader originalHtmlContent)
     {
         org.w3c.dom.Document result;
 
@@ -103,7 +105,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         } catch (Exception e) {
             // This shouldn't happen since we're not doing any IO... I consider this a flaw in the
             // design of HTML Cleaner.
-            throw new RuntimeException("Unhandled error when cleaning HTML [" + originalHtmlContent + "]", e);
+            throw new RuntimeException("Unhandled error when cleaning HTML", e);
         }
 
         Document document = new JDomSerializer(cleanerProperties, false).createJDom(cleanedNode);
@@ -117,8 +119,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             DOMOutputter outputter = new DOMOutputter();
             result = outputter.output(document);
         } catch (JDOMException e) {
-            throw new RuntimeException("Failed to convert JDOM Document to W3C Document for content ["
-                + originalHtmlContent + "]", e);
+            throw new RuntimeException("Failed to convert JDOM Document to W3C Document", e);
         }
 
         return result;

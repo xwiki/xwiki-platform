@@ -23,7 +23,6 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.parser.ParseException;
 
 import java.util.List;
 
@@ -40,6 +39,7 @@ public class DefaultSyntaxFactoryTest extends AbstractRenderingTestCase
         assertTrue("MediaWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.MEDIAWIKI, "1.0")));
         assertTrue("TWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.TWIKI, "1.0")));
         assertTrue("XHTML syntax not found", syntaxes.contains(new Syntax(SyntaxType.XHTML, "1.0")));
+        assertTrue("HTML syntax not found", syntaxes.contains(new Syntax(SyntaxType.HTML, "4.01")));
     }
 
     public void testCreateSyntaxFromSyntaxIdString() throws Exception

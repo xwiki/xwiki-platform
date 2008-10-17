@@ -19,6 +19,8 @@
  */
 package org.xwiki.xml.html;
 
+import java.io.Reader;
+
 import org.w3c.dom.Document;
 
 /**
@@ -40,5 +42,5 @@ public interface HTMLCleaner
      * @param originalHtmlContent the original content (HTML) to clean
      * @return the cleaned HTML as a w3c DOM (this allows further transformations if needed)
      */
-    Document clean(String originalHtmlContent);
+    Document clean(Reader originalHtmlContent);
 }

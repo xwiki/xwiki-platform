@@ -106,6 +106,27 @@
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
+      <role-hint>html/4.01</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.WikiModelHTMLParser</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.LinkParser</role>
+          <role-hint>xwiki/2.0</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.url.XWikiURLFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>        
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.HTMLCleaner</role>        
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.parser.Parser</role>
       <role-hint>confluence/1.0</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.DoxiaConfluenceParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>

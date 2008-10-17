@@ -20,6 +20,8 @@
  */
 package org.xwiki.xml;
 
+import java.io.StringReader;
+
 import junit.framework.TestCase;
 import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
@@ -37,8 +39,10 @@ public class XMLUtilsTest extends TestCase
     {
         DefaultHTMLCleaner cleaner = new DefaultHTMLCleaner();
         cleaner.initialize();
-        Document document = cleaner.clean("<html><head/><body><p>test1</p><p>test2</p></body></html>");
+        Document document = 
+            cleaner.clean(new StringReader("<html><head/><body><p>test1</p><p>test2</p></body></html>"));
         XMLUtils.stripHTMLEnvelope(document);
-        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", XMLUtils.toString(document));
+        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", 
+            XMLUtils.toString(document));
     }
 }

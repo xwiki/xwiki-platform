@@ -42,6 +42,8 @@ public class SyntaxType
 
     public static final SyntaxType XHTML = getSyntaxType("XHTML");
 
+    public static final SyntaxType HTML = getSyntaxType("HTML");
+
     private static Map<String, SyntaxType> syntaxTypeMap;
 
     private String id;

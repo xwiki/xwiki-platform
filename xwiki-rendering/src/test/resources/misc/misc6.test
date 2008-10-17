@@ -1,0 +1,22 @@
+.#-------------------------------------------------------------------------------------------------------
+.input|html/4.01
+.# Verify that some invalid and not well formed HTML (it's missing a proper HTML, HEAD and BODY elements)
+.# can be parsed using the HTML parser.
+.#-------------------------------------------------------------------------------------------------------
+<h2>header</h2>
+<p>paragraph</p>
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginSection [2]
+onWord [header]
+endSection [2]
+beginParagraph
+onWord [paragraph]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<h2 id="Hheader"><span>header</span></h2><p>paragraph</p>

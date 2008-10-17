@@ -32,6 +32,7 @@ import org.jdom.output.SAXOutputter;
 import org.jdom.JDOMException;
 import org.w3c.dom.Document;
 
+import java.io.StringReader;
 import java.util.List;
 
 /**
@@ -72,7 +73,7 @@ public class HTMLMacro extends XHTMLMacro
         DOMBuilder builder = new DOMBuilder();
 
         // clean the HTML to transform it into valid XHTML
-        Document document = this.htmlCleaner.clean(content);
+        Document document = this.htmlCleaner.clean(new StringReader(content));
 
         // Remove the HMTL envelope since this macro is only a fragment of a page which will already have an
         // HTML envelope when rendered.

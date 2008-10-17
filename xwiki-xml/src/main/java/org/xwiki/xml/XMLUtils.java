@@ -109,8 +109,8 @@ public final class XMLUtils
     }
 
     /**
-     * Strip the HTML envelope if it exists. Precisely this means removig the head tag and move all tags in the body tag
-     * directly under the html element. This is useful for example if you wish to insert an HTML fragment into an
+     * Strip the HTML envelope if it exists. Precisely this means removing the head tag and move all tags in the body 
+     * tag directly under the html element. This is useful for example if you wish to insert an HTML fragment into an
      * existing HTML page.
      * 
      * @param document the w3c Document to strip

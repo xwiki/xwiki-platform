@@ -20,6 +20,8 @@
  */
 package org.xwiki.xml.internal.html;
 
+import java.io.StringReader;
+
 import junit.framework.TestCase;
 
 import org.xwiki.xml.XMLUtils;
@@ -94,9 +96,9 @@ public class DefaultHTMLCleanerTest extends TestCase
     {
         assertHTML("<p>hello</p>", "<script>whatever</script><p>hello</p>");
     }
-
+    
     private void assertHTML(String expected, String actual)
     {
-        assertEquals(HEADER_FULL + expected + FOOTER, XMLUtils.toString(this.cleaner.clean(actual)));
+        assertEquals(HEADER_FULL + expected + FOOTER, XMLUtils.toString(this.cleaner.clean(new StringReader(actual))));
     }
 }

@@ -96,7 +96,7 @@ public class DefaultCacheManager implements CacheManager, Composable
      * 
      * @see org.xwiki.cache.CacheManager#createNewCache(org.xwiki.cache.config.CacheConfiguration)
      */
-    public <T> Cache<T> createNewCache(CacheConfiguration config) throws CacheException, ComponentLookupException
+    public <T> Cache<T> createNewCache(CacheConfiguration config) throws CacheException
     {
         return createNewCache(config, this.configuration.getDefaultCache());
     }
@@ -106,7 +106,7 @@ public class DefaultCacheManager implements CacheManager, Composable
      * 
      * @see org.xwiki.cache.CacheManager#createNewLocalCache(org.xwiki.cache.config.CacheConfiguration)
      */
-    public <T> Cache<T> createNewLocalCache(CacheConfiguration config) throws CacheException, ComponentLookupException
+    public <T> Cache<T> createNewLocalCache(CacheConfiguration config) throws CacheException
     {
         return createNewCache(config, this.configuration.getDefaultLocalCache());
     }
@@ -119,12 +119,15 @@ public class DefaultCacheManager implements CacheManager, Composable
      * @param cacheHint the role hint to lookup.
      * @return a new {@link Cache}.
      * @throws CacheException error when creating the cache.
-     * @throws ComponentLookupException error when searching for cache component.
      */
-    public <T> Cache<T> createNewCache(CacheConfiguration config, String cacheHint) throws CacheException,
-        ComponentLookupException
+    public <T> Cache<T> createNewCache(CacheConfiguration config, String cacheHint) throws CacheException
     {
-        CacheFactory cacheFactory = (CacheFactory) this.componentManager.lookup(CacheFactory.ROLE, cacheHint);
+        CacheFactory cacheFactory;
+        try {
+            cacheFactory = (CacheFactory) this.componentManager.lookup(CacheFactory.ROLE, cacheHint);
+        } catch (ComponentLookupException e) {
+            throw new CacheException("Failed to get cache factory for role hint [" + cacheHint + "]", e);
+        }
 
         return cacheFactory.newCache(config);
     }

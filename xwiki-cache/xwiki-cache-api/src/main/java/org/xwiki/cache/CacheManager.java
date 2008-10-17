@@ -59,9 +59,8 @@ public interface CacheManager
      * @param config the cache configuration.
      * @return a new {@link Cache}.
      * @throws CacheException error when creating the cache.
-     * @throws ComponentLookupException error when searching for cache component.
      */
-    <T> Cache<T> createNewCache(CacheConfiguration config) throws CacheException, ComponentLookupException;
+    <T> Cache<T> createNewCache(CacheConfiguration config) throws CacheException;
 
     /**
      * Find the local cache implementation component to use and create a new cache.
@@ -73,7 +72,6 @@ public interface CacheManager
      * @param config the cache configuration.
      * @return a new local {@link Cache}.
      * @throws CacheException error when creating the cache.
-     * @throws ComponentLookupException error when searching for cache component.
      */
-    <T> Cache<T> createNewLocalCache(CacheConfiguration config) throws CacheException, ComponentLookupException;
+    <T> Cache<T> createNewLocalCache(CacheConfiguration config) throws CacheException;
 }

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.server.filter;
 
 import java.io.IOException;
+import java.io.StringReader;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -83,7 +84,7 @@ public class ConversionFilter implements Filter
                 String oldValue = req.getParameter(wysiwygName);
                 String newValue = oldValue;
                 try {
-                    newValue = converter.fromHTML(XMLUtils.toString(cleaner.clean(oldValue)));
+                    newValue = converter.fromHTML(XMLUtils.toString(cleaner.clean(new StringReader(oldValue))));
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
                 }

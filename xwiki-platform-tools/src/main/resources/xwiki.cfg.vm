@@ -16,7 +16,7 @@ xwiki.plugins=$xwikiCfgPlugins
 # [Since 1.6RC1] Defines the list of supported syntaxes
 # Available syntaxes are: 
 #    xwiki/1.0, xwiki/2.0, confluence/1.0, jspwiki/1.0, creole/1.0, 
-#    mediawiki/1.0, xhtml/1.0, twiki/1.0
+#    mediawiki/1.0, twiki/1.0, xhtml/1.0, html/4.01
 xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0
 
 # This parameter allows XWiki to operate in Hosting mode allowing to create

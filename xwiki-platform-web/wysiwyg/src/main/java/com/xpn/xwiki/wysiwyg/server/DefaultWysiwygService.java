@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.server;
 
+import java.io.StringReader;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -85,7 +87,7 @@ public class DefaultWysiwygService extends RemoteServiceServlet implements Wysiw
      */
     public String cleanHTML(String dirtyHTML)
     {
-        return XMLUtils.toString(getHTMLCleaner().clean(dirtyHTML));
+        return XMLUtils.toString(getHTMLCleaner().clean(new StringReader(dirtyHTML)));
     }
 
     /**

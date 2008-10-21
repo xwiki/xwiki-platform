@@ -31,8 +31,8 @@
     <version>11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-webdav</artifactId>
-  <name>XWiki Platform - Plugins - WebDAV plugin</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <name>XWiki Platform - Plugins - WebDAV</name>
+  <version>1.0-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
@@ -42,7 +42,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-webdav</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

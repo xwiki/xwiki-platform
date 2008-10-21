@@ -21,23 +21,37 @@
 package com.xpn.xwiki.plugin.webdav;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
+import com.xpn.xwiki.plugin.PluginApi;
 
-public class XWikiDavApi extends Api
+/**
+ * The Api class for the webdav plugin.
+ * 
+ * @version $Id$
+ */
+public class XWikiDavApi extends PluginApi<XWikiDavPlugin>
 {
-    private XWikiDavPlugin plugin;
-
+    /**
+     * Default plugin API constructor.
+     * 
+     * @param plugin The protected plugin instance.
+     * @param context The XWiki context.
+     */
     public XWikiDavApi(XWikiDavPlugin plugin, XWikiContext context)
     {
-        super(context);		
-        this.plugin = plugin;
+        super(plugin, context);
     }
 
+    /**
+     * Compute the URL that can be used to access an attachment over WebDAV.
+     * 
+     * @param doc The document which is having the attachment.
+     * @param attachment The attachment itself.
+     * @return The <code>String</code> representation of the WebDAV url corresponding to the attachment.
+     */
     public String getDavURL(Document doc, Attachment attachment)
     {
-        return XWikiDavUtils.getDavURL(doc, attachment);
+        return getProtectedPlugin().getDavURL(doc, attachment);
     }
 }

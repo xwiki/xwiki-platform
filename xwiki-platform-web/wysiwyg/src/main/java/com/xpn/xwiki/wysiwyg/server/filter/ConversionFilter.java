@@ -92,8 +92,9 @@ public class ConversionFilter implements Filter
                 mreq.setParameter(wysiwygName, newValue);
             }
             chain.doFilter(mreq, res);
+        } else {
+            chain.doFilter(req, res);
         }
-        chain.doFilter(req, res);
     }
 
     /**

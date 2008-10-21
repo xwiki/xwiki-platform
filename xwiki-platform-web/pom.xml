@@ -40,7 +40,7 @@
   </scm>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
-    <gwtVersion>1.5.0-rc1</gwtVersion>
+    <gwtVersion>1.5.2</gwtVersion>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.18-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>1.7-SNAPSHOT</platform.core.version>

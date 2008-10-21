@@ -33,7 +33,7 @@
   </parent>
   <artifactId>foxwiki-distribution</artifactId>
   <packaging>pom</packaging>
-  <name>FoXWiki - Distribution</name>
+  <name>XWiki Platform - Tools - FoXWiki - Distribution</name>
   <description>The packaging of the extension</description>
   <dependencies>
     <dependency>
@@ -50,11 +50,11 @@
         <version>2.2-beta-2</version>
         <configuration>
           <descriptors>
-           <descriptor>src/assemble/distribution.xml</descriptor>
+            <descriptor>src/assemble/distribution.xml</descriptor>
           </descriptors>
           <finalName>foxwiki-distribution-${pom.version}</finalName>
           <!-- 
-              This will generate a warning with maven-assembly-pluign 2.2-beta2 version.
+              This will generate a warning with maven-assembly-plugin 2.2-beta2 version.
               Once 2.2-beta3 is out, we need to upgrade into that version.
             -->
           <appendAssemblyId>false</appendAssemblyId>

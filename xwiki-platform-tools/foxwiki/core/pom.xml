@@ -33,6 +33,6 @@
   </parent>
   <artifactId>foxwiki-core</artifactId>
   <packaging>jar</packaging>
-  <name>FoXWiki - Core</name>
+  <name>XWiki Platform - Tools - FoXWiki - Core</name>
   <description>The actual "code" files of the extension</description>
 </project>

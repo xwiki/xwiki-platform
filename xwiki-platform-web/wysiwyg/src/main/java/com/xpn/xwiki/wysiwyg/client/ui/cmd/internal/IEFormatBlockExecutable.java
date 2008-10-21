@@ -19,17 +19,29 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.google.gwt.user.client.Element;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 public class IEFormatBlockExecutable extends FormatBlockExecutable
 {
-    public boolean execute(Element target, String parameter)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see FormatBlockExecutable#execute(Document, String)
+     */
+    public boolean execute(Document doc, String parameter)
     {
-        return super.execute(target, parameter);
+        // TODO
+        return super.execute(doc, parameter);
     }
 
-    public String getParameter(Element target)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see FormatBlockExecutable#getParameter(Document)
+     */
+    public String getParameter(Document doc)
     {
-        return super.getParameter(target);
+        // TODO
+        return super.getParameter(doc);
     }
 }

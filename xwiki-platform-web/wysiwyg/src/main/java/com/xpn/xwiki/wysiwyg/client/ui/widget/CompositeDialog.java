@@ -54,7 +54,12 @@ public class CompositeDialog extends Composite implements SourcesPopupEvents,
 
     public void center()
     {
+        // PopupPanel#center calls PopupPanel#hide if the dialog was not showing. We call PopupPanel#show before in
+        // order to avoid this behavior.
+        dialog.setVisible(false);
+        dialog.show();
         dialog.center();
+        dialog.setVisible(true);
     }
 
     public void hide()

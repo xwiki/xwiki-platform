@@ -22,10 +22,23 @@ package com.xpn.xwiki.wysiwyg.client.selection.internal;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
+import com.xpn.xwiki.wysiwyg.client.selection.RangeCompare;
 import com.xpn.xwiki.wysiwyg.client.util.DocumentFragment;
 
-public class DefaultRange extends AbstractRange
+/**
+ * The default range implementation just forwards the calls to the underlying browser implementation. It should be used
+ * only for browsers that follow the W3C Range specification.
+ * 
+ * @version $Id$
+ */
+public class DefaultRange extends AbstractRange<JavaScriptObject>
 {
+    /**
+     * Creates a new instance that wraps the given native range object. All the calls will be forwarded to this native
+     * object.
+     * 
+     * @param jsRange The native range object to be wrapped.
+     */
     DefaultRange(JavaScriptObject jsRange)
     {
         super(jsRange);
@@ -46,7 +59,8 @@ public class DefaultRange extends AbstractRange
      * @see Range#getCommonAncestorContainer()
      */
     public native Node getCommonAncestorContainer() /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().commonAncestorContainer;
+        var range = this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()();
+        return range.commonAncestorContainer;
     }-*/;
 
     /**
@@ -216,8 +230,22 @@ public class DefaultRange extends AbstractRange
      * 
      * @see AbstractRange#compareBoundaryPoints(int, JavaScriptObject)
      */
-    protected native short compareBoundaryPoints(int how, JavaScriptObject sourceRange) /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().compareBoundaryPoints(how, sourceRange);
+    protected short compareBoundaryPoints(RangeCompare how, JavaScriptObject sourceRange)
+    {
+        return compareBoundaryPoints(how.ordinal(), sourceRange);
+    }
+
+    /**
+     * Compare the boundary-points of two ranges in a document.
+     * 
+     * @param how The type of comparison.
+     * @param sourceRange The range to compared to.
+     * @return -1, 0 or 1 depending on whether the corresponding boundary-point of this range is respectively before,
+     *         equal to, or after the corresponding boundary-point of sourceRange.
+     */
+    private native short compareBoundaryPoints(int how, JavaScriptObject sourceRange) /*-{
+        var range = this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()();
+        return range.compareBoundaryPoints(how, sourceRange);
     }-*/;
 
     /**
@@ -230,7 +258,10 @@ public class DefaultRange extends AbstractRange
         return new DefaultRange(cloneJSRange());
     }
 
-    protected native JavaScriptObject cloneJSRange() /*-{
+    /**
+     * @return A clone of the underlying native range object.
+     */
+    private native JavaScriptObject cloneJSRange() /*-{
         return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractRange::getJSRange()().cloneRange();
     }-*/;
 

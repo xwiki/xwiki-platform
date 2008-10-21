@@ -25,6 +25,8 @@ import com.xpn.xwiki.wysiwyg.client.util.DocumentFragment;
 /**
  * The {@link Range} object represents a fragment of a document that can contain nodes and parts of text nodes in a
  * given document.
+ * 
+ * @version $Id$
  */
 public interface Range
 {
@@ -127,8 +129,8 @@ public interface Range
      * Compare the boundary-points of two Ranges in a document.
      * 
      * @param how The type of comparison.
-     * @param sourceRange The Range on which this current Range is compared to.
-     * @return -1, 0 or 1 depending on whether the corresponding boundary-point of the Range is respectively before,
+     * @param sourceRange The range to compared to.
+     * @return -1, 0 or 1 depending on whether the corresponding boundary-point of this range is respectively before,
      *         equal to, or after the corresponding boundary-point of sourceRange.
      */
     short compareBoundaryPoints(RangeCompare how, Range sourceRange);

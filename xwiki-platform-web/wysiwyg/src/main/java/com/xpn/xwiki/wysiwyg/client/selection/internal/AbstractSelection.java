@@ -23,16 +23,36 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
 import com.xpn.xwiki.wysiwyg.client.selection.Selection;
 
-public abstract class AbstractSelection implements Selection
+/**
+ * Abstract selection that implements the Mozilla range specification using the API offered by the browser. Concrete
+ * extensions of these class have the role to adapt the specific selection API offered by each browser to the Mozilla
+ * selection specification.
+ * 
+ * @param <S> Browser specific selection implementation.
+ * @param <R> Browser specific range implementation.
+ * @version $Id$
+ */
+public abstract class AbstractSelection<S extends JavaScriptObject, R extends JavaScriptObject> implements Selection
 {
-    private final JavaScriptObject jsSelection;
+    /**
+     * Browser specific selection implementation.
+     */
+    private final S jsSelection;
 
-    AbstractSelection(JavaScriptObject jsSelection)
+    /**
+     * Creates a new instance that has to adapt the given browser-specific selection to the Mozilla specification.
+     * 
+     * @param jsSelection The selection implementation to adapt.
+     */
+    AbstractSelection(S jsSelection)
     {
         this.jsSelection = jsSelection;
     }
 
-    public final JavaScriptObject getJSSelection()
+    /**
+     * @return The underlying selection implementation used.
+     */
+    public final S getJSSelection()
     {
         return this.jsSelection;
     }
@@ -42,22 +62,30 @@ public abstract class AbstractSelection implements Selection
      * 
      * @see Selection#addRange(Range)
      */
-    public final void addRange(Range range)
+    @SuppressWarnings("unchecked")
+    public void addRange(Range range)
     {
-        addRange(((AbstractRange) range).getJSRange());
+        addRange(((AbstractRange<R>) range).getJSRange());
     }
 
-    protected abstract void addRange(JavaScriptObject range);
+    /**
+     * @param range Adds this range to the current selection.
+     */
+    protected abstract void addRange(R range);
 
     /**
      * {@inheritDoc}
      * 
      * @see Selection#removeRange(Range)
      */
-    public final void removeRange(Range range)
+    @SuppressWarnings("unchecked")
+    public void removeRange(Range range)
     {
-        removeRange(((AbstractRange) range).getJSRange());
+        removeRange(((AbstractRange<R>) range).getJSRange());
     }
 
-    protected abstract void removeRange(JavaScriptObject range);
+    /**
+     * @param range Removes this range from the current selection.
+     */
+    protected abstract void removeRange(R range);
 }

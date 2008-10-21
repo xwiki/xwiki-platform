@@ -12,9 +12,9 @@ $JAVA32_HOME/java \
 -Djava.compiler=NONE \
 -Xrunjdwp:transport=dt_socket,server=y,address=5006,suspend=y \
 -cp \
-$LIB_DIR/xwiki-web-wysiwyg-1.6-SNAPSHOT.jar:\
-$LIB_DIR/xwiki-web-wysiwyg-1.6-SNAPSHOT-sources.jar:\
-$LIB_DIR/xwiki-web-gwt-1.6-SNAPSHOT-sources.jar:\
+$LIB_DIR/xwiki-web-wysiwyg-1.7-SNAPSHOT.jar:\
+$LIB_DIR/xwiki-web-wysiwyg-1.7-SNAPSHOT-sources.jar:\
+$LIB_DIR/xwiki-web-gwt-1.7-SNAPSHOT-sources.jar:\
 $LIB_DIR/junit-3.8.1.jar:\
 $LIB_DIR/incubator-glasspanel-r729.jar:\
 $GWT_HOME/gwt-dev-linux.jar:\

@@ -23,6 +23,8 @@ import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 
 /**
  * Fake HTML converter that doesn't change the input string at all.
+ * 
+ * @version $Id$
  */
 public class FakeHTMLConverter implements HTMLConverter
 {

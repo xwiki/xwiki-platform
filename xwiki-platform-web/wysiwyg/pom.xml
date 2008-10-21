@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
@@ -9,9 +10,6 @@
   <name>XWiki Platform - Web - WYSIWYG</name>
   <packaging>war</packaging>
   <description>XWiki's What You See Is What You Get editor</description>
-  <properties>
-    <gwtHome>${java.io.tmpdir}/xwiki/gwt/${gwtArtifactId}-${gwtVersion}</gwtHome>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>com.google.gwt</groupId>
@@ -24,21 +22,27 @@
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
       <version>${gwtVersion}</version>
-      <!-- This JAR is used to generate JS files and shouldn't be included in the server side
-        WAR. However an issue in the GWT maven plugin prevents it from working with
-        "provided" scope. See http://code.google.com/p/gwt-maven/issues/detail?id=46. When
-        it's fixed, add a <scope>provided</scope> element. -->
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwtVersion}</version>
-      <classifier>${os}</classifier>
-      <!-- <scope>provided</scope> -->
+      <classifier>${platform}-libs</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>${gwtVersion}</version>
+      <classifier>${platform}</classifier>
+      <scope>provided</scope>
       <!-- We load this library this way because GWT looks for SWT libraries in the same folder -->
-      <scope>system</scope>
-      <systemPath>${gwtHome}/gwt-dev-${os}.jar</systemPath>
+      <!--
+        <scope>system</scope>
+        <systemPath>${settings.localRepository}/com/google/gwt/gwt-dev/${gwtVersion}/gwt-dev-${platform}.jar</systemPath>
+      -->
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
@@ -92,8 +96,10 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
-      <!-- I can't restrict the scope because maven-googlewebtoolkit2-plugin fails 
-        to compile the sources. We shouldn't have this artifact in the final lib directory. -->
+      <!--
+        I can't restrict the scope because maven-googlewebtoolkit2-plugin fails to compile the sources. We shouldn't
+        have this artifact in the final lib directory.
+      -->
       <!-- <scope>test</scope> -->
     </dependency>
     <dependency>
@@ -111,14 +117,14 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Download and unpack the GWT compiler -->
+      <!-- Download and unpack the GWT libs -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>unzip-gwt-compiler</id>
-            <phase>initialize</phase>
+            <id>unzip-gwt-libs</id>
+            <phase>compile</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -126,12 +132,14 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>com.google.gwt</groupId>
-                  <artifactId>${gwtArtifactId}</artifactId>
+                  <artifactId>gwt-dev</artifactId>
                   <version>${gwtVersion}</version>
+                  <classifier>${platform}-libs</classifier>
                   <type>zip</type>
+                  <overWrite>false</overWrite>
                 </artifactItem>
               </artifactItems>
-              <outputDirectory>${java.io.tmpdir}/xwiki/gwt</outputDirectory>
+              <outputDirectory>${settings.localRepository}/com/google/gwt/gwt-dev/${gwtVersion}</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -141,6 +149,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <executions>
           <execution>
+            <id>generate-classes</id>
             <phase>compile</phase>
             <configuration>
               <source>1.5</source>
@@ -152,33 +161,21 @@
       <plugin>
         <groupId>com.totsp.gwt</groupId>
         <artifactId>maven-googlewebtoolkit2-plugin</artifactId>
-        <version>1.5.3</version>
+        <version>2.0-beta24</version>
         <configuration>
+          <compileTargets>
+            <value>com.xpn.xwiki.wysiwyg.Wysiwyg</value>
+          </compileTargets>
+          <runTarget>com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.html</runTarget>
           <logLevel>WARN</logLevel><!-- ERROR, WARN, INFO, TRACE, DEBUG, SPAM, ALL -->
           <style>OBF</style><!-- OBF[USCATED], PRETTY, DETAILED -->
-          <runTarget>com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.html</runTarget>
-          <gwtHome>${gwtHome}</gwtHome>
-          <compileTarget>
-            <value>com.xpn.xwiki.wysiwyg.Wysiwyg</value>
-          </compileTarget>
+          <noServer>false</noServer>
           <extraJvmArgs>-Xmx1024m</extraJvmArgs>
+          <gwtVersion>${gwtVersion}</gwtVersion>
         </configuration>
-        <!-- The GWT plugin is adding quotes around the path to compensate for the fact that old
-          versions of plexus utils were not adding them. Now that plexus utils is adding them
-          this is failing since they're added twice. We should try to move to version 2.x of
-          the GWT plugin since it may have been fixed there. In the meantime we force an old
-          version of plexus utils to be used.
-          See http://jira.codehaus.org/browse/MNG-3414 for more details -->
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>1.4.2</version>
-            <scope>provided</scope>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
+            <id>generate-javascript</id>
             <goals>
               <goal>compile</goal>
             </goals>
@@ -186,14 +183,19 @@
         </executions>
       </plugin>
       <plugin>
-        <!-- GWT's hosted browser needs client sources. We include all the 
-          sources for now because we cannot filter server sources. -->
+        <!--
+          GWT's hosted browser needs client sources. We include all the sources for now because we cannot filter server
+          sources.
+        -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
         <executions>
           <execution>
-            <!-- We bind this plugin to the test phase because we need to include the sources jar 
-              in the final war, so the jar must be created before the war is assembled. -->
+            <id>build-source-jar</id>
+            <!--
+              We bind this plugin to the test phase because we need to include the sources jar in the final war, so the
+              jar must be created before the war is assembled.
+            -->
             <phase>test</phase>
             <goals>
               <goal>jar</goal>
@@ -230,10 +232,11 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <!-- We skip tests because we could not integrate the GWTTestCase derived tests 
-            with Maven. The main problem is that these tests need the hosted browser which 
-            in turn needs a 32-bit JRE. We could not find a way to specify the JRE to be used 
-            when running the tests. -->
+          <!--
+            We skip tests because we could not integrate the GWTTestCase derived tests with Maven. The main problem is
+            that these tests need the hosted browser which in turn needs a 32-bit JRE. We could not find a way to
+            specify the JRE to be used when running the tests.
+          -->
           <skip>true</skip>
         </configuration>
       </plugin>
@@ -248,8 +251,7 @@
         </os>
       </activation>
       <properties>
-        <gwtArtifactId>gwt-linux</gwtArtifactId>
-        <os>linux</os>
+        <platform>linux</platform>
       </properties>
     </profile>
     <profile>
@@ -260,8 +262,7 @@
         </os>
       </activation>
       <properties>
-        <gwtArtifactId>gwt-linux</gwtArtifactId>
-        <os>linux</os>
+        <platform>linux</platform>
       </properties>
     </profile>
     <profile>
@@ -272,8 +273,7 @@
         </os>
       </activation>
       <properties>
-        <gwtArtifactId>gwt-mac</gwtArtifactId>
-        <os>mac</os>
+        <platform>mac</platform>
       </properties>
     </profile>
     <profile>
@@ -284,15 +284,14 @@
         </os>
       </activation>
       <properties>
-        <gwtArtifactId>gwt-windows</gwtArtifactId>
-        <os>windows</os>
+        <platform>windows</platform>
       </properties>
     </profile>
   </profiles>
   <repositories>
     <repository>
-      <id>gwt-maven</id>
-      <url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo</url>
+      <id>ibiblio</id>
+      <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
     </repository>
   </repositories>
   <pluginRepositories>

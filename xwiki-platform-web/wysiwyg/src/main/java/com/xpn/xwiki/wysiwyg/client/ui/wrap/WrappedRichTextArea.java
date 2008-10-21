@@ -22,27 +22,62 @@ package com.xpn.xwiki.wysiwyg.client.ui.wrap;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.dom.client.Text;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RichTextArea;
+import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
 import com.xpn.xwiki.wysiwyg.client.selection.Selection;
-import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKeyFactory;
 import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
-public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
+public class WrappedRichTextArea extends RichTextArea
 {
-    public static final String STYLESHEET = GWT.getModuleBaseURL() + "RichTextArea.css";
+    private class LoadCommand implements Command
+    {
+        public void execute()
+        {
+            Document doc = (Document) IFrameElement.as(getElement()).getContentDocument().cast();
+            Node head = doc.getElementsByTagName("head").getItem(0);
 
-    private List<XShortcutKey> shortcutKeys = new ArrayList<XShortcutKey>();
+            // Add style sheet declarations
+            LinkElement linkPrototype = doc.xCreateLinkElement();
+            linkPrototype.setRel("stylesheet");
+            linkPrototype.setType("text/css");
+            for (String styleSheetURL : iframeConfig.getStyleSheetURLs()) {
+                LinkElement link = (LinkElement) linkPrototype.cloneNode(false);
+                link.setHref(styleSheetURL);
+                head.appendChild(link);
+            }
+
+            // Add script declarations
+            ScriptElement scriptPrototype = doc.xCreateScriptElement();
+            scriptPrototype.setType("text/javascript");
+            for (String scriptURL : iframeConfig.getScriptURLs()) {
+                ScriptElement script = (ScriptElement) scriptPrototype.cloneNode(false);
+                script.setSrc(scriptURL);
+                head.appendChild(script);
+            }
+
+            // Set the class and id attributes on body
+            doc.getBody().setId(iframeConfig.getBodyId());
+            doc.getBody().setClassName(iframeConfig.getBodyClassName());
+        }
+    }
+
+    private final List<XShortcutKey> shortcutKeys = new ArrayList<XShortcutKey>();
+
+    private final IFrameConfig iframeConfig = new IFrameConfig();
 
     public void addShortcutKey(XShortcutKey shortcutKey)
     {
@@ -57,31 +92,29 @@ public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see HasStyleSheet#getStyleSheetURL()
+     * @return The DOM document being edited with this rich text area.
      */
-    public String getStyleSheetURL()
+    public Document getDocument()
     {
-        BasicFormatter basic = getBasicFormatter();
-        if (basic instanceof HasStyleSheet) {
-            return ((HasStyleSheet) basic).getStyleSheetURL();
-        } else {
-            return null;
-        }
+        return IFrameElement.as(getElement()).getContentDocument().cast();
+    }
+
+    /**
+     * @return The configuration object associated with the in-line frame of this rich text area.
+     */
+    public IFrameConfig getIFrameConfig()
+    {
+        return iframeConfig;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see HasStyleSheet#setStyleSheetURL(String)
+     * @see Widget#onLoad()
      */
-    public void setStyleSheetURL(String styleSheetURL)
+    protected void onLoad()
     {
-        BasicFormatter basic = getBasicFormatter();
-        if (basic instanceof HasStyleSheet) {
-            ((HasStyleSheet) basic).setStyleSheetURL(styleSheetURL);
-        }
+        DeferredCommand.addCommand(new LoadCommand());
     }
 
     /**
@@ -103,8 +136,7 @@ public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
 
     public void onEnter(Event event)
     {
-        IFrameElement iframe = IFrameElement.as(getElement());
-        Selection selection = SelectionManager.INSTANCE.getSelection(iframe);
+        Selection selection = getDocument().getSelection();
         if (selection.getRangeCount() == 0) {
             // We might not have an implementation of Selection for the current browser.
             // This should be removed in the future.
@@ -137,7 +169,7 @@ public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
                     range.deleteContents();
 
                     // Create the line break and insert it before the current range.
-                    Element br = iframe.getContentDocument().createBRElement();
+                    Element br = getDocument().xCreateBRElement();
                     Node refNode = range.getStartContainer();
                     if (refNode.hasChildNodes()) {
                         refNode = refNode.getChildNodes().getItem(range.getStartOffset());
@@ -146,7 +178,7 @@ public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
 
                     // Update the current range
                     selection.removeAllRanges();
-                    range = RangeFactory.INSTANCE.createRange(iframe);
+                    range = getDocument().createRange();
                     range.setStartBefore(refNode);
                     range.setEndBefore(refNode);
                     selection.addRange(range);
@@ -177,7 +209,7 @@ public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
                     String leftData = right.getData().substring(0, startOffset);
                     String rightData = right.getData().substring(startOffset);
                     right.setData(rightData);
-                    Text left = iframe.getContentDocument().createTextNode(leftData);
+                    Text left = getDocument().createTextNode(leftData);
                     right.getParentNode().insertBefore(left, right);
                 }
 
@@ -188,7 +220,7 @@ public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
             }
 
             // Wrap left in-line siblings in a paragraph.
-            Element leftParagraph = iframe.getContentDocument().createPElement();
+            Element leftParagraph = getDocument().xCreatePElement();
             Node leftSibling = splitRightNode.getPreviousSibling();
             if (leftSibling != null && DOMUtils.getInstance().isInline(leftSibling)) {
                 leftParagraph.appendChild(leftSibling);
@@ -201,7 +233,7 @@ public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
             }
 
             // Wrap right in-line siblings in a paragraph.
-            Element rightParagraph = iframe.getContentDocument().createPElement();
+            Element rightParagraph = getDocument().xCreatePElement();
             ancestor.replaceChild(rightParagraph, splitRightNode);
             rightParagraph.appendChild(splitRightNode);
             Node rightSibling = rightParagraph.getNextSibling();
@@ -211,7 +243,7 @@ public class WrappedRichTextArea extends RichTextArea implements HasStyleSheet
             }
 
             // Create the new range and move the cursor inside the new paragraph.
-            range = RangeFactory.INSTANCE.createRange(iframe);
+            range = getDocument().createRange();
             range.selectNodeContents(DOMUtils.getInstance().getFirstLeaf(rightParagraph));
             range.collapse(true);
             selection.addRange(range);

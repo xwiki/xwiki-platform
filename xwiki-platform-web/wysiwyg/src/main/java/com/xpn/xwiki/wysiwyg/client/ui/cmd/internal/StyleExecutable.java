@@ -22,16 +22,13 @@ package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.Text;
 import com.google.gwt.user.client.Element;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
 import com.xpn.xwiki.wysiwyg.client.selection.Selection;
-import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Executable;
 import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 import com.xpn.xwiki.wysiwyg.client.util.TextFragment;
 
 public class StyleExecutable extends DefaultExecutable
@@ -81,36 +78,30 @@ public class StyleExecutable extends DefaultExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(Element, String)
+     * @see DefaultExecutable#execute(Document, String)
      */
-    public boolean execute(Element target, String parameter)
+    public boolean execute(Document doc, String parameter)
     {
-        boolean executed = isExecuted(target);
-        IFrameElement iframe = IFrameElement.as(target);
-        Selection selection = SelectionManager.INSTANCE.getSelection(iframe);
-        if (selection.getRangeCount() > 0) {
-            List<Range> ranges = new ArrayList<Range>();
-            for (int i = 0; i < selection.getRangeCount(); i++) {
-                if (executed) {
-                    ranges.add(removeStyle(iframe, DOMUtils.getInstance().getTextRange(selection.getRangeAt(i))));
-                } else {
-                    ranges.add(addStyle(iframe, DOMUtils.getInstance().getTextRange(selection.getRangeAt(i))));
-                }
+        boolean executed = isExecuted(doc);
+        Selection selection = doc.getSelection();
+        List<Range> ranges = new ArrayList<Range>();
+        for (int i = 0; i < selection.getRangeCount(); i++) {
+            if (executed) {
+                ranges.add(removeStyle(doc, DOMUtils.getInstance().getTextRange(selection.getRangeAt(i))));
+            } else {
+                ranges.add(addStyle(doc, DOMUtils.getInstance().getTextRange(selection.getRangeAt(i))));
             }
-            selection.removeAllRanges();
-            for (Range range : ranges) {
-                selection.addRange(range);
-            }
-            return true;
-        } else {
-            // This should be removed after we implement the Selection and Range for IE.
-            return super.execute(target, parameter);
         }
+        selection.removeAllRanges();
+        for (Range range : ranges) {
+            selection.addRange(range);
+        }
+        return true;
     }
 
-    protected Range addStyle(IFrameElement iframe, Range range)
+    protected Range addStyle(Document doc, Range range)
     {
-        Range newRange = RangeFactory.INSTANCE.createRange(iframe);
+        Range newRange = doc.createRange();
         if (range.getCommonAncestorContainer().getNodeType() == Node.TEXT_NODE) {
             Text text = Text.as(range.getCommonAncestorContainer());
             addStyle(text, range.getStartOffset(), range.getEndOffset());
@@ -174,7 +165,7 @@ public class StyleExecutable extends DefaultExecutable
             text.setData(text.getData().substring(beginIndex, endIndex));
         }
 
-        com.google.gwt.dom.client.Element styleElement = text.getOwnerDocument().createElement(tagName);
+        com.google.gwt.dom.client.Element styleElement = ((Document) text.getOwnerDocument()).xCreateElement(tagName);
         if (className != null) {
             styleElement.setClassName(className);
         }
@@ -188,9 +179,9 @@ public class StyleExecutable extends DefaultExecutable
         styleElement.appendChild(ancestor);
     }
 
-    protected Range removeStyle(IFrameElement iframe, Range range)
+    protected Range removeStyle(Document doc, Range range)
     {
-        Range newRange = RangeFactory.INSTANCE.createRange(iframe);
+        Range newRange = doc.createRange();
         if (range.getCommonAncestorContainer().getNodeType() == Node.TEXT_NODE) {
             Text text = Text.as(range.getCommonAncestorContainer());
             removeStyle(text, range.getStartOffset(), range.getEndOffset());
@@ -278,9 +269,9 @@ public class StyleExecutable extends DefaultExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(Element)
+     * @see DefaultExecutable#getParameter(Document)
      */
-    public String getParameter(Element target)
+    public String getParameter(Document doc)
     {
         return null;
     }
@@ -288,22 +279,17 @@ public class StyleExecutable extends DefaultExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(Element)
+     * @see DefaultExecutable#isEnabled(Document)
      */
-    public boolean isEnabled(Element target)
+    public boolean isEnabled(Document doc)
     {
-        Selection selection = SelectionManager.INSTANCE.getSelection(IFrameElement.as(target));
-        if (selection.getRangeCount() > 0) {
-            for (int i = 0; i < selection.getRangeCount(); i++) {
-                if (!isEnabled(selection.getRangeAt(i))) {
-                    return false;
-                }
+        Selection selection = doc.getSelection();
+        for (int i = 0; i < selection.getRangeCount(); i++) {
+            if (!isEnabled(selection.getRangeAt(i))) {
+                return false;
             }
-            return true;
-        } else {
-            // This should be removed after we implement the Selection and Range for IE.
-            return super.isEnabled(target);
         }
+        return true;
     }
 
     private boolean isEnabled(Range range)
@@ -315,22 +301,17 @@ public class StyleExecutable extends DefaultExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(Element)
+     * @see DefaultExecutable#isExecuted(Document)
      */
-    public boolean isExecuted(Element target)
+    public boolean isExecuted(Document doc)
     {
-        Selection selection = SelectionManager.INSTANCE.getSelection(IFrameElement.as(target));
-        if (selection.getRangeCount() > 0) {
-            for (int i = 0; i < selection.getRangeCount(); i++) {
-                if (!isExecuted(DOMUtils.getInstance().getTextRange(selection.getRangeAt(i)))) {
-                    return false;
-                }
+        Selection selection = doc.getSelection();
+        for (int i = 0; i < selection.getRangeCount(); i++) {
+            if (!isExecuted(DOMUtils.getInstance().getTextRange(selection.getRangeAt(i)))) {
+                return false;
             }
-            return true;
-        } else {
-            // This should be removed after we implement the Selection and Range for IE.
-            return super.isExecuted(target);
         }
+        return true;
     }
 
     private boolean isExecuted(Range range)
@@ -356,9 +337,9 @@ public class StyleExecutable extends DefaultExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isSupported(Element)
+     * @see DefaultExecutable#isSupported(Document)
      */
-    public boolean isSupported(Element target)
+    public boolean isSupported(Document doc)
     {
         return true;
     }
@@ -369,13 +350,13 @@ public class StyleExecutable extends DefaultExecutable
             node = node.getParentNode();
         }
         if (inheritable) {
-            return DOMUtils.getInstance().getComputedStyleProperty((Element) node, propertyName).equalsIgnoreCase(
-                propertyValue);
+            return propertyValue.equalsIgnoreCase(DOMUtils.getInstance().getComputedStyleProperty((Element) node,
+                propertyName));
         } else {
             while (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
-                if (DOMUtils.getInstance().getComputedStyleProperty(element, propertyName).equalsIgnoreCase(
-                    propertyValue)) {
+                if (propertyValue.equalsIgnoreCase(DOMUtils.getInstance().getComputedStyleProperty(element,
+                    propertyName))) {
                     return true;
                 }
                 node = node.getParentNode();

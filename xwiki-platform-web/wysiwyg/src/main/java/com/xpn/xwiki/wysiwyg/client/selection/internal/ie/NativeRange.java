@@ -17,37 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.selection.internal;
+package com.xpn.xwiki.wysiwyg.client.selection.internal.ie;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
-import com.xpn.xwiki.wysiwyg.client.selection.Selection;
-import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
 
 /**
- * The default {@link SelectionManager} implementation. Retrieves the selection object using Mozilla's API.
+ * Base class for {@link TextRange} and {@link ControlRange}, the two types of range provided by Internet Explorer.
  * 
  * @version $Id$
  */
-public final class DefaultSelectionManager implements SelectionManager
+public class NativeRange extends JavaScriptObject
 {
     /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionManager#getSelection(Document)
+     * Default constructor. Needs to be protected because all instances are created from JavaScript.
      */
-    public Selection getSelection(Document doc)
+    protected NativeRange()
     {
-        return new DefaultSelection(getJSSelection(doc));
     }
 
     /**
-     * Retrieves the native selection object using Mozilla's API.
-     * 
-     * @param doc The DOM document for which to retrieve the native selection.
-     * @return The selection JavaScript object associated with the specified document.
+     * Makes the selection equal to the current object. When applied to a TextRange object, the select method causes the
+     * current object to be highlighted. When applied to a ControlRange object, the select method produces a shaded
+     * rectangle around the elements in the control range.
      */
-    private native JavaScriptObject getJSSelection(Document doc) /*-{
-        return doc.defaultView.getSelection();
+    public final native void select() /*-{
+        this.select();
+    }-*/;
+
+    /**
+     * @return The document used to create this range.
+     */
+    public final native Document getOwnerDocument() /*-{
+        return this.ownerDocument;
     }-*/;
 }

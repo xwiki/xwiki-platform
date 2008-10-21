@@ -20,16 +20,25 @@
 package com.xpn.xwiki.wysiwyg.client.selection;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.dom.client.Document;
 import com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager;
 
+/**
+ * Interface for retrieving the current selection.
+ * 
+ * @version $Id$
+ */
 public interface SelectionManager
 {
+    /**
+     * We create the singleton instance using deferred binding in order to use different implementations for different
+     * browsers.
+     */
     SelectionManager INSTANCE = GWT.create(DefaultSelectionManager.class);
 
     /**
-     * @param iframe An in-line frame DOM element.
-     * @return The current selection associated with the given in-line frame.
+     * @param doc The document for which to retrieve the selection.
+     * @return The selection associated with the specified document.
      */
-    Selection getSelection(IFrameElement iframe);
+    Selection getSelection(Document doc);
 }

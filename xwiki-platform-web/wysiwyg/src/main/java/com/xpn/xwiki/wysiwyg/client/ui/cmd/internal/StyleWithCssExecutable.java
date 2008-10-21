@@ -19,25 +19,35 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.google.gwt.user.client.Element;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 public class StyleWithCssExecutable extends AbstractExecutable
 {
-    public boolean execute(Element target, String parameter)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExecutable#execute(Document, String)
+     */
+    public boolean execute(Document doc, String parameter)
     {
         boolean styleWithCSS = Boolean.valueOf(parameter);
-        boolean success = execute(target, Command.STYLE_WITH_CSS.toString(), String.valueOf(styleWithCSS));
+        boolean success = execute(doc, Command.STYLE_WITH_CSS.toString(), String.valueOf(styleWithCSS));
         // useCSS command is deprecated and has opposite meaning
-        success = success || execute(target, "useCSS", String.valueOf(!styleWithCSS));
+        success = success || execute(doc, "useCSS", String.valueOf(!styleWithCSS));
         return success;
     }
 
-    public String getParameter(Element target)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExecutable#getParameter(Document)
+     */
+    public String getParameter(Document doc)
     {
-        String parameter = getParameter(target, Command.STYLE_WITH_CSS.toString());
+        String parameter = getParameter(doc, Command.STYLE_WITH_CSS.toString());
         if (parameter == null) {
-            parameter = getParameter(target, "useCSS");
+            parameter = getParameter(doc, "useCSS");
             if (parameter != null) {
                 parameter = String.valueOf(!Boolean.valueOf(parameter));
             }
@@ -45,18 +55,33 @@ public class StyleWithCssExecutable extends AbstractExecutable
         return parameter;
     }
 
-    public boolean isEnabled(Element target)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExecutable#isEnabled(Document)
+     */
+    public boolean isEnabled(Document doc)
     {
-        return isEnabled(target, Command.STYLE_WITH_CSS.toString()) || isEnabled(target, "useCSS");
+        return isEnabled(doc, Command.STYLE_WITH_CSS.toString()) || isEnabled(doc, "useCSS");
     }
 
-    public boolean isExecuted(Element target)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExecutable#isExecuted(Document)
+     */
+    public boolean isExecuted(Document doc)
     {
-        return isExecuted(target, Command.STYLE_WITH_CSS.toString()) || isExecuted(target, "useCSS");
+        return isExecuted(doc, Command.STYLE_WITH_CSS.toString()) || isExecuted(doc, "useCSS");
     }
 
-    public boolean isSupported(Element target)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExecutable#isSupported(Document)
+     */
+    public boolean isSupported(Document doc)
     {
-        return isSupported(target, Command.STYLE_WITH_CSS.toString()) || isSupported(target, "useCSS");
+        return isSupported(doc, Command.STYLE_WITH_CSS.toString()) || isSupported(doc, "useCSS");
     }
 }

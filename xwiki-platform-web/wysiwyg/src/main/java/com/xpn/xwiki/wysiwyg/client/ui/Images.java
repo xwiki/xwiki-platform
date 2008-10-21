@@ -12,208 +12,126 @@ public interface Images extends ImageBundle
 {
     Images INSTANCE = (Images) GWT.create(Images.class);
 
-    /**
-     * @gwt.resource attachment.gif
-     */
+    @Resource("attachment.gif")
     AbstractImagePrototype attachment();
 
-    /**
-     * @gwt.resource backcolor.gif
-     */
+    @Resource("backcolor.gif")
     AbstractImagePrototype backColor();
 
-    /**
-     * @gwt.resource bold.gif
-     */
+    @Resource("bold.gif")
     AbstractImagePrototype bold();
 
-    /**
-     * @gwt.resource charmap.gif
-     */
+    @Resource("charmap.gif")
     AbstractImagePrototype charmap();
 
-    /**
-     * @gwt.resource copy.gif
-     */
+    @Resource("copy.gif")
     AbstractImagePrototype copy();
 
-    /**
-     * @gwt.resource close.gif
-     */
+    @Resource("close.gif")
     AbstractImagePrototype close();
 
-    /**
-     * @gwt.resource cut.gif
-     */
+    @Resource("cut.gif")
     AbstractImagePrototype cut();
 
-    /**
-     * @gwt.resource table_delete_col.gif
-     */
+    @Resource("table_delete_col.gif")
     AbstractImagePrototype deleteCol();
 
-    /**
-     * @gwt.resource table_delete_row.gif
-     */
+    @Resource("table_delete_row.gif")
     AbstractImagePrototype deleteRow();
 
-    /**
-     * @gwt.resource forecolor.gif
-     */
+    @Resource("forecolor.gif")
     AbstractImagePrototype foreColor();
 
-    /**
-     * @gwt.resource hr.gif
-     */
+    @Resource("hr.gif")
     AbstractImagePrototype hr();
 
-    /**
-     * @gwt.resource image.gif
-     */
+    @Resource("image.gif")
     AbstractImagePrototype image();
 
-    /**
-     * @gwt.resource indent.gif
-     */
+    @Resource("indent.gif")
     AbstractImagePrototype indent();
 
-    /**
-     * @gwt.resource table_insert_col_after.gif
-     */
+    @Resource("table_insert_col_after.gif")
     AbstractImagePrototype insertColAfter();
 
-    /**
-     * @gwt.resource table_insert_col_before.gif
-     */
+    @Resource("table_insert_col_before.gif")
     AbstractImagePrototype insertColBefore();
 
-    /**
-     * @gwt.resource table_insert_row_after.gif
-     */
+    @Resource("table_insert_row_after.gif")
     AbstractImagePrototype insertRowAfter();
 
-    /**
-     * @gwt.resource table_insert_row_before.gif
-     */
+    @Resource("table_insert_row_before.gif")
     AbstractImagePrototype insertRowBefore();
 
-    /**
-     * @gwt.resource table.gif
-     */
+    @Resource("table.gif")
     AbstractImagePrototype insertTable();
 
-    /**
-     * @gwt.resource italic.gif
-     */
+    @Resource("italic.gif")
     AbstractImagePrototype italic();
 
-    /**
-     * @gwt.resource justifycenter.gif
-     */
+    @Resource("justifycenter.gif")
     AbstractImagePrototype justifyCenter();
 
-    /**
-     * @gwt.resource justifyfull.gif
-     */
+    @Resource("justifyfull.gif")
     AbstractImagePrototype justifyFull();
 
-    /**
-     * @gwt.resource justifyleft.gif
-     */
+    @Resource("justifyleft.gif")
     AbstractImagePrototype justifyLeft();
 
-    /**
-     * @gwt.resource justifyright.gif
-     */
+    @Resource("justifyright.gif")
     AbstractImagePrototype justifyRight();
 
-    /**
-     * @gwt.resource link.gif
-     */
+    @Resource("link.gif")
     AbstractImagePrototype link();
 
-    /**
-     * @gwt.resource macro.gif
-     */
+    @Resource("macro.gif")
     AbstractImagePrototype macro();
 
-    /**
-     * @gwt.resource ol.gif
-     */
+    @Resource("ol.gif")
     AbstractImagePrototype ol();
 
-    /**
-     * @gwt.resource outdent.gif
-     */
+    @Resource("outdent.gif")
     AbstractImagePrototype outdent();
 
-    /**
-     * @gwt.resource palete.png
-     */
+    @Resource("palete.png")
     AbstractImagePrototype palete();
 
-    /**
-     * @gwt.resource paste.gif
-     */
+    @Resource("paste.gif")
     AbstractImagePrototype paste();
 
-    /**
-     * @gwt.resource redo.gif
-     */
+    @Resource("redo.gif")
     AbstractImagePrototype redo();
 
-    /**
-     * @gwt.resource removeformat.gif
-     */
+    @Resource("removeformat.gif")
     AbstractImagePrototype removeFormat();
 
-    /**
-     * @gwt.resource spacer.gif
-     */
+    @Resource("spacer.gif")
     AbstractImagePrototype spacer();
 
-    /**
-     * @gwt.resource strikethrough.gif
-     */
+    @Resource("strikethrough.gif")
     AbstractImagePrototype strikeThrough();
 
-    /**
-     * @gwt.resource subscript.gif
-     */
+    @Resource("subscript.gif")
     AbstractImagePrototype subscript();
 
-    /**
-     * @gwt.resource superscript.gif
-     */
+    @Resource("superscript.gif")
     AbstractImagePrototype superscript();
 
-    /**
-     * @gwt.resource sync.gif
-     */
+    @Resource("sync.gif")
     AbstractImagePrototype sync();
 
-    /**
-     * @gwt.resource tt.gif
-     */
+    @Resource("tt.gif")
     AbstractImagePrototype teletype();
 
-    /**
-     * @gwt.resource ul.gif
-     */
+    @Resource("ul.gif")
     AbstractImagePrototype ul();
 
-    /**
-     * @gwt.resource underline.gif
-     */
+    @Resource("underline.gif")
     AbstractImagePrototype underline();
 
-    /**
-     * @gwt.resource undo.gif
-     */
+    @Resource("undo.gif")
     AbstractImagePrototype undo();
 
-    /**
-     * @gwt.resource unlink.gif
-     */
+    @Resource("unlink.gif")
     AbstractImagePrototype unlink();
 }

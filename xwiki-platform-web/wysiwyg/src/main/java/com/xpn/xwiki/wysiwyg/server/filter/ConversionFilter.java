@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.server.filter;
 
 import java.io.IOException;
-import java.io.StringReader;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -32,8 +31,6 @@ import javax.servlet.ServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.xml.XMLUtils;
-import org.xwiki.xml.html.HTMLCleaner;
 
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
@@ -46,9 +43,14 @@ import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
  * to the server is error-prone for the following reason: the WYSIWYG behaves like a text area that can be put anywhere
  * in an HTML page, inside or outside an HTML form; because of this the editor is not aware of what submit buttons are
  * present on the container page and what submit logic these buttons might have associated with them.
+ * 
+ * @version $Id$
  */
 public class ConversionFilter implements Filter
 {
+    /**
+     * The logger instance.
+     */
     private static final Log LOG = LogFactory.getLog(ConversionFilter.class);
 
     /**
@@ -70,7 +72,6 @@ public class ConversionFilter implements Filter
     {
         String[] wysiwygNames = req.getParameterValues("wysiwyg");
         if (wysiwygNames != null) {
-            HTMLCleaner cleaner = (HTMLCleaner) Utils.getComponent(HTMLCleaner.ROLE);
             MutableServletRequestFactory mreqFactory =
                 (MutableServletRequestFactory) Utils.getComponent(MutableServletRequestFactory.ROLE, req.getProtocol());
             MutableServletRequest mreq = mreqFactory.newInstance(req);
@@ -84,13 +85,13 @@ public class ConversionFilter implements Filter
                 String oldValue = req.getParameter(wysiwygName);
                 String newValue = oldValue;
                 try {
-                    newValue = converter.fromHTML(XMLUtils.toString(cleaner.clean(new StringReader(oldValue))));
+                    newValue = converter.fromHTML(oldValue);
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
                 }
                 mreq.setParameter(wysiwygName, newValue);
             }
-            req = mreq;
+            chain.doFilter(mreq, res);
         }
         chain.doFilter(req, res);
     }

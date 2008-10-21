@@ -24,17 +24,17 @@ import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FocusListener;
-import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Executable;
+import com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea;
 
 public class DefaultCommandManager extends AbstractCommandManager implements FocusListener
 {
     public final static Map<Command, Executable> EXECUTABLES;
 
-    private final FocusWidget widget;
+    private final WrappedRichTextArea rta;
 
     private final Map<Command, Executable> executables;
 
@@ -65,38 +65,26 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES.put(Command.JUSTIFY_RIGHT, new DefaultExecutable(Command.JUSTIFY_RIGHT.toString()));
         EXECUTABLES.put(Command.OUTDENT, new DefaultExecutable(Command.OUTDENT.toString()));
         EXECUTABLES.put(Command.REMOVE_FORMAT, new DefaultExecutable(Command.REMOVE_FORMAT.toString()));
-        EXECUTABLES.put(Command.STRIKE_THROUGH, new StyleExecutable("del",
-            null,
-            "text-decoration",
-            "line-through",
-            false,
-            Command.STRIKE_THROUGH.toString()));
+        EXECUTABLES.put(Command.STRIKE_THROUGH, new StyleExecutable("del", null, "text-decoration", "line-through",
+            false, Command.STRIKE_THROUGH.toString()));
         EXECUTABLES.put(Command.STYLE_WITH_CSS, new StyleWithCssExecutable());
         EXECUTABLES.put(Command.SUB_SCRIPT, new DefaultExecutable(Command.SUB_SCRIPT.toString()));
         EXECUTABLES.put(Command.SUPER_SCRIPT, new DefaultExecutable(Command.SUPER_SCRIPT.toString()));
-        EXECUTABLES.put(Command.TELETYPE, new StyleExecutable("tt",
-            null,
-            "font-family",
-            "monospace",
-            true,
+        EXECUTABLES.put(Command.TELETYPE, new StyleExecutable("tt", null, "font-family", "monospace", true,
             Command.TELETYPE.toString()));
-        EXECUTABLES.put(Command.UNDERLINE, new StyleExecutable("ins",
-            null,
-            "text-decoration",
-            "underline",
-            false,
+        EXECUTABLES.put(Command.UNDERLINE, new StyleExecutable("ins", null, "text-decoration", "underline", false,
             Command.UNDERLINE.toString()));
     }
 
-    public DefaultCommandManager(FocusWidget widget)
+    public DefaultCommandManager(WrappedRichTextArea rta)
     {
-        this(widget, EXECUTABLES);
+        this(rta, EXECUTABLES);
     }
 
-    public DefaultCommandManager(FocusWidget widget, Map<Command, Executable> executables)
+    public DefaultCommandManager(WrappedRichTextArea rta, Map<Command, Executable> executables)
     {
-        this.widget = widget;
-        widget.addFocusListener(this);
+        this.rta = rta;
+        rta.addFocusListener(this);
 
         this.executables = new HashMap<Command, Executable>(executables);
     }
@@ -112,8 +100,8 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return false;
         }
-        focusWidget();
-        boolean success = executable.execute(widget.getElement(), param);
+        focus();
+        boolean success = executable.execute(rta.getDocument(), param);
         if (success) {
             commandListeners.fireCommand(this, cmd, param);
         }
@@ -131,8 +119,8 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return false;
         }
-        focusWidget();
-        return executable.isEnabled(widget.getElement());
+        focus();
+        return executable.isEnabled(rta.getDocument());
     }
 
     /**
@@ -146,8 +134,8 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return false;
         }
-        focusWidget();
-        return executable.isExecuted(widget.getElement());
+        focus();
+        return executable.isExecuted(rta.getDocument());
     }
 
     /**
@@ -161,8 +149,8 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return false;
         }
-        focusWidget();
-        return executable.isSupported(widget.getElement());
+        focus();
+        return executable.isSupported(rta.getDocument());
     }
 
     /**
@@ -176,8 +164,8 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return null;
         }
-        focusWidget();
-        return executable.getParameter(widget.getElement());
+        focus();
+        return executable.getParameter(rta.getDocument());
     }
 
     public Executable registerCommand(Command command, Executable executable)
@@ -197,7 +185,7 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
      */
     public void onFocus(Widget sender)
     {
-        if (sender == widget) {
+        if (sender == rta) {
             focused = true;
         }
     }
@@ -209,15 +197,15 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
      */
     public void onLostFocus(Widget sender)
     {
-        if (sender == widget) {
+        if (sender == rta) {
             focused = false;
         }
     }
 
-    private void focusWidget()
+    private void focus()
     {
         if (!focused) {
-            widget.setFocus(true);
+            rta.setFocus(true);
         }
     }
 }

@@ -68,7 +68,6 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     private void loadUI()
     {
         setName("Wysiwyg");
-        int i = 0;
         for (final Config config : getConfigs()) {
             String hookId = config.getParameter("hookId");
             if (hookId == null) {
@@ -103,7 +102,10 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
             // Create the WYSIWYG Editor
             final XWysiwygEditor editor = XWysiwygEditorFactory.getInstance().newEditor(config, this);
-            editor.getUI().getTextArea().setStyleSheetURL(config.getParameter("stylesheet"));
+            editor.getUI().getTextArea().getIFrameConfig().addStyleSheet(config.getParameter("stylesheet"));
+            editor.getUI().getTextArea().getIFrameConfig().addStyleSheet(GWT.getModuleBaseURL() + "RichTextArea.css");
+            editor.getUI().getTextArea().getIFrameConfig().setBodyId("body");
+            editor.getUI().getTextArea().getIFrameConfig().addBodyStyleName("main");
             editor.getUI().getTextArea().setHTML(value);
             editor.getUI().getTextArea().setHeight(height);
             if (name != null) {

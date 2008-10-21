@@ -19,11 +19,32 @@
  */
 package com.xpn.xwiki.wysiwyg.server.converter;
 
+/**
+ * Converts HTML to/from a specific syntax.
+ * 
+ * @version $Id$
+ */
 public interface HTMLConverter
 {
+    /**
+     * The role of this component, used to look up implementations.
+     */
     String ROLE = HTMLConverter.class.getName();
 
+    /**
+     * Converts to HTML the specified source text. The converter expects the source text to have a specific known
+     * syntax.
+     * 
+     * @param source The text to be converted. Its syntax is priorly known by the converter.
+     * @return The HTML result of the conversion.
+     */
     String toHTML(String source);
 
+    /**
+     * Converts the specified HTML text to a specific syntax, priorly known by the converter.
+     * 
+     * @param html The HTML text to be converted.
+     * @return The result on the conversion.
+     */
     String fromHTML(String html);
 }

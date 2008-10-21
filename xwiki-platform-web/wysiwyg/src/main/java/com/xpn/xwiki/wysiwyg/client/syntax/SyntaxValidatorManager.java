@@ -21,6 +21,8 @@ package com.xpn.xwiki.wysiwyg.client.syntax;
 
 /**
  * Utility class for registering and retrieving syntax validators for different syntaxes.
+ * 
+ * @version $Id$
  */
 public interface SyntaxValidatorManager
 {

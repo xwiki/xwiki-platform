@@ -28,6 +28,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * Plugin for manipulating the WYSIWYG editor.
  * 
  * @see WysiwygPlugin
+ * @version $Id$
  */
 public class WysiwygPlugin extends XWikiDefaultPlugin
 {

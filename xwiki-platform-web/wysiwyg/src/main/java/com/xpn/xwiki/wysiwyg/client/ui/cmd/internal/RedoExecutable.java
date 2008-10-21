@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.google.gwt.user.client.Element;
 import com.xpn.xwiki.wysiwyg.client.history.History;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Executable;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 public class RedoExecutable implements Executable
 {
@@ -35,9 +35,9 @@ public class RedoExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(Element, String)
+     * @see Executable#execute(Document, String)
      */
-    public boolean execute(Element target, String param)
+    public boolean execute(Document doc, String param)
     {
         if (history.canRedo()) {
             history.redo();
@@ -50,9 +50,9 @@ public class RedoExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(Element)
+     * @see Executable#getParameter(Document)
      */
-    public String getParameter(Element target)
+    public String getParameter(Document doc)
     {
         return null;
     }
@@ -60,9 +60,9 @@ public class RedoExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(Element)
+     * @see Executable#isEnabled(Document)
      */
-    public boolean isEnabled(Element target)
+    public boolean isEnabled(Document doc)
     {
         return history.canRedo();
     }
@@ -70,9 +70,9 @@ public class RedoExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(Element)
+     * @see Executable#isExecuted(Document)
      */
-    public boolean isExecuted(Element target)
+    public boolean isExecuted(Document doc)
     {
         // Right now there's no way to test if the redo command has been executed.
         return true;
@@ -81,9 +81,9 @@ public class RedoExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isSupported(Element)
+     * @see Executable#isSupported(Document)
      */
-    public boolean isSupported(Element target)
+    public boolean isSupported(Document doc)
     {
         return true;
     }

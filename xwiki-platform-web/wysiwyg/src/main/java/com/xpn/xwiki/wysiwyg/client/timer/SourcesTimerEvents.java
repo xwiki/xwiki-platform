@@ -21,6 +21,8 @@ package com.xpn.xwiki.wysiwyg.client.timer;
 
 /**
  * An interface for registering timer listeners.
+ * 
+ * @version $Id$
  */
 public interface SourcesTimerEvents
 {

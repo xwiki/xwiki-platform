@@ -8,9 +8,9 @@ GWT_HOME=/tmp/xwiki/gwt/gwt-linux-1.5.0-rc1;
 $JAVA32_HOME/java \
 -Xmx1024m \
 -cp \
-$LIB_DIR/xwiki-web-wysiwyg-1.6-SNAPSHOT.jar:\
-$LIB_DIR/xwiki-web-wysiwyg-1.6-SNAPSHOT-sources.jar:\
-$LIB_DIR/xwiki-web-gwt-1.6-SNAPSHOT-sources.jar:\
+$LIB_DIR/xwiki-web-wysiwyg-1.7-SNAPSHOT.jar:\
+$LIB_DIR/xwiki-web-wysiwyg-1.7-SNAPSHOT-sources.jar:\
+$LIB_DIR/xwiki-web-gwt-1.7-SNAPSHOT-sources.jar:\
 $LIB_DIR/junit-3.8.1.jar:\
 $LIB_DIR/incubator-glasspanel-r729.jar:\
 $GWT_HOME/gwt-dev-linux.jar:\

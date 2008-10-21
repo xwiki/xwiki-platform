@@ -19,13 +19,25 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.google.gwt.user.client.Element;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Executable;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
+/**
+ * Executes a predefined command on a specific document.
+ * 
+ * @version $Id$
+ */
 public class DefaultExecutable extends AbstractExecutable
 {
+    /**
+     * The predefined command executed by this executable.
+     */
     protected String command;
 
+    /**
+     * Creates a new instance that will execute the specified command.
+     * 
+     * @param command A predefined command to be executed by this executable.
+     */
     public DefaultExecutable(String command)
     {
         this.command = command;
@@ -34,50 +46,50 @@ public class DefaultExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(Element, String)
+     * @see AbstractExecutable#execute(Document, String)
      */
-    public boolean execute(Element target, String parameter)
+    public boolean execute(Document doc, String parameter)
     {
-        return execute(target, command, parameter);
+        return execute(doc, command, parameter);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(Element)
+     * @see AbstractExecutable#getParameter(Document)
      */
-    public String getParameter(Element target)
+    public String getParameter(Document doc)
     {
-        return getParameter(target, command);
+        return getParameter(doc, command);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(Element)
+     * @see AbstractExecutable#isEnabled(Document)
      */
-    public boolean isEnabled(Element target)
+    public boolean isEnabled(Document doc)
     {
-        return isEnabled(target, command);
+        return isEnabled(doc, command);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(Element)
+     * @see AbstractExecutable#isExecuted(Document)
      */
-    public boolean isExecuted(Element target)
+    public boolean isExecuted(Document doc)
     {
-        return isExecuted(target, command);
+        return isExecuted(doc, command);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isSupported(Element)
+     * @see AbstractExecutable#isSupported(Document)
      */
-    public boolean isSupported(Element target)
+    public boolean isSupported(Document doc)
     {
-        return isSupported(target, command);
+        return isSupported(doc, command);
     }
 }

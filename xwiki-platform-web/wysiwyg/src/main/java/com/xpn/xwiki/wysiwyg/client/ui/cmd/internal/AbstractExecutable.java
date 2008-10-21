@@ -19,46 +19,46 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.google.gwt.user.client.Element;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Executable;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 public abstract class AbstractExecutable implements Executable
 {
-    protected native boolean execute(Element target, String command, String parameter) /*-{
+    protected native boolean execute(Document doc, String command, String parameter) /*-{
         try{
-            return target.contentWindow.document.execCommand(command, false, parameter);
+            return doc.execCommand(command, false, parameter);
         } catch(e) {
             return false;
         }
     }-*/;
 
-    protected native String getParameter(Element target, String command) /*-{
+    protected native String getParameter(Document doc, String command) /*-{
         try{
-            return target.contentWindow.document.queryCommandValue(command);
+            return doc.queryCommandValue(command);
         } catch(e) {
             return null;
         }
     }-*/;
 
-    protected native boolean isEnabled(Element target, String command) /*-{
+    protected native boolean isEnabled(Document doc, String command) /*-{
         try{
-            return target.contentWindow.document.queryCommandEnabled(command);
+            return doc.queryCommandEnabled(command);
         } catch(e) {
             return false;
         }
     }-*/;
 
-    protected native boolean isExecuted(Element target, String command) /*-{
+    protected native boolean isExecuted(Document doc, String command) /*-{
         try{
-            return target.contentWindow.document.queryCommandState(command);
+            return doc.queryCommandState(command);
         } catch(e) {
             return false;
         }
     }-*/;
 
-    protected native boolean isSupported(Element target, String command) /*-{
+    protected native boolean isSupported(Document doc, String command) /*-{
         try{
-            return target.contentWindow.document.queryCommandSupported(command);
+            return doc.queryCommandSupported(command);
         } catch(e) {
             return true;
         }

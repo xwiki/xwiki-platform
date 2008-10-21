@@ -30,14 +30,22 @@ import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 
 /**
  * Api for the WysiwygPlugin.
+ * 
+ * @version $Id$
  */
 public class WysiwygPluginApi extends Api
 {
     /**
-     * the plugin instance
+     * The plugin instance.
      */
     private WysiwygPlugin plugin;
 
+    /**
+     * Creates a new API instance for the given plug-in in the specified context.
+     * 
+     * @param plugin The underlying plug-in of this plug-in API.
+     * @param context The XWiki context.
+     */
     public WysiwygPluginApi(WysiwygPlugin plugin, XWikiContext context)
     {
         super(context);
@@ -45,6 +53,7 @@ public class WysiwygPluginApi extends Api
     }
 
     /**
+     * @return The underlying plug-in of this plug-in API.
      * @see #plugin
      */
     public WysiwygPlugin getPlugin()
@@ -56,6 +65,7 @@ public class WysiwygPluginApi extends Api
     }
 
     /**
+     * @param plugin The underlying plug-in of this plug-in API.
      * @see #plugin
      */
     public void setPlugin(WysiwygPlugin plugin)

@@ -25,9 +25,14 @@ import javax.servlet.ServletRequest;
  * A factory for mutable servlet requests. This factory is needed because concrete mutable servlet requests don't have a
  * default constructor and I couldn't make the component manager (Plexus) inject the current servlet request when
  * instantiating mutable servlet requets.
+ * 
+ * @version $Id$
  */
 public interface MutableServletRequestFactory
 {
+    /**
+     * This component's role, used when code needs to look it up.
+     */
     String ROLE = MutableServletRequestFactory.class.getName();
 
     /**

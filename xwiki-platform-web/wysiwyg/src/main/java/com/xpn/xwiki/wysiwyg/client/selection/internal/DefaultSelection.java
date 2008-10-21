@@ -24,8 +24,20 @@ import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
 import com.xpn.xwiki.wysiwyg.client.selection.Selection;
 
-public final class DefaultSelection extends AbstractSelection
+/**
+ * The default selection implementation just forwards the calls to the underlying browser implementation. It should be
+ * used only for browsers that follow Mozilla's selection specification.
+ * 
+ * @version $Id$
+ */
+public final class DefaultSelection extends AbstractSelection<JavaScriptObject, JavaScriptObject>
 {
+    /**
+     * Creates a new instance that wraps the given native selection object. All the calls will be forwarded to this
+     * JavaScript object.
+     * 
+     * @param jsSelection The native selection object to be wrapped.
+     */
     DefaultSelection(JavaScriptObject jsSelection)
     {
         super(jsSelection);
@@ -46,7 +58,8 @@ public final class DefaultSelection extends AbstractSelection
      * @see Selection#collapse(Node, int)
      */
     public native void collapse(Node parentNode, int offset) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()().collapse(parentNode, offset);
+        var range = this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()();
+        range.collapse(parentNode, offset);
     }-*/;
 
     /**
@@ -82,7 +95,8 @@ public final class DefaultSelection extends AbstractSelection
      * @see Selection#deleteFromDocument()
      */
     public native void deleteFromDocument() /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()().deleteFromDocument();
+        var range = this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()();
+        range.deleteFromDocument();
     }-*/;
 
     /**
@@ -91,7 +105,8 @@ public final class DefaultSelection extends AbstractSelection
      * @see Selection#extend(Node, int)
      */
     public native void extend(Node parentNode, int offset) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()().extend(parentNode, offset);
+        var range = this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()();
+        range.extend(parentNode, offset);
     }-*/;
 
     /**
@@ -140,8 +155,13 @@ public final class DefaultSelection extends AbstractSelection
         return new DefaultRange(getJSRangeAt(index));
     }
 
-    protected native JavaScriptObject getJSRangeAt(int index) /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()().getRangeAt(index);
+    /**
+     * @param index The index of the range to retrieve. Usually the selection contains just one range.
+     * @return The JavaScript range at the specified index in the JavaScript selection object wrapped by this object.
+     */
+    private native JavaScriptObject getJSRangeAt(int index) /*-{
+        var range = this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()();
+        return range.getRangeAt(index);
     }-*/;
 
     /**
@@ -186,7 +206,8 @@ public final class DefaultSelection extends AbstractSelection
      * @see Selection#selectAllChildren(Node)
      */
     public native void selectAllChildren(Node parentNode) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()().selectAllChildren(parentNode);
+        var range = this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()();
+        range.selectAllChildren(parentNode);
     }-*/;
 
     /**
@@ -195,7 +216,8 @@ public final class DefaultSelection extends AbstractSelection
      * @see Selection#selectionLanguageChange(boolean)
      */
     public native void selectionLanguageChange(boolean langRTL) /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()().selectionLanguageChange(langRTL);
+        var range = this.@com.xpn.xwiki.wysiwyg.client.selection.internal.AbstractSelection::getJSSelection()();
+        range.selectionLanguageChange(langRTL);
     }-*/;
 
     /**

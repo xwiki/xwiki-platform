@@ -24,6 +24,8 @@ import javax.servlet.ServletRequest;
 /**
  * A servlet request that can be modified. It is very useful, for instance, when you need to change the values of some
  * request parameters, inside a filter.
+ * 
+ * @version $Id$
  */
 public interface MutableServletRequest extends ServletRequest
 {
@@ -42,8 +44,8 @@ public interface MutableServletRequest extends ServletRequest
      * 
      * @param name The name of the request parameter.
      * @param values The new array of values for the specified request parameter.
-     * @return The old values of the specified request parameter, or <code>null</code> if this is the first time we
-     *         set its values.
+     * @return The old values of the specified request parameter, or <code>null</code> if this is the first time we set
+     *         its values.
      */
     String[] setParameterValues(String name, String[] values);
 }

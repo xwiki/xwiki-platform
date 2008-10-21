@@ -30,10 +30,24 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequest;
 
+/**
+ * {@link MutableServletRequest} implementation for the HTTP protocol.
+ * 
+ * @version $Id$
+ */
 public class MutableHttpServletRequest extends HttpServletRequestWrapper implements MutableServletRequest
 {
+    /**
+     * Parameters used instead of those from the wrapped request. This way exiting request parameters can be overwritten
+     * and also new parameters can be added.
+     */
     private final Map<String, String[]> params = new HashMap<String, String[]>();
 
+    /**
+     * Wraps the specified request and copies its parameters to {@link #params} where they can be overwritten later.
+     * 
+     * @param request The request to be wrapped.
+     */
     public MutableHttpServletRequest(HttpServletRequest request)
     {
         super(request);

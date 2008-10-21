@@ -31,6 +31,11 @@ import org.xwiki.rendering.renderer.WikiPrinter;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 
+/**
+ * Converts HTML to XDOM traverse events. It is used only in debug mode.
+ * 
+ * @version $Id$
+ */
 public class EventsHTMLConverter implements HTMLConverter
 {
     /**

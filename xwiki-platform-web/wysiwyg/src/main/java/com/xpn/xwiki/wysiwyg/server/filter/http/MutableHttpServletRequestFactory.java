@@ -25,6 +25,11 @@ import javax.servlet.http.HttpServletRequest;
 import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequest;
 import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequestFactory;
 
+/**
+ * {@link MutableServletRequestFactory} implementation for the HTTP protocol.
+ * 
+ * @version $Id$
+ */
 public class MutableHttpServletRequestFactory implements MutableServletRequestFactory
 {
     /**

@@ -19,15 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.history.internal;
 
-import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.history.History;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
 import com.xpn.xwiki.wysiwyg.client.selection.Selection;
-import com.xpn.xwiki.wysiwyg.client.selection.SelectionManager;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKeyFactory;
@@ -35,6 +32,7 @@ import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 public class DefaultHistory implements History, KeyboardListener, CommandListener
 {
@@ -199,20 +197,21 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
     {
         currentEntry = entry;
 
-        String[] path = entry.getPath().split(" ");
         textArea.setHTML(entry.getContent());
-        IFrameElement iframe = textArea.getIFrameElement();
-        Node node = iframe.getContentDocument();
+        Document doc = textArea.getDocument();
+
+        Node node = doc;
+        String[] path = entry.getPath().split(" ");
         for (int i = path.length - 1; i > 0; i--) {
             node = node.getChildNodes().getItem(Integer.parseInt(path[i]));
         }
 
-        Range range = RangeFactory.INSTANCE.createRange(iframe);
+        Range range = doc.createRange();
         int offset = Integer.parseInt(path[0]);
         range.setStart(node, offset);
         range.setEnd(node, offset);
 
-        Selection selection = SelectionManager.INSTANCE.getSelection(iframe);
+        Selection selection = doc.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
     }
@@ -223,7 +222,7 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
             return;
         }
 
-        Selection selection = SelectionManager.INSTANCE.getSelection(textArea.getIFrameElement());
+        Selection selection = textArea.getDocument().getSelection();
         Range range = selection.getRangeAt(0);
 
         StringBuffer path = new StringBuffer("");

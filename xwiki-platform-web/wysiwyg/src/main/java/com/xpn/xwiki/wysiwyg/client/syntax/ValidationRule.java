@@ -24,6 +24,8 @@ import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 /**
  * A validation rule states that some of the editor's features (like 'bold', 'indent' etc.) should not be enabled when
  * the text area is in a specific state.
+ * 
+ * @version $Id$
  */
 public interface ValidationRule
 {

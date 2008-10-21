@@ -23,6 +23,8 @@ import java.util.ArrayList;
 
 /**
  * A collection of timer listeners.
+ * 
+ * @version $Id$
  */
 public class TimerListenerCollection extends ArrayList<TimerListener>
 {

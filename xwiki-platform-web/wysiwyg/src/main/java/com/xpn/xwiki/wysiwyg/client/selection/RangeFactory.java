@@ -20,16 +20,25 @@
 package com.xpn.xwiki.wysiwyg.client.selection;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.dom.client.Document;
 import com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory;
 
+/**
+ * Defines the interface used to create range objects.
+ * 
+ * @version $Id$
+ */
 public interface RangeFactory
 {
+    /**
+     * We create the singleton instance using deferred binding in order to use different implementations for different
+     * browsers.
+     */
     RangeFactory INSTANCE = GWT.create(DefaultRangeFactory.class);
 
     /**
-     * @param iframe An in-line frame DOM element.
-     * @return A new range bound to the document of the given in-line frame.
+     * @param doc The DOM document for which to create the range.
+     * @return A new range bound to the specified document.
      */
-    Range createRange(IFrameElement iframe);
+    Range createRange(Document doc);
 }

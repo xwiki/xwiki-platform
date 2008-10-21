@@ -81,12 +81,19 @@ public abstract class DOMUtils
 
     public int getNodeIndex(Node node)
     {
-        int index = 0;
-        while (node.getPreviousSibling() != null) {
-            index++;
-            node = node.getPreviousSibling();
+        int count = 0;
+        Node leftSibling = node.getPreviousSibling();
+        Node rightSibling = node.getNextSibling();
+        while (leftSibling != null && rightSibling != null) {
+            count++;
+            leftSibling = leftSibling.getPreviousSibling();
+            rightSibling = rightSibling.getNextSibling();
         }
-        return index;
+        if (leftSibling == null) {
+            return count;
+        } else {
+            return node.getParentNode().getChildNodes().getLength() - 1 - count;
+        }
     }
 
     public TextFragment normalize(Text text)
@@ -176,5 +183,19 @@ public abstract class DOMUtils
 
             return textRange;
         }
+    }
+
+    public String getTextContent(Node startNode, Node endNode)
+    {
+        Node leaf = this.getFirstLeaf(startNode);
+        Node lastLeaf = this.getLastLeaf(endNode);
+        StringBuffer textContent = new StringBuffer();
+        while (leaf != null && leaf != lastLeaf) {
+            if (leaf.getNodeType() == Node.TEXT_NODE) {
+                textContent.append(leaf.getNodeValue());
+            }
+            leaf = this.getNextLeaf(leaf);
+        }
+        return textContent.toString();
     }
 }

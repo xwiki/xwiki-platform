@@ -37,6 +37,11 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 
+/**
+ * Converts HTML into/from xwiki/2.0 syntax.
+ * 
+ * @version $Id$
+ */
 public class XWikiHTMLConverter implements HTMLConverter
 {
     /**
@@ -47,7 +52,7 @@ public class XWikiHTMLConverter implements HTMLConverter
     public String fromHTML(String html)
     {
         try {
-            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xhtml/1.0");
+            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "html/4.01");
             XDOM dom = parser.parse(new StringReader(html));
             WikiPrinter printer = new DefaultWikiPrinter();
             XWikiSyntaxRenderer renderer = new XWikiSyntaxRenderer(printer);

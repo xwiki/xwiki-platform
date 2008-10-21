@@ -24,6 +24,8 @@ import com.google.gwt.dom.client.Node;
 /**
  * A selection object represents the ranges that the user has selected, or the cursor position when the user didn't
  * select any range. It is the only was to get access to the current DOM nodes being edited with the WYSIWYG editor.
+ * 
+ * @version $Id$
  */
 public interface Selection
 {
@@ -58,6 +60,7 @@ public interface Selection
     int getRangeCount();
 
     /**
+     * @param index The index of the range to retrieve. Usually the selection contains just one range.
      * @return The range at the specified index.
      */
     Range getRangeAt(int index);
@@ -94,9 +97,11 @@ public interface Selection
     void collapseToEnd();
 
     /**
-     * Indicates whether the node is part of the selection. If partlyContained is set to true, the function returns true
-     * when some part of the node is part of the selection. If partlyContained is set to false, the function only
-     * returns true when the entire node is part of the selection.
+     * Indicates whether the node is part of the selection.
+     * 
+     * @param node The DOM node to be tested.
+     * @param partlyContained If false, the entire subtree rooted in the given node is tested.
+     * @return true when the entire node is part of the selection.
      */
     boolean containsNode(Node node, boolean partlyContained);
 
@@ -108,12 +113,12 @@ public interface Selection
     void selectAllChildren(Node parentNode);
 
     /**
-     * Adds a range to the current selection.
+     * @param range Adds this range to the current selection.
      */
     void addRange(Range range);
 
     /**
-     * Removes a range from the current selection.
+     * @param range Removes this range from the current selection.
      */
     void removeRange(Range range);
 
@@ -128,7 +133,7 @@ public interface Selection
     void deleteFromDocument();
 
     /**
-     * Modifies the cursor Bidi level after a change in keyboard direction
+     * Modifies the cursor Bidi level after a change in keyboard direction.
      * 
      * @param langRTL is true if the new language is right-to-left or false if the new language is left-to-right.
      */

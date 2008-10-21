@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui;
 
-import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ChangeListenerCollection;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -49,7 +48,9 @@ import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.RedoExecutable;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.UndoExecutable;
+import com.xpn.xwiki.wysiwyg.client.ui.wrap.IFrameConfig;
 import com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 public class XRichTextArea extends Composite implements HasHTML, HasName, HasFocus, SourcesMouseEvents,
     SourcesClickEvents, SourcesFocusEvents, SourcesChangeEvents, ClickListener, FocusListener, KeyboardListener,
@@ -84,12 +85,10 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
         value = new Hidden();
         value.setDefaultValue("");
 
-        DefaultCommandManager cm = new DefaultCommandManager(rta);
-        this.cm = cm;
-
+        cm = new DefaultCommandManager(rta);
         history = new DefaultHistory(this, 10);
-        cm.registerCommand(Command.UNDO, new UndoExecutable(history));
-        cm.registerCommand(Command.REDO, new RedoExecutable(history));
+        ((DefaultCommandManager) cm).registerCommand(Command.UNDO, new UndoExecutable(history));
+        ((DefaultCommandManager) cm).registerCommand(Command.REDO, new RedoExecutable(history));
 
         FlowPanel container = new FlowPanel();
         container.add(value);
@@ -271,6 +270,9 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
     }
 
     /**
+     * Gets whether this widget is enabled.
+     * 
+     * @return <code>true</code> if the widget is enabled
      * @see RichTextArea#isEnabled()
      */
     public boolean isEnabled()
@@ -279,6 +281,9 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
     }
 
     /**
+     * Sets whether this widget is enabled.
+     * 
+     * @param enabled <code>true</code> to enable the widget, <code>false</code> to disable it
      * @see RichTextArea#setEnabled(boolean)
      */
     public void setEnabled(boolean enabled)
@@ -287,6 +292,9 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
     }
 
     /**
+     * Gets the basic rich text formatting interface.
+     * 
+     * @return <code>null</code> if basic formatting is not supported
      * @see RichTextArea#getBasicFormatter()
      */
     public RichTextArea.BasicFormatter getBasicFormatter()
@@ -295,6 +303,9 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
     }
 
     /**
+     * Gets the full rich text formatting interface.
+     * 
+     * @return <code>null</code> if full formatting is not supported
      * @see RichTextArea#getExtendedFormatter()
      */
     public RichTextArea.ExtendedFormatter getExtendedFormatter()
@@ -311,6 +322,10 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
     }
 
     /**
+     * Prevents the default behavior of the specified shortcut key in the browser so that classes using this rich text
+     * area can execute their own behavior.
+     * 
+     * @param shortcutKey The shortcut key to activate.
      * @see WrappedRichTextArea#addShortcutKey(XShortcutKey)
      */
     public void addShortcutKey(XShortcutKey shortcutKey)
@@ -319,6 +334,7 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
     }
 
     /**
+     * @param shortcutKey The shortcut key to be removed from the active shortcut key for this rich text area.
      * @see WrappedRichTextArea#removeShortcutKey(XShortcutKey)
      */
     public void removeShortcutKey(XShortcutKey shortcutKey)
@@ -523,18 +539,19 @@ public class XRichTextArea extends Composite implements HasHTML, HasName, HasFoc
         changeListeners.remove(listener);
     }
 
-    public IFrameElement getIFrameElement()
+    /**
+     * @return The DOM document being edited with this rich text area.
+     */
+    public Document getDocument()
     {
-        return IFrameElement.as(rta.getElement());
+        return rta.getDocument();
     }
 
-    public String getStyleSheetURL()
+    /**
+     * @return The configuration object associated with the in-line frame of this rich text area.
+     */
+    public IFrameConfig getIFrameConfig()
     {
-        return rta.getStyleSheetURL();
-    }
-
-    public void setStyleSheetURL(String styleSheetURL)
-    {
-        rta.setStyleSheetURL(styleSheetURL);
+        return rta.getIFrameConfig();
     }
 }

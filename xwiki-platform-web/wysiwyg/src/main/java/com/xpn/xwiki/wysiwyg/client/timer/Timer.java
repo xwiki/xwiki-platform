@@ -22,6 +22,8 @@ package com.xpn.xwiki.wysiwyg.client.timer;
 /**
  * Extends {@link com.google.gwt.user.client.Timer} by allowing timer listeners to be registered and notified whenever
  * the run method is being called.
+ * 
+ * @version $Id$
  */
 public class Timer extends com.google.gwt.user.client.Timer implements SourcesTimerEvents
 {

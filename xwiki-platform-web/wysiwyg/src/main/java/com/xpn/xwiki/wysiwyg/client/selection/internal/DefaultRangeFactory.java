@@ -20,23 +20,32 @@
 package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.dom.client.Document;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
 import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
 
-public final class DefaultRangeFactory implements RangeFactory
+/**
+ * The default {@link RangeFactory} implementation. It creates JavaScript range objects using Mozilla's API.
+ * 
+ * @version $Id$
+ */
+public class DefaultRangeFactory implements RangeFactory
 {
     /**
      * {@inheritDoc}
      * 
-     * @see RangeFactory#createRange(IFrameElement)
+     * @see RangeFactory#createRange(Document)
      */
-    public Range createRange(IFrameElement iframe)
+    public Range createRange(Document doc)
     {
-        return new DefaultRange(createJSRange(iframe));
+        return new DefaultRange(createJSRange(doc));
     }
 
-    protected native JavaScriptObject createJSRange(IFrameElement iframe) /*-{
-        return iframe.contentDocument.createRange();
+    /**
+     * @param doc The DOM document for which to create the range.
+     * @return A new JavaScript range object for the specified document, created using Mozilla's API.
+     */
+    protected native JavaScriptObject createJSRange(Document doc) /*-{
+        return doc.createRange();
     }-*/;
 }

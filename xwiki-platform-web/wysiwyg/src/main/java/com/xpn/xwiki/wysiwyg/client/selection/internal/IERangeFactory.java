@@ -19,24 +19,54 @@
  */
 package com.xpn.xwiki.wysiwyg.client.selection.internal;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.dom.client.Document;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
+import com.xpn.xwiki.wysiwyg.client.selection.RangeCacheProxy;
 import com.xpn.xwiki.wysiwyg.client.selection.RangeFactory;
+import com.xpn.xwiki.wysiwyg.client.selection.internal.ie.NativeRange;
+import com.xpn.xwiki.wysiwyg.client.selection.internal.ie.TextRange;
 
+/**
+ * {@link RangeFactory} implementation for Internet Explorer.
+ * 
+ * @version $Id$
+ */
 public final class IERangeFactory implements RangeFactory
 {
     /**
      * {@inheritDoc}
      * 
-     * @see RangeFactory#createRange(IFrameElement)
+     * @see RangeFactory#createRange(Document)
      */
-    public Range createRange(IFrameElement iframe)
+    public Range createRange(Document doc)
     {
-        return new IERange(createJSRange(iframe));
+        return createRange(TextRange.newInstance(doc));
     }
 
-    protected native JavaScriptObject createJSRange(IFrameElement iframe) /*-{
-        return iframe.contentDocument.selection.createRange();
-    }-*/;
+    /**
+     * @param jsRange native range object
+     * @return A new Range, created based on the given native range.
+     */
+    public static Range createRange(NativeRange jsRange)
+    {
+        return new RangeCacheProxy(new IERange(jsRange));
+    }
+
+    /**
+     * Tries to cast the given range to an {@link IERange} instance.
+     * 
+     * @param range the range to be casted
+     * @return casting result
+     */
+    public static IERange cast(Range range)
+    {
+        if (!(range instanceof RangeCacheProxy)) {
+            throw new ClassCastException("Expecting RangeCacheProxy!");
+        }
+        Range cachedRange = ((RangeCacheProxy) range).getCachedRange();
+        if (!(cachedRange instanceof IERange)) {
+            throw new ClassCastException("Expecting IERange!");
+        }
+        return (IERange) cachedRange;
+    }
 }

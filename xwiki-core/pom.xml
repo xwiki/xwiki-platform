@@ -634,7 +634,7 @@
             </goals>
             <configuration>
               <includes>
-                <include>**/AbstractBridgedXWikiComponentTestCase.class</include>
+                <include>**/test/*.class</include>
               </includes>
             </configuration>
           </execution>

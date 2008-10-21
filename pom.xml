@@ -70,5 +70,6 @@
     <module>xwiki-rendering</module>
     <module>xwiki-configuration</module>
     <module>xwiki-query</module>
+    <module>xwiki-webdav</module>
   </modules>
 </project>

@@ -28,17 +28,16 @@
   <servlet>		
     <servlet-name>XWikiDispatcherServlet</servlet-name>
     <servlet-class>com.xpn.xwiki.XWikiRootServlet</servlet-class>
+    <!-- Uncomment and edit this if you want to redirect to a different webapp name.
+    <init-param>
+      <param-name>redirectoTo</param-name>
+      <param-value>xwiki</param-value>
+      <description>The address to redirect to when the client hits the root of the container.</description>
+    </init-param>
+    -->
   </servlet>
   <servlet-mapping>
     <servlet-name>XWikiDispatcherServlet</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
-  <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-    <welcome-file>index.htm</welcome-file>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>default.html</welcome-file>
-    <welcome-file>default.htm</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
-  </welcome-file-list>
 </web-app>

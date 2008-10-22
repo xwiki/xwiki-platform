@@ -17,39 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.internal.renderer.xhtml;
 
 import java.util.Map;
 
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
-import org.xwiki.rendering.renderer.WikiPrinter;
-import org.xwiki.rendering.renderer.XHTMLRenderer;
+import org.xwiki.rendering.renderer.XHTMLWikiPrinter;
 
-public class WysiwygEditorXHTMLRenderer extends XHTMLRenderer
+/**
+ * Renders a XWiki Macro into XHTML.
+ * 
+ * @version $Id$
+ * @since 1.7M2
+ */
+public class XHTMLMacroRenderer
 {
+    private static final String SEPARATOR = "|-|";
+    
     private XWikiMacroPrinter macroPrinter;
 
-    public WysiwygEditorXHTMLRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
-        RenderingConfiguration configuration)
+    public XHTMLMacroRenderer()
     {
-        super(printer, documentAccessBridge, configuration);
         this.macroPrinter = new XWikiMacroPrinter();
     }
 
-    @Override
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void render(XHTMLWikiPrinter printer, String name, Map<String, String> parameters, String content)
     {
-        print("<span class=\"macro-code\"><![CDATA[");
-        // Print the source of the macro
-        print(this.macroPrinter.print(name, parameters, content));
-        print("]]></span><span class=\"macro-output\">");
+        beginRender(printer, name, parameters, content);
+        endRender(printer);
     }
 
-    @Override
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginRender(XHTMLWikiPrinter printer, String name, Map<String, String> parameters, String content)
     {
-        print("</span>");
+        StringBuilder buffer = new StringBuilder("startmacro:");
+        buffer.append(name);
+        buffer.append(SEPARATOR);
+        if (!parameters.isEmpty()) {
+            buffer.append(this.macroPrinter.printParameters(parameters));
+        }
+        buffer.append(SEPARATOR);
+        buffer.append(content);
+        printer.printXMLComment(buffer.toString());
+    }
+
+    public void endRender(XHTMLWikiPrinter printer)
+    {
+        printer.printXMLComment("stopmacro");
     }
 }

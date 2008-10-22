@@ -36,13 +36,7 @@ public class XWikiMacroPrinter
         buffer.append("{{").append(name);
         if (!parameters.isEmpty()) {
             buffer.append(' ');
-            for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
-                String paramName = paramsIt.next();
-                buffer.append(paramName).append('=').append('\"').append(parameters.get(paramName)).append('\"');
-                if (paramsIt.hasNext()) {
-                    buffer.append(' ');
-                }
-            }
+            buffer.append(printParameters(parameters));
         }
         if ((content == null) || (content.length() == 0)) {
             buffer.append("/}}");
@@ -52,6 +46,19 @@ public class XWikiMacroPrinter
             buffer.append("{{/").append(name).append("}}");
         }
 
+        return buffer.toString();
+    }
+    
+    public String printParameters(Map<String, String> parameters)
+    {
+        StringBuffer buffer = new StringBuffer();
+        for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
+            String paramName = paramsIt.next();
+            buffer.append(paramName).append('=').append('\"').append(parameters.get(paramName)).append('\"');
+            if (paramsIt.hasNext()) {
+                buffer.append(' ');
+            }
+        }
         return buffer.toString();
     }
 }

@@ -34,6 +34,7 @@ import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
 
 /**
  * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
@@ -43,18 +44,20 @@ import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
  */
 public class XHTMLRenderer extends AbstractPrintRenderer
 {
-    private DocumentAccessBridge documentAccessBridge;
-
-    private RenderingConfiguration configuration;
-
     /**
      * A temporary service offering methods manipulating XWiki Documents that are needed to output the correct XHTML.
      * For example this is used to verify if a document exists when computing the HREF attribute for a link. It's
      * temporary because the current Document services have not yet been rewritten with the new architecture. This
      * bridge allows us to be independent of the XWiki Core module, thus preventing a cyclic dependency.
      */
+    private DocumentAccessBridge documentAccessBridge;
+
+    private RenderingConfiguration configuration;
+
     private XHTMLLinkRenderer linkRenderer;
 
+    private XHTMLMacroRenderer macroRenderer;
+    
     private XHTMLIdGenerator idGenerator;
 
     private XHTMLWikiPrinter xhtmlWikiPrinter;
@@ -113,6 +116,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
         this.documentAccessBridge = documentAccessBridge;
         this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, configuration);
+        this.macroRenderer = new XHTMLMacroRenderer();
         this.configuration = configuration;
         this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
     }
@@ -268,7 +272,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginLink(Link link, boolean isFreeStandingURI)
     {
-        this.linkRenderer.beginRenderLink(getXHTMLWikiPrinter(), link, isFreeStandingURI);
+        this.linkRenderer.beginRender(getXHTMLWikiPrinter(), link, isFreeStandingURI);
         this.originalPrinters.push(getPrinter());
         this.setPrinter(new DelegateWikiPrinter(getPrinter()));
     }
@@ -282,7 +286,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         DelegateWikiPrinter printer = (DelegateWikiPrinter) getPrinter();
         setPrinter(this.originalPrinters.pop());
-        this.linkRenderer.endRenderLink(getXHTMLWikiPrinter(), link, isFreeStandingURI, 
+        this.linkRenderer.endRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, 
             !printer.hasContentBeenPrinted);
     }
 
@@ -293,8 +297,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
     {
-        // Do nothing since macro output depends on Macro execution which transforms the macro
-        // into a set of other events.
+        // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
+        // so that the macro can be reconstructed when moving back from XHTML to XDOM.
+        this.macroRenderer.render(getXHTMLWikiPrinter(), name, parameters, content);
     }
 
     /**
@@ -304,8 +309,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
-        // Do nothing since macro output depends on Macro execution which transforms the macro
-        // into a set of other events.
+        // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
+        // so that the macro can be reconstructed when moving back from XHTML to XDOM.
+        this.macroRenderer.render(getXHTMLWikiPrinter(), name, parameters, content);
     }
 
     /**
@@ -470,7 +476,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        // Ignore macro markers, nothing to do.
+        // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
+        // so that the macro can be reconstructed when moving back from XHTML to XDOM.
+        this.macroRenderer.beginRender(getXHTMLWikiPrinter(), name, parameters, content);
     }
 
     /**
@@ -480,7 +488,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        // Ignore macro markers, nothing to do.
+        // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
+        // so that the macro can be reconstructed when moving back from XHTML to XDOM.
+        this.macroRenderer.endRender(getXHTMLWikiPrinter());
     }
 
     /**

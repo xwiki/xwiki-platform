@@ -1,32 +1,43 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Same a macro1.test but this time the macro is executed.
 .#-----------------------------------------------------
-{{testsimplemacro param1="value1" param2="value2"}}
-content
-{{/testsimplemacro}}
+{{velocity}}
+Some **content**
+{{/velocity}}
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-onMacroStandalone [testsimplemacro] [param1=value1|param2=value2] [
-content
+beginMacroMarker [velocity] [] [
+Some **content**
+]
+beginParagraph
+onWord [Some]
+onSpace
+beginBold
+onWord [content]
+endBold
+endParagraph
+endMacroMarker [velocity] [] [
+Some **content**
 ]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
-content
---><!--stopmacro-->
+<!--startmacro:velocity|-||-|
+Some **content**
+--><p>Some <strong>content</strong></p><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-{{testsimplemacro param1="value1" param2="value2"}}
-content
-{{/testsimplemacro}}
+{{velocity}}
+Some **content**
+{{/velocity}}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
-content
---><!--stopmacro--></html> 
+<html><!--startmacro:velocity|-||-|
+Some **content**
+--><p>Some <strong>content</strong></p><!--stopmacro--></html> 

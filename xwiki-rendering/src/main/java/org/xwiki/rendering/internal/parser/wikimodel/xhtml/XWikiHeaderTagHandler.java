@@ -52,6 +52,7 @@ public class XWikiHeaderTagHandler extends HeaderTagHandler
         	params = params.remove("id");
         }
         
+        context.getTagStack().setStackParameter("insideBlockElement", true);
         context.getScannerContext().beginHeader(level, params);
     }
 }

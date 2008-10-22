@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.renderer;
 
 import org.xwiki.rendering.renderer.XHTMLRenderer;
-import org.xwiki.rendering.renderer.WysiwygEditorXHTMLRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererType;
@@ -54,10 +53,6 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
                 break;
             case XWIKISYNTAX:
                 result = new XWikiSyntaxRenderer(printer);
-                break;
-            case WYSIWYG:
-                result = new WysiwygEditorXHTMLRenderer(printer, this.documentAccessBridge,
-                    this.renderingConfiguration);
                 break;
             case EVENTS:
                 result = new EventsRenderer(printer);

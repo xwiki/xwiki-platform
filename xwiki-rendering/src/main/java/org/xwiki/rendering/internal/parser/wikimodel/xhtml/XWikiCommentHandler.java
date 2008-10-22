@@ -34,8 +34,9 @@ import org.xwiki.rendering.renderer.XHTMLRenderer;
 import org.xwiki.url.XWikiURLFactory;
 
 /**
- * Handle Link definition in comments (we store the link reference in a comment since otherwise there are situations
- * where it's not possible to reconstruct the original reference from the rendered HTML value).
+ * Handle Link and Macro definitions in comments (we store links in a comment since otherwise there are situations
+ * where it's not possible to reconstruct the original reference from the rendered HTML value and for macros it
+ * wouldn't be possible at all to reconstruct the macro).
  *  
  * @version $Id$
  * @since 1.7M1
@@ -93,6 +94,8 @@ public class XWikiCommentHandler extends CommentHandler
             stack.setStackParameter("isInLink", false);
             stack.setStackParameter("isFreeStandingLink", false);
             this.reference = null;
+        } else {
+            super.onComment(content, stack);
         }
     }
 }

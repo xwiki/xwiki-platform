@@ -27,7 +27,7 @@ package org.xwiki.rendering.renderer;
  */
 public enum PrintRendererType
 {
-    XHTML("xhtml"), XWIKISYNTAX("xwiki"), EVENTS("event"), TEX("tex"), WYSIWYG("wysiwyg");
+    XHTML("xhtml"), XWIKISYNTAX("xwiki"), EVENTS("event"), TEX("tex");
 
     private String id;
 
@@ -47,8 +47,6 @@ public enum PrintRendererType
             result = PrintRendererType.EVENTS;
         } else if (id.equalsIgnoreCase(PrintRendererType.TEX.id)) {
             result = PrintRendererType.TEX;
-        } else if (id.equalsIgnoreCase(PrintRendererType.WYSIWYG.id)) {
-            result = PrintRendererType.WYSIWYG;
         } else {
             throw new RuntimeException("Invalid Print Renderer type [" + id + "]");
         }

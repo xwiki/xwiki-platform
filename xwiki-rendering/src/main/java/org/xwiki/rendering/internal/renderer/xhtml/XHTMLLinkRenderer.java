@@ -50,7 +50,7 @@ public class XHTMLLinkRenderer
         this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
     }
 
-    public void beginRenderLink(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI)
+    public void beginRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI)
     {
         try {
             beginRenderLinkInternal(printer, link, isFreeStandingURI);
@@ -59,7 +59,7 @@ public class XHTMLLinkRenderer
         }
     }
 
-    public void endRenderLink(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, boolean generateLinkContent)
+    public void endRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, boolean generateLinkContent)
     {
         try {
             endRenderLinkInternal(printer, link, isFreeStandingURI, generateLinkContent);

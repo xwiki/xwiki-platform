@@ -20,6 +20,8 @@
 package org.xwiki.rendering.scaffolding;
 
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.renderer.PrintRenderer;
@@ -67,7 +69,8 @@ public class RenderingTestCase extends MockObjectTestCase
         if (this.runTransformations) {
             TransformationManager transformationManager =
                 (TransformationManager) getComponentManager().lookup(TransformationManager.ROLE);
-            transformationManager.performTransformations(dom, parser.getSyntax());
+            // TODO: Decide if this is the best way. Right now we're forcing the usage of XWiki 2.0 macros.
+            transformationManager.performTransformations(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
         }
 
         dom.traverse(this.renderer);

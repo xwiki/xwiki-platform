@@ -30,7 +30,7 @@
     <version>1.5</version>
   </parent>
   <artifactId>xwiki-core</artifactId>
-  <version>1.5-curriki-SNAPSHOT</version>
+  <version>1.5-curriki2</version>
   <name>XWiki Platform - Core - Core</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Core</description>
@@ -722,9 +722,9 @@
   </profiles>
 
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.5-curriki</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.5-curriki</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.5-curriki</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.5-curriki2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.5-curriki2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.5-curriki2</url>
   </scm>
 </project>
 

@@ -1,10 +1,7 @@
 package com.xpn.xwiki.tool.xar;
 
 import java.io.File;
-import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -37,21 +34,11 @@ abstract class AbstractXarMojo extends AbstractMojo
     protected static final String PACKAGE_XML = "package.xml";
 
     /**
-     * The name of the tag that marks the list of files in PACKAGE_XML.
-     */
-    protected static final String FILES_TAG = "files";
-
-    /**
-     * The name of the tag that marks a specific file in PACKAGE_XML.
-     */
-    protected static final String FILE_TAG = "file";
-
-    /**
      * Default excludes.
-     * 
-     * @todo For now we exclude all files in META-INF even though we would like to keep them. This is because we want
-     *       that newly generated XAR be compatible with older versions of XWiki (as otherwise they wouldn't be able to
-     *       be imported in those older versions as the Package plugin would fail.
+     * @todo For now we exclude all files in META-INF even though we would like to keep them. This
+     *       is because we want that newly generated XAR be compatible with older versions of
+     *       XWiki (as otherwise they wouldn't be able to be imported in those older versions as
+     *       the Package plugin would fail.
      */
     private static final String[] DEFAULT_EXCLUDES = new String[] {"**/META-INF/**"};
 
@@ -62,21 +49,21 @@ abstract class AbstractXarMojo extends AbstractMojo
 
     /**
      * List of files to include. Specified as fileset patterns.
-     * 
+     *
      * @parameter
      */
     protected String[] includes;
-
+ 
     /**
      * List of files to exclude. Specified as fileset patterns.
-     * 
+     *
      * @parameter
      */
     protected String[] excludes;
-
+    
     /**
      * The maven project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -88,8 +75,9 @@ abstract class AbstractXarMojo extends AbstractMojo
      */
     protected String[] getIncludes()
     {
-        if (this.includes != null && this.includes.length > 0) {
-            return this.includes;
+        if (includes != null && includes.length > 0)
+        {
+            return includes;
         }
         return DEFAULT_INCLUDES;
     }
@@ -99,12 +87,13 @@ abstract class AbstractXarMojo extends AbstractMojo
      */
     protected String[] getExcludes()
     {
-        if (this.excludes != null && this.excludes.length > 0) {
-            return this.excludes;
+        if (excludes != null && excludes.length > 0)
+        {
+            return excludes;
         }
-        return DEFAULT_EXCLUDES;
+        return DEFAULT_EXCLUDES; 
     }
-
+    
     /**
      * Unpacks the XAR file (exclude the package.xml file if it exists).
      * 
@@ -114,20 +103,21 @@ abstract class AbstractXarMojo extends AbstractMojo
      * @param overwrite indicate if extracted files has to overwrite existing ones.
      * @throws MojoExecutionException error when unpacking the file.
      */
-    protected void unpack(File file, File location, String logName, boolean overwrite) throws MojoExecutionException
+    protected void unpack(File file, File location, String logName, boolean overwrite)
+        throws MojoExecutionException
     {
         try {
             ZipUnArchiver unArchiver = new ZipUnArchiver();
             unArchiver.enableLogging(new ConsoleLogger(Logger.LEVEL_ERROR, logName));
             unArchiver.setSourceFile(file);
             unArchiver.setDestDirectory(location);
-
+            
             FileSelector[] selectors;
-
+            
             IncludeExcludeFileSelector fs = new IncludeExcludeFileSelector();
             fs.setIncludes(getIncludes());
             fs.setExcludes(getExcludes());
-
+                        
             // Ensure that we don't overwrite XML document files present in this project since
             // we want those to be used and not the ones in the dependent XAR.
             unArchiver.setOverwrite(overwrite);
@@ -136,56 +126,18 @@ abstract class AbstractXarMojo extends AbstractMojo
                 // Do not unpack any package.xml file in dependant XARs. We'll generate a complete
                 // one automatically.
                 IncludeExcludeFileSelector fs2 = new IncludeExcludeFileSelector();
-                fs2.setExcludes(new String[] {PACKAGE_XML});
-                selectors = new FileSelector[] {fs, fs2};
+                fs2.setExcludes(new String[]{PACKAGE_XML});
+                selectors = new FileSelector[]{fs, fs2};
             } else {
-                selectors = new FileSelector[] {fs};
+                selectors = new FileSelector[]{fs};
             }
 
             unArchiver.setFileSelectors(selectors);
-
+            
             unArchiver.extract();
         } catch (Exception e) {
-            throw new MojoExecutionException("Error unpacking file " + HOOK_OPEN + file + HOOK_CLOSE + " to "
-                + HOOK_OPEN + location + HOOK_CLOSE, e);
-        }
-    }
-
-    /**
-     * Unpacks a XAR artifact into the build output directory.
-     * 
-     * @param artifact the XAR artifact to unpack.
-     * @throws MojoExecutionException in case of unpack error
-     */
-    protected void unpackXarToOutputDirectory(Artifact artifact) throws MojoExecutionException
-    {
-        File outputLocation = new File(this.project.getBuild().getOutputDirectory());
-
-        if (!outputLocation.exists()) {
-            outputLocation.mkdirs();
-        }
-
-        File file = artifact.getFile();
-        unpack(file, outputLocation, "XarMojo", false);
-    }
-
-    /**
-     * Unpack non-optional runtime xar dependencies.
-     * 
-     * @throws MojoExecutionException error when unpacking dependencies, if a malformed dependency was provided.
-     */
-    @SuppressWarnings("unchecked")
-    protected void unpackDependentXars() throws MojoExecutionException
-    {
-        Set<Artifact> artifacts = this.project.getArtifacts();
-        ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME);
-        for (Artifact artifact : artifacts) {
-            if (!artifact.isOptional() && filter.include(artifact)) {
-                String type = artifact.getType();
-                if ("xar".equals(type)) {
-                    unpackXarToOutputDirectory(artifact);
-                }
-            }
+            throw new MojoExecutionException("Error unpacking file " + HOOK_OPEN + file
+                + HOOK_CLOSE + " to " + HOOK_OPEN + location + HOOK_CLOSE, e);
         }
     }
 }

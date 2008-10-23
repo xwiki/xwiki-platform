@@ -177,7 +177,7 @@ public class LDAPProfileXClass
         try {
             // Search for uid in database
             String sql =
-                ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=? and obj.id=prop.id.id and prop.name=? and lower(prop.value=?)";
+                ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=? and obj.id=prop.id.id and prop.name=? and lower(prop.value)=?";
 
             documentList =
                 this.context.getWiki().getStore().searchDocuments(sql,

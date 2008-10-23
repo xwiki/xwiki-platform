@@ -22,6 +22,11 @@ package com.xpn.xwiki.wysiwyg.client.util.internal;
 import com.google.gwt.dom.client.Element;
 import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
 
+/**
+ * Contains methods from {@link DOMUtils} that require a different implementation in Internet Explorer.
+ * 
+ * @version $Id$
+ */
 public class IEDOMUtils extends DOMUtils
 {
     /**

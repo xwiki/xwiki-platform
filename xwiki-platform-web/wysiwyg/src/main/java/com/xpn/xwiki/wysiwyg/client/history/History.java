@@ -19,13 +19,30 @@
  */
 package com.xpn.xwiki.wysiwyg.client.history;
 
+/**
+ * Interface for undoing and redoing user's edit actions.
+ * 
+ * @version $Id$
+ */
 public interface History
 {
+    /**
+     * @return false if the current version of the edited content is the latest one.
+     */
     boolean canRedo();
 
+    /**
+     * @return false if the current version is the first one or if it is the oldest one stored in the history.
+     */
     boolean canUndo();
 
+    /**
+     * Loads the next newer version of the edited content.
+     */
     void redo();
 
+    /**
+     * Loads the next older version of the edited content.
+     */
     void undo();
 }

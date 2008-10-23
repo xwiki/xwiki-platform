@@ -21,14 +21,36 @@ package com.xpn.xwiki.wysiwyg.client.util;
 
 import com.google.gwt.dom.client.Text;
 
+/**
+ * A text fragment is a substring of a text node from a DOM tree. It is uniquely identified by the source text node, the
+ * index of the first character and the index of the last character.
+ * 
+ * @version $Id$
+ */
 public class TextFragment
 {
+    /**
+     * The source text node.
+     */
     private final Text text;
 
+    /**
+     * The index of fragment's first character, in the source text node.
+     */
     private final int startIndex;
 
+    /**
+     * The index of fragment's last character, in the source text node.
+     */
     private final int endIndex;
 
+    /**
+     * Creates a new fragment of the given text node.
+     * 
+     * @param text the source text node.
+     * @param startIndex the index of fragment's first character, in the source text node.
+     * @param endIndex the index of fragment's last character, in the source text node.
+     */
     public TextFragment(Text text, int startIndex, int endIndex)
     {
         this.text = text;
@@ -36,16 +58,25 @@ public class TextFragment
         this.endIndex = endIndex;
     }
 
+    /**
+     * @return the source text node.
+     */
     public Text getText()
     {
         return text;
     }
 
+    /**
+     * @return the index of fragment's first character, in the source text node.
+     */
     public int getStartIndex()
     {
         return startIndex;
     }
 
+    /**
+     * @return the index of fragment's last character, in the source text node.
+     */
     public int getEndIndex()
     {
         return endIndex;

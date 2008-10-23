@@ -270,6 +270,19 @@ public final class IERange extends AbstractRange<NativeRange>
     }
 
     /**
+     * Utility method for retrieving the sibling of the given node in the specified direction. If right is true the next
+     * sibling is returned. Otherwise, the previous sibling is returned. (reduces cyclomatic complexity)
+     * 
+     * @param node The node whose sibling will be returned.
+     * @param right The direction to look for the sibling.
+     * @return The sibling of the specified node, in the specified direction.
+     */
+    private Node getSibling(Node node, boolean right)
+    {
+        return right ? node.getNextSibling() : node.getPreviousSibling();
+    }
+
+    /**
      * Returns the locator for the specified end point.
      * 
      * @param start Specifies the end point.
@@ -334,7 +347,7 @@ public final class IERange extends AbstractRange<NativeRange>
                 } else {
                     // We jump over this text node.
                     offset -= sibling.getNodeValue().length();
-                    sibling = start ? sibling.getNextSibling() : sibling.getPreviousSibling();
+                    sibling = getSibling(sibling, start);
                 }
             } else if (--offset <= 0) {
                 // The current sibling is an element
@@ -342,7 +355,7 @@ public final class IERange extends AbstractRange<NativeRange>
                 // possible-cursor-positions.
 
                 // The end point is before or after the current sibling.
-                Node nextSibling = start ? sibling.getNextSibling() : sibling.getPreviousSibling();
+                Node nextSibling = getSibling(sibling, start);
                 // We prefer that the end point is inside a text node
                 if (nextSibling == null || nextSibling.getNodeType() == Node.ELEMENT_NODE) {
                     // The end point is before the first child, after the last child or between elements.
@@ -396,25 +409,23 @@ public final class IERange extends AbstractRange<NativeRange>
                 if (offset <= sibling.getNodeValue().length()) {
                     // We cannot move further to the left.
                     return start ? offset : sibling.getNodeValue().length() - offset;
-                } else {
-                    // We jump over this text node.
-                    offset -= sibling.getNodeValue().length();
-                    sibling = start ? sibling.getNextSibling() : sibling.getPreviousSibling();
                 }
+                // We jump over this text node.
+                offset -= sibling.getNodeValue().length();
+                sibling = getSibling(sibling, start);
             } else if (--offset == 0) {
                 // The current sibling is an element
                 // We can position the cursor between elements so we must decrease the number of
                 // possible-cursor-positions.
 
                 // The range ends before the current sibling.
-                Node nextSibling = start ? sibling.getNextSibling() : sibling.getPreviousSibling();
+                Node nextSibling = getSibling(sibling, start);
                 // We prefer that the end point is inside a text node.
                 if (nextSibling == null || nextSibling.getNodeType() == Node.ELEMENT_NODE) {
                     // The end point is before the first child, after the last child or between elements.
                     return DOMUtils.getInstance().getNodeIndex(sibling) + (start ? 1 : 0);
-                } else {
-                    sibling = nextSibling;
                 }
+                sibling = nextSibling;
             }
         }
         // We should not get here.
@@ -548,8 +559,7 @@ public final class IERange extends AbstractRange<NativeRange>
                     setEndAfter(refNode.getLastChild());
                 }
             } else if (refNode.getNodeType() == Node.TEXT_NODE) {
-                setEndBefore(refNode);
-                ((TextRange) getJSRange()).moveEnd(Unit.CHARACTER, offset);
+                ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_END, refNode, offset);
             }
         } else {
             collapse(true);
@@ -602,8 +612,7 @@ public final class IERange extends AbstractRange<NativeRange>
                     setStartAfter(refNode.getLastChild());
                 }
             } else if (refNode.getNodeType() == Node.TEXT_NODE) {
-                setStartBefore(refNode);
-                ((TextRange) getJSRange()).moveStart(Unit.CHARACTER, offset);
+                ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_START, refNode, offset);
             }
         } else {
             collapse(false);

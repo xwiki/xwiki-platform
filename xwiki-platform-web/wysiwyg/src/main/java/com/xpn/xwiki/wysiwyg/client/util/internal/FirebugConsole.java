@@ -23,6 +23,7 @@ import com.xpn.xwiki.wysiwyg.client.util.Console;
 
 /**
  * @see http://getfirebug.com/console.html
+ * @version $Id$
  */
 public class FirebugConsole extends Console
 {

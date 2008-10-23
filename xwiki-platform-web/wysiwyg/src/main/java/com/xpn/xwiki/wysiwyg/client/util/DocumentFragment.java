@@ -21,8 +21,16 @@ package com.xpn.xwiki.wysiwyg.client.util;
 
 import com.google.gwt.dom.client.Node;
 
+/**
+ * A fragment of a DOM document.
+ * 
+ * @version $Id$
+ */
 public final class DocumentFragment extends Node
 {
+    /**
+     * Default constructor. Needs to be protected because all instances are created from JavaScript.
+     */
     protected DocumentFragment()
     {
     }

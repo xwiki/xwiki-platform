@@ -21,10 +21,23 @@ package com.xpn.xwiki.wysiwyg.client.util;
 
 import com.google.gwt.core.client.GWT;
 
+/**
+ * Interface to the browser's console. Useful for logging and profiling. This class provides an empty implementation.
+ * Each browser has its own console API. You should extend this class and overwrite the needed methods by using that
+ * API.
+ * 
+ * @version $Id$
+ */
 public class Console
 {
+    /**
+     * The console instance in use.
+     */
     private static Console instance;
 
+    /**
+     * @return The console instance in use.
+     */
     public static synchronized Console getInstance()
     {
         if (instance == null) {

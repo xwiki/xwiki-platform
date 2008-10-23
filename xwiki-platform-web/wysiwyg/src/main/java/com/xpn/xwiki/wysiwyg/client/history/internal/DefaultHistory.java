@@ -19,7 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.history.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.Text;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.history.History;
@@ -34,85 +38,59 @@ import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.util.Document;
 
+/**
+ * Default implementation for {@link History}.
+ * 
+ * @version $Id$
+ */
 public class DefaultHistory implements History, KeyboardListener, CommandListener
 {
-    public static class Entry
-    {
-        private final String content;
-
-        private final String path;
-
-        private Entry nextEntry;
-
-        private Entry previousEntry;
-
-        public Entry(String content, String path)
-        {
-            this.content = content;
-            this.path = path;
-        }
-
-        public String getContent()
-        {
-            return content;
-        }
-
-        public String getPath()
-        {
-            return path;
-        }
-
-        public Entry getNextEntry()
-        {
-            return nextEntry;
-        }
-
-        public void setNextEntry(Entry nextEntry)
-        {
-            this.nextEntry = nextEntry;
-        }
-
-        public Entry getPreviousEntry()
-        {
-            return previousEntry;
-        }
-
-        public void setPreviousEntry(Entry previousEntry)
-        {
-            this.previousEntry = previousEntry;
-        }
-
-        public int getIndex()
-        {
-            int index = 0;
-            Entry entry = this;
-            while (entry.getPreviousEntry() != null) {
-                index++;
-                entry = entry.getPreviousEntry();
-            }
-            return index;
-        }
-    }
-
-    public static enum KeyboardAction
-    {
-        UNDEFINED, INSERT_WORD, DELETE, INSERT_SPACE, INSERT_NEW_LINE, MOVE_CARET
-    }
-
+    /**
+     * The rich text area for which we record the history. Actions taken on this rich text area trigger the update of
+     * the history. Using the {@link History} interface the content of this rich text area can be reverted to a previous
+     * version.
+     */
     private final XRichTextArea textArea;
 
+    /**
+     * The maximum number of entries the history can hold. While the history is full, each time we want to add a new
+     * entry we have to remove the oldest one to make room.
+     */
     private final int capacity;
 
+    /**
+     * The shortcut key that triggers the undo action.
+     */
     private final XShortcutKey undoKey = XShortcutKeyFactory.createCtrlShortcutKey('Z');
 
+    /**
+     * The shortcut key that triggers the redo action.
+     */
     private final XShortcutKey redoKey = XShortcutKeyFactory.createCtrlShortcutKey('Y');
 
+    /**
+     * The oldest stored history entry.
+     */
     private Entry oldestEntry;
 
+    /**
+     * Points to the history entry storing the current version of the edited content.
+     */
     private Entry currentEntry;
 
+    /**
+     * The previous keyboard action done by the user. The history is updated whenever the user changes the type of
+     * keyboard action he does on the edited content.
+     */
     private KeyboardAction previousKeyboardAction;
 
+    /**
+     * Starts to record the history of the given rich text area. At each moment the number of history entries stored is
+     * at most the specified capacity.
+     * 
+     * @param textArea the rich text area for which to record the history.
+     * @param capacity the maximum number of history entries that can be stored.
+     */
     public DefaultHistory(XRichTextArea textArea, int capacity)
     {
         assert (capacity > 1);
@@ -172,6 +150,12 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
         }
     }
 
+    /**
+     * NOTE: the number of stored entries is computed each time because the history length can drop significantly if the
+     * user reverts and continues editing.
+     * 
+     * @return true if the number of history entries stored is equal or exceeds the {@link #capacity}.
+     */
     private boolean isFull()
     {
         int entryCount = 0;
@@ -183,16 +167,26 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
         return entryCount >= capacity;
     }
 
+    /**
+     * @return true if there are no history entries stored.
+     */
     private boolean isEmpty()
     {
         return oldestEntry == null;
     }
 
+    /**
+     * @return true if the user is doing an edit action on the current version of the edited content. The stored HTML
+     *         content in the current history entry should be different from the one in the text area.
+     */
     private boolean isDirty()
     {
         return currentEntry != null && !currentEntry.getContent().equals(textArea.getHTML());
     }
 
+    /**
+     * @param entry the history entry to load in the rich text area.
+     */
     private void load(Entry entry)
     {
         currentEntry = entry;
@@ -200,22 +194,57 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
         textArea.setHTML(entry.getContent());
         Document doc = textArea.getDocument();
 
-        Node node = doc;
-        String[] path = entry.getPath().split(" ");
-        for (int i = path.length - 1; i > 0; i--) {
-            node = node.getChildNodes().getItem(Integer.parseInt(path[i]));
-        }
-
         Range range = doc.createRange();
-        int offset = Integer.parseInt(path[0]);
-        range.setStart(node, offset);
-        range.setEnd(node, offset);
+        range.setStart(getNode(doc, entry.getStartPath()), entry.getStartPath().get(0));
+        range.setEnd(getNode(doc, entry.getEndPath()), entry.getEndPath().get(0));
 
         Selection selection = doc.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
     }
 
+    /**
+     * @param node a DOM node.
+     * @param offset the offset inside the given node. It represents the number of characters in case of text node and
+     *            the number of child nodes otherwise.
+     * @return the path from the given node to root of the DOM tree, where each token in the path represents the
+     *         normalized index of the node at that level.
+     */
+    private static List<Integer> getPath(Node node, int offset)
+    {
+        List<Integer> path = new ArrayList<Integer>();
+        if (node.getNodeType() == Node.TEXT_NODE) {
+            path.add(DOMUtils.getInstance().getOffset(Text.as(node)) + offset);
+        } else if (offset == node.getChildNodes().getLength()) {
+            path.add(DOMUtils.getInstance().getNormalizedChildCount(node));
+        } else {
+            path.add(DOMUtils.getInstance().getNormalizedNodeIndex(node.getChildNodes().getItem(offset)));
+        }
+        Node ancestor = node;
+        while (ancestor.getParentNode() != null) {
+            path.add(DOMUtils.getInstance().getNormalizedNodeIndex(ancestor));
+            ancestor = ancestor.getParentNode();
+        }
+        return path;
+    }
+
+    /**
+     * @param doc a DOM document
+     * @param path a DOM path. Each token in the path is a node index.
+     * @return the node at the end of the given path in the specified DOM tree.
+     */
+    private static Node getNode(Document doc, List<Integer> path)
+    {
+        Node node = doc;
+        for (int i = path.size() - 1; i > 0; i--) {
+            node = node.getChildNodes().getItem(path.get(i));
+        }
+        return node;
+    }
+
+    /**
+     * Saves the current state of the underlying rich text area.
+     */
     private void save()
     {
         if (!isEmpty() && !isDirty()) {
@@ -225,16 +254,10 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
         Selection selection = textArea.getDocument().getSelection();
         Range range = selection.getRangeAt(0);
 
-        StringBuffer path = new StringBuffer("");
-        path.append(range.getEndOffset());
-        Node node = range.getEndContainer();
-        while (node.getParentNode() != null) {
-            path.append(" ");
-            path.append(DOMUtils.getInstance().getNodeIndex(node));
-            node = node.getParentNode();
-        }
+        List<Integer> startPath = getPath(range.getStartContainer(), range.getStartOffset());
+        List<Integer> endPath = getPath(range.getEndContainer(), range.getEndOffset());
 
-        Entry newestEntry = new Entry(textArea.getHTML(), path.toString());
+        Entry newestEntry = new Entry(textArea.getHTML(), startPath, endPath);
         if (currentEntry != null) {
             currentEntry.setNextEntry(newestEntry);
         }
@@ -258,7 +281,7 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
     public void onKeyDown(Widget sender, char keyCode, int modifiers)
     {
         if (sender == textArea && (modifiers & KeyboardListener.MODIFIER_CTRL) == 0) {
-            KeyboardAction currentKeyboardAction = getKeyboardAction(keyCode, modifiers);
+            KeyboardAction currentKeyboardAction = KeyboardAction.valueOf(keyCode, modifiers);
             if (isEmpty() || currentKeyboardAction != previousKeyboardAction) {
                 save();
             }
@@ -304,26 +327,8 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
         if (sender == textArea.getCommandManager()) {
             if (command != Command.UNDO && command != Command.REDO) {
                 save();
-                previousKeyboardAction = KeyboardAction.UNDEFINED;
+                previousKeyboardAction = null;
             }
-        }
-    }
-
-    private KeyboardAction getKeyboardAction(int keyCode, int modifiers)
-    {
-        if (keyCode == ' ' || keyCode == KeyboardListener.KEY_TAB) {
-            return KeyboardAction.INSERT_SPACE;
-        } else if (keyCode == KeyboardListener.KEY_BACKSPACE || keyCode == KeyboardListener.KEY_DELETE) {
-            return KeyboardAction.DELETE;
-        } else if (keyCode == KeyboardListener.KEY_ENTER) {
-            return KeyboardAction.INSERT_NEW_LINE;
-        } else if (keyCode == KeyboardListener.KEY_DOWN || keyCode == KeyboardListener.KEY_END
-            || keyCode == KeyboardListener.KEY_HOME || keyCode == KeyboardListener.KEY_LEFT
-            || keyCode == KeyboardListener.KEY_PAGEDOWN || keyCode == KeyboardListener.KEY_PAGEUP
-            || keyCode == KeyboardListener.KEY_RIGHT || keyCode == KeyboardListener.KEY_UP) {
-            return KeyboardAction.MOVE_CARET;
-        } else {
-            return KeyboardAction.INSERT_WORD;
         }
     }
 }

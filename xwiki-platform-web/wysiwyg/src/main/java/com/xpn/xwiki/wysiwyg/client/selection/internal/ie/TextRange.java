@@ -344,14 +344,34 @@ public final class TextRange extends NativeRange
      * 
      * @param how Specifies the end point to transfer using one of the following values:
      *            <ul>
-     *            <li>{@link RangeCompare#START_TO_END}: Move the start of this TextRange object after the refNode.</li>
+     *            <li>{@link RangeCompare#START_TO_END}: Move the end of this TextRange object before the refNode.</li>
      *            <li>{@link RangeCompare#START_TO_START}: Move the start of this TextRange object before the refNode.</li>
-     *            <li>{@link RangeCompare#END_TO_START}: Move the end of this TextRange object before the refNode.</li>
+     *            <li>{@link RangeCompare#END_TO_START}: Move the start of this TextRange object after the refNode.</li>
      *            <li>{@link RangeCompare#END_TO_END}: Move the end of this TextRange object after the refNode.</li>
      *            </ul>
      * @param refNode The reference point.
      */
     public void setEndPoint(RangeCompare how, Node refNode)
+    {
+        setEndPoint(how, refNode, 0);
+    }
+
+    /**
+     * Sets the end point of this range based on the given DOM node and the specified offset. A text range has two end
+     * points: one at the beginning of the text range and one at the end. An end point can also be the position between
+     * two characters in an HTML document.
+     * 
+     * @param how Specifies the end point to transfer using one of the following values:
+     *            <ul>
+     *            <li>{@link RangeCompare#START_TO_END}: Move the end of this TextRange object before the refNode.</li>
+     *            <li>{@link RangeCompare#START_TO_START}: Move the start of this TextRange object before the refNode.</li>
+     *            <li>{@link RangeCompare#END_TO_START}: Move the start of this TextRange object after the refNode.</li>
+     *            <li>{@link RangeCompare#END_TO_END}: Move the end of this TextRange object after the refNode.</li>
+     *            </ul>
+     * @param refNode The reference point.
+     * @param offset The number of possible-cursor-positions to move from the reference point.
+     */
+    public void setEndPoint(RangeCompare how, Node refNode, int offset)
     {
         TextRange refRange = this.duplicate();
         if (refNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -360,6 +380,12 @@ public final class TextRange extends NativeRange
             refRange.moveToTextNode(Text.as(refNode));
         } else {
             throw new IllegalArgumentException("Expecting element or text node!");
+        }
+        if (offset != 0) {
+            if (how == RangeCompare.END_TO_END || how == RangeCompare.END_TO_START) {
+                refRange.collapse(false);
+            }
+            refRange.move(Unit.CHARACTER, offset);
         }
         this.setEndPoint(how, refRange);
     }

@@ -23,6 +23,8 @@ import com.google.gwt.user.client.Command;
 
 /**
  * Interface for an object whose update can be deferred. Only the most recent update gets executed.
+ * 
+ * @version $Id$
  */
 public interface DeferredUpdate
 {
@@ -41,15 +43,20 @@ public interface DeferredUpdate
          */
         private final long index;
 
+        /**
+         * @param target the object for which to create a new update command.
+         */
         public UpdateCommand(DeferredUpdate target)
         {
             this.target = target;
             index = target.incUpdateIndex();
         }
 
+        /**
+         * Executes the update only if it's the most recent one.
+         */
         public void execute()
         {
-            // Executes the update only if it's the most recent one.
             if (index == target.getUpdateIndex()) {
                 target.onUpdate();
             }

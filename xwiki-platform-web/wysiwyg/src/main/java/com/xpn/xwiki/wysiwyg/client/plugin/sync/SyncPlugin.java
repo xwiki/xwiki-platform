@@ -23,7 +23,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.Constants;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Diff;
@@ -43,6 +42,8 @@ import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 
 public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerListener, AsyncCallback<SyncResult>
 {
+    public static final int DEFAULT_SYNC_DELAY = 3000;
+
     private PushButton sync;
 
     private Timer timer;
@@ -88,7 +89,7 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
 
         timer = new Timer();
         timer.addTimerListener(this);
-        timer.scheduleRepeating(wysiwyg.getParamAsInt("sync_delay", Constants.DEFAULT_SYNC_DELAY));
+        timer.scheduleRepeating(wysiwyg.getParamAsInt("sync_delay", DEFAULT_SYNC_DELAY));
     }
 
     /**

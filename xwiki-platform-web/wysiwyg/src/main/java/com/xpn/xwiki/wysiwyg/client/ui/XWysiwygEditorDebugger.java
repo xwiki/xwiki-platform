@@ -23,7 +23,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.TextArea;
-import com.xpn.xwiki.wysiwyg.client.Constants;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.timer.Timer;
 import com.xpn.xwiki.wysiwyg.client.timer.TimerListener;
@@ -79,7 +78,7 @@ public class XWysiwygEditorDebugger extends Composite implements TimerListener
 
         timer = new Timer();
         timer.addTimerListener(this);
-        timer.scheduleRepeating(Constants.DEFAULT_SYNC_DELAY + 1000);
+        timer.scheduleRepeating(4000);
     }
 
     public void refreshData()

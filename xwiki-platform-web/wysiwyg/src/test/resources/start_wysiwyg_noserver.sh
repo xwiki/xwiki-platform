@@ -1,20 +1,23 @@
 #!/bin/bash
 
+XE_VERSION=1.7-SNAPSHOT
+GWT_VERSION=1.5.2;
+
 APP_DIR=`dirname $0`/webapps/xwiki;
 LIB_DIR=$APP_DIR/WEB-INF/lib;
 JAVA32_HOME=/usr/lib/jvm/ia32-java-1.5.0-sun/bin;
-GWT_HOME=/tmp/xwiki/gwt/gwt-linux-1.5.0-rc1;
+GWT_REPO=~/.m2/repository/com/google/gwt;
 
 $JAVA32_HOME/java \
 -Xmx1024m \
 -cp \
-$LIB_DIR/xwiki-web-wysiwyg-1.7-SNAPSHOT.jar:\
-$LIB_DIR/xwiki-web-wysiwyg-1.7-SNAPSHOT-sources.jar:\
-$LIB_DIR/xwiki-web-gwt-1.7-SNAPSHOT-sources.jar:\
+$LIB_DIR/xwiki-web-wysiwyg-$XE_VERSION.jar:\
+$LIB_DIR/xwiki-web-wysiwyg-$XE_VERSION-sources.jar:\
+$LIB_DIR/xwiki-web-gwt-$XE_VERSION-sources.jar:\
 $LIB_DIR/junit-3.8.1.jar:\
 $LIB_DIR/incubator-glasspanel-r729.jar:\
-$GWT_HOME/gwt-dev-linux.jar:\
-$GWT_HOME/gwt-user.jar \
+$GWT_REPO/gwt-dev/$GWT_VERSION/gwt-dev-$GWT_VERSION-linux.jar:\
+$GWT_REPO/gwt-user/$GWT_VERSION/gwt-user-$GWT_VERSION.jar \
 com.google.gwt.dev.GWTShell \
 -logLevel WARN \
 -style DETAILED \

@@ -11,18 +11,18 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginItalic
+beginFormat: [ITALIC]
 onWord [italic]
 onSpace
-endItalic
+endFormat: [ITALIC]
 onSpace
 onWord [not]
 onSpace
 onWord [italic]
-beginItalic
+beginFormat: [ITALIC]
 onSpace
 onWord [italic]
-endItalic
+endFormat: [ITALIC]
 endParagraph
 endDocument
 .#-----------------------------------------------------

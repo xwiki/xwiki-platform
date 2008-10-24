@@ -9,7 +9,7 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginBold
+beginFormat: [BOLD]
 onWord [This]
 onSpace
 onWord [is]
@@ -23,7 +23,7 @@ onSpace
 onWord [a]
 onSpace
 onWord [list]
-endBold
+endFormat: [BOLD]
 endParagraph
 endDocument
 .#-----------------------------------------------------

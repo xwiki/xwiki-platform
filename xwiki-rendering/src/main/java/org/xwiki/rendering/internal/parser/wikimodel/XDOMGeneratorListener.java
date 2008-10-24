@@ -206,12 +206,28 @@ public class XDOMGeneratorListener implements IWemListener
         // Don't do anything since there's no notion of Document block in XWiki rendering.
     }
 
+    /**
+     * {@inheritDoc}
+     * @see IWemListener#endFormat(WikiFormat)
+     */
     public void endFormat(WikiFormat format)
     {
         List<WikiStyle> styles = format.getStyles();
-        if (styles.size() > 0) {
+        if ((styles.size() > 0) || (format.getParams().size() > 0))  {
 
-            FormatBlock block = new FormatBlock(generateListFromStack(), convertFormat(styles.get(styles.size() - 1)));
+            // Generate nested FormatBlock blocks since XWiki uses nested Format blocks whereas Wikimodel doesn't.
+            FormatBlock block;
+            if (styles.size() > 0) {
+                block = new FormatBlock(generateListFromStack(), convertFormat(styles.get(styles.size() - 1)));
+            } else {
+                block = new FormatBlock(generateListFromStack(), Format.NONE);
+            }
+
+            // If there are any parameters set in the format then set it on the last block.
+            if (format.getParams().size() > 0) {
+                block.setParameters(convertParameters(new WikiParameters(format.getParams())));
+            }
+            
             if (styles.size() > 1) {
                 ListIterator<WikiStyle> it = styles.listIterator(styles.size() - 1);
                 while (it.hasPrevious()) {
@@ -223,7 +239,8 @@ public class XDOMGeneratorListener implements IWemListener
             // block then merge them.
             Block previous = this.stack.peek();
             if (FormatBlock.class.isAssignableFrom(previous.getClass())
-                && (((FormatBlock) previous).getFormat() == block.getFormat()))
+                && (((FormatBlock) previous).getFormat() == block.getFormat())
+                && (((FormatBlock) previous).getParameters().equals(block.getParameters())))
             {
                 previous.addChildren(block.getChildren());
             } else {
@@ -232,7 +249,7 @@ public class XDOMGeneratorListener implements IWemListener
 
         } else {
             // WikiModel generate begin/endFormat events even for simple text with no style so we need to remove our 
-            // marker
+            // marker.
             for (Block block : generateListFromStack()) {
                 this.stack.push(block);
             }

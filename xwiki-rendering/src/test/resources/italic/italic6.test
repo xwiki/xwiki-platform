@@ -11,10 +11,10 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginItalic
+beginFormat: [ITALIC]
 onSpecialSymbol [/]
 onWord [italic]
-endItalic
+endFormat: [ITALIC]
 onSpecialSymbol [/]
 endParagraph
 endDocument

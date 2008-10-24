@@ -11,9 +11,9 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginBold
+beginFormat: [BOLD]
 onWord [bold]
-endBold
+endFormat: [BOLD]
 onSpace
 onWord [but]
 onSpace

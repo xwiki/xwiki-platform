@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
 import org.wikimodel.wem.WikiParameter;
-import org.wikimodel.wem.xhtml.handler.TagHandler;
+import org.wikimodel.wem.xhtml.handler.SpanTagHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext;
 
 /**
@@ -30,22 +30,30 @@ import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext;
  * @version $Id$
  * @since 1.7M1
  */
-public class XWikiSpanTagHandler extends TagHandler
+public class XWikiSpanTagHandler extends SpanTagHandler
 {
-    public XWikiSpanTagHandler() {
-        super(false, false, true);
-    }
-
     @Override
     protected void begin(TagContext context)
     {
         // If we're on a span for unknown links then skip the event for its content.
         // Ex: <a href="..."><span class="wikicreatelinktext">...</span><span class="wikicreatelinkqm">?</span></a>
         WikiParameter classParam = context.getParams().getParameter("class");
-        if ((classParam != null) && ((classParam.getValue().contains("wikicreatelinkqm") 
-            || classParam.getValue().contains("wikigeneratedlinkcontent"))))
-        {
-            setAccumulateContent(true);
+        if (classParam != null) {
+            if (classParam.getValue().contains("wikicreatelinkqm") 
+                || classParam.getValue().contains("wikigeneratedlinkcontent"))
+            {
+                setAccumulateContent(true);
+            } else if (classParam.getValue().equals("wikilink") 
+                || classParam.getValue().equals("wikicreatelink")
+                || classParam.getValue().equals("wikicreatelinktext")
+                || classParam.getValue().equals("wikiexternallink"))
+            {
+                // Nothing to do 
+            } else {
+                super.begin(context);
+            }
+        } else {
+            super.begin(context);
         }
     }
 
@@ -53,10 +61,22 @@ public class XWikiSpanTagHandler extends TagHandler
     protected void end(TagContext context)
     {
         WikiParameter classParam = context.getParams().getParameter("class");
-        if ((classParam != null) && ((classParam.getValue().contains("wikicreatelinkqm") 
-            || classParam.getValue().contains("wikigeneratedlinkcontent"))))
-        {
-            setAccumulateContent(false);
+        if (classParam != null) {
+            if (classParam.getValue().contains("wikicreatelinkqm") 
+                || classParam.getValue().contains("wikigeneratedlinkcontent"))
+            {
+                setAccumulateContent(false);
+            } else if (classParam.getValue().equals("wikilink") 
+                || classParam.getValue().equals("wikicreatelink")
+                || classParam.getValue().equals("wikicreatelinktext")
+                || classParam.getValue().equals("wikiexternallink"))
+            {
+                // Nothing to do 
+            } else {
+                super.end(context);
+            }
+        } else {
+            super.end(context);
         }
     }
 }

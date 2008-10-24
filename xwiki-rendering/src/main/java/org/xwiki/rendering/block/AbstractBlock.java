@@ -156,6 +156,16 @@ public abstract class AbstractBlock implements Block
     }
 
     /**
+     * Set several parameters at once.
+     * 
+     * @param parameters the parameters to set
+     */
+    public void setParameters(Map<String, String> parameters)
+    {
+        this.parameters.putAll(parameters);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.block.Block#setParent(org.xwiki.rendering.block.Block)

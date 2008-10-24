@@ -1,33 +1,74 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
+.# Specify both paragraph params followed by params on a word 
 (% param1="value1" param2="value2" %)
-paragraph1
+(% param3="value3" %)hello(%%) world
 
-paragraph2
+.# Make sure that same param names override values
+(% param4="valueA" %)hello (% param4="valueB" %)world
+
+.# Verify that world is using param5=value4
+**(% param5="value4" %)hello** world
+
+.# Make sure that params override whatever previous values were set.
+.# i.e. world only has param7=valueB and NOT param6=valueA
+(% param6="valueA" %)hello (% param7="valueB" %)world
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph [[param1]=[value1][param2]=[value2]]
-onWord [paragraph1]
+beginFormat: [NONE] [[param3]=[value3]]
+onWord [hello]
+endFormat: [NONE] [[param3]=[value3]]
+onSpace
+onWord [world]
 endParagraph [[param1]=[value1][param2]=[value2]]
 beginParagraph
-onWord [paragraph2]
+beginFormat: [NONE] [[param4]=[valueA]]
+onWord [hello]
+onSpace
+endFormat: [NONE] [[param4]=[valueA]]
+beginFormat: [NONE] [[param4]=[valueB]]
+onWord [world]
+endFormat: [NONE] [[param4]=[valueB]]
+endParagraph
+beginParagraph
+beginFormat: [BOLD] [[param5]=[value4]]
+onWord [hello]
+endFormat: [BOLD] [[param5]=[value4]]
+beginFormat: [NONE] [[param5]=[value4]]
+onSpace
+onWord [world]
+endFormat: [NONE] [[param5]=[value4]]
+endParagraph
+beginParagraph
+beginFormat: [NONE] [[param6]=[valueA]]
+onWord [hello]
+onSpace
+endFormat: [NONE] [[param6]=[valueA]]
+beginFormat: [NONE] [[param7]=[valueB]]
+onWord [world]
+endFormat: [NONE] [[param7]=[valueB]]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p param1="value1" param2="value2">paragraph1</p><p>paragraph2</p>
+<p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello </span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4"> world</span></p><p><span param6="valueA">hello </span><span param7="valueB">world</span></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 (% param1="value1" param2="value2" %)
-paragraph1
+(% param3="value3" %)hello(%%) world
 
-paragraph2
+(% param4="valueA" %)hello (% param4="valueB" %)world
+
+**(% param5="value4" %)hello** world
+
+(% param6="valueA" %)hello (% param7="valueB" %)world
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p param1="value1" param2="value2">paragraph1</p><p>paragraph2</p></html>
+<html><p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello </span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4"> world</span></p><p><span param6="valueA">hello </span><span param7="valueB">world</span></p></html>

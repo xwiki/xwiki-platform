@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.renderer;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Stack;
 
@@ -72,6 +73,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     private Stack<WikiPrinter> originalPrinters = new Stack<WikiPrinter>();
     private WikiPrinter linkBlocksPrinter; 
+    
+    private Format previousFormat;
+    private Map<String, String> previousFormatParameters;
     
     public XWikiSyntaxRenderer(WikiPrinter printer)
     {
@@ -134,9 +138,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#beginFormat(org.xwiki.rendering.listener.Format)
+     * @see Renderer#beginFormat(Format, Map)
      */
-    public void beginFormat(Format format)
+    public void beginFormat(Format format, Map<String, String> parameters)
     {
         switch (format) {
             case BOLD:
@@ -161,14 +165,24 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
                 print("##");
                 break;
         }
+        // If the previous format had parameters and the parameters are different from the current ones then close them
+        if (this.previousFormatParameters != null && !this.previousFormatParameters.equals(parameters)) {
+            this.previousFormatParameters = null;
+            printParameters(parameters, false);
+        } else if (this.previousFormatParameters == null) {
+            this.previousFormatParameters = null;
+            printParameters(parameters, false);
+        } else {
+            this.previousFormatParameters = null;
+        }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#endFormat(org.xwiki.rendering.listener.Format)
+     * @see Renderer#endFormat(Format, Map)
      */
-    public void endFormat(Format format)
+    public void endFormat(Format format, Map<String, String> parameters)
     {
         switch (format) {
             case BOLD:
@@ -192,6 +206,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             case MONOSPACE:
                 print("##");
                 break;
+        }
+        if (!parameters.isEmpty()) {
+            this.previousFormatParameters = parameters;
         }
     }
 
@@ -213,7 +230,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endParagraph(Map<String, String> parameters)
     {
-        // Nothing to do
+        this.previousFormatParameters = null;
     }
 
     /**
@@ -767,17 +784,17 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     protected void printParameters(Map<String, String> parameters, boolean newLine)
     {
         if (!parameters.isEmpty()) {
-	    	StringBuffer buffer = new StringBuffer("(%");
-	        for (Map.Entry<String, String> entry : parameters.entrySet()) {
-	            buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(entry.getValue()).append('\"');
-	        }
-	        buffer.append(" %)");
-	
-	        if (newLine) {
-	            buffer.append("\n");
-	        }
-	
-	        print(buffer.toString());
+            StringBuffer buffer = new StringBuffer("(%");
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(entry.getValue()).append('\"');
+            }
+            buffer.append(" %)");
+    
+            if (newLine) {
+                buffer.append("\n");
+            }
+    
+            print(buffer.toString());
         }
     }
 
@@ -789,6 +806,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     @Override
     protected void print(String text)
     {
+        // Handle empty formatting parameters.
+        if (this.previousFormatParameters != null) {
+            super.print("(%%)");
+            this.previousFormatParameters = null;
+        }
+
         if (!this.isInsideMacroMarker) {
             super.print(text);
         }

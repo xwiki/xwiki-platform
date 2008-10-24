@@ -40,10 +40,11 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#beginFormat(org.xwiki.rendering.listener.Format)
+     * @see Listener#beginFormat(Format, Map)
      */
-    public void beginFormat(Format format)
+    public void beginFormat(Format format, Map<String, String> parameters)
     {
+        // TODO: Handle parameters
         switch (format) {
             case BOLD:
                 this.sink.bold();
@@ -65,10 +66,11 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#endFormat(org.xwiki.rendering.listener.Format)
+     * @see Listener#endFormat(Format, Map)
      */
-    public void endFormat(Format format)
+    public void endFormat(Format format, Map<String, String> parameters)
     {
+        // TODO: Handle parameters
         switch (format) {
             case BOLD:
                 this.sink.bold_();

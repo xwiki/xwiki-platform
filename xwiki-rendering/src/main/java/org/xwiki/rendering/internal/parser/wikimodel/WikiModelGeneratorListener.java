@@ -63,23 +63,29 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#beginFormat(org.xwiki.rendering.listener.Format)
+     * @see Listener#beginFormat(Format, Map)
      */
-    public void beginFormat(Format format)
+    public void beginFormat(Format format, Map<String, String> parameters)
     {
         switch (format) {
             case BOLD:
-                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRONG));
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRONG, 
+                    createWikiParameters(parameters).toList()));
                 break;
             case ITALIC:
-                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM));
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM,
+                    createWikiParameters(parameters).toList()));
                 break;
             case STRIKEDOUT:
-                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRIKE));
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRIKE,
+                    createWikiParameters(parameters).toList()));
                 break;
             case UNDERLINED:
-                // TODO: Not supported by wikimodel yet.
-                // See http://code.google.com/p/wikimodel/issues/detail?id=31
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.INS,
+                    createWikiParameters(parameters).toList()));
+                break;
+            case NONE:
+                this.wikimodelListener.beginFormat(new WikiFormat(createWikiParameters(parameters).toList()));
                 break;
         }
     }
@@ -87,23 +93,29 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#endFormat(org.xwiki.rendering.listener.Format)
+     * @see Listener#endFormat(Format, Map)
      */
-    public void endFormat(Format format)
+    public void endFormat(Format format, Map<String, String> parameters)
     {
         switch (format) {
             case BOLD:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG, 
+                    createWikiParameters(parameters).toList()));
                 break;
             case ITALIC:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM,
+                    createWikiParameters(parameters).toList()));
                 break;
             case STRIKEDOUT:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRIKE));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRIKE,
+                    createWikiParameters(parameters).toList()));
                 break;
             case UNDERLINED:
-                // TODO: Not supported by wikimodel yet.
-                // See http://code.google.com/p/wikimodel/issues/detail?id=31
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.INS,
+                    createWikiParameters(parameters).toList()));
+                break;
+            case NONE:
+                this.wikimodelListener.endFormat(new WikiFormat(createWikiParameters(parameters).toList()));
                 break;
         }
     }

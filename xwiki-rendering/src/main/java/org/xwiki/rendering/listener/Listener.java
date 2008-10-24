@@ -58,17 +58,19 @@ public interface Listener
      * End of a text formatting block.
      * 
      * @param format the formatting type (bold, italic, etc)
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see Format
      */
-    void beginFormat(Format format);
+    void beginFormat(Format format, Map<String, String> parameters);
 
     /**
      * End of a text formatting block.
      * 
      * @param format the formatting type (bold, italic, etc)
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see Format
      */
-    void endFormat(Format format);
+    void endFormat(Format format, Map<String, String> parameters);
 
     /**
      * Start of a paragraph.

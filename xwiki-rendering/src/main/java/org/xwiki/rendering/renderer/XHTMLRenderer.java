@@ -164,9 +164,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#beginFormat(org.xwiki.rendering.listener.Format)
+     * @see Renderer#beginFormat(Format, Map)
      */
-    public void beginFormat(Format format)
+    public void beginFormat(Format format, Map<String, String> parameters)
     {
         switch (format) {
             case BOLD:
@@ -191,15 +191,21 @@ public class XHTMLRenderer extends AbstractPrintRenderer
                 getXHTMLWikiPrinter().printXMLStartElement("tt");
                 break;
         }
+        if (!parameters.isEmpty()) {
+            getXHTMLWikiPrinter().printXMLStartElement("span", parameters);
+        }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#endFormat(org.xwiki.rendering.listener.Format)
+     * @see Renderer#endFormat(Format, Map)
      */
-    public void endFormat(Format format)
+    public void endFormat(Format format, Map<String, String> parameters)
     {
+        if (!parameters.isEmpty()) {
+            getXHTMLWikiPrinter().printXMLEndElement("span");
+        }
         switch (format) {
             case BOLD:
                 getXHTMLWikiPrinter().printXMLEndElement("strong");

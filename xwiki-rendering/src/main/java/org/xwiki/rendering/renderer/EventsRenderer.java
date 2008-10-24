@@ -56,65 +56,21 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#beginFormat(org.xwiki.rendering.listener.Format)
+     * @see Listener#beginFormat(Format, Map)
      */
-    public void beginFormat(Format format)
+    public void beginFormat(Format format, Map<String, String> parameters)
     {
-        switch (format) {
-            case BOLD:
-                println("beginBold");
-                break;
-            case ITALIC:
-                println("beginItalic");
-                break;
-            case STRIKEDOUT:
-                println("beginStrikedOut");
-                break;
-            case UNDERLINED:
-                println("beginUnderline");
-                break;
-            case SUPERSCRIPT:
-                println("beginSuperscript");
-                break;
-            case SUBSCRIPT:
-                println("beginSubscript");
-                break;
-            case MONOSPACE:
-                println("beginMonospace");
-                break;
-        }
+        println("beginFormat: [" + format + "]" + serializeParameters(parameters));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#endFormat(org.xwiki.rendering.listener.Format)
+     * @see Listener#endFormat(Format, Map)
      */
-    public void endFormat(Format format)
+    public void endFormat(Format format, Map<String, String> parameters)
     {
-        switch (format) {
-            case BOLD:
-                println("endBold");
-                break;
-            case ITALIC:
-                println("endItalic");
-                break;
-            case STRIKEDOUT:
-                println("endStrikedOut");
-                break;
-            case UNDERLINED:
-                println("endUnderline");
-                break;
-            case SUPERSCRIPT:
-                println("endSuperscript");
-                break;
-            case SUBSCRIPT:
-                println("endSubscript");
-                break;
-            case MONOSPACE:
-                println("endMonospace");
-                break;
-        }
+        println("endFormat: [" + format + "]" + serializeParameters(parameters));
     }
 
     public void beginParagraph(Map<String, String> parameters)

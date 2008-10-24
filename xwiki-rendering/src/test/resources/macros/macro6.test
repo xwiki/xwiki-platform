@@ -15,9 +15,9 @@ Some **content**
 beginParagraph
 onWord [Some]
 onSpace
-beginBold
+beginFormat: [BOLD]
 onWord [content]
-endBold
+endFormat: [BOLD]
 endParagraph
 endMacroMarker [velocity] [] [
 Some **content**

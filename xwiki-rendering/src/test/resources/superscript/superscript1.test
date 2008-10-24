@@ -11,9 +11,9 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginSuperscript
+beginFormat: [SUPERSCRIPT]
 onWord [superscript]
-endSuperscript
+endFormat: [SUPERSCRIPT]
 endParagraph
 endDocument
 .#-----------------------------------------------------

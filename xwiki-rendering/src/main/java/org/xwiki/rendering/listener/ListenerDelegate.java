@@ -29,11 +29,11 @@ public class ListenerDelegate implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginFormat(Format)
+     * @see org.xwiki.rendering.listener.Listener#beginFormat(Format, Map)
      */
-    public void beginFormat(Format format)
+    public void beginFormat(Format format, Map<String, String> parameters)
     {
-        this.listener.beginFormat(format);
+        this.listener.beginFormat(format, parameters);
     }
 
     public void beginList(ListType listType, Map<String, String> parameters)
@@ -69,11 +69,11 @@ public class ListenerDelegate implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endFormat(Format)
+     * @see org.xwiki.rendering.listener.Listener#endFormat(Format, Map)
      */
-    public void endFormat(Format format)
+    public void endFormat(Format format, Map<String, String> parameters)
     {
-        this.listener.endFormat(format);
+        this.listener.endFormat(format, parameters);
     }
 
     public void endList(ListType listType, Map<String, String> parameters)

@@ -11,15 +11,15 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginBold
+beginFormat: [BOLD]
 onWord [bold]
 onSpace
 onWord [and]
 onSpace
-beginItalic
+beginFormat: [ITALIC]
 onWord [italic]
-endItalic
-endBold
+endFormat: [ITALIC]
+endFormat: [BOLD]
 endParagraph
 endDocument
 .#-----------------------------------------------------

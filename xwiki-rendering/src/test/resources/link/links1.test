@@ -48,9 +48,9 @@ beginLink [Reference = [Page|Name]] [false]
 endLink [Reference = [Page|Name]] [false]
 onLineBreak
 beginLink [Reference = [Page]] [false]
-beginBold
+beginFormat: [BOLD]
 onWord [hello]
-endBold
+endFormat: [BOLD]
 endLink [Reference = [Page]] [false]
 onLineBreak
 beginLink [Reference = [Page]] [false]

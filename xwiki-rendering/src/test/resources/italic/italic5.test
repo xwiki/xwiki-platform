@@ -7,14 +7,14 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginItalic
+beginFormat: [ITALIC]
 onSpace
 onWord [This]
 onSpace
 onWord [is]
 onSpace
 onWord [italic]
-endItalic
+endFormat: [ITALIC]
 endParagraph
 endDocument
 .#-----------------------------------------------------

@@ -11,10 +11,10 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginBold
+beginFormat: [BOLD]
 onSpecialSymbol [*]
 onWord [bold]
-endBold
+endFormat: [BOLD]
 onSpecialSymbol [*]
 endParagraph
 endDocument

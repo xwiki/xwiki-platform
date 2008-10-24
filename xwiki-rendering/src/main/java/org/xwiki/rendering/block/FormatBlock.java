@@ -61,7 +61,7 @@ public class FormatBlock extends AbstractFatherBlock
      */
     public void before(Listener listener)
     {
-        listener.beginFormat(getFormat());
+        listener.beginFormat(getFormat(), getParameters());
     }
 
     /**
@@ -70,6 +70,6 @@ public class FormatBlock extends AbstractFatherBlock
      */
     public void after(Listener listener)
     {
-        listener.endFormat(getFormat());
+        listener.endFormat(getFormat(), getParameters());
     }
 }

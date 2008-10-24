@@ -82,7 +82,7 @@
     <dependency>
       <groupId>org.wikimodel</groupId>
       <artifactId>org.wikimodel.wem</artifactId>
-      <version>2.0.7-20081022</version>
+      <version>2.0.7-20081024</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>

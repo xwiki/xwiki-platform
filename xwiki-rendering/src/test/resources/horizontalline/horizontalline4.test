@@ -7,9 +7,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginStrikedOut
+beginFormat: [STRIKEDOUT]
 onSpecialSymbol [-]
-endStrikedOut
+endFormat: [STRIKEDOUT]
 endParagraph
 endDocument
 .#-----------------------------------------------------

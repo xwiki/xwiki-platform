@@ -23,7 +23,6 @@ endDocument
 (% param1="value1" param2="value2" %)
 * item
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=39 
 <html><ul param1="value1" param2="value2"><li>item</li></ul></html>

@@ -30,7 +30,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * Implementation for Block operations. All blocks should extend this class.
+ * Implementation for Block operations. All blocks should extend this class. Supports the notion of parameters
+ * which can be added to a block (see {@link #setParameter(String, Object)} for more details).
  * 
  * @version $Id$
  * @since 1.5M2
@@ -199,6 +200,7 @@ public abstract class AbstractBlock implements Block
      * 
      * @param parameters the parameters to set
      * @see #setParameter(String, Object)
+     * @since 1.7M2
      */
     public void setParameters(Map<String, String> parameters)
     {

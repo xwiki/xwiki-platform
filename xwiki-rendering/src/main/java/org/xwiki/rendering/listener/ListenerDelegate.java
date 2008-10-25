@@ -194,11 +194,11 @@ public class ListenerDelegate implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
      */
-    public void onVerbatimStandalone(String protectedString)
+    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
-        this.listener.onVerbatimStandalone(protectedString);
+        this.listener.onVerbatimStandalone(protectedString, parameters);
     }
 
     /**

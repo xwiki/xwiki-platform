@@ -221,11 +221,11 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
      */
-    public void onVerbatimStandalone(String protectedString)
+    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
-        println("onVerbatimStandalone [" + protectedString + "]");
+        println("onVerbatimStandalone [" + protectedString + "]" + serializeParameters(parameters));
     }
 
     /**

@@ -357,9 +357,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         } else {
             this.listStyle.append("1");
         }
-        if (!parameters.isEmpty()) {
-            printParameters(parameters);
-        }
+        printParameters(parameters);
 
         this.listDepth++;
     }
@@ -491,11 +489,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onVerbatimStandalone(String)
+     * @see org.xwiki.rendering.renderer.Renderer#onVerbatimStandalone(String, Map)
      */
-    public void onVerbatimStandalone(String protectedString)
+    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
         printNewLine();
+        printParameters(parameters);
         onVerbatimInline(protectedString);
     }
 

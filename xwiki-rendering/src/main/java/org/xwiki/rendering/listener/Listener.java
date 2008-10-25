@@ -424,6 +424,7 @@ public interface Listener
      * A portion of text that shouldn't be rendered and that is located on one or several lines by itself.
      * 
      * @param protectedString the string to protected from rendering
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
-    void onVerbatimStandalone(String protectedString);
+    void onVerbatimStandalone(String protectedString, Map<String, String> parameters);
 }

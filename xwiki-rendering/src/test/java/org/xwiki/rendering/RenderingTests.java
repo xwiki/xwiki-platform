@@ -74,6 +74,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("verbatim/verbatim3", false);
         suite.addTestsFromResource("verbatim/verbatim4", false);
         suite.addTestsFromResource("verbatim/verbatim5", false);
+        suite.addTestsFromResource("verbatim/verbatim6", false);
 
         // Table formatting
         suite.addTestsFromResource("table/table1", false);

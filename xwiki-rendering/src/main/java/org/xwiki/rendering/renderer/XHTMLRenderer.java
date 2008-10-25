@@ -540,11 +540,11 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onVerbatimStandalone(String)
+     * @see org.xwiki.rendering.renderer.Renderer#onVerbatimStandalone(String, Map)
      */
-    public void onVerbatimStandalone(String protectedString)
+    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
-        getXHTMLWikiPrinter().printXMLStartElement("pre");
+        getXHTMLWikiPrinter().printXMLStartElement("pre", parameters);
         getXHTMLWikiPrinter().printXML(protectedString);
         getXHTMLWikiPrinter().printXMLEndElement("pre");
     }

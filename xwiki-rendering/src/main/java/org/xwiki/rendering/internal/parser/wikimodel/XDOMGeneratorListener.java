@@ -520,11 +520,11 @@ public class XDOMGeneratorListener implements IWemListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.wikimodel.wem.IWemListener#onVerbatimBlock(String)
+     * @see org.wikimodel.wem.IWemListener#onVerbatimBlock(String, WikiParameters)
      */
-    public void onVerbatimBlock(String protectedString)
+    public void onVerbatimBlock(String protectedString, WikiParameters params)
     {
-        this.stack.push(new VerbatimStandaloneBlock(protectedString));
+        this.stack.push(new VerbatimStandaloneBlock(protectedString, convertParameters(params)));
     }
 
     /**

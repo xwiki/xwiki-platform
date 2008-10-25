@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.block;
 
+import java.util.Map;
+
 /**
  * Common implementation for standalone verbatim blocks and inline verbatim blocks.
  *
@@ -37,6 +39,16 @@ public abstract class AbstractVerbatimBlock extends AbstractBlock implements Ver
      */
     public AbstractVerbatimBlock(String protectedString)
     {
+        this.protectedString = protectedString;
+    }
+
+    /**
+     * @param protectedString the string to protect from rendering
+     * @param parameters the parameters to set
+     */
+    public AbstractVerbatimBlock(String protectedString, Map<String, String> parameters)
+    {
+        super(parameters);
         this.protectedString = protectedString;
     }
 

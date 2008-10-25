@@ -255,6 +255,7 @@ public class DoxiaGeneratorListener implements Listener
      */
     public void onHorizontalLine(Map<String, String> parameters)
     {
+        // TODO: Handle parameters
         this.sink.horizontalRule();
     }
 
@@ -283,10 +284,11 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
      */
-    public void onVerbatimStandalone(String protectedString)
+    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
+        // TODO: Handle parameters
         onVerbatimInline(protectedString);
     }
 

@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.block;
 
+import java.util.Map;
+
 import org.xwiki.rendering.listener.Listener;
 
 /**
@@ -40,10 +42,19 @@ public class VerbatimStandaloneBlock extends AbstractVerbatimBlock
 
     /**
      * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractVerbatimBlock#AbstractVerbatimBlock(String, Map)
+     */
+    public VerbatimStandaloneBlock(String protectedString, Map<String, String> parameters)
+    {
+        super(protectedString, parameters);
+    }
+    
+    /**
+     * {@inheritDoc}
      * @see org.xwiki.rendering.block.AbstractVerbatimBlock#traverse(org.xwiki.rendering.listener.Listener)
      */
     public void traverse(Listener listener)
     {
-        listener.onVerbatimStandalone(getProtectedString());
+        listener.onVerbatimStandalone(getProtectedString(), getParameters());
     }
 }

@@ -274,11 +274,11 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
      */
-    public void onVerbatimStandalone(String protectedString)
+    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
-        this.wikimodelListener.onVerbatimBlock(protectedString);
+        this.wikimodelListener.onVerbatimBlock(protectedString, createWikiParameters(parameters));
     }
 
     /**

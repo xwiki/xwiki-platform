@@ -82,7 +82,7 @@
     <dependency>
       <groupId>org.wikimodel</groupId>
       <artifactId>org.wikimodel.wem</artifactId>
-      <version>2.0.7-20081024</version>
+      <version>2.0.7-20081025</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>
@@ -151,6 +151,7 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.3-SNAPSHOT</version>
         <dependencies>
           <dependency>
             <groupId>com.xpn.xwiki.platform.tools</groupId>
@@ -161,22 +162,7 @@
         <configuration>
           <includes>
             **/Listener.java
-            **/block/Block.java
-            **/block/FatherBlock.java
-            **/block/AbstractBlock.java
-            **/block/AbstractFatherBlock.java
-            **/block/*ListBlock.java
-            **/block/FormatBlock.java
-            **/block/EscapeBlock.java
-            **/block/HorizontalLineBlock.java
-            **/block/IdBlock.java
-            **/block/LineBreakBlock.java
-            **/block/LinkBlock.java
-            **/block/ListItemBlock.java
-            **/block/NewLineBlock.java
-            **/block/MacroBlock.java
-            **/block/XDOM.java
-            **/block/Table*.java
+            **/block/*.java
           </includes>
         </configuration>
       </plugin>

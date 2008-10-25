@@ -17,7 +17,6 @@ org.radeox.filter.StrikeThroughFilter
 org.radeox.filter.ParagraphFilter
 com.xpn.xwiki.render.filter.StrongFilter
 org.radeox.filter.ItalicFilter
-org.radeox.filter.KeyFilter
 org.radeox.filter.TypographyFilter
 # Restore the remove Code macro content to that it can be evaluated by the CodeFilter filter
 com.xpn.xwiki.render.filter.CodeRestoreFilter

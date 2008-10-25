@@ -30,7 +30,7 @@ import org.apache.commons.beanutils.converters.AbstractConverter;
  * @version $Id: $
  * @since 1.6M2
  */
-public class ColorConverter extends AbstractConverter
+public final class ColorConverter extends AbstractConverter
 {
     private static final ColorConverter instance = new ColorConverter();
 
@@ -86,7 +86,7 @@ public class ColorConverter extends AbstractConverter
     }
 
     /**
-     * Parsers a String in the form "x, y, z" into an SWT RGB class
+     * Parsers a String in the form "x, y, z" into an SWT RGB class.
      * 
      * @param value
      * @return RGB
@@ -149,7 +149,6 @@ public class ColorConverter extends AbstractConverter
 
     protected int parseNumber(String text)
     {
-        text = text.trim();
         return Integer.parseInt(text.trim());
     }
 }

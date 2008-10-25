@@ -46,6 +46,8 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.parser.LinkParser;
 
 /**
+ * Doxia Sink that generates a XWiki {@link XDOM} object containing page Blocks.
+ * 
  * @version $Id$
  * @since 1.5M2
  */

@@ -62,7 +62,7 @@ public abstract class AbstractBlock implements Block
     }
 
     /**
-     * Construct a block with parameters
+     * Construct a block with parameters.
      * 
      * @param parameters the parameters to set
      */

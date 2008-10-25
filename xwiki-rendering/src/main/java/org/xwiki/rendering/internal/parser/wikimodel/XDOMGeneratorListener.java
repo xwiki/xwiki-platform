@@ -133,7 +133,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginInfoBlock(char infoType, WikiParameters params)
     {
-        System.out.println("beginInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
+        throw new RuntimeException("beginInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
     }
 
     public void beginList(WikiParameters params, boolean ordered)
@@ -153,12 +153,12 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginPropertyBlock(String propertyUri, boolean doc)
     {
-        System.out.println("beginPropertyBlock(" + propertyUri + ", " + doc + ") (not handled yet)");
+        throw new RuntimeException("beginPropertyBlock(" + propertyUri + ", " + doc + ") (not handled yet)");
     }
 
     public void beginPropertyInline(String str)
     {
-        System.out.println("beginPropertyInline(" + str + ") (not handled yet)");
+        throw new RuntimeException("beginPropertyInline(" + str + ") (not handled yet)");
     }
 
     public void beginQuotation(WikiParameters params)
@@ -264,7 +264,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endInfoBlock(char infoType, WikiParameters params)
     {
-        System.out.println("endInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
+        throw new RuntimeException("endInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
     }
 
     public void endList(WikiParameters params, boolean ordered)
@@ -291,12 +291,12 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endPropertyBlock(String propertyUri, boolean doc)
     {
-        System.out.println("endPropertyBlock(" + propertyUri + ", " + doc + ") (not handled yet)");
+        throw new RuntimeException("endPropertyBlock(" + propertyUri + ", " + doc + ") (not handled yet)");
     }
 
     public void endPropertyInline(String inlineProperty)
     {
-        System.out.println("endPropertyInline(" + inlineProperty + ") (not handled yet)");
+        throw new RuntimeException("endPropertyInline(" + inlineProperty + ") (not handled yet)");
     }
 
     public void endQuotation(WikiParameters params)
@@ -353,12 +353,12 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void onExtensionBlock(String extensionName, WikiParameters params)
     {
-        System.out.println("onExtensionBlock(" + extensionName + ", " + params + ") (not handled yet)");
+        throw new RuntimeException("onExtensionBlock(" + extensionName + ", " + params + ") (not handled yet)");
     }
 
     public void onExtensionInline(String extensionName, WikiParameters params)
     {
-        System.out.println("onExtensionInline(" + extensionName + ", " + params + ") (not handled yet)");
+        throw new RuntimeException("onExtensionInline(" + extensionName + ", " + params + ") (not handled yet)");
     }
 
     /**
@@ -514,7 +514,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onTableCaption(String str)
     {
-        System.out.println("onTableCaption(" + str + ") (not handled yet)");
+        throw new RuntimeException("onTableCaption(" + str + ") (not handled yet)");
     }
 
     /**

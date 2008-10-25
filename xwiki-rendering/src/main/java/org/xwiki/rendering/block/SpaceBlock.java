@@ -25,7 +25,7 @@ import org.xwiki.rendering.listener.Listener;
  * @version $Id$
  * @since 1.5M2
  */
-public class SpaceBlock extends AbstractBlock
+public final class SpaceBlock extends AbstractBlock
 {
     public static final SpaceBlock SPACE_BLOCK = new SpaceBlock();
 

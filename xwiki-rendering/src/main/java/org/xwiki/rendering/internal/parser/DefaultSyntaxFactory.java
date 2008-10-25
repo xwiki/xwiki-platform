@@ -65,7 +65,7 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
      */
     public void initialize() throws InitializationException
     {
-        List<Syntax> syntaxes = new ArrayList<Syntax>();
+        List<Syntax> syntaxList = new ArrayList<Syntax>();
         List<Parser> parsers;
         try {
             parsers = this.componentManager.lookupList(Parser.ROLE);
@@ -74,10 +74,10 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
         }
 
         for (Parser parser : parsers) {
-            syntaxes.add(parser.getSyntax());
+            syntaxList.add(parser.getSyntax());
         }
 
-        this.syntaxes = syntaxes;
+        this.syntaxes = syntaxList;
     }
 
     public Syntax createSyntaxFromIdString(String syntaxIdAsString) throws ParseException

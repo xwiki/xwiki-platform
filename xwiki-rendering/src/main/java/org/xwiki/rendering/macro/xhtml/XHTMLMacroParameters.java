@@ -30,7 +30,7 @@ public class XHTMLMacroParameters
     /**
      * Indicate if the user has asked to escape wiki syntax or not.
      */
-    boolean escapeWikiSyntax;
+    private boolean escapeWikiSyntax;
 
     /**
      * @return indicate if the user has asked to escape wiki syntax or not.

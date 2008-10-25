@@ -55,7 +55,8 @@ public class XWikiCommentHandler extends CommentHandler
 
     private String reference;
     
-    public XWikiCommentHandler(Parser parser, LinkParser linkParser, XWikiURLFactory urlFactory, PrintRendererFactory printRendererFactory)
+    public XWikiCommentHandler(Parser parser, LinkParser linkParser, XWikiURLFactory urlFactory, 
+        PrintRendererFactory printRendererFactory)
     {
         this.parser = parser;
         this.linkParser = linkParser;
@@ -85,9 +86,9 @@ public class XWikiCommentHandler extends CommentHandler
             if (isFreeStandingLink) {
                 stack.getScannerContext().onReference(this.reference);
             } else {
-                WikiReference reference = this.referenceParser.parse(
+                WikiReference wikiReference = this.referenceParser.parse(
                     (printer.toString().length() > 0 ? printer.toString() + ">>" : "") + this.reference);
-                stack.getScannerContext().onReference(reference);
+                stack.getScannerContext().onReference(wikiReference);
             }
             
             stack.setStackParameter("xdomGeneratorListener", null);

@@ -43,6 +43,12 @@ public abstract class AbstractFatherBlock extends AbstractBlock implements Fathe
         this(childrenBlocks, Collections.<String, String> emptyMap());
     }
 
+    /**
+     * Construct a block with children blocks and parameters.
+     * 
+     * @param childrenBlocks the list of children blocks of the block to construct
+     * @param parameters the parameters to set
+     */
     public AbstractFatherBlock(List<Block> childrenBlocks, Map<String, String> parameters)
     {
         super(parameters);

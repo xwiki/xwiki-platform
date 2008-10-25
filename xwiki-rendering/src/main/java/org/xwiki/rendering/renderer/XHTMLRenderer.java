@@ -29,9 +29,6 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
-import org.xwiki.rendering.renderer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.Renderer;
-import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
@@ -108,6 +105,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * @param printer the object to which to write the XHTML output to
      * @param documentAccessBridge see {@link #documentAccessBridge}
+     * @param configuration the rendering configuration
      */
     public XHTMLRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
         RenderingConfiguration configuration)
@@ -508,7 +506,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         // Note: We're using <a><a/> and not <a/> since some browsers do not support the <a/> syntax (FF3)
         // when the content type is set to HTML instead of XHTML.
-        getXHTMLWikiPrinter().printXMLStartElement("a", new String[][] { {"id", name}, {"name", name}});
+        getXHTMLWikiPrinter().printXMLStartElement("a", new String[][] {{"id", name}, {"name", name}});
         getXHTMLWikiPrinter().printXMLEndElement("a");
     }
 

@@ -30,7 +30,6 @@ import org.dom4j.tree.DefaultElement;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.xwiki.rendering.renderer.WikiPrinter;
 
 /**
  * Base toolkit class for all xml based renderers.
@@ -46,7 +45,6 @@ public class XHTMLWikiPrinter
 
     /**
      * @param printer the object to which to write the XHTML output to
-     * @param documentAccessBridge see {@link #documentAccessBridge}
      */
     public XHTMLWikiPrinter(WikiPrinter printer)
     {
@@ -130,7 +128,7 @@ public class XHTMLWikiPrinter
     }
 
     /**
-     * Print the start tag of xml element. In the form <name>.
+     * Print the start tag of xml element. In the form &lt;name&gt;.
      */
     public void printXMLStartElement(String name)
     {
@@ -138,7 +136,7 @@ public class XHTMLWikiPrinter
     }
 
     /**
-     * Print the start tag of xml element. In the form <name att1="value1" att2="value2">.
+     * Print the start tag of xml element. In the form &lt;name att1="value1" att2="value2"&gt;.
      */
     public void printXMLStartElement(String name, String[][] attributes)
     {
@@ -146,7 +144,7 @@ public class XHTMLWikiPrinter
     }
 
     /**
-     * Print the start tag of xml element. In the form <name att1="value1" att2="value2">.
+     * Print the start tag of xml element. In the form &lt;name att1="value1" att2="value2"&gt;.
      */
     public void printXMLStartElement(String name, Map<String, String> attributes)
     {
@@ -154,7 +152,7 @@ public class XHTMLWikiPrinter
     }
 
     /**
-     * Print the start tag of xml element. In the form <name att1="value1" att2="value2">.
+     * Print the start tag of xml element. In the form &lt;name att1="value1" att2="value2"&gt;.
      */
     public void printXMLStartElement(String name, Attributes attributes)
     {
@@ -166,7 +164,7 @@ public class XHTMLWikiPrinter
     }
 
     /**
-     * Print the end tag of xml element. In the form </name>.
+     * Print the end tag of xml element. In the form &lt;/name&gt;.
      */
     public void printXMLEndElement(String name)
     {

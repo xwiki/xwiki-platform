@@ -29,7 +29,7 @@ import org.xwiki.rendering.listener.Listener;
  * @since 1.5M2
  * @see LineBreakBlock
  */
-public class NewLineBlock extends AbstractBlock
+public final class NewLineBlock extends AbstractBlock
 {
     /**
      * The single instance for a new line block. There's no need for more than one instance since there's

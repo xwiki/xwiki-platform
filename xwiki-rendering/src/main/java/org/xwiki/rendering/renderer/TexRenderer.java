@@ -28,12 +28,12 @@ public class TexRenderer extends ListenerDelegate implements PrintRenderer
 {
     private WikiPrinter printer;
 
-	public TexRenderer(WikiPrinter printer)
-	{
+    public TexRenderer(WikiPrinter printer)
+    {
         this.printer = printer;
         setWrappedListener(new WikiModelGeneratorListener(
-				new TexSerializer(new WikiModelPrinterAdapter(getPrinter()), null, null, null)));
-	}
+            new TexSerializer(new WikiModelPrinterAdapter(getPrinter()), null, null, null)));
+    }
 
     /**
      * {@inheritDoc}

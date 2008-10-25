@@ -37,17 +37,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 public abstract class AbstractBlock implements Block
 {
+    /**
+     * Store parameters, see {@link #setParameter(String, Object)} for more explanations on what parameters are.
+     */
     private Map<String, String> parameters = new LinkedHashMap<String, String>();
-
-    public AbstractBlock()
-    {
-        // Nothing to do
-    }
-
-    public AbstractBlock(Map<String, String> parameters)
-    {
-        this.parameters.putAll(parameters);
-    }
 
     /**
      * The Blocks this Block contains.
@@ -59,6 +52,24 @@ public abstract class AbstractBlock implements Block
      */
     private Block parentBlock;
 
+    /**
+     * Empty constructor to construct an empty block.
+     */
+    public AbstractBlock()
+    {
+        // Nothing to do
+    }
+
+    /**
+     * Construct a block with parameters
+     * 
+     * @param parameters the parameters to set
+     */
+    public AbstractBlock(Map<String, String> parameters)
+    {
+        this.parameters.putAll(parameters);
+    }
+    
     /**
      * {@inheritDoc}
      * 
@@ -135,21 +146,49 @@ public abstract class AbstractBlock implements Block
         return this.parentBlock;
     }
 
+    /**
+     * @return all parameters
+     */
     public Map<String, String> getParameters()
     {
         return Collections.unmodifiableMap(this.parameters);
     }
 
+    /**
+     * See {@link #setParameter(String, Object)} for detailed explanations on parameters.
+     * 
+     * @param name the name of the parameter to return
+     * @return the parameter or null if the parameter doesn't exist
+     */
     public String getParameter(String name)
     {
         return this.parameters.get(name);
     }
 
+    /**
+     * Set a parameter on the current block. See {@link #setParameter(String, Object)} for more details.
+     * 
+     * @param name the parameter's name
+     * @param value the parameter's value
+     */
     public void setParameter(String name, String value)
     {
         this.parameters.put(name, value);
     }
 
+    /**
+     * Set a parameter on the current block. A parameter is any semantic data associated with a block.
+     * It can be used for various purposes and provide additional information to the renderers/listeners.
+     * For example you can pass style information such as <code>style="color:red"</code> (in that example
+     * the name would be <code>style</code> and the value <code>"color:red"</code>) to indicate that the
+     * current block should be displayed in red.
+     * 
+     * <p>Note that there are currently no well-defined known parameter names and you'll need to check what
+     * the different renderers/listeners support to know what to use.</p>
+     * 
+     * @param name the parameter's name
+     * @param value the parameter's value
+     */
     public void setParameter(String name, Object value)
     {
         setParameter(name, ConvertUtils.convert(value));
@@ -159,6 +198,7 @@ public abstract class AbstractBlock implements Block
      * Set several parameters at once.
      * 
      * @param parameters the parameters to set
+     * @see #setParameter(String, Object)
      */
     public void setParameters(Map<String, String> parameters)
     {

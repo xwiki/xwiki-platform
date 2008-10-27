@@ -70,7 +70,7 @@ public class StyleExecutable extends DefaultExecutable
         return propertyName;
     }
 
-    public String getProeprtyValue()
+    public String getPropertyValue()
     {
         return propertyValue;
     }

@@ -263,7 +263,14 @@ public final class IERange extends AbstractRange<NativeRange>
     public Node getCommonAncestorContainer()
     {
         if (getJSRange() instanceof TextRange) {
-            return ((TextRange) getJSRange()).getParentElement();
+            Node startContainer = getStartContainer();
+            // If the range is within a text node then the common ancestor container is that text node.
+            if (startContainer.getNodeType() == Node.TEXT_NODE
+                && (isCollapsed() || startContainer == getEndContainer())) {
+                return startContainer;
+            } else {
+                return ((TextRange) getJSRange()).getParentElement();
+            }
         } else {
             return ((ControlRange) getJSRange()).get(0).getParentNode();
         }

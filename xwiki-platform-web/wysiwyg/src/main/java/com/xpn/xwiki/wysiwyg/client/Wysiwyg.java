@@ -37,6 +37,11 @@ import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditor;
 import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditorDebugger;
 import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditorFactory;
 
+/**
+ * The class responsible for loading the WYSIWYG editors. It can be also viewed as the application context.
+ * 
+ * @version $Id$
+ */
 public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 {
     /**
@@ -46,7 +51,10 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
      */
     public void onModuleLoad()
     {
+        setName("Wysiwyg");
+        // Test to see if we're running in hosted mode or web mode.
         if (!GWT.isScript()) {
+            // We're running in hosted mode so we need to login first.
             getXWikiServiceInstance().login("Admin", "admin", true, new XWikiAsyncCallback(this)
             {
                 public void onFailure(Throwable caught)
@@ -65,9 +73,11 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
         }
     }
 
+    /**
+     * Loads all the WYSIWYG editors on the host page.
+     */
     private void loadUI()
     {
-        setName("Wysiwyg");
         for (final Config config : getConfigs()) {
             String hookId = config.getParameter("hookId");
             if (hookId == null) {
@@ -121,6 +131,9 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
         }
     }
 
+    /**
+     * @return The list of configuration objects present in the host page.
+     */
     private List<Config> getConfigs()
     {
         List<Config> configs = new ArrayList<Config>();
@@ -133,11 +146,19 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
         return configs;
     }
 
+    /**
+     * Retrieves the configuration object associated with the WYSIWYG editor with the specified index. We can have more
+     * than one WYSIWYG editor in a host page and thus each editor will have an index. The first index is 0. A
+     * configuration object is a JavaScript object that can be loaded with GWT's {@link Dictionary} mechanism.
+     * 
+     * @param index The index of the editor whose configuration object must be retrieved.
+     * @return The configuration object for the specified editor.
+     */
     private Config getConfig(int index)
     {
         Dictionary dictionary = null;
         try {
-            dictionary = Dictionary.getDictionary("Wysiwyg" + String.valueOf(index));
+            dictionary = Dictionary.getDictionary(getName() + String.valueOf(index));
             return new DefaultConfig(dictionary);
         } catch (MissingResourceException e) {
             return null;

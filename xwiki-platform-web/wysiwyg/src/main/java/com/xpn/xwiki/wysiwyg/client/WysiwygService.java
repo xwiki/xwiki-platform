@@ -25,12 +25,33 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
+/**
+ * The service interface used on the server.
+ * 
+ * @version $Id$
+ */
 public interface WysiwygService extends RemoteService
 {
+    /**
+     * Utility class for accessing the service stub.
+     */
     public static final class Singleton
     {
+        /**
+         * The service stub.
+         */
         private static WysiwygServiceAsync instance;
 
+        /**
+         * Private constructor because this is a utility class.
+         */
+        private Singleton()
+        {
+        }
+
+        /**
+         * @return The service stub.
+         */
         public static synchronized WysiwygServiceAsync getInstance()
         {
             if (instance == null) {
@@ -39,16 +60,39 @@ public interface WysiwygService extends RemoteService
 
                 instance = (WysiwygServiceAsync) GWT.create(WysiwygService.class);
                 ((ServiceDefTarget) instance).setServiceEntryPoint(baseURL + "WysiwygService");
+
+                // We cache the service calls.
+                instance = new WysiwygServiceAsyncCacheProxy(instance);
             }
             return instance;
         }
     }
 
+    /**
+     * @param html The HTML fragment to be converted.
+     * @param syntax The syntax of the result.
+     * @return The result of converting the given HTML fragment to the specified syntax.
+     */
     String fromHTML(String html, String syntax);
 
+    /**
+     * @param source The text to be converted.
+     * @param syntax The syntax of the given text.
+     * @return The result of converting the given text from the specified syntax to HTML.
+     */
     String toHTML(String source, String syntax);
 
+    /**
+     * @param dirtyHTML The HTML fragment to be cleaned.
+     * @return The result of cleaning the given HTML fragment.
+     */
     String cleanHTML(String dirtyHTML);
 
+    /**
+     * @param syncedRevision The changes to this editor's content, since the last update.
+     * @param pageName The page being edited.
+     * @param version The version affected by syncedRevision.
+     * @return The result of synchronizing this editor with others editing the same page.
+     */
     SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version);
 }

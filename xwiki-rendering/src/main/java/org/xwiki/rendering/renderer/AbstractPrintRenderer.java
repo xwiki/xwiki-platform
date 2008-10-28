@@ -25,7 +25,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 /**
  * Common methods for all {@link org.xwiki.rendering.renderer.PrintRenderer} implementations.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public abstract class AbstractPrintRenderer extends AbstractLogEnabled implements PrintRenderer

@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.renderer;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Stack;
 
@@ -42,12 +41,10 @@ import org.apache.commons.lang.StringUtils;
 public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 {
     private XWikiSyntaxLinkRenderer linkRenderer;
-    
-    private boolean isFirstElementRendered = false;
-    
-    private StringBuffer listStyle = new StringBuffer();
 
-    private boolean isInsideMacroMarker = false;
+    private boolean isFirstElementRendered = false;
+
+    private StringBuffer listStyle = new StringBuffer();
 
     private boolean isBeginListItemFound = false;
 
@@ -68,15 +65,17 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     private int quotationDepth = 0;
 
     private Stack<Boolean> isEndTableRowFoundStack = new Stack<Boolean>();
-    
+
     private XWikiMacroPrinter macroPrinter;
 
     private Stack<WikiPrinter> originalPrinters = new Stack<WikiPrinter>();
-    private WikiPrinter linkBlocksPrinter; 
-    
+
+    private WikiPrinter linkBlocksPrinter;
+
     private Format previousFormat;
+
     private Map<String, String> previousFormatParameters;
-    
+
     public XWikiSyntaxRenderer(WikiPrinter printer)
     {
         super(printer);
@@ -374,7 +373,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             this.isEndListItemFound = false;
             this.isBeginListItemFound = false;
         }
-        
+
         this.isBeginListItemFound = true;
 
         print(this.listStyle.toString());
@@ -440,7 +439,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     {
         // When we encounter a macro marker we ignore all other blocks inside since we're going to use the macro
         // definition wrapped by the macro marker to construct the xwiki syntax.
-        this.isInsideMacroMarker = true;
+        pushVoidPrinter();
     }
 
     /**
@@ -450,7 +449,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        this.isInsideMacroMarker = false;
+        popVoidPrinter();
+
         print(this.macroPrinter.print(name, parameters, content));
     }
 
@@ -785,14 +785,15 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (!parameters.isEmpty()) {
             StringBuffer buffer = new StringBuffer("(%");
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(entry.getValue()).append('\"');
+                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(entry.getValue())
+                    .append('\"');
             }
             buffer.append(" %)");
-    
+
             if (newLine) {
                 buffer.append("\n");
             }
-    
+
             print(buffer.toString());
         }
     }
@@ -811,11 +812,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             this.previousFormatParameters = null;
         }
 
-        if (!this.isInsideMacroMarker) {
-            super.print(text);
-        }
+        super.print(text);
     }
-    
+
     private void printNewLine()
     {
         if (this.isFirstElementRendered) {

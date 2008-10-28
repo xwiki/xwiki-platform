@@ -28,6 +28,8 @@ import org.xwiki.component.logging.AbstractLogEnabled;
  */
 public abstract class AbstractPrintRenderer extends AbstractLogEnabled implements PrintRenderer
 {
+    private WikiPrinter currentPrinter;
+
     private WikiPrinter printer;
 
     public AbstractPrintRenderer(WikiPrinter printer)
@@ -53,6 +55,27 @@ public abstract class AbstractPrintRenderer extends AbstractLogEnabled implement
     public WikiPrinter getPrinter()
     {
         return this.printer;
+    }
+
+    /**
+     * Switch current writer with a writer which do nothing.
+     */
+    protected void pushVoidPrinter()
+    {
+        if (this.printer != VoidWikiPrinter.VOIDWIKIPRINTER) {
+            this.currentPrinter = this.printer;
+            this.printer = VoidWikiPrinter.VOIDWIKIPRINTER;
+        }
+    }
+
+    /**
+     * Restore current printer.
+     */
+    protected void popVoidPrinter()
+    {
+        if (this.printer == VoidWikiPrinter.VOIDWIKIPRINTER) {
+            this.printer = this.currentPrinter;
+        }
     }
 
     protected void setPrinter(WikiPrinter printer)

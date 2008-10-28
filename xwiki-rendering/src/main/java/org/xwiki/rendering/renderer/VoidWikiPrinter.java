@@ -29,7 +29,7 @@ public class VoidWikiPrinter implements WikiPrinter
     /**
      * Unique instance of {@link VoidWikiPrinter}.
      */
-    public static VoidWikiPrinter VOIDWIKIPRINTER = new VoidWikiPrinter();
+    public static final VoidWikiPrinter VOIDWIKIPRINTER = new VoidWikiPrinter();
 
     /**
      * Use {@link #VOIDWIKIPRINTER}.

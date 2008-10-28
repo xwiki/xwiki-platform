@@ -22,7 +22,7 @@ package org.xwiki.rendering.renderer;
 /**
  * A WikiPrinter implementation which does not do anything.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class VoidWikiPrinter implements WikiPrinter
 {

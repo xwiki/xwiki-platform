@@ -20,6 +20,8 @@
 package org.xwiki.rendering.block;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +41,9 @@ public class XMLBlock extends AbstractFatherBlock
     {
         super(childrenBlocks);
         this.name = name;
-        this.attributes = attributes;
+
+        // Make sure we preserve the order provided to us so that getAttributes() will return the same order.
+        this.attributes = new LinkedHashMap<String, String>(attributes);
     }
 
     public XMLBlock(String name, Map<String, String> attributes)
@@ -54,7 +58,7 @@ public class XMLBlock extends AbstractFatherBlock
     
     public Map<String, String> getAttributes() 
     {
-        return this.attributes;
+        return Collections.unmodifiableMap(this.attributes);
     }
     
     public void after(Listener listener)

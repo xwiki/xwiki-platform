@@ -18,6 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */package org.xwiki.rendering.renderer;
 
+import java.util.Stack;
+
 import org.xwiki.component.logging.AbstractLogEnabled;
 
 /**
@@ -28,13 +30,11 @@ import org.xwiki.component.logging.AbstractLogEnabled;
  */
 public abstract class AbstractPrintRenderer extends AbstractLogEnabled implements PrintRenderer
 {
-    private WikiPrinter currentPrinter;
-
-    private WikiPrinter printer;
+    private Stack<WikiPrinter> printers = new Stack<WikiPrinter>();
 
     public AbstractPrintRenderer(WikiPrinter printer)
     {
-        this.printer = printer;
+        this.pushPrinter(printer);
     }
 
     protected void print(String text)
@@ -54,7 +54,25 @@ public abstract class AbstractPrintRenderer extends AbstractLogEnabled implement
      */
     public WikiPrinter getPrinter()
     {
-        return this.printer;
+        return this.printers.peek();
+    }
+
+    /**
+     * Change the current {@link WikiPrinter} with provide one.
+     * 
+     * @param wikiPrinter the {@link WikiPrinter} to use since now.
+     */
+    protected void pushPrinter(WikiPrinter wikiPrinter)
+    {
+        this.printers.push(wikiPrinter);
+    }
+
+    /**
+     * Pop the current {@link WikiPrinter}.
+     */
+    protected void popPrinter()
+    {
+        this.printers.pop();
     }
 
     /**
@@ -62,9 +80,8 @@ public abstract class AbstractPrintRenderer extends AbstractLogEnabled implement
      */
     protected void pushVoidPrinter()
     {
-        if (this.printer != VoidWikiPrinter.VOIDWIKIPRINTER) {
-            this.currentPrinter = this.printer;
-            this.printer = VoidWikiPrinter.VOIDWIKIPRINTER;
+        if (getPrinter() != VoidWikiPrinter.VOIDWIKIPRINTER) {
+            pushPrinter(VoidWikiPrinter.VOIDWIKIPRINTER);
         }
     }
 
@@ -73,14 +90,8 @@ public abstract class AbstractPrintRenderer extends AbstractLogEnabled implement
      */
     protected void popVoidPrinter()
     {
-        if (this.printer == VoidWikiPrinter.VOIDWIKIPRINTER) {
-            this.printer = this.currentPrinter;
+        if (getPrinter() == VoidWikiPrinter.VOIDWIKIPRINTER) {
+            popPrinter();
         }
     }
-
-    protected void setPrinter(WikiPrinter printer)
-    {
-        this.printer = printer;
-    }
-
 }

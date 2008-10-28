@@ -68,17 +68,14 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     private XWikiMacroPrinter macroPrinter;
 
-    private Stack<WikiPrinter> originalPrinters = new Stack<WikiPrinter>();
-
     private WikiPrinter linkBlocksPrinter;
-
-    private Format previousFormat;
 
     private Map<String, String> previousFormatParameters;
 
     public XWikiSyntaxRenderer(WikiPrinter printer)
     {
         super(printer);
+
         this.macroPrinter = new XWikiMacroPrinter();
         this.linkRenderer = new XWikiSyntaxLinkRenderer();
     }
@@ -113,9 +110,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (!isFreeStandingURI) {
             print("[[");
         }
-        this.originalPrinters.push(getPrinter());
+
         this.linkBlocksPrinter = new DefaultWikiPrinter();
-        this.setPrinter(this.linkBlocksPrinter);
+        pushPrinter(this.linkBlocksPrinter);
     }
 
     /**
@@ -126,7 +123,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void endLink(Link link, boolean isFreeStandingURI)
     {
         String content = this.linkBlocksPrinter.toString();
-        setPrinter(this.originalPrinters.pop());
+        popPrinter();
 
         print(this.linkRenderer.renderLink(content, link));
         if (!isFreeStandingURI) {

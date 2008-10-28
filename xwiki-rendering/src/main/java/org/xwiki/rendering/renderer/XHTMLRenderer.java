@@ -21,7 +21,6 @@ package org.xwiki.rendering.renderer;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Stack;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
@@ -54,17 +53,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     private XHTMLLinkRenderer linkRenderer;
 
     private XHTMLMacroRenderer macroRenderer;
-    
+
     private XHTMLIdGenerator idGenerator;
 
     private XHTMLWikiPrinter xhtmlWikiPrinter;
-
-    /**
-     * Used to save the original Printer when we redirect all outputs to a new Printer to compute a section title. We
-     * need to do this since the XHTML we generate for a section title contains a unique id that we generate based on
-     * the section title and the events for the section title are generated after the beginSection() event.
-     */
-    private Stack<WikiPrinter> originalPrinters = new Stack<WikiPrinter>();
 
     /**
      * The temporary Printer used to redirect all outputs when computing the section title.
@@ -72,13 +64,13 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * @see #originalPrinter
      */
     private WikiPrinter sectionTitlePrinter;
-    
+
     public class DelegateWikiPrinter implements WikiPrinter
     {
         private WikiPrinter printer;
-        
-        private boolean hasContentBeenPrinted; 
-        
+
+        private boolean hasContentBeenPrinted;
+
         public DelegateWikiPrinter(WikiPrinter printer)
         {
             this.printer = printer;
@@ -122,14 +114,31 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractPrintRenderer#setPrinter(org.xwiki.rendering.renderer.WikiPrinter)
+     * @see org.xwiki.rendering.renderer.AbstractPrintRenderer#pushPrinter(org.xwiki.rendering.renderer.WikiPrinter)
      */
     @Override
-    public void setPrinter(WikiPrinter printer)
+    protected void pushPrinter(WikiPrinter wikiPrinter)
     {
-        super.setPrinter(printer);
+        super.pushPrinter(wikiPrinter);
 
-        this.xhtmlWikiPrinter.setWikiPrinter(printer);
+        if (this.xhtmlWikiPrinter != null) {
+            this.xhtmlWikiPrinter.setWikiPrinter(getPrinter());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractPrintRenderer#popPrinter()
+     */
+    @Override
+    protected void popPrinter()
+    {
+        super.popPrinter();
+
+        if (this.xhtmlWikiPrinter != null) {
+            this.xhtmlWikiPrinter.setWikiPrinter(getPrinter());
+        }
     }
 
     protected XHTMLWikiPrinter getXHTMLWikiPrinter()
@@ -268,7 +277,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         // Voluntarily do nothing since we want the same behavior as HTML.
     }
-  
+
     /**
      * {@inheritDoc}
      * 
@@ -277,8 +286,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void beginLink(Link link, boolean isFreeStandingURI)
     {
         this.linkRenderer.beginRender(getXHTMLWikiPrinter(), link, isFreeStandingURI);
-        this.originalPrinters.push(getPrinter());
-        this.setPrinter(new DelegateWikiPrinter(getPrinter()));
+        pushPrinter(new DelegateWikiPrinter(getPrinter()));
     }
 
     /**
@@ -289,9 +297,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endLink(Link link, boolean isFreeStandingURI)
     {
         DelegateWikiPrinter printer = (DelegateWikiPrinter) getPrinter();
-        setPrinter(this.originalPrinters.pop());
-        this.linkRenderer.endRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, 
-            !printer.hasContentBeenPrinted);
+        popPrinter();
+        this.linkRenderer.endRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, !printer.hasContentBeenPrinted);
     }
 
     /**
@@ -329,9 +336,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         // Thus we're doing the output in the endSection() event.
 
         // Redirect all output to our writer
-        this.originalPrinters.push(getPrinter());
         this.sectionTitlePrinter = new DefaultWikiPrinter();
-        this.setPrinter(this.sectionTitlePrinter);
+        pushPrinter(this.sectionTitlePrinter);
     }
 
     private void processBeginSection(SectionLevel level, String sectionTitle, Map<String, String> parameters)
@@ -356,7 +362,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endSection(SectionLevel level, Map<String, String> parameters)
     {
         String sectionTitle = this.sectionTitlePrinter.toString();
-        setPrinter(this.originalPrinters.pop());
+        popPrinter();
         processBeginSection(level, sectionTitle, parameters);
         print(sectionTitle);
 
@@ -506,7 +512,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         // Note: We're using <a><a/> and not <a/> since some browsers do not support the <a/> syntax (FF3)
         // when the content type is set to HTML instead of XHTML.
-        getXHTMLWikiPrinter().printXMLStartElement("a", new String[][] {{"id", name}, {"name", name}});
+        getXHTMLWikiPrinter().printXMLStartElement("a", new String[][] { {"id", name}, {"name", name}});
         getXHTMLWikiPrinter().printXMLEndElement("a");
     }
 

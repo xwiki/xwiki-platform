@@ -45,13 +45,13 @@ public class TocMacroParameters
         PAGE;
     };
 
-    private int start;
+    private int start = 2;
 
-    private int depth;
+    private int depth = 6;
 
-    private Scope scope;
+    private Scope scope = Scope.PAGE;
 
-    private boolean numbered;
+    private boolean numbered = false;
 
     /**
      * @return the minimum section level. For example if 2 then level 1 sections will not be listed.

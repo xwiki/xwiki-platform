@@ -50,7 +50,7 @@ public class DefaultHTMLCleanerTest extends TestCase
         this.cleaner = new DefaultHTMLCleaner();
         this.cleaner.initialize();
     }
-
+    
     public void testSpecialCharacters()
     {
         // TODO: We still have a problem I think in that if there are characters such as "&" or quote in the source
@@ -90,6 +90,15 @@ public class DefaultHTMLCleanerTest extends TestCase
         assertHTML("<ol><li><ol><li>item</li></ol></li></ol>", "<ol><ol><li>item</li></ol></ol>");
         assertHTML("<ul><li>item1<ul><li><ul><li>item2</li></ul></li><li>item3</li></ul></li></ul>", 
             "<ul><li>item1</li><ul><ul><li>item2</li></ul><li>item3</li></ul></ul>");
+    }
+
+    /**
+     * Verify that scripts are not cleaned and that we can have a CDATA section inside.
+     */
+    public void testScript()
+    {
+        String script = "<script type=\"text/javascript\">//<![CDATA[alert(\"Hello World\")// ]]></script>"; 
+        assertHTML(script, script);
     }
 
     private void assertHTML(String expected, String actual)

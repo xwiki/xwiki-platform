@@ -98,6 +98,16 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         CleanerProperties cleanerProperties = cleaner.getProperties();
         cleanerProperties.setOmitUnknownTags(true);
 
+        // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if we use
+        // the best practice of using CDATA inside a script. For example:
+        //   <script type="text/javascript">
+        //     //<![CDATA[
+        //     ...
+        //     // ]]>
+        //   </script>
+        // Thus we need to turn off this feature.
+        cleanerProperties.setUseCdataForScriptAndStyle(false);
+        
         TagNode cleanedNode;
         try {
             cleanedNode = cleaner.clean(originalHtmlContent);

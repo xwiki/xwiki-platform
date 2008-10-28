@@ -34,6 +34,9 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -46,9 +49,6 @@ import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
 
@@ -173,9 +173,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 if (list == null) {
                     try {
                         list =
-                            context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser").bindValue(
-                                "username", username).bindValue("shortname", shortname).bindValue("veryshortname",
-                                veryshortname).execute();
+                            context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
+                                .bindValue("username", username).bindValue("shortname", shortname).bindValue(
+                                    "veryshortname", veryshortname).execute();
                     } catch (QueryException ex) {
                         throw new XWikiException(0, 0, ex.getMessage(), ex);
                     }
@@ -433,7 +433,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      *            <li>fiedname : the name of the field</li>
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
-     *            </ul> .
+     *            </ul>
      * @param order the field to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
@@ -541,7 +541,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      *            <li>fiedname : the name of the field</li>
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
-     *            </ul> .
+     *            </ul>
      * @param withdetails indicate if a {@link List} containing {@link String} names is returned or {@link List}
      *            containing {@link XWikiDocument}.
      * @param nb the maximum number od result to return.
@@ -579,9 +579,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
 
             try {
                 groups =
-                    context.getWiki().getStore().getQueryManager().createQuery(
-                        "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS) + "]/@fullName",
-                        Query.XPATH).setLimit(nb).setOffset(start).execute();
+                    context.getWiki().getStore().getQueryManager()
+                        .createQuery(
+                            "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS)
+                                + "]/@fullName", Query.XPATH).setLimit(nb).setOffset(start).execute();
             } catch (QueryException ex) {
                 throw new XWikiException(0, 0, ex.getMessage(), ex);
             }
@@ -599,7 +600,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      *            <li>fiedname : the name of the field</li>
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
-     *            </ul> .
+     *            </ul>
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user or group to return.
      * @param context the {@link XWikiContext}.
@@ -668,14 +669,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         queryString.append(" FROM XWikiDocument as doc, BaseObject as obj, StringProperty as field");
 
         // Add where clause
-        queryString
-            .append(" WHERE doc.fullName=:groupdocname and doc.fullName=obj.name and obj.className=:groupclassname and obj.id=field.id.id");
+        queryString.append(" WHERE doc.fullName=:groupdocname and doc.fullName=obj.name "
+            + "and obj.className=:groupclassname and obj.id=field.id.id");
         parameterValues.put("groupdocname", groupFullName);
         parameterValues.put("groupclassname", CLASS_XWIKIGROUPS);
 
         queryString.append(" and trim(both from field.value)<>:emptystring");
         parameterValues.put("emptystring", "");
-        
+
         if (matchField != null) {
             queryString.append(" and lower(field.value) like :matchfield");
             parameterValues.put("matchfield", HQLLIKE_ALL_SYMBOL + matchField.toLowerCase() + HQLLIKE_ALL_SYMBOL);

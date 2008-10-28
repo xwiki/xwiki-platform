@@ -102,6 +102,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/toc/macrotoc1", true);
         suite.addTestsFromResource("macros/toc/macrotoc2", true);
         suite.addTestsFromResource("macros/toc/macrotoc3", true);
+        suite.addTestsFromResource("macros/toc/macrotoc4", true);
 
         // Other
         suite.addTestsFromResource("escape/escape1", false);

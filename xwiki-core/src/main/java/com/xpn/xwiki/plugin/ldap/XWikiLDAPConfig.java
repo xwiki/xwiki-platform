@@ -331,10 +331,6 @@ public final class XWikiLDAPConfig
 
         String ldapFieldMapping = getLDAPParam("ldap_fields_mapping", null, context);
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Ready to create user from LDAP with fields " + ldapFieldMapping);
-        }
-
         if (ldapFieldMapping != null && ldapFieldMapping.length() > 0) {
             String[] fields = ldapFieldMapping.split(USERMAPPING_SEP);
 

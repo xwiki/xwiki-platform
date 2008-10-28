@@ -97,7 +97,6 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         cleaner.setTransformations(getCleaningTransformations());
         CleanerProperties cleanerProperties = cleaner.getProperties();
         cleanerProperties.setOmitUnknownTags(true);
-        cleanerProperties.setPruneTags("script,style");
 
         TagNode cleanedNode;
         try {

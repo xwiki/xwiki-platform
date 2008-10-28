@@ -10,5 +10,5 @@
   <packaging>xar</packaging>
   <name>XWiki Platform - Applications - Office Importer</name>
   <version>1.0-SNAPSHOT</version>
-  <description>XWiki Platform - Applications - Office Importer</description>
+  <description>An XWiki application used to transform office documents into wiki pages.</description>
 </project>

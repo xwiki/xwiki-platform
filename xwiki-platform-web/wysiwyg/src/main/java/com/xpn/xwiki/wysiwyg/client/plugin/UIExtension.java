@@ -24,6 +24,8 @@ import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 
 /**
  * User interface extension.
+ * 
+ * @version $Id$
  */
 public interface UIExtension
 {

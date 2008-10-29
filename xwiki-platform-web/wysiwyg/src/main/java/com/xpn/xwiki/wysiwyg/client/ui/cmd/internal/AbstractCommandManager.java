@@ -61,7 +61,7 @@ public abstract class AbstractCommandManager implements CommandManager
      */
     public boolean execute(Command cmd)
     {
-        return execute(cmd, null);
+        return execute(cmd, (String) null);
     }
 
     /**

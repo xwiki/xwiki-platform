@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.util;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.Text;
@@ -297,4 +298,20 @@ public abstract class DOMUtils
             return textRange;
         }
     }
+
+    /**
+     * Creates a copy of a node from an external document that can be inserted into the given document.
+     * 
+     * @param doc The document in which we want to insert the returned copy.
+     * @param externalNode The node from another document to be imported.
+     * @param deep Indicates whether the children of the given node need to be imported.
+     * @return a copy of the given node that can be inserted into the specified document.
+     */
+    public abstract Node importNode(Document doc, Node externalNode, boolean deep);
+
+    /**
+     * @param element The DOM element whose attribute names are returned.
+     * @return The names of DOM attributes present on the given element.
+     */
+    public abstract JsArrayString getAttributeNames(Element element);
 }

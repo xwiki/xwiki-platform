@@ -24,6 +24,8 @@ import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 
 /**
  * Manages the list of installed plug-ins.
+ * 
+ * @version $Id$
  */
 public interface PluginManager
 {

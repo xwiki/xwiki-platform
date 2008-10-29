@@ -21,6 +21,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin;
 
 /**
  * Interface for instantiating a plug-in. Each plug-in must have a concrete implementation of this interface.
+ * 
+ * @version $Id$
  */
 public interface PluginFactory
 {

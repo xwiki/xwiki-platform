@@ -23,6 +23,8 @@ import java.util.Set;
 
 /**
  * Interface for retrieving the configuration parameters of the WYSIWYG editor.
+ * 
+ * @version $Id$
  */
 public interface Config
 {

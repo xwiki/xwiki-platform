@@ -19,7 +19,19 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd;
 
+/**
+ * Interface that must be implemented in order to be notified of executed commands.
+ * 
+ * @version $Id$
+ */
 public interface CommandListener
 {
+    /**
+     * Notifies that the given command has been executed with the given parameter by the specified command manager.
+     * 
+     * @param sender The command manager that executed the command.
+     * @param command The command executed.
+     * @param param The parameter used when the command was executed.
+     */
     void onCommand(CommandManager sender, Command command, String param);
 }

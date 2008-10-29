@@ -19,39 +19,53 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd;
 
+/**
+ * Interface for executing commands on a DOM tree and for retrieving informations about the state of these commands.
+ * This is the recommended way of doing DOM mutations because others can be notified when these mutation occur. A group
+ * of DOM mutations with a well defined purpose should be grouped in a command.
+ * 
+ * @version $Id$
+ */
 public interface CommandManager extends SourcesCommandEvents
 {
     /**
-     * Executes a command on the current document, current selection, or the given range.
+     * Executes a command on the current selection of the underlying document.
      * 
      * @param cmd The command to execute.
-     * @param param Variant that specifies the string, number, or other value to assign. Possible values depend on the
-     *            command.
-     * @return <code>true</code> if the command is successful.
+     * @param param The parameter of the command.
+     * @return <code>true</code> if the command is executed successfully.
      */
     boolean execute(Command cmd, String param);
 
     /**
-     * @see #execute(Command, String)
+     * Executes a command on the current selection of the underlying document.
+     * 
+     * @param cmd The command to execute.
+     * @param param The parameter of the command.
+     * @return <code>true</code> if the command is executed successfully.
      */
     boolean execute(Command cmd, int param);
 
     /**
-     * @see #execute(Command, String)
+     * Executes a command on the current selection of the underlying document.
+     * 
+     * @param cmd The command to execute.
+     * @param param The parameter of the command.
+     * @return <code>true</code> if the command is executed successfully.
      */
     boolean execute(Command cmd, boolean param);
 
     /**
-     * Executes a command on the current document, current selection, or the given range.
+     * Executes a command on the current selection of the underlying document.
      * 
      * @param cmd The command to execute.
-     * @return <code>true</code> if the command is successful.
+     * @return <code>true</code> if the command is executed successfully.
      */
     boolean execute(Command cmd);
 
     /**
-     * Returns a boolean value that indicates whether a specified command can be successfully executed using
-     * {@link #execute(Command, String)}, given the current state of the document.
+     * Returns a boolean value that indicates whether the specified command can be successfully executed using
+     * {@link #execute(Command, String)}, given the current selection of the document.
      * 
      * @param cmd The command to test.
      * @return <code>true</code> if the command is enabled.
@@ -59,15 +73,15 @@ public interface CommandManager extends SourcesCommandEvents
     boolean isEnabled(Command cmd);
 
     /**
-     * Returns a boolean value that indicates the current state of the command.
+     * Returns a boolean value that indicates the current state of the given command.
      * 
      * @param cmd The command to test.
-     * @return <code>true</code> if the given command has been executed on the object.
+     * @return <code>true</code> if the given command has been executed on the current selection.
      */
     boolean isExecuted(Command cmd);
 
     /**
-     * Returns a boolean value that indicates whether the current command is supported on the current range.
+     * Returns a boolean value that indicates whether the current command is supported on the current document.
      * 
      * @param cmd The command to test
      * @return <code>true</code> if the command is supported.
@@ -75,21 +89,29 @@ public interface CommandManager extends SourcesCommandEvents
     boolean isSupported(Command cmd);
 
     /**
-     * Returns the current value of the document, range, or current selection for the given command.
+     * Returns the value of the given command for the current selection in the underlying document. In most of the cases
+     * this value is the parameter used for executing the command.
      * 
      * @param cmd The command to query.
-     * @return the command value for the document, range, or current selection, if supported. Possible values depend on
-     *         the given command.
+     * @return the command value for current selection, if supported.
      */
     String getStringValue(Command cmd);
 
     /**
-     * @see #getStringValue(Command)
+     * Returns the value of the given command for the current selection in the underlying document. In most of the cases
+     * this value is the parameter used for executing the command.
+     * 
+     * @param cmd The command to query.
+     * @return the command value for current selection, if supported.
      */
     Integer getIntegerValue(Command cmd);
 
     /**
-     * @see #getStringValue(Command)
+     * Returns the value of the given command for the current selection in the underlying document. In most of the cases
+     * this value is the parameter used for executing the command.
+     * 
+     * @param cmd The command to query.
+     * @return the command value for current selection, if supported.
      */
     Boolean getBooleanValue(Command cmd);
 }

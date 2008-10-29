@@ -24,6 +24,8 @@ import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 
 /**
  * A plug-in for the WYSIWYG editor.
+ * 
+ * @version $Id$
  */
 public interface Plugin
 {

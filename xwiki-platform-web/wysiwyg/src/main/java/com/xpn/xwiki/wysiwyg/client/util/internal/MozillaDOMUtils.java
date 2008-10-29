@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.util.internal;
 
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 /**
  * Contains methods from {@link DOMUtils} that require a different implementation in Mozilla.
@@ -36,5 +39,27 @@ public class MozillaDOMUtils extends DOMUtils
      */
     public native String getComputedStyleProperty(Element el, String propertyName) /*-{
         return el.ownerDocument.defaultView.getComputedStyle(el, null).getPropertyValue(propertyName);
+    }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#importNode(Document, Node, boolean)
+     */
+    public native Node importNode(Document doc, Node externalNode, boolean deep) /*-{
+        return doc.importNode(externalNode, deep);
+    }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#getAttributeNames(Element)
+     */
+    public native JsArrayString getAttributeNames(Element element) /*-{
+        var attrNames = [];
+        for(var i = 0; i < element.attributes.length; i++) {
+            attrNames.push(element.attributes.item(i));
+        }
+        return attrNames;
     }-*/;
 }

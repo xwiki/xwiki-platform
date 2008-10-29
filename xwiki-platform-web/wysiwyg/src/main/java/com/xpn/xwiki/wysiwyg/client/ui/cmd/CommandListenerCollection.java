@@ -21,8 +21,26 @@ package com.xpn.xwiki.wysiwyg.client.ui.cmd;
 
 import java.util.ArrayList;
 
+/**
+ * A collection of {@link CommandListener}. It provides an easy way of notifying all the listeners when a
+ * {@link Command} is executed.
+ * 
+ * @version $Id$
+ */
 public class CommandListenerCollection extends ArrayList<CommandListener>
 {
+    /**
+     * Field required by all {@link java.io.Serializable} classes.
+     */
+    private static final long serialVersionUID = 7719987791305106197L;
+
+    /**
+     * Notifies all the listeners in this collection.
+     * 
+     * @param sender The command manager that executed the command.
+     * @param command The command executed.
+     * @param param The parameter used when the command was executed.
+     */
     public void fireCommand(CommandManager sender, Command command, String param)
     {
         for (CommandListener listener : this) {

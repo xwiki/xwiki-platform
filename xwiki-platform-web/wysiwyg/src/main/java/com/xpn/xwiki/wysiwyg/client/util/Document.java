@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.util;
 import com.google.gwt.dom.client.BRElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.ParagraphElement;
 import com.google.gwt.dom.client.ScriptElement;
 import com.xpn.xwiki.wysiwyg.client.selection.Range;
@@ -110,5 +111,17 @@ public class Document extends com.google.gwt.dom.client.Document
     public final Range createRange()
     {
         return RangeFactory.INSTANCE.createRange(this);
+    }
+
+    /**
+     * Creates a copy of a node from an external document that can be inserted into this document.
+     * 
+     * @param externalNode The node from another document to be imported.
+     * @param deep Indicates whether the children of the given node need to be imported.
+     * @return a copy of the given node that can be inserted into this document.
+     */
+    public final Node xImportNode(Node externalNode, boolean deep)
+    {
+        return DOMUtils.getInstance().importNode(this, externalNode, deep);
     }
 }

@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.util.internal;
 
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 /**
  * Contains methods from {@link DOMUtils} that require a different implementation in Internet Explorer.
@@ -36,5 +39,47 @@ public class IEDOMUtils extends DOMUtils
      */
     public native String getComputedStyleProperty(Element el, String propertyName) /*-{
         return el.currentStyle[propertyName];
+    }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#importNode(Document, Node, boolean)
+     */
+    public Node importNode(Document doc, Node externalNode, boolean deep)
+    {
+        switch (externalNode.getNodeType()) {
+            case Node.TEXT_NODE:
+                return doc.createTextNode(externalNode.getNodeValue());
+            case Node.ELEMENT_NODE:
+                Element externalElement = Element.as(externalNode);
+                Element internalElement = doc.xCreateElement(externalElement.getTagName());
+                JsArrayString attrNames = getAttributeNames(externalElement);
+                for (int i = 0; i < attrNames.length(); i++) {
+                    String attrName = attrNames.get(i);
+                    internalElement.setAttribute(attrName, externalElement.getAttribute(attrName));
+                }
+                if (deep) {
+                    // TODO
+                }
+                return internalElement;
+            default:
+                throw new IllegalArgumentException("Cannot import node of type " + externalNode.getNodeType() + "!");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#getAttributeNames(Element)
+     */
+    public native JsArrayString getAttributeNames(Element element) /*-{
+        var attrNames = [];
+        for(var i = 0; i < element.attributes.length; i++){
+            if(element.attributes[i].specified) {
+                attrNames.push(element.attributes[i].nodeName);
+            }
+        }
+        return attrNames;
     }-*/;
 }

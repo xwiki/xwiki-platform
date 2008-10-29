@@ -21,6 +21,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin;
 
 /**
  * Manages the list of available plug-in factories.
+ * 
+ * @version $Id$
  */
 public interface PluginFactoryManager
 {

@@ -36,7 +36,7 @@ public class RegexXWikiURLFactory implements XWikiURLFactory, Initializable
 {
     private String pattern;
 
-    private Map regexMappings;
+    private Map<String, String> regexMappings;
     
     private Pattern regexPattern;
 

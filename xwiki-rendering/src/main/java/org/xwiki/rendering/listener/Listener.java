@@ -309,20 +309,22 @@ public interface Listener
      * 
      * @param link the link definition (the reference)
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see Link
      * @since 1.7M1
      */
-    void beginLink(Link link, boolean isFreeStandingURI);
+    void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters);
 
     /**
      * End of a link.
      * 
      * @param link the link definition (the reference)
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see Link
      * @since 1.7M1
      */
-    void endLink(Link link, boolean isFreeStandingURI);
+    void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters);
 
     /**
      * An explicit line break specified in the wiki syntax. For example for XWiki this would be "\\". Note that this is
@@ -427,4 +429,15 @@ public interface Listener
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
     void onVerbatimStandalone(String protectedString, Map<String, String> parameters);
+    
+    /**
+     * An image.
+     * 
+     * @param imageLocation the location of the image using the following format 
+     *        <code>[wiki:Space.Page]^imageName</code> where <code>imageName</code> is the name of the image
+     *        (for example "my.png").
+     * @param isFreeStandingURI if true then the image is defined directly as a URI in the text
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
+     */
+    void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters);
 }

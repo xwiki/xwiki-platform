@@ -24,6 +24,7 @@ import java.util.Stack;
 
 import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
+import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
@@ -103,14 +104,13 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#beginLink(Link, boolean)
+     * @see PrintRenderer#beginLink(Link, boolean, Map)
      */
-    public void beginLink(Link link, boolean isFreeStandingURI)
+    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        if (!isFreeStandingURI) {
-            print("[[");
-        }
-
+        this.linkRenderer.beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
+        
+        // Defer printing the link content since we need to gather all nested elements
         this.linkBlocksPrinter = new DefaultWikiPrinter();
         pushPrinter(this.linkBlocksPrinter);
     }
@@ -118,17 +118,15 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#endLink(Link, boolean)
+     * @see PrintRenderer#endLink(Link, boolean, Map)
      */
-    public void endLink(Link link, boolean isFreeStandingURI)
+    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         String content = this.linkBlocksPrinter.toString();
         popPrinter();
 
-        print(this.linkRenderer.renderLink(content, link));
-        if (!isFreeStandingURI) {
-            print("]]");
-        }
+        this.linkRenderer.renderLinkContent(getPrinter(), content);
+        this.linkRenderer.endRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
     }
 
     /**
@@ -770,6 +768,21 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void endTableRow(Map<String, String> parameters)
     {
         this.isEndTableRowFoundStack.set(this.isEndTableRowFoundStack.size() - 1, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onImage(String, boolean, Map)
+     */
+    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+        Link link = new Link();
+        link.setReference("image:" + imageLocation);
+        link.setType(LinkType.URI);
+        
+        this.linkRenderer.beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
+        this.linkRenderer.endRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
     }
 
     protected void printParameters(Map<String, String> parameters)

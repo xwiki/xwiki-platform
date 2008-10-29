@@ -445,10 +445,10 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.Listener#beginLink(Link, boolean)  
+     * @see org.xwiki.rendering.listener.Listener#beginLink(Link, boolean, Map)  
      * @since 1.7M1
      */
-    public void beginLink(Link link, boolean isFreeStandingURI)
+    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.sink.link(link.getReference());
     }
@@ -456,11 +456,27 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.Listener#endLink(Link, boolean)  
+     * @see org.xwiki.rendering.listener.Listener#endLink(Link, boolean, Map)  
      * @since 1.7M1
      */
-    public void endLink(Link link, boolean isFreeStandingURI)
+    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.sink.link_();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#onImage(String, boolean, Map)
+     * @since 1.7M2
+     */
+    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+        this.sink.figure();
+        // TODO: handle special XWiki format for image locations. How do we pass image bits to Doxia?
+        // TODO: Handle parameters
+        // TODO: Handle free standing URI (if supported by Doxia)
+        this.sink.figureGraphics(imageLocation);
+        this.sink.figure_();
     }
 }

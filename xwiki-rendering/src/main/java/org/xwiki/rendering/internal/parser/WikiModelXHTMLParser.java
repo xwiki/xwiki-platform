@@ -33,6 +33,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiCommentHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiHeaderTagHandler;
+import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiImageTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiReferenceTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiSpanTagHandler;
 
@@ -76,6 +77,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     	handlers.put("h5", handler);
     	handlers.put("h6", handler);
     	handlers.put("a", new XWikiReferenceTagHandler());
+        handlers.put("img", new XWikiImageTagHandler());
     	handlers.put("span", new XWikiSpanTagHandler());
     	
     	XhtmlParser parser = new XhtmlParser();

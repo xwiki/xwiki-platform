@@ -136,4 +136,14 @@ public interface DocumentAccessBridge
      * @throws Exception If the document cannot be accessed.
      */
     String getURL(String documentName, String action, String queryString, String anchor) throws Exception;
+
+    /**
+     * Retrieves the internal (without the hostname) URL that can be used to access an attachment
+     * 
+     * @param documentName the full name of the document containing the attachment (eg "wiki:Space.Page") 
+     * @param attachmentName the attachment name (eg "my.png")
+     * @return the attachment URL
+     * @throws Exception If the document or the attachment cannot be accessed
+     */
+    String getAttachmentURL(String documentName, String attachmentName) throws Exception;
 }

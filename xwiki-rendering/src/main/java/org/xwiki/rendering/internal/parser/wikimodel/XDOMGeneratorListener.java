@@ -37,6 +37,7 @@ import org.wikimodel.wem.WikiReference;
 import org.wikimodel.wem.WikiStyle;
 import org.xwiki.rendering.block.*;
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Format;
@@ -415,18 +416,9 @@ public class XDOMGeneratorListener implements IWemListener
      * Called when WikiModel finds an reference such as a URI located directly in the text (free-standing URI), 
      * as opposed to a link inside wiki link syntax delimiters.
      */
-    public void onReference(String ref)
+    public void onReference(String reference)
     {
-        // If there's no link parser defined, don't handle links...
-        // TODO: Generate some output log
-        if (this.linkParser != null) {
-            try {
-                this.stack.push(new LinkBlock(Collections.<Block>emptyList(), this.linkParser.parse(ref), true));
-            } catch (ParseException e) {
-                // TODO: Should we instead generate ErrorBlocks?
-                throw new RuntimeException("Failed to parse link [" + ref + "]", e);
-            }
-        }
+        onReference(reference, null, true, Collections.<String, String>emptyMap());
     }
 
     /**
@@ -434,54 +426,29 @@ public class XDOMGeneratorListener implements IWemListener
      * 
      * @see org.wikimodel.wem.IWemListener#onReference(String)
      */
-    public void onReference(WikiReference ref)
+    public void onReference(WikiReference reference)
+    {
+        onReference(reference.getLink(), reference.getLabel(), false, convertParameters(reference.getParameters())); 
+    }
+
+    private void onReference(String reference, String label, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // If there's no link parser defined, don't handle links...
         // TODO: Generate some output log
         if (this.linkParser != null) {
-            Link link;
-            try {
-                link = this.linkParser.parse(ref.getLink());
-            } catch (ParseException e) {
-                // TODO: Should we instead generate ErrorBlocks?
-                throw new RuntimeException("Failed to parse link [" + ref.getLink() + "]", e);
-            }
-            
-            // TODO: Remove the need to parse the label passed by WikiModel when it implements support for wiki syntax 
-            // in links. See http://code.google.com/p/wikimodel/issues/detail?id=87
-            List<Block> linkedBlocks = Collections.<Block>emptyList();
-            if ((ref.getLabel() != null) && (ref.getLabel().length() > 0)) {
-                try {
-                    // TODO: Use an inline parser. See http://jira.xwiki.org/jira/browse/XWIKI-2748
-                    ParserUtils parserUtils = new ParserUtils();
-                    linkedBlocks = parserUtils.parseInline(this.parser, ref.getLabel());
-                } catch (ParseException e) {
-                    // TODO: Handle errors
-                }
-            }
-            
-            // Check if the reference in the link is an relative URI. If that's the case transform it into
-            // a document name since all relative URIs should point to wiki documents.
-            //
-            // Note that we don't modify URLs since it's impossible for us to know whether it's an internal URL
-            // or some external URL. Thus to handle all cases we generate an XHTML placeholder when outputting
-            // a link to XHTML and the XHMTL parser knows about this placeholder and can transform it back into
-            // a document name without having to parse any URI/URL. We still need this handling below in cases
-            // where the placeholder would not have been generated.
-            if (link.getReference().startsWith("/")) {
-                try {
-                    XWikiURL url = this.urlFactory.createURL(link.getReference());
-                    link.setReference(new DocumentNameSerializer().serialize(url));
-                } catch (InvalidURLException e) {
-                    // If it fails it means this was not a link pointing to a xwiki document after all so we just
-                    // leave it as is.
-                }
-            }
+            Block resultBlock;
+            Link link = parseLink(reference);
 
-            this.stack.push(new LinkBlock(linkedBlocks, link));
+            // Verify if we have an image or a link. An image is identified by an "image:" uri
+            // The reason we get this event is because WikiModel handles links and images in the same manner. 
+            resultBlock = createImageBlock(link, isFreeStandingURI, parameters);
+            if (resultBlock == null) {
+                resultBlock = createLinkBlock(link, label, isFreeStandingURI, parameters); 
+            }
+            this.stack.push(resultBlock);
         }
     }
-
+    
     /**
      * {@inheritDoc}
      * 
@@ -599,5 +566,82 @@ public class XDOMGeneratorListener implements IWemListener
             result = Format.NONE;
         }
         return result;
+    }
+    
+    private Link parseLink(String reference)
+    {
+        Link link;
+        try {
+            link = this.linkParser.parse(reference);
+        } catch (ParseException e) {
+            // TODO: Should we instead generate ErrorBlocks?
+            throw new RuntimeException("Failed to parse link [" + reference + "]", e);
+        }
+        return link;
+    }
+
+    /**
+     * Create an image block if the link passed in parameter represents an image.
+     * 
+     * @param link the link that potentially represents an image
+     * @return an image block of the link represents an image or null if it's not an image
+     */
+    private Block createImageBlock(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+        Block resultBlock = null;
+
+        // Verify if we have an image or a link. An image is identified by an "image:" uri
+        // The reason we get this event is because WikiModel handles links and images in the same manner. 
+        if ((link.getType() == LinkType.URI) && (link.getReference().startsWith("image:"))) {
+            String imageLocation = link.getReference().substring("image:".length());
+            resultBlock = new ImageBlock(imageLocation, isFreeStandingURI, parameters);
+        }
+        
+        return resultBlock;
+    }
+    
+    private Block createLinkBlock(Link link, String label, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+        Block resultBlock;
+        
+        if (isFreeStandingURI) {
+            resultBlock = new LinkBlock(Collections.<Block>emptyList(), link, true);
+        } else {
+        
+            // TODO: Remove the need to parse the label passed by WikiModel when it implements support for wiki syntax 
+            // in links. See http://code.google.com/p/wikimodel/issues/detail?id=87
+            List<Block> linkedBlocks = Collections.<Block>emptyList();
+            if ((label != null) && (label.length() > 0)) {
+                try {
+                    // TODO: Use an inline parser. See http://jira.xwiki.org/jira/browse/XWIKI-2748
+                    ParserUtils parserUtils = new ParserUtils();
+                    linkedBlocks = parserUtils.parseInline(this.parser, label);
+                } catch (ParseException e) {
+                    // TODO: Handle errors
+                }
+            }
+            
+            // Check if the reference in the link is an relative URI. If that's the case transform it into
+            // a document name since all relative URIs should point to wiki documents.
+            //
+            // Note that we don't modify URLs since it's impossible for us to know whether it's an internal URL
+            // or some external URL. Thus to handle all cases we generate an XHTML placeholder when outputting
+            // a link to XHTML and the XHMTL parser knows about this placeholder and can transform it back into
+            // a document name without having to parse any URI/URL. We still need this handling below as a special
+            // security measure in cases where the placeholder would not have been generated.
+            if (link.getReference().startsWith("/")) {
+                try {
+                    XWikiURL url = this.urlFactory.createURL(link.getReference());
+                    link.setReference(new DocumentNameSerializer().serialize(url));
+                } catch (InvalidURLException e) {
+                    // If it fails it means this was not a link pointing to a xwiki document after all so we just
+                    // leave it as is.
+                }
+            }
+            
+            resultBlock = new LinkBlock(linkedBlocks, link, false, parameters); 
+        }
+        
+        return resultBlock; 
     }
 }

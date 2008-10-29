@@ -113,9 +113,16 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("horizontalline/horizontalline3", false);
         suite.addTestsFromResource("horizontalline/horizontalline4", false);
         suite.addTestsFromResource("horizontalline/horizontalline5", false);
-        suite.addTestsFromResource("link/links1", true);
+        suite.addTestsFromResource("link/links1", false);
         suite.addTestsFromResource("link/links2", false);
         suite.addTestsFromResource("link/links3", false);
+        suite.addTestsFromResource("link/links4", false);
+        suite.addTestsFromResource("link/links5", false);
+        suite.addTestsFromResource("link/links6", false);
+        suite.addTestsFromResource("link/links7", true);
+        suite.addTestsFromResource("link/links8", false);
+        suite.addTestsFromResource("link/links9", false);
+        suite.addTestsFromResource("link/links10", false);
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("list/list2", false);
         suite.addTestsFromResource("list/list3", false);
@@ -148,6 +155,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("misc/misc6", false);
         suite.addTestsFromResource("encoding/encoding1", false);
         suite.addTestsFromResource("encoding/encoding2", false);
+        suite.addTestsFromResource("image/image1", false);
+        suite.addTestsFromResource("image/image2", false);
 
         return new PlexusTestSetup(suite);
     }

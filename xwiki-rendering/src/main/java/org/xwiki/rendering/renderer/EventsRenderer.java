@@ -93,14 +93,14 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("onNewLine");
     }
 
-    public void beginLink(Link link, boolean isFreeStandingURI)
+    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        println("beginLink [" + link + "] [" + isFreeStandingURI + "]");
+        println("beginLink [" + link + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
     }
 
-    public void endLink(Link link, boolean isFreeStandingURI)
+    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        println("endLink [" + link + "] [" + isFreeStandingURI + "]");
+        println("endLink [" + link + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
     }
 
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
@@ -376,6 +376,17 @@ public class EventsRenderer extends AbstractPrintRenderer
     public void endTableRow(Map<String, String> parameters)
     {
         println("endTableRow" + serializeParameters(parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onImage(String, boolean, Map)
+     * @since 1.7M2
+     */
+    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+       println("onImage: [" + imageLocation + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
     }
 
     public String getEscaped(String str)

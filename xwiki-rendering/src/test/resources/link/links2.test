@@ -1,33 +1,25 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-This is a mailto:content element
+[[Space.ExistingPage#anchor?param=value]]
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onWord [This]
-onSpace
-onWord [is]
-onSpace
-onWord [a]
-onSpace
-beginLink [Reference = [mailto:content]] [true]
-endLink [Reference = [mailto:content]] [true]
-onSpace
-onWord [element]
+beginLink [Reference = [Space.ExistingPage] QueryString = [param=value] Anchor = [anchor]] [false]
+endLink [Reference = [Space.ExistingPage] QueryString = [param=value] Anchor = [anchor]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>This is a <!--startwikilink:mailto:content--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="mailto:content"><span class="wikigeneratedlinkcontent">mailto:content</span></a></span><!--stopwikilink--> element</p>
+<p><!--startwikilink:Space.ExistingPage#anchor?param=value--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-This is a mailto:content element
+[[Space.ExistingPage#anchor?param=value]]
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>This is a <!--startwikilink:mailto:content--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="mailto:content"><span class="wikigeneratedlinkcontent">mailto:content</span></a></span><!--stopwikilink--> element</p></html>
+<html><p><!--startwikilink:Space.ExistingPage#anchor?param=value--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--></p></html>

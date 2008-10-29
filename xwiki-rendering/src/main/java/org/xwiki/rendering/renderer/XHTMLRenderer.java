@@ -281,20 +281,20 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#beginLink(Link, boolean)
+     * @see Renderer#beginLink(Link, boolean, Map)
      */
-    public void beginLink(Link link, boolean isFreeStandingURI)
+    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.linkRenderer.beginRender(getXHTMLWikiPrinter(), link, isFreeStandingURI);
+        this.linkRenderer.beginRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, parameters);
         pushPrinter(new DelegateWikiPrinter(getPrinter()));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#endLink(Link, boolean)
+     * @see Renderer#endLink(Link, boolean, Map)
      */
-    public void endLink(Link link, boolean isFreeStandingURI)
+    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         DelegateWikiPrinter printer = (DelegateWikiPrinter) getPrinter();
         popPrinter();
@@ -752,5 +752,51 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endTableHeadCell(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("th");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onImage(String, boolean, Map)
+     * @since 1.7M2
+     */
+    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+        // First we need to compute the image URL. Start by extracting the attachment name from the document name.
+        // The syntax format is: "(document name)@(attachment name)"
+        String documentName = null;
+        String attachmentName;
+        int attachmentSeparatorPosition = imageLocation.indexOf("@");
+        if (attachmentSeparatorPosition > -1) {
+            documentName = imageLocation.substring(0, attachmentSeparatorPosition);
+            attachmentName = imageLocation.substring(attachmentSeparatorPosition + 1);
+        } else {
+            attachmentName = imageLocation;
+        }
+        String imageURL;
+        try {
+            imageURL = this.documentAccessBridge.getAttachmentURL(documentName, attachmentName);
+        } catch (Exception e) {
+            // TODO: Handle exceptions in a better manner
+            throw new RuntimeException("Failed to get attachment URL for [" + imageLocation + "]", e);
+        }
+        
+        // Then add it as an attribute of the IMG element.
+        Map<String, String> attributes = new LinkedHashMap<String, String>();
+        attributes.put("src", imageURL);
+        
+        // Add the class if we're on a freestanding uri
+        if (isFreeStandingURI) {
+            attributes.put("class", "wikimodel-freestanding");
+        }
+        
+        // Add the other parameters as attributes
+        attributes.putAll(parameters);
+
+        // And generate the XHTML IMG element. We need to save the image location in XML comment so that
+        // it can be reconstructed later on when moving from XHTML to wiki syntax.
+        getXHTMLWikiPrinter().printXMLComment("startimage:" + imageLocation);
+        getXHTMLWikiPrinter().printXMLElement("img", attributes);
+        getXHTMLWikiPrinter().printXMLComment("stopimage");
     }
 }

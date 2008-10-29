@@ -58,9 +58,9 @@ public abstract class AbstractPrintRenderer extends AbstractLogEnabled implement
     }
 
     /**
-     * Change the current {@link WikiPrinter} with provide one.
+     * Change the current {@link WikiPrinter} with the provided one.
      * 
-     * @param wikiPrinter the {@link WikiPrinter} to use since now.
+     * @param wikiPrinter the new {@link WikiPrinter} to use
      */
     protected void pushPrinter(WikiPrinter wikiPrinter)
     {
@@ -68,7 +68,7 @@ public abstract class AbstractPrintRenderer extends AbstractLogEnabled implement
     }
 
     /**
-     * Pop the current {@link WikiPrinter}.
+     * Removes the current {@link WikiPrinter} and instead sets the previous printer as active.
      */
     protected void popPrinter()
     {

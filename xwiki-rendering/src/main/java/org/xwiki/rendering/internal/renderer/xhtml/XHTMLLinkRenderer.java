@@ -50,10 +50,11 @@ public class XHTMLLinkRenderer
         this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
     }
 
-    public void beginRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI)
+    public void beginRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, 
+        Map<String, String> parameters)
     {
         try {
-            beginRenderLinkInternal(printer, link, isFreeStandingURI);
+            beginRenderLinkInternal(printer, link, isFreeStandingURI, parameters);
         } catch (Exception e) {
             // TODO: Handle error
         }
@@ -68,8 +69,8 @@ public class XHTMLLinkRenderer
         }
     }
 
-    private void beginRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI)
-        throws Exception
+    private void beginRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, 
+        Map<String, String> parameters) throws Exception
     {
         // Add an XML comment as a placeholder so that the XHTML parser can find the document name. 
         // Otherwise it would be too difficult to transform a URL into a document name especially since 
@@ -78,6 +79,9 @@ public class XHTMLLinkRenderer
 
         Map<String, String> spanAttributes = new LinkedHashMap<String, String>();
         Map<String, String> aAttributes = new LinkedHashMap<String, String>();
+        
+        // Add all parameters to the A attributes
+        aAttributes.putAll(parameters);
         
         if (link.isExternalLink()) {
             spanAttributes.put("class", "wikiexternallink");

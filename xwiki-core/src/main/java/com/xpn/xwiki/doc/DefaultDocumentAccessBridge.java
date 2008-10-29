@@ -188,4 +188,16 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             documentName == null && anchor != null ? xcontext.getDoc().getFullName() : documentName, xcontext).getURL(
             action, queryString, anchor, xcontext);
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getAttachmentURL(String, String)
+     */
+    public String getAttachmentURL(String documentName, String attachmentName) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        return xcontext.getWiki().getAttachmentURL(
+            documentName == null ? xcontext.getDoc().getFullName() : documentName, attachmentName, xcontext);
+    }
 }

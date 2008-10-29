@@ -27,44 +27,39 @@ import org.xwiki.rendering.parser.ParseException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 /**
- * Parses the content of XWiki links. The format is as follows:
- * <code>(alias[|>])(link)(@interWikiAlias)(|parameters)</code>, where:
+ * Parses the content of XWiki links.
+ * 
+ * The format is as follows:
+ * <code>(link)(@interWikiAlias)?</code>, where:
  * <ul>
- *   <li><code>alias</code>: An optional string which will be displayed to the user as the link
- *       name when rendered. Example: "My Page".</li>
  *   <li><code>link</code>: The full link reference using the following syntax:
- *       <code>(reference)(#anchor)(?queryString)</code>, where:
+ *       <code>(reference)(#anchor)?(?queryString)?</code>, where:
  *       <ul>
  *         <li><code>reference</code>: The link reference. This can be either a URI in the form
  *             <code>protocol:path</code> (example: "http://xwiki.org", "mailto:john@smith.com) or
- *             a wiki page name (example: "wiki.Space.WebHome").</li>
+ *             a wiki page name (example: "wiki:Space.WebHome").</li>
  *         <li><code>anchor</code>: An optional anchor name pointing to an anchor defined in the
  *             referenced link. Note that in XWiki anchors are automatically created for titles.
  *             Example: "TableOfContentAnchor".</li>
  *         <li><code>queryString</code>: An optional query string for specifying parameters that
  *             will be used in the rendered URL. Example: "mydata1=5&mydata2=Hello".</li>
  *       </ul>
- *       Either the <code>link</code> or the <code>alias</code> must be specified.</li>
+ *       The <code>link</code> element is mandatory.</li>
  *   <li><code>interWikiAlias</code>: An optional
  *       <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias as defined in the
  *       InterWiki Map. Example: "wikipedia"</li>
- *   <li><code>parameters</code>: An optional parameters list using the following format:
- *       <code>param1=value1 param2=value2 ... paramN=valueN</code>. For example this can be used
- *       to set the HTML target attribute for a <code>a</code> element (Example: target=_self,
- *       target=_blank</li>
  * </ul>
  * Examples of valid wiki links:
  * <ul>
  *   <li>Hello World</li>
- *   <li>Hello World>HelloWorld</li>
- *   <li>Hello World>HelloWorld>target=_blank</li>
- *   <li>Hello World>http://myserver.com/HelloWorld</li>
- *   <li>Hello World>HelloWorld#Anchor</li>
- *   <li>http://myserver.com</li>
+ *   <li>http://myserver.com/HelloWorld</li>
+ *   <li>HelloWorld#Anchor</li>
  *   <li>Hello World@Wikipedia</li>
  *   <li>mywiki:HelloWorld</li>
  *   <li>Hello World?param1=1&param2=2</li>
@@ -85,7 +80,7 @@ public class XWikiLinkParser implements LinkParser
 
     private static final Pattern URL_SCHEME_PATTERN = Pattern.compile("[a-zA-Z0-9+.-]*://");
 
-    private static final String MAILTO_URI_PREFIX = "mailto:";
+    private static final List<String> URI_PREFIXES = Arrays.asList("mailto", "image", "attach");
     
     public Link parse(String rawLink) throws ParseException
     {
@@ -134,7 +129,7 @@ public class XWikiLinkParser implements LinkParser
     }
 
     /**
-     * Find out the URI part of the full link. Supported URIs are either "mailto:" or any URL
+     * Find out the URI part of the full link. Supported URIs are "mailto:", "image:", "attach:" or any URL
      * in the form "protocol://".
      *
      * @param content the string to parse. This parameter will be modified by the method to remove
@@ -146,12 +141,13 @@ public class XWikiLinkParser implements LinkParser
     {
         String uri = null;
 
-        // First, look for an email URI
-        if (content.indexOf(MAILTO_URI_PREFIX) == 0) {
+        // First, look for one of the known URI schemes
+        int uriSchemeDelimiter = content.indexOf(":");
+        if ((uriSchemeDelimiter > -1) && URI_PREFIXES.contains(content.substring(0, uriSchemeDelimiter))) {
             try {
                 uri = new URI(content.toString()).toString();
             } catch (URISyntaxException e) {
-                throw new ParseException("Invalid mailto URI [" + content.toString() + "]", e);
+                throw new ParseException("Invalid URI [" + content.toString() + "]", e);
             }
             content.setLength(0);
         } else {

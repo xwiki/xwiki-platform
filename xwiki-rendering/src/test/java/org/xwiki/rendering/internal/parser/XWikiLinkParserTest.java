@@ -30,7 +30,7 @@ import org.xwiki.rendering.parser.LinkParser;
  */
 public class XWikiLinkParserTest extends TestCase
 {
-    public void testParseLink() throws Exception
+    public void testParseLinks() throws Exception
     {
         LinkParser parser = new XWikiLinkParser();
 
@@ -56,11 +56,6 @@ public class XWikiLinkParserTest extends TestCase
         assertEquals("xredirect=../whatever", link.getQueryString());
         assertEquals("Reference = [Hello World] QueryString = [xredirect=../whatever]", link.toString());
 
-        // We consider that myxwiki is the wiki name and http://xwiki.org is the page name
-        link = parser.parse("mywiki:http://xwiki.org");
-        assertEquals("mywiki:http://xwiki.org", link.getReference());
-        assertEquals("Reference = [mywiki:http://xwiki.org]", link.toString());
-
         link = parser.parse("HelloWorld?xredirect=http://xwiki.org");
         assertEquals("HelloWorld", link.getReference());
         assertEquals("xredirect=http://xwiki.org", link.getQueryString());
@@ -80,9 +75,30 @@ public class XWikiLinkParserTest extends TestCase
         assertEquals("anchor", link.getAnchor());
         assertEquals("Reference = [Hello] Anchor = [anchor]", link.toString());
 
+        // Verify mailto: URI is recognized
         link = parser.parse("mailto:john@smith.com");
         assertEquals("mailto:john@smith.com", link.getReference());
         assertEquals(LinkType.URI, link.getType());
         assertEquals("Reference = [mailto:john@smith.com]", link.toString());
-    }
+        
+        // Verify image: URI is recognized
+        link = parser.parse("image:some:content");
+        assertEquals("image:some:content", link.getReference());
+        assertEquals(LinkType.URI, link.getType());
+        assertEquals("Reference = [image:some:content]", link.toString());
+
+        // Verify attach: URI is recognized
+        link = parser.parse("attach:some:content");
+        assertEquals("attach:some:content", link.getReference());
+        assertEquals(LinkType.URI, link.getType());
+        assertEquals("Reference = [attach:some:content]", link.toString());
+        
+        // Verify that unknown URIs are ignored
+        // Note: We consider that myxwiki is the wiki name and http://xwiki.org is the page name
+        link = parser.parse("mywiki:http://xwiki.org");
+        assertEquals("mywiki:http://xwiki.org", link.getReference());
+        assertEquals(LinkType.DOCUMENT, link.getType());
+        assertEquals("Reference = [mywiki:http://xwiki.org]", link.toString());
+        
+}
 }

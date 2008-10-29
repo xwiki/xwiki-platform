@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.block;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.Link;
@@ -45,20 +47,22 @@ public class LinkBlock extends AbstractFatherBlock
     /**
      * @param childrenBlocks the nested children blocks
      * @param link the link
+     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      */
-    public LinkBlock(List<Block> childrenBlocks, Link link)
+    public LinkBlock(List<Block> childrenBlocks, Link link, boolean isFreeStandingURI)
     {
-        this(childrenBlocks, link, false);
+        this(childrenBlocks, link, isFreeStandingURI, Collections.<String, String>emptyMap());
     }
 
     /**
      * @param childrenBlocks the nested children blocks
      * @param link the link
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
+     * @param parameters the parameters to set
      */
-    public LinkBlock(List<Block> childrenBlocks, Link link, boolean isFreeStandingURI)
+    public LinkBlock(List<Block> childrenBlocks, Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        super(childrenBlocks);
+        super(childrenBlocks, parameters);
         this.link = link;
         this.isFreeStandingURI = isFreeStandingURI;
     }
@@ -86,7 +90,7 @@ public class LinkBlock extends AbstractFatherBlock
      */
     public void before(Listener listener)
     {
-        listener.beginLink(getLink(), isFreeStandingURI());
+        listener.beginLink(getLink(), isFreeStandingURI(), getParameters());
     }
 
     /**
@@ -95,6 +99,6 @@ public class LinkBlock extends AbstractFatherBlock
      */
     public void after(Listener listener)
     {
-        listener.endLink(getLink(), isFreeStandingURI());
+        listener.endLink(getLink(), isFreeStandingURI(), getParameters());
     }
 }

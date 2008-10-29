@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
+import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.impl.WikiScannerContext;
 import org.wikimodel.wem.xhtml.handler.ReferenceTagHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
@@ -42,6 +43,7 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
     {
         stack.setStackParameter("isInLink", false);
         stack.setStackParameter("isFreeStandingLink", false);
+        stack.setStackParameter("linkParameters", WikiParameters.EMPTY);
     }
 
     @Override
@@ -58,6 +60,12 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
             // XWikiCommentHandler.
             if (isFreeStandingReference(context)) {
                 context.getTagStack().setStackParameter("isFreeStandingLink", true);
+            } else {
+                // Save the parameters set on the A element so that we can generate the correct link
+                // in the XWiki Comment handler. Note that we must exclude the href parameter.
+                WikiParameters params = context.getParams();
+                params = params.remove("href");
+                context.getTagStack().setStackParameter("linkParameters", params);
             }
             
             setAccumulateContent(false);
@@ -76,5 +84,4 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
             super.end(context);
         }
     }
-
 }

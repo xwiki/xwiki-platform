@@ -116,14 +116,14 @@ public class ListenerDelegate implements Listener
         this.listener.onLineBreak();
     }
     
-    public void beginLink(Link link, boolean isFreeStandingURI)
+    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.listener.beginLink(link, isFreeStandingURI);
+        this.listener.beginLink(link, isFreeStandingURI, parameters);
     }
 
-    public void endLink(Link link, boolean isFreeStandingURI)
+    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.listener.endLink(link, isFreeStandingURI);
+        this.listener.endLink(link, isFreeStandingURI, parameters);
     }
 
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
@@ -349,5 +349,16 @@ public class ListenerDelegate implements Listener
     public void endTableRow(Map<String, String> parameters)
     {
         this.listener.endTableRow(parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#onImage(String, boolean, Map)
+     * @since 1.7M2
+     */
+    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+        this.listener.onImage(imageLocation, isFreeStandingURI, parameters);
     }
 }

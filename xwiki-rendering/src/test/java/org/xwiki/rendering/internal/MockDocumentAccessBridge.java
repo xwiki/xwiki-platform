@@ -56,35 +56,42 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
         }
         return result;
     }
+    
+    public String getAttachmentURL(String documentName, String attachmentName) throws Exception
+    {
+        return "/xwiki/bin/download/" 
+            + (documentName == null ? "currentdoc" : documentName.replace(".", "/"))
+            + "/" + attachmentName;
+    }
 
     public String getProperty(String documentName, String className, int objectNumber, String propertyName)
         throws Exception
     {
-        return "Property value";
+        throw new RuntimeException("Not implemented");
     }
 
     public String getProperty(String documentName, String className, String propertyName) throws Exception
     {
-        return "Property value";
+        throw new RuntimeException("Not implemented");
     }
 
     public String getProperty(String documentName, String propertyName) throws Exception
     {
-        return "Property value";
+        throw new RuntimeException("Not implemented");
     }
 
     public String getPropertyType(String className, String propertyName) throws Exception
     {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     public boolean isPropertyCustomMapped(String className, String propertyName) throws Exception
     {
-        return false;
+        throw new RuntimeException("Not implemented");
     }
 
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 }

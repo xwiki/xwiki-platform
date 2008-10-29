@@ -192,13 +192,13 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.onLineBreak();
     }
 
-    public void beginLink(Link link, boolean isFreeStandingURI)
+    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // TODO wait for WikiModel to support wiki syntax in links
         // See http://code.google.com/p/wikimodel/issues/detail?id=87
     }
 
-    public void endLink(Link link, boolean isFreeStandingURI)
+    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // TODO wait for WikiModel to support wiki syntax in links
         // See http://code.google.com/p/wikimodel/issues/detail?id=87
@@ -425,6 +425,13 @@ public class WikiModelGeneratorListener implements Listener
     public void endTableRow(Map<String, String> parameters)
     {
         this.wikimodelListener.endTableRow(createWikiParameters(parameters));
+    }
+
+    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+        // Note: This means that any WikiModel listener needs to be overriden with a XWiki specific
+        // version that knows how to handle XWiki image location format.
+//TODO        this.wikimodelListener.onReference("image:" + imageLocation);
     }
 
     private WikiParameters createWikiParameters(Map<String, String> parameters)

@@ -1,0 +1,30 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+Inline images image:existing.attachment image:Space.ExistingPage@existing.attachment
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [Inline]
+onSpace
+onWord [images]
+onSpace
+onImage: [existing.attachment] [true]
+onSpace
+onImage: [Space.ExistingPage@existing.attachment] [true]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>Inline images <!--startimage:existing.attachment--><img src="/xwiki/bin/download/currentdoc/existing.attachment" class="wikimodel-freestanding"/><!--stopimage--> <!--startimage:Space.ExistingPage@existing.attachment--><img src="/xwiki/bin/download/Space/ExistingPage/existing.attachment" class="wikimodel-freestanding"/><!--stopimage--></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+Inline images image:existing.attachment image:Space.ExistingPage@existing.attachment
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>Inline images <!--startimage:existing.attachment--><img src="/xwiki/bin/download/currentdoc/existing.attachment" class="wikimodel-freestanding"/><!--stopimage--> <!--startimage:Space.ExistingPage@existing.attachment--><img src="/xwiki/bin/download/Space/ExistingPage/existing.attachment" class="wikimodel-freestanding"/><!--stopimage--></p></html>

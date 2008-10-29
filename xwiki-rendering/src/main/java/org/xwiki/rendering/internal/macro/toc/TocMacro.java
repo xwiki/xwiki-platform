@@ -204,7 +204,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
 
         Link link = new Link();
         link.setAnchor(idBlock.getName());
-        LinkBlock linkBlock = new LinkBlock(sectionBlock.getChildren(), link);
+        LinkBlock linkBlock = new LinkBlock(sectionBlock.getChildren(), link, false);
 
         return new ListItemBlock(Arrays.<Block> asList(linkBlock));
     }

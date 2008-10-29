@@ -1,0 +1,35 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+[[{{macro}}]]
+[[Label>Reference]]
+[[Reference|Param=Value]]
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Reference = [{{macro}}]] [false]
+endLink [Reference = [{{macro}}]] [false]
+onLineBreak
+beginLink [Reference = [Label>Reference]] [false]
+endLink [Reference = [Label>Reference]] [false]
+onLineBreak
+beginLink [Reference = [Reference|Param=Value]] [false]
+endLink [Reference = [Reference|Param=Value]] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p><!--startwikilink:{{macro}}--><span class="wikicreatelink"><a href="/xwiki/bin/view/{{macro}}"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">{{macro}}</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Label>Reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/Label&gt;Reference"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">Label&gt;Reference</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Reference|Param=Value--><span class="wikicreatelink"><a href="/xwiki/bin/view/Reference|Param=Value"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">Reference|Param=Value</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+[[{{macro}}]]
+[[Label>Reference]]
+[[Reference|Param=Value]]
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p><!--startwikilink:{{macro}}--><span class="wikicreatelink"><a href="/xwiki/bin/view/{{macro}}"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">{{macro}}</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Label>Reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/Label&gt;Reference"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">Label&gt;Reference</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Reference|Param=Value--><span class="wikicreatelink"><a href="/xwiki/bin/view/Reference|Param=Value"><span class="wikicreatelinktext"><span class="wikigeneratedlinkcontent">Reference|Param=Value</span></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--></p></html>

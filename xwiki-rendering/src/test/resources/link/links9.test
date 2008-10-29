@@ -1,0 +1,33 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+This is a mailto:content element
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [This]
+onSpace
+onWord [is]
+onSpace
+onWord [a]
+onSpace
+beginLink [Reference = [mailto:content]] [true]
+endLink [Reference = [mailto:content]] [true]
+onSpace
+onWord [element]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>This is a <!--startwikilink:mailto:content--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="mailto:content"><span class="wikigeneratedlinkcontent">mailto:content</span></a></span><!--stopwikilink--> element</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+This is a mailto:content element
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>This is a <!--startwikilink:mailto:content--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="mailto:content"><span class="wikigeneratedlinkcontent">mailto:content</span></a></span><!--stopwikilink--> element</p></html>

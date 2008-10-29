@@ -555,7 +555,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 if ((transport == null) || (session == null)) {
                     // initialize JavaMail Session and Transport
                     Properties props = initProperties(mailConfiguration);
-                    session = Session.getDefaultInstance(props, null);
+                    session = Session.getInstance(props, null);
                     transport = session.getTransport("smtp");
                     if (!mailConfiguration.usesAuthentication()) {
                         // no auth info - typical 127.0.0.1 open relay scenario

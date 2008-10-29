@@ -63,7 +63,7 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
     /**
      * The folder containing JBossCache properties files.
      */
-    private static final String PROPS_PATH = "cache/jboss/";
+    private static final String PROPS_PATH = "cache/jbosscache/";
 
     /**
      * The extension of JBossCache properties files.

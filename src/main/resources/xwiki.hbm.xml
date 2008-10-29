@@ -796,7 +796,7 @@
             <column name="XWP_COMMENT_REGISTERED" length="255" />
         </property>
         <property name="documentBundles" type="string">
-            <column name="XWP_DOCUMENT_BUNDLES" length="255" />
+            <column name="XWP_DOCUMENT_BUNDLES" length="2000" />
         </property>
 
     </class>

@@ -42,6 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
@@ -278,6 +279,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                             }
                         }
                     }
+                    content = Utils.replacePlaceholders(content, context);
                 } finally {
                     // Remove including doc or set the previous one
                     if (idoc == null) {

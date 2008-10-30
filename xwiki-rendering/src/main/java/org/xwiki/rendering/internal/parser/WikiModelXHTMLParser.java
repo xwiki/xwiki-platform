@@ -83,8 +83,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     	XhtmlParser parser = new XhtmlParser();
     	parser.setExtraHandlers(handlers);
     	parser.setEscapeHandler(new XWikiXhtmlEscapeHandler());
-    	parser.setCommentHandler(
-    	    new XWikiCommentHandler(this, this.linkParser, this.urlFactory, this.printRendererFactory));
+    	parser.setCommentHandler(new XWikiCommentHandler(this, this.linkParser, this.printRendererFactory));
     	return parser;
     }
 }

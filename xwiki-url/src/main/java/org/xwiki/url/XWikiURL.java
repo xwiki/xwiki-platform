@@ -31,6 +31,7 @@ import java.util.Collections;
  */
 public class XWikiURL
 {
+    // TODO: Refactor this when we have the new model which will have a DocumentName or DocumentIdentity class.
     private String action;
 
     private String space;

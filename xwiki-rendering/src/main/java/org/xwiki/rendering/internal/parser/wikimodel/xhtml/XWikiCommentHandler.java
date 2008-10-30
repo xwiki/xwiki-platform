@@ -32,7 +32,6 @@ import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRendererType;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
-import org.xwiki.url.XWikiURLFactory;
 
 /**
  * Handle Link and Macro definitions in comments (we store links in a comment since otherwise there are situations
@@ -48,20 +47,16 @@ public class XWikiCommentHandler extends CommentHandler
     
     private LinkParser linkParser;
     
-    private XWikiURLFactory urlFactory;
-    
     private PrintRendererFactory printRendererFactory;
     
     private WikiReferenceParser referenceParser;
 
     private String commentContent;
     
-    public XWikiCommentHandler(Parser parser, LinkParser linkParser, XWikiURLFactory urlFactory, 
-        PrintRendererFactory printRendererFactory)
+    public XWikiCommentHandler(Parser parser, LinkParser linkParser, PrintRendererFactory printRendererFactory)
     {
         this.parser = parser;
         this.linkParser = linkParser;
-        this.urlFactory = urlFactory;
         this.printRendererFactory = printRendererFactory;
         this.referenceParser = new XWikiReferenceParser();
     }
@@ -87,7 +82,7 @@ public class XWikiCommentHandler extends CommentHandler
     
     private void handleLinkCommentStart(String content, TagStack stack)
     {
-        XDOMGeneratorListener listener = new XDOMGeneratorListener(this.parser, this.linkParser, this.urlFactory);
+        XDOMGeneratorListener listener = new XDOMGeneratorListener(this.parser, this.linkParser);
         stack.setStackParameter("xdomGeneratorListener", listener);
         stack.setStackParameter("isInLink", true);
         this.commentContent = content.substring("startwikilink:".length());

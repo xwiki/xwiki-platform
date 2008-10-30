@@ -48,9 +48,6 @@
           <role>org.xwiki.rendering.parser.LinkParser</role>
           <role-hint>xwiki/2.0</role-hint>
         </requirement>
-        <requirement>
-          <role>org.xwiki.url.XWikiURLFactory</role>
-        </requirement>
       </requirements>
     </component>
     <component>
@@ -97,9 +94,6 @@
           <role-hint>xwiki/2.0</role-hint>
         </requirement>
         <requirement>
-          <role>org.xwiki.url.XWikiURLFactory</role>
-        </requirement>
-        <requirement>
           <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>        
         </requirement>
       </requirements>
@@ -113,9 +107,6 @@
         <requirement>
           <role>org.xwiki.rendering.parser.LinkParser</role>
           <role-hint>xwiki/2.0</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.xwiki.url.XWikiURLFactory</role>
         </requirement>
         <requirement>
           <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>        

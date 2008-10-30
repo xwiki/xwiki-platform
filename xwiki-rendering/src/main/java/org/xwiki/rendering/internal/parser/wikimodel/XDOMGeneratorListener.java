@@ -45,10 +45,6 @@ import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
-import org.xwiki.url.XWikiURLFactory;
-import org.xwiki.url.XWikiURL;
-import org.xwiki.url.InvalidURLException;
-import org.xwiki.url.serializer.DocumentNameSerializer;
 
 /**
  * Transforms WikiModel events into XWiki Rendering events.
@@ -66,8 +62,6 @@ public class XDOMGeneratorListener implements IWemListener
     
     private LinkParser linkParser;
 
-    private XWikiURLFactory urlFactory;
-
     private class MarkerBlock extends AbstractBlock
     {
         public void traverse(Listener listener)
@@ -77,11 +71,10 @@ public class XDOMGeneratorListener implements IWemListener
 
     // TODO: Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links.
     // See http://code.google.com/p/wikimodel/issues/detail?id=87
-    public XDOMGeneratorListener(Parser parser, LinkParser linkParser, XWikiURLFactory urlFactory)
+    public XDOMGeneratorListener(Parser parser, LinkParser linkParser)
     {
         this.parser = parser;
         this.linkParser = linkParser;
-        this.urlFactory = urlFactory;
     }
 
     public XDOM getDocument()
@@ -618,24 +611,6 @@ public class XDOMGeneratorListener implements IWemListener
                     linkedBlocks = parserUtils.parseInline(this.parser, label);
                 } catch (ParseException e) {
                     // TODO: Handle errors
-                }
-            }
-            
-            // Check if the reference in the link is an relative URI. If that's the case transform it into
-            // a document name since all relative URIs should point to wiki documents.
-            //
-            // Note that we don't modify URLs since it's impossible for us to know whether it's an internal URL
-            // or some external URL. Thus to handle all cases we generate an XHTML placeholder when outputting
-            // a link to XHTML and the XHMTL parser knows about this placeholder and can transform it back into
-            // a document name without having to parse any URI/URL. We still need this handling below as a special
-            // security measure in cases where the placeholder would not have been generated.
-            if (link.getReference().startsWith("/")) {
-                try {
-                    XWikiURL url = this.urlFactory.createURL(link.getReference());
-                    link.setReference(new DocumentNameSerializer().serialize(url));
-                } catch (InvalidURLException e) {
-                    // If it fails it means this was not a link pointing to a xwiki document after all so we just
-                    // leave it as is.
                 }
             }
             

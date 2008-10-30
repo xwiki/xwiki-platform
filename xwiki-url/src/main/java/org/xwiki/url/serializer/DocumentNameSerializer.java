@@ -30,6 +30,7 @@ import org.xwiki.url.XWikiURL;
  */
 public class DocumentNameSerializer
 {
+    // TODO: Refactor this when we have the new model which will have a DocumentName or DocumentIdentity class.
     public String serialize(XWikiURL xwikiURL)
     {
         StringBuffer result = new StringBuffer();

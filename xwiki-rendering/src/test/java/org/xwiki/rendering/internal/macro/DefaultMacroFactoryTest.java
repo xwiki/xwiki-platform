@@ -19,6 +19,11 @@
  */
 package org.xwiki.rendering.internal.macro;
 
+import java.util.Collections;
+
+import org.jmock.Mock;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -36,5 +41,27 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
     {
         MacroFactory factory = (MacroFactory) getComponentManager().lookup(MacroFactory.ROLE);
         factory.getMacro("xhtml", new Syntax(SyntaxType.XWIKI, "2.0"));
+    }
+    
+    /** 
+     * Tests what happens when a macro is registered with an invalid hint.
+     */
+    public void testInvalidMacroHint() throws Exception
+    {
+        DefaultMacroFactory factory = new DefaultMacroFactory();
+        Mock mockComponentManager = mock(ComponentManager.class);
+        
+        mockComponentManager.expects(once()).method("lookupMap").will(returnValue(
+            Collections.singletonMap("invalidHint", "dummy")));
+        factory.compose((ComponentManager) mockComponentManager.proxy());
+        
+        try {
+            factory.initialize();
+            fail("Should have raised an exception here");
+        } catch (InitializationException expected) {
+            assertEquals("Invalid Macro descriptor hint format [invalidHint]. The hint should contain the macro "
+                + "name followed by a \"/\" followed by the syntax for which the macro is valid.", 
+                expected.getMessage());
+        }
     }
 }

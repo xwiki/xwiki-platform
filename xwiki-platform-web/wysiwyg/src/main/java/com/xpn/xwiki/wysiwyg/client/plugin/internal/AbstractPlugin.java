@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.plugin.Config;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
 
 /**
  * Abstract implementation of the {@link Plugin} interface. This could serve as a base class for all kind of plug-ins.

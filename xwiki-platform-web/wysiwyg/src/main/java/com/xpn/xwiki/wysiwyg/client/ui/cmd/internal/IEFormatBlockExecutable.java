@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.xpn.xwiki.wysiwyg.client.util.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 
 public class IEFormatBlockExecutable extends FormatBlockExecutable
 {

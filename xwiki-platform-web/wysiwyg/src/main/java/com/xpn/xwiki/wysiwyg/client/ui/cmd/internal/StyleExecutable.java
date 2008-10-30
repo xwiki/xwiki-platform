@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.Text;
-import com.google.gwt.user.client.Element;
-import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.Selection;
-import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.util.Document;
-import com.xpn.xwiki.wysiwyg.client.util.TextFragment;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.Selection;
+import com.xpn.xwiki.wysiwyg.client.dom.Text;
+import com.xpn.xwiki.wysiwyg.client.dom.TextFragment;
 
 public class StyleExecutable extends DefaultExecutable
 {
@@ -107,10 +107,9 @@ public class StyleExecutable extends DefaultExecutable
             addStyle(text, range.getStartOffset(), range.getEndOffset());
             newRange.selectNodeContents(text);
         } else if (range.isCollapsed()) {
-            com.google.gwt.dom.client.Element leafElement =
-                Element.as(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
+            Element leafElement = Element.as(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
             assert (!leafElement.hasChildNodes());
-            Text text = leafElement.getOwnerDocument().createTextNode("");
+            Text text = leafElement.getOwnerDocument().createTextNode("").cast();
             leafElement.getParentNode().insertBefore(text, leafElement);
             addStyle(text, 0, 0);
             newRange.selectNodeContents(text);
@@ -147,7 +146,7 @@ public class StyleExecutable extends DefaultExecutable
     {
         if (beginIndex > 0) {
             String leftData = text.getData().substring(0, beginIndex);
-            Text left = text.getOwnerDocument().createTextNode(leftData);
+            Text left = text.getOwnerDocument().createTextNode(leftData).cast();
             text.getParentNode().insertBefore(left, text);
             text.setData(text.getData().substring(beginIndex));
             endIndex -= beginIndex;
@@ -156,7 +155,7 @@ public class StyleExecutable extends DefaultExecutable
 
         if (endIndex < text.getLength()) {
             String rightData = text.getData().substring(endIndex);
-            Text right = text.getOwnerDocument().createTextNode(rightData);
+            Text right = text.getOwnerDocument().createTextNode(rightData).cast();
             if (text.getNextSibling() != null) {
                 text.getParentNode().insertBefore(right, text.getNextSibling());
             } else {
@@ -186,18 +185,17 @@ public class StyleExecutable extends DefaultExecutable
             Text text = Text.as(range.getCommonAncestorContainer());
             removeStyle(text, range.getStartOffset(), range.getEndOffset());
 
-            TextFragment fragment = DOMUtils.getInstance().normalize(text);
+            TextFragment fragment = text.normalize();
             newRange.setStart(fragment.getText(), fragment.getStartIndex());
             newRange.setEnd(fragment.getText(), fragment.getEndIndex());
         } else if (range.isCollapsed()) {
-            com.google.gwt.dom.client.Element leafElement =
-                Element.as(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
+            Element leafElement = Element.as(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
             assert (!leafElement.hasChildNodes());
-            Text text = leafElement.getOwnerDocument().createTextNode("");
+            Text text = leafElement.getOwnerDocument().createTextNode("").cast();
             leafElement.getParentNode().insertBefore(text, leafElement);
             removeStyle(text, 0, 0);
 
-            TextFragment fragment = DOMUtils.getInstance().normalize(text);
+            TextFragment fragment = text.normalize();
             newRange.setStart(fragment.getText(), fragment.getStartIndex());
             newRange.setEnd(fragment.getText(), fragment.getEndIndex());
         } else {
@@ -216,18 +214,18 @@ public class StyleExecutable extends DefaultExecutable
 
             if (node == lastText) {
                 removeStyle(lastText, 0, range.getEndOffset());
-                int lastTextOffset = DOMUtils.getInstance().getOffset(lastText);
+                int lastTextOffset = lastText.getOffset();
 
-                TextFragment firstFragment = DOMUtils.getInstance().normalize(firstText);
+                TextFragment firstFragment = firstText.normalize();
                 newRange.setStart(firstFragment.getText(), firstFragment.getStartIndex());
                 if (lastText.getParentNode() != null) {
-                    TextFragment lastFragment = DOMUtils.getInstance().normalize(lastText);
+                    TextFragment lastFragment = lastText.normalize();
                     newRange.setEnd(lastFragment.getText(), lastFragment.getEndIndex());
                 } else {
                     newRange.setEnd(firstFragment.getText(), lastTextOffset + lastText.getLength());
                 }
             } else {
-                TextFragment firstFragment = DOMUtils.getInstance().normalize(firstText);
+                TextFragment firstFragment = firstText.normalize();
                 newRange.setStart(firstFragment.getText(), firstFragment.getStartIndex());
                 newRange.setEnd(firstFragment.getText(), firstFragment.getStartIndex());
             }
@@ -239,7 +237,7 @@ public class StyleExecutable extends DefaultExecutable
     {
         if (beginIndex > 0) {
             String leftData = text.getData().substring(0, beginIndex);
-            Text left = text.getOwnerDocument().createTextNode(leftData);
+            Text left = text.getOwnerDocument().createTextNode(leftData).cast();
             text.getParentNode().insertBefore(left, text);
             text.setData(text.getData().substring(beginIndex));
             endIndex -= beginIndex;
@@ -248,7 +246,7 @@ public class StyleExecutable extends DefaultExecutable
 
         if (endIndex < text.getLength()) {
             String rightData = text.getData().substring(endIndex);
-            Text right = text.getOwnerDocument().createTextNode(rightData);
+            Text right = text.getOwnerDocument().createTextNode(rightData).cast();
             if (text.getNextSibling() != null) {
                 text.getParentNode().insertBefore(right, text.getNextSibling());
             } else {
@@ -350,13 +348,11 @@ public class StyleExecutable extends DefaultExecutable
             node = node.getParentNode();
         }
         if (inheritable) {
-            return propertyValue.equalsIgnoreCase(DOMUtils.getInstance().getComputedStyleProperty((Element) node,
-                propertyName));
+            return propertyValue.equalsIgnoreCase(Element.as(node).getComputedStyleProperty(propertyName));
         } else {
             while (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
-                if (propertyValue.equalsIgnoreCase(DOMUtils.getInstance().getComputedStyleProperty(element,
-                    propertyName))) {
+                if (propertyValue.equalsIgnoreCase(element.getComputedStyleProperty(propertyName))) {
                     return true;
                 }
                 node = node.getParentNode();

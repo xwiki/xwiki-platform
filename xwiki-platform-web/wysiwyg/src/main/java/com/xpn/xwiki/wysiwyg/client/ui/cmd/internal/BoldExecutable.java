@@ -20,9 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.Element;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
 
 public class BoldExecutable extends StyleExecutable
 {
@@ -41,7 +40,7 @@ public class BoldExecutable extends StyleExecutable
         if (node.getNodeType() == Node.TEXT_NODE) {
             node = node.getParentNode();
         }
-        String fontWeight = DOMUtils.getInstance().getComputedStyleProperty((Element) node, "font-weight");
+        String fontWeight = Element.as(node).getComputedStyleProperty("font-weight");
         if ("bold".equalsIgnoreCase(fontWeight) || "bolder".equalsIgnoreCase(fontWeight)) {
             return true;
         } else {

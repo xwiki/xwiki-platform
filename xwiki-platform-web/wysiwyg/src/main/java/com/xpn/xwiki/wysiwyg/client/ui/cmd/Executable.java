@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd;
 
-import com.xpn.xwiki.wysiwyg.client.util.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 
 /**
  * The code associated with a {@link Command}.

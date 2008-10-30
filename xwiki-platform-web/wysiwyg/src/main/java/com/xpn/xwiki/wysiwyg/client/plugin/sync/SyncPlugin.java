@@ -30,15 +30,15 @@ import com.xpn.xwiki.wysiwyg.client.diff.DifferentiationFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.PatchFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.diff.ToString;
-import com.xpn.xwiki.wysiwyg.client.plugin.Config;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
-import com.xpn.xwiki.wysiwyg.client.timer.Timer;
-import com.xpn.xwiki.wysiwyg.client.timer.TimerListener;
 import com.xpn.xwiki.wysiwyg.client.ui.Images;
 import com.xpn.xwiki.wysiwyg.client.ui.Strings;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.Timer;
+import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
 
 public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerListener, AsyncCallback<SyncResult>
 {

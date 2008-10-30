@@ -26,12 +26,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
-import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdate;
+import com.xpn.xwiki.wysiwyg.client.util.WithDeferredUpdate;
 
 /**
  * An abstract kind of plug-in that listens to the changes in the state of the editor's text area.
  */
-public abstract class StatefulPlugin extends AbstractPlugin implements DeferredUpdate, ClickListener, KeyboardListener,
+public abstract class StatefulPlugin extends AbstractPlugin implements WithDeferredUpdate, ClickListener, KeyboardListener,
     CommandListener
 {
     private long updateIndex = -1;
@@ -103,7 +103,7 @@ public abstract class StatefulPlugin extends AbstractPlugin implements DeferredU
     /**
      * {@inheritDoc}
      * 
-     * @see DeferredUpdate#getUpdateIndex()
+     * @see WithDeferredUpdate#getUpdateIndex()
      */
     public long getUpdateIndex()
     {
@@ -113,7 +113,7 @@ public abstract class StatefulPlugin extends AbstractPlugin implements DeferredU
     /**
      * {@inheritDoc}
      * 
-     * @see DeferredUpdate#incUpdateIndex()
+     * @see WithDeferredUpdate#incUpdateIndex()
      */
     public long incUpdateIndex()
     {

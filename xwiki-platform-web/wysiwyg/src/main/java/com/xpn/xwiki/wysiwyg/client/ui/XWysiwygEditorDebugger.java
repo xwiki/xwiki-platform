@@ -24,8 +24,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
-import com.xpn.xwiki.wysiwyg.client.timer.Timer;
-import com.xpn.xwiki.wysiwyg.client.timer.TimerListener;
+import com.xpn.xwiki.wysiwyg.client.util.Timer;
+import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
 
 public class XWysiwygEditorDebugger extends Composite implements TimerListener
 {

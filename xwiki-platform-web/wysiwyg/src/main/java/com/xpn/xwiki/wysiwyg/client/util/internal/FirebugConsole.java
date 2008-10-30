@@ -32,7 +32,8 @@ public class FirebugConsole extends Console
      * 
      * @see Console#count(String)
      */
-    public native void count(String title) /*-{
+    public native void count(String title)
+    /*-{
         try {
             console.count(title);
         } catch(e) {
@@ -45,7 +46,8 @@ public class FirebugConsole extends Console
      * 
      * @see Console#profile(String)
      */
-    public native void profile(String title) /*-{
+    public native void profile(String title)
+    /*-{
         try {
             console.profile(title);
         } catch(e) {
@@ -58,7 +60,8 @@ public class FirebugConsole extends Console
      * 
      * @see Console#profileEnd()
      */
-    public native void profileEnd() /*-{
+    public native void profileEnd()
+    /*-{
         try {
             console.profileEnd();
         } catch(e) {
@@ -71,7 +74,8 @@ public class FirebugConsole extends Console
      * 
      * @see Console#time(String)
      */
-    public native void time(String name) /*-{
+    public native void time(String name)
+    /*-{
         try {
             console.time(name);
         } catch(e) {
@@ -84,7 +88,8 @@ public class FirebugConsole extends Console
      * 
      * @see Console#timeEnd(String)
      */
-    public native void timeEnd(String name) /*-{
+    public native void timeEnd(String name)
+    /*-{
         try {
             console.timeEnd(name);
         } catch(e) {

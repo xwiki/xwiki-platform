@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.ui;
 
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.plugin.Config;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.font.FontPluginFactory;
@@ -39,6 +38,7 @@ import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XHTMLSyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
 
 public class XWysiwygEditorFactory
 {

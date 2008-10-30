@@ -23,20 +23,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.Text;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.Selection;
+import com.xpn.xwiki.wysiwyg.client.dom.Text;
 import com.xpn.xwiki.wysiwyg.client.history.History;
-import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.Selection;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKeyFactory;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
-import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 /**
  * Default implementation for {@link History}.
@@ -214,7 +214,7 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
     {
         List<Integer> path = new ArrayList<Integer>();
         if (node.getNodeType() == Node.TEXT_NODE) {
-            path.add(DOMUtils.getInstance().getOffset(Text.as(node)) + offset);
+            path.add(Text.as(node).getOffset() + offset);
         } else if (offset == node.getChildNodes().getLength()) {
             path.add(DOMUtils.getInstance().getNormalizedChildCount(node));
         } else {

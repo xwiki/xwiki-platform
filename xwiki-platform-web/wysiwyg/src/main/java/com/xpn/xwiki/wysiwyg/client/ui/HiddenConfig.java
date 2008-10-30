@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Hidden;
-import com.xpn.xwiki.wysiwyg.client.plugin.Config;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
 
 public class HiddenConfig extends Composite implements Config
 {

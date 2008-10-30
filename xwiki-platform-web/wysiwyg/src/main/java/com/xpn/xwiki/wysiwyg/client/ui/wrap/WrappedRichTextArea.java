@@ -34,12 +34,12 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.selection.Range;
-import com.xpn.xwiki.wysiwyg.client.selection.Selection;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKeyFactory;
-import com.xpn.xwiki.wysiwyg.client.util.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 public class WrappedRichTextArea extends RichTextArea
 {

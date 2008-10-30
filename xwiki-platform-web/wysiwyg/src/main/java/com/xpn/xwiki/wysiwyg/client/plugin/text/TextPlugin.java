@@ -24,7 +24,6 @@ import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.plugin.Config;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatefulPlugin;
@@ -35,6 +34,7 @@ import com.xpn.xwiki.wysiwyg.client.ui.XRichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKeyFactory;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
 
 /**
  * {@link XRichTextEditor} plug-in for making text bold, italic, underline or strike through. It installs four toggle

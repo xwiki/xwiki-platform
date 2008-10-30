@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.xpn.xwiki.wysiwyg.client.util.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 
 /**
  * Executes a predefined command on a specific document.

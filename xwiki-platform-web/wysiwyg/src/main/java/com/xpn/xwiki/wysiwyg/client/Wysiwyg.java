@@ -31,11 +31,11 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
-import com.xpn.xwiki.wysiwyg.client.plugin.Config;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultConfig;
 import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditor;
 import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditorDebugger;
 import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditorFactory;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.internal.DefaultConfig;
 
 /**
  * The class responsible for loading the WYSIWYG editors. It can be also viewed as the application context.

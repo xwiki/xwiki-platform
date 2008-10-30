@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin;
 
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
 
 /**
  * A plug-in for the WYSIWYG editor.

@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Executable;
-import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 public abstract class AbstractExecutable implements Executable
 {

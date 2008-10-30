@@ -31,7 +31,6 @@ import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.plugin.Config;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
@@ -42,9 +41,10 @@ import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
-import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdate;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.WithDeferredUpdate;
 
-public class XWysiwygEditor implements DeferredUpdate, ClickListener, KeyboardListener, CommandListener,
+public class XWysiwygEditor implements WithDeferredUpdate, ClickListener, KeyboardListener, CommandListener,
     ChangeListener, LoadListener
 {
     private class SyntaxValidationCommand implements IncrementalCommand
@@ -274,7 +274,7 @@ public class XWysiwygEditor implements DeferredUpdate, ClickListener, KeyboardLi
     /**
      * {@inheritDoc}
      * 
-     * @see DeferredUpdate#getUpdateIndex()
+     * @see WithDeferredUpdate#getUpdateIndex()
      */
     public long getUpdateIndex()
     {
@@ -284,7 +284,7 @@ public class XWysiwygEditor implements DeferredUpdate, ClickListener, KeyboardLi
     /**
      * {@inheritDoc}
      * 
-     * @see DeferredUpdate#incUpdateIndex()
+     * @see WithDeferredUpdate#incUpdateIndex()
      */
     public long incUpdateIndex()
     {
@@ -299,7 +299,7 @@ public class XWysiwygEditor implements DeferredUpdate, ClickListener, KeyboardLi
     /**
      * {@inheritDoc}
      * 
-     * @see DeferredUpdate#onUpdate()
+     * @see WithDeferredUpdate#onUpdate()
      */
     public void onUpdate()
     {

@@ -10,32 +10,32 @@
   <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg" />
 
   <!-- RangeFactory -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory" />
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultRangeFactory">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultRangeFactory" />
   </replace-with>
 
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.IERangeFactory">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultRangeFactory" />
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.IERangeFactory">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultRangeFactory" />
     <when-property-is name="user.agent" value="ie6" />
   </replace-with>
 
   <!-- SelectionManager -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager" />
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultSelectionManager">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultSelectionManager" />
   </replace-with>
 
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.selection.internal.IESelectionManager">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.selection.internal.DefaultSelectionManager" />
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.IESelectionManager">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultSelectionManager" />
     <when-property-is name="user.agent" value="ie6" />
   </replace-with>
 
   <!-- DOMUtils -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.util.internal.MozillaDOMUtils">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.DOMUtils" />
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.MozillaDOMUtils">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.DOMUtils" />
   </replace-with>
 
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.util.internal.IEDOMUtils">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.DOMUtils" />
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.IEDOMUtils">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.DOMUtils" />
     <when-property-is name="user.agent" value="ie6" />
   </replace-with>
 

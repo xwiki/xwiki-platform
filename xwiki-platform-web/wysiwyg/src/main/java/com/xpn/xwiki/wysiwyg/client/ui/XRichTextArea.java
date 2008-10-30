@@ -41,6 +41,7 @@ import com.google.gwt.user.client.ui.SourcesClickEvents;
 import com.google.gwt.user.client.ui.SourcesFocusEvents;
 import com.google.gwt.user.client.ui.SourcesMouseEvents;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.history.History;
 import com.xpn.xwiki.wysiwyg.client.history.internal.DefaultHistory;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
@@ -50,7 +51,6 @@ import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.RedoExecutable;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.UndoExecutable;
 import com.xpn.xwiki.wysiwyg.client.ui.wrap.IFrameConfig;
 import com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.util.Document;
 
 public class XRichTextArea extends Composite implements HasHTML, HasName, HasFocus, SourcesMouseEvents,
     SourcesClickEvents, SourcesFocusEvents, SourcesChangeEvents, ClickListener, FocusListener, KeyboardListener,

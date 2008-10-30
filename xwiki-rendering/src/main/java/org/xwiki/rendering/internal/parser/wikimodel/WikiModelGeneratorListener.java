@@ -34,6 +34,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
  * Map XWiki Listener events on to WikiModel events.
@@ -146,7 +147,12 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.beginHeader(level.getAsInt(), createWikiParameters(parameters));
     }
 
-    public void beginXMLElement(String name, Map<String, String> attributes)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Listener#beginXMLNode(XMLNode)
+     */
+    public void beginXMLNode(XMLNode node)
     {
         // TODO: Find what to do... For now don't render XML elements
     }
@@ -177,7 +183,12 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endHeader(level.getAsInt(), createWikiParameters(parameters));
     }
 
-    public void endXMLElement(String name, Map<String, String> attributes)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Listener#endXMLNode(XMLNode)
+     */
+    public void endXMLNode(XMLNode node)
     {
         // TODO: Find what to do... For now don't render XML elements
     }

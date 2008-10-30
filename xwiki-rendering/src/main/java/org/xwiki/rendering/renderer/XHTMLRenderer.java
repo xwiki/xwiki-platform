@@ -28,6 +28,9 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.xml.XMLComment;
+import org.xwiki.rendering.listener.xml.XMLElement;
+import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
@@ -462,21 +465,41 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginXMLElement(String, java.util.Map)
+     * @see org.xwiki.rendering.renderer.Renderer#beginXMLNode(XMLNode)
      */
-    public void beginXMLElement(String name, Map<String, String> attributes)
+    public void beginXMLNode(XMLNode node)
     {
-        getXHTMLWikiPrinter().printXMLStartElement(name, attributes);
+        switch (node.getNodeType()) {
+            case CDATA:
+                getXHTMLWikiPrinter().printXMLStartCData();
+                break;
+            case COMMENT:
+                XMLComment commentNode = (XMLComment) node;
+                getXHTMLWikiPrinter().printXMLComment(commentNode.getComment());
+                break;
+            case ELEMENT:
+                XMLElement elementNode = (XMLElement) node;
+                getXHTMLWikiPrinter().printXMLStartElement(elementNode.getName(), elementNode.getAttributes());
+                break;
+        }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endXMLElement(String, java.util.Map)
+     * @see org.xwiki.rendering.renderer.Renderer#endXMLNode(XMLNode)
      */
-    public void endXMLElement(String name, Map<String, String> attributes)
+    public void endXMLNode(XMLNode node)
     {
-        getXHTMLWikiPrinter().printXMLEndElement(name);
+        switch (node.getNodeType()) {
+            case CDATA:
+                getXHTMLWikiPrinter().printXMLEndCData();
+                break;
+            case ELEMENT:
+                XMLElement element = (XMLElement) node;
+                getXHTMLWikiPrinter().printXMLEndElement(element.getName());
+                break;
+        }
     }
 
     /**

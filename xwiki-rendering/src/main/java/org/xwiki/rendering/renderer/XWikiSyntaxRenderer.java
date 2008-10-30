@@ -26,9 +26,11 @@ import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.xml.XMLNode;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -406,23 +408,23 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#beginXMLElement(String, java.util.Map)
+     * @see org.xwiki.rendering.renderer.Renderer#beginXMLNode(XMLNode)
      */
-    public void beginXMLElement(String name, Map<String, String> attributes)
+    public void beginXMLNode(XMLNode node)
     {
         // There's no xwiki wiki syntax for writing HTML (we have to use Macros for that). Hence discard
-        // any XML element events.
+        // any XML node events.
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#endXMLElement(String, java.util.Map)
+     * @see PrintRenderer#endXMLNode(XMLNode)
      */
-    public void endXMLElement(String name, Map<String, String> attributes)
+    public void endXMLNode(XMLNode node)
     {
         // There's no xwiki wiki syntax for writing HTML (we have to use Macros for that). Hence discard
-        // any XML element events.
+        // any XML node events.
     }
 
     /**

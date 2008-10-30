@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.macro.xhtml;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -30,6 +30,7 @@ import java.util.Stack;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.Attributes2;
+import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.XMLBlock;
@@ -40,13 +41,18 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.xml.XMLCData;
+import org.xwiki.rendering.listener.xml.XMLComment;
+import org.xwiki.rendering.listener.xml.XMLElement;
 import org.apache.commons.lang.StringUtils;
 
 /**
+ * XML SAX handler that converts XML events into Blocks.
+ * 
  * @version $Id$
  * @since 1.5M2
  */
-public class XMLBlockConverterHandler extends DefaultHandler
+public class XMLBlockConverterHandler extends DefaultHandler implements LexicalHandler
 {
     private Parser parser;
 
@@ -65,6 +71,11 @@ public class XMLBlockConverterHandler extends DefaultHandler
 
     private final MarkerBlock marker = new MarkerBlock();
 
+    /** 
+     * True if we're parsing the DTD section. When this happens we ignore comments and CDATA sections.
+     */
+    private boolean isInDTD;
+   
     private class MarkerBlock extends AbstractBlock
     {
         public void traverse(Listener listener)
@@ -135,12 +146,9 @@ public class XMLBlockConverterHandler extends DefaultHandler
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException
     {
-        if (this.accumulationBuffer.length() > 0) {
-            processCharacters(this.accumulationBuffer.toString().toCharArray(), 0, this.accumulationBuffer.length());
-            this.accumulationBuffer.delete(0, this.accumulationBuffer.length());
-        }
+        flushAccumulationBuffer();
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         for (int i = 0; i < attributes.getLength(); i++) {
             // The XHTML DTD specifies some default value for some attributes. For example for a TD element
             // it defines colspan=1 and rowspan=1. Thus we'll get a colspan and rowspan attribute passed to
@@ -158,7 +166,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
                 map.put(attributes.getQName(i), attributes.getValue(i));
             }
         }
-        this.stack.push(new XMLBlock(name, map));
+        this.stack.push(new XMLBlock(new XMLElement(name, map)));
         this.stack.push(this.marker);
     }
 
@@ -170,14 +178,65 @@ public class XMLBlockConverterHandler extends DefaultHandler
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException
     {
-        if (accumulationBuffer.length() > 0) {
-            processCharacters(this.accumulationBuffer.toString().toCharArray(), 0, this.accumulationBuffer.length());
-            this.accumulationBuffer.delete(0, this.accumulationBuffer.length());
-        }
+        flushAccumulationBuffer();
 
         // Pop the stack until we reach a marker block
         List<Block> nestedBlocks = generateListFromStack();
         this.stack.peek().addChildren(nestedBlocks);
+    }
+
+    public void comment(char[] value, int offset, int count) throws SAXException
+    {
+        if (!isInDTD) {
+            this.stack.push(new XMLBlock(new XMLComment(new String(value, offset, count))));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see LexicalHandler#startCDATA()
+     */
+    public void startCDATA() throws SAXException
+    {
+        if (!isInDTD) {
+            flushAccumulationBuffer();
+            this.stack.push(new XMLBlock(new XMLCData()));
+            this.stack.push(this.marker);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see LexicalHandler#endCDATA()
+     */
+    public void endCDATA() throws SAXException
+    {
+        if (!isInDTD) {
+            flushAccumulationBuffer();
+            // Pop the stack until we reach a marker block
+            List<Block> nestedBlocks = generateListFromStack();
+            this.stack.peek().addChildren(nestedBlocks);
+        }
+    }
+
+    public void startDTD(String arg0, String arg1, String arg2) throws SAXException
+    {
+        this.isInDTD = true;
+    }
+
+    public void endDTD() throws SAXException
+    {
+        this.isInDTD = false;
+    }
+
+    public void startEntity(String arg0) throws SAXException
+    {
+        // Nothing to do since an entity definition shouldn't be present in a XHTML macro content
+    }
+
+    public void endEntity(String arg0) throws SAXException
+    {
+        // Nothing to do since an entity definition shouldn't be present in a XHTML macro content
     }
 
     private List<Block> generateListFromStack()
@@ -194,5 +253,13 @@ public class XMLBlockConverterHandler extends DefaultHandler
         Collections.reverse(blocks);
         return blocks;
     }
-
+    
+    private void flushAccumulationBuffer() throws SAXException
+    {
+        if (this.accumulationBuffer.length() > 0) {
+            processCharacters(this.accumulationBuffer.toString().toCharArray(), 0, 
+                this.accumulationBuffer.length());
+            this.accumulationBuffer.delete(0, this.accumulationBuffer.length());
+        }
+    }
 }

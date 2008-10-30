@@ -191,6 +191,30 @@ public class XHTMLWikiPrinter
     }
 
     /**
+     * Start a CDATA section.
+     */
+    public void printXMLStartCData()
+    {
+        try {
+            this.xmlWriter.startCDATA();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
+    /**
+     * End a CDATA section.
+     */
+    public void printXMLEndCData()
+    {
+        try {
+            this.xmlWriter.endCDATA();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+    
+    /**
      * Convert provided table into {@link Attributes} to use in xml writer.
      */
     public Attributes createAttributes(String[][] parameters)

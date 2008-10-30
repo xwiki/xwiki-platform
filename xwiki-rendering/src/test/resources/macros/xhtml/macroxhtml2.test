@@ -23,17 +23,17 @@ beginMacroMarker [xhtml] [] [
 </tr>
 </table>
 ]
-beginXMLElement [table] []
-beginXMLElement [tr] []
-beginXMLElement [td] []
+beginXMLNode [table]
+beginXMLNode [tr]
+beginXMLNode [td]
 beginList [BULLETED]
 beginListItem
 onWord [listitem]
 endListItem
 endList [BULLETED]
-endXMLElement [td] []
-endXMLElement [tr] []
-endXMLElement [table] []
+endXMLNode [td]
+endXMLNode [tr]
+endXMLNode [table]
 endMacroMarker [xhtml] [] [
 <table>
 <tr>

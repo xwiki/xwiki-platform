@@ -100,6 +100,9 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
             xr.setContentHandler(handler);
             xr.setErrorHandler(handler);
             xr.setEntityResolver(this.entityResolver);
+            
+            // Allow access to CDATA and XML Comments.
+            xr.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
 
             // Since XML can only have a single root node and since we want to allow users to put
             // content such as the following, we need to wrap the content in a root node:

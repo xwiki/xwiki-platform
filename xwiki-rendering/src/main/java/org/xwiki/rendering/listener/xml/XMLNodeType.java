@@ -17,45 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.block;
-
-import java.util.Collections;
-import java.util.List;
-
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.xml.XMLNode;
+package org.xwiki.rendering.listener.xml;
 
 /**
+ * Defines what is the content of an {@link XWMLNode} instance.
+ * 
  * @version $Id$
- * @since 1.5M2
+ * @since 1.7M2
  */
-public class XMLBlock extends AbstractFatherBlock
+public enum XMLNodeType
 {
-    private XMLNode node;
-    
-    public XMLBlock(List<Block> childrenBlocks, XMLNode node)
-    {
-        super(childrenBlocks);
-        this.node = node;
-    }
-
-    public XMLBlock(XMLNode node)
-    {
-        this(Collections.<Block>emptyList(), node);
-    }
-    
-    public XMLNode getXMLNode()
-    {
-        return this.node;
-    }
-    
-    public void before(Listener listener)
-    {
-        listener.beginXMLNode(getXMLNode());
-    }
-
-    public void after(Listener listener)
-    {
-        listener.endXMLNode(getXMLNode());
-    }
+    ELEMENT, COMMENT, CDATA, UNKNOWN;
 }

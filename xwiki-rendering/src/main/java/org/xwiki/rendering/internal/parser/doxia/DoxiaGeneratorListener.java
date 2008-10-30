@@ -27,6 +27,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.xml.XMLNode;
 
 public class DoxiaGeneratorListener implements Listener
 {
@@ -138,7 +139,12 @@ public class DoxiaGeneratorListener implements Listener
         }
     }
 
-    public void beginXMLElement(String name, Map<String, String> attributes)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Listener#beginXMLNode(XMLNode)
+     */
+    public void beginXMLNode(XMLNode node)
     {
         // TODO: Find out what to do...
     }
@@ -191,7 +197,12 @@ public class DoxiaGeneratorListener implements Listener
         }
     }
 
-    public void endXMLElement(String name, Map<String, String> attributes)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Listener#endXMLNode(XMLNode)
+     */
+    public void endXMLNode(XMLNode node)
     {
         // TODO: Find out what to do...
     }

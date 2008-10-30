@@ -27,6 +27,7 @@ import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.xml.XMLNode;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -163,14 +164,14 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("onEscape [" + escapedString + "]");
     }
 
-    public void beginXMLElement(String name, Map<String, String> attributes)
+    public void beginXMLNode(XMLNode node)
     {
-        println("beginXMLElement [" + name + "] [" + toStringXMLElement(attributes) + "]");
+        println("beginXMLNode " + node);
     }
 
-    public void endXMLElement(String name, Map<String, String> attributes)
+    public void endXMLNode(XMLNode node)
     {
-        println("endXMLElement [" + name + "] [" + toStringXMLElement(attributes) + "]");
+        println("endXMLNode " + node);
     }
 
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
@@ -409,19 +410,6 @@ public class EventsRenderer extends AbstractPrintRenderer
         }
 
         return printableStr;
-    }
-
-    private StringBuffer toStringXMLElement(Map<String, String> attributes)
-    {
-        StringBuffer buffer = new StringBuffer();
-        for (Iterator<String> it = attributes.keySet().iterator(); it.hasNext();) {
-            String attributeName = it.next();
-            buffer.append(attributeName).append("=").append(attributes.get(attributeName));
-            if (it.hasNext()) {
-                buffer.append(",");
-            }
-        }
-        return buffer;
     }
 
     private void printMacroData(String eventName, String name, Map<String, String> parameters, String content)

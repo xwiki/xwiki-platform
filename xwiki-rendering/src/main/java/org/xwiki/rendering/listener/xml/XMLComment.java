@@ -17,45 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.block;
-
-import java.util.Collections;
-import java.util.List;
-
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.xml.XMLNode;
+package org.xwiki.rendering.listener.xml;
 
 /**
+ * Represents an XML Comment section.
+ * 
  * @version $Id$
- * @since 1.5M2
+ * @since 1.7M2
  */
-public class XMLBlock extends AbstractFatherBlock
+public class XMLComment extends XMLNode
 {
-    private XMLNode node;
+    private String comment;
     
-    public XMLBlock(List<Block> childrenBlocks, XMLNode node)
+    public XMLComment(String comment)
     {
-        super(childrenBlocks);
-        this.node = node;
-    }
-
-    public XMLBlock(XMLNode node)
-    {
-        this(Collections.<Block>emptyList(), node);
+        this.comment = comment;
     }
     
-    public XMLNode getXMLNode()
+    public XMLNodeType getNodeType()
     {
-        return this.node;
+        return XMLNodeType.COMMENT;
     }
     
-    public void before(Listener listener)
+    public String getComment()
     {
-        listener.beginXMLNode(getXMLNode());
+        return this.comment;
     }
-
-    public void after(Listener listener)
+    
+    @Override
+    public String toString()
     {
-        listener.endXMLNode(getXMLNode());
+        return "[" + getComment() + "]";
     }
 }

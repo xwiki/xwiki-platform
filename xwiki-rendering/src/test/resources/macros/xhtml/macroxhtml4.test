@@ -12,13 +12,13 @@ beginDocument
 beginMacroMarker [xhtml] [] [
 <p>Some <span>text</span></p>
 ]
-beginXMLElement [p] []
+beginXMLNode [p]
 onWord [Some]
 onSpace
-beginXMLElement [span] []
+beginXMLNode [span]
 onWord [text]
-endXMLElement [span] []
-endXMLElement [p] []
+endXMLNode [span]
+endXMLNode [p]
 endMacroMarker [xhtml] [] [
 <p>Some <span>text</span></p>
 ]

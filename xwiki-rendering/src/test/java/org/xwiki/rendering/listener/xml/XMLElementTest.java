@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.block;
+package org.xwiki.rendering.listener.xml;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,12 +26,12 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 /**
- * Unit tests for {@link XMLBlock}.
+ * Unit tests for {@link XMLElement}.
  * 
  * @version $Id $
  * @since 1.7MZ
  */
-public class XMLBlockTest extends TestCase
+public class XMLElementTest extends TestCase
 {
     /**
      * Verify attribute order is kept (i.e. same order as what the user enters).
@@ -41,12 +41,13 @@ public class XMLBlockTest extends TestCase
     public void testAttributeOrder()
     {
         Map<String, String> attributes = new HashMap<String, String>();
-        attributes.put("aaa", "value1");
-        attributes.put("bbb", "value2");
-        XMLBlock block = new XMLBlock("element", attributes);
+        for (int i = 0; i < 10; i++) {
+            attributes.put("key" + i, "value" + i);
+        }
+        XMLElement element = new XMLElement("element", attributes);
         
         Iterator<String> it = attributes.keySet().iterator();
-        Iterator<String> newIt = block.getAttributes().keySet().iterator();
+        Iterator<String> newIt = element.getAttributes().keySet().iterator();
         while (it.hasNext()) {
             assertEquals(newIt.next(), it.next());
         }

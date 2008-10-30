@@ -17,45 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.block;
-
-import java.util.Collections;
-import java.util.List;
-
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.xml.XMLNode;
+package org.xwiki.rendering.listener.xml;
 
 /**
+ * Represents an XML CDATA section.
+ * 
  * @version $Id$
- * @since 1.5M2
+ * @since 1.7M2
  */
-public class XMLBlock extends AbstractFatherBlock
+public class XMLCData extends XMLNode
 {
-    private XMLNode node;
-    
-    public XMLBlock(List<Block> childrenBlocks, XMLNode node)
+    public XMLNodeType getNodeType()
     {
-        super(childrenBlocks);
-        this.node = node;
-    }
-
-    public XMLBlock(XMLNode node)
-    {
-        this(Collections.<Block>emptyList(), node);
+        return XMLNodeType.CDATA;
     }
     
-    public XMLNode getXMLNode()
+    @Override
+    public String toString()
     {
-        return this.node;
-    }
-    
-    public void before(Listener listener)
-    {
-        listener.beginXMLNode(getXMLNode());
-    }
-
-    public void after(Listener listener)
-    {
-        listener.endXMLNode(getXMLNode());
+        return "[CDATA]";
     }
 }

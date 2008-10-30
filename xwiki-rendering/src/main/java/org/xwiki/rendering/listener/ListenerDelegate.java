@@ -2,6 +2,8 @@ package org.xwiki.rendering.listener;
 
 import java.util.Map;
 
+import org.xwiki.rendering.listener.xml.XMLNode;
+
 public class ListenerDelegate implements Listener
 {
     private Listener listener;
@@ -61,9 +63,14 @@ public class ListenerDelegate implements Listener
         this.listener.beginSection(level, parameters);
     }
 
-    public void beginXMLElement(String name, Map<String, String> attributes)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Listener#beginXMLNode(XMLNode)
+     */
+    public void beginXMLNode(XMLNode node)
     {
-        this.listener.beginXMLElement(name, attributes);
+        this.listener.beginXMLNode(node);
     }
 
     /**
@@ -101,9 +108,14 @@ public class ListenerDelegate implements Listener
         this.listener.endSection(level, parameters);
     }
 
-    public void endXMLElement(String name, Map<String, String> attributes)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Listener#endXMLNode(XMLNode)
+     */
+    public void endXMLNode(XMLNode node)
     {
-        this.listener.endXMLElement(name, attributes);
+        this.listener.endXMLNode(node);
     }
 
     public void onEscape(String escapedString)

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -46,8 +47,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     {
         super.setUp();
 
-        this.transformation = new MacroTransformation();
-        this.transformation.compose(getComponentManager());
+        this.transformation = (MacroTransformation) getComponentManager().lookup(Transformation.ROLE, "macro");
     }
 
     /**

@@ -27,25 +27,25 @@
     <!-- Components used for testing -->
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>testsimplemacro/xwiki</role-hint>
+      <role-hint>testsimplemacro</role-hint>
       <implementation>org.xwiki.rendering.internal.transformation.TestSimpleMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>testnestedmacro/xwiki</role-hint>
+      <role-hint>testnestedmacro</role-hint>
       <implementation>org.xwiki.rendering.internal.transformation.TestNestedMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>testrecursivemacro/xwiki</role-hint>
+      <role-hint>testrecursivemacro</role-hint>
       <implementation>org.xwiki.rendering.internal.transformation.TestRecursiveMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>testprioritymacro/xwiki</role-hint>
+      <role-hint>testprioritymacro</role-hint>
       <implementation>org.xwiki.rendering.internal.transformation.TestPriorityMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>

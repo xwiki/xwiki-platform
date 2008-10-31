@@ -20,13 +20,17 @@
 package org.xwiki.rendering.internal.macro;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jmock.Mock;
+import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro;
+import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroFactory;
 
 /**
@@ -37,10 +41,50 @@ import org.xwiki.rendering.macro.MacroFactory;
  */
 public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
 {
+    private Mock mockLogger;
+    private Mock mockComponentManager;
+    private DefaultMacroFactory factory;
+    
+    protected void setUp() throws Exception
+    {
+        this.mockLogger = mock(Logger.class);
+        this.mockComponentManager = mock(ComponentManager.class);
+        
+        this.factory = (DefaultMacroFactory) getComponentManager().lookup(MacroFactory.ROLE);
+        this.factory.enableLogging((Logger) this.mockLogger.proxy());
+    }
+
     public void testGetExistingMacro() throws Exception
     {
-        MacroFactory factory = (MacroFactory) getComponentManager().lookup(MacroFactory.ROLE);
-        factory.getMacro("xhtml", new Syntax(SyntaxType.XWIKI, "2.0"));
+        this.factory.getMacro("xhtml", new Syntax(SyntaxType.XWIKI, "2.0"));
+    }
+
+    public void testMacroRegisteredForAGivenSyntaxOnly() throws Exception
+    {
+        Macro< ? > macro = new XHTMLMacro();
+        this.mockComponentManager.expects(once()).method("lookupMap").will(returnValue(
+            Collections.singletonMap("macro/xwiki/2.0", macro)));
+        this.factory.compose((ComponentManager) this.mockComponentManager.proxy());
+        this.factory.initialize();
+        
+        Macro< ? > macroResult = this.factory.getMacro("macro", new Syntax(SyntaxType.XWIKI, "2.0"));
+        assertSame(macro, macroResult);
+    }
+    
+    public void testMacroRegisteredForAGivenSyntaxOverridesMacroRegisteredForAllSyntaxes() throws Exception
+    {
+        Macro< ? > macro1 = new XHTMLMacro();
+        Macro< ? > macro2 = new XHTMLMacro();
+        Map<String, Macro< ? >> macroDefinitions = new HashMap<String, Macro< ? >>();
+        macroDefinitions.put("macro", macro1);
+        macroDefinitions.put("macro/xwiki/2.0", macro2);
+
+        this.mockComponentManager.expects(once()).method("lookupMap").will(returnValue(macroDefinitions));
+        this.factory.compose((ComponentManager) this.mockComponentManager.proxy());
+        this.factory.initialize();
+        
+        Macro< ? > macroResult = this.factory.getMacro("macro", new Syntax(SyntaxType.XWIKI, "2.0"));
+        assertSame(macro2, macroResult);
     }
     
     /** 
@@ -48,20 +92,18 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
      */
     public void testInvalidMacroHint() throws Exception
     {
-        DefaultMacroFactory factory = new DefaultMacroFactory();
-        Mock mockComponentManager = mock(ComponentManager.class);
-        
-        mockComponentManager.expects(once()).method("lookupMap").will(returnValue(
-            Collections.singletonMap("invalidHint", "dummy")));
-        factory.compose((ComponentManager) mockComponentManager.proxy());
-        
-        try {
-            factory.initialize();
-            fail("Should have raised an exception here");
-        } catch (InitializationException expected) {
-            assertEquals("Invalid Macro descriptor hint format [invalidHint]. The hint should contain the macro "
-                + "name followed by a \"/\" followed by the syntax for which the macro is valid.", 
-                expected.getMessage());
-        }
+        this.mockComponentManager.expects(once()).method("lookupMap").will(returnValue(
+            Collections.singletonMap("macro/invalidsyntax", "dummy")));
+        this.factory.compose((ComponentManager) this.mockComponentManager.proxy());
+
+        // Verify that when a Macro has an invalid hint it's logged as a warning.
+        this.mockLogger.expects(once()).method("warn").with(eq("Invalid Macro descriptor format for hint "
+            + "[macro/invalidsyntax]. The hint should contain either the macro name only or the macro name "
+            + "followed by the syntax for which it is valid. In that case the macro name should be followed by "
+            + "a \"/\" followed by the syntax name followed by another \"/\" followed by the syntax version. "
+            + "This macro will not be available in the system."));
+        this.factory.initialize();
     }
+    
+    
 }

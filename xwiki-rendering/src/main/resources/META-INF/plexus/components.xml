@@ -145,6 +145,11 @@
       <role-hint>macro</role-hint>
       <implementation>org.xwiki.rendering.internal.transformation.MacroTransformation</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.macro.MacroFactory</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.SyntaxFactory</role>
@@ -157,6 +162,11 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.rendering.internal.macro.DefaultMacroFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.SyntaxFactory</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>org.xwiki.rendering.transformation.TransformationManager</role>
@@ -204,7 +214,7 @@
     <!-- Macros -->
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>xhtml/xwiki</role-hint>
+      <role-hint>xhtml</role-hint>
       <implementation>org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
@@ -222,7 +232,7 @@
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>html/xwiki</role-hint>
+      <role-hint>html</role-hint>
       <implementation>org.xwiki.rendering.internal.macro.html.HTMLMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
@@ -243,7 +253,7 @@
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>velocity/xwiki</role-hint>
+      <role-hint>velocity</role-hint>
       <implementation>org.xwiki.rendering.internal.macro.velocity.VelocityMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
@@ -261,7 +271,7 @@
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>include/xwiki</role-hint>
+      <role-hint>include</role-hint>
       <implementation>org.xwiki.rendering.internal.macro.include.IncludeMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
@@ -278,10 +288,6 @@
           <role>org.xwiki.rendering.parser.Parser</role>
           <role-hint>xwiki/2.0</role-hint>
         </requirement>
-        <requirement>
-          <role>org.xwiki.rendering.transformation.Transformation</role>
-          <role-hint>macro</role-hint>
-        </requirement>
       </requirements>
       <configuration>
         <!-- The include macro must execute first since if it runs with the current context it needs to bring
@@ -291,7 +297,7 @@
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>toc/xwiki</role-hint>
+      <role-hint>toc</role-hint>
       <implementation>org.xwiki.rendering.internal.macro.toc.TocMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
@@ -305,7 +311,7 @@
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>id/xwiki</role-hint>
+      <role-hint>id</role-hint>
       <implementation>org.xwiki.rendering.internal.macro.id.IdMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>

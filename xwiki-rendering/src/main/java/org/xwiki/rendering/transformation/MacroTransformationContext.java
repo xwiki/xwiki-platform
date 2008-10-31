@@ -21,6 +21,7 @@ package org.xwiki.rendering.transformation;
 
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.internal.transformation.MacroTransformation;
 
 /**
  * The context of the macro transformation process. Contains information such as the current XWiki DOM for the
@@ -30,12 +31,6 @@ import org.xwiki.rendering.block.MacroBlock;
  */
 public class MacroTransformationContext
 {
-    /**
-     * An empty macro context. Useful for example when calling a macro that doesn't use the context passed to
-     * it.
-     */
-    public static final MacroTransformationContext EMPTY = new MacroTransformationContext(null, XDOM.EMPTY);
-
     /**
      * The macro currently being processed.
      */
@@ -52,24 +47,12 @@ public class MacroTransformationContext
     private boolean isInlined;
     
     /**
-     * Default constructor.
+     * The current Macro Transformation being executed. Useful for Macros which need to perform other transformations
+     * in turn such as the Include macro which needs to execute Macro transformation if the included page should be 
+     * executed in its own context.
      */
-    public MacroTransformationContext()
-    {
-        this(null, XDOM.EMPTY);
-    }
-
-    /**
-     * @param currentMacroBlock the macro currently processed.
-     * @param xdom the complete {@link XDOM} of the page currently being transformed.
-     */
-    public MacroTransformationContext(MacroBlock currentMacroBlock, XDOM xdom)
-    {
-        setCurrentMacroBlock(currentMacroBlock);
-        setXDOM(xdom);
-        setInlined(false);
-    }
-
+    private MacroTransformation macroTransformation;
+    
     /**
      * @param currentMacroBlock the macro currently being processed.
      */
@@ -116,5 +99,15 @@ public class MacroTransformationContext
     public boolean isInlined()
     {
         return this.isInlined;
+    }
+    
+    public void setMacroTransformation(MacroTransformation macroTransformation)
+    {
+        this.macroTransformation = macroTransformation;
+    }
+    
+    public MacroTransformation getMacroTransformation()
+    {
+        return this.macroTransformation;
     }
 }

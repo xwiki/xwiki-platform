@@ -29,6 +29,7 @@ import org.xwiki.context.ExecutionContextInitializerException;
 import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.internal.util.EnumConverter;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -39,7 +40,6 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.rendering.transformation.Transformation;
 
 /**
  * @version $Id$
@@ -58,11 +58,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * Injected by the Component Manager.
      */
     private Parser parser;
-
-    /**
-     * Injected by the Component Manager.
-     */
-    private Transformation macroTransformation;
 
     /**
      * Injected by the Component Manager.
@@ -136,7 +131,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // to be executed at this stage since they should be executed by the currently running
         // Macro Transformation.
         if (actualContext == Context.NEW) {
-            result = executeWithNewContext(documentName, includedContent);
+            result = executeWithNewContext(documentName, includedContent, context.getMacroTransformation());
         } else {
             result = executeWithCurrentContext(documentName, includedContent);
         }
@@ -144,8 +139,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         return result;
     }
 
-    private List<Block> executeWithNewContext(String includedDocumentName, String includedContent)
-        throws MacroExecutionException
+    private List<Block> executeWithNewContext(String includedDocumentName, String includedContent, 
+        MacroTransformation macroTransformation) throws MacroExecutionException
     {
         List<Block> result;
 
@@ -160,7 +155,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             this.execution.pushContext(ec);
             // TODO: Need to set the current document, space and wiki. This is required for wiki syntax acting on
             // documents. For example if a link says "WebHome" it should point to the webhome of the current space.
-            result = generateIncludedPageDOM(includedDocumentName, includedContent, true);
+            result = generateIncludedPageDOM(includedDocumentName, includedContent, macroTransformation);
         } catch (ExecutionContextInitializerException e) {
             throw new MacroExecutionException("Failed to create new Execution Context for included page ["
                 + includedDocumentName + "]", e);
@@ -175,11 +170,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     private List<Block> executeWithCurrentContext(String includedDocumentName, String includedContent)
         throws MacroExecutionException
     {
-        return generateIncludedPageDOM(includedDocumentName, includedContent, false);
+        return generateIncludedPageDOM(includedDocumentName, includedContent, null);
     }
 
     private List<Block> generateIncludedPageDOM(String includedDocumentName, String includedContent,
-        boolean runMacroTransformation) throws MacroExecutionException
+        MacroTransformation macroTransformation) throws MacroExecutionException
     {
         XDOM includedDom;
         try {
@@ -189,8 +184,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             // included page to be added to the list of macros on the including page so that they're all sorted
             // and executed in the right order. Note that this works only because the Include macro has the highest
             // execution priority and is thus executed first.
-            if (runMacroTransformation) {
-                this.macroTransformation.transform(includedDom, SYNTAX);
+            if (macroTransformation != null) {
+                macroTransformation.transform(includedDom, SYNTAX);
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to parse included page [" + includedDocumentName + "]", e);

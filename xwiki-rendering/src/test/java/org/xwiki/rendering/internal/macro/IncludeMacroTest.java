@@ -27,10 +27,13 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.macro.velocity.VelocityMacro;
+import org.xwiki.rendering.internal.transformation.MacroTransformation;
+import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -47,7 +50,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
             + "onMacroStandalone [someMacro] [] []\n"
             + "endDocument";
 
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");
+        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.ROLE, "include");
         Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
         macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
@@ -56,7 +59,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         parameters.setDocument("wiki:Space.Page");
         parameters.setContext(Context.CURRENT);
 
-        List<Block> blocks = macro.execute(parameters, null, MacroTransformationContext.EMPTY);
+        List<Block> blocks = macro.execute(parameters, null, new MacroTransformationContext());
 
         assertBlocks(expected, blocks);
     }
@@ -79,7 +82,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($myvar = 'hello')");
 
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");
+        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include");
         Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(
             returnValue("{{velocity}}$myvar{{/velocity}}"));
@@ -89,7 +92,14 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         parameters.setDocument("wiki:Space.Page");
         parameters.setContext(Context.NEW);
 
-        List<Block> blocks = macro.execute(parameters, null, MacroTransformationContext.EMPTY);
+        // Create a Macro transformation context with the Macro transformation object defined so that the include
+        // macro can transform included page which is using a new context.
+        MacroTransformation macroTransformation = 
+            (MacroTransformation) getComponentManager().lookup(Transformation.ROLE, "macro");
+        MacroTransformationContext context = new MacroTransformationContext();
+        context.setMacroTransformation(macroTransformation);
+        
+        List<Block> blocks = macro.execute(parameters, null, context);
 
         assertBlocks(expected, blocks);
     }

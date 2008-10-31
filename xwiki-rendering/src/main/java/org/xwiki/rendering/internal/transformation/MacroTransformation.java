@@ -24,9 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroInlineBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
@@ -34,6 +31,8 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroFactory;
+import org.xwiki.rendering.macro.MacroNotFoundException;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.transformation.AbstractTransformation;
@@ -51,7 +50,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
-public class MacroTransformation extends AbstractTransformation implements Composable
+public class MacroTransformation extends AbstractTransformation
 {
     /**
      * Number of macro executions allowed when rendering the current content before considering that we are in a loop.
@@ -59,8 +58,11 @@ public class MacroTransformation extends AbstractTransformation implements Compo
      */
     private int maxMacroExecutions = 1000;
 
-    private ComponentManager componentManager;
-
+    /**
+     * Handles macro registration and macro lookups. Injected by the Component Manager.
+     */
+    private MacroFactory macroFactory;
+    
     private class MacroHolder implements Comparable<MacroHolder>
     {
         Macro< ? > macro;
@@ -84,24 +86,14 @@ public class MacroTransformation extends AbstractTransformation implements Compo
     /**
      * {@inheritDoc}
      * 
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.transformation.Transformation#transform(org.xwiki.rendering.block.XDOM , org.xwiki.rendering.parser.Syntax)
      */
     public void transform(XDOM dom, Syntax syntax) throws TransformationException
     {
+        // Create a macro execution context with all the information required for macros.
         MacroTransformationContext context = new MacroTransformationContext();
-
-        // We set the XWiki DOM in the Macro execution context so that macros who need to act on the DOM can do so.
         context.setXDOM(dom);
+        context.setMacroTransformation(this);
 
         // Counter to prevent infinite recursion if a macro generates the same macro for example.
         int executions = 0;
@@ -123,16 +115,15 @@ public class MacroTransformation extends AbstractTransformation implements Compo
 
         // 1) Sort the macros by priority to find the highest priority macro to execute
         for (MacroBlock macroBlock : context.getXDOM().getChildrenByType(MacroBlock.class, true)) {
-            String hintName = macroBlock.getName() + "/" + syntax.getType().toIdString();
             try {
-                Macro< ? > macro = (Macro< ? >) this.componentManager.lookup(Macro.ROLE, hintName);
+                Macro< ? > macro = this.macroFactory.getMacro(macroBlock.getName(), syntax);
                 macroHolders.add(new MacroHolder(macro, macroBlock));
-            } catch (ComponentLookupException e) {
+            } catch (MacroNotFoundException e) {
                 // TODO: When a macro fails to be loaded replace it with an Error Block so that 1) we don't try to load
                 // it again
                 // and 2) the user can clearly see that it failed to be executed.
-                getLogger().warn(
-                    "Failed to find macro [" + macroBlock.getName() + "] for hint [" + hintName + "]. Ignoring it");
+                getLogger().warn("Failed to perform transformation for macro [" + macroBlock.getName() 
+                    + "]. Ignoring it");
             }
         }
         // If no macros were found, return with no changes. This can happen if the macros fail to be found.

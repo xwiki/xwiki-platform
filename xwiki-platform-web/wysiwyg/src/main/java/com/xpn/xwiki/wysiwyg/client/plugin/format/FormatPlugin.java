@@ -26,17 +26,17 @@ import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
+import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatefulPlugin;
-import com.xpn.xwiki.wysiwyg.client.ui.Strings;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextEditor;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link XRichTextEditor} plug-in for formatting text. It can be used to format text as heading 1 to 5. It installs a
+ * {@link RichTextEditor} plug-in for formatting text. It can be used to format text as heading 1 to 5. It installs a
  * select on the tool bar and updates its status depending on the current cursor position.
  */
 public class FormatPlugin extends StatefulPlugin implements ChangeListener
@@ -61,9 +61,9 @@ public class FormatPlugin extends StatefulPlugin implements ChangeListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, XRichTextArea, Config)
+     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
+    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
 

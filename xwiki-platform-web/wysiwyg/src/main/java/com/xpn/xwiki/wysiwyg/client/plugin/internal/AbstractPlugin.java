@@ -25,8 +25,8 @@ import java.util.List;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Abstract implementation of the {@link Plugin} interface. This could serve as a base class for all kind of plug-ins.
@@ -35,7 +35,7 @@ public abstract class AbstractPlugin implements Plugin
 {
     private Wysiwyg wysiwyg;
 
-    private XRichTextArea textArea;
+    private RichTextArea textArea;
 
     private Config config;
 
@@ -48,7 +48,7 @@ public abstract class AbstractPlugin implements Plugin
         return config;
     }
 
-    protected XRichTextArea getTextArea()
+    protected RichTextArea getTextArea()
     {
         return textArea;
     }
@@ -66,9 +66,9 @@ public abstract class AbstractPlugin implements Plugin
     /**
      * {@inheritDoc}
      * 
-     * @see Plugin#init(Wysiwyg, XRichTextArea, Config)
+     * @see Plugin#init(Wysiwyg, RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
+    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         if (loaded) {
             throw new IllegalStateException();

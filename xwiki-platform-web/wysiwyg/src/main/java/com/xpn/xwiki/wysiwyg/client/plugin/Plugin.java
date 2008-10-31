@@ -20,8 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin;
 
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * A plug-in for the WYSIWYG editor.
@@ -38,7 +38,7 @@ public interface Plugin
      * @param textArea The text area of the editor.
      * @param config The configuration.
      */
-    void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config);
+    void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config);
 
     /**
      * @return All the user interface extensions that are provided by this plug-in.

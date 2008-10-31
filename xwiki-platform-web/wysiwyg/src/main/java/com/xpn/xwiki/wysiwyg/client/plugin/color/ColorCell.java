@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.color;
 
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.xpn.xwiki.wysiwyg.client.dom.Style;
 
 public class ColorCell extends FlowPanel
 {
@@ -33,7 +34,7 @@ public class ColorCell extends FlowPanel
         super();
 
         this.color = color;
-        getElement().getStyle().setProperty("backgroundColor", color);
+        getElement().getStyle().setProperty(Style.BACKGROUND_COLOR, color);
         addStyleName("colorCell");
 
         sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);

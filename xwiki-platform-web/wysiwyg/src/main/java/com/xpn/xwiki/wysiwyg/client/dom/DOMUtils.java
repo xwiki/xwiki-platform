@@ -188,7 +188,7 @@ public abstract class DOMUtils
      */
     public boolean isInline(Node node)
     {
-        return "inline".equalsIgnoreCase(getDisplay(node));
+        return Style.Display.INLINE.equalsIgnoreCase(getDisplay(node));
     }
 
     /**
@@ -199,9 +199,9 @@ public abstract class DOMUtils
     {
         switch (node.getNodeType()) {
             case Node.TEXT_NODE:
-                return "inline";
+                return Style.Display.INLINE;
             case Node.ELEMENT_NODE:
-                return getComputedStyleProperty((Element) node, "display");
+                return getComputedStyleProperty((Element) node, Style.DISPLAY);
             default:
                 return null;
         }

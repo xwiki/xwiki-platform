@@ -21,10 +21,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.ui.Strings;
-import com.xpn.xwiki.wysiwyg.client.ui.widget.CompositeDialog;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 
-public class SymbolPicker extends CompositeDialog implements ClickListener
+public class SymbolPicker extends CompositeDialogBox implements ClickListener
 {
     public final static Object[][] SYMBOLS =
         {

@@ -20,8 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Validation rule for text area's commands. Verifies if a specific command can be executed on the current state of the
@@ -42,9 +42,9 @@ public class DefaultValidationRule implements ValidationRule
     /**
      * {@inheritDoc}
      * 
-     * @see ValidationRule#areValid(XRichTextArea)
+     * @see ValidationRule#areValid(SubmittableRichTextArea)
      */
-    public boolean areValid(XRichTextArea textArea)
+    public boolean areValid(RichTextArea textArea)
     {
         return textArea.getCommandManager().isEnabled(command);
     }

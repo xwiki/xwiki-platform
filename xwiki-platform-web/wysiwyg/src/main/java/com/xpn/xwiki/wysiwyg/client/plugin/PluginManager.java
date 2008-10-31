@@ -20,7 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.plugin;
 
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
 
 /**
  * Manages the list of installed plug-ins.
@@ -43,7 +43,7 @@ public interface PluginManager
 
     /**
      * Loads the specified plug-in. A new instance of this plug-in is obtained using the current plug-in factory
-     * manager. The {@link Plugin#init(Wysiwyg, XRichTextArea, Config)} method is called.
+     * manager. The {@link Plugin#init(Wysiwyg, SubmittableRichTextArea, Config)} method is called.
      * 
      * @param pluginName The name of the plug-in to be loaded. This name should match the value returned by
      *            {@link PluginFactory#getPluginName()} method of this plug-in's factory.

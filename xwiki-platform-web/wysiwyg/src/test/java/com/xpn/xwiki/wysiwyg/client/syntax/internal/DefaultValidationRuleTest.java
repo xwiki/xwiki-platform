@@ -21,9 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
 import com.google.gwt.user.client.ui.RootPanel;
 import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.MockCommandManager;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Unit test for {@link DefaultValidationRule}.
@@ -33,7 +33,7 @@ public class DefaultValidationRuleTest extends WysiwygClientTest
     public void testOutdentRule()
     {
         DefaultValidationRule outdentRule = new DefaultValidationRule("outdent", Command.OUTDENT);
-        XRichTextArea textArea = new XRichTextArea(new MockCommandManager());
+        RichTextArea textArea = new RichTextArea(new MockCommandManager());
         RootPanel.get().add(textArea);
 
         assertFalse(outdentRule.areValid(textArea));

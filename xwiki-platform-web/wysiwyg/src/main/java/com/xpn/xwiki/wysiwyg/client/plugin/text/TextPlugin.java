@@ -24,39 +24,39 @@ import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
+import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatefulPlugin;
-import com.xpn.xwiki.wysiwyg.client.ui.Images;
-import com.xpn.xwiki.wysiwyg.client.ui.Strings;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextEditor;
-import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
-import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKeyFactory;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
+import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyFactory;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link XRichTextEditor} plug-in for making text bold, italic, underline or strike through. It installs four toggle
+ * {@link RichTextEditor} plug-in for making text bold, italic, underline or strike through. It installs four toggle
  * buttons on the tool bar and updates their status depending on the current cursor position and the direction of the
  * navigation using the arrow keys. For instance, if you navigate from a bold region to an italic one and you type a
- * character it will be bold.<br/> <b>Known issues:</b> When you navigate backwards, from right to left, using the
- * arrow keys, the status of the toggle buttons is not synchronized with the text area. The text area behaves properly
- * though.
+ * character it will be bold.<br/>
+ * <b>Known issues:</b> When you navigate backwards, from right to left, using the arrow keys, the status of the toggle
+ * buttons is not synchronized with the text area. The text area behaves properly though.
  */
 public class TextPlugin extends StatefulPlugin
 {
     private ToggleButton bold;
 
-    private XShortcutKey boldKey;
+    private ShortcutKey boldKey;
 
     private ToggleButton italic;
 
-    private XShortcutKey italicKey;
+    private ShortcutKey italicKey;
 
     private ToggleButton underline;
 
-    private XShortcutKey underlineKey;
+    private ShortcutKey underlineKey;
 
     private ToggleButton strikeThrough;
 
@@ -67,16 +67,16 @@ public class TextPlugin extends StatefulPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, XRichTextArea, Config)
+     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
+    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
 
         if (getTextArea().getCommandManager().isSupported(Command.BOLD)) {
             bold = new ToggleButton(Images.INSTANCE.bold().createImage(), this);
             bold.setTitle(Strings.INSTANCE.bold());
-            boldKey = XShortcutKeyFactory.createCtrlShortcutKey('B');
+            boldKey = ShortcutKeyFactory.createCtrlShortcutKey('B');
             getTextArea().addShortcutKey(boldKey);
             toolBarExtension.addFeature("bold", bold);
         }
@@ -84,7 +84,7 @@ public class TextPlugin extends StatefulPlugin
         if (getTextArea().getCommandManager().isSupported(Command.ITALIC)) {
             italic = new ToggleButton(Images.INSTANCE.italic().createImage(), this);
             italic.setTitle(Strings.INSTANCE.italic());
-            italicKey = XShortcutKeyFactory.createCtrlShortcutKey('I');
+            italicKey = ShortcutKeyFactory.createCtrlShortcutKey('I');
             getTextArea().addShortcutKey(italicKey);
             toolBarExtension.addFeature("italic", italic);
         }
@@ -92,7 +92,7 @@ public class TextPlugin extends StatefulPlugin
         if (getTextArea().getCommandManager().isSupported(Command.UNDERLINE)) {
             underline = new ToggleButton(Images.INSTANCE.underline().createImage(), this);
             underline.setTitle(Strings.INSTANCE.underline());
-            underlineKey = XShortcutKeyFactory.createCtrlShortcutKey('U');
+            underlineKey = ShortcutKeyFactory.createCtrlShortcutKey('U');
             getTextArea().addShortcutKey(underlineKey);
             toolBarExtension.addFeature("underline", underline);
         }

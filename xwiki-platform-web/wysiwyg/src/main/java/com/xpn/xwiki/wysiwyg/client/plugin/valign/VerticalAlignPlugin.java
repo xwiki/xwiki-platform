@@ -23,22 +23,23 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
+import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatefulPlugin;
-import com.xpn.xwiki.wysiwyg.client.ui.Images;
-import com.xpn.xwiki.wysiwyg.client.ui.Strings;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextEditor;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link XRichTextEditor} plug-in for making text superscript or subscript. It installs two toggle buttons on the tool
+ * {@link RichTextEditor} plug-in for making text superscript or subscript. It installs two toggle buttons on the tool
  * bar and updates their status depending on the current cursor position and the direction of the navigation using the
  * arrow keys. For instance, if you navigate from a subscript region to a superscript one and you type a character it
- * will be subscript.<br/> <b>Known issues:</b> When you navigate backwards, from right to left, using the arrow keys,
- * the status of the toggle buttons is not synchronized with the text area. The text area behaves properly though.
+ * will be subscript.<br/>
+ * <b>Known issues:</b> When you navigate backwards, from right to left, using the arrow keys, the status of the toggle
+ * buttons is not synchronized with the text area. The text area behaves properly though.
  */
 public class VerticalAlignPlugin extends StatefulPlugin
 {
@@ -51,9 +52,9 @@ public class VerticalAlignPlugin extends StatefulPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, XRichTextArea, Config)
+     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
+    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
 

@@ -20,17 +20,17 @@
 package com.xpn.xwiki.wysiwyg.client.syntax.rule;
 
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 public class DisableListInHeader implements ValidationRule
 {
     /**
      * {@inheritDoc}
      * 
-     * @see ValidationRule#areValid(XRichTextArea)
+     * @see ValidationRule#areValid(SubmittableRichTextArea)
      */
-    public boolean areValid(XRichTextArea textArea)
+    public boolean areValid(RichTextArea textArea)
     {
         String level = textArea.getCommandManager().getStringValue(Command.FORMAT_BLOCK);
         if (level != null && level.toLowerCase().startsWith("h")) {

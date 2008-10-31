@@ -23,15 +23,15 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.ui.Images;
-import com.xpn.xwiki.wysiwyg.client.ui.Strings;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.ui.widget.PopupListener;
-import com.xpn.xwiki.wysiwyg.client.ui.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
+import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 public class SymbolPlugin extends AbstractPlugin implements ClickListener, PopupListener
 {
@@ -44,9 +44,9 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, XRichTextArea, Config)
+     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
+    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
 

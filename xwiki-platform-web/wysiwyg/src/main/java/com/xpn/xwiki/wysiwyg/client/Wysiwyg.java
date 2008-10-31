@@ -31,9 +31,9 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
-import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditor;
-import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditorDebugger;
-import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditorFactory;
+import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditor;
+import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorDebugger;
+import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorFactory;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.internal.DefaultConfig;
 
@@ -111,11 +111,12 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
             hook.getParentElement().replaceChild(container, hook);
 
             // Create the WYSIWYG Editor
-            final XWysiwygEditor editor = XWysiwygEditorFactory.getInstance().newEditor(config, this);
-            editor.getUI().getTextArea().getIFrameConfig().addStyleSheet(config.getParameter("stylesheet"));
-            editor.getUI().getTextArea().getIFrameConfig().addStyleSheet(GWT.getModuleBaseURL() + "RichTextArea.css");
-            editor.getUI().getTextArea().getIFrameConfig().setBodyId("body");
-            editor.getUI().getTextArea().getIFrameConfig().addBodyStyleName("main");
+            final WysiwygEditor editor = WysiwygEditorFactory.getInstance().newEditor(config, this);
+            editor.getUI().getTextArea().getDocumentTemplate().addStyleSheet(config.getParameter("stylesheet"));
+            editor.getUI().getTextArea().getDocumentTemplate().addStyleSheet(
+                GWT.getModuleBaseURL() + "RichTextArea.css");
+            editor.getUI().getTextArea().getDocumentTemplate().setBodyId("body");
+            editor.getUI().getTextArea().getDocumentTemplate().addBodyStyleName("main");
             editor.getUI().getTextArea().setHTML(value);
             editor.getUI().getTextArea().setHeight(height);
             if (name != null) {
@@ -124,7 +125,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
             // Insert the WYSIWYG Editor
             if ("true".equals(config.getParameter("debug", "false"))) {
-                RootPanel.get(containerId).add(new XWysiwygEditorDebugger(editor));
+                RootPanel.get(containerId).add(new WysiwygEditorDebugger(editor));
             } else {
                 RootPanel.get(containerId).add(editor.getUI());
             }

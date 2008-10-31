@@ -20,7 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
 import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Unit test for {@link DisablingRule}.
@@ -30,6 +30,6 @@ public class DisablingRuleTest extends WysiwygClientTest
     public void testAlwaysDisabled()
     {
         DisablingRule dr = new DisablingRule(new String[] {"a", "b", "c"});
-        assertFalse(dr.areValid(new XRichTextArea()));
+        assertFalse(dr.areValid(new RichTextArea()));
     }
 }

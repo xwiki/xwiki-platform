@@ -26,8 +26,8 @@ import java.util.Map;
 
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Base class for syntax-specific validators. It includes by default syntax-independent rules.
@@ -109,9 +109,9 @@ public abstract class DefaultSyntaxValidator implements SyntaxValidator
     /**
      * {@inheritDoc}
      * 
-     * @see SyntaxValidator#isValid(String, XRichTextArea)
+     * @see SyntaxValidator#isValid(String, SubmittableRichTextArea)
      */
-    public boolean isValid(String feature, XRichTextArea textArea)
+    public boolean isValid(String feature, RichTextArea textArea)
     {
         if (hasValidationRules(feature)) {
             for (ValidationRule rule : getValidationRules(feature)) {

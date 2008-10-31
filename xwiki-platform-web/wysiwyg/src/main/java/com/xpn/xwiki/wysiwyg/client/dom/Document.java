@@ -137,4 +137,77 @@ public class Document extends com.google.gwt.dom.client.Document
     {
         return DOMUtils.getInstance().importNode(this, externalNode, deep);
     }
+
+    /**
+     * When an HTML document has been switched to designMode, the document object exposes the execCommand method which
+     * allows one to run commands to manipulate the contents of the editable region. Most commands affect the document's
+     * selection (bold, italics, etc), while others insert new elements (adding a link) or affect an entire line
+     * (indenting). When using contentEditable, calling execCommand will affect the currently active editable element.
+     * 
+     * @param command The name of the command.
+     * @param parameter Some commands (such as insertimage) require an extra value argument (the image's url). Pass an
+     *            argument of null if no argument is needed.
+     * @return true if the specified command has been successfully executed.
+     */
+    public final native boolean execCommand(String command, String parameter)
+    /*-{
+        try{
+            return this.execCommand(command, false, parameter);
+        } catch(e) {
+            return false;
+        }
+    }-*/;
+
+    /**
+     * @param command The name of the command to query.
+     * @return The current value of the current range for the given command. If a command value has not been explicitly
+     *         set then it returns null.
+     */
+    public final native String queryCommandValue(String command)
+    /*-{
+        try{
+            return this.queryCommandValue(command);
+        } catch(e) {
+            return null;
+        }
+    }-*/;
+
+    /**
+     * @param command The name of the command to query.
+     * @return true if the given command can be executed on the current range.
+     */
+    public final native boolean queryCommandEnabled(String command)
+    /*-{
+        try{
+            return this.queryCommandEnabled(command);
+        } catch(e) {
+            return false;
+        }
+    }-*/;
+
+    /**
+     * @param command The name of the command to query.
+     * @return true if the given command has been executed on the current range.
+     */
+    public final native boolean queryCommandState(String command)
+    /*-{
+        try{
+            return this.queryCommandState(command);
+        } catch(e) {
+            return false;
+        }
+    }-*/;
+
+    /**
+     * @param command The name of the command to query.
+     * @return true if the given command is supported by the current browser.
+     */
+    public final native boolean queryCommandSupported(String command)
+    /*-{
+        try{
+            return this.queryCommandSupported(command);
+        } catch(e) {
+            return true;
+        }
+    }-*/;
 }

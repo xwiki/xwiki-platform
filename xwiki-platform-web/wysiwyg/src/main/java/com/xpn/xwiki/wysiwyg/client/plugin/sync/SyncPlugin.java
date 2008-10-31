@@ -30,15 +30,15 @@ import com.xpn.xwiki.wysiwyg.client.diff.DifferentiationFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.PatchFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.diff.ToString;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
-import com.xpn.xwiki.wysiwyg.client.ui.Images;
-import com.xpn.xwiki.wysiwyg.client.ui.Strings;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.Timer;
 import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerListener, AsyncCallback<SyncResult>
 {
@@ -65,9 +65,9 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, XRichTextArea, Config)
+     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
+    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
 

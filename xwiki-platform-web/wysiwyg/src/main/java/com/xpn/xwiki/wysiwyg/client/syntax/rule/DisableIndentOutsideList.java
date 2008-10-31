@@ -20,17 +20,17 @@
 package com.xpn.xwiki.wysiwyg.client.syntax.rule;
 
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 public class DisableIndentOutsideList implements ValidationRule
 {
     /**
      * {@inheritDoc}
      * 
-     * @see ValidationRule#areValid(XRichTextArea)
+     * @see ValidationRule#areValid(SubmittableRichTextArea)
      */
-    public boolean areValid(XRichTextArea textArea)
+    public boolean areValid(RichTextArea textArea)
     {
         return textArea.getCommandManager().isExecuted(Command.INSERT_UNORDERED_LIST)
             || textArea.getCommandManager().isExecuted(Command.INSERT_ORDERED_LIST);

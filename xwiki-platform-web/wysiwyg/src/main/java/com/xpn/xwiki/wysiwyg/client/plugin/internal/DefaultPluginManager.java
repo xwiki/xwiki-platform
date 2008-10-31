@@ -28,8 +28,8 @@ import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Default implementation of the {@link PluginManager} interface. We don't plan to provide another implementation.
@@ -51,13 +51,13 @@ public class DefaultPluginManager implements PluginManager
 
     private final Wysiwyg wysiwyg;
 
-    private final XRichTextArea textArea;
+    private final RichTextArea textArea;
 
     private final Config config;
 
     private PluginFactoryManager pfm;
 
-    public DefaultPluginManager(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
+    public DefaultPluginManager(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         this.wysiwyg = wysiwyg;
         this.textArea = textArea;

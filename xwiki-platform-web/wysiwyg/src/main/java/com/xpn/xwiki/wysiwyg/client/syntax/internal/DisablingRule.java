@@ -20,7 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Utility rule for disabling some of the editor's features.
@@ -47,9 +47,9 @@ public class DisablingRule implements ValidationRule
     /**
      * {@inheritDoc}
      * 
-     * @see ValidationRule#areValid(XRichTextArea)
+     * @see ValidationRule#areValid(SubmittableRichTextArea)
      */
-    public boolean areValid(XRichTextArea textArea)
+    public boolean areValid(RichTextArea textArea)
     {
         return false;
     }

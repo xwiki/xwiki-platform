@@ -21,7 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.syntax;
 
 import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRule;
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Unit test for any concrete implementation of {@link SyntaxValidator}
@@ -33,7 +33,7 @@ public abstract class SyntaxValidatorTest extends WysiwygClientTest
     public void testAddRemoveDisablingRule()
     {
         String feature = "feature";
-        XRichTextArea textArea = new XRichTextArea();
+        RichTextArea textArea = new RichTextArea();
         SyntaxValidator sv = newSyntaxValidator();
         DisablingRule dr = new DisablingRule(new String[] {feature});
 

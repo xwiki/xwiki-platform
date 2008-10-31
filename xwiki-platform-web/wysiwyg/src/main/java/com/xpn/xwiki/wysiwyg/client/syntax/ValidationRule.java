@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax;
 
-import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * A validation rule states that some of the editor's features (like 'bold', 'indent' etc.) should not be enabled when
@@ -41,5 +41,5 @@ public interface ValidationRule
      * @param textArea The text area whose current state should be considered.
      * @return true if all the underlying features should be enabled, false otherwise.
      */
-    boolean areValid(XRichTextArea textArea);
+    boolean areValid(RichTextArea textArea);
 }

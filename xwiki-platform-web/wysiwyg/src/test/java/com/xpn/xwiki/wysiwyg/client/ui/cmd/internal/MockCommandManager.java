@@ -22,8 +22,9 @@ package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractCommandManager;
 
 /**
  * Mock command manager to be used on unit tests.

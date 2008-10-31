@@ -23,10 +23,10 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListener;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.util.WithDeferredUpdate;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
 /**
  * An abstract kind of plug-in that listens to the changes in the state of the editor's text area.

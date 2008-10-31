@@ -24,7 +24,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
@@ -79,7 +78,7 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
     /**
      * {@inheritDoc}
      * 
-     * @see ServletRequest#getParameter(String)
+     * @see HttpServletRequestWrapper#getParameter(String)
      */
     public String getParameter(String name)
     {
@@ -90,7 +89,7 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
     /**
      * {@inheritDoc}
      * 
-     * @see ServletRequest#getParameterMap()
+     * @see HttpServletRequestWrapper#getParameterMap()
      */
     public Map<String, String[]> getParameterMap()
     {
@@ -100,7 +99,7 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
     /**
      * {@inheritDoc}
      * 
-     * @see ServletRequest#getParameterNames()
+     * @see HttpServletRequestWrapper#getParameterNames()
      */
     public Enumeration<String> getParameterNames()
     {
@@ -110,7 +109,7 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
     /**
      * {@inheritDoc}
      * 
-     * @see ServletRequest#getParameterValues(String)
+     * @see HttpServletRequestWrapper#getParameterValues(String)
      */
     public String[] getParameterValues(String name)
     {

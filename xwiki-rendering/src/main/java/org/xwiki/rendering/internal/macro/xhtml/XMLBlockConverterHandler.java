@@ -157,9 +157,9 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
             // the Attributes2 class.
             // See http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html#package_description
             if (attributes instanceof Attributes2) {
-                Attributes2 attribute2 = (Attributes2) attributes;
+                Attributes2 attributes2 = (Attributes2) attributes;
                 // If the attribute is present in the XHTML source file then add it, otherwise skip it.
-                if (attribute2.isSpecified(i)) {
+                if (attributes2.isSpecified(i)) {
                     map.put(attributes.getQName(i), attributes.getValue(i));
                 }
             } else {

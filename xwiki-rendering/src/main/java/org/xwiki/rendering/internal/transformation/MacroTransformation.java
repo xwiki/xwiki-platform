@@ -20,22 +20,15 @@
 package org.xwiki.rendering.internal.transformation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.maven.doxia.module.confluence.parser.VerbatimBlock;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ErrorBlock;
-import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.MacroInlineBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
-import org.xwiki.rendering.block.MacroStandaloneBlock;
-import org.xwiki.rendering.block.VerbatimInlineBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.MacroFactory;
@@ -191,9 +184,9 @@ public class MacroTransformation extends AbstractTransformation
                 Macro< ? > macro = this.macroFactory.getMacro(macroBlock.getName(), syntax);
                 macroHolders.add(new MacroHolder(macro, macroBlock));
             } catch (MacroNotFoundException e) {
-                // TODO: When a macro fails to be loaded replace it with an Error Block so that 1) we don't try to load
-                // it again
-                // and 2) the user can clearly see that it failed to be executed.
+                // When a macro cannot be found we simply log a warning. The MacroBlock will remain in the XDOM
+                // object and it'll be up to the renderers to decide how to display the fact that the macro
+                // wasn't executed.
                 getLogger().warn("Failed to find macro [" + macroBlock.getName() + "]. Ignoring it.");
             }
         }

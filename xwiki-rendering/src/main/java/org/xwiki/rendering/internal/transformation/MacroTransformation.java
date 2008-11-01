@@ -20,15 +20,22 @@
 package org.xwiki.rendering.internal.transformation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.maven.doxia.module.confluence.parser.VerbatimBlock;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ErrorBlock;
+import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.MacroInlineBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.MacroStandaloneBlock;
+import org.xwiki.rendering.block.VerbatimInlineBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.MacroFactory;
@@ -111,34 +118,18 @@ public class MacroTransformation extends AbstractTransformation
     private boolean transformOnce(List<MacroBlock> macroBlocks, MacroTransformationContext context, Syntax syntax)
         throws TransformationException
     {
-        List<MacroHolder> macroHolders = new ArrayList<MacroHolder>();
-
-        // 1) Sort the macros by priority to find the highest priority macro to execute
-        for (MacroBlock macroBlock : context.getXDOM().getChildrenByType(MacroBlock.class, true)) {
-            try {
-                Macro< ? > macro = this.macroFactory.getMacro(macroBlock.getName(), syntax);
-                macroHolders.add(new MacroHolder(macro, macroBlock));
-            } catch (MacroNotFoundException e) {
-                // TODO: When a macro fails to be loaded replace it with an Error Block so that 1) we don't try to load
-                // it again
-                // and 2) the user can clearly see that it failed to be executed.
-                getLogger().warn("Failed to perform transformation for macro [" + macroBlock.getName() 
-                    + "]. Ignoring it");
-            }
-        }
-        // If no macros were found, return with no changes. This can happen if the macros fail to be found.
-        if (macroHolders.isEmpty()) {
+        // 1) Get highest priority macro to execute
+        MacroHolder macroHolder = getHighestPriorityMacro(context.getXDOM(), syntax); 
+        if (macroHolder == null) {
             return false;
         }
-        // Sort the Macros by priority
-        Collections.sort(macroHolders);
-        MacroHolder macroHolder = macroHolders.get(0);
-
+        
         // 2) Verify if we're in macro inline mode and if the macro supports it. If not, send an error.
         if (MacroInlineBlock.class.isAssignableFrom(macroHolder.macroBlock.getClass())) {
             context.setInlined(true);
             if (!macroHolder.macro.supportsInlineMode()) {
                 // TODO: Do something to show the error. Use an Error block? Throw an exception?
+                return false;
             }
         }
         
@@ -147,6 +138,7 @@ public class MacroTransformation extends AbstractTransformation
         try {
             context.setCurrentMacroBlock(macroHolder.macroBlock);
 
+            // Populate and validate macro parameters. 
             Object macroParameters;
             try {
                 macroParameters = macroHolder.macro.getDescriptor().getParametersBeanClass().newInstance();
@@ -184,5 +176,31 @@ public class MacroTransformation extends AbstractTransformation
         childrenBlocks.addAll(pos, resultBlocks);
         childrenBlocks.remove(pos + resultBlocks.size());
         return true;
+    }
+    
+    /**
+     * @return the macro with the highest priority for the passed syntax or null if no macro is found
+     */
+    private MacroHolder getHighestPriorityMacro(XDOM xdom, Syntax syntax)
+    {
+        List<MacroHolder> macroHolders = new ArrayList<MacroHolder>();
+
+        // 1) Sort the macros by priority to find the highest priority macro to execute
+        for (MacroBlock macroBlock : xdom.getChildrenByType(MacroBlock.class, true)) {
+            try {
+                Macro< ? > macro = this.macroFactory.getMacro(macroBlock.getName(), syntax);
+                macroHolders.add(new MacroHolder(macro, macroBlock));
+            } catch (MacroNotFoundException e) {
+                // TODO: When a macro fails to be loaded replace it with an Error Block so that 1) we don't try to load
+                // it again
+                // and 2) the user can clearly see that it failed to be executed.
+                getLogger().warn("Failed to find macro [" + macroBlock.getName() + "]. Ignoring it.");
+            }
+        }
+
+        // Sort the Macros by priority
+        Collections.sort(macroHolders);
+        
+        return macroHolders.size() > 0 ? macroHolders.get(0): null;
     }
 }

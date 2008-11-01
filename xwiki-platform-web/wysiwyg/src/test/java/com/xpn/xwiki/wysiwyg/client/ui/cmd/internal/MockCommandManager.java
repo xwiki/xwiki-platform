@@ -23,16 +23,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractCommandManager;
 
 /**
  * Mock command manager to be used on unit tests.
+ * 
+ * @version $Id$
  */
 public class MockCommandManager extends AbstractCommandManager
 {
+    /**
+     * The commands that have been executed by this manager.
+     */
     private final Map<Command, String> history;
 
+    /**
+     * Creates a new mock command manager.
+     */
     public MockCommandManager()
     {
         history = new HashMap<Command, String>();
@@ -41,7 +48,7 @@ public class MockCommandManager extends AbstractCommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#execute(Command, String)
+     * @see AbstractCommandManager#execute(Command, String)
      */
     public boolean execute(Command cmd, String param)
     {
@@ -52,7 +59,7 @@ public class MockCommandManager extends AbstractCommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#isEnabled(Command)
+     * @see AbstractCommandManager#isEnabled(Command)
      */
     public boolean isEnabled(Command cmd)
     {
@@ -65,7 +72,7 @@ public class MockCommandManager extends AbstractCommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#isExecuted(Command)
+     * @see AbstractCommandManager#isExecuted(Command)
      */
     public boolean isExecuted(Command cmd)
     {
@@ -75,7 +82,7 @@ public class MockCommandManager extends AbstractCommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#isSupported(Command)
+     * @see AbstractCommandManager#isSupported(Command)
      */
     public boolean isSupported(Command cmd)
     {
@@ -85,7 +92,7 @@ public class MockCommandManager extends AbstractCommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#getStringValue(Command)
+     * @see AbstractCommandManager#getStringValue(Command)
      */
     public String getStringValue(Command cmd)
     {

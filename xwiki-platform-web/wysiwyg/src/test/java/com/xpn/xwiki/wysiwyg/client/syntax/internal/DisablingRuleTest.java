@@ -19,14 +19,19 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
-import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Unit test for {@link DisablingRule}.
+ * 
+ * @version $Id$
  */
-public class DisablingRuleTest extends WysiwygClientTest
+public class DisablingRuleTest extends AbstractWysiwygClientTest
 {
+    /**
+     * Tests if a {@link DisablingRule} really disables the specified features.
+     */
     public void testAlwaysDisabled()
     {
         DisablingRule dr = new DisablingRule(new String[] {"a", "b", "c"});

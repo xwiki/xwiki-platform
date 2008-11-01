@@ -27,6 +27,8 @@ import com.xpn.xwiki.wysiwyg.client.plugin.UIExtensionTest;
 
 /**
  * Unit tests for {@link FocusWidgetUIExtension}.
+ * 
+ * @version $Id$
  */
 public class FocusWidgetUIExtensionTest extends UIExtensionTest
 {

@@ -17,19 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client;
+package com.xpn.xwiki.wysiwyg.client.dom;
 
-import com.google.gwt.junit.client.GWTTestCase;
+import com.google.gwt.dom.client.DivElement;
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
-public abstract class WysiwygClientTest extends GWTTestCase
+/**
+ * Unit tests for {@link Range}.
+ * 
+ * @version $Id$
+ */
+public class RangeTest extends AbstractWysiwygClientTest
 {
     /**
-     * {@inheritDoc}
-     * 
-     * @see GWTTestCase#getModuleName()
+     * Unit test for {@link Range#toHTML()}.
      */
-    public String getModuleName()
+    public void testToHTML()
     {
-        return "com.xpn.xwiki.wysiwyg.Wysiwyg";
+        Document doc = Document.get().cast();
+
+        DivElement container = doc.createDivElement();
+        container.setInnerHTML("<strong>aa</strong><em>bb</em>");
+        doc.getBody().appendChild(container);
+
+        Range range = doc.createRange();
+        range.setStart(container.getFirstChild().getFirstChild(), 1);
+        range.setEnd(container.getLastChild().getFirstChild(), 1);
+
+        assertEquals("<strong>a</strong><em>b</em>", range.toHTML());
     }
 }

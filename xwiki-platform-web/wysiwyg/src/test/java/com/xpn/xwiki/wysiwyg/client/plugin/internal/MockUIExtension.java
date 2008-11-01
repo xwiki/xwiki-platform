@@ -24,13 +24,29 @@ import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 
 /**
  * Mock user interface extension to be used in unit tests.
+ * 
+ * @version $Id$
  */
 public class MockUIExtension implements UIExtension
 {
+    /**
+     * @see #getRole()
+     */
     private final String role;
 
+    /**
+     * This mock UI extension offers just a single feature.
+     * 
+     * @see #getFeatures()
+     */
     private final String feature;
 
+    /**
+     * Creates a new mock UI extension having the specified role and providing the specified feature.
+     * 
+     * @param role Identifies the extension point.
+     * @param feature The name of the feature to be provided by the newly created mock UI extension.
+     */
     public MockUIExtension(String role, String feature)
     {
         this.role = role;

@@ -686,4 +686,18 @@ public final class IERange extends AbstractRange<NativeRange>
             return "";
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#toHTML()
+     */
+    public String toHTML()
+    {
+        if (getJSRange() instanceof TextRange) {
+            return ((TextRange) getJSRange()).getHTML();
+        } else {
+            return ((ControlRange) getJSRange()).get(0).getString();
+        }
+    }
 }

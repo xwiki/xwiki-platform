@@ -19,19 +19,24 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin;
 
-import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MockPluginFactory;
 
 /**
  * Unit tests for any concrete implementation of {@link PluginFactoryManager}.
+ * 
+ * @version $Id$
  */
-public abstract class PluginFactoryManagerTest extends WysiwygClientTest
+public abstract class PluginFactoryManagerTest extends AbstractWysiwygClientTest
 {
     /**
      * @return A new instance of the concrete {@link PluginFactoryManager} being tested.
      */
     protected abstract PluginFactoryManager newPluginFactoryManager();
 
+    /**
+     * Test the basic operations: add, get and remove a plugin factory.
+     */
     public void testCommonUseCase()
     {
         PluginFactoryManager pfm = newPluginFactoryManager();

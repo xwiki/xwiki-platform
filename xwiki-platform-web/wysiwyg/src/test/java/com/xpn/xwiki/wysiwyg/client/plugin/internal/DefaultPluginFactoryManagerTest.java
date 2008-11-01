@@ -24,9 +24,16 @@ import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManagerTest;
 
 /**
  * Unit tests for {@link DefaultPluginFactoryManager}.
+ * 
+ * @version $Id$
  */
 public class DefaultPluginFactoryManagerTest extends PluginFactoryManagerTest
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see PluginFactoryManagerTest#newPluginFactoryManager()
+     */
     protected PluginFactoryManager newPluginFactoryManager()
     {
         return new DefaultPluginFactoryManager();

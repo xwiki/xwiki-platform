@@ -17,39 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin;
+package com.xpn.xwiki.wysiwyg.client;
 
-import com.google.gwt.user.client.Random;
-import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
+import com.google.gwt.junit.client.GWTTestCase;
 
 /**
- * Unit tests for any concrete implementation of the {@link UIExtension} interface.
+ * Base class for all WYSIWYG client tests. It returns the name of the module in {@link #getModuleName()} so you don't
+ * have to do it in each test.
  * 
  * @version $Id$
  */
-public abstract class UIExtensionTest extends AbstractWysiwygClientTest
+public abstract class AbstractWysiwygClientTest extends GWTTestCase
 {
     /**
-     * @return A new instance of the concrete {@link UIExtension} being tested.
+     * {@inheritDoc}
+     * 
+     * @see GWTTestCase#getModuleName()
      */
-    protected abstract UIExtension newUIExtension();
-
-    /**
-     * Tests the enabling and disabling of a feature.
-     */
-    public void testEnabled()
+    public String getModuleName()
     {
-        UIExtension uie = newUIExtension();
-
-        String[] features = uie.getFeatures();
-        assertTrue(features.length > 0);
-
-        String feature = features[Random.nextInt(features.length)];
-
-        uie.setEnabled(feature, true);
-        assertTrue(uie.isEnabled(feature));
-
-        uie.setEnabled(feature, false);
-        assertFalse(uie.isEnabled(feature));
+        return "com.xpn.xwiki.wysiwyg.Wysiwyg";
     }
 }

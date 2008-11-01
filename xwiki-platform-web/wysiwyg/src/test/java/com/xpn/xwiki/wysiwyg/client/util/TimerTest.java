@@ -22,26 +22,43 @@ package com.xpn.xwiki.wysiwyg.client.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
-import com.xpn.xwiki.wysiwyg.client.util.Timer;
-import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
 /**
  * Unit tests for {@link Timer}.
+ * 
+ * @version $Id$
  */
-public class TimerTest extends WysiwygClientTest
+public class TimerTest extends AbstractWysiwygClientTest
 {
     /**
-     * Finish the test after all the listeners have been notified.
+     * A timer listener that unregisters itself when it is notified. The last one finishes the test after. So in order
+     * to finish the test all the listeners have to be notified.
      */
     public class FinishTestTimerListener implements TimerListener
     {
+        /**
+         * The timer this object listens to.
+         */
         private final Timer timer;
 
+        /**
+         * The list of other objects listening to {@link #timer}.
+         */
         private final List<TimerListener> listeners;
 
+        /**
+         * Just an object to synchronize the removal from {@link #listeners}.
+         */
         private final Object lock;
 
+        /**
+         * Creates a new timer listener.
+         * 
+         * @param timer The timer that is listened.
+         * @param listeners The other listeners.
+         * @param lock The common synchronization object.
+         */
         public FinishTestTimerListener(Timer timer, List<TimerListener> listeners, Object lock)
         {
             this.timer = timer;
@@ -53,6 +70,11 @@ public class TimerTest extends WysiwygClientTest
             this.lock = lock;
         }
 
+        /**
+         * {@inheritDoc}
+         * 
+         * @see TimerListener#onElapsed(Timer)
+         */
         public void onElapsed(Timer sender)
         {
             assertEquals(timer, sender);

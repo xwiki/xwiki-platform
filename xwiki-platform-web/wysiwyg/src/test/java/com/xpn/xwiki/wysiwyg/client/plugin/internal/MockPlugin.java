@@ -27,11 +27,21 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Mock plug-in to be used in unit tests.
+ * 
+ * @version $Id$
  */
 public class MockPlugin implements Plugin
 {
+    /**
+     * The only UI extension provided by this mock plugin.
+     */
     private final UIExtension uie;
 
+    /**
+     * Creates a new mock plugin that provides the given UI extension.
+     * 
+     * @param uie A user interface extension.
+     */
     public MockPlugin(UIExtension uie)
     {
         this.uie = uie;

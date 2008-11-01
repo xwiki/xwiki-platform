@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin;
 
-import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MockPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MockPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MockPluginFactoryManager;
@@ -27,14 +27,20 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.MockUIExtension;
 
 /**
  * Unit tests for any concrete implementation of {@link PluginManagerTest}.
+ * 
+ * @version $Id$
  */
-public abstract class PluginManagerTest extends WysiwygClientTest
+public abstract class PluginManagerTest extends AbstractWysiwygClientTest
 {
     /**
      * @return A new instance of the concrete {@link PluginManager} being tested.
      */
     protected abstract PluginManager newPluginManager();
 
+    /**
+     * Tests if the features of a plugin become available after the plugin is loaded by a plugin manager, and if they
+     * are not available after the plugin is unloaded.
+     */
     public void testCommonUseCase()
     {
         PluginManager pm = newPluginManager();
@@ -54,7 +60,7 @@ public abstract class PluginManagerTest extends WysiwygClientTest
         pm.load(pluginName);
         assertEquals(uie, pm.getUIExtension(role, feature));
 
-        pm.unload("list");
+        pm.unload(pluginName);
         assertNull(pm.getUIExtension(role, feature));
     }
 }

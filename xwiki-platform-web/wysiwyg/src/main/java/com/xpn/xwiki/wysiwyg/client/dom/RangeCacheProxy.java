@@ -367,4 +367,14 @@ public class RangeCacheProxy implements Range
     {
         return range.toString();
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#toHTML()
+     */
+    public String toHTML()
+    {
+        return range.toHTML();
+    }
 }

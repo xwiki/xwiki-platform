@@ -20,16 +20,21 @@
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
 import com.google.gwt.user.client.ui.RootPanel;
-import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.MockCommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Unit test for {@link DefaultValidationRule}.
+ * 
+ * @version $Id$
  */
-public class DefaultValidationRuleTest extends WysiwygClientTest
+public class DefaultValidationRuleTest extends AbstractWysiwygClientTest
 {
+    /**
+     * Tests if the outdent feature becomes enabled after the indent command is executed.
+     */
     public void testOutdentRule()
     {
         DefaultValidationRule outdentRule = new DefaultValidationRule("outdent", Command.OUTDENT);

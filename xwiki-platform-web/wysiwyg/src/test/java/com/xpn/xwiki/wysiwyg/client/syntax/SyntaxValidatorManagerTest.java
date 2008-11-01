@@ -19,16 +19,24 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax;
 
-import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
 
 /**
  * Unit test for any concrete implementation of {@link SyntaxValidatorManager}.
+ * 
+ * @version $Id$
  */
-public abstract class SyntaxValidatorManagerTest extends WysiwygClientTest
+public abstract class SyntaxValidatorManagerTest extends AbstractWysiwygClientTest
 {
+    /**
+     * @return A new instance of the concrete implementation of {@link SyntaxValidatorManager} being tested.
+     */
     protected abstract SyntaxValidatorManager newSyntaxValidatorManager();
 
+    /**
+     * Tests the basic operations: add, get and remove a {@link SyntaxValidator}.
+     */
     public void testAddGetRemove()
     {
         SyntaxValidatorManager svm = newSyntaxValidatorManager();

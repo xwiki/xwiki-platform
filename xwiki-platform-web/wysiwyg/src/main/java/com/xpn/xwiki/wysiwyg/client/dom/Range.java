@@ -188,6 +188,11 @@ public interface Range
     String toString();
 
     /**
+     * @return The HTML contents of this range.
+     */
+    String toHTML();
+
+    /**
      * Called to indicate that the Range is no longer in use and that the implementation may relinquish any resources
      * associated with this Range.
      */

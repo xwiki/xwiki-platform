@@ -24,11 +24,21 @@ import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 
 /**
  * Mock plug-in factory manager to be used in unit tests.
+ * 
+ * @version $Id$
  */
 public class MockPluginFactoryManager implements PluginFactoryManager
 {
+    /**
+     * The only plugin factory known by this factory manager.
+     */
     private final PluginFactory factory;
 
+    /**
+     * Creates a new mock plugin factory manager that uses only the given plugin factory.
+     * 
+     * @param factory The only factory that will be used by the newly created manager.
+     */
     public MockPluginFactoryManager(PluginFactory factory)
     {
         this.factory = factory;

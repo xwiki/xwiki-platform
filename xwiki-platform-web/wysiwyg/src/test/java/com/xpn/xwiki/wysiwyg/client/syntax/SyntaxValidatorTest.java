@@ -19,17 +19,26 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax;
 
-import com.xpn.xwiki.wysiwyg.client.WysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRule;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
- * Unit test for any concrete implementation of {@link SyntaxValidator}
+ * Unit test for any concrete implementation of {@link SyntaxValidator}.
+ * 
+ * @version $Id$
  */
-public abstract class SyntaxValidatorTest extends WysiwygClientTest
+public abstract class SyntaxValidatorTest extends AbstractWysiwygClientTest
 {
+    /**
+     * @return A new instance of the concrete implementation of {@link SyntaxValidator} being tested.
+     */
     protected abstract SyntaxValidator newSyntaxValidator();
 
+    /**
+     * Tests if adding a {@link DisablingRule} for a feature disables that feature and removing it re-enables the
+     * feature.
+     */
     public void testAddRemoveDisablingRule()
     {
         String feature = "feature";

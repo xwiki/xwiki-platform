@@ -24,9 +24,16 @@ import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorTest;
 
 /**
  * Unit test for {@link XWikiSyntaxValidator}.
+ * 
+ * @version $Id$
  */
 public class XWikiSyntaxValidatorTest extends SyntaxValidatorTest
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SyntaxValidatorTest#newSyntaxValidator()
+     */
     protected SyntaxValidator newSyntaxValidator()
     {
         return new XWikiSyntaxValidator();

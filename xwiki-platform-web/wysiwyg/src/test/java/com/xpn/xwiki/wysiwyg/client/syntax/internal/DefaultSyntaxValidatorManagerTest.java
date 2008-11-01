@@ -24,9 +24,16 @@ import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManagerTest;
 
 /**
  * Unit test for {@link DefaultSyntaxValidatorManager}.
+ * 
+ * @version $Id$
  */
 public class DefaultSyntaxValidatorManagerTest extends SyntaxValidatorManagerTest
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SyntaxValidatorManagerTest#newSyntaxValidatorManager()
+     */
     protected SyntaxValidatorManager newSyntaxValidatorManager()
     {
         return new DefaultSyntaxValidatorManager();

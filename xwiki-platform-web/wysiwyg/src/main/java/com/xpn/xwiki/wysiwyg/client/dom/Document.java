@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.dom;
 
 import com.google.gwt.dom.client.BRElement;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.ParagraphElement;
@@ -66,7 +67,7 @@ public class Document extends com.google.gwt.dom.client.Document
      */
     public final LinkElement xCreateLinkElement()
     {
-        return (LinkElement) xCreateElement("link").cast();
+        return xCreateElement("link").cast();
     }
 
     /**
@@ -76,7 +77,7 @@ public class Document extends com.google.gwt.dom.client.Document
      */
     public final ScriptElement xCreateScriptElement()
     {
-        return (ScriptElement) xCreateElement("script").cast();
+        return xCreateElement("script").cast();
     }
 
     /**
@@ -86,7 +87,7 @@ public class Document extends com.google.gwt.dom.client.Document
      */
     public final BRElement xCreateBRElement()
     {
-        return (BRElement) xCreateElement("br").cast();
+        return xCreateElement("br").cast();
     }
 
     /**
@@ -96,7 +97,17 @@ public class Document extends com.google.gwt.dom.client.Document
      */
     public final ParagraphElement xCreatePElement()
     {
-        return (ParagraphElement) xCreateElement("p").cast();
+        return xCreateElement("p").cast();
+    }
+
+    /**
+     * Creates a &lt;div&gt; element.
+     * 
+     * @return the newly created element.
+     */
+    public final DivElement xCreateDivElement()
+    {
+        return xCreateElement("div").cast();
     }
 
     /**

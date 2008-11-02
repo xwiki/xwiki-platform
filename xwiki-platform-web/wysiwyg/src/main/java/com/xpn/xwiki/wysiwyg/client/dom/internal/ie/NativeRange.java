@@ -53,4 +53,22 @@ public class NativeRange extends JavaScriptObject
     /*-{
         return this.ownerDocument;
     }-*/;
+
+    /**
+     * This method is needed because <code>instanceof</code> operator returns true all the time when applied on a
+     * overlay type. For instance:<br/>
+     * 
+     * <pre>
+     * TextRange textRange = TextRange.newInstance(doc);
+     * boolean result = textRange instanceof TextRange; // result is true, which is right.
+     * result = textRange instanceof ControlRange // result is also true, which is wrong.
+     * </pre>
+     * 
+     * @return true if this is a text range, and false if it is a control range.
+     * @see http://code.google.com/p/google-web-toolkit/wiki/OverlayTypes
+     */
+    public final native boolean isTextRange()
+    /*-{
+        return this.item ? false : true;
+    }-*/;
 }

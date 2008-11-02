@@ -64,4 +64,14 @@
       <when-property-is name="user.agent" value="gecko" />
     </any>
   </replace-with>
+
+  <!-- InsertHTMLExecutable -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable" />
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.IEInsertHTMLExecutable">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable" />
+    <when-property-is name="user.agent" value="ie6" />
+  </replace-with>
 </module>

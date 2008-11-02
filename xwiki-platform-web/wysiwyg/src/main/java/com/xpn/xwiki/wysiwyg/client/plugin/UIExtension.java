@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.plugin;
 
 import com.google.gwt.user.client.ui.UIObject;
-import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 
 /**
  * User interface extension.
@@ -65,7 +64,7 @@ public interface UIExtension
      * 
      * @param feature The feature whose enabled state is queried.
      * @return <code>true</code> if the specified feature is enabled.
-     * @see SyntaxValidator
+     * @see com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator
      */
     boolean isEnabled(String feature);
 }

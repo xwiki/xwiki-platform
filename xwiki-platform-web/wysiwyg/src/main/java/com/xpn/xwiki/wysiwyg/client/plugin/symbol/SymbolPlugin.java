@@ -33,12 +33,26 @@ import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
+/**
+ * Allows the user to insert a special symbol chosen with a symbol picker in place of the current selection.
+ * 
+ * @version $Id$
+ */
 public class SymbolPlugin extends AbstractPlugin implements ClickListener, PopupListener
 {
-    private PushButton symbolButton;
+    /**
+     * The insert button to be placed on the tool bar.
+     */
+    private PushButton insert;
 
-    private SymbolPicker symbolPicker;
+    /**
+     * The symbol picker used for choosing the symbol to insert.
+     */
+    private SymbolPicker picker;
 
+    /**
+     * Tool bar extension.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
@@ -51,10 +65,10 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
         super.init(wysiwyg, textArea, config);
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_HTML)) {
-            symbolButton = new PushButton(Images.INSTANCE.charmap().createImage(), this);
-            symbolButton.setTitle(Strings.INSTANCE.charmap());
+            insert = new PushButton(Images.INSTANCE.charmap().createImage(), this);
+            insert.setTitle(Strings.INSTANCE.charmap());
 
-            toolBarExtension.addFeature("symbol", symbolButton);
+            toolBarExtension.addFeature("symbol", insert);
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
@@ -69,16 +83,16 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
      */
     public void destroy()
     {
-        if (symbolButton != null) {
-            symbolButton.removeFromParent();
-            symbolButton.removeClickListener(this);
-            symbolButton = null;
+        if (insert != null) {
+            insert.removeFromParent();
+            insert.removeClickListener(this);
+            insert = null;
 
-            if (symbolPicker != null) {
-                symbolPicker.hide();
-                symbolPicker.removeFromParent();
-                symbolPicker.removePopupListener(this);
-                symbolPicker = null;
+            if (picker != null) {
+                picker.hide();
+                picker.removeFromParent();
+                picker.removePopupListener(this);
+                picker = null;
             }
         }
 
@@ -96,7 +110,7 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
      */
     public void onClick(Widget sender)
     {
-        if (sender == symbolButton) {
+        if (sender == insert) {
             onSymbols(true);
         }
     }
@@ -113,11 +127,25 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
         }
     }
 
+    /**
+     * Either shows the symbol picker dialog or inserts the chosen symbol depending in the given flag.
+     * 
+     * @param show whether to show the symbol picker or insert the chosen symbol.
+     */
     public void onSymbols(boolean show)
     {
         if (show) {
-            getSymbolPicker().center();
+            if (insert.isEnabled()) {
+                // We save the selection because in some browsers, including Internet Explorer, by clicking on the
+                // symbol picker dialog we loose the selection in the rich text area and the symbol gets inserted at the
+                // beginning of the text.
+                saveSelection();
+                getSymbolPicker().center();
+            }
         } else {
+            // We restore the selection before inserting the symbol to be sure that the chosen symbol is inserted in the
+            // right place.
+            restoreSelection();
             String character = getSymbolPicker().getSymbol();
             if (character != null) {
                 getTextArea().getCommandManager().execute(Command.INSERT_HTML, character);
@@ -129,12 +157,19 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
         }
     }
 
+    /**
+     * We use lazy loading in case of the symbol picker to optimize editor loading time because the symbol palette is an
+     * HTML table with many cells and takes a bit of time to be created. In the future we should consider using
+     * innerHTML for creating the palette and widget binding.
+     * 
+     * @return the symbol picker to be used for selecting the symbol.
+     */
     private SymbolPicker getSymbolPicker()
     {
-        if (symbolPicker == null) {
-            symbolPicker = new SymbolPicker();
-            symbolPicker.addPopupListener(this);
+        if (picker == null) {
+            picker = new SymbolPicker();
+            picker.addPopupListener(this);
         }
-        return symbolPicker;
+        return picker;
     }
 }

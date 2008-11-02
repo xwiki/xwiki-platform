@@ -130,16 +130,16 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     protected short compareBoundaryPoints(RangeCompare how, NativeRange sourceRange)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             TextRange textRange = (TextRange) getJSRange();
-            if (sourceRange instanceof TextRange) {
+            if (sourceRange.isTextRange()) {
                 return textRange.compareEndPoints(how, (TextRange) sourceRange);
             } else {
                 // TODO
                 throw new UnsupportedOperationException();
             }
         } else {
-            if (sourceRange instanceof TextRange) {
+            if (sourceRange.isTextRange()) {
                 // TODO
                 throw new UnsupportedOperationException();
             } else {
@@ -156,7 +156,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public DocumentFragment cloneContents()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             // TODO
             throw new UnsupportedOperationException();
         } else {
@@ -173,7 +173,7 @@ public final class IERange extends AbstractRange<NativeRange>
     public Range cloneRange()
     {
         NativeRange clone;
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             clone = ((TextRange) getJSRange()).duplicate();
         } else {
             ControlRange controlRange = (ControlRange) getJSRange();
@@ -193,7 +193,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void collapse(boolean toStart)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             ((TextRange) getJSRange()).collapse(toStart);
         } else {
             TextRange textRange = TextRange.newInstance((ControlRange) getJSRange());
@@ -209,7 +209,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void deleteContents()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             ((TextRange) getJSRange()).setHTML("");
         } else {
             ControlRange range = (ControlRange) getJSRange();
@@ -229,7 +229,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void detach()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             // TODO
             throw new UnsupportedOperationException();
         } else {
@@ -245,7 +245,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public DocumentFragment extractContents()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             // TODO
             throw new UnsupportedOperationException();
         } else {
@@ -261,7 +261,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public Node getCommonAncestorContainer()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             Node startContainer = getStartContainer();
             // If the range is within a text node then the common ancestor container is that text node.
             if (startContainer.getNodeType() == Node.TEXT_NODE
@@ -382,7 +382,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public Node getEndContainer()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             return getEndPointContainer(false);
         } else {
             // ControlRange
@@ -445,7 +445,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public int getEndOffset()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             return getEndPointOffset(false);
         } else {
             // ControlRange
@@ -460,7 +460,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public Node getStartContainer()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             return getEndPointContainer(true);
         } else {
             // ControlRange
@@ -475,7 +475,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public int getStartOffset()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             return getEndPointOffset(true);
         } else {
             return DOMUtils.getInstance().getNodeIndex(((ControlRange) getJSRange()).get(0));
@@ -489,7 +489,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void insertNode(Node newNode)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             // TODO
             throw new UnsupportedOperationException();
         } else {
@@ -505,7 +505,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public boolean isCollapsed()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             TextRange textRange = (TextRange) getJSRange();
             return textRange.getText().length() == 0 && textRange.getHTML().length() == 0;
         } else {
@@ -520,7 +520,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void selectNode(Node refNode)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             // TODO
             throw new UnsupportedOperationException();
         } else {
@@ -536,7 +536,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void selectNodeContents(Node refNode)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             TextRange textRange = (TextRange) getJSRange();
             if (refNode.getNodeType() == Node.ELEMENT_NODE) {
                 textRange.moveToElementText(Element.as(refNode));
@@ -557,7 +557,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void setEnd(Node refNode, int offset)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             if (refNode.getNodeType() == Node.ELEMENT_NODE) {
                 if (offset < refNode.getChildNodes().getLength()) {
                     setEndBefore(refNode.getChildNodes().getItem(offset));
@@ -580,7 +580,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void setEndAfter(Node refNode)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             ((TextRange) getJSRange()).setEndPoint(RangeCompare.END_TO_END, refNode);
         } else {
             collapse(true);
@@ -595,7 +595,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void setEndBefore(Node refNode)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_END, refNode);
         } else {
             collapse(true);
@@ -610,7 +610,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void setStart(Node refNode, int offset)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             if (refNode.getNodeType() == Node.ELEMENT_NODE) {
                 if (offset < refNode.getChildNodes().getLength()) {
                     setStartBefore(refNode.getChildNodes().getItem(offset));
@@ -633,7 +633,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void setStartAfter(Node refNode)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             ((TextRange) getJSRange()).setEndPoint(RangeCompare.END_TO_START, refNode);
         } else {
             collapse(false);
@@ -648,7 +648,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void setStartBefore(Node refNode)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_START, refNode);
         } else {
             collapse(false);
@@ -663,7 +663,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public void surroundContents(Node newParent)
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             // TODO
             throw new UnsupportedOperationException();
         } else {
@@ -679,7 +679,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public String toString()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             return ((TextRange) getJSRange()).getText();
         } else {
             // ControlRange
@@ -694,7 +694,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public String toHTML()
     {
-        if (getJSRange() instanceof TextRange) {
+        if (getJSRange().isTextRange()) {
             return ((TextRange) getJSRange()).getHTML();
         } else {
             return ((ControlRange) getJSRange()).get(0).getString();

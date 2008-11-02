@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link SymbolPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class SymbolPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton instance.
+     */
     private static SymbolPluginFactory instance;
 
+    /**
+     * Creates a new factory for {@link SymbolPlugin}.
+     */
     private SymbolPluginFactory()
     {
         super("symbol");
     }
 
+    /**
+     * @return the singleton instance.
+     */
     public static synchronized SymbolPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class SymbolPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

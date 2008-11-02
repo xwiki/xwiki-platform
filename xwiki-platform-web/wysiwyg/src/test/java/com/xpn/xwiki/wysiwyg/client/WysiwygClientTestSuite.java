@@ -32,6 +32,7 @@ import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidatorTest;
 import com.xpn.xwiki.wysiwyg.client.util.TimerTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.history.HistoryTest;
 
 /**
  * All the client tests to be run. We're using a test suite because it decreases the overall testing time. GWTTestCase
@@ -66,6 +67,9 @@ public class WysiwygClientTestSuite extends GWTTestSuite
 
         // util
         suite.addTestSuite(TimerTest.class);
+
+        // widget
+        suite.addTestSuite(HistoryTest.class);
 
         return suite;
     }

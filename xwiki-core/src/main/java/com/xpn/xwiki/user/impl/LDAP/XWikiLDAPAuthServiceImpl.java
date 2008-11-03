@@ -666,8 +666,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             }
 
         } catch (Exception e) {
-            LOG.error(
-                String.format("Failed to add a user [{0}] to a group [{1}]", new Object[] {userName, groupName}), e);
+            LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", new Object[] {userName, groupName}),
+                e);
         }
     }
 
@@ -815,6 +815,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     protected XWikiDocument getAvailableUserProfile(String validXWikiUserName, String ldapUid, XWikiContext context)
         throws XWikiException
     {
+        BaseClass userClass = context.getWiki().getUserClass(context);
         LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
 
         String fullUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + validXWikiUserName;
@@ -829,10 +830,14 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             XWikiDocument doc = context.getWiki().getDocument(profileName, context);
 
-            String ldapUidFromObject = ldapXClass.getUid(doc);
+            // Don't use non user existing document
+            if (doc.isNew() || doc.getObject(userClass.getName()) != null) {
+                String ldapUidFromObject = ldapXClass.getUid(doc);
 
-            if (ldapUidFromObject == null || ldapUid.equalsIgnoreCase(ldapUidFromObject)) {
-                return doc;
+                // If the user is a LDAP user compare uids
+                if (ldapUidFromObject == null || ldapUid.equalsIgnoreCase(ldapUidFromObject)) {
+                    return doc;
+                }
             }
         }
     }

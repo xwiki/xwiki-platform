@@ -27,6 +27,7 @@ import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultComment;
 import org.dom4j.tree.DefaultElement;
+import org.jdom.CDATA;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -197,17 +198,20 @@ public class XHTMLWikiPrinter
     {
         try {
             this.xmlWriter.startCDATA();
+            // Ensure that characters inside CDATA sections are not escaped
+            this.xmlWriter.setEscapeText(false);
         } catch (Exception e) {
             // TODO: handle exception
         }
     }
-
+    
     /**
      * End a CDATA section.
      */
     public void printXMLEndCData()
     {
         try {
+            this.xmlWriter.setEscapeText(true);
             this.xmlWriter.endCDATA();
         } catch (Exception e) {
             // TODO: handle exception

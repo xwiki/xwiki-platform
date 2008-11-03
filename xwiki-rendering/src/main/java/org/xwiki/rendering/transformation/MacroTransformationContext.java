@@ -47,9 +47,7 @@ public class MacroTransformationContext
     private boolean isInlined;
     
     /**
-     * The current Macro Transformation being executed. Useful for Macros which need to perform other transformations
-     * in turn such as the Include macro which needs to execute Macro transformation if the included page should be 
-     * executed in its own context.
+     * See {@link #getMacroTransformation()}.
      */
     private MacroTransformation macroTransformation;
     
@@ -101,11 +99,19 @@ public class MacroTransformationContext
         return this.isInlined;
     }
     
+    /**
+     * @param macroTransformation the macro transformation being used
+     * @see #getMacroTransformation()
+     */
     public void setMacroTransformation(MacroTransformation macroTransformation)
     {
         this.macroTransformation = macroTransformation;
     }
     
+    /**
+     * @return the current Macro Transformation instance being executed. Useful for Macros which need to perform other transformations in turn such as the Include macro which needs 
+     *         to execute Macro transformation if the included page should be executed in its own context.
+     */
     public MacroTransformation getMacroTransformation()
     {
         return this.macroTransformation;

@@ -24,6 +24,7 @@ import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
+import com.xpn.xwiki.wysiwyg.client.dom.Style;
 
 /**
  * Contains methods from {@link DOMUtils} that require a different implementation in Internet Explorer.
@@ -37,9 +38,20 @@ public class IEDOMUtils extends DOMUtils
      * 
      * @see DOMUtils#getComputedStyleProperty(Element, String)
      */
-    public native String getComputedStyleProperty(Element el, String propertyName)
+    public String getComputedStyleProperty(Element el, String propertyName)
+    {
+        return getComputedStylePropertyIE(el, Style.toCamelCase(propertyName));
+    }
+
+    /**
+     * @param el The element for which we retrieve the computed value of the given style property.
+     * @param propertyName The name of the property in camel case format.
+     * @return The computed value of the given style property on the specified element.
+     */
+    private native String getComputedStylePropertyIE(Element el, String propertyName)
     /*-{
-        return el.currentStyle[propertyName];
+        // We force it to be a string because we treat it as a string in the java code.
+        return '' + el.currentStyle[propertyName];
     }-*/;
 
     /**

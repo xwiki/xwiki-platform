@@ -413,6 +413,17 @@ public final class TextRange extends NativeRange
     public void moveToTextNode(Text textNode)
     {
         int startOffset = 0;
+        int endOffset = textNode.getLength();
+        if (textNode.getLength() == 0) {
+            // In Internet Explorer you cannot position the caret inside an empty text node so we do a trick. We insert
+            // an invisible character and schedule a cleaning as soon as possible. We have to do this trick in order to
+            // ensure that the implementation of W3C Range specification using IE's API is as powerful as the Mozilla
+            // one.
+            textNode.setData("\u200C");
+            scheduleCleaning(textNode);
+            startOffset = 1;
+        }
+
         Node sibling = textNode.getPreviousSibling();
         // We look for the closest element sibling to the left of the refNode.
         // At the same time, we count the number of character we jump back.
@@ -433,6 +444,46 @@ public final class TextRange extends NativeRange
         }
 
         this.move(Unit.CHARACTER, startOffset);
-        this.moveEnd(Unit.CHARACTER, textNode.getNodeValue().length());
+        this.moveEnd(Unit.CHARACTER, endOffset);
     }
+
+    /**
+     * Schedules a cleaning of the invisible character that was added in order to ensure consistency between the IE's
+     * and Mozilla's implementation of W3C Range specification. The cleaning has to be done as soon as possible. We do
+     * it on the next user key stroke, click or if the text area looses focus (which happens if the user submits the
+     * form containing the text area).
+     * 
+     * @param text The text node whose contents will be cleaned of the zero-width non-joiner character.
+     * @see #moveToTextNode(Text)
+     * @see http://en.wikipedia.org/wiki/Zero-width_non-joiner
+     */
+    public native void scheduleCleaning(Text text)
+    /*-{ 
+        var self = this;
+        var cleanZeroWidthNonJoiner = function(event) {
+            // We remove the listener to ensure the cleaning is done only once.
+            self.ownerDocument.body.detachEvent('onkeydown', arguments.callee);
+            self.ownerDocument.body.detachEvent('onclick', arguments.callee);
+            self.ownerDocument.body.detachEvent('onblur', arguments.callee);
+            self = null;
+            if (event.type == 'blur') {
+                // If the text area looses focus we can and have to change the DOM immediately 
+                // because otherwise the invisible character might get submitted.
+                text.nodeValue = text.nodeValue.replace(/\u200C/g, '');
+            } else {
+                // If the user clicks or presses a key then we defer the cleaning after the event is handled.
+                // It's advisable to do so because otherwise we might kill the browser.
+                var _text = text;
+                setTimeout(function(){
+                    _text.nodeValue = _text.nodeValue.replace(/\u200C/g, '');
+                    _text = null;
+                }, 0);
+            }
+            text = null;
+        }
+        this.ownerDocument.body.attachEvent('onkeydown', cleanZeroWidthNonJoiner);
+        this.ownerDocument.body.attachEvent('onclick', cleanZeroWidthNonJoiner);
+        this.ownerDocument.body.attachEvent('onblur', cleanZeroWidthNonJoiner);
+        cleanZeroWidthNonJoiner = null;
+    }-*/;
 }

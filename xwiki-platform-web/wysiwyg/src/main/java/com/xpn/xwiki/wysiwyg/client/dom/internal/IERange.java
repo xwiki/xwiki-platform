@@ -120,7 +120,7 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     public short compareBoundaryPoints(RangeCompare how, Range sourceRange)
     {
-        return compareBoundaryPoints(how, IERangeFactory.cast(sourceRange).getJSRange());
+        return compareBoundaryPoints(how, ((IERange) sourceRange).getJSRange());
     }
 
     /**
@@ -183,7 +183,7 @@ public final class IERange extends AbstractRange<NativeRange>
             }
             clone = controlRangeClone;
         }
-        return IERangeFactory.createRange(clone);
+        return new IERange(clone);
     }
 
     /**
@@ -350,11 +350,9 @@ public final class IERange extends AbstractRange<NativeRange>
                 if (offset <= sibling.getNodeValue().length()) {
                     // We cannot move further to the left.
                     return sibling;
-                } else {
-                    // We jump over this text node.
-                    offset -= sibling.getNodeValue().length();
-                    sibling = getSibling(sibling, start);
                 }
+                // We jump over this text node.
+                offset -= sibling.getNodeValue().length();
             } else if (--offset <= 0) {
                 // The current sibling is an element
                 // We can position the cursor between elements so we must decrease the number of
@@ -366,10 +364,11 @@ public final class IERange extends AbstractRange<NativeRange>
                 if (nextSibling == null || nextSibling.getNodeType() == Node.ELEMENT_NODE) {
                     // The end point is before the first child, after the last child or between elements.
                     return sibling.getParentNode();
-                } else {
-                    sibling = nextSibling;
                 }
+                sibling = nextSibling;
+                continue;
             }
+            sibling = getSibling(sibling, start);
         }
         // We should not get here.
         return null;
@@ -418,8 +417,7 @@ public final class IERange extends AbstractRange<NativeRange>
                 }
                 // We jump over this text node.
                 offset -= sibling.getNodeValue().length();
-                sibling = getSibling(sibling, start);
-            } else if (--offset == 0) {
+            } else if (--offset <= 0) {
                 // The current sibling is an element
                 // We can position the cursor between elements so we must decrease the number of
                 // possible-cursor-positions.
@@ -432,7 +430,9 @@ public final class IERange extends AbstractRange<NativeRange>
                     return DOMUtils.getInstance().getNodeIndex(sibling) + (start ? 1 : 0);
                 }
                 sibling = nextSibling;
+                continue;
             }
+            sibling = getSibling(sibling, start);
         }
         // We should not get here.
         return -1;

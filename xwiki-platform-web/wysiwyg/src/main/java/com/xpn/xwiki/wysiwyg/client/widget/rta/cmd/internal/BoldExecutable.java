@@ -37,7 +37,7 @@ public class BoldExecutable extends StyleExecutable
      */
     public BoldExecutable()
     {
-        super("strong", null, Style.FONT_WEIGHT, Style.FontWeight.BLOD, true);
+        super("strong", null, Style.FONT_WEIGHT, Style.FontWeight.BLOD, true, false);
     }
 
     /**

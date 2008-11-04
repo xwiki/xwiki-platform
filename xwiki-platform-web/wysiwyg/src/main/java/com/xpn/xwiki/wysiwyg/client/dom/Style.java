@@ -166,4 +166,23 @@ public class Style extends com.google.gwt.dom.client.Style
     protected Style()
     {
     }
+
+    /**
+     * Some browsers expect the camel case form of a style property. For instance, the camel case form of "font-weight"
+     * is "fontWeight".
+     * 
+     * @param propertyName The name of style property.
+     * @return The camel case form of the given property name.
+     */
+    public static String toCamelCase(String propertyName)
+    {
+        int dashIndex = propertyName.indexOf('-');
+        if (dashIndex < 0 || dashIndex == propertyName.length() - 1) {
+            return propertyName;
+        }
+        StringBuffer camelCase = new StringBuffer(propertyName.substring(0, dashIndex));
+        camelCase.append(propertyName.substring(dashIndex + 1, dashIndex + 2).toUpperCase());
+        camelCase.append(propertyName.substring(dashIndex + 2));
+        return camelCase.toString();
+    }
 }

@@ -103,7 +103,7 @@ public class RangeCacheProxy implements Range
      */
     public short compareBoundaryPoints(RangeCompare how, Range sourceRange)
     {
-        return range.compareBoundaryPoints(how, sourceRange);
+        return range.compareBoundaryPoints(how, ((RangeCacheProxy) sourceRange).getCachedRange());
     }
 
     /**
@@ -123,7 +123,7 @@ public class RangeCacheProxy implements Range
      */
     public Range cloneRange()
     {
-        return range.cloneRange();
+        return new RangeCacheProxy(range.cloneRange());
     }
 
     /**

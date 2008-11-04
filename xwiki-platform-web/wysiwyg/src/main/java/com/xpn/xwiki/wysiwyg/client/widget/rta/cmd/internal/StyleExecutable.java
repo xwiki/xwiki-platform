@@ -67,6 +67,11 @@ public class StyleExecutable implements Executable
     private final boolean inheritable;
 
     /**
+     * Flag that specifies if {@link #propertyName} can have multiple values.
+     */
+    private final boolean multipleValue;
+
+    /**
      * Creates a new instance.
      * 
      * @param tagName {@link #tagName}
@@ -74,15 +79,17 @@ public class StyleExecutable implements Executable
      * @param propertyName {@link #propertyName}
      * @param propertyValue {@link #propertyValue}
      * @param inheritable {@link #inheritable}
+     * @param multipleValue {@link #multipleValue}
      */
     public StyleExecutable(String tagName, String className, String propertyName, String propertyValue,
-        boolean inheritable)
+        boolean inheritable, boolean multipleValue)
     {
         this.tagName = tagName;
         this.className = className;
         this.propertyName = propertyName;
         this.propertyValue = propertyValue;
         this.inheritable = inheritable;
+        this.multipleValue = multipleValue;
     }
 
     /**
@@ -436,16 +443,30 @@ public class StyleExecutable implements Executable
             node = node.getParentNode();
         }
         if (inheritable) {
-            return propertyValue.equalsIgnoreCase(Element.as(node).getComputedStyleProperty(propertyName));
+            return matchesInheritedStyle(Element.as(node));
         } else {
             while (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) node;
-                if (propertyValue.equalsIgnoreCase(element.getComputedStyleProperty(propertyName))) {
+                if (matchesInheritedStyle(Element.as(node))) {
                     return true;
                 }
                 node = node.getParentNode();
             }
             return false;
+        }
+    }
+
+    /**
+     * @param element A DOM element.
+     * @return true if the given element matches the style associated with this executable, without testing the
+     *         ancestors of the element.
+     */
+    protected boolean matchesInheritedStyle(Element element)
+    {
+        String computedValue = element.getComputedStyleProperty(propertyName);
+        if (multipleValue) {
+            return computedValue.toLowerCase().contains(propertyValue);
+        } else {
+            return propertyValue.equalsIgnoreCase(computedValue);
         }
     }
 

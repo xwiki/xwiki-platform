@@ -24,6 +24,7 @@ import junit.framework.TestSuite;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeTest;
+import com.xpn.xwiki.wysiwyg.client.dom.StyleTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtensionTest;
@@ -53,6 +54,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
 
         // dom
         suite.addTestSuite(RangeTest.class);
+        suite.addTestSuite(StyleTest.class);
 
         // plugin
         suite.addTestSuite(DefaultPluginFactoryManagerTest.class);

@@ -19,9 +19,11 @@
  */
 package org.xwiki.rendering.macro.xhtml;
 
+import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro} Macro.
- *
+ * 
  * @version $Id$
  * @since 1.6M1
  */
@@ -33,18 +35,19 @@ public class XHTMLMacroParameters
     private boolean escapeWikiSyntax;
 
     /**
+     * @param escapeWikiSyntax indicate if the user has asked to escape wiki syntax or not.
+     */
+    @ParameterDescription("indicate if the user has asked to escape wiki syntax or not")
+    public void setEscapeWikiSyntax(boolean escapeWikiSyntax)
+    {
+        this.escapeWikiSyntax = escapeWikiSyntax;
+    }
+
+    /**
      * @return indicate if the user has asked to escape wiki syntax or not.
      */
     public boolean isEscapeWikiSyntax()
     {
         return this.escapeWikiSyntax;
-    }
-
-    /**
-     * @param escapeWikiSyntax indicate if the user has asked to escape wiki syntax or not.
-     */
-    public void setEscapeWikiSyntax(boolean escapeWikiSyntax)
-    {
-        this.escapeWikiSyntax = escapeWikiSyntax;
     }
 }

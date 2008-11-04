@@ -123,7 +123,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
 
         // Construct table of content from sections list
         Block rootBlock =
-            generateTree(sections, parameters.getStart(), parameters.getDepth(), parameters.numbered(),
+            generateTree(sections, parameters.getStart(), parameters.getDepth(), parameters.isNumbered(),
                 rootSectionBlock);
 
         return Arrays.asList(rootBlock);

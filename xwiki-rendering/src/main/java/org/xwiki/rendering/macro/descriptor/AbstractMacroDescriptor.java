@@ -19,6 +19,15 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Describe a macro.
  * 
@@ -32,12 +41,72 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
      */
     private String description;
 
+    /**
+     * The class of the JAVA bean containing macro parameters.
+     */
     private Class< ? > parametersBeanClass;
+
+    /**
+     * A map containing the {@link ParameterDescriptor} for each parameters supported for this macro.
+     * <p>
+     * The {@link Map} keys are lower cased for easier case insensitive search, to get the "real" name of the property
+     * use {@link ParameterDescriptor#getName()}.
+     */
+    private Map<String, ParameterDescriptor> parameterDescriptorMap = new LinkedHashMap<String, ParameterDescriptor>();
 
     public AbstractMacroDescriptor(String description, Class< ? > parametersBeanClass)
     {
         this.description = description;
         this.parametersBeanClass = parametersBeanClass;
+    }
+
+    protected void extractParameterDescriptorMap()
+    {
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(this.parametersBeanClass);
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+            if (propertyDescriptors != null) {
+                for (int i = 0; i < propertyDescriptors.length; i++) {
+                    PropertyDescriptor propertyDescriptor = propertyDescriptors[i];
+                    if (propertyDescriptor != null) {
+                        extractParameterDescriptor(propertyDescriptor);
+                    }
+                }
+            }
+        } catch (IntrospectionException e) {
+            // TODO: add error log here
+        }
+    }
+
+    protected void extractParameterDescriptor(PropertyDescriptor propertyDescriptor)
+    {
+        DefaultParameterDescriptor desc = new DefaultParameterDescriptor();
+        desc.setName(propertyDescriptor.getName());
+        desc.setType(propertyDescriptor.getPropertyType());
+
+        Method writeMethod = propertyDescriptor.getWriteMethod();
+
+        if (writeMethod != null) {
+            Method readMethod = propertyDescriptor.getReadMethod();
+
+            String description;
+
+            ParameterDescription parameterDescription = writeMethod.getAnnotation(ParameterDescription.class);
+
+            if (parameterDescription == null && readMethod != null) {
+                parameterDescription = readMethod.getAnnotation(ParameterDescription.class);
+            }
+
+            if (parameterDescription != null) {
+                description = parameterDescription.value();
+            } else {
+                description = propertyDescriptor.getShortDescription();
+            }
+
+            desc.setDescription(description);
+
+            this.parameterDescriptorMap.put(desc.getName().toLowerCase(), desc);
+        }
     }
 
     /**
@@ -50,8 +119,23 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
         return this.description;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.MacroDescriptor#getParametersBeanClass()
+     */
     public Class< ? > getParametersBeanClass()
     {
         return this.parametersBeanClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.MacroDescriptor#getParameterDescriptorMap()
+     */
+    public Map<String, ParameterDescriptor> getParameterDescriptorMap()
+    {
+        return Collections.unmodifiableMap(this.parameterDescriptorMap);
     }
 }

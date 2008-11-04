@@ -17,28 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.id;
+package org.xwiki.rendering.macro.descriptor;
 
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
-
-/**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.id.IdMacro} Macro.
- * 
- * @version $Id$
- * @since 1.6M1
- */
-public class IdMacroParameters
+public class DefaultParameterDescriptor implements ParameterDescriptor
 {
-    private String name;
+    String name;
 
-    @ParameterDescription("the identifier string")
+    String description;
+
+    Class< ? > type;
+
+    public String getName()
+    {
+        return this.name;
+    }
+
     public void setName(String name)
     {
         this.name = name;
     }
 
-    public String getName()
+    public String getDescription()
     {
-        return this.name;
+        return this.description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
+    public Class< ? > getType()
+    {
+        return this.type;
+    }
+
+    public void setType(Class< ? > type)
+    {
+        this.type = type;
     }
 }

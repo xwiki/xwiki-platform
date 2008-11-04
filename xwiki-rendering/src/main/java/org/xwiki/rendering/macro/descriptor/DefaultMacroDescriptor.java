@@ -41,8 +41,15 @@ public class DefaultMacroDescriptor extends AbstractMacroDescriptor
     public DefaultMacroDescriptor(String description, Class< ? > parametersBeanClass)
     {
         super(description, parametersBeanClass);
+
+        extractParameterDescriptorMap();
     }
 
+    /**
+     * Used as a JAVA bean for macro which does not support any parameter.
+     * 
+     * @version $Id$
+     */
     public static class NoParameter
     {
     }

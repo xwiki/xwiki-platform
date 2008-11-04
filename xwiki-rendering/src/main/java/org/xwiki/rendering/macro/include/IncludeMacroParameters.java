@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.include;
 
+import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
  * 
@@ -48,6 +50,15 @@ public class IncludeMacroParameters
     private Context context;
 
     /**
+     * @param document the name of the document to include.
+     */
+    @ParameterDescription("the name of the document to include")
+    public void setDocument(String document)
+    {
+        this.document = document;
+    }
+
+    /**
      * @return the name of the document to include.
      */
     public String getDocument()
@@ -55,9 +66,15 @@ public class IncludeMacroParameters
         return this.document;
     }
 
-    public void setDocument(String document)
+    /**
+     * @param context defines whether the included page is executed in its separated execution context or whether it's
+     *            executed in the context of the current page.
+     */
+    @ParameterDescription("defines whether the included page is executed in its separated execution context"
+        + " or whether it's executed in the context of the current page")
+    public void setContext(Context context)
     {
-        this.document = document;
+        this.context = context;
     }
 
     /**
@@ -67,10 +84,5 @@ public class IncludeMacroParameters
     public Context getContext()
     {
         return this.context;
-    }
-
-    public void setContext(Context context)
-    {
-        this.context = context;
     }
 }

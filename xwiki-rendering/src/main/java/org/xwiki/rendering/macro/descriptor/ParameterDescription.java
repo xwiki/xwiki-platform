@@ -17,28 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.id;
+package org.xwiki.rendering.macro.descriptor;
 
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.id.IdMacro} Macro.
- * 
- * @version $Id$
- * @since 1.6M1
- */
-public class IdMacroParameters
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ParameterDescription
 {
-    private String name;
-
-    @ParameterDescription("the identifier string")
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getName()
-    {
-        return this.name;
-    }
+    String value();
 }

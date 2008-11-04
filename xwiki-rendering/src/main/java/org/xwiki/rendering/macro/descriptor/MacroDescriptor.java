@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
+import java.util.Map;
+
 /**
  * Describe a Macro (macro description and macro parameters description).
  * 
@@ -32,5 +34,14 @@ public interface MacroDescriptor
      */
     String getDescription();
 
+    /**
+     * @return the class of the JAVA bean containing macro parameters.
+     */
     Class< ? > getParametersBeanClass();
+
+    /**
+     * @return a {@link Map} containing the {@link ParameterDescriptor} for each parameter.
+     * @since 1.7M2
+     */
+    Map<String, ParameterDescriptor> getParameterDescriptorMap();
 }

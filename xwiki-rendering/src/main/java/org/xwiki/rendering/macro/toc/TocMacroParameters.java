@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.macro.toc;
 
+import org.xwiki.rendering.macro.descriptor.ParameterDescription;
 import org.xwiki.rendering.macro.parameter.ParameterValueTooLowException;
 
 /**
@@ -54,13 +55,10 @@ public class TocMacroParameters
     private boolean numbered = false;
 
     /**
-     * @return the minimum section level. For example if 2 then level 1 sections will not be listed.
+     * @param start the minimum section level. For example if 2 then level 1 sections will not be listed.
+     * @throws ParameterValueTooLowException the provided value is too low, it needs to be >= 1.
      */
-    public int getStart()
-    {
-        return this.start;
-    }
-
+    @ParameterDescription("the minimum section level. For example if 2 then level 1 sections will not be listed")
     public void setStart(int start) throws ParameterValueTooLowException
     {
         if (start < 1) {
@@ -71,13 +69,19 @@ public class TocMacroParameters
     }
 
     /**
-     * @return the maximum section level. For example if 3 then all section levels from 4 will not be listed.
+     * @return the minimum section level. For example if 2 then level 1 sections will not be listed.
      */
-    public int getDepth()
+    public int getStart()
     {
-        return this.depth;
+        return this.start;
     }
 
+    /**
+     * @param depth the maximum section level. For example if 3 then all section levels from 4 will not be listed.
+     * @throws ParameterValueTooLowException the provided value is too low, it needs to be >= 1.
+     */
+    @ParameterDescription("the maximum section level. "
+        + "For example if 3 then all section levels from 4 will not be listed")
     public void setDepth(int depth) throws ParameterValueTooLowException
     {
         if (depth < 1) {
@@ -88,7 +92,26 @@ public class TocMacroParameters
     }
 
     /**
-     * @return local or page. If local only section in the current scope will be listed. For example if the macro is
+     * @return the maximum section level. For example if 3 then all section levels from 4 will not be listed.
+     */
+    public int getDepth()
+    {
+        return this.depth;
+    }
+
+    /**
+     * @param scope If local only section in the current scope will be listed. For example if the macro is written in a
+     *            section, only subsections of this section will be listed.
+     */
+    @ParameterDescription("if local only section in the current scope will be listed. "
+        + "For example if the macro is written in a section, only subsections of this section will be listed")
+    public void setScope(Scope scope)
+    {
+        this.scope = scope;
+    }
+
+    /**
+     * @return if {@link Scope#LOCAL} only section in the current scope will be listed. For example if the macro is
      *         written in a section, only subsections of this section will be listed.
      */
     public Scope getScope()
@@ -96,21 +119,17 @@ public class TocMacroParameters
         return this.scope;
     }
 
-    public void setScope(Scope scope)
-    {
-        this.scope = scope;
-    }
-
-    /**
-     * @return true or false. If true the section title number is printed.
-     */
-    public boolean numbered()
-    {
-        return this.numbered;
-    }
-
+    @ParameterDescription("if true the section title number is printed")
     public void setNumbered(boolean numbered)
     {
         this.numbered = numbered;
+    }
+
+    /**
+     * @return if true the section title number is printed.
+     */
+    public boolean isNumbered()
+    {
+        return this.numbered;
     }
 }

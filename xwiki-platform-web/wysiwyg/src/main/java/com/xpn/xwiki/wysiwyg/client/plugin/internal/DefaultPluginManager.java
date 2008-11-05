@@ -33,6 +33,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Default implementation of the {@link PluginManager} interface. We don't plan to provide another implementation.
+ * 
+ * @version $Id$
  */
 public class DefaultPluginManager implements PluginManager
 {
@@ -49,14 +51,33 @@ public class DefaultPluginManager implements PluginManager
      */
     private final Map<String, Map<String, UIExtension>> uiExtensions;
 
+    /**
+     * The application context.
+     */
     private final Wysiwyg wysiwyg;
 
+    /**
+     * The rich text area of the editor served by this plugin manager.
+     */
     private final RichTextArea textArea;
 
+    /**
+     * The configuration object associated with the editor served by this plugin manager.
+     */
     private final Config config;
 
+    /**
+     * The plugin factory manager used to create new instances of plugins.
+     */
     private PluginFactoryManager pfm;
 
+    /**
+     * Creates a new default plugin manager.
+     * 
+     * @param wysiwyg The context of the application.
+     * @param textArea The text area of the editor served by the newly created manager.
+     * @param config The configuration object associated with the editor served by the newly created manager.
+     */
     public DefaultPluginManager(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         this.wysiwyg = wysiwyg;
@@ -153,6 +174,12 @@ public class DefaultPluginManager implements PluginManager
         return getUIExtensions(role).get(feature);
     }
 
+    /**
+     * @param role A role, meaning the name of an extension point.
+     * @return The user interface extensions with the specified role, grouped in a map whose key is the name of a
+     *         feature. Basically, the returned value is the association between features and the user interface
+     *         extensions that offers those features.
+     */
     private Map<String, UIExtension> getUIExtensions(String role)
     {
         Map<String, UIExtension> roleUIExtensions = uiExtensions.get(role);

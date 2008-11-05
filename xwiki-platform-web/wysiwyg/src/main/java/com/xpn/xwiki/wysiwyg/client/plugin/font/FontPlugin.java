@@ -26,12 +26,12 @@ import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatefulPlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
-public class FontPlugin extends StatefulPlugin implements ChangeListener
+public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
 {
     public static final FontFamily[] FAMILIES;
 
@@ -165,7 +165,7 @@ public class FontPlugin extends StatefulPlugin implements ChangeListener
     /**
      * {@inheritDoc}
      * 
-     * @see StatefulPlugin#onUpdate()
+     * @see AbstractStatefulPlugin#onUpdate()
      */
     public void onUpdate()
     {

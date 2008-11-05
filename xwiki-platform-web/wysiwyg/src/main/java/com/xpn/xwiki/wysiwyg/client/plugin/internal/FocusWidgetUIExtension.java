@@ -21,14 +21,21 @@ package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.UIObject;
-import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 
 /**
- * Concrete implementation of the {@link UIExtension} interface. Each feature must have associated an user interface
+ * Concrete implementation of the {@link AbstractUIExtension}. Each feature must have associated an user interface
  * object derived from {@link FocusWidget}.
+ * 
+ * @version $Id$
  */
 public class FocusWidgetUIExtension extends AbstractUIExtension
 {
+    /**
+     * Creates a new user interface extension that will extend the specified extension point with widgets that can gain
+     * focus.
+     * 
+     * @param role The role of the newly created user interface extension.
+     */
     public FocusWidgetUIExtension(String role)
     {
         super(role);
@@ -37,7 +44,7 @@ public class FocusWidgetUIExtension extends AbstractUIExtension
     /**
      * {@inheritDoc}
      * 
-     * @see UIExtension#isEnabled(String)
+     * @see AbstractUIExtension#isEnabled(String)
      */
     public boolean isEnabled(String feature)
     {
@@ -51,7 +58,7 @@ public class FocusWidgetUIExtension extends AbstractUIExtension
     /**
      * {@inheritDoc}
      * 
-     * @see UIExtension#setEnabled(String, boolean)
+     * @see AbstractUIExtension#setEnabled(String, boolean)
      */
     public void setEnabled(String feature, boolean enabled)
     {

@@ -31,6 +31,7 @@ import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
 import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -49,6 +50,12 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
      * The symbol picker used for choosing the symbol to insert.
      */
     private SymbolPicker picker;
+
+    /**
+     * Used to preserve the selection of the rich text area while the dialog is opened. Some browsers like Internet
+     * Explorer loose the selection if you click inside a dialog box.
+     */
+    private SelectionPreserver selectionPreserver;
 
     /**
      * Tool bar extension.
@@ -72,6 +79,7 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
+            selectionPreserver = new SelectionPreserver(getTextArea());
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -137,15 +145,13 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
         if (show) {
             if (insert.isEnabled()) {
                 // We save the selection because in some browsers, including Internet Explorer, by clicking on the
-                // symbol picker dialog we loose the selection in the rich text area and the symbol gets inserted at the
-                // beginning of the text.
-                saveSelection();
+                // dialog we loose the selection in the target document.
+                selectionPreserver.saveSelection();
                 getSymbolPicker().center();
             }
         } else {
-            // We restore the selection before inserting the symbol to be sure that the chosen symbol is inserted in the
-            // right place.
-            restoreSelection();
+            // We restore the selection in the target document before closing the dialog.
+            selectionPreserver.restoreSelection();
             String character = getSymbolPicker().getSymbol();
             if (character != null) {
                 getTextArea().getCommandManager().execute(Command.INSERT_HTML, character);

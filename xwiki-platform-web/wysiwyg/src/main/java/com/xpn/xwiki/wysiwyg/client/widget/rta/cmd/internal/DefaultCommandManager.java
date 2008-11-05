@@ -128,6 +128,9 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return false;
         }
+        if (commandListeners.fireBeforeCommand(this, cmd, param)) {
+            return false;
+        }
         focus();
         boolean success = executable.execute(rta, param);
         if (success) {

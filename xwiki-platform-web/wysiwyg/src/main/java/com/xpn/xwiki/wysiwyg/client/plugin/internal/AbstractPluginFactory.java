@@ -24,11 +24,21 @@ import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 /**
  * Abstract implementation of the {@link PluginFactory} interface. This could serve as a base class for all kind of
  * plug-in factories.
+ * 
+ * @version $Id$
  */
 public abstract class AbstractPluginFactory implements PluginFactory
 {
+    /**
+     * The name of the plugins that will be created by this factory.
+     */
     private final String pluginName;
 
+    /**
+     * Creates a new factory for the specified plugin.
+     * 
+     * @param pluginName The name of the plugins that will be created by this factory.
+     */
     protected AbstractPluginFactory(String pluginName)
     {
         this.pluginName = pluginName;

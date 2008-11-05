@@ -27,13 +27,26 @@ import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 
 /**
  * Aggregates many {@link UIExtension} objects that have the same role.
+ * 
+ * @version $Id$
  */
 public class CompositeUIExtension implements UIExtension
 {
+    /**
+     * The list of {@link UIExtension} aggregated by this object.
+     */
     private final List<UIExtension> extensions;
 
+    /**
+     * @see UIExtension#getRole()
+     */
     private final String role;
 
+    /**
+     * Creates a new composite user interface extension with the specified role.
+     * 
+     * @param role The extension point where the newly created composite UI extension fits.
+     */
     public CompositeUIExtension(String role)
     {
         this.role = role;
@@ -112,6 +125,11 @@ public class CompositeUIExtension implements UIExtension
         }
     }
 
+    /**
+     * Aggregates the specified {@link UIExtension}.
+     * 
+     * @param uie A user interface extension having the same role as this composite.
+     */
     public void addUIExtension(UIExtension uie)
     {
         if (role.equals(uie.getRole())) {
@@ -119,6 +137,11 @@ public class CompositeUIExtension implements UIExtension
         }
     }
 
+    /**
+     * Removes the specified {@link UIExtension} from the composite.
+     * 
+     * @param uie A user interface extension.
+     */
     public void removeUIExtension(UIExtension uie)
     {
         extensions.remove(uie);

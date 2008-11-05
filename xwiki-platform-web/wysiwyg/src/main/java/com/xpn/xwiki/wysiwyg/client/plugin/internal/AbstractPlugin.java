@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -58,16 +56,6 @@ public abstract class AbstractPlugin implements Plugin
      * {@link #init(Wysiwyg, RichTextArea, Config)} method must be called.
      */
     private boolean loaded;
-
-    /**
-     * The range affected by this plugin.<br/>
-     * Most of the plugins alter the DOM document edited with the rich text area by executing commands on the current
-     * selection (thus on the current range). In some cases, a plugin needs to get user input before executing such a
-     * command. It can gather the needed information by opening a dialog, for instance. In some browsers this may lead
-     * to loosing the selection on the rich text area. In this case the plugin can {@link #saveSelection()} before
-     * opening the dialog and {@link #restoreSelection()} before executing the command.
-     */
-    private Range range;
 
     /**
      * The list of user interface extensions provided by this plugin.
@@ -104,31 +92,6 @@ public abstract class AbstractPlugin implements Plugin
     protected List<UIExtension> getUIExtensionList()
     {
         return uiExtensions;
-    }
-
-    /**
-     * Saves the first range in the current selection for later changes.
-     * 
-     * @see #range
-     * @see #restoreSelection()
-     */
-    protected void saveSelection()
-    {
-        range = getTextArea().getDocument().getSelection().getRangeAt(0);
-    }
-
-    /**
-     * Restores the saved selection.
-     * 
-     * @see #range
-     * @see #saveSelection()
-     */
-    protected void restoreSelection()
-    {
-        Selection selection = getTextArea().getDocument().getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        range = null;
     }
 
     /**

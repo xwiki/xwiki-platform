@@ -35,7 +35,25 @@ public class CommandListenerCollection extends ArrayList<CommandListener>
     private static final long serialVersionUID = 7719987791305106197L;
 
     /**
-     * Notifies all the listeners in this collection.
+     * Notifies all the listeners in this collection that the specified command is about to be executed.
+     * 
+     * @param sender The command manager that will execute the command.
+     * @param command The command that is about to be executed.
+     * @param param The parameter that will be used to execute the command.
+     * @return true if one of the listeners wants to prevent the command from being executed.
+     */
+    public boolean fireBeforeCommand(CommandManager sender, Command command, String param)
+    {
+        for (CommandListener listener : this) {
+            if (listener.onBeforeCommand(sender, command, param)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Notifies all the listeners in this collection that the specified command was executed.
      * 
      * @param sender The command manager that executed the command.
      * @param command The command executed.

@@ -30,10 +30,17 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
 /**
  * An abstract kind of plug-in that listens to the changes in the state of the editor's text area.
+ * 
+ * @version $Id$
  */
-public abstract class StatefulPlugin extends AbstractPlugin implements WithDeferredUpdate, ClickListener, KeyboardListener,
-    CommandListener
+public abstract class AbstractStatefulPlugin extends AbstractPlugin implements WithDeferredUpdate, ClickListener,
+    KeyboardListener, CommandListener
 {
+    /**
+     * The index of the last update.
+     * 
+     * @see WithDeferredUpdate#getUpdateIndex()
+     */
     private long updateIndex = -1;
 
     /**
@@ -78,6 +85,17 @@ public abstract class StatefulPlugin extends AbstractPlugin implements WithDefer
         if (sender == getTextArea()) {
             deferUpdate();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
+     */
+    public boolean onBeforeCommand(CommandManager sender, Command command, String param)
+    {
+        // ignore
+        return false;
     }
 
     /**

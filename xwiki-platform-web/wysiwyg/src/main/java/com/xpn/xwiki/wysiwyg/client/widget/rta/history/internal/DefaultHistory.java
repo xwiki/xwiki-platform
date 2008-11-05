@@ -236,10 +236,15 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
     private static Node getNode(Document doc, List<Integer> path)
     {
         Node node = doc;
-        for (int i = path.size() - 1; i > 0; i--) {
+        for (int i = path.size() - 1; i > 1; i--) {
             node = node.getChildNodes().getItem(path.get(i));
         }
-        return node;
+        assert (node.getNodeType() == Node.ELEMENT_NODE);
+        if (node.getChildNodes().getLength() == 0) {
+            // If this element had an empty text node as child it was lost so we recreate it.
+            node.appendChild(node.getOwnerDocument().createTextNode(""));
+        }
+        return node.getChildNodes().getItem(path.get(1));
     }
 
     /**
@@ -320,9 +325,9 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
     /**
      * {@inheritDoc}
      * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
+     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
      */
-    public void onCommand(CommandManager sender, Command command, String param)
+    public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         if (sender == textArea.getCommandManager()) {
             if (command != Command.UNDO && command != Command.REDO) {
@@ -330,5 +335,16 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
                 previousKeyboardAction = null;
             }
         }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see CommandListener#onCommand(CommandManager, Command, String)
+     */
+    public void onCommand(CommandManager sender, Command command, String param)
+    {
+        // ignore
     }
 }

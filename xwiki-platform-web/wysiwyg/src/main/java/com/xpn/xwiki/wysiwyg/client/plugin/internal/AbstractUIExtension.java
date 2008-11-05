@@ -29,13 +29,27 @@ import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 /**
  * Abstract implementation of the {@link UIExtension} interface. This could serve as a base class for all kind of user
  * interface extensions. It offers the possibility of adding and removing user interface features.
+ * 
+ * @version $Id$
  */
 public abstract class AbstractUIExtension implements UIExtension
 {
+    /**
+     * The association between features and the user interface objects that trigger/expose those features.
+     */
     private final Map<String, UIObject> uiObjects;
 
+    /**
+     * The name of the extension point. Specifies what's the role of this UI extension. Examples of extension point
+     * (roles) are: tool bar, menu bar or status bar.
+     */
     private final String role;
 
+    /**
+     * Creates a new user interface extension with the specified role.
+     * 
+     * @param role The name of the extension point where the newly created UI extension fits.
+     */
     public AbstractUIExtension(String role)
     {
         this.role = role;
@@ -73,16 +87,32 @@ public abstract class AbstractUIExtension implements UIExtension
         return uiObjects.get(feature);
     }
 
+    /**
+     * Associates an UI object with a feature. This UI object is supposed to trigger or expose the feature.
+     * 
+     * @param feature A feature like <em>bold</em> or <em>insertMacro</em>.
+     * @param uiObject A user interface object like a {@link com.google.gwt.user.client.ui.PushButton}.
+     * @return The previously UI object associated with the given feature.
+     */
     public UIObject addFeature(String feature, UIObject uiObject)
     {
         return uiObjects.put(feature, uiObject);
     }
 
+    /**
+     * Removes the specified feature from this UI extension.
+     * 
+     * @param feature A feature like <em>bold</em> or <em>insertMacro</em>.
+     * @return The previously UI object associated with the given feature.
+     */
     public UIObject removeFeature(String feature)
     {
         return uiObjects.remove(feature);
     }
 
+    /**
+     * Removes all features from this UI extension.
+     */
     public void clearFeatures()
     {
         uiObjects.clear();

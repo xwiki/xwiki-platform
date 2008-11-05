@@ -27,6 +27,17 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd;
 public interface CommandListener
 {
     /**
+     * Notifies that the given command is about to be executed with the given parameter by the specified command
+     * manager.
+     * 
+     * @param sender The command manager that is about to execute the specified command.
+     * @param command The command that will be executed.
+     * @param param The parameter that will be passed to the command.
+     * @return true to prevent the execution of the command, false to allow it.
+     */
+    boolean onBeforeCommand(CommandManager sender, Command command, String param);
+
+    /**
      * Notifies that the given command has been executed with the given parameter by the specified command manager.
      * 
      * @param sender The command manager that executed the command.

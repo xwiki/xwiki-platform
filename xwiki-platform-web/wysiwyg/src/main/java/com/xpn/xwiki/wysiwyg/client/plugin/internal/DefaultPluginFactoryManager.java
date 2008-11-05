@@ -27,6 +27,8 @@ import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 
 /**
  * Default implementation of the {@link PluginFactoryManager}. We don't plan to provide another implementation.
+ * 
+ * @version $Id$
  */
 public final class DefaultPluginFactoryManager implements PluginFactoryManager
 {

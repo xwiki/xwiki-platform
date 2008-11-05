@@ -28,7 +28,7 @@ import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatefulPlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -41,7 +41,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * <b>Known issues:</b> When you navigate backwards, from right to left, using the arrow keys, the status of the toggle
  * buttons is not synchronized with the text area. The text area behaves properly though.
  */
-public class VerticalAlignPlugin extends StatefulPlugin
+public class VerticalAlignPlugin extends AbstractStatefulPlugin
 {
     private ToggleButton superScript;
 
@@ -140,7 +140,7 @@ public class VerticalAlignPlugin extends StatefulPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see StatefulPlugin#onUpdate()
+     * @see AbstractStatefulPlugin#onUpdate()
      */
     public void onUpdate()
     {

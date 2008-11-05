@@ -156,6 +156,17 @@ public class WysiwygEditor implements WithDeferredUpdate, ClickListener, Keyboar
     /**
      * {@inheritDoc}
      * 
+     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
+     */
+    public boolean onBeforeCommand(CommandManager sender, Command command, String param)
+    {
+        // ignore
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see CommandListener#onCommand(CommandManager, Command, String)
      */
     public void onCommand(CommandManager sender, Command command, String param)

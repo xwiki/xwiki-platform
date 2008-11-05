@@ -640,7 +640,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     {
         try {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(String.format("Adding user {0} to xwiki group {1}", userName, groupName));
+                LOG.debug(MessageFormat.format("Adding user {0} to xwiki group {1}", userName, groupName));
             }
 
             String fullWikiUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + userName;
@@ -660,11 +660,11 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             context.getWiki().saveDocument(groupDoc, context);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug(String.format("Finished adding user {0} to xwiki group {1}", userName, groupName));
+                LOG.debug(MessageFormat.format("Finished adding user {0} to xwiki group {1}", userName, groupName));
             }
 
         } catch (Exception e) {
-            LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", userName, groupName), e);
+            LOG.error(MessageFormat.format("Failed to add a user [{0}] to a group [{1}]", userName, groupName), e);
         }
     }
 

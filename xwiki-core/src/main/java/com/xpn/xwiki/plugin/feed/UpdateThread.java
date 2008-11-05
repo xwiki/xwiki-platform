@@ -21,29 +21,44 @@
 
 package com.xpn.xwiki.plugin.feed;
 
+import java.util.Date;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-import java.util.Date;
-
-public class UpdateThread implements Runnable {
+public class UpdateThread implements Runnable
+{
     protected boolean fullContent;
+
     protected String space;
+
     protected FeedPlugin feedPlugin;
+
     protected XWikiContext context;
+
     protected int scheduleTimer;
+
     protected boolean updateInProgress = false;
+
     protected boolean forceUpdate = false;
+
     protected boolean stopUpdate = false;
+
     protected Date startDate;
+
     protected Date endDate;
+
     protected int nbLoadedArticles;
+
     protected int nbLoadedFeeds;
+
     protected int nbLoadedFeedsErrors;
+
     protected Exception exception;
 
-
-    public UpdateThread(String space, boolean fullContent, int scheduleTimer, FeedPlugin feedPlugin, XWikiContext context) {
+    public UpdateThread(String space, boolean fullContent, int scheduleTimer, FeedPlugin feedPlugin,
+        XWikiContext context)
+    {
         this.fullContent = fullContent;
         this.space = space;
         this.feedPlugin = feedPlugin;
@@ -51,7 +66,8 @@ public class UpdateThread implements Runnable {
         this.context = context;
     }
 
-    public void run() {
+    public void run()
+    {
         while (true) {
             update();
             if (stopUpdate) {
@@ -66,9 +82,10 @@ public class UpdateThread implements Runnable {
         }
     }
 
-    public void update() {
+    public void update()
+    {
         if (!stopUpdate) {
-            if (updateInProgress==false) {
+            if (updateInProgress == false) {
                 updateInProgress = true;
                 nbLoadedFeeds = 0;
                 nbLoadedFeedsErrors = 0;
@@ -89,7 +106,7 @@ public class UpdateThread implements Runnable {
                     context.getWiki().getStore().cleanUp(context);
                 }
                 // an update has been schedule..
-                if ((forceUpdate==true)&&(stopUpdate==false)) {
+                if ((forceUpdate == true) && (stopUpdate == false)) {
                     forceUpdate = false;
                     update();
                 }
@@ -100,50 +117,61 @@ public class UpdateThread implements Runnable {
         }
     }
 
-    public String getSpace() {
+    public String getSpace()
+    {
         return space;
     }
 
-    public boolean isUpdateInProgress() {
+    public boolean isUpdateInProgress()
+    {
         return updateInProgress;
     }
 
-    public Date getStartDate() {
+    public Date getStartDate()
+    {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public Date getEndDate()
+    {
         return endDate;
     }
 
-    public int getNbLoadedArticles() {
+    public int getNbLoadedArticles()
+    {
         return nbLoadedArticles;
     }
 
-    public Exception getException() {
+    public Exception getException()
+    {
         return exception;
     }
 
-    public void stopUpdate() {
+    public void stopUpdate()
+    {
         if (!updateInProgress) {
-            feedPlugin.removeUpdateThread(space, this, context);             
+            feedPlugin.removeUpdateThread(space, this, context);
         }
         stopUpdate = true;
     }
 
-    public int getNbLoadedFeeds() {
+    public int getNbLoadedFeeds()
+    {
         return nbLoadedFeeds;
     }
 
-    public void setNbLoadedFeeds(int nbLoadedFeeds) {
+    public void setNbLoadedFeeds(int nbLoadedFeeds)
+    {
         this.nbLoadedFeeds = nbLoadedFeeds;
     }
 
-    public int getNbLoadedFeedsErrors() {
+    public int getNbLoadedFeedsErrors()
+    {
         return nbLoadedFeedsErrors;
     }
 
-    public void setNbLoadedFeedsErrors(int nbLoadedFeedsErrors) {
+    public void setNbLoadedFeedsErrors(int nbLoadedFeedsErrors)
+    {
         this.nbLoadedFeedsErrors = nbLoadedFeedsErrors;
     }
 }

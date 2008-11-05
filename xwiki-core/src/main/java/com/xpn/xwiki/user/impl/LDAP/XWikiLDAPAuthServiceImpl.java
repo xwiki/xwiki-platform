@@ -21,9 +21,12 @@
 
 package com.xpn.xwiki.user.impl.LDAP;
 
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,10 +47,6 @@ import com.xpn.xwiki.plugin.ldap.XWikiLDAPConnection;
 import com.xpn.xwiki.plugin.ldap.XWikiLDAPSearchAttribute;
 import com.xpn.xwiki.plugin.ldap.XWikiLDAPUtils;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
-
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
-import java.util.HashMap;
 
 /**
  * This class provides an authentication method that validates a user trough LDAP against a directory. It gives LDAP
@@ -641,7 +640,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     {
         try {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(String.format("Adding user {0} to xwiki group {1}", new Object[] {userName, groupName}));
+                LOG.debug(String.format("Adding user {0} to xwiki group {1}", userName, groupName));
             }
 
             String fullWikiUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + userName;
@@ -661,13 +660,11 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             context.getWiki().saveDocument(groupDoc, context);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug(String.format("Finished adding user {0} to xwiki group {1}", new Object[] {userName,
-                groupName}));
+                LOG.debug(String.format("Finished adding user {0} to xwiki group {1}", userName, groupName));
             }
 
         } catch (Exception e) {
-            LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", new Object[] {userName, groupName}),
-                e);
+            LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", userName, groupName), e);
         }
     }
 

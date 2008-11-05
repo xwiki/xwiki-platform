@@ -110,10 +110,10 @@ public class XWikiContext extends Hashtable<Object, Object>
     private int archiveCacheSize = 20;
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    private Map<String, BaseClass> classCache = new LRUMap(classCacheSize);
+    private Map<String, BaseClass> classCache = new LRUMap(this.classCacheSize);
 
     // Used to avoid reloading archives in the same request
-    private Map<String, XWikiDocumentArchive> archiveCache = new LRUMap(archiveCacheSize);
+    private Map<String, XWikiDocumentArchive> archiveCache = new LRUMap(this.archiveCacheSize);
 
     private List<String> displayedFields = new ArrayList<String>();
 
@@ -123,7 +123,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWiki getWiki()
     {
-        return wiki;
+        return this.wiki;
     }
 
     public Util getUtil()
@@ -143,7 +143,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiEngineContext getEngineContext()
     {
-        return engine_context;
+        return this.engine_context;
     }
 
     public void setEngineContext(XWikiEngineContext engine_context)
@@ -153,7 +153,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiRequest getRequest()
     {
-        return request;
+        return this.request;
     }
 
     public void setRequest(XWikiRequest request)
@@ -163,7 +163,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public String getAction()
     {
-        return action;
+        return this.action;
     }
 
     public void setAction(String action)
@@ -173,7 +173,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiResponse getResponse()
     {
-        return response;
+        return this.response;
     }
 
     public void setResponse(XWikiResponse response)
@@ -183,7 +183,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public String getDatabase()
     {
-        return database;
+        return this.database;
     }
 
     public void setDatabase(String database)
@@ -206,7 +206,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public String getOriginalDatabase()
     {
-        return orig_database;
+        return this.orig_database;
     }
 
     public void setOriginalDatabase(String database)
@@ -264,8 +264,8 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public String getUser()
     {
-        if (user != null) {
-            return user.getUser();
+        if (this.user != null) {
+            return this.user.getUser();
         } else {
             return "XWiki.XWikiGuest";
         }
@@ -279,12 +279,12 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiUser getXWikiUser()
     {
-        return user;
+        return this.user;
     }
 
     public String getLanguage()
     {
-        return language;
+        return this.language;
     }
 
     public void setLanguage(String language)
@@ -299,7 +299,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public String getInterfaceLanguage()
     {
-        return interfaceLanguage;
+        return this.interfaceLanguage;
     }
 
     public void setInterfaceLanguage(String interfaceLanguage)
@@ -309,7 +309,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public int getMode()
     {
-        return mode;
+        return this.mode;
     }
 
     public void setMode(int mode)
@@ -319,7 +319,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public URL getURL()
     {
-        return url;
+        return this.url;
     }
 
     public void setURL(URL url)
@@ -329,7 +329,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiURLFactory getURLFactory()
     {
-        return URLFactory;
+        return this.URLFactory;
     }
 
     public void setURLFactory(XWikiURLFactory URLFactory)
@@ -339,7 +339,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiForm getForm()
     {
-        return form;
+        return this.form;
     }
 
     public void setForm(XWikiForm form)
@@ -359,7 +359,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XmlRpcServer getXMLRPCServer()
     {
-        return xmlRpcServer;
+        return this.xmlRpcServer;
     }
 
     public void setXMLRPCServer(XmlRpcServer xmlRpcServer)
@@ -374,22 +374,22 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public String getWikiOwner()
     {
-        return wikiOwner;
+        return this.wikiOwner;
     }
 
     public void setWikiServer(XWikiDocument doc)
     {
-        wikiServer = doc;
+        this.wikiServer = doc;
     }
 
     public XWikiDocument getWikiServer()
     {
-        return wikiServer;
+        return this.wikiServer;
     }
 
     public int getCacheDuration()
     {
-        return cacheDuration;
+        return this.cacheDuration;
     }
 
     public void setCacheDuration(int cacheDuration)
@@ -410,25 +410,25 @@ public class XWikiContext extends Hashtable<Object, Object>
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public void addBaseClass(BaseClass bclass)
     {
-        classCache.put(bclass.getName(), bclass);
+        this.classCache.put(bclass.getName(), bclass);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public BaseClass getBaseClass(String name)
     {
-        return classCache.get(name);
+        return this.classCache.get(name);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public void addDocumentArchive(String key, XWikiDocumentArchive obj)
     {
-        archiveCache.put(key, obj);
+        this.archiveCache.put(key, obj);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public XWikiDocumentArchive getDocumentArchive(String key)
     {
-        return archiveCache.get(key);
+        return this.archiveCache.get(key);
     }
 
     public void setLinksAction(String action)
@@ -483,12 +483,12 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public void addDisplayedField(String fieldname)
     {
-        displayedFields.add(fieldname);
+        this.displayedFields.add(fieldname);
     }
 
     public List<String> getDisplayedFields()
     {
-        return displayedFields;
+        return this.displayedFields;
     }
 
     public String getEditorWysiwyg()

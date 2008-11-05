@@ -24,9 +24,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Use this annotation to add a description to a macro parameters bean method.
+ * 
+ * @version $Id$
+ * @since 1.7M2
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ParameterDescription
 {
+    /**
+     * @return the description.
+     */
     String value();
 }

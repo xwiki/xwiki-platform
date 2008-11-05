@@ -19,11 +19,26 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
+/**
+ * Define a macro parameter.
+ * 
+ * @version $Id$
+ * @since 1.7M2
+ */
 public interface ParameterDescriptor
 {
+    /**
+     * @return the name of the parameter.
+     */
     String getName();
 
+    /**
+     * @return the description of the parameter.
+     */
     String getDescription();
 
+    /**
+     * @return the type of the parameter.
+     */
     Class< ? > getType();
 }

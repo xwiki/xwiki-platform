@@ -60,6 +60,10 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
         this.parametersBeanClass = parametersBeanClass;
     }
 
+    /**
+     * Extract parameters informations from {@link #parametersBeanClass} and insert it in {@link #parameterDescriptorMap}.
+     * @since 1.7M2
+     */
     protected void extractParameterDescriptorMap()
     {
         try {
@@ -78,6 +82,12 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
         }
     }
 
+    /**
+     * Extract provided parameters informations and insert it in {@link #parameterDescriptorMap}.
+     * 
+     * @param propertyDescriptor the JAVA bean property descriptor.
+     * @since 1.7M2
+     */
     protected void extractParameterDescriptor(PropertyDescriptor propertyDescriptor)
     {
         DefaultParameterDescriptor desc = new DefaultParameterDescriptor();

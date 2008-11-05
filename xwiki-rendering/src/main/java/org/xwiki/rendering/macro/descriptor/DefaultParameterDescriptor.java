@@ -19,39 +19,78 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
+/**
+ * The default implementation of {@link ParameterDescriptor}.
+ * 
+ * @version $Id$
+ * @since 1.7M2
+ */
 public class DefaultParameterDescriptor implements ParameterDescriptor
 {
+    /**
+     * The name of the parameter
+     */
     String name;
 
+    /**
+     * The description of the parameter.
+     */
     String description;
 
+    /**
+     * The type of the parameter.
+     */
     Class< ? > type;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getName()
+     */
     public String getName()
     {
         return this.name;
     }
 
+    /**
+     * @param name the name of the parameter.
+     */
     public void setName(String name)
     {
         this.name = name;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getDescription()
+     */
     public String getDescription()
     {
         return this.description;
     }
 
+    /**
+     * @param description the description of the parameter.
+     */
     public void setDescription(String description)
     {
         this.description = description;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getType()
+     */
     public Class< ? > getType()
     {
         return this.type;
     }
 
+    /**
+     * @param type the type of the parameter.
+     */
     public void setType(Class< ? > type)
     {
         this.type = type;

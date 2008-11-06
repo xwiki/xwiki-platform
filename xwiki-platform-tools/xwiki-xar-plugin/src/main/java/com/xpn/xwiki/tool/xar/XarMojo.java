@@ -68,7 +68,7 @@ public class XarMojo extends AbstractXarMojo
     public void execute() throws MojoExecutionException
     {
         if (this.project.getResources().size() < 1) {
-            this.getLog().warn("No XAR created as no resources were found");
+            getLog().warn("No XAR created as no resources were found");
             return;
         }
 
@@ -138,7 +138,7 @@ public class XarMojo extends AbstractXarMojo
      */
     private void generatePackageXml(File packageFile, Collection<ArchiveEntry> files) throws Exception
     {
-        this.getLog().info("Generating package.xml descriptor at [" + packageFile.getPath() + "]");
+        getLog().info("Generating package.xml descriptor at [" + packageFile.getPath() + "]");
 
         OutputFormat outputFormat = new OutputFormat("", true);
         outputFormat.setEncoding("ISO-8859-1");
@@ -244,7 +244,7 @@ public class XarMojo extends AbstractXarMojo
             doc = new XWikiDocument();
             doc.fromXML(file);
         } catch (Exception e) {
-            this.getLog().warn(
+            getLog().warn(
                 "Failed to parse [" + file.getAbsolutePath() + "], skipping it. " + "The error was [" + e.getMessage()
                     + "]", e);
         }
@@ -271,6 +271,7 @@ public class XarMojo extends AbstractXarMojo
         if (filesElement == null) {
             throw new Exception("The supplied document contains no document list ");
         }
+
         Collection elements = filesElement.elements(FILE_TAG);
         for (Object item : elements) {
             if (item instanceof Element) {
@@ -315,11 +316,11 @@ public class XarMojo extends AbstractXarMojo
     private void addFilesToArchive(ZipArchiver archiver, File sourceDir, File packageXml) throws Exception
     {
         Collection<String> documentNames = null;
-        this.getLog().info("Using the existing package.xml descriptor at [" + packageXml.getPath() + "]");
+        getLog().info("Using the existing package.xml descriptor at [" + packageXml.getPath() + "]");
         try {
             documentNames = getDocumentNamesFromXML(packageXml);
         } catch (Exception e) {
-            this.getLog().error("The existing " + PACKAGE_XML + " is invalid.");
+            getLog().error("The existing " + PACKAGE_XML + " is invalid.");
             throw e;
         }
 

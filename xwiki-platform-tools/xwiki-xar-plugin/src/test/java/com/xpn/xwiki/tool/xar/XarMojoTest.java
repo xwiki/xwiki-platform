@@ -49,6 +49,8 @@ public class XarMojoTest extends AbstractMojoTestCase
      */
     protected static final String XARMOJO = "XarMojo";
 
+    protected static final String TESTRESSOURCES_PATH = "target/test-classes";
+
     /**
      * The name of the XarMojo field containing the MavenProject.
      */
@@ -58,13 +60,15 @@ public class XarMojoTest extends AbstractMojoTestCase
      * The path to the xar archive the plugin tries to create. This is used for the testValidXml() test case
      */
     protected static final String XAR_PATH_VALIDXML =
-        getPath("src/test/resources/validXml/target/xwiki-enterprise-wiki.xar");
+        getPath(TESTRESSOURCES_PATH + "/validXml/target/xwiki-enterprise-wiki.xar");
 
     /**
      * The path to the xar archive the plugin tries to create. This is used for the testNoXml() test case
      */
     protected static final String XAR_PATH_NOXML =
-        getPath("src/test/resources/noXml/target/xwiki-enterprise-wiki-test.xar");
+        getPath(TESTRESSOURCES_PATH + "/noXml/target/xwiki-enterprise-wiki-test.xar");
+
+    protected static final String TMPDIR_PATH = "target/test-tmp/";
 
     /**
      * A temporary directory used for extracting xar archives.
@@ -79,11 +83,11 @@ public class XarMojoTest extends AbstractMojoTestCase
     @Override
     protected void setUp() throws Exception
     {
-        this.tempDir = new File(getPath("src/test/resources/temp"));
+        this.tempDir = new File(getPath(TMPDIR_PATH));
         if (this.tempDir.exists()) {
             deleteDirectory(this.tempDir);
         }
-        assertTrue("Cannot create a temporary directory at " + this.tempDir.getAbsolutePath(), this.tempDir.mkdir());
+        assertTrue("Cannot create a temporary directory at " + this.tempDir.getAbsolutePath(), this.tempDir.mkdirs());
         super.setUp();
     }
 
@@ -142,8 +146,8 @@ public class XarMojoTest extends AbstractMojoTestCase
         assertTrue(entries.hasMoreElements());
         assertEquals(entries.nextElement().toString(), XarMojo.PACKAGE_XML);
         Collection<String> documentNames =
-            XarMojo.getDocumentNamesFromXML(new File(
-                getPath("src/test/resources/validXml/src/main/resources/package.xml")));
+            XarMojo.getDocumentNamesFromXML(new File(getPath(TESTRESSOURCES_PATH
+                + "/validXml/src/main/resources/package.xml")));
         int countEntries = 0;
 
         while (entries.hasMoreElements()) {
@@ -207,6 +211,7 @@ public class XarMojoTest extends AbstractMojoTestCase
                 fail("Document " + documentName + " cannot be found in the newly created xar archive.");
             }
         }
+
         assertEquals("The newly created xar archive doesn't contain the required documents", documentNames.size(),
             countEntries);
 
@@ -222,20 +227,20 @@ public class XarMojoTest extends AbstractMojoTestCase
         MavenProject project = new MavenProject();
 
         Build build = new Build();
-        build.setOutputDirectory(getPath("src/test/resources/malformedXml/target/classes"));
-        build.setDirectory(getPath("src/test/resources/malformedXml/target"));
+        build.setOutputDirectory(getPath(TESTRESSOURCES_PATH + "/malformedXml/target/classes"));
+        build.setDirectory(getPath(TESTRESSOURCES_PATH + "/malformedXml/target"));
         project.setBuild(build);
 
         project.setName("Test Project Invalid");
         project.setDescription("Test Description Invalid");
         project.setVersion("Test Version");
-        project.setFile(new File(getPath("src/test/resources/malformedXml/pom.xml")));
+        project.setFile(new File(getPath(TESTRESSOURCES_PATH + "/malformedXml/pom.xml")));
 
         Resource res = new Resource();
-        res.setDirectory(getPath("src/test/resources/malformedXml/src/main/resources"));
+        res.setDirectory(getPath(TESTRESSOURCES_PATH + "/malformedXml/src/main/resources"));
         project.addResource(res);
         res = new Resource();
-        res.setDirectory(getPath("src/test/resources/malformedXml/target/maven-shared-archive-resources"));
+        res.setDirectory(getPath(TESTRESSOURCES_PATH + "/malformedXml/target/maven-shared-archive-resources"));
         project.addResource(res);
 
         project.setArtifactId("xwiki-enterprise-wiki-test-artifact");
@@ -266,20 +271,20 @@ public class XarMojoTest extends AbstractMojoTestCase
         MavenProject project = new MavenProject();
 
         Build build = new Build();
-        build.setOutputDirectory(getPath("src/test/resources/validXml/target/classes"));
-        build.setDirectory(getPath("src/test/resources/validXml/target"));
+        build.setOutputDirectory(getPath(TESTRESSOURCES_PATH + "/validXml/target/classes"));
+        build.setDirectory(getPath(TESTRESSOURCES_PATH + "/validXml/target"));
         project.setBuild(build);
 
         project.setName("Test Project");
         project.setDescription("Test Description");
         project.setVersion("TestVersion");
-        project.setFile(new File(getPath("src/test/resources/validXml/pom.xml")));
+        project.setFile(new File(getPath(TESTRESSOURCES_PATH + "/validXml/pom.xml")));
 
         Resource res = new Resource();
-        res.setDirectory(getPath("src/test/resources/validXml/src/main/resources"));
+        res.setDirectory(getPath(TESTRESSOURCES_PATH + "/validXml/src/main/resources"));
         project.addResource(res);
         res = new Resource();
-        res.setDirectory(getPath("src/test/resources/validXml/target/maven-shared-archive-resources"));
+        res.setDirectory(getPath(TESTRESSOURCES_PATH + "/validXml/target/maven-shared-archive-resources"));
         project.addResource(res);
 
         project.setArtifactId("xwiki-enterprise-wiki");
@@ -304,8 +309,8 @@ public class XarMojoTest extends AbstractMojoTestCase
         MavenProject project = new MavenProject();
 
         Build build = new Build();
-        build.setOutputDirectory(getPath("src/test/resources/noXml/target/classes"));
-        build.setDirectory(getPath("src/test/resources/noXml/target"));
+        build.setOutputDirectory(getPath(TESTRESSOURCES_PATH + "/noXml/target/classes"));
+        build.setDirectory(getPath(TESTRESSOURCES_PATH + "/noXml/target"));
         // Creating a dummy package.xml file under target/classes. The plugin should ignore that and look
         // under resources/ for it and create a new one if it doesn't exist.
         File dummyPackageXml = new File(build.getOutputDirectory(), XarMojo.PACKAGE_XML);
@@ -317,13 +322,13 @@ public class XarMojoTest extends AbstractMojoTestCase
         project.setName("Test Project2");
         project.setDescription("Test Description2");
         project.setVersion("TestVersion2");
-        project.setFile(new File(getPath("src/test/resources/noXml/pom.xml")));
+        project.setFile(new File(getPath(TESTRESSOURCES_PATH + "/noXml/pom.xml")));
 
         Resource res = new Resource();
-        res.setDirectory(getPath("src/test/resources/noXml/src/main/resources"));
+        res.setDirectory(getPath(TESTRESSOURCES_PATH + "/noXml/src/main/resources"));
         project.addResource(res);
         res = new Resource();
-        res.setDirectory(getPath("src/test/resources/noXml/target/maven-shared-archive-resources"));
+        res.setDirectory(getPath(TESTRESSOURCES_PATH + "/noXml/target/maven-shared-archive-resources"));
         project.addResource(res);
 
         project.setArtifactId("xwiki-enterprise-wiki-test");

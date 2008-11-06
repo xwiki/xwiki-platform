@@ -22,10 +22,11 @@ package org.xwiki.rendering.transformation;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
- * The context of the macro transformation process. Contains information such as the current XWiki DOM for the
- * parsed content and the current Macro block being processed by the Macro transformation. 
+ * The context of the macro transformation process. Contains information such as the current XWiki DOM for the parsed
+ * content and the current Macro block being processed by the Macro transformation.
  * 
  * @version $Id$
  */
@@ -45,12 +46,17 @@ public class MacroTransformationContext
      * Whether the macro is called in inline mode or not.
      */
     private boolean isInlined;
-    
+
     /**
      * See {@link #getMacroTransformation()}.
      */
     private MacroTransformation macroTransformation;
-    
+
+    /**
+     * The current syntax.
+     */
+    private Syntax syntax;
+
     /**
      * @param currentMacroBlock the macro currently being processed.
      */
@@ -98,7 +104,7 @@ public class MacroTransformationContext
     {
         return this.isInlined;
     }
-    
+
     /**
      * @param macroTransformation the macro transformation being used
      * @see #getMacroTransformation()
@@ -107,13 +113,30 @@ public class MacroTransformationContext
     {
         this.macroTransformation = macroTransformation;
     }
-    
+
     /**
-     * @return the current Macro Transformation instance being executed. Useful for Macros which need to perform other transformations in turn such as the Include macro which needs 
-     *         to execute Macro transformation if the included page should be executed in its own context.
+     * @return the current Macro Transformation instance being executed. Useful for Macros which need to perform other
+     *         transformations in turn such as the Include macro which needs to execute Macro transformation if the
+     *         included page should be executed in its own context.
      */
     public MacroTransformation getMacroTransformation()
     {
         return this.macroTransformation;
+    }
+
+    /**
+     * @param syntaxId the current syntax.
+     */
+    public void setSyntax(Syntax syntax)
+    {
+        this.syntax = syntax;
+    }
+
+    /**
+     * @return the current syntax.
+     */
+    public Syntax getSyntax()
+    {
+        return syntax;
     }
 }

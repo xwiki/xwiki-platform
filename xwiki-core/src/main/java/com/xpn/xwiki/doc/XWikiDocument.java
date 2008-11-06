@@ -3872,8 +3872,9 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @return the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
-     *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentModelBridge#getSyntaxId()
      */
     public String getSyntaxId()
     {

@@ -43,5 +43,4 @@ public class StringUtils
     {
         return str == null || str.length() == 0;
     }
-
 }

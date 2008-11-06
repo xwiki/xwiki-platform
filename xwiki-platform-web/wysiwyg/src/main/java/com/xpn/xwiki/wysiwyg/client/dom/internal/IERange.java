@@ -316,7 +316,7 @@ public final class IERange extends AbstractRange<NativeRange>
             if (parent.hasChildNodes()) {
                 base = start ? parent.getFirstChild() : parent.getLastChild();
             } else {
-                // The range is inside an empty element. It must be collapsed.
+                // The end point of this range is inside an empty element.
                 // The offset should be 0.
                 assert (offset == 0);
                 base = parent;
@@ -401,11 +401,7 @@ public final class IERange extends AbstractRange<NativeRange>
         EndPointLocator locator = getEndPointLocator(start);
         Node sibling = locator.getBase();
         int offset = locator.getOffset();
-
-        if (offset == 0 && sibling.getNodeType() == Node.ELEMENT_NODE) {
-            // The end point is before the first child or after the last child of the parent node.
-            return start ? 0 : sibling.getParentNode().getChildNodes().getLength();
-        }
+        boolean zero = offset == 0;
 
         // Between the found sibling and the end point container there are only text nodes and elements inside which we
         // cannot position the cursor.
@@ -427,7 +423,8 @@ public final class IERange extends AbstractRange<NativeRange>
                 // We prefer that the end point is inside a text node.
                 if (nextSibling == null || nextSibling.getNodeType() == Node.ELEMENT_NODE) {
                     // The end point is before the first child, after the last child or between elements.
-                    return DOMUtils.getInstance().getNodeIndex(sibling) + (start ? 1 : 0);
+                    return DOMUtils.getInstance().getNodeIndex(sibling)
+                        + ((start && !zero) || (!start && zero) ? 1 : 0);
                 }
                 sibling = nextSibling;
                 continue;
@@ -559,10 +556,10 @@ public final class IERange extends AbstractRange<NativeRange>
     {
         if (getJSRange().isTextRange()) {
             if (refNode.getNodeType() == Node.ELEMENT_NODE) {
-                if (offset < refNode.getChildNodes().getLength()) {
-                    setEndBefore(refNode.getChildNodes().getItem(offset));
+                if (offset > 0) {
+                    setEndAfter(refNode.getChildNodes().getItem(offset - 1));
                 } else {
-                    setEndAfter(refNode.getLastChild());
+                    setEndBefore(refNode.getFirstChild());
                 }
             } else if (refNode.getNodeType() == Node.TEXT_NODE) {
                 ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_END, refNode, offset);

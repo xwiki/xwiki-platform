@@ -125,7 +125,7 @@ public class MacroTransformationContext
     }
 
     /**
-     * @param syntaxId the current syntax.
+     * @param syntax the current syntax.
      */
     public void setSyntax(Syntax syntax)
     {

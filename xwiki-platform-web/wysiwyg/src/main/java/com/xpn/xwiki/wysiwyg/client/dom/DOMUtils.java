@@ -231,7 +231,13 @@ public abstract class DOMUtils
 
             // Find the first text node in the range and start the range there
             if (range.getStartContainer().getNodeType() != Node.TEXT_NODE) {
-                Node leaf = getFirstLeaf(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
+                Node leaf;
+                if (range.getStartOffset() == range.getStartContainer().getChildNodes().getLength()) {
+                    // The start point is either inside an empty node or after the last child of a node.
+                    leaf = getNextLeaf(range.getStartContainer());
+                } else {
+                    leaf = getFirstLeaf(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
+                }
                 while (leaf.getNodeType() != Node.TEXT_NODE) {
                     leaf = getNextLeaf(leaf);
                 }
@@ -240,7 +246,13 @@ public abstract class DOMUtils
 
             // Find the last text node in the range and end the range there
             if (range.getEndContainer().getNodeType() != Node.TEXT_NODE) {
-                Node leaf = getLastLeaf(range.getEndContainer().getChildNodes().getItem(range.getEndOffset()));
+                Node leaf;
+                if (range.getEndOffset() == 0) {
+                    // The end point is either inside an empty node or before the first child of a node.
+                    leaf = getPreviousLeaf(range.getStartContainer());
+                } else {
+                    leaf = getLastLeaf(range.getEndContainer().getChildNodes().getItem(range.getEndOffset() - 1));
+                }
                 while (leaf.getNodeType() != Node.TEXT_NODE) {
                     leaf = getPreviousLeaf(leaf);
                 }

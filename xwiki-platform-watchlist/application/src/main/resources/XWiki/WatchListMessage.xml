@@ -70,7 +70,15 @@
 <number>0</number>
 <className>XWiki.Mail</className>
 <property>
-<html>&lt;body style="background-color:#F7F7F7;"&gt;
+<html>##
+## Preamble
+## Since the core does not have getExternal calls for attachments, we need to get the server part manually.
+#set($externalUrl = $doc.getExternalURL())
+#set($idx = $externalUrl.indexOf('/', 8))
+#set($externalUrl = $externalUrl.substring(0, $idx))
+##
+##
+&lt;body style="background-color:#F7F7F7;"&gt;
 &lt;b&gt;Hello $pseudo,&lt;/b&gt;&lt;br/&gt;
 &lt;i&gt;This message is sent by XWiki. Here are the documents in your watchlist that have been created or updated since the last notification :&lt;/i&gt;&lt;br/&gt;
 &lt;br/&gt;
@@ -268,11 +276,11 @@ $html
       &lt;tr&gt;
         &lt;td&gt;
           #if(!$attachChange.origVersion)
-            Attachment added : &lt;a href="$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)"&gt;$attachChange.fileName&lt;/a&gt;
+            Attachment added : &lt;a href="${externalUrl}$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)"&gt;$attachChange.fileName&lt;/a&gt;
           #elseif(!$attachChange.newVersion)
             Attachment deleted : $attachChange.fileName
           #else
-            Attachment updated from version &lt;a href="$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.origVersion)"&gt;$attachChange.origVersion&lt;/a&gt;
+            Attachment updated from version &lt;a href="${externalUrl}$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.origVersion)"&gt;$attachChange.origVersion&lt;/a&gt;
             to version &lt;a href="$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)"&gt;$attachChange.newVersion&lt;/a&gt;
           #end
         &lt;/td&gt;

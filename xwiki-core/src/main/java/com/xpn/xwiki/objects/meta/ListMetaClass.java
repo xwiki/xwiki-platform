@@ -59,7 +59,7 @@ public class ListMetaClass extends PropertyMetaClass
 
         BooleanClass picker_class = new BooleanClass(this);
         picker_class.setName("picker");
-        picker_class.setPrettyName("Use Picker");
+        picker_class.setPrettyName("Use Suggest");
         picker_class.setDisplayType("yesno");
         picker_class.setDisplayFormType("checkbox");
         picker_class.setDefaultValue(1);

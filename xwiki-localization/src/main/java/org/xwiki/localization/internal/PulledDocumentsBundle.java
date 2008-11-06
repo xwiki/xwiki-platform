@@ -63,17 +63,19 @@ public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle,
         List<String> documentNames = (List<String>) this.execution.getContext().getProperty(PULLED_CONTEXT_KEY);
         if (documentNames != null) {
             Properties props;
-            for (String documentName : documentNames) {
-                try {
-                    // The document names should contain the wiki prefix already.
-                    props = getDocumentBundle(documentName, language);
-                    if (props.containsKey(key)) {
-                        translation = props.getProperty(key);
-                        // The first translation found is returned.
-                        break;
+            synchronized (documentNames) {
+                for (String documentName : documentNames) {
+                    try {
+                        // The document names should contain the wiki prefix already.
+                        props = getDocumentBundle(documentName, language);
+                        if (props.containsKey(key)) {
+                            translation = props.getProperty(key);
+                            // The first translation found is returned.
+                            break;
+                        }
+                    } catch (Exception ex) {
+                        getLogger().warn("Cannot load document bundle: [{0}]", documentName);
                     }
-                } catch (Exception ex) {
-                    getLogger().warn("Cannot load document bundle: [{0}]", documentName);
                 }
             }
         }
@@ -102,7 +104,9 @@ public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle,
                 documentNames = new ArrayList<String>();
                 this.execution.getContext().setProperty(PULLED_CONTEXT_KEY, documentNames);
             }
-            documentNames.add(documentName);
+            synchronized (documentNames) {
+                documentNames.add(documentName);
+            }
         }
     }
 

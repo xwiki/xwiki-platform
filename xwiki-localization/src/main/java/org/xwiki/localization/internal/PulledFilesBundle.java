@@ -54,16 +54,18 @@ public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundl
         List<String> fileNames = (List<String>) this.execution.getContext().getProperty(PULLED_CONTEXT_KEY);
         if (fileNames != null) {
             Properties props;
-            for (String fileName : fileNames) {
-                try {
-                    props = getFileBundle(fileName, language);
-                    if (props.containsKey(key)) {
-                        translation = props.getProperty(key);
-                        // The first translation found is returned.
-                        break;
+            synchronized (fileNames) {
+                for (String fileName : fileNames) {
+                    try {
+                        props = getFileBundle(fileName, language);
+                        if (props.containsKey(key)) {
+                            translation = props.getProperty(key);
+                            // The first translation found is returned.
+                            break;
+                        }
+                    } catch (Exception e) {
+                        getLogger().warn("Cannot load resource bundle: [{0}]", fileName);
                     }
-                } catch (Exception e) {
-                    getLogger().warn("Cannot load resource bundle: [{0}]", fileName);
                 }
             }
         }
@@ -86,7 +88,9 @@ public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundl
                 fileNames = new ArrayList<String>();
                 this.execution.getContext().setProperty(PULLED_CONTEXT_KEY, fileNames);
             }
-            fileNames.add(bundleLocation);
+            synchronized (fileNames) {
+                fileNames.add(bundleLocation);
+            }
         }
     }
 }

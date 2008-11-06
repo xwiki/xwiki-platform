@@ -111,7 +111,9 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
                     String oldBundleNames = StringUtils.join(this.staticBundleNames.remove(wiki), JOIN_SEPARATOR);
                     String newBundleNames = StringUtils.join(this.getStaticDocumentBundles(wiki), JOIN_SEPARATOR);
                     if (!StringUtils.equals(oldBundleNames, newBundleNames)) {
-                        this.staticBundles.remove(wiki);
+                        synchronized (this.staticBundles) {
+                            this.staticBundles.remove(wiki);
+                        }
                     }
                 }
             }

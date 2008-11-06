@@ -2413,7 +2413,7 @@ public class XWikiDocument implements DocumentModelBridge
                 for (BaseObject obj : objects) {
                     if (obj != null) {
                         BaseClass objclass = null;
-                        if (obj.getName().equals(obj.getClassName())) {
+                        if (StringUtils.equals(getFullName(), obj.getClassName())) {
                             objclass = bclass;
                         } else {
                             objclass = obj.getxWikiClass(context);

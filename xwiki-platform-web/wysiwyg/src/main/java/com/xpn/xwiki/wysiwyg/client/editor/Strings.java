@@ -30,11 +30,13 @@ public interface Strings extends Constants
 
     String copy();
 
-    String cut();
+    String cut();   
 
     String deleteCol();
 
     String deleteRow();
+    
+    String deleteTable();
 
     String font();
 

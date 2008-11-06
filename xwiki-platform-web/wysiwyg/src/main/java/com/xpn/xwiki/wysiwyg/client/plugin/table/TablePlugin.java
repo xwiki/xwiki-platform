@@ -19,71 +19,89 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.DeleteCol;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.DeleteRow;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.DeleteTable;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertColAfter;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertColBefore;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowAfter;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowBefore;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertTable;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
+/**
+ * Plug-in allowing to manipulate tables in the WYSIWYG editor. 
+ * 
+ * @version $Id$
+ */
 public class TablePlugin extends AbstractPlugin implements ClickListener
 {
-    private PushButton insertTable;
+    /**
+     * List of table features (example : InsertTable, DeleteCol).
+     */
+    private List<TableFeature> features = new ArrayList<TableFeature>();
 
-    private PushButton insertRowBefore;
-
-    private PushButton insertRowAfter;
-
-    private PushButton deleteRow;
-
-    private PushButton insertColBefore;
-
-    private PushButton insertColAfter;
-
-    private PushButton deleteCol;
-
+    /**
+     * The plug-in toolbar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+    
+    /**
+     * WYSIWYG RichTextArea.
+     */
+    private RichTextArea rta;
+
+    /**
+     * Make a feature available.
+     * 
+     * @param rta WYSIWYG RichTextArea.
+     * @param feature feature to enable.
+     */
+    private void addFeature(RichTextArea rta, TableFeature feature)
+    {
+        rta.getCommandManager().registerCommand(feature.getCommand(), feature);
+        toolBarExtension.addFeature(feature.getName(), feature.getButton());
+        features.add(feature);        
+    }
+    
+    /**
+     * Get WYSIWYG RichTextArea.
+     * 
+     * @return WYSIWYG RichTextArea.
+     */
+    public RichTextArea getRichTextArea()
+    {
+        return rta;
+    }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractPlugin#init(Wysiwyg, XRichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(Wysiwyg wysiwyg, RichTextArea rta, Config config)
     {
-        super.init(wysiwyg, textArea, config);
+        super.init(wysiwyg, rta, config);
+        
+        this.rta = rta;
 
-        insertTable = new PushButton(Images.INSTANCE.insertTable().createImage(), this);
-        insertTable.setTitle(Strings.INSTANCE.insertTable());
-        toolBarExtension.addFeature("inserttable", insertTable);
-
-        insertRowBefore = new PushButton(Images.INSTANCE.insertRowBefore().createImage(), this);
-        insertRowBefore.setTitle(Strings.INSTANCE.insertRowBefore());
-        toolBarExtension.addFeature("insertrowbefore", insertRowBefore);
-
-        insertRowAfter = new PushButton(Images.INSTANCE.insertRowAfter().createImage(), this);
-        insertRowAfter.setTitle(Strings.INSTANCE.insertRowAfter());
-        toolBarExtension.addFeature("insertrowafter", insertRowAfter);
-
-        deleteRow = new PushButton(Images.INSTANCE.deleteRow().createImage(), this);
-        deleteRow.setTitle(Strings.INSTANCE.deleteRow());
-        toolBarExtension.addFeature("deleterow", deleteRow);
-
-        insertColBefore = new PushButton(Images.INSTANCE.insertColBefore().createImage(), this);
-        insertColBefore.setTitle(Strings.INSTANCE.insertColBefore());
-        toolBarExtension.addFeature("insertcolbefore", insertColBefore);
-
-        insertColAfter = new PushButton(Images.INSTANCE.insertColAfter().createImage(), this);
-        insertColAfter.setTitle(Strings.INSTANCE.insertColAfter());
-        toolBarExtension.addFeature("insertcolafter", insertColAfter);
-
-        deleteCol = new PushButton(Images.INSTANCE.deleteCol().createImage(), this);
-        deleteCol.setTitle(Strings.INSTANCE.deleteCol());
-        toolBarExtension.addFeature("deletecol", deleteCol);
+        addFeature(rta, new InsertTable(this));
+        addFeature(rta, new InsertRowBefore(this));
+        addFeature(rta, new InsertRowAfter(this));
+        addFeature(rta, new DeleteRow(this));
+        addFeature(rta, new InsertColBefore(this));
+        addFeature(rta, new InsertColAfter(this));
+        addFeature(rta, new DeleteCol(this));
+        addFeature(rta, new DeleteTable(this));
 
         getUIExtensionList().add(toolBarExtension);
     }
@@ -95,36 +113,12 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
      */
     public void destroy()
     {
-        insertTable.removeFromParent();
-        insertTable.removeClickListener(this);
-        insertTable = null;
-
-        insertRowBefore.removeFromParent();
-        insertRowBefore.removeClickListener(this);
-        insertRowBefore = null;
-
-        insertRowAfter.removeFromParent();
-        insertRowAfter.removeClickListener(this);
-        insertRowAfter = null;
-
-        deleteRow.removeFromParent();
-        deleteRow.removeClickListener(this);
-        deleteRow = null;
-
-        insertColBefore.removeFromParent();
-        insertColBefore.removeClickListener(this);
-        insertColBefore = null;
-
-        insertColAfter.removeFromParent();
-        insertColAfter.removeClickListener(this);
-        insertColAfter = null;
-
-        deleteCol.removeFromParent();
-        deleteCol.removeClickListener(this);
-        deleteCol = null;
-
+        for (TableFeature feature : features) {
+            feature.getButton().removeFromParent();
+            feature.getButton().removeClickListener(this);
+            features.remove(feature);
+        }
         toolBarExtension.clearFeatures();
-
         super.destroy();
     }
 
@@ -134,56 +128,11 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
      * @see ClickListener#onClick(Widget)
      */
     public void onClick(Widget sender)
-    {
-        if (sender == insertTable) {
-            onInsertTable();
-        } else if (sender == insertRowBefore) {
-            onInsertRowBefore();
-        } else if (sender == insertRowAfter) {
-            onInsertRowAfter();
-        } else if (sender == deleteRow) {
-            onDeleteRow();
-        } else if (sender == insertColBefore) {
-            onInsertColBefore();
-        } else if (sender == insertColAfter) {
-            onInsertColAfter();
-        } else if (sender == deleteCol) {
-            onDeleteCol();
+    {        
+        for (TableFeature feature : features) {
+            if (sender == feature.getButton()) {
+                getTextArea().getCommandManager().execute(feature.getCommand());
+            }
         }
-    }
-
-    public void onInsertTable()
-    {
-        // TODO
-    }
-
-    public void onInsertRowBefore()
-    {
-        // TODO
-    }
-
-    public void onInsertRowAfter()
-    {
-        // TODO
-    }
-
-    public void onDeleteRow()
-    {
-        // TODO
-    }
-
-    public void onInsertColBefore()
-    {
-        // TODO
-    }
-
-    public void onInsertColAfter()
-    {
-        // TODO
-    }
-
-    public void onDeleteCol()
-    {
-        // TODO
     }
 }

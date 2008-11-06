@@ -50,6 +50,9 @@ public interface Images extends ImageBundle
 
     @Resource("indent.gif")
     AbstractImagePrototype indent();
+    
+    @Resource("table_delete.gif")
+    AbstractImagePrototype deleteTable();
 
     @Resource("table_insert_col_after.gif")
     AbstractImagePrototype insertColAfter();

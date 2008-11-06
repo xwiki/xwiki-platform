@@ -17,51 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.table;
+package com.xpn.xwiki.wysiwyg.client.plugin.table.util;
 
-import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
+import com.xpn.xwiki.wysiwyg.client.dom.JavaScriptObject;
 
 /**
- * Factory for the WYSIWYG table plug-in.
- * 
  * @version $Id$
  */
-public final class TablePluginFactory extends AbstractPluginFactory
+public class TableConfig extends JavaScriptObject
 {
     /**
-     * Factory instance.
+     * Default constructor. Overlay types always have protected, zero-arguments constructors.
      */
-    private static TablePluginFactory instance;
-
-    /**
-     * Default constructor.
-     */
-    private TablePluginFactory()
+    protected TableConfig()
     {
-        super("table");
     }
 
     /**
-     * Return the factory instance, create one if none exist.
+     * Number of rows in the table.
      * 
-     * @return factory instance.
+     * @return number of rows.
      */
-    public static synchronized TablePluginFactory getInstance()
-    {
-        if (instance == null) {
-            instance = new TablePluginFactory();
-        }
-        return instance;
-    }
+    public final native int getRowNumber()
+    /*-{ 
+        return this.rows; 
+    }-*/;
 
     /**
-     * {@inheritDoc}
+     * Number of columns in the table.
      * 
-     * @see PluginFactory#newInstance()
+     * @return number of columns.
      */
-    public Plugin newInstance()
-    {
-        return new TablePlugin();
-    }
+    public final native int getColNumber()
+    /*-{ 
+        return this.cols; 
+    }-*/;
 }

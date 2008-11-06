@@ -1,0 +1,187 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
+
+import com.google.gwt.dom.client.TableCellElement;
+import com.google.gwt.dom.client.TableElement;
+import com.google.gwt.dom.client.TableRowElement;
+import com.google.gwt.user.client.ui.PushButton;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.InsertTableDialog;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
+import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
+import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+
+/**
+ * Feature allowing to insert a table in the editor. It is disabled when the caret is positioned in a table.
+ * 
+ * @version $Id$
+ */
+public class InsertTable extends AbstractTableFeature implements PopupListener
+{
+    /**
+     * Table plug-in.
+     */
+    private TablePlugin plugin;
+
+    /**
+     * Table dialog.
+     */
+    private InsertTableDialog dialog;
+
+    /**
+     * RTA Selection preserver.
+     */
+    private SelectionPreserver selectionPreserver;
+
+    /**
+     * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
+     * their own PushButton.
+     * 
+     * @param plugin table plug-in.
+     */
+    public InsertTable(TablePlugin plugin)
+    {
+        name = "inserttable";
+        command = new Command(name);
+        button = new PushButton(Images.INSTANCE.insertTable().createImage(), plugin);
+        button.setTitle(Strings.INSTANCE.insertTable());
+        selectionPreserver = new SelectionPreserver(plugin.getRichTextArea());
+        this.plugin = plugin;
+    }
+
+    /**
+     * Get table wizard pop-up.
+     * 
+     * @return the table wizard pop-up instance.
+     */
+    public InsertTableDialog getDialog()
+    {
+        if (dialog == null) {
+            dialog = new InsertTableDialog();
+            dialog.addPopupListener(this);
+        }
+        return dialog;
+    }
+
+    /**
+     * Display the table creation wizard.
+     * 
+     * @param rta WYSIWYG RichTextArea
+     */
+    public void showDialog(RichTextArea rta)
+    {
+        if (getButton().isEnabled()) {
+            // We save the selection because in some browsers, including Internet Explorer, by clicking on the
+            // table wizard we loose the selection in the rich text area and the symbol gets inserted at the
+            // beginning of the text.
+            selectionPreserver.saveSelection();
+            getDialog().center();
+        }
+    }
+
+    /**
+     * Insert a HTML table in the editor.
+     * 
+     * @param rta WYSIWYG RichTextArea
+     * @param config creation parameters.
+     * @return the newly created table.
+     */
+    public TableElement insertTable(RichTextArea rta, TableConfig config)
+    {
+        Range range = utils.getRange(rta.getDocument());
+        TableElement table = rta.getDocument().createTableElement();
+        TableRowElement row;
+        TableCellElement cell;
+
+        // Create rows and columns according to the configuration
+        for (int i = 0; i < config.getRowNumber(); i++) {
+            row = table.insertRow(i);
+            for (int j = 0; j < config.getColNumber(); j++) {
+                cell = row.insertCell(j);
+                cell.setInnerHTML(TableUtils.CELL_DEFAULTHTML);
+            }
+        }
+
+        // FIXME : improve node insertion based on current caret node info.
+        // DEPENDENCY : InsertBlockExecutable to be committed by mflorea.
+        // Append the table to the document.
+        range.getCommonAncestorContainer().appendChild(table);
+
+        return table;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Executable#execute(RichTextArea, String)
+     */
+    public boolean execute(RichTextArea rta, String parameter)
+    {
+        if (StringUtils.isEmpty(parameter)) {
+            // The command has been executed without insertion configuration, display the configuration dialog.
+            showDialog(rta);
+        } else {
+            // Insert the table element.
+            TableElement table = insertTable(rta, (TableConfig) TableConfig.fromJson(parameter));
+            // Put the caret in the first cell of the table.
+            utils.putCaretInNode(rta, table.getRows().getItem(0).getCells().getItem(0));
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Executable#isEnabled(RichTextArea)
+     */
+    public boolean isEnabled(RichTextArea rta)
+    {
+        return utils.getTable(utils.getCaretNode(rta.getDocument())) == null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see PopupListener#onPopupClosed(PopupPanel, boolean)
+     */
+    public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
+    {
+        if (!autoClosed && !getDialog().isCanceled()) {
+            // Call the command again, passing the insertion configuration as a JSON object.
+            plugin.getRichTextArea().getCommandManager().execute(getCommand(),
+                "{ rows:" + getDialog().getRowNumber() + ", cols: " + getDialog().getColNumber() + " }");
+        } else {
+            // We get here if the dialog has been closed by clicking the close button.
+            // In this case we return the focus to the text area.
+            selectionPreserver.restoreSelection();
+            plugin.getRichTextArea().setFocus(true);
+        }
+    }
+}

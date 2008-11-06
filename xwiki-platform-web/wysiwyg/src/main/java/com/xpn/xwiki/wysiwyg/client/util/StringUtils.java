@@ -17,51 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.table;
-
-import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
+package com.xpn.xwiki.wysiwyg.client.util;
 
 /**
- * Factory for the WYSIWYG table plug-in.
+ * Operations on Strings.
  * 
  * @version $Id$
  */
-public final class TablePluginFactory extends AbstractPluginFactory
+public class StringUtils
 {
     /**
-     * Factory instance.
+     * Constructor.
      */
-    private static TablePluginFactory instance;
-
-    /**
-     * Default constructor.
-     */
-    private TablePluginFactory()
+    protected StringUtils()
     {
-        super("table");
     }
 
     /**
-     * Return the factory instance, create one if none exist.
+     * Check is a String is empty ("") or null.
      * 
-     * @return factory instance.
+     * @param str String to inspect.
+     * @return true if the string is empty or null, false otherwise.
      */
-    public static synchronized TablePluginFactory getInstance()
+    public static boolean isEmpty(String str)
     {
-        if (instance == null) {
-            instance = new TablePluginFactory();
-        }
-        return instance;
+        return str == null || str.length() == 0;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactory#newInstance()
-     */
-    public Plugin newInstance()
-    {
-        return new TablePlugin();
-    }
 }

@@ -5,11 +5,24 @@ body {
 body.main {
   position: static !important;
   padding: 0px !important;
-  margin: 0px !important;
+  margin: 6px !important;
   height: auto !important;
   min-height: 0px !important;
   max-height: none !important;
   width: auto !important;
   min-width: 0px !important;
   max-width: none !important;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 0;
+  margin: 0;  
+}
+
+table td { 
+  border: 1px dotted gray !important;
+  padding: 3px;
+  margin: 0;
 }

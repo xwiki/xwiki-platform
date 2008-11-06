@@ -62,6 +62,7 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
      * 
      * @see junit.framework.TestCase#setUp()
      */
+    @Override
     protected void setUp()
     {
         this.rightService = new XWikiRightServiceImpl();
@@ -89,7 +90,7 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
 
         this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
-        this.mockXWiki.stubs().method("getGroupService").will(returnValue(mockAuthService.proxy()));
+        this.mockXWiki.stubs().method("getGroupService").will(returnValue(this.mockAuthService.proxy()));
 
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
     }
@@ -110,12 +111,13 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
         mockGlobalRightObj.stubs().method("getStringValue").with(eq("users")).will(returnValue(""));
         mockGlobalRightObj.stubs().method("getIntValue").with(eq("allow")).will(returnValue(1));
         mockGlobalRightObj.stubs().method("setNumber");
+        mockGlobalRightObj.stubs().method("setName");
 
         doc.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
 
         this.context.setDatabase("wiki2");
 
-        boolean result = rightService.checkRight(GLOBALUSERNAME, doc, "view", true, true, true, context);
+        boolean result = this.rightService.checkRight(GLOBALUSERNAME, doc, "view", true, true, true, this.context);
 
         assertTrue(GLOBALUSERNAME + "does not have global view right on wiki2", result);
     }

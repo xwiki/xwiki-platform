@@ -1,103 +1,58 @@
-#set($tocreate=$request.getParameter("tocreate"))
-#set($title = $request.getParameter("title"))
-#set($template = "")
-#set($template = $request.getParameter("template"))
-#set($parent = "")
-#set($parent=$request.getParameter("parent"))
-#set($auxparams="")
-#set($auxparams=$request.getParameter("auxparams"))
+#set($tocreate = "$!{request.getParameter('tocreate')}")
+#set($title = "$!{request.getParameter('title')}")
+#set($template = "$!{request.getParameter('template')}")
+#set($parent = "$!{request.getParameter('parent')}")
+#set($auxparams = "$!{request.getParameter('auxparams')}")
 ##
 ## Create panel
 ##
 #if($tocreate=="panel")
-#set($docname=$title.replaceAll("/", "%2F"))
-#if(!$template || $template == "")
-#set($template="Panels.PanelTemplate")
-#end
-#set($pcontent = "#")
-#set($pcontent = $pcontent.concat("panelheader('${title}')${util.getNewline()}${util.getNewline()}#"))
-#set($pcontent = $pcontent.concat("panelfooter()"))
-#set($pcontent = $util.encodeURL($pcontent))
-#set($redirectaction = "inline")
-#set($redirectparams = "template=${template}&Panels.PanelClass_0_name=${title}&Panels.PanelClass_0_content=$pcontent")
+  #set($docname=$title.replaceAll("/", "%2F"))
+  #if($template == "")
+    #set($template="Panels.PanelTemplate")
+  #end
+  #set($pcontent = "#")
+  #set($pcontent = $pcontent.concat("panelheader('${title}')${util.getNewline()}${util.getNewline()}#"))
+  #set($pcontent = $pcontent.concat("panelfooter()"))
+  #set($pcontent = $util.encodeURL($pcontent))
+  #set($redirectaction = "inline")
+  #set($redirectparams = "template=${template}&Panels.PanelClass_0_name=${title}&Panels.PanelClass_0_content=$pcontent")
 ##
 ## Create page
 ##
 #elseif($tocreate=="page")
-#set($docname=$title.replaceAll("/", "."))
-#set($etitle = $util.encodeURI($title))
-#set($etemplate = $util.encodeURI("${template}"))
-#set($eparent = $util.encodeURI("${parent}${auxparams}"))
-#set($redirectaction = "edit")
-#set($redirectparams = "template=${etemplate}&parent=${eparent}&title=$etitle")
+  #set($docname=$title.replaceAll("/", "."))
+  #set($etitle = $util.encodeURI($title))
+  #set($etemplate = $util.encodeURI("${template}"))
+  #set($eparent = $util.encodeURI("${parent}${auxparams}"))
+  #set($redirectaction = "edit")
+  #set($redirectparams = "template=${etemplate}&parent=${eparent}&title=$etitle")
 ##
 ## Create space
 ##
 #elseif($tocreate=="space")
-#set($title=$title.replaceAll(" \\.\\/", ""))
-#set($docname="${title}.WebHome")
-#set($eparent = $util.encodeURI("${parent}${auxparams}"))
-## TODO : Use a WebHome template ?
-#set($redirectaction = "edit")
-#set($redirectparams = "parent=${eparent}&title=$title")
+  #set($title=$title.replaceAll(" \\.\\/", ""))
+  #set($docname="${title}.WebHome")
+  #set($eparent = $util.encodeURI("${parent}${auxparams}"))
+  ## TODO : Use a WebHome template ?
+  #set($redirectaction = "edit")
+  #set($redirectparams = "parent=${eparent}&title=$title")
 ##
 ## Create blog post
 ##
 #elseif($tocreate=="post")
-#set($docname="Blog.${title.replaceAll(' ', '')}")
-#set($etitle = $util.encodeURI($title))
-#set($redirectaction = "inline")
-#set($redirectparams = "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$etitle")
+  #set($docname="Blog.${title.replaceAll(' ', '')}")
+  #set($etitle = $util.encodeURI($title))
+  #set($redirectaction = "inline")
+  #set($redirectparams = "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$etitle")
 #end
 ##
 ## Send redirect
 ##
 #set($newdoc=$xwiki.getDocument($docname))
 #if(!$newdoc.isNew())
-#set($redirecturl = $newdoc.getURL("view", "xpage=docalreadyexists"))
+  #set($redirecturl = $newdoc.getURL("view", "xpage=docalreadyexists"))
 #else
-#set($redirecturl = $newdoc.getURL($redirectaction, $redirectparams))
+  #set($redirecturl = $newdoc.getURL($redirectaction, $redirectparams))
 #end
 $response.sendRedirect($redirecturl)
-##
-##
-##
-##
-##
-## #set($tocreate=$request.getParameter("tocreate"))
-## #set($title = $request.getParameter("title"))
-## #set($template = $request.getParameter("template"))
-## #if($tocreate=="panel")
-## #set($docname=$title.replaceAll("/", "%2F"))
-## #if(!$template)
-## #set($template="Panels.PanelTemplate")
-## #end
-## #set($newdoc=$xwiki.getDocument($docname))
-## #if($newdoc.isNew())
-## #set($pcontent = "#")
-## #set($pcontent = $pcontent.concat("panelheader('${title}')${util.getNewline()}${util.getNewline()}#"))
-## #set($pcontent = $pcontent.concat("panelfooter()"))
-## #set($pcontent = $util.encodeURI($pcontent))
-## $pcontent
-## $response.sendRedirect($newdoc.getURL("inline", "template=${template}&Panels.PanelClass_0_name=${title}&Panels.PanelClass_0_content=$pcontent"))
-## #else
-## $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
-## #end
-## #elseif($tocreate=="page")
-## #set($docname=$title.replaceAll("/", "."))
-## #elseif($tocreate=="space")
-## #set($title=$title.replaceAll("[ ./]", ""))
-## #set($docname="${title}.WebHome")
-## #elseif($tocreate=="post")
-## #set($docname="Blog.${title.replaceAll(' ', '')}")
-## #end
-## #set($newdoc=$xwiki.getDocument($docname))
-## #if($newdoc.isNew())
-## #if($tocreate == "post")
-## $response.sendRedirect($newdoc.getURL("inline", "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$title"))
-## #else
-## $response.sendRedirect($newdoc.getURL("edit", "template=${template}"))
-## #end
-## #else
-## $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
-## #end

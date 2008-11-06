@@ -26,9 +26,9 @@ import java.util.Map;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.IncrementalCommand;
 import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.LoadListener;
+import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
-public class WysiwygEditor implements WithDeferredUpdate, ClickListener, KeyboardListener, CommandListener,
+public class WysiwygEditor implements WithDeferredUpdate, MouseListener, KeyboardListener, CommandListener,
     ChangeListener, LoadListener
 {
     private class SyntaxValidationCommand implements IncrementalCommand
@@ -98,7 +98,7 @@ public class WysiwygEditor implements WithDeferredUpdate, ClickListener, Keyboar
         ui.addLoadListener(this);
         ui.getConfig().addFlag("wysiwyg");
         ui.getConfig().setParameter("syntax", config.getParameter("syntax", DEFAULT_SYNTAX));
-        ui.getTextArea().addClickListener(this);
+        ui.getTextArea().addMouseListener(this);
         ui.getTextArea().addKeyboardListener(this);
         ui.getTextArea().getCommandManager().addCommandListener(this);
         ui.getTextArea().addChangeListener(this);
@@ -112,10 +112,52 @@ public class WysiwygEditor implements WithDeferredUpdate, ClickListener, Keyboar
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see MouseListener#onMouseDown(Widget, int, int)
      */
-    public void onClick(Widget sender)
+    public void onMouseDown(Widget sender, int x, int y)
     {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MouseListener#onMouseEnter(Widget)
+     */
+    public void onMouseEnter(Widget sender)
+    {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MouseListener#onMouseLeave(Widget)
+     */
+    public void onMouseLeave(Widget sender)
+    {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MouseListener#onMouseMove(Widget, int, int)
+     */
+    public void onMouseMove(Widget sender, int x, int y)
+    {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MouseListener#onMouseUp(Widget, int, int)
+     */
+    public void onMouseUp(Widget sender, int x, int y)
+    {
+        // We listen to mouse up events instead of clicks because if the user selects text and the end points of the
+        // selection are in different DOM nodes the click events are not triggered.
         if (sender == ui.getTextArea()) {
             deferUpdate();
         }
@@ -210,6 +252,11 @@ public class WysiwygEditor implements WithDeferredUpdate, ClickListener, Keyboar
         }
     }
 
+    /**
+     * Loads the plugins specified in the configuration (or the default list of plugins if the configuration doesn't
+     * specify the <em>plugins</em> parameter) and fills the tool bar of the editor with the features specified in the
+     * configuration.
+     */
     private void loadPlugins()
     {
         if (this.toolBarFeatures != null) {
@@ -302,6 +349,9 @@ public class WysiwygEditor implements WithDeferredUpdate, ClickListener, Keyboar
         return ++updateIndex;
     }
 
+    /**
+     * Schedules an update. More than one update can be scheduled, but only the last one will be executed.
+     */
     private void deferUpdate()
     {
         DeferredCommand.addCommand(new UpdateCommand(this));
@@ -328,11 +378,20 @@ public class WysiwygEditor implements WithDeferredUpdate, ClickListener, Keyboar
         DeferredCommand.addCommand(new SyntaxValidationCommand());
     }
 
+    /**
+     * In a Model-View-Controller architecture {@link RichTextEditor} represents the View component, while this class
+     * represents the Controller. The model could be considered the DOM document edited.
+     * 
+     * @return The user interface of this editor.
+     */
     public RichTextEditor getUI()
     {
         return ui;
     }
 
+    /**
+     * @return The syntax in which the HTML output of this editor will be converted on the server side.
+     */
     public String getSyntax()
     {
         return ui.getConfig().getParameter("syntax");

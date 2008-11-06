@@ -25,8 +25,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -96,7 +96,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addClickListener(this);
+            getTextArea().addMouseListener(this);
             getTextArea().addKeyboardListener(this);
             getTextArea().getCommandManager().addCommandListener(this);
             getUIExtensionList().add(toolBarExtension);
@@ -123,7 +123,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeClickListener(this);
+            getTextArea().removeMouseListener(this);
             getTextArea().removeKeyboardListener(this);
             getTextArea().getCommandManager().removeCommandListener(this);
             toolBarExtension.clearFeatures();

@@ -27,8 +27,8 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -37,7 +37,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * {@link RichTextEditor} plug-in for inserting ordered (numbered) and unordered (bullet) lists. It installs two toggle
  * buttons on the tool bar and updates their status depending on the current cursor position.
  */
-public class ListPlugin extends AbstractStatefulPlugin
+public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
 {
     private ToggleButton ol;
 
@@ -67,7 +67,7 @@ public class ListPlugin extends AbstractStatefulPlugin
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addClickListener(this);
+            getTextArea().addMouseListener(this);
             getTextArea().addKeyboardListener(this);
             getTextArea().getCommandManager().addCommandListener(this);
             getUIExtensionList().add(toolBarExtension);
@@ -94,7 +94,7 @@ public class ListPlugin extends AbstractStatefulPlugin
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeClickListener(this);
+            getTextArea().removeMouseListener(this);
             getTextArea().removeKeyboardListener(this);
             getTextArea().getCommandManager().removeCommandListener(this);
             toolBarExtension.clearFeatures();
@@ -114,8 +114,6 @@ public class ListPlugin extends AbstractStatefulPlugin
             onOrderedList();
         } else if (sender == ul) {
             onUnorderedList();
-        } else {
-            super.onClick(sender);
         }
     }
 

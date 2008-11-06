@@ -28,8 +28,8 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyFactory;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * <b>Known issues:</b> When you navigate backwards, from right to left, using the arrow keys, the status of the toggle
  * buttons is not synchronized with the text area. The text area behaves properly though.
  */
-public class TextPlugin extends AbstractStatefulPlugin
+public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
 {
     private ToggleButton bold;
 
@@ -111,7 +111,7 @@ public class TextPlugin extends AbstractStatefulPlugin
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().addKeyboardListener(this);
-            getTextArea().addClickListener(this);
+            getTextArea().addMouseListener(this);
             getTextArea().getCommandManager().addCommandListener(this);
             getUIExtensionList().add(toolBarExtension);
         }
@@ -158,7 +158,7 @@ public class TextPlugin extends AbstractStatefulPlugin
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeClickListener(this);
+            getTextArea().removeMouseListener(this);
             getTextArea().removeKeyboardListener(this);
             getTextArea().getCommandManager().removeCommandListener(this);
             toolBarExtension.clearFeatures();
@@ -184,8 +184,6 @@ public class TextPlugin extends AbstractStatefulPlugin
             onStrikeThrough();
         } else if (sender == teletype) {
             onTeletype();
-        } else {
-            super.onClick(sender);
         }
     }
 

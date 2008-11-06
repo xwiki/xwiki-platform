@@ -20,8 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.KeyboardListener;
+import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.util.WithDeferredUpdate;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -33,7 +33,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public abstract class AbstractStatefulPlugin extends AbstractPlugin implements WithDeferredUpdate, ClickListener,
+public abstract class AbstractStatefulPlugin extends AbstractPlugin implements WithDeferredUpdate, MouseListener,
     KeyboardListener, CommandListener
 {
     /**
@@ -46,10 +46,52 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements W
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see MouseListener#onMouseDown(Widget, int, int)
      */
-    public void onClick(Widget sender)
+    public void onMouseDown(Widget sender, int x, int y)
     {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MouseListener#onMouseEnter(Widget)
+     */
+    public void onMouseEnter(Widget sender)
+    {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MouseListener#onMouseLeave(Widget)
+     */
+    public void onMouseLeave(Widget sender)
+    {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MouseListener#onMouseMove(Widget, int, int)
+     */
+    public void onMouseMove(Widget sender, int x, int y)
+    {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MouseListener#onMouseUp(Widget, int, int)
+     */
+    public void onMouseUp(Widget sender, int x, int y)
+    {
+        // We listen to mouse up events instead of clicks because if the user selects text and the end points of the
+        // selection are in different DOM nodes the click events are not triggered.
         if (sender == getTextArea()) {
             deferUpdate();
         }

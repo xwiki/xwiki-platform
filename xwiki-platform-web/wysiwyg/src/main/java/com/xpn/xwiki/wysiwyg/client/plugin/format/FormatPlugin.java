@@ -29,8 +29,8 @@ import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -83,7 +83,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
             toolBarExtension.addFeature("format", levels);
             getUIExtensionList().add(toolBarExtension);
 
-            getTextArea().addClickListener(this);
+            getTextArea().addMouseListener(this);
             getTextArea().addKeyboardListener(this);
             getTextArea().getCommandManager().addCommandListener(this);
         }
@@ -101,7 +101,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
             levels.removeChangeListener(this);
             levels = null;
 
-            getTextArea().removeClickListener(this);
+            getTextArea().removeMouseListener(this);
             getTextArea().removeKeyboardListener(this);
             getTextArea().getCommandManager().removeCommandListener(this);
 

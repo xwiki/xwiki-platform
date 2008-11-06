@@ -85,7 +85,7 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
                 translation = props.getProperty(key);
             }
         } catch (Exception e) {
-            getLogger().info("Unhandled exception while translating");
+            getLogger().info("Unhandled exception while translating: {0}", e.getMessage());
         }
         return translation;
     }
@@ -174,7 +174,7 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
                 }
                 properties.putAll(getDocumentBundle(fullDocumentName, language));
             } catch (Exception ex) {
-                getLogger().warn("Exception loading a document bundle: " + fullDocumentName);
+                getLogger().warn("Exception loading document bundle [{0}]", fullDocumentName);
             }
         }
         // Also watch the preferences for this wiki, in case the list of documents is changed.

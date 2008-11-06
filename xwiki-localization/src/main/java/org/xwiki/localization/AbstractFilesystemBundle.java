@@ -95,7 +95,7 @@ public abstract class AbstractFilesystemBundle extends AbstractBundle implements
             // ResourceBundles already have inherited properties included.
             return props;
         } catch (MissingResourceException ex) {
-            getLogger().warn("Invalid file bundle used: " + fileName);
+            getLogger().warn("Invalid file bundle used: [{0}]", fileName);
         }
         return new Properties();
     }

@@ -63,7 +63,7 @@ public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundl
                         break;
                     }
                 } catch (Exception e) {
-                    getLogger().warn("Cannot load resource bundle: " + fileName);
+                    getLogger().warn("Cannot load resource bundle: [{0}]", fileName);
                 }
             }
         }
@@ -81,12 +81,12 @@ public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundl
     {
         // In theory, the execution context should not be shared by more than one thread. But just in case...
         synchronized (this.execution.getContext()) {
-            List<String> usedBundles = (List<String>) this.execution.getContext().getProperty(PULLED_CONTEXT_KEY);
-            if (usedBundles == null) {
-                usedBundles = new ArrayList<String>();
-                this.execution.getContext().setProperty(PULLED_CONTEXT_KEY, usedBundles);
+            List<String> fileNames = (List<String>) this.execution.getContext().getProperty(PULLED_CONTEXT_KEY);
+            if (fileNames == null) {
+                fileNames = new ArrayList<String>();
+                this.execution.getContext().setProperty(PULLED_CONTEXT_KEY, fileNames);
             }
-            usedBundles.add(bundleLocation);
+            fileNames.add(bundleLocation);
         }
     }
 }

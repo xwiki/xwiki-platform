@@ -73,7 +73,7 @@ public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle,
                         break;
                     }
                 } catch (Exception ex) {
-                    getLogger().warn("Cannot load document bundle: " + documentName);
+                    getLogger().warn("Cannot load document bundle: [{0}]", documentName);
                 }
             }
         }
@@ -97,12 +97,12 @@ public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle,
         }
         // In theory, the execution context should not be shared by more than one thread. But just in case...
         synchronized (this.execution.getContext()) {
-            List<String> usedBundles = (List<String>) this.execution.getContext().getProperty(PULLED_CONTEXT_KEY);
-            if (usedBundles == null) {
-                usedBundles = new ArrayList<String>();
-                this.execution.getContext().setProperty(PULLED_CONTEXT_KEY, usedBundles);
+            List<String> documentNames = (List<String>) this.execution.getContext().getProperty(PULLED_CONTEXT_KEY);
+            if (documentNames == null) {
+                documentNames = new ArrayList<String>();
+                this.execution.getContext().setProperty(PULLED_CONTEXT_KEY, documentNames);
             }
-            usedBundles.add(documentName);
+            documentNames.add(documentName);
         }
     }
 

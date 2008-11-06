@@ -201,7 +201,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
             }
         } catch (IOException ex) {
             // Cannot do anything more
-            getLogger().error("Invalid document resource bundle: " + documentName, ex);
+            getLogger().error("Invalid document resource bundle: [{0}]", ex, documentName);
         }
         return props;
     }

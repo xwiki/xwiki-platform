@@ -83,7 +83,7 @@ public class DefaultWikiInformation extends AbstractLogEnabled implements WikiIn
             return StringUtils.defaultIfEmpty(this.documentAccessBridge.getProperty(wiki + ":"
                 + PREFERENCES_DOCUMENT_NAME, PREFERENCES_CLASS_NAME, DEFAULT_LANGUAGE_PROPERTY_NAME), DEFAULT_LANGUAGE);
         } catch (Exception ex) {
-            getLogger().warn("Error getting the default language of the wiki " + wiki, ex);
+            getLogger().warn("Error getting the default language of the wiki [{0}]", ex, wiki);
         }
         return DEFAULT_LANGUAGE;
     }

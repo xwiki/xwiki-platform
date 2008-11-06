@@ -43,7 +43,6 @@ public class XWikiDocument
      */
     private String space;
 
-
     /**
      * The language of the document.
      */
@@ -119,7 +118,7 @@ public class XWikiDocument
     {
         this.space = space;
     }
-   
+
     /**
      * @return the language of the document.
      */
@@ -151,12 +150,29 @@ public class XWikiDocument
     {
         this.defaultLanguage = defaultLanguage;
     }
- 
+
     /**
      * @return the full name of the document.
      */
     public String getFullName()
     {
         return this.space == null ? this.name : this.space + "." + this.name;
+    }
+
+    /**
+     * @param file the file containing the document.
+     * @return the full name of the document or null, if the document is invalid
+     */
+    public static String getFullName(File file)
+    {
+        XWikiDocument doc = null;
+        try {
+            doc = new XWikiDocument();
+            doc.fromXML(file);
+        } catch (Exception e) {
+            return null;
+        }
+
+        return doc.getFullName();
     }
 }

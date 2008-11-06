@@ -11,11 +11,11 @@
   <head>
     <title>
     #if(!$title)
-      #set( $title = $!xwiki.getWebPreference("title"))
+      #set( $title = $!xwiki.getWebPreference('title'))
       #if ( $title != "")
-        $xwiki.parseContent($title)
+        $xwiki.parseContent($title).replaceAll('&(?!#)', '&#38;')
       #else
-        XWiki - $!doc.space - $!doc.displayTitle
+        XWiki - $!doc.space.replaceAll('&(?!#)', '&#38;') - $!doc.displayTitle.replaceAll('&(?!#)', '&#38;')
       #end
     #else
       $title

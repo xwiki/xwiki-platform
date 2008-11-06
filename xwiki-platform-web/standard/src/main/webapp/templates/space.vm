@@ -6,7 +6,7 @@
 #set($discard = $parents.add($parent))
 #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
 #set($pdocurl = $pdoc.getURL("view"))
-#set($nstring = "<a href='$pdocurl'>${pdoc.displayTitle}</a> &gt; $string")
+#set($nstring = "<a href='$pdocurl'>${pdoc.displayTitle.replaceAll('&(?!#)', '&#38;')}</a> &gt; $string")
 #set($level = $level + 1)
 #breadcrumb($pdoc $nstring $level)
 #else
@@ -19,7 +19,7 @@ $string
 <hr/>
   <div id="breadcrumbs">
     <span class="breadcrumbspace"><a href="$spaceViewUrl">${doc.space}</a>: </span>
-#breadcrumb($doc "<a href='${doc.getURL('view')}'>$tdoc.displayTitle</a>" 0)
+#breadcrumb($doc "<a href='${doc.getURL('view')}'>$tdoc.displayTitle.replaceAll('&(?!#)', '&#38;')</a>" 0)
   </div>
 <hr/>
 </div>

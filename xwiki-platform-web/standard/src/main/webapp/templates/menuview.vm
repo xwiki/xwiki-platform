@@ -119,7 +119,7 @@
 #submenuitem($doc.getURL("export", "format=pdf&amp;$docvariant") $msg.get("core.menu.export.pdf") "tmExportPdf")
 #submenuitem($doc.getURL("export", "format=rtf&amp;$docvariant") $msg.get("core.menu.export.rtf") "tmExportRtf")
 #submenuitem($doc.getURL("export", "format=html&amp;$docvariant") $msg.get("core.menu.export.html") "tmExportHtml")
-#submenuitem($doc.getURL("export", "format=xar&amp;name=$doc.fullName&amp;pages=$doc.fullName&amp;$docvariant") $msg.get("core.menu.export.xar") "tmExportXar")
+#submenuitem($doc.getURL("export", "format=xar&amp;name=$util.encodeURI($doc.fullName)&amp;pages=$util.encodeURI($doc.fullName)&amp;$docvariant") $msg.get("core.menu.export.xar") "tmExportXar")
 #xwikitopmenuentryend()
 ##
 ## Actions menu

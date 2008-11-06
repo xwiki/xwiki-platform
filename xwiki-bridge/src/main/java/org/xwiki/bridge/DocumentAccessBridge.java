@@ -98,7 +98,8 @@ public interface DocumentAccessBridge
     /**
      * @param className The name of the class.
      * @param propertyName The name of the property.
-     * @return class name of the property object or null if property is not found. For example StringProperty, IntegerProperty.
+     * @return class name of the property object or null if property is not found. For example StringProperty,
+     *         IntegerProperty.
      * @throws Exception if class cannot be accessed
      */
     String getPropertyType(String className, String propertyName) throws Exception;
@@ -123,7 +124,7 @@ public interface DocumentAccessBridge
     byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception;
 
     /**
-     * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action,
+     * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.
      * 
      * @param documentName The name of the document to access.
      * @param action The "mode" in which the document is accessed, for example <code>view</code> to view the document,
@@ -138,9 +139,9 @@ public interface DocumentAccessBridge
     String getURL(String documentName, String action, String queryString, String anchor) throws Exception;
 
     /**
-     * Retrieves the internal (without the hostname) URL that can be used to access an attachment
+     * Retrieves the internal (without the hostname) URL that can be used to access an attachment.
      * 
-     * @param documentName the full name of the document containing the attachment (eg "wiki:Space.Page") 
+     * @param documentName the full name of the document containing the attachment (eg "wiki:Space.Page")
      * @param attachmentName the attachment name (eg "my.png")
      * @return the attachment URL
      * @throws Exception If the document or the attachment cannot be accessed

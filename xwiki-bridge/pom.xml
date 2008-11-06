@@ -34,4 +34,20 @@
   <name>XWiki Platform - Core - Bridge</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Temporary bridge between new components and the old core, until the old core is completely split into components</description>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>com.xpn.xwiki.platform.tools</groupId>
+            <artifactId>xwiki-verification-resources</artifactId>
+            <version>${platform.tool.verification.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
 </project>

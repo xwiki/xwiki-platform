@@ -29,6 +29,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
@@ -223,11 +225,21 @@ public class XWikiDocumentTest extends MockObjectTestCase
         assertEquals("1 Section 3\nModified content of section 3", this.document.getContentOfSection(3));
     }
 
-    public void testCloneSaveVersions() {
+    public void testCloneSaveVersions()
+    {
         XWikiDocument doc1 = new XWikiDocument("qwe", "qwe");
         XWikiDocument doc2 = (XWikiDocument) doc1.clone();
         doc1.incrementVersion();
         doc2.incrementVersion();
         assertEquals(doc1.getVersion(), doc2.getVersion());
+    }
+
+    public void testAddObject() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument("test", "document");
+        this.mockXWiki.stubs().method("getClass").will(returnValue(new BaseClass()));
+        BaseObject object = BaseClass.newCustomClassInstance("XWiki.XWikiUsers", this.context);
+        doc.addObject("XWiki.XWikiUsers", object);
+        assertEquals("XWikiDocument.addObject does not set the object's name", doc.getFullName(), object.getName());
     }
 }

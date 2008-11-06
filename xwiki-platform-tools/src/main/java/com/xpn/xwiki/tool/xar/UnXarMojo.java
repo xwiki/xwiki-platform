@@ -26,7 +26,7 @@ import org.codehaus.plexus.archiver.ArchiverException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Expand a XAR file.
@@ -83,8 +83,8 @@ public class UnXarMojo extends AbstractXarMojo
         try {
             performUnArchive();
         } catch (Exception e) {
-            throw new MojoExecutionException("Error while expanding the XAR file " + HOOK_OPEN
-                + this.groupId + TWO_POINTS + this.artifactId + HOOK_CLOSE, e);
+            throw new MojoExecutionException("Error while expanding the XAR file " + HOOK_OPEN + this.groupId
+                + TWO_POINTS + this.artifactId + HOOK_CLOSE, e);
         }
     }
 
@@ -97,28 +97,23 @@ public class UnXarMojo extends AbstractXarMojo
         Artifact resolvedArtifact = null;
 
         getLog().debug(
-            "Searching for an artifact that matches " + HOOK_OPEN + this.groupId + TWO_POINTS
-                + this.artifactId + HOOK_CLOSE + DOTDOTDOT);
+            "Searching for an artifact that matches " + HOOK_OPEN + this.groupId + TWO_POINTS + this.artifactId
+                + HOOK_CLOSE + DOTDOTDOT);
 
-        Iterator it = this.project.getArtifacts().iterator();
-        while (it.hasNext()) {
-            Artifact artifact = (Artifact) it.next();
-
+        for (Artifact artifact : (Set<Artifact>) this.project.getArtifacts()) {
             getLog().debug(
-                "Checking artifact " + HOOK_OPEN + artifact.getGroupId() + TWO_POINTS
-                    + artifact.getArtifactId() + TWO_POINTS + artifact.getType() + HOOK_CLOSE
-                    + DOTDOTDOT);
+                "Checking artifact " + HOOK_OPEN + artifact.getGroupId() + TWO_POINTS + artifact.getArtifactId()
+                    + TWO_POINTS + artifact.getType() + HOOK_CLOSE + DOTDOTDOT);
 
-            if (artifact.getGroupId().equals(this.groupId)
-                && artifact.getArtifactId().equals(this.artifactId)) {
+            if (artifact.getGroupId().equals(this.groupId) && artifact.getArtifactId().equals(this.artifactId)) {
                 resolvedArtifact = artifact;
                 break;
             }
         }
 
         if (resolvedArtifact == null) {
-            throw new MojoExecutionException("Artifact " + HOOK_OPEN + this.groupId + TWO_POINTS
-                + this.artifactId + HOOK_CLOSE + " is not a dependency of the project.");
+            throw new MojoExecutionException("Artifact " + HOOK_OPEN + this.groupId + TWO_POINTS + this.artifactId
+                + HOOK_CLOSE + " is not a dependency of the project.");
         }
 
         return resolvedArtifact;

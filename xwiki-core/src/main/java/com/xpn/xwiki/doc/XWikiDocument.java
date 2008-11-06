@@ -1313,6 +1313,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void addObject(String classname, BaseObject object)
     {
+        if (object != null) {
+            object.setName(getFullName());
+        }
         Vector<BaseObject> vobj = getObjects(classname);
         if (vobj == null) {
             setObject(classname, 0, object);
@@ -1324,6 +1327,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setObject(String classname, int nb, BaseObject object)
     {
+        if (object != null) {
+            object.setName(getFullName());
+        }
         Vector<BaseObject> objects = getObjects(classname);
         if (objects == null) {
             objects = new Vector<BaseObject>();

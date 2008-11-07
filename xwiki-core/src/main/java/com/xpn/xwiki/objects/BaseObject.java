@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 
@@ -168,17 +169,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
             }
         }
 
-        Element el = new DOMElement("name");
-        el.addText(getName());
-        oel.add(el);
-
-        el = new DOMElement("number");
-        el.addText(getNumber() + "");
-        oel.add(el);
-
-        el = new DOMElement("className");
-        el.addText(getClassName());
-        oel.add(el);
+        oel.add(exportProperty("name", getName()));
+        oel.add(exportProperty("number", String.valueOf(getNumber())));
+        oel.add(exportProperty("className", getClassName()));
 
         // Iterate over values/properties sorted by field name so that the values are
         // exported to XML in a consistent order.
@@ -194,6 +187,13 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
             }
         }
         return oel;
+    }
+
+    private Element exportProperty(String propertyName, String propertyValue)
+    {
+        Element propertyElement = new DOMElement(propertyName);
+        propertyElement.addText(StringUtils.defaultString(propertyValue));
+        return propertyElement;
     }
 
     public void fromXML(Element oel) throws XWikiException

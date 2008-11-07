@@ -41,6 +41,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      * 
      * @see com.xpn.xwiki.objects.BaseCollection#hashCode()
      */
+    @Override
     public int hashCode()
     {
         String str = getName() + getClassName();
@@ -57,6 +58,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      * 
      * @see com.xpn.xwiki.objects.BaseCollection#setId(int)
      */
+    @Override
     public void setId(int id)
     {
     }
@@ -120,6 +122,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      * 
      * @see com.xpn.xwiki.objects.BaseCollection#clone()
      */
+    @Override
     public Object clone()
     {
         BaseObject object = (BaseObject) super.clone();
@@ -132,6 +135,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      * 
      * @see com.xpn.xwiki.objects.BaseCollection#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj)
     {
         if (!super.equals(obj)) {
@@ -150,6 +154,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      * 
      * @see com.xpn.xwiki.objects.BaseCollection#toXML(com.xpn.xwiki.objects.classes.BaseClass)
      */
+    @Override
     public Element toXML(BaseClass bclass)
     {
         Element oel = new DOMElement("object");
@@ -225,16 +230,19 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         BaseClass bclass = getxWikiClass(context);
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         BaseProperty prop = (BaseProperty) safeget(fieldname);
-        if ((value instanceof String) && (pclass != null))
+        if ((value instanceof String) && (pclass != null)) {
             prop = pclass.fromString((String) value);
-        else {
-            if ((prop == null) && (pclass != null))
+        } else {
+            if ((prop == null) && (pclass != null)) {
                 prop = pclass.newProperty();
-            if (prop != null)
+            }
+            if (prop != null) {
                 prop.setValue(value);
+            }
         }
 
-        if (prop != null)
+        if (prop != null) {
             safeput(fieldname, prop);
+        }
     }
 }

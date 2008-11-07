@@ -290,8 +290,8 @@ public abstract class DOMUtils
      */
     public Node getFirstAncestor(Node node, String tagName) {
         Node parent = node;
-        // While there is a parent and it is not the document node
-        while (parent != null && parent.getNodeType() != Node.DOCUMENT_NODE) {
+        // While there is a parent
+        while (parent != null) {
             // Check if this node is the needed element
             if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getNodeName().equalsIgnoreCase(tagName)) {
                 return parent;

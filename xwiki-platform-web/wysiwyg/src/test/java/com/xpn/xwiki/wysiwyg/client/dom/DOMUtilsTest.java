@@ -66,33 +66,23 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
      */
     public void testGetFirstAncestor()
     {
-        //setup a wikiLink tree
+        // setup a wikiLink tree
         Document doc = Document.get().cast();
         DivElement emptyContainer = doc.createDivElement();
         doc.getBody().appendChild(emptyContainer);
 
         // do setup in the empty container
-        Node startContainer = doc.createDivElement();
+        DivElement startContainer = doc.createDivElement();
+        String wikilinkHTML =
+            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan\">"
+                + "<a id=\"anchor\">x<strong id=\"boldWiki\">wiki</strong></a></span><!--stopwikilink-->rox";
+        startContainer.setInnerHTML(wikilinkHTML);
         emptyContainer.appendChild(startContainer);
-        Node preambleText = doc.createTextNode("our");
-        startContainer.appendChild(preambleText);
-        Node startWikiLinkComment = doc.createComment("startwikilink:Ref.erence");
-        startContainer.appendChild(startWikiLinkComment);
-        SpanElement wrappingSpan = doc.createSpanElement();
-        startContainer.appendChild(wrappingSpan);
-        AnchorElement anchor = doc.createAnchorElement();
-        wrappingSpan.appendChild(anchor);
-        Node labelPreamble = doc.createTextNode("x");
-        anchor.appendChild(labelPreamble);
-        Element boldWiki = doc.createElement("strong");
-        anchor.appendChild(boldWiki);
-        Node labelBoldWiki = doc.createTextNode("wiki");
-        boldWiki.appendChild(labelBoldWiki);
-        Node stopWikiLinkComment = doc.createComment("stopwikilink");
-        startContainer.appendChild(stopWikiLinkComment);
-        Node endText = doc.createTextNode("rox");
-        startContainer.appendChild(endText);
-        
+        Node anchor = doc.getElementById("anchor");
+        Node wrappingSpan = doc.getElementById("wrappingSpan");
+        Node boldWiki = doc.getElementById("boldWiki");
+        Node labelBoldWiki = boldWiki.getFirstChild();
+
         // check if there is a first ancestor of type a for the bold inside the anchor
         assertSame(anchor, DOMUtils.getInstance().getFirstAncestor(boldWiki, "a"));
         // check if there is a first ancestor of type a for the text inside bold in the anchor
@@ -101,7 +91,7 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         assertNull(DOMUtils.getInstance().getFirstAncestor(wrappingSpan, "a"));
         // check a finds itself as ancestor
         assertSame(anchor, DOMUtils.getInstance().getFirstAncestor(anchor, "a"));
-        //check div ancestor search stops at startContainer
+        // check div ancestor search stops at startContainer
         assertSame(startContainer, DOMUtils.getInstance().getFirstAncestor(anchor, "div"));
     }
 
@@ -110,36 +100,28 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
      */
     public void testGetFirstDescendant()
     {
-        //setup a wikiLink tree
+        // setup a wikiLink tree
         Document doc = Document.get().cast();
         DivElement emptyContainer = doc.createDivElement();
         doc.getBody().appendChild(emptyContainer);
 
         // do setup in the empty container
-        Node startContainer = doc.createDivElement();
+        DivElement startContainer = doc.createDivElement();
+
+        String wikilinkHTML =
+            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan\">"
+                + "<a id=\"anchor\">x<span id=\"styledWiki\">wiki</span></a></span><!--stopwikilink-->rox";
+
+        startContainer.setInnerHTML(wikilinkHTML);
         emptyContainer.appendChild(startContainer);
-        Node preambleText = doc.createTextNode("our");
-        startContainer.appendChild(preambleText);
-        Node startWikiLinkComment = doc.createComment("startwikilink:Ref.erence");
-        startContainer.appendChild(startWikiLinkComment);
-        SpanElement wrappingSpan = doc.createSpanElement();
-        startContainer.appendChild(wrappingSpan);
-        AnchorElement anchor = doc.createAnchorElement();
-        wrappingSpan.appendChild(anchor);
-        Node labelPreamble = doc.createTextNode("x");
-        anchor.appendChild(labelPreamble);
-        SpanElement styledWiki = doc.createSpanElement();
-        anchor.appendChild(styledWiki);
-        Node labelBoldWiki = doc.createTextNode("wiki");
-        styledWiki.appendChild(labelBoldWiki);
-        Node stopWikiLinkComment = doc.createComment("stopwikilink");
-        startContainer.appendChild(stopWikiLinkComment);
-        Node endText = doc.createTextNode("rox");
-        startContainer.appendChild(endText);
-        
-        //check anchor shows up as descendant of startContainer
+
+        Node anchor = doc.getElementById("anchor");
+        Node wrappingSpan = doc.getElementById("wrappingSpan");
+        Node preambleText = startContainer.getFirstChild();
+
+        // check anchor shows up as descendant of startContainer
         assertSame(anchor, DOMUtils.getInstance().getFirstDescendant(startContainer, "a"));
-        //check anchor shows up as descendant of itself
+        // check anchor shows up as descendant of itself
         assertSame(anchor, DOMUtils.getInstance().getFirstDescendant(anchor, "a"));
         // check there is no descendant of type bold in the wrapping span
         assertNull(DOMUtils.getInstance().getFirstDescendant(wrappingSpan, "strong"));
@@ -147,5 +129,5 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         assertSame(wrappingSpan, DOMUtils.getInstance().getFirstDescendant(emptyContainer, "span"));
         // check there is no anchor descendant of a text
         assertNull(DOMUtils.getInstance().getFirstDescendant(preambleText, "a"));
-    }    
+    }
 }

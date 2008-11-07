@@ -69,9 +69,9 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         DivElement container = doc.createDivElement();
         container.setInnerHTML("<strong>aa</strong><em>bb</em>");
         doc.getBody().appendChild(container);
+        Iterator<Node> it = doc.getIterator(container);
+        it.next();
         try {
-            Iterator<Node> it = doc.getIterator(container);
-            it.next();
             it.remove();
             fail();
         } catch (UnsupportedOperationException e) {
@@ -134,18 +134,18 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         // setup document
         Document doc = Document.get().cast();
         Node commentNode = doc.createComment("xwikirox");
-        
+
         doc.getBody().appendChild(commentNode);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
         expected.add(commentNode);
-        
+
         assertSame(expected, doc.getIterator(commentNode));
     }
 
     /**
-     * Test that an iterator over a node with only text children.
+     * Test an iterator over a node with only text children.
      */
     public void testOnlyTextChildren()
     {
@@ -170,12 +170,12 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         expected.add(aliceText);
         expected.add(bobText);
         expected.add(carolText);
-        
+
         assertSame(expected, doc.getIterator(startContainer));
     }
-    
+
     /**
-     * Test that an iterator over a node with only some empty element children.
+     * Test an iterator over a node with only some empty element children.
      */
     public void testElementChildren()
     {
@@ -200,12 +200,12 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         expected.add(aliceText);
         expected.add(cargo);
         expected.add(bobText);
-        
+
         assertSame(expected, doc.getIterator(startContainer));
     }
-    
+
     /**
-     * Test that an iterator over a node with element with subtree children to its right.
+     * Test an iterator over a node with element with subtree children to its right.
      */
     public void testElementSubtreeRight()
     {
@@ -232,13 +232,13 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         expected.add(aliceText);
         expected.add(cargo);
         expected.add(bobText);
-        expected.add(come);        
-        
+        expected.add(come);
+
         assertSame(expected, doc.getIterator(startContainer));
     }
-    
+
     /**
-     * Test that an iterator over a node with element with subtree children to its left.
+     * Test an iterator over a node with element with subtree children to its left.
      */
     public void testElementSubtreeLeft()
     {
@@ -256,7 +256,7 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         startContainer.appendChild(cargo);
         cargo.appendChild(bobText);
         cargo.appendChild(come);
-        startContainer.appendChild(aliceText);        
+        startContainer.appendChild(aliceText);
         emptyContainer.appendChild(startContainer);
 
         // setup expected
@@ -266,10 +266,10 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         expected.add(bobText);
         expected.add(come);
         expected.add(aliceText);
-        
+
         assertSame(expected, doc.getIterator(startContainer));
     }
-    
+
     /**
      * Test that an iterator over a node with element with subtree children to its left.
      */
@@ -286,10 +286,10 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         Node bobText = doc.createTextNode("bob");
         Node come = doc.createComment("come");
         DivElement cargo = doc.createDivElement();
-        startContainer.appendChild(come);        
+        startContainer.appendChild(come);
         startContainer.appendChild(cargo);
         cargo.appendChild(bobText);
-        startContainer.appendChild(aliceText);        
+        startContainer.appendChild(aliceText);
         emptyContainer.appendChild(startContainer);
 
         // setup expected
@@ -299,10 +299,10 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         expected.add(cargo);
         expected.add(bobText);
         expected.add(aliceText);
-        
+
         assertSame(expected, doc.getIterator(startContainer));
     }
-    
+
     /**
      * Test an iterator over an enclosing element of a wikilink.
      */
@@ -333,9 +333,9 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         startContainer.appendChild(stopWikiLinkComment);
         Node endText = doc.createTextNode("rox");
         startContainer.appendChild(endText);
-        
+
         emptyContainer.appendChild(startContainer);
-        
+
         // setup expected
         List<Node> expected = new ArrayList<Node>();
         expected.add(startContainer);
@@ -348,20 +348,21 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         expected.add(labelBoldWiki);
         expected.add(stopWikiLinkComment);
         expected.add(endText);
-        
+
         assertSame(expected, doc.getIterator(startContainer));
-    }    
-    
+    }
+
     /**
      * Asserts the expected list of nodes with the actual list returned by this iterator.
      * 
      * @param expected the list of expected nodes
      * @param actual the iterator to compare with the expected list
      */
-    private void assertSame(List<Node> expected, Iterator<Node> actual) {
+    private void assertSame(List<Node> expected, Iterator<Node> actual)
+    {
         int listIndex = 0;
         for (; actual.hasNext();) {
             assertSame(expected.get(listIndex++), actual.next());
-        }        
+        }
     }
 }

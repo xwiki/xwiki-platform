@@ -41,7 +41,7 @@ public class DepthFirstPreOrderIterator implements Iterator<Node>
      * The node where the iteration has started (the root of the subtree which we're iterating).
      */
     private Node startNode;
-    
+
     /**
      * Creates an iterator for the subtree rooted in startNode.
      * 
@@ -75,29 +75,21 @@ public class DepthFirstPreOrderIterator implements Iterator<Node>
         // try to go down
         if (currentNode.getFirstChild() != null) {
             this.currentNode = currentNode.getFirstChild();
-        } else if (currentNode == startNode) {
-            // if we're in the top node and have no children, then search is done
-            this.currentNode = null;
-        // try to go right
-        } else if (currentNode.getNextSibling() != null) {
-            // We're under the root node, look for siblings
-            this.currentNode = currentNode.getNextSibling();
         } else {
-            // this is the last node in this parent's children list
-            // Go up until you find a brother of an ancestor which is not null
-            Node parent = currentNode.getParentNode();
-            while (parent != startNode) {
-                if (parent.getNextSibling() != null) {
-                    this.currentNode = parent.getNextSibling();
+            // try to go right: from this node or any of its ancestors, until we haven't reached the startNode
+            Node ancestor = currentNode;
+            while (ancestor != startNode) {
+                if (ancestor.getNextSibling() != null) {
+                    this.currentNode = ancestor.getNextSibling();
                     break;
                 }
-                parent = parent.getParentNode();
+                ancestor = ancestor.getParentNode();
             }
             // if we got back to the root searching up, then we have no more options
-            if (parent == startNode) {
+            if (ancestor == startNode) {
                 this.currentNode = null;
             }
-        }        
+        }
         return nodeToReturn;
     }
 

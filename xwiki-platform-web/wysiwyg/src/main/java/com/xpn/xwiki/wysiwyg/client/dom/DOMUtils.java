@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom;
 
+import java.util.Iterator;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
@@ -278,4 +279,45 @@ public abstract class DOMUtils
      * @return The names of DOM attributes present on the given element.
      */
     public abstract JsArrayString getAttributeNames(Element element);
+
+    /**
+     * Searches for the first ancestor with the name <code>tagName</code> of the passed node, including the node itself.
+     * The search order starts with <code>node</code> and continued to the root of the tree.
+     * 
+     * @param node the node to find ancestor for
+     * @param tagName the tag name to look for up in the DOM tree.
+     * @return the first node with name <code>tagName</code> found.  
+     */
+    public Node getFirstAncestor(Node node, String tagName) {
+        Node parent = node;
+        // While there is a parent and it is not the document node
+        while (parent != null && parent.getNodeType() != Node.DOCUMENT_NODE) {
+            // Check if this node is the needed element
+            if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getNodeName().equalsIgnoreCase(tagName)) {
+                return parent;
+            }
+            parent = parent.getParentNode();
+        }
+        return null;
+    }
+    
+    /**
+     * Searches for the first element descendant with the name <code>tagName</code>. Searching is done in a DFS order
+     * with node processing on first pass through them.
+     * 
+     * @param node the node to start the search from
+     * @param tagName the name of the searched element
+     * @return the first descendant of type <code>tagName</code> of the passed node, in DFS order.
+     */
+    public Node getFirstDescendant(Node node, String tagName)
+    {
+        Iterator<Node> it = ((Document) node.getOwnerDocument()).getIterator(node);
+        while (it.hasNext()) {
+            Node currentNode = it.next();
+            if (currentNode.getNodeType() == Node.ELEMENT_NODE && currentNode.getNodeName().equalsIgnoreCase(tagName)) {
+                return currentNode;
+            }
+        }
+        return null;
+    }
 }

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom;
 
+import java.util.Iterator;
 import com.google.gwt.dom.client.BRElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LinkElement;
@@ -58,6 +59,15 @@ public class Document extends com.google.gwt.dom.client.Document
     public final native Element xCreateElement(String tagName)
     /*-{
         return this.createElement(tagName);
+    }-*/;
+
+    /**
+     * @param data contains the data to be added to the comment.
+     * @return the created comment node.
+     */
+    public final native Node createComment(String data)
+    /*-{
+        return this.createComment(data);
     }-*/;
 
     /**
@@ -147,6 +157,19 @@ public class Document extends com.google.gwt.dom.client.Document
     public final Node xImportNode(Node externalNode, boolean deep)
     {
         return DOMUtils.getInstance().importNode(this, externalNode, deep);
+    }
+
+    /**
+     * Returns an iterator for the depth-first pre-order strategy, starting in <code>startNode</code>.
+     * 
+     * @param startNode node to start iteration from
+     * @return the depth-first pre-order iterator
+     * @see {@link DepthFirstPreOrderIterator}
+     * @see http://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-Document
+     */
+    public final Iterator<Node> getIterator(Node startNode)
+    {
+        return new DepthFirstPreOrderIterator(startNode);
     }
 
     /**

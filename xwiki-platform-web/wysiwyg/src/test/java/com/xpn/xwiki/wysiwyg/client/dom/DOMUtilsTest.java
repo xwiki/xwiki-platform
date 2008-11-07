@@ -19,7 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom;
 
+import com.google.gwt.dom.client.AnchorElement;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.SpanElement;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
 /**
@@ -56,4 +60,92 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         assertEquals(Node.TEXT_NODE, textRange.getEndContainer().getNodeType());
         assertEquals(2, textRange.getEndOffset());
     }
+
+    /**
+     * Unit test for {@link DOMUtils#getFirstAncestor(Node, String)}.
+     */
+    public void testGetFirstAncestor()
+    {
+        //setup a wikiLink tree
+        Document doc = Document.get().cast();
+        DivElement emptyContainer = doc.createDivElement();
+        doc.getBody().appendChild(emptyContainer);
+
+        // do setup in the empty container
+        Node startContainer = doc.createDivElement();
+        emptyContainer.appendChild(startContainer);
+        Node preambleText = doc.createTextNode("our");
+        startContainer.appendChild(preambleText);
+        Node startWikiLinkComment = doc.createComment("startwikilink:Ref.erence");
+        startContainer.appendChild(startWikiLinkComment);
+        SpanElement wrappingSpan = doc.createSpanElement();
+        startContainer.appendChild(wrappingSpan);
+        AnchorElement anchor = doc.createAnchorElement();
+        wrappingSpan.appendChild(anchor);
+        Node labelPreamble = doc.createTextNode("x");
+        anchor.appendChild(labelPreamble);
+        Element boldWiki = doc.createElement("strong");
+        anchor.appendChild(boldWiki);
+        Node labelBoldWiki = doc.createTextNode("wiki");
+        boldWiki.appendChild(labelBoldWiki);
+        Node stopWikiLinkComment = doc.createComment("stopwikilink");
+        startContainer.appendChild(stopWikiLinkComment);
+        Node endText = doc.createTextNode("rox");
+        startContainer.appendChild(endText);
+        
+        // check if there is a first ancestor of type a for the bold inside the anchor
+        assertSame(anchor, DOMUtils.getInstance().getFirstAncestor(boldWiki, "a"));
+        // check if there is a first ancestor of type a for the text inside bold in the anchor
+        assertSame(anchor, DOMUtils.getInstance().getFirstAncestor(labelBoldWiki, "a"));
+        // check there is no a ancestor of the wikilink span
+        assertNull(DOMUtils.getInstance().getFirstAncestor(wrappingSpan, "a"));
+        // check a finds itself as ancestor
+        assertSame(anchor, DOMUtils.getInstance().getFirstAncestor(anchor, "a"));
+        //check div ancestor search stops at startContainer
+        assertSame(startContainer, DOMUtils.getInstance().getFirstAncestor(anchor, "div"));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getFirstDescendant(Node, String)}.
+     */
+    public void testGetFirstDescendant()
+    {
+        //setup a wikiLink tree
+        Document doc = Document.get().cast();
+        DivElement emptyContainer = doc.createDivElement();
+        doc.getBody().appendChild(emptyContainer);
+
+        // do setup in the empty container
+        Node startContainer = doc.createDivElement();
+        emptyContainer.appendChild(startContainer);
+        Node preambleText = doc.createTextNode("our");
+        startContainer.appendChild(preambleText);
+        Node startWikiLinkComment = doc.createComment("startwikilink:Ref.erence");
+        startContainer.appendChild(startWikiLinkComment);
+        SpanElement wrappingSpan = doc.createSpanElement();
+        startContainer.appendChild(wrappingSpan);
+        AnchorElement anchor = doc.createAnchorElement();
+        wrappingSpan.appendChild(anchor);
+        Node labelPreamble = doc.createTextNode("x");
+        anchor.appendChild(labelPreamble);
+        SpanElement styledWiki = doc.createSpanElement();
+        anchor.appendChild(styledWiki);
+        Node labelBoldWiki = doc.createTextNode("wiki");
+        styledWiki.appendChild(labelBoldWiki);
+        Node stopWikiLinkComment = doc.createComment("stopwikilink");
+        startContainer.appendChild(stopWikiLinkComment);
+        Node endText = doc.createTextNode("rox");
+        startContainer.appendChild(endText);
+        
+        //check anchor shows up as descendant of startContainer
+        assertSame(anchor, DOMUtils.getInstance().getFirstDescendant(startContainer, "a"));
+        //check anchor shows up as descendant of itself
+        assertSame(anchor, DOMUtils.getInstance().getFirstDescendant(anchor, "a"));
+        // check there is no descendant of type bold in the wrapping span
+        assertNull(DOMUtils.getInstance().getFirstDescendant(wrappingSpan, "strong"));
+        // check the first span descendant stops at the wrapping span
+        assertSame(wrappingSpan, DOMUtils.getInstance().getFirstDescendant(emptyContainer, "span"));
+        // check there is no anchor descendant of a text
+        assertNull(DOMUtils.getInstance().getFirstDescendant(preambleText, "a"));
+    }    
 }

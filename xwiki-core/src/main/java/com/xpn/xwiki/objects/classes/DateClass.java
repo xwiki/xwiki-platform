@@ -169,12 +169,6 @@ public class DateClass  extends PropertyClass
         input.setID(prefix + name);
         input.setSize(getSize());
         buffer.append(input.toString());
-
-        link link = new link();
-        link.setHref("javascript:void()");
-        link.setOnClick("");
-        link.setTarget("?");
-        buffer.append(link.toString());
     }
 
     public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {

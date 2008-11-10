@@ -137,27 +137,6 @@ public final class TableUtils
     }
 
     /**
-     * Recursive method inspecting node ancestors to find the first ancestor matching a node name.
-     * 
-     * @param node Node to inspect.
-     * @param nodeName Node name to match.
-     * @return the matching Node if any, null otherwise.
-     */
-    /*private Node getFirstMatchingAncestor(Node node, String nodeName)
-    {
-        // if the node has the specified name, return it
-        if (nodeName.equals(node.getNodeName())) {
-            return node;
-        }
-        // if the node has a parent, recursively call this method passing the parent node
-        if (hasParent(node)) {
-            return getFirstMatchingAncestor(node.getParentNode(), nodeName);
-        }
-        // return null if we're at the top of the node tree and there's no matching node
-        return null;
-    }*/
-
-    /**
      * Browse node ancestors and return the first table element.
      * 
      * @param node the Node to inspect.

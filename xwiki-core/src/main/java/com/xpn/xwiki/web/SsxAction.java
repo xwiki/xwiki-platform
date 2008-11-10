@@ -32,6 +32,7 @@ import com.xpn.xwiki.web.sx.AbstractSxAction;
 import com.xpn.xwiki.web.sx.CssExtension;
 import com.xpn.xwiki.web.sx.Extension;
 import com.xpn.xwiki.web.sx.SxDocumentSource;
+import com.xpn.xwiki.web.sx.SxResourceSource;
 import com.xpn.xwiki.web.sx.SxSource;
 
 /**
@@ -46,7 +47,7 @@ public class SsxAction extends AbstractSxAction
 {
     /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(SsxAction.class);
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -55,16 +56,22 @@ public class SsxAction extends AbstractSxAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        if (context.getDoc().isNew()) {
-            context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return "docdoesnotexist";
-        }
 
         SxSource sxSource;
 
         Extension sxType = new CssExtension();
 
-        sxSource = new SxDocumentSource(context, sxType);
+        if (context.getRequest().getParameter("resource") != null) {
+            sxSource = new SxResourceSource(context.getRequest().getParameter("resource"));
+        }
+
+        else {
+            if (context.getDoc().isNew()) {
+                context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return "docdoesnotexist";
+            }
+            sxSource = new SxDocumentSource(context, sxType);
+        }
 
         super.renderExtension(sxSource, sxType, context);
         return null;

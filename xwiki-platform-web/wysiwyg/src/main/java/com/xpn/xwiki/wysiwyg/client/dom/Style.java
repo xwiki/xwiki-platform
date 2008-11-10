@@ -104,7 +104,7 @@ public class Style extends com.google.gwt.dom.client.Style
         /**
          * Defines thick characters.
          */
-        public static final String BLOD = "bold";
+        public static final String BOLD = "bold";
 
         /**
          * Defines thicker characters.

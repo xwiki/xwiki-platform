@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
-import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Style;
 
@@ -37,22 +36,18 @@ public class BoldExecutable extends StyleExecutable
      */
     public BoldExecutable()
     {
-        super("strong", null, Style.FONT_WEIGHT, Style.FontWeight.BLOD, true, false);
+        super("strong", null, Style.FONT_WEIGHT, Style.FontWeight.BOLD, true, false);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see StyleExecutable#matchesStyle(Node)
+     * @see StyleExecutable#matchesStyle(Element)
      */
-    protected boolean matchesStyle(Node inputNode)
+    protected boolean matchesStyle(Element inputElement)
     {
-        Node node = inputNode;
-        if (node.getNodeType() == Node.TEXT_NODE) {
-            node = node.getParentNode();
-        }
-        String fontWeight = Element.as(node).getComputedStyleProperty(Style.FONT_WEIGHT);
-        if (Style.FontWeight.BLOD.equalsIgnoreCase(fontWeight)
+        String fontWeight = inputElement.getComputedStyleProperty(Style.FONT_WEIGHT);
+        if (Style.FontWeight.BOLD.equalsIgnoreCase(fontWeight) 
             || Style.FontWeight.BOLDER.equalsIgnoreCase(fontWeight)) {
             return true;
         } else {

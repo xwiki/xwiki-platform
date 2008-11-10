@@ -439,12 +439,24 @@ public class StyleExecutable implements Executable
     protected boolean matchesStyle(Node inputNode)
     {
         Node node = inputNode;
-        if (node.getNodeType() == Node.TEXT_NODE) {
+        if (node.getNodeType() == Node.DOCUMENT_NODE) {
+            node = ((Document) node).getDocumentElement();
+        } else if (node.getNodeType() != Node.ELEMENT_NODE) {
             node = node.getParentNode();
         }
+        return matchesStyle(Element.as(node));
+    }
+
+    /**
+     * @param inputElement A DOM element.
+     * @return true if the given element matches the style associated with this executable.
+     */
+    protected boolean matchesStyle(Element inputElement)
+    {
         if (inheritable) {
-            return matchesInheritedStyle(Element.as(node));
+            return matchesInheritedStyle(inputElement);
         } else {
+            Node node = inputElement;
             while (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
                 if (matchesInheritedStyle(Element.as(node))) {
                     return true;

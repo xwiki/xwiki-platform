@@ -244,4 +244,12 @@ public class Document extends com.google.gwt.dom.client.Document
             return true;
         }
     }-*/;
+
+    /**
+     * @return the document element.
+     */
+    public final Element getDocumentElement()
+    {
+        return this.getFirstChild().cast();
+    }
 }

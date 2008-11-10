@@ -24,14 +24,14 @@ public interface Images extends ImageBundle
     @Resource("charmap.gif")
     AbstractImagePrototype charmap();
 
-    @Resource("copy.gif")
-    AbstractImagePrototype copy();
+    // @Resource("copy.gif")
+    // AbstractImagePrototype copy();
 
     @Resource("close.gif")
     AbstractImagePrototype close();
 
-    @Resource("cut.gif")
-    AbstractImagePrototype cut();
+    // @Resource("cut.gif")
+    // AbstractImagePrototype cut();
 
     @Resource("table_delete_col.gif")
     AbstractImagePrototype deleteCol();
@@ -50,7 +50,7 @@ public interface Images extends ImageBundle
 
     @Resource("indent.gif")
     AbstractImagePrototype indent();
-    
+
     @Resource("table_delete.gif")
     AbstractImagePrototype deleteTable();
 
@@ -96,20 +96,14 @@ public interface Images extends ImageBundle
     @Resource("outdent.gif")
     AbstractImagePrototype outdent();
 
-    @Resource("palete.png")
-    AbstractImagePrototype palete();
-
-    @Resource("paste.gif")
-    AbstractImagePrototype paste();
+    // @Resource("paste.gif")
+    // AbstractImagePrototype paste();
 
     @Resource("redo.gif")
     AbstractImagePrototype redo();
 
     @Resource("removeformat.gif")
     AbstractImagePrototype removeFormat();
-
-    @Resource("spacer.gif")
-    AbstractImagePrototype spacer();
 
     @Resource("strikethrough.gif")
     AbstractImagePrototype strikeThrough();

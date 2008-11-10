@@ -34,8 +34,6 @@ public class MiscPlugin extends AbstractPlugin implements ClickListener
 {
     private PushButton unformat;
 
-    private PushButton charmap;
-
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
@@ -51,10 +49,6 @@ public class MiscPlugin extends AbstractPlugin implements ClickListener
         unformat.setTitle(Strings.INSTANCE.removeFormat());
         toolBarExtension.addFeature("unformat", unformat);
 
-        charmap = new PushButton(Images.INSTANCE.charmap().createImage(), this);
-        charmap.setTitle(Strings.INSTANCE.charmap());
-        toolBarExtension.addFeature("charmap", charmap);
-
         getUIExtensionList().add(toolBarExtension);
     }
 
@@ -68,10 +62,6 @@ public class MiscPlugin extends AbstractPlugin implements ClickListener
         unformat.removeFromParent();
         unformat.removeClickListener(this);
         unformat = null;
-
-        charmap.removeFromParent();
-        charmap.removeClickListener(this);
-        charmap = null;
 
         toolBarExtension.clearFeatures();
 
@@ -87,17 +77,10 @@ public class MiscPlugin extends AbstractPlugin implements ClickListener
     {
         if (sender == unformat) {
             onUnformat();
-        } else if (sender == charmap) {
-            onCharMap();
         }
     }
 
     public void onUnformat()
-    {
-        // TODO
-    }
-
-    public void onCharMap()
     {
         // TODO
     }

@@ -19,13 +19,13 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.Text;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
+import com.xpn.xwiki.wysiwyg.client.dom.Text;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.ControlRange;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.NativeRange;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.TextRange;
@@ -298,8 +298,16 @@ public final class IERange extends AbstractRange<NativeRange>
     {
         // We use a collapsed text range to iterate through nodes.
         TextRange cursor = ((TextRange) getJSRange()).duplicate();
-        cursor.collapse(start);
+        if (!isCollapsed()) {
+            cursor.collapse(start);
+            if (start) {
+                cursor.moveEnd(Unit.CHARACTER, 1);
+            } else {
+                cursor.moveStart(Unit.CHARACTER, -1);
+            }
+        }
         Element parent = cursor.getParentElement();
+        cursor.collapse(start);
 
         // We iterate through neighbor nodes as long as we can and till the parent node changes.
         // We count the number of possible-cursor-positions we jump.

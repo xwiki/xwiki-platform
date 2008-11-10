@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 
 /**
  * A control range is a list of DOM elements. When an element is added to a control range and that range is selected the

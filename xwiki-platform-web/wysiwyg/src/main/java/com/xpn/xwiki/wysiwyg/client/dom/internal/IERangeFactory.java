@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.google.gwt.dom.client.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCacheProxy;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeFactory;

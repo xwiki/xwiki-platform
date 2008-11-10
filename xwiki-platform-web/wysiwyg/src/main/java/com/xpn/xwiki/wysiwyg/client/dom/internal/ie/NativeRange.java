@@ -20,7 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 
 /**
  * Base class for {@link TextRange} and {@link ControlRange}, the two types of range provided by Internet Explorer.

@@ -19,11 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.Text;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
+import com.xpn.xwiki.wysiwyg.client.dom.Text;
 
 /**
  * A text range is a DOM fragment that usually starts and ends inside a text node. It can be used to visually select a
@@ -395,12 +395,7 @@ public final class TextRange extends NativeRange
         } else {
             throw new IllegalArgumentException("Expecting element or text node!");
         }
-        if (offset != 0) {
-            if (how == RangeCompare.END_TO_END || how == RangeCompare.END_TO_START) {
-                refRange.collapse(false);
-            }
-            refRange.move(Unit.CHARACTER, offset);
-        }
+        refRange.shift(Unit.CHARACTER, offset);
         this.setEndPoint(how, refRange);
     }
 
@@ -412,78 +407,50 @@ public final class TextRange extends NativeRange
      */
     public void moveToTextNode(Text textNode)
     {
-        int startOffset = 0;
-        int endOffset = textNode.getLength();
         if (textNode.getLength() == 0) {
-            // In Internet Explorer you cannot position the caret inside an empty text node so we do a trick. We insert
-            // an invisible character and schedule a cleaning as soon as possible. We have to do this trick in order to
-            // ensure that the implementation of W3C Range specification using IE's API is as powerful as the Mozilla
-            // one.
-            textNode.setData("\u200C");
-            scheduleCleaning(textNode);
-            startOffset = 1;
+            // In Internet Explorer you cannot position the caret inside an empty text node. As a consequence we have to
+            // insert a space character. We have to do this in order to ensure that the implementation of W3C Range
+            // specification using IE's API is as powerful as the Mozilla one.
+            // @see http://forums.microsoft.com/msdn/ShowPost.aspx?postid=4097966
+            textNode.setData(" ");
         }
 
-        Node sibling = textNode.getPreviousSibling();
-        // We look for the closest element sibling to the left of the refNode.
+        int startOffset = 0;
+        Node refNode = textNode.getPreviousSibling();
+        // We look for a reference element. We first search for the closest element sibling to the left of the textNode.
         // At the same time, we count the number of character we jump back.
-        while (sibling != null && sibling.getNodeType() != Node.ELEMENT_NODE) {
-            if (sibling.getNodeType() == Node.TEXT_NODE) {
-                startOffset += sibling.getNodeValue().length();
+        while (refNode != null && refNode.getNodeType() != Node.ELEMENT_NODE) {
+            if (refNode.getNodeType() == Node.TEXT_NODE) {
+                startOffset += refNode.getNodeValue().length();
             }
         }
-
-        if (sibling == null) {
-            // Looks like refNode doesn't have any previous element siblings.
-            // Thus we select the contents of the parent node and adjust the range later.
-            this.moveToElementText(Element.as(textNode.getParentNode()));
-        } else {
-            // We found an element thus we position just after it, to the right.
-            this.moveToElementText(Element.as(sibling));
-            this.collapse(false);
+        if (refNode == null) {
+            // Looks like textNode doesn't have any previous element siblings.
+            // Thus we use the parent element as the reference point.
+            refNode = textNode.getParentNode();
         }
 
-        this.move(Unit.CHARACTER, startOffset);
-        this.moveEnd(Unit.CHARACTER, endOffset);
+        this.moveToElementText(Element.as(refNode));
+        this.shift(Unit.CHARACTER, startOffset);
     }
 
     /**
-     * Schedules a cleaning of the invisible character that was added in order to ensure consistency between the IE's
-     * and Mozilla's implementation of W3C Range specification. The cleaning has to be done as soon as possible. We do
-     * it on the next user key stroke, click or if the text area looses focus (which happens if the user submits the
-     * form containing the text area).
+     * Moves both end points of this range by the given number of units.
      * 
-     * @param text The text node whose contents will be cleaned of the zero-width non-joiner character.
-     * @see #moveToTextNode(Text)
-     * @see http://en.wikipedia.org/wiki/Zero-width_non-joiner
+     * @param unit Specifies the units to move.
+     * @param count Specifies the number of units to move. This can be positive or negative.
+     * @return The number of units moved.
      */
-    public native void scheduleCleaning(Text text)
-    /*-{ 
-        var self = this;
-        var cleanZeroWidthNonJoiner = function(event) {
-            // We remove the listener to ensure the cleaning is done only once.
-            self.ownerDocument.body.detachEvent('onkeydown', arguments.callee);
-            self.ownerDocument.body.detachEvent('onclick', arguments.callee);
-            self.ownerDocument.body.detachEvent('onblur', arguments.callee);
-            self = null;
-            if (event.type == 'blur') {
-                // If the text area looses focus we can and have to change the DOM immediately 
-                // because otherwise the invisible character might get submitted.
-                text.nodeValue = text.nodeValue.replace(/\u200C/g, '');
-            } else {
-                // If the user clicks or presses a key then we defer the cleaning after the event is handled.
-                // It's advisable to do so because otherwise we might kill the browser.
-                var _text = text;
-                setTimeout(function(){
-                    _text.nodeValue = _text.nodeValue.replace(/\u200C/g, '');
-                    _text = null;
-                }, 0);
-            }
-            text = null;
+    public int shift(Unit unit, int count)
+    {
+        if (count == 0) {
+            return 0;
+        } else if (count > 0) {
+            moveEnd(unit, count);
+            return moveStart(unit, count);
+        } else {
+            moveStart(unit, count);
+            return moveEnd(unit, count);
         }
-        this.ownerDocument.body.attachEvent('onkeydown', cleanZeroWidthNonJoiner);
-        this.ownerDocument.body.attachEvent('onclick', cleanZeroWidthNonJoiner);
-        this.ownerDocument.body.attachEvent('onblur', cleanZeroWidthNonJoiner);
-        cleanZeroWidthNonJoiner = null;
-    }-*/;
+    }
 }

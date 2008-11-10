@@ -20,12 +20,14 @@
 package com.xpn.xwiki.wysiwyg.client.dom;
 
 import java.util.Iterator;
+
 import com.google.gwt.dom.client.BRElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.ParagraphElement;
 import com.google.gwt.dom.client.ScriptElement;
+import com.google.gwt.dom.client.SpanElement;
 
 /**
  * Extends the document implementation provided by GWT to add support for multi-window, selection and range.
@@ -118,6 +120,16 @@ public class Document extends com.google.gwt.dom.client.Document
     public final DivElement xCreateDivElement()
     {
         return xCreateElement("div").cast();
+    }
+
+    /**
+     * Creates a &lt;span&gt; element.
+     * 
+     * @return the newly created element.
+     */
+    public final SpanElement xCreateSpanElement()
+    {
+        return xCreateElement("span").cast();
     }
 
     /**

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.dom;
 
 import java.util.Iterator;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
@@ -286,9 +287,10 @@ public abstract class DOMUtils
      * 
      * @param node the node to find ancestor for
      * @param tagName the tag name to look for up in the DOM tree.
-     * @return the first node with name <code>tagName</code> found.  
+     * @return the first node with name <code>tagName</code> found.
      */
-    public Node getFirstAncestor(Node node, String tagName) {
+    public Node getFirstAncestor(Node node, String tagName)
+    {
         Node parent = node;
         // While there is a parent
         while (parent != null) {
@@ -300,7 +302,7 @@ public abstract class DOMUtils
         }
         return null;
     }
-    
+
     /**
      * Searches for the first element descendant with the name <code>tagName</code>. Searching is done in a DFS order
      * with node processing on first pass through them.

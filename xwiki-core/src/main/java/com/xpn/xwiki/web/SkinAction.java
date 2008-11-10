@@ -21,8 +21,8 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -38,10 +38,10 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * <p>
- * Action for serving skin files. It allows skins to be defined using XDocuments as skins, by
- * letting files be placed as text fields in an XWiki.XWikiSkins object, or as attachments to the
- * document, or as a file in the filesystem. If the file is not found in the current skin, then it
- * is searched in its base skin, and eventually in the default base skins,
+ * Action for serving skin files. It allows skins to be defined using XDocuments as skins, by letting files be placed as
+ * text fields in an XWiki.XWikiSkins object, or as attachments to the document, or as a file in the filesystem. If the
+ * file is not found in the current skin, then it is searched in its base skin, and eventually in the default base
+ * skins,
  * </p>
  * <p>
  * This action indicates that the results should be publicly cacheable for 30 days.
@@ -66,6 +66,7 @@ public class SkinAction extends XWikiAction
      * 
      * @see XWikiAction#render(XWikiContext)
      */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -79,8 +80,8 @@ public class SkinAction extends XWikiAction
         String path = request.getPathInfo();
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
-                + " ; defaultbaseskin: " + defaultbaseskin);
+            LOG.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin + " ; defaultbaseskin: "
+                + defaultbaseskin);
         }
 
         int idx = path.lastIndexOf(DELIMITER);
@@ -130,14 +131,13 @@ public class SkinAction extends XWikiAction
     }
 
     /**
-     * Tries to serve a skin file using <tt>doc</tt> as a skin document. The file is searched in
-     * the following places:
+     * Tries to serve a skin file using <tt>doc</tt> as a skin document. The file is searched in the following places:
      * <ol>
-     * <li>As the content of a property with the same name as the requested filename, from an
-     * XWikiSkins object attached to the document.</li>
+     * <li>As the content of a property with the same name as the requested filename, from an XWikiSkins object attached
+     * to the document.</li>
      * <li>As the content of an attachment with the same name as the requested filename.</li>
-     * <li>As a file located on the filesystem, in the directory with the same name as the current
-     * document (in case the URL was actually pointing to <tt>/skins/directory/file</tt>).</li>
+     * <li>As a file located on the filesystem, in the directory with the same name as the current document (in case the
+     * URL was actually pointing to <tt>/skins/directory/file</tt>).</li>
      * </ol>
      * 
      * @param filename The name of the skin file that should be rendered.
@@ -146,12 +146,10 @@ public class SkinAction extends XWikiAction
      * @return <tt>true</tt> if the attachment was found and the content was successfully sent.
      * @throws XWikiException If the attachment cannot be loaded.
      */
-    private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
-        throws XWikiException
+    private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Rendering file '" + filename + "' within the '" + doc.getFullName()
-                + "' document");
+            LOG.debug("Rendering file '" + filename + "' within the '" + doc.getFullName() + "' document");
         }
         try {
             if (doc.isNew()) {
@@ -161,14 +159,12 @@ public class SkinAction extends XWikiAction
             } else {
                 return renderFileFromObjectField(filename, doc, context)
                     || renderFileFromAttachment(filename, doc, context)
-                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderSkinFromFilesystem(
-                        filename, doc.getName(), context));
+                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderSkinFromFilesystem(filename, doc.getName(),
+                        context));
             }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                "Exception while sending response:",
-                e);
+                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response:", e);
         }
 
         return renderSkinFromFilesystem(filename, doc.getName(), context);
@@ -183,12 +179,10 @@ public class SkinAction extends XWikiAction
      * @return <tt>true</tt> if the file was found and its content was successfully sent.
      * @throws XWikiException If the response cannot be sent.
      */
-    private boolean renderSkinFromFilesystem(String filename, String skin, XWikiContext context)
-        throws XWikiException
+    private boolean renderSkinFromFilesystem(String filename, String skin, XWikiContext context) throws XWikiException
     {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Rendering filesystem file '" + filename + "' from the '" + skin
-                + "' skin directory");
+            LOG.debug("Rendering filesystem file '" + filename + "' from the '" + skin + "' skin directory");
         }
         XWikiResponse response = context.getResponse();
         String path = DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename;
@@ -203,13 +197,11 @@ public class SkinAction extends XWikiAction
                     // If the content contained velocity code, then it should not be cached
                     if (Arrays.equals(newdata, data)) {
                         modified = context.getWiki().getResourceLastModificationDate(path);
-                    }
-                    else {
+                    } else {
                         modified = new Date();
                         data = newdata;
                     }
-                }
-                else {
+                } else {
                     modified = context.getWiki().getResourceLastModificationDate(path);
                 }
                 setupHeaders(response, mimetype, modified, data.length);
@@ -217,9 +209,7 @@ public class SkinAction extends XWikiAction
                     response.getOutputStream().write(data);
                 } catch (IOException e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                        "Exception while sending response",
-                        e);
+                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
                 }
                 return true;
             }
@@ -235,12 +225,12 @@ public class SkinAction extends XWikiAction
      * @param filename The name of the skin file that should be rendered.
      * @param doc The skin {@link XWikiDocument document}.
      * @param context The current {@link XWikiContext request context}.
-     * @return <tt>true</tt> if the object exists, and the field is set to a non-empty value, and
-     *         its content was successfully sent.
+     * @return <tt>true</tt> if the object exists, and the field is set to a non-empty value, and its content was
+     *         successfully sent.
      * @throws IOException If the response cannot be sent.
      */
-    public boolean renderFileFromObjectField(String filename, XWikiDocument doc,
-        XWikiContext context) throws IOException
+    public boolean renderFileFromObjectField(String filename, XWikiDocument doc, XWikiContext context)
+        throws IOException
     {
         LOG.debug("... as object property");
         BaseObject object = doc.getObject("XWiki.XWikiSkins");
@@ -275,8 +265,8 @@ public class SkinAction extends XWikiAction
      * @throws IOException If the response cannot be sent.
      * @throws XWikiException If the attachment cannot be loaded.
      */
-    public boolean renderFileFromAttachment(String filename, XWikiDocument doc,
-        XWikiContext context) throws IOException, XWikiException
+    public boolean renderFileFromAttachment(String filename, XWikiDocument doc, XWikiContext context)
+        throws IOException, XWikiException
     {
         LOG.debug("... as attachment");
         XWikiAttachment attachment = doc.getAttachment(filename);
@@ -306,12 +296,9 @@ public class SkinAction extends XWikiAction
     public boolean isJavascriptMimeType(String mimetype)
     {
         boolean result =
-            "text/javascript".equalsIgnoreCase(mimetype)
-                || "application/x-javascript".equalsIgnoreCase(mimetype)
+            "text/javascript".equalsIgnoreCase(mimetype) || "application/x-javascript".equalsIgnoreCase(mimetype)
                 || "application/javascript".equalsIgnoreCase(mimetype);
-        result |=
-            "application/ecmascript".equalsIgnoreCase(mimetype)
-                || "text/ecmascript".equalsIgnoreCase(mimetype);
+        result |= "application/ecmascript".equalsIgnoreCase(mimetype) || "text/ecmascript".equalsIgnoreCase(mimetype);
         return result;
     }
 
@@ -331,12 +318,10 @@ public class SkinAction extends XWikiAction
      * 
      * @param response The servlet response object, where the headers should be set.
      * @param mimetype The mimetype of the file. Used in the "Content-Type" header.
-     * @param lastChanged The date of the last change of the file. Used in the "Last-Modified"
-     *            header.
+     * @param lastChanged The date of the last change of the file. Used in the "Last-Modified" header.
      * @param length The length of the content (in bytes). Used in the "Content-Length" header.
      */
-    protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged,
-        int length)
+    protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, int length)
     {
         if (!StringUtils.isBlank(mimetype)) {
             response.setContentType(mimetype);

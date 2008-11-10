@@ -45,10 +45,10 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class InsertTable extends AbstractTableFeature implements PopupListener
 {
     /**
-     * Table plug-in.
+     * Feature name.
      */
-    private TablePlugin plugin;
-
+    private static final String NAME = "inserttable"; 
+    
     /**
      * Table dialog.
      */
@@ -67,12 +67,9 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public InsertTable(TablePlugin plugin)
     {
-        name = "inserttable";
-        command = new Command(name);
-        button = new PushButton(Images.INSTANCE.insertTable().createImage(), plugin);
-        button.setTitle(Strings.INSTANCE.insertTable());
-        selectionPreserver = new SelectionPreserver(plugin.getRichTextArea());
-        this.plugin = plugin;
+        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.insertTable().createImage(),
+            plugin), Strings.INSTANCE.insertTable(), plugin);
+        selectionPreserver = new SelectionPreserver(plugin.getTextArea());
     }
 
     /**
@@ -114,7 +111,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public TableElement insertTable(RichTextArea rta, TableConfig config)
     {
-        Range range = utils.getRange(rta.getDocument());
+        Range range = TableUtils.getInstance().getRange(rta.getDocument());
         TableElement table = rta.getDocument().createTableElement();
         TableRowElement row;
         TableCellElement cell;
@@ -150,7 +147,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
             // Insert the table element.
             TableElement table = insertTable(rta, (TableConfig) TableConfig.fromJson(parameter));
             // Put the caret in the first cell of the table.
-            utils.putCaretInNode(rta, table.getRows().getItem(0).getCells().getItem(0));
+            TableUtils.getInstance().putCaretInNode(rta, table.getRows().getItem(0).getCells().getItem(0));
         }
 
         return true;
@@ -163,7 +160,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return utils.getTable(utils.getCaretNode(rta.getDocument())) == null;
+        return TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument())) == null;
     }
 
     /**
@@ -175,13 +172,13 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     {
         if (!autoClosed && !getDialog().isCanceled()) {
             // Call the command again, passing the insertion configuration as a JSON object.
-            plugin.getRichTextArea().getCommandManager().execute(getCommand(),
+            getPlugin().getTextArea().getCommandManager().execute(getCommand(),
                 "{ rows:" + getDialog().getRowNumber() + ", cols: " + getDialog().getColNumber() + " }");
         } else {
             // We get here if the dialog has been closed by clicking the close button.
             // In this case we return the focus to the text area.
             selectionPreserver.restoreSelection();
-            plugin.getRichTextArea().setFocus(true);
+            getPlugin().getTextArea().setFocus(true);
         }
     }
 }

@@ -71,14 +71,6 @@ public abstract class AbstractPlugin implements Plugin
     }
 
     /**
-     * @return {@link #textArea}
-     */
-    protected RichTextArea getTextArea()
-    {
-        return textArea;
-    }
-
-    /**
      * @return {@link #wysiwyg}
      */
     protected Wysiwyg getWysiwyg()
@@ -108,6 +100,14 @@ public abstract class AbstractPlugin implements Plugin
         this.wysiwyg = wysiwyg;
         this.textArea = textArea;
         this.config = config;
+    }
+    
+    /**
+     * @return {@link #textArea}
+     */
+    public RichTextArea getTextArea()
+    {
+        return textArea;
     }
 
     /**

@@ -31,4 +31,16 @@ public interface TableFeature extends Executable
      * @return feature command.
      */
     Command getCommand();
+    
+    /**
+     * Get table plugin.
+     * 
+     * @return table plugin.
+     */
+    TablePlugin getPlugin();
+    
+    /**
+     * Remove feature button from the interface.
+     */
+    void destroy();
 }

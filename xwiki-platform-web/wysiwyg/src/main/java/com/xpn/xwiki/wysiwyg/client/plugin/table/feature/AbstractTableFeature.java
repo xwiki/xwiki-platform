@@ -19,9 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
+import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableFeature;
-import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -33,29 +34,47 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public abstract class AbstractTableFeature implements TableFeature
 {
     /**
-     * TableUtils instance.
-     */
-    protected TableUtils utils = TableUtils.getInstance();
-
-    /**
      * Feature name (examples: inserttable, insertrowbefore).
      */
-    protected String name;
+    private final String name;
 
     /**
      * Feature toolbar push-button.
      */
-    protected PushButton button;
+    private final PushButton button;
 
     /**
      * Feature command.
      */
-    protected Command command;
+    private final Command command;
+    
+    /**
+     * Table plug-in.
+     */
+    private final TablePlugin plugin;    
 
     /**
-     * Get feature name.
+     * Default constructor.
      * 
-     * @return feature name (examples: inserttable, insertrowbefore).
+     * @param name feature name.
+     * @param command feature command.
+     * @param button feature button.
+     * @param title feature button title.
+     * @param plugin table plug-in.
+     */
+    public AbstractTableFeature(String name, Command command, PushButton button, String title, TablePlugin plugin)
+    {
+        this.name = name;
+        this.command = command;
+        this.button = button;
+        button.setTitle(title);
+        this.plugin = plugin;
+    }    
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see TableFeature#getName()
      */
     public String getName()
     {
@@ -63,19 +82,19 @@ public abstract class AbstractTableFeature implements TableFeature
     }
 
     /**
-     * Get feature button.
+     * {@inheritDoc}
      * 
-     * @return feature button.
+     * @see TableFeature#getButton()
      */
     public PushButton getButton()
     {
         return button;
-    }
+    }    
 
     /**
-     * Get feature command.
+     * {@inheritDoc}
      * 
-     * @return feature command.
+     * @see TableFeature#getCommand()
      */
     public Command getCommand()
     {
@@ -110,5 +129,26 @@ public abstract class AbstractTableFeature implements TableFeature
     public boolean isSupported(RichTextArea rta)
     {
         return true;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see TableFeature#getPlugin()
+     */
+    public TablePlugin getPlugin()
+    {
+        return plugin;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see TableFeature#destroy()
+     */
+    public void destroy()
+    {
+        getButton().removeFromParent();
+        getButton().removeClickListener((ClickListener) getPlugin());
     }
 }

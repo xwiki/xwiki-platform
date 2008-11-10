@@ -24,6 +24,7 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.dom.client.TableRowElement;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
@@ -142,7 +143,7 @@ public final class TableUtils
      * @param nodeName Node name to match.
      * @return the matching Node if any, null otherwise.
      */
-    private Node getFirstMatchingAncestor(Node node, String nodeName)
+    /*private Node getFirstMatchingAncestor(Node node, String nodeName)
     {
         // if the node has the specified name, return it
         if (nodeName.equals(node.getNodeName())) {
@@ -154,7 +155,7 @@ public final class TableUtils
         }
         // return null if we're at the top of the node tree and there's no matching node
         return null;
-    }
+    }*/
 
     /**
      * Browse node ancestors and return the first table element.
@@ -163,8 +164,8 @@ public final class TableUtils
      * @return the matching TableElement if any, null otherwise.
      */
     public TableElement getTable(Node node)
-    {
-        return (TableElement) getFirstMatchingAncestor(node, TABLE_NODENAME);
+    {        
+        return (TableElement) DOMUtils.getInstance().getFirstAncestor(node, TABLE_NODENAME);
     }
 
     /**
@@ -175,7 +176,7 @@ public final class TableUtils
      */
     public TableRowElement getRow(Node node)
     {
-        return (TableRowElement) getFirstMatchingAncestor(node, ROW_NODENAME);
+        return (TableRowElement) DOMUtils.getInstance().getFirstAncestor(node, ROW_NODENAME);
     }
 
     /**
@@ -185,8 +186,8 @@ public final class TableUtils
      * @return the matching TableCellElement if any, null otherwise.
      */
     public TableCellElement getCell(Node node)
-    {
-        return (TableCellElement) getFirstMatchingAncestor(node, COL_NODENAME);
+    {        
+        return (TableCellElement) DOMUtils.getInstance().getFirstAncestor(node, COL_NODENAME);
     }
 
     /**

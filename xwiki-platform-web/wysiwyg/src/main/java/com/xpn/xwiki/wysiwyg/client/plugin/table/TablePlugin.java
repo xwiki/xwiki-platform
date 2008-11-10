@@ -48,17 +48,12 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
     /**
      * List of table features (example : InsertTable, DeleteCol).
      */
-    private List<TableFeature> features = new ArrayList<TableFeature>();
+    private final List<TableFeature> features = new ArrayList<TableFeature>();
 
     /**
      * The plug-in toolbar.
      */
-    private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
-    
-    /**
-     * WYSIWYG RichTextArea.
-     */
-    private RichTextArea rta;
+    private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");   
 
     /**
      * Make a feature available.
@@ -72,16 +67,6 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
         toolBarExtension.addFeature(feature.getName(), feature.getButton());
         features.add(feature);        
     }
-    
-    /**
-     * Get WYSIWYG RichTextArea.
-     * 
-     * @return WYSIWYG RichTextArea.
-     */
-    public RichTextArea getRichTextArea()
-    {
-        return rta;
-    }
 
     /**
      * {@inheritDoc}
@@ -91,8 +76,6 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
     public void init(Wysiwyg wysiwyg, RichTextArea rta, Config config)
     {
         super.init(wysiwyg, rta, config);
-        
-        this.rta = rta;
 
         addFeature(rta, new InsertTable(this));
         addFeature(rta, new InsertRowBefore(this));
@@ -114,8 +97,7 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
     public void destroy()
     {
         for (TableFeature feature : features) {
-            feature.getButton().removeFromParent();
-            feature.getButton().removeClickListener(this);
+            feature.destroy();
             features.remove(feature);
         }
         toolBarExtension.clearFeatures();

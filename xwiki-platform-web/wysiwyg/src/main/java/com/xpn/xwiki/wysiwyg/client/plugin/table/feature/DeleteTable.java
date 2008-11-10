@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -36,6 +37,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class DeleteTable extends AbstractTableFeature
 {
     /**
+     * Feature name.
+     */
+    private static final String NAME = "deletetable";
+
+    /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
      * their own PushButton.
      * 
@@ -43,10 +49,8 @@ public class DeleteTable extends AbstractTableFeature
      */
     public DeleteTable(TablePlugin plugin)
     {
-        name = "deletecol";
-        command = new Command(name);
-        button = new PushButton(Images.INSTANCE.deleteTable().createImage(), plugin);
-        button.setTitle(Strings.INSTANCE.deleteTable());
+        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.deleteTable().createImage(), plugin),
+            Strings.INSTANCE.deleteTable(), plugin);
     }
 
     /**
@@ -56,7 +60,8 @@ public class DeleteTable extends AbstractTableFeature
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
-        TableElement table = utils.getTable(utils.getCaretNode(rta.getDocument()));
+        TableElement table =
+            TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument()));
         table.getParentNode().removeChild(table);
         // FIXME : the table editor rulers are still visible, find a way to clean midas state after deletion.
         return true;
@@ -69,6 +74,6 @@ public class DeleteTable extends AbstractTableFeature
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return utils.getTable(utils.getCaretNode(rta.getDocument())) != null;
+        return TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
     }
 }

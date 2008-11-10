@@ -25,6 +25,7 @@ import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.dom.client.TableRowElement;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
@@ -39,6 +40,11 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 public class DeleteCol extends AbstractTableFeature
 {
     /**
+     * Feature name.
+     */
+    private static final String NAME = "deletecol";
+
+    /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
      * their own PushButton.
      * 
@@ -46,10 +52,8 @@ public class DeleteCol extends AbstractTableFeature
      */
     public DeleteCol(TablePlugin plugin)
     {
-        name = "deletecol";
-        command = new Command(name);
-        button = new PushButton(Images.INSTANCE.deleteCol().createImage(), plugin);
-        button.setTitle(Strings.INSTANCE.deleteCol());
+        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.deleteCol().createImage(), plugin),
+            Strings.INSTANCE.deleteCol(), plugin);
     }
 
     /**
@@ -59,18 +63,19 @@ public class DeleteCol extends AbstractTableFeature
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
-        TableCellElement caretCell = utils.getCell(utils.getCaretNode(rta.getDocument()));
+        TableCellElement caretCell =
+            TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument()));
         int cellIndex = caretCell.getCellIndex();
-        TableElement table = utils.getTable(caretCell);
+        TableElement table = TableUtils.getInstance().getTable(caretCell);
         NodeList<TableRowElement> rows = table.getRows();
 
         // Move caret
-        TableCellElement newCaretCell = utils.getPreviousCellInRow(caretCell);
+        TableCellElement newCaretCell = TableUtils.getInstance().getPreviousCellInRow(caretCell);
         if (newCaretCell == null) {
-            newCaretCell = utils.getNextCellInRow(caretCell);
+            newCaretCell = TableUtils.getInstance().getNextCellInRow(caretCell);
         }
         if (newCaretCell != null) {
-            utils.putCaretInNode(rta, newCaretCell);
+            TableUtils.getInstance().putCaretInNode(rta, newCaretCell);
         }
 
         // Loop over table rows to delete a cell in each of them
@@ -89,6 +94,6 @@ public class DeleteCol extends AbstractTableFeature
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return utils.getCell(utils.getCaretNode(rta.getDocument())) != null;
+        return TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
     }
 }

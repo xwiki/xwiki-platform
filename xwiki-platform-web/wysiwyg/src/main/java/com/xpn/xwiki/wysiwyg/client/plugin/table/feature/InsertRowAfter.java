@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -37,6 +38,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class InsertRowAfter extends AbstractTableFeature
 {
     /**
+     * Feature name.
+     */
+    private static final String NAME = "insertrowafter";
+
+    /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
      * their own PushButton.
      * 
@@ -44,10 +50,8 @@ public class InsertRowAfter extends AbstractTableFeature
      */
     public InsertRowAfter(TablePlugin plugin)
     {
-        name = "insertrowafter";
-        command = new Command(name);
-        button = new PushButton(Images.INSTANCE.insertRowAfter().createImage(), plugin);
-        button.setTitle(Strings.INSTANCE.insertRowAfter());
+        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.insertRowAfter().createImage(), plugin),
+            Strings.INSTANCE.insertRowAfter(), plugin);
     }
 
     /**
@@ -57,9 +61,10 @@ public class InsertRowAfter extends AbstractTableFeature
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
-        TableCellElement currentCell = utils.getCell(utils.getCaretNode(rta.getDocument()));
-        utils.insertRow(rta.getDocument(), false);
-        utils.putCaretInNode(rta, utils.getNextCellInColumn(currentCell));
+        TableCellElement currentCell =
+            TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument()));
+        TableUtils.getInstance().insertRow(rta.getDocument(), false);
+        TableUtils.getInstance().putCaretInNode(rta, TableUtils.getInstance().getNextCellInColumn(currentCell));
         return true;
     }
 
@@ -70,6 +75,6 @@ public class InsertRowAfter extends AbstractTableFeature
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return utils.getRow(utils.getCaretNode(rta.getDocument())) != null;
+        return TableUtils.getInstance().getRow(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
     }
 }

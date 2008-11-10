@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -37,6 +38,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class InsertColBefore extends AbstractTableFeature
 {
     /**
+     * Feature name.
+     */
+    private static final String NAME = "insertcolbefore";
+
+    /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
      * their own PushButton.
      * 
@@ -44,10 +50,8 @@ public class InsertColBefore extends AbstractTableFeature
      */
     public InsertColBefore(TablePlugin plugin)
     {
-        name = "insertcolbefore";
-        command = new Command(name);
-        button = new PushButton(Images.INSTANCE.insertColBefore().createImage(), plugin);
-        button.setTitle(Strings.INSTANCE.insertColBefore());
+        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.insertColBefore().createImage(), plugin),
+            Strings.INSTANCE.insertColBefore(), plugin);
     }
 
     /**
@@ -57,9 +61,10 @@ public class InsertColBefore extends AbstractTableFeature
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
-        TableCellElement currentCell = utils.getCell(utils.getCaretNode(rta.getDocument()));
-        utils.insertCol(rta.getDocument(), true);
-        utils.putCaretInNode(rta, utils.getPreviousCellInRow(currentCell));
+        TableCellElement currentCell =
+            TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument()));
+        TableUtils.getInstance().insertCol(rta.getDocument(), true);
+        TableUtils.getInstance().putCaretInNode(rta, TableUtils.getInstance().getPreviousCellInRow(currentCell));
         return true;
     }
 
@@ -70,6 +75,6 @@ public class InsertColBefore extends AbstractTableFeature
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return utils.getCell(utils.getCaretNode(rta.getDocument())) != null;
+        return TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
     }
 }

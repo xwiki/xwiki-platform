@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -38,6 +39,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class InsertRowBefore extends AbstractTableFeature
 {
     /**
+     * Feature name.
+     */
+    private static final String NAME = "insertrowbefore";
+
+    /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
      * their own PushButton.
      * 
@@ -45,10 +51,8 @@ public class InsertRowBefore extends AbstractTableFeature
      */
     public InsertRowBefore(TablePlugin plugin)
     {
-        name = "insertrowbefore";
-        command = new Command(name);
-        button = new PushButton(Images.INSTANCE.insertRowBefore().createImage(), plugin);
-        button.setTitle(Strings.INSTANCE.insertRowBefore());
+        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.insertRowBefore().createImage(), plugin),
+            Strings.INSTANCE.insertRowBefore(), plugin);
     }
 
     /**
@@ -58,9 +62,10 @@ public class InsertRowBefore extends AbstractTableFeature
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
-        TableCellElement currentCell = utils.getCell(utils.getCaretNode(rta.getDocument()));
-        utils.insertRow(rta.getDocument(), true);
-        utils.putCaretInNode(rta, utils.getPreviousCellInColumn(currentCell));
+        TableCellElement currentCell =
+            TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument()));
+        TableUtils.getInstance().insertRow(rta.getDocument(), true);
+        TableUtils.getInstance().putCaretInNode(rta, TableUtils.getInstance().getPreviousCellInColumn(currentCell));
         return true;
     }
 
@@ -71,7 +76,7 @@ public class InsertRowBefore extends AbstractTableFeature
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        Node node = utils.getCaretNode(rta.getDocument());
-        return utils.getRow(node) != null;
+        Node node = TableUtils.getInstance().getCaretNode(rta.getDocument());
+        return TableUtils.getInstance().getRow(node) != null;
     }
 }

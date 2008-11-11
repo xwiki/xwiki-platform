@@ -81,4 +81,21 @@ public class Element extends com.google.gwt.dom.client.Element
     {
         DOMUtils.getInstance().setInnerHTML(this, html);
     }
+
+    /**
+     * Replaces this element with its child nodes. In other word, all the child nodes of this element are moved to its
+     * parent node and the element is removed from its parent.
+     */
+    public final void unwrap()
+    {
+        if (this.getParentNode() == null || this.getParentNode().getNodeType() == Node.DOCUMENT_NODE) {
+            return;
+        }
+        Node child = this.getFirstChild();
+        while (child != null) {
+            this.getParentNode().insertBefore(child, this);
+            child = this.getFirstChild();
+        }
+        this.getParentNode().removeChild(this);
+    }
 }

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
+import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 
@@ -27,7 +29,9 @@ import com.xpn.xwiki.wysiwyg.client.dom.Selection;
  * selection (thus on the current range). In some cases, a plugin needs to get user input before executing such a
  * command. It can gather the needed information by opening a dialog, for instance. In some browsers this may lead to
  * loosing the selection on the rich text area. In this case the plugin has to {@link #saveSelection()} before the
- * dialog is shown and {@link #restoreSelection()} after the dialog is closed.
+ * dialog is shown and {@link #restoreSelection()} after the dialog is closed.<br/>
+ * The selection preserver can be also used to restore the selection after executing commands like insert HTML. In this
+ * particular case the restored selection will contain the HTML that replaced the previous selection.
  * 
  * @version $Id$
  */
@@ -39,10 +43,47 @@ public class SelectionPreserver
     private final RichTextArea rta;
 
     /**
-     * The preserved range. Usually a selection contains just one range. So we save only the first range of the
-     * selection.
+     * The parent of the start container.
+     * 
+     * @see Range#getStartContainer()
      */
-    private Range range;
+    private Node startParent;
+
+    /**
+     * The index of the start container within its parent node.
+     * 
+     * @see Range#getStartContainer()
+     */
+    private int startIndex;
+
+    /**
+     * The start offset.
+     * 
+     * @see Range#getStartOffset()
+     */
+    private int startOffset;
+
+    /**
+     * The parent of the end container.
+     * 
+     * @see Range#getEndContainer()
+     */
+    private Node endParent;
+
+    /**
+     * The number of siblings to the left of the end container. In other words, the right-index (relative to the last
+     * child) of the end container within its parent node.
+     * 
+     * @see Range#getEndContainer()
+     */
+    private int endIndex;
+
+    /**
+     * The right-offset, relative to the last child or last character (depending on end container's node type).
+     * 
+     * @see Range#getEndOffset()
+     */
+    private int endOffset;
 
     /**
      * Creates a new selection preserver for the specified rich text area.
@@ -63,7 +104,21 @@ public class SelectionPreserver
      */
     public void saveSelection()
     {
-        range = rta.getDocument().getSelection().getRangeAt(0);
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
+
+        Node start = range.getStartContainer();
+        startParent = start.getParentNode();
+        startIndex = DOMUtils.getInstance().getNodeIndex(start);
+        startOffset = range.getStartOffset();
+
+        Node end = range.getEndContainer();
+        endParent = end.getParentNode();
+        endIndex = endParent.getChildNodes().getLength() - DOMUtils.getInstance().getNodeIndex(end);
+        if (end.getNodeType() == Node.TEXT_NODE) {
+            endOffset = end.getNodeValue().length() - range.getEndOffset();
+        } else {
+            endOffset = end.getChildNodes().getLength() - range.getEndOffset();
+        }
     }
 
     /**
@@ -74,9 +129,16 @@ public class SelectionPreserver
      */
     public void restoreSelection()
     {
+        Range range = rta.getDocument().createRange();
+        range.setStart(startParent.getChildNodes().getItem(startIndex), startOffset);
+        Node end = endParent.getChildNodes().getItem(endParent.getChildNodes().getLength() - endIndex);
+        if (end.getNodeType() == Node.TEXT_NODE) {
+            range.setEnd(end, end.getNodeValue().length() - endOffset);
+        } else {
+            range.setEnd(end, end.getChildNodes().getLength() - endOffset);
+        }
         Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
-        range = null;
     }
 }

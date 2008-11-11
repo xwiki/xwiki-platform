@@ -98,14 +98,16 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     }
 
     /**
-     * Custom constructor allowing us to inject a mock command manager. It was mainly added to be used in unit tests.
+     * Custom constructor allowing us to inject a mock command manager and a mock history. It was mainly added to be
+     * used in unit tests.
      * 
      * @param cm Custom command manager
+     * @param history Custom history mechanism.
      */
-    public RichTextArea(CommandManager cm)
+    public RichTextArea(CommandManager cm, History history)
     {
         this.cm = cm;
-        history = new DefaultHistory(this, 10);
+        this.history = history;
     }
 
     /**

@@ -2560,6 +2560,12 @@ public class XWikiDocument implements DocumentModelBridge
             setDate(date);
         }
 
+        String contentUpdateDateString = getElement(docel, "contentUpdateDate");
+        if (!StringUtils.isEmpty(contentUpdateDateString)) {
+            Date contentUpdateDate = new Date(Long.parseLong(contentUpdateDateString));
+            setContentUpdateDate(contentUpdateDate);
+        }
+
         String scdate = getElement(docel, "creationDate");
         if (!scdate.equals("")) {
             Date cdate = new Date(Long.parseLong(scdate));

@@ -429,6 +429,7 @@ public final class TextRange extends NativeRange
             if (refNode.getNodeType() == Node.TEXT_NODE) {
                 startOffset += refNode.getNodeValue().length();
             }
+            refNode = refNode.getPreviousSibling();
         }
         if (refNode == null) {
             // Looks like textNode doesn't have any previous element siblings.

@@ -83,7 +83,7 @@ public class Element extends com.google.gwt.dom.client.Element
     }
 
     /**
-     * Replaces this element with its child nodes. In other word, all the child nodes of this element are moved to its
+     * Replaces this element with its child nodes. In other words, all the child nodes of this element are moved to its
      * parent node and the element is removed from its parent.
      */
     public final void unwrap()

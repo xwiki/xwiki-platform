@@ -19,11 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom;
 
-import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.SpanElement;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
 /**

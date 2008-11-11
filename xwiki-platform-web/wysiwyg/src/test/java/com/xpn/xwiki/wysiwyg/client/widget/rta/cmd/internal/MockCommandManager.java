@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractCommandManager;
 
 /**
  * Mock command manager to be used on unit tests.

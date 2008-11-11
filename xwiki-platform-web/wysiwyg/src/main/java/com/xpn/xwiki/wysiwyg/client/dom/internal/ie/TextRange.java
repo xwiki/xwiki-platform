@@ -112,7 +112,13 @@ public final class TextRange extends NativeRange
      */
     public native void setHTML(String html)
     /*-{
-        this.pasteHTML(html);
+        // We do this because IE trims the leading comment (if any) in the html, so we add a dummy text before it and 
+        // remove it afterwards. We need this when adding wikilinks for example, who's html start with a comment. Even 
+        // if we hadn't the links, it is generally a good method to make sure that "what you set is what you get".
+        var id = 'org.xwiki.wysiwyg.iesucks';
+        this.pasteHTML('<span id="' + id + '">iesucks</span>' + html);
+        var marker = this.ownerDocument.getElementById(id);
+        marker.parentNode.removeChild(marker);
     }-*/;
 
     /**

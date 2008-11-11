@@ -66,4 +66,14 @@ public class MozillaDOMUtils extends DOMUtils
         }
         return attrNames;
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#setInnerHTML(Element, String)
+     */
+    public void setInnerHTML(Element element, String html)
+    {
+        element.setInnerHTML(html);
+    }
 }

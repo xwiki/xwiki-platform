@@ -70,4 +70,15 @@ public class Element extends com.google.gwt.dom.client.Element
     {
         return DOMUtils.getInstance().getComputedStyleProperty(this, propertyName);
     }
+
+    /**
+     * Set inner HTML in cross browser manner.
+     * 
+     * @param html the html to set.
+     * @see {@link DOMUtils#setInnerHTML(Element, String)}
+     */
+    public final void xSetInnerHTML(String html)
+    {
+        DOMUtils.getInstance().setInnerHTML(this, html);
+    }
 }

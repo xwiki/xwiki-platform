@@ -96,4 +96,15 @@ public class IEDOMUtils extends DOMUtils
         }
         return attrNames;
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#setInnerHTML(Element, String)
+     */
+    public void setInnerHTML(Element element, String html)
+    {
+        element.setInnerHTML("<span>iesucks</span>" + html);
+        element.removeChild(element.getFirstChild());
+    }
 }

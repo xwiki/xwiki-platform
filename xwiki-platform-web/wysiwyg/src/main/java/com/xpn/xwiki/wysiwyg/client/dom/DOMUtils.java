@@ -322,4 +322,13 @@ public abstract class DOMUtils
         }
         return null;
     }
+
+    /**
+     * Helps setting the inner HTML for an element, in a cross-browser manner, because IE seems to trim leading comments
+     * in the inner HTML.
+     * 
+     * @param element element to set the inner HTML for
+     * @param html the html string to set
+     */
+    public abstract void setInnerHTML(Element element, String html);
 }

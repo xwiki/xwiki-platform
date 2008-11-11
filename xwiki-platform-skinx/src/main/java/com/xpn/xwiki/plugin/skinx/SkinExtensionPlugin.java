@@ -90,7 +90,21 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
     @SuppressWarnings("unchecked")
     protected Set<String> getRequestList(XWikiContext context)
     {
+        initializeRequestListIfNeeded(context);
         return (Set<String>) context.get(this.getClass().getCanonicalName());
+    }
+
+    /**
+     * Initializes the list of pulled extensions corresponding to this request, if it wasn't already initialized. This
+     * method is not thread safe, since a context should not be shared among threads.
+     * 
+     * @param context The current context where this list is stored.
+     */
+    protected void initializeRequestListIfNeeded(XWikiContext context)
+    {
+        if (!context.containsKey(this.getClass().getCanonicalName())) {
+            context.put(this.getClass().getCanonicalName(), new LinkedHashSet<String>());
+        }
     }
 
     /**
@@ -100,7 +114,9 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
      */
     public void use(String skinFile, XWikiContext context)
     {
-        LOG.debug(String.format("Using [%s] as [%s] extension", skinFile, this.getName()));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Using [%s] as [%s] extension", skinFile, this.getName()));
+        }
         getRequestList(context).add(skinFile);
     }
 
@@ -119,20 +135,18 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#startRenderingHandler(java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#beginParsing(XWikiContext)
      */
     @Override
     public void beginParsing(XWikiContext context)
     {
-        if (!context.containsKey(this.getClass().getCanonicalName())) {
-            context.put(this.getClass().getCanonicalName(), new LinkedHashSet<String>());
-        }
+        initializeRequestListIfNeeded(context);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#endRenderingHandler(java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#endParsing(String, XWikiContext)
      */
     @Override
     public String endParsing(String content, XWikiContext context)

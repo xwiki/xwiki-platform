@@ -26,54 +26,52 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
-	<artifactId>xwiki-tools</artifactId>
-	<version>11</version>
+    <artifactId>xwiki-tools</artifactId>
+    <version>14-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-xmldoc-update-plugin</artifactId>
   <name>XWiki Platform - Tools - XML Doc Update Plugin</name>
   <packaging>maven-plugin</packaging>
   <version>1.4-SNAPSHOT</version>
-  <description> A Maven plugin to load XWiki documents from XML and
-		perform file attachment or setting object properties, before writting
-		the document back to XML </description>
+  <description> A Maven plugin to load XWiki documents from XML and perform file attachment or setting object properties, before writting the document back to XML </description>
   <dependencies>
     <dependency>
-	  <groupId>com.xpn.xwiki.platform</groupId>
-	  <artifactId>xwiki-core</artifactId>
-	  <version>1.5.1</version>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>1.6.1</version>
     </dependency>
-	<dependency>
-	  <groupId>javax.servlet</groupId>
-	  <artifactId>servlet-api</artifactId>
-	   <!-- Note: Needed to create a XWikiDocument, and xwiki-core does not provide it anymore. -->
-	  <scope>compile</scope>
-	</dependency>
-	<dependency>
-	  <groupId>org.apache.maven</groupId>
-	  <artifactId>maven-plugin-api</artifactId>
-	  <version>2.0</version>
-	</dependency>
-	<dependency>
-	  <groupId>org.apache.maven</groupId>
-	  <artifactId>maven-archiver</artifactId>
-	  <version>2.2</version>
-	</dependency>
-	<dependency>
-	  <groupId>org.apache.maven</groupId>
-	  <artifactId>maven-artifact</artifactId>
-	  <version>2.0</version>
-	</dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <!-- Note: Needed to create a XWikiDocument, and xwiki-core does not provide it anymore. -->
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-archiver</artifactId>
+      <version>2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0</version>
+    </dependency>
     <!-- XML processing -->
-	<dependency>
-	  <groupId>dom4j</groupId>
-	  <artifactId>dom4j</artifactId>
-	  <version>1.6.1</version>
-	</dependency>
-	<dependency>
-	  <artifactId>jaxen</artifactId>
-	  <groupId>jaxen</groupId>
-	  <version>1.1-beta-9</version>
-	  <scope>runtime</scope>
-	</dependency>
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <artifactId>jaxen</artifactId>
+      <groupId>jaxen</groupId>
+      <version>1.1-beta-9</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

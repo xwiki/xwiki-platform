@@ -481,7 +481,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                     LOG.debug("Creating new XWiki user based on LDAP attribues located at " + ldapDn);
                 }
 
-                createUserFromLDAP(userProfile, searchAttributeList, ldapDn, ldapUid, context);
+                userProfile = createUserFromLDAP(userProfile, searchAttributeList, ldapDn, ldapUid, context);
 
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("New XWiki user created: [" + userProfile.getFullName() + "] in wiki ["
@@ -748,12 +748,15 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     /**
      * Create an XWiki user and set all mapped attributes from LDAP to XWiki attributes.
      * 
-     * @param xwikiUserName the XWiki user name.
+     * @param userProfile the XWiki user profile.
      * @param searchAttributes the attributes.
+     * @param ldapDN the LDAP DN of the user.
+     * @param ldapUid the LDAP unique id of the user.
      * @param context the XWiki context.
+     * @return the created user.
      * @throws XWikiException error when creating XWiki user.
      */
-    protected void createUserFromLDAP(XWikiDocument userProfile, List<XWikiLDAPSearchAttribute> searchAttributes,
+    protected XWikiDocument createUserFromLDAP(XWikiDocument userProfile, List<XWikiLDAPSearchAttribute> searchAttributes,
         String ldapDN, String ldapUid, XWikiContext context) throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
@@ -776,15 +779,18 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // Mark user active
         map.put("active", "1");
 
-        context.getWiki().createUser(userProfile.getFullName(), map, userClass.getName(),
+        context.getWiki().createUser(userProfile.getName(), map, userClass.getName(),
             "#includeForm(\"XWiki.XWikiUserSheet\")", "edit", context);
 
         // Update ldap profile object
-        LDAPProfileXClass ldaXClass = new LDAPProfileXClass(context);
+        XWikiDocument createdUserProfile = context.getWiki().getDocument(userProfile.getFullName(), context);
+        LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
 
-        if (ldaXClass.updateLDAPObject(userProfile, ldapDN, ldapUid)) {
-            context.getWiki().saveDocument(userProfile, context);
+        if (ldapXClass.updateLDAPObject(createdUserProfile, ldapDN, ldapUid)) {
+            context.getWiki().saveDocument(createdUserProfile, context);
         }
+        
+        return createdUserProfile;
     }
 
     protected XWikiDocument getUserProfileByUid(String validXWikiUserName, String ldapUid, XWikiContext context)

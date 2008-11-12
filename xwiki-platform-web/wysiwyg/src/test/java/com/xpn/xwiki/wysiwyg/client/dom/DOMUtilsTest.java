@@ -72,13 +72,13 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         // do setup in the empty container
         DivElement startContainer = doc.createDivElement();
         String wikilinkHTML =
-            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan\">"
-                + "<a id=\"anchor\">x<strong id=\"boldWiki\">wiki</strong></a></span><!--stopwikilink-->rox";
+            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan-fa\">"
+                + "<a id=\"anchor-fa\">x<strong id=\"boldWiki-fa\">wiki</strong></a></span><!--stopwikilink-->rox";
         startContainer.setInnerHTML(wikilinkHTML);
         emptyContainer.appendChild(startContainer);
-        Node anchor = doc.getElementById("anchor");
-        Node wrappingSpan = doc.getElementById("wrappingSpan");
-        Node boldWiki = doc.getElementById("boldWiki");
+        Node anchor = doc.getElementById("anchor-fa");
+        Node wrappingSpan = doc.getElementById("wrappingSpan-fa");
+        Node boldWiki = doc.getElementById("boldWiki-fa");
         Node labelBoldWiki = boldWiki.getFirstChild();
 
         // check if there is a first ancestor of type a for the bold inside the anchor
@@ -107,25 +107,30 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         DivElement startContainer = doc.createDivElement();
 
         String wikilinkHTML =
-            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan\">"
-                + "<a id=\"anchor\">x<span id=\"styledWiki\">wiki</span></a></span><!--stopwikilink-->rox";
+            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan-fd\">"
+                + "<a id=\"anchor-fd\">x<span id=\"styledWiki-fd\">wiki</span></a></span><!--stopwikilink-->rox";
 
         startContainer.setInnerHTML(wikilinkHTML);
         emptyContainer.appendChild(startContainer);
 
-        Node anchor = doc.getElementById("anchor");
-        Node wrappingSpan = doc.getElementById("wrappingSpan");
+        Node anchor = doc.getElementById("anchor-fd");
+        Node wrappingSpan = doc.getElementById("wrappingSpan-fd");
         Node preambleText = startContainer.getFirstChild();
 
         // check anchor shows up as descendant of startContainer
-        assertSame(anchor, DOMUtils.getInstance().getFirstDescendant(startContainer, "a"));
+        assertSame("Anchor does not show up as descendant of startContainer", anchor, DOMUtils.getInstance()
+            .getFirstDescendant(startContainer, "a"));
         // check anchor shows up as descendant of itself
-        assertSame(anchor, DOMUtils.getInstance().getFirstDescendant(anchor, "a"));
+        assertSame("Anchor does not show up as descendant of itself", anchor, DOMUtils.getInstance()
+            .getFirstDescendant(anchor, "a"));
         // check there is no descendant of type bold in the wrapping span
-        assertNull(DOMUtils.getInstance().getFirstDescendant(wrappingSpan, "strong"));
+        assertNull("There is a descendant of type bold in the wrapping span", DOMUtils.getInstance()
+            .getFirstDescendant(wrappingSpan, "strong"));
         // check the first span descendant stops at the wrapping span
-        assertSame(wrappingSpan, DOMUtils.getInstance().getFirstDescendant(emptyContainer, "span"));
+        assertSame("The first span descendant does not stop at the wrapping span", wrappingSpan, DOMUtils.getInstance()
+            .getFirstDescendant(emptyContainer, "span"));
         // check there is no anchor descendant of a text
-        assertNull(DOMUtils.getInstance().getFirstDescendant(preambleText, "a"));
+        assertNull("There is an anchor descendant of a text", DOMUtils.getInstance().getFirstDescendant(preambleText,
+            "a"));
     }
 }

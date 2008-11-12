@@ -180,7 +180,7 @@ public class LDAPProfileXClass
                 ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=? and obj.id=prop.id.id and prop.name=? and lower(prop.value)=?";
 
             documentList =
-                this.context.getWiki().getStore().searchDocuments(sql,
+                this.context.getWiki().getStore().searchDocuments(sql, false, 0, 0,
                     Arrays.asList(ldapClass.getName(), LDAP_XFIELD_UID, uid.toLowerCase()), this.context);
         } catch (XWikiException e) {
             LOG.error("Fail to search for document containing ldap uid [" + uid + "]", e);

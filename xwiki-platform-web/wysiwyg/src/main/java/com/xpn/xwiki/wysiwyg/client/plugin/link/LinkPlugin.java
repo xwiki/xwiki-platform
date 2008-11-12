@@ -27,15 +27,45 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkDialog;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
+import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
-public class LinkPlugin extends AbstractPlugin implements ClickListener
+/**
+ * Rich text editor plug-in for inserting links, using a dialog to get link settings from the user. It installs two
+ * buttons in the toolbar, for its two actions: link and unlink.
+ * 
+ * @version $Id$
+ */
+public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupListener
 {
+    /**
+     * The button from the toolbar for create a link.
+     */
     private PushButton link;
 
+    /**
+     * The button from the toolbar for destroy a link.
+     */
     private PushButton unlink;
 
+    /**
+     * The dialog for create a link.
+     */
+    private LinkDialog linkDialog;
+
+    /**
+     * Selection preserver to store the selection before and after the dialog showing.
+     */
+    private SelectionPreserver selectionPreserver;
+
+    /**
+     * The toolbar extension used to add the link buttons to the toolbar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
@@ -47,15 +77,23 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener
     {
         super.init(wysiwyg, textArea, config);
 
-        link = new PushButton(Images.INSTANCE.link().createImage(), this);
-        link.setTitle(Strings.INSTANCE.link());
-        toolBarExtension.addFeature("link", link);
+        if (getTextArea().getCommandManager().isSupported(Command.CREATE_LINK)) {
+            link = new PushButton(Images.INSTANCE.link().createImage(), this);
+            link.setTitle(Strings.INSTANCE.link());
+            toolBarExtension.addFeature("link", link);
+        }
 
-        unlink = new PushButton(Images.INSTANCE.unlink().createImage(), this);
-        unlink.setTitle(Strings.INSTANCE.unlink());
-        toolBarExtension.addFeature("unlink", unlink);
+        if (getTextArea().getCommandManager().isSupported(Command.UNLINK)) {
+            unlink = new PushButton(Images.INSTANCE.unlink().createImage(), this);
+            unlink.setTitle(Strings.INSTANCE.unlink());
+            toolBarExtension.addFeature("unlink", unlink);
+        }
 
-        getUIExtensionList().add(toolBarExtension);
+        if (toolBarExtension.getFeatures().length > 0) {
+            getTextArea().addClickListener(this);
+            getUIExtensionList().add(toolBarExtension);
+            selectionPreserver = new SelectionPreserver(textArea);
+        }
     }
 
     /**
@@ -65,16 +103,29 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener
      */
     public void destroy()
     {
-        link.removeFromParent();
-        link.removeClickListener(this);
-        link = null;
+        if (link != null) {
+            link.removeFromParent();
+            link.removeClickListener(this);
+            link = null;
 
-        unlink.removeFromParent();
-        unlink.removeClickListener(this);
-        unlink = null;
+            if (linkDialog != null) {
+                linkDialog.hide();
+                linkDialog.removeFromParent();
+                linkDialog.removePopupListener(this);
+                linkDialog = null;
+            }
+        }
 
-        toolBarExtension.clearFeatures();
+        if (unlink != null) {
+            unlink.removeFromParent();
+            unlink.removeClickListener(this);
+            unlink = null;
+        }
 
+        if (toolBarExtension.getFeatures().length > 0) {
+            getTextArea().removeClickListener(this);
+            toolBarExtension.clearFeatures();
+        }
         super.destroy();
     }
 
@@ -86,19 +137,76 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener
     public void onClick(Widget sender)
     {
         if (sender == link) {
-            onLink();
+            onLink(true);
         } else if (sender == unlink) {
             onUnlink();
         }
     }
 
-    public void onLink()
+    /**
+     * Depending on the passed parameter, the link dialog is displayed for the user to create a link or the created link
+     * is inserted in the document.
+     * 
+     * @param show true if the link dialog must be shown, false otherwise
+     */
+    public void onLink(boolean show)
     {
-        // TODO
+        if (show) {
+            // save the selection
+            selectionPreserver.saveSelection();
+            // setup the dialog data
+            // use only the first range in the user selection
+            getLinkDialog().setLabel(getTextArea().getDocument().getSelection().getRangeAt(0).toHTML(),
+                getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+            // show the dialog
+            getLinkDialog().center();
+        } else {
+            // restore selection, to be sure to execute the command on the right selection
+            selectionPreserver.restoreSelection();
+            String url = getLinkDialog().getLink();
+            if (url != null) {
+                getTextArea().getCommandManager().execute(Command.CREATE_LINK, url);
+                // restore the selection once again to select the inserted text
+                selectionPreserver.restoreSelection();
+            } else {
+                // We get here if the link dialog has been closed by clicking the close button.
+                // In this case we return the focus to the text area.
+                getTextArea().setFocus(true);
+            }
+        }
     }
 
+    /**
+     * Executed when the unlink button is clicked.
+     */
     public void onUnlink()
     {
-        // TODO
+        getTextArea().getCommandManager().execute(Command.UNLINK);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see PopupListener#onPopupClosed(PopupPanel, boolean)
+     */
+    public void onPopupClosed(SourcesPopupEvents sender, boolean autoHide)
+    {
+        if (sender == getLinkDialog() && !autoHide) {
+            onLink(false);
+        }
+    }
+
+    /**
+     * Lazy creation of the link dialog, to optimize editor loading time.
+     * 
+     * @return the link dialog to be used for inserting the link.
+     */
+    private LinkDialog getLinkDialog()
+    {
+        if (linkDialog == null) {
+            linkDialog = new LinkDialog();
+            linkDialog.addPopupListener(this);
+        }
+        return linkDialog;
     }
 }

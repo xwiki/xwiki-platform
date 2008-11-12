@@ -57,6 +57,7 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES = new HashMap<Command, Executable>();
         EXECUTABLES.put(Command.BACK_COLOR, (Executable) GWT.create(BackColorExecutable.class));
         EXECUTABLES.put(Command.BOLD, new BoldExecutable());
+        EXECUTABLES.put(Command.CREATE_LINK, new CreateLinkExecutable());
         EXECUTABLES.put(Command.FONT_NAME, new DefaultExecutable(Command.FONT_NAME.toString()));
         EXECUTABLES.put(Command.FONT_SIZE, new DefaultExecutable(Command.FONT_SIZE.toString()));
         EXECUTABLES.put(Command.FORE_COLOR, new DefaultExecutable(Command.FORE_COLOR.toString()));
@@ -87,6 +88,7 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES.put(Command.TELETYPE, new StyleExecutable("tt", null, Style.FONT_FAMILY, "monospace", true, true));
         EXECUTABLES.put(Command.UNDERLINE, new StyleExecutable("ins", null, Style.TEXT_DECORATION,
             Style.TextDecoration.UNDERLINE, false, true));
+        EXECUTABLES.put(Command.UNLINK, new UnlinkExecutable());
         EXECUTABLES.put(Command.UNDO, new UndoExecutable());
     }
 

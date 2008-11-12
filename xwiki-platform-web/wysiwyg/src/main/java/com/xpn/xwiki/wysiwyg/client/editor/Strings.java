@@ -82,8 +82,6 @@ public interface Strings extends Constants
 
     String justifyRight();
 
-    String link();
-
     String macro();
 
     String normal();
@@ -114,5 +112,29 @@ public interface Strings extends Constants
 
     String undo();
 
+    String link();
+
     String unlink();
+
+    String linkCreateLinkButon();
+
+    String linkEmailTab();
+
+    String linkWebPageTab();
+    
+    String linkLabelLabel();
+
+    String linkWebPageLabel();
+
+    String linkEmailLabel();
+
+    String linkEmailAddressTextBox();
+
+    String linkWebPageTextBox();
+
+    String linkEmailAddressError();
+
+    String linkWebPageAddressError();
+    
+    String linkNoLabelError();
 }

@@ -64,7 +64,8 @@ public abstract class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("fontsize", Command.FONT_SIZE));
         addValidationRule(new DefaultValidationRule("forecolor", Command.FORE_COLOR));
         addValidationRule(new DefaultValidationRule("backcolor", Command.BACK_COLOR));
-        
+        addValidationRule(new DefaultValidationRule("link", Command.CREATE_LINK));
+        addValidationRule(new DefaultValidationRule("unlink", Command.UNLINK));
         // FIXME : implement this in the table plugin when possible
         addValidationRule(new DefaultValidationRule("deletecol", new Command("deletecol")));
         addValidationRule(new DefaultValidationRule("deleterow", new Command("deleterow")));

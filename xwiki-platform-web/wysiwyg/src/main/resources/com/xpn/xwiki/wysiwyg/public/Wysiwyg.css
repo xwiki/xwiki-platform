@@ -179,6 +179,7 @@
   background-color:#FFA500;
   white-space:nowrap;
   line-height:16px;
+  height: 16px;
   cursor:move;
 }
 
@@ -214,4 +215,55 @@
 * html .gwt-PopupPanel .popupContent {
   /* IE6 */
   width: 1px; 
+}
+/********styles for link********/
+.gwt-TabBar {
+}
+.gwt-TabBar .gwt-TabBarFirst {
+  width: 5px;  /* first tab distance from the left */
+}
+.gwt-TabBar .gwt-TabBarRest {
+}
+.gwt-TabBar .gwt-TabBarItem {
+  margin-left: 6px;
+  padding: 3px 6px 3px 6px;
+  cursor: pointer;
+  cursor: hand;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  background: #d0e4f6; 
+}
+.gwt-TabBar .gwt-TabBarItem-selected {
+  cursor: default;
+  background: #92c1f0;
+} 
+.gwt-TabPanel {
+  padding: 6px;
+}
+.gwt-TabPanelBottom {
+  border-color: #92c1f0;
+  border-style: solid;
+  border-width: 3px 2px 2px;
+  overflow: hidden;
+  padding: 6px;
+}
+.gwt-PopupPanel {
+  background: white;
+}
+
+.xLinkToUrl .gwt-Label{
+	font-weight: bold;
+	width: 300px;
+	padding: 5px;
+	
+}
+.xLinkToUrl .gwt-TextBox{
+	font-size: x-small;		
+	margin: 0 5px;
+	width: 300px;
+}
+.xLinkToUrl .gwt-Button{
+	font-size: x-small;	
+	margin: 8px;
 }

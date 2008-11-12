@@ -41,6 +41,12 @@ public class Command
     public static final Command BOLD = new Command("bold");
 
     /**
+     * This command will insert a link in place of the current selection, either if it is a collapsed selection or an
+     * expanded one. It is based on the insert HTML command, and it will insert the link HTML received as a parameter.  
+     */
+    public static final Command CREATE_LINK = new Command("createlink");
+
+    /**
      * This command will set the font face for a selection or at the insertion point if there is no selection.<br/>
      * The given string is such as would be used in the "name" attribute of the font tag.
      */
@@ -203,6 +209,12 @@ public class Command
      * have no effect.
      */
     public static final Command UNDO = new Command("undo");
+
+    /**
+     * If the insertion point is within a link or if the current selection contains a link, the link will be removed and
+     * the text will remain.
+     */
+    public static final Command UNLINK = new Command("unlink");
 
     /**
      * The name of the command. For predefined commands (supported by the built-in rich text editor, the one offered by

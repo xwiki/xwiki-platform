@@ -135,16 +135,15 @@ public final class IERange extends AbstractRange<NativeRange>
             if (sourceRange.isTextRange()) {
                 return textRange.compareEndPoints(how, (TextRange) sourceRange);
             } else {
-                // TODO
-                throw new UnsupportedOperationException();
+                return textRange.compareEndPoints(how, TextRange.newInstance((ControlRange) sourceRange));
             }
         } else {
             if (sourceRange.isTextRange()) {
-                // TODO
-                throw new UnsupportedOperationException();
+                return TextRange.newInstance((ControlRange) getJSRange())
+                    .compareEndPoints(how, (TextRange) sourceRange);
             } else {
-                // TODO
-                throw new UnsupportedOperationException();
+                return TextRange.newInstance((ControlRange) getJSRange()).compareEndPoints(how,
+                    TextRange.newInstance((ControlRange) sourceRange));
             }
         }
     }
@@ -157,11 +156,23 @@ public final class IERange extends AbstractRange<NativeRange>
     public DocumentFragment cloneContents()
     {
         if (getJSRange().isTextRange()) {
-            // TODO
-            throw new UnsupportedOperationException();
+            TextRange textRange = (TextRange) getJSRange();
+            Element container = textRange.getOwnerDocument().xCreateDivElement().cast();
+            container.setInnerHTML(textRange.getHTML());
+            DocumentFragment contents = textRange.getOwnerDocument().createDocumentFragment();
+            Node child = container.getFirstChild();
+            while (child != null) {
+                contents.appendChild(child);
+                child = container.getFirstChild();
+            }
+            return contents;
         } else {
-            // TODO
-            throw new UnsupportedOperationException();
+            ControlRange controlRange = (ControlRange) getJSRange();
+            DocumentFragment contents = controlRange.getOwnerDocument().createDocumentFragment();
+            for (int i = 0; i < controlRange.getLength(); i++) {
+                contents.appendChild(controlRange.get(i).cloneNode(true));
+            }
+            return contents;
         }
     }
 

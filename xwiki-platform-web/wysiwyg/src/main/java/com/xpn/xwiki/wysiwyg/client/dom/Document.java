@@ -264,4 +264,22 @@ public class Document extends com.google.gwt.dom.client.Document
     {
         return this.getFirstChild().cast();
     }
+
+    /**
+     * Creates an empty document fragment.<br/>
+     * A DocumentFragment is a minimal document object that has no parent. It supports the following DOM 2 methods:
+     * appendChild, cloneNode, hasAttributes, hasChildNodes, insertBefore, normalize, removeChild, replaceChild.<br/>
+     * It also supports the following DOM 2 properties: attributes, childNodes, firstChild, lastChild, localName,
+     * namespaceURI, nextSibling, nodeName, nodeType, nodeValue, ownerDocument, parentNode, prefix, previousSibling,
+     * textContent.<br/>
+     * Various other methods can take a document fragment as an argument (e.g. Node interface methods such as
+     * appendChild and insertBefore), in which case the children of the fragment are appended or inserted, not the
+     * fragment itself.
+     * 
+     * @return The newly created document fragment.
+     */
+    public final native DocumentFragment createDocumentFragment()
+    /*-{
+        return this.createDocumentFragment();
+    }-*/;
 }

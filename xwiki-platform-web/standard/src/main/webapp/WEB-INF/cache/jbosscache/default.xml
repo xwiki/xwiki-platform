@@ -33,7 +33,7 @@
                            REPL_SYNC
                            INVALIDATION_ASYNC
                            INVALIDATION_SYNC   -->
-      <attribute name="CacheMode">REPL_ASYNC</attribute>
+      <attribute name="CacheMode">LOCAL</attribute>
 
       <!-- Name of cluster. Needs to be the same for all JBoss Cache nodes in a
            cluster in order to find each other. 

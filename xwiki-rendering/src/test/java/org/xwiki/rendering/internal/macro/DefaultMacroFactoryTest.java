@@ -55,6 +55,8 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
     @Override
     protected void setUp() throws Exception
     {
+        super.setUp();
+
         this.mockLogger = mock(Logger.class);
         this.mockComponentManager = mock(ComponentManager.class);
 

@@ -22,7 +22,10 @@ package com.xpn.xwiki.wysiwyg.client.dom;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Unit tests for {@link DOMUtils}.
@@ -32,13 +35,58 @@ import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 public class DOMUtilsTest extends AbstractWysiwygClientTest
 {
     /**
+     * The rich text area to perform tests on.
+     */
+    private RichTextArea rta;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractWysiwygClientTest#gwtSetUp()
+     */
+    protected void gwtSetUp() throws Exception
+    {
+        super.gwtSetUp();
+
+        rta = new RichTextArea();
+        RootPanel.get().add(rta);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractWysiwygClientTest#gwtTearDown()
+     */
+    protected void gwtTearDown() throws Exception
+    {
+        super.gwtTearDown();
+
+        RootPanel.get().remove(rta);
+    }
+
+    /**
      * Unit test for {@link DOMUtils#getTextRange(Range)}.
      */
     public void testGetTextRange()
     {
-        Document doc = Document.get().cast();
+        delayTestFinish(300);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestGetTextRange();
+            }
+        }).schedule(100);
+    }
 
-        Element container = doc.createSpanElement().cast();
+    /**
+     * Unit test for {@link DOMUtils#getTextRange(Range)}.
+     */
+    private void doTestGetTextRange()
+    {
+        Document doc = rta.getDocument();
+
+        Element container = doc.xCreateSpanElement();
         container.setInnerHTML("<a href=\"http://www.xwiki.org\"><strong>ab</strong>cd<em>ef</em></a>");
         doc.getBody().appendChild(doc.createTextNode("before"));
         doc.getBody().appendChild(container);
@@ -57,64 +105,103 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
 
         assertEquals(Node.TEXT_NODE, textRange.getEndContainer().getNodeType());
         assertEquals(2, textRange.getEndOffset());
+
+        finishTest();
     }
 
     /**
-     * Unit test for {@link DOMUtils#getFirstAncestor(Node, String)}.
+     * Test the first ancestor search, on a wikilink like html structure.
      */
     public void testGetFirstAncestor()
     {
-        // setup a wikiLink tree
-        Document doc = Document.get().cast();
-        DivElement emptyContainer = doc.createDivElement();
-        doc.getBody().appendChild(emptyContainer);
-
-        // do setup in the empty container
-        DivElement startContainer = doc.createDivElement();
-        String wikilinkHTML =
-            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan-fa\">"
-                + "<a id=\"anchor-fa\">x<strong id=\"boldWiki-fa\">wiki</strong></a></span><!--stopwikilink-->rox";
-        startContainer.setInnerHTML(wikilinkHTML);
-        emptyContainer.appendChild(startContainer);
-        Node anchor = doc.getElementById("anchor-fa");
-        Node wrappingSpan = doc.getElementById("wrappingSpan-fa");
-        Node boldWiki = doc.getElementById("boldWiki-fa");
-        Node labelBoldWiki = boldWiki.getFirstChild();
-
-        // check if there is a first ancestor of type a for the bold inside the anchor
-        assertSame(anchor, DOMUtils.getInstance().getFirstAncestor(boldWiki, "a"));
-        // check if there is a first ancestor of type a for the text inside bold in the anchor
-        assertSame(anchor, DOMUtils.getInstance().getFirstAncestor(labelBoldWiki, "a"));
-        // check there is no a ancestor of the wikilink span
-        assertNull(DOMUtils.getInstance().getFirstAncestor(wrappingSpan, "a"));
-        // check a finds itself as ancestor
-        assertSame(anchor, DOMUtils.getInstance().getFirstAncestor(anchor, "a"));
-        // check div ancestor search stops at startContainer
-        assertSame(startContainer, DOMUtils.getInstance().getFirstAncestor(anchor, "div"));
+        delayTestFinish(300);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestGetFirstAncestor();
+            }
+        }).schedule(100);
     }
 
     /**
-     * Unit test for {@link DOMUtils#getFirstDescendant(Node, String)}.
+     * Test the first ancestor search, on a wikilink like html structure.
      */
-    public void testGetFirstDescendant()
+    private void doTestGetFirstAncestor()
     {
         // setup a wikiLink tree
-        Document doc = Document.get().cast();
-        DivElement emptyContainer = doc.createDivElement();
+        Document doc = rta.getDocument();
+        DivElement emptyContainer = doc.xCreateDivElement();
         doc.getBody().appendChild(emptyContainer);
 
         // do setup in the empty container
-        DivElement startContainer = doc.createDivElement();
+        DivElement startContainer = doc.xCreateDivElement();
+        String wikilinkHTML =
+            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan\">"
+                + "<a id=\"anchor\">x<strong id=\"boldWiki\">wiki</strong></a></span><!--stopwikilink-->rox";
+        startContainer.setInnerHTML(wikilinkHTML);
+        emptyContainer.appendChild(startContainer);
+        Node anchor = doc.getElementById("anchor");
+        Node wrappingSpan = doc.getElementById("wrappingSpan");
+        Node boldWiki = doc.getElementById("boldWiki");
+        Node labelBoldWiki = boldWiki.getFirstChild();
+
+        // check if there is a first ancestor of type a for the bold inside the anchor
+        assertSame("There isn't an anchor ancestor for the bold inside the anchor", anchor, DOMUtils.getInstance()
+            .getFirstAncestor(boldWiki, "a"));
+        // check if there is a first ancestor of type a for the text inside bold in the anchor
+        assertSame("There isn't an anchor ancestor for the text in the bold inside the anchor", anchor, DOMUtils
+            .getInstance().getFirstAncestor(labelBoldWiki, "a"));
+        // check there is no a ancestor of the wikilink span
+        assertNull("There is an anchor ancestor for the wikilink span", DOMUtils.getInstance().getFirstAncestor(
+            wrappingSpan, "a"));
+        // check a finds itself as ancestor
+        assertSame("The anchor is not an anhor ancestor of itself", anchor, DOMUtils.getInstance().getFirstAncestor(
+            anchor, "a"));
+        // check div ancestor search stops at startContainer
+        assertSame("Div ancestor search for the anchor does not stop at first div", startContainer, DOMUtils
+            .getInstance().getFirstAncestor(anchor, "div"));
+
+        finishTest();
+    }
+
+    /**
+     * Test the first descendant search function, on a wikilink like structure.
+     */
+    public void testGetFirstDescendant()
+    {
+        delayTestFinish(300);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestFirstDescendant();
+            }
+        }).schedule(100);
+    }
+
+    /**
+     * Test the first descendant search function, on a wikilink like structure.
+     */
+    private void doTestFirstDescendant()
+    {
+        // setup a wikiLink tree
+        Document doc = rta.getDocument();
+        DivElement emptyContainer = doc.xCreateDivElement();
+        doc.getBody().appendChild(emptyContainer);
+
+        // do setup in the empty container
+        DivElement startContainer = doc.xCreateDivElement();
 
         String wikilinkHTML =
-            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan-fd\">"
-                + "<a id=\"anchor-fd\">x<span id=\"styledWiki-fd\">wiki</span></a></span><!--stopwikilink-->rox";
+            "our<!--startwikilink:Ref.erence--><span class=\"wikilink\" id=\"wrappingSpan\">"
+                + "<a id=\"anchor\">x<span id=\"styledWiki\">wiki</span></a></span><!--stopwikilink-->rox";
 
         startContainer.setInnerHTML(wikilinkHTML);
         emptyContainer.appendChild(startContainer);
 
-        Node anchor = doc.getElementById("anchor-fd");
-        Node wrappingSpan = doc.getElementById("wrappingSpan-fd");
+        Node anchor = doc.getElementById("anchor");
+        Node wrappingSpan = doc.getElementById("wrappingSpan");
         Node preambleText = startContainer.getFirstChild();
 
         // check anchor shows up as descendant of startContainer
@@ -132,5 +219,7 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         // check there is no anchor descendant of a text
         assertNull("There is an anchor descendant of a text", DOMUtils.getInstance().getFirstDescendant(preambleText,
             "a"));
+
+        finishTest();
     }
 }

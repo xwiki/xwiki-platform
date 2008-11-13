@@ -30,9 +30,9 @@
     <version>1.7-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-macro-parent</artifactId>
-  <name>XWiki Platform - Core - Macro - Parent POM</name>
+  <artifactId>xwiki-core-macros-parent</artifactId>
+  <name>XWiki Platform - Core - Macros - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Macro - Parent POM</description>
+  <description>Macros implementations supported by XWiki Platform</description>
 </project>
        

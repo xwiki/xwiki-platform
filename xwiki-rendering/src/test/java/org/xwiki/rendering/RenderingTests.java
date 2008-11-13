@@ -22,8 +22,8 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import com.xpn.xwiki.test.PlexusTestSetup;
 
 /**
  * All Rendering integration tests defined in text files using a special format.
@@ -36,7 +36,7 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-        
+
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);
         suite.addTestsFromResource("bold/bold2", false);
@@ -88,11 +88,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macro3", false);
         suite.addTestsFromResource("macros/macro4", false);
         suite.addTestsFromResource("macros/macro5", false);
-        suite.addTestsFromResource("macros/macro6", true);
         suite.addTestsFromResource("macros/macrohtml", true);
-        suite.addTestsFromResource("macros/velocity/macrovelocity1", true);
-        suite.addTestsFromResource("macros/velocity/macrovelocity2", true);
-        suite.addTestsFromResource("macros/velocity/macrovelocity3", true);
         suite.addTestsFromResource("macros/xhtml/macroxhtml1", true);
         suite.addTestsFromResource("macros/xhtml/macroxhtml2", true);
         suite.addTestsFromResource("macros/xhtml/macroxhtml3", true);
@@ -121,7 +117,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("link/links4", false);
         suite.addTestsFromResource("link/links5", false);
         suite.addTestsFromResource("link/links6", false);
-        suite.addTestsFromResource("link/links7", true);
         suite.addTestsFromResource("link/links8", false);
         suite.addTestsFromResource("link/links9", false);
         suite.addTestsFromResource("link/links10", false);
@@ -161,6 +156,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image1", false);
         suite.addTestsFromResource("image/image2", false);
 
-        return new PlexusTestSetup(suite);
+        return new RenderingPlexusTestSetup(suite);
     }
 }

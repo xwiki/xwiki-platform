@@ -53,37 +53,5 @@
         <priority>500</priority>
       </configuration>
     </component>
-
-    <!-- Override default Velocity Manager component implementation for testing -->
-    <component>
-      <role>org.xwiki.velocity.VelocityManager</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.macro.MockVelocityManager</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-
-    <!-- Override default Document Access Bridge component implementation for testing -->
-    <component>
-      <role>org.xwiki.bridge.DocumentAccessBridge</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.MockDocumentAccessBridge</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-
-    <!-- Override default Id Generator component implementation for testing -->
-    <component>
-      <role>org.xwiki.rendering.util.IdGenerator</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.util.MockIdGenerator</implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
-    </component>
-
-    <!-- Override default configuration source collection for testing -->
-    <component>
-      <role>org.xwiki.configuration.ConfigurationSourceCollection</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.configuration.MockConfigurationSourceCollection</implementation>
-    </component>
-
   </components>
 </component-set>

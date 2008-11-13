@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.util;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.util.IdGenerator;
 
 /**
@@ -28,6 +30,22 @@ import org.xwiki.rendering.util.IdGenerator;
  */
 public class MockIdGenerator implements IdGenerator
 {
+    /**
+     * Create and return a descriptor for this component.
+     * 
+     * @return the descriptor of the component.
+     */
+    public static ComponentDescriptor getComponentDescriptor()
+    {
+        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
+
+        componentDescriptor.setRole(IdGenerator.ROLE);
+        componentDescriptor.setRoleHint("default");
+        componentDescriptor.setImplementation(MockIdGenerator.class.getName());
+
+        return componentDescriptor;
+    }
+
     /**
      * {@inheritDoc}
      * 

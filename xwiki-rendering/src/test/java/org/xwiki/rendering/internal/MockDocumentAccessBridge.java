@@ -20,6 +20,8 @@
 package org.xwiki.rendering.internal;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 
 /**
  * Mock {@link DocumentAccessBridge} implementation used for testing, since we don't want to pull any dependency on the
@@ -30,6 +32,22 @@ import org.xwiki.bridge.DocumentAccessBridge;
  */
 public class MockDocumentAccessBridge implements DocumentAccessBridge
 {
+    /**
+     * Create and return a descriptor for this component.
+     * 
+     * @return the descriptor of the component.
+     */
+    public static ComponentDescriptor getComponentDescriptor()
+    {
+        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
+
+        componentDescriptor.setRole(DocumentAccessBridge.ROLE);
+        componentDescriptor.setRoleHint("default");
+        componentDescriptor.setImplementation(MockDocumentAccessBridge.class.getName());
+
+        return componentDescriptor;
+    }
+    
     public String getDocumentContent(String documentName) throws Exception
     {
         return "Some content";

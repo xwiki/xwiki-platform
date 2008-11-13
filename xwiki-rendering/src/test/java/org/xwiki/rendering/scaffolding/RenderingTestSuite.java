@@ -19,21 +19,21 @@
  */
 package org.xwiki.rendering.scaffolding;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import junit.framework.TestSuite;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.PrintRendererType;
-import org.xwiki.rendering.renderer.DefaultWikiPrinter;
-import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
 import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
+import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
+import org.xwiki.rendering.renderer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererType;
 
 /**
  * @version $Id: $
@@ -78,12 +78,15 @@ public class RenderingTestSuite extends TestSuite
 
     /**
      * Read test data separated by lines containing ".". For example:
-     * <pre><code>
+     * 
+     * <pre>
+     * &lt;code&gt;
      * .input|xwiki/2.0
      * This is a test
      * .expect|XHTML
-     * <p>This is a test</p>
-     * </code></pre>
+     * &lt;p&gt;This is a test&lt;/p&gt;
+     * &lt;/code&gt;
+     * </pre>
      */
     private Data readTestData(InputStream source, String resourceName) throws Exception
     {

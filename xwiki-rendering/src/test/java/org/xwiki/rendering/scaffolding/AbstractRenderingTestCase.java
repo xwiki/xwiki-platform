@@ -19,13 +19,16 @@
  */
 package org.xwiki.rendering.scaffolding;
 
+import java.util.List;
+
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.MockDocumentAccessBridge;
+import org.xwiki.rendering.internal.configuration.MockConfigurationSourceCollection;
+import org.xwiki.rendering.internal.util.MockIdGenerator;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.renderer.EventsRenderer;
-
-import java.util.List;
+import org.xwiki.rendering.renderer.WikiPrinter;
 
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
@@ -49,5 +52,20 @@ public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTe
         WikiPrinter printer = new DefaultWikiPrinter();
         dom.traverse(new EventsRenderer(printer));
         assertEquals(expected, printer.toString());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponentDescriptor(MockIdGenerator.getComponentDescriptor());
+        getComponentManager().registerComponentDescriptor(MockConfigurationSourceCollection.getComponentDescriptor());
     }
 }

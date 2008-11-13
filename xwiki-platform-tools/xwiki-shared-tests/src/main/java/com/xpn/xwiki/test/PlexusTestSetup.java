@@ -30,9 +30,9 @@ import java.lang.reflect.Method;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
- * JUnit Test Setup that initializes Plexus. Test suite that want to initialize the Plexus component manager
- * only once should use this class instead of {@link AbstractXWikiComponentTestCase}.
- *
+ * JUnit Test Setup that initializes Plexus. Test suite that want to initialize the Plexus component manager only once
+ * should use this class instead of {@link AbstractXWikiComponentTestCase}.
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
@@ -45,14 +45,37 @@ public class PlexusTestSetup extends TestSetup
         super(suite);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.extensions.TestDecorator#getTest()
+     */
+    @Override
     public TestSuite getTest()
     {
         return (TestSuite) super.getTest();
     }
 
+    /**
+     * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) which can
+     *         then be put in the XWiki Context for testing.
+     * @since 1.7M3
+     */
+    public ComponentManager getComponentManager() throws Exception
+    {
+        return this.initializer.getComponentManager();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.extensions.TestSetup#setUp()
+     */
+    @Override
     protected void setUp() throws Exception
     {
         this.initializer.initialize();
+
         for (Enumeration tests = getTest().tests(); tests.hasMoreElements();) {
             Test test = (Test) tests.nextElement();
             try {
@@ -64,6 +87,12 @@ public class PlexusTestSetup extends TestSetup
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.extensions.TestSetup#tearDown()
+     */
+    @Override
     protected void tearDown() throws Exception
     {
         this.initializer.shutdown();

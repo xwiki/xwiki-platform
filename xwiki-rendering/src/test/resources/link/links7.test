@@ -1,0 +1,42 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+[[**hello**>>Page]]
+[[= notheader>>Page]]
+[[{{testsimplemacro}}label{{/testsimplemacro}}>>Page]]
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Reference = [Page]] [false]
+beginFormat: [BOLD]
+onWord [hello]
+endFormat: [BOLD]
+endLink [Reference = [Page]] [false]
+onLineBreak
+beginLink [Reference = [Page]] [false]
+onSpecialSymbol [=]
+onSpace
+onWord [notheader]
+endLink [Reference = [Page]] [false]
+onLineBreak
+beginLink [Reference = [Page]] [false]
+onMacroInline [testsimplemacro] [] [label]
+endLink [Reference = [Page]] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><strong>hello</strong></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext">= notheader</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+[[**hello**>>Page]]
+[[= notheader>>Page]]
+[[{{testsimplemacro}}label{{/testsimplemacro}}>>Page]]
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><strong>hello</strong></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext">= notheader</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><!--startmacro:testsimplemacro|-||-|label-->label<!--stopmacro--></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--></p></html>

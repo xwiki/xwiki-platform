@@ -252,18 +252,17 @@
   background: white;
 }
 
-.xLinkToUrl .gwt-Label{
-	font-weight: bold;
-	width: 300px;
-	padding: 5px;
-	
+.xLinkToUrl .gwt-Label {
+  font-weight: bold;
+  width: 300px;
+  padding: 5px;
 }
-.xLinkToUrl .gwt-TextBox{
-	font-size: x-small;		
-	margin: 0 5px;
-	width: 300px;
+.xLinkToUrl .gwt-TextBox { 
+  font-size: x-small;
+  margin: 0 5px;
+  width: 300px;
 }
-.xLinkToUrl .gwt-Button{
-	font-size: x-small;	
-	margin: 8px;
+.xLinkToUrl .gwt-Button {
+  font-size: x-small;
+  margin: 8px;
 }

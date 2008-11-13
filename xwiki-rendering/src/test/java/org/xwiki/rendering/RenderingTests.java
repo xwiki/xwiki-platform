@@ -88,6 +88,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macro3", false);
         suite.addTestsFromResource("macros/macro4", false);
         suite.addTestsFromResource("macros/macro5", false);
+        suite.addTestsFromResource("macros/macro6", true);
         suite.addTestsFromResource("macros/macrohtml", true);
         suite.addTestsFromResource("macros/xhtml/macroxhtml1", true);
         suite.addTestsFromResource("macros/xhtml/macroxhtml2", true);

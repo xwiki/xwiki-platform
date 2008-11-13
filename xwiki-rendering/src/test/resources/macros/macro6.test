@@ -2,42 +2,38 @@
 .input|xwiki/2.0
 .# Same a macro1.test but this time the macro is executed.
 .#-----------------------------------------------------
-{{velocity}}
+{{testsimplemacro}}
 Some **content**
-{{/velocity}}
+{{/testsimplemacro}}
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [velocity] [] [
+beginMacroMarker [testsimplemacro] [] [
 Some **content**
 ]
 beginParagraph
-onWord [Some]
-onSpace
-beginFormat: [BOLD]
-onWord [content]
-endFormat: [BOLD]
+onWord [simplemacro0]
 endParagraph
-endMacroMarker [velocity] [] [
+endMacroMarker [testsimplemacro] [] [
 Some **content**
 ]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<!--startmacro:velocity|-||-|
+<!--startmacro:testsimplemacro|-||-|
 Some **content**
---><p>Some <strong>content</strong></p><!--stopmacro-->
+--><p>simplemacro0</p><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-{{velocity}}
+{{testsimplemacro}}
 Some **content**
-{{/velocity}}
+{{/testsimplemacro}}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><!--startmacro:velocity|-||-|
+<html><!--startmacro:testsimplemacro|-||-|
 Some **content**
---><p>Some <strong>content</strong></p><!--stopmacro--></html> 
+--><p>simplemacro0</p><!--stopmacro--></html> 

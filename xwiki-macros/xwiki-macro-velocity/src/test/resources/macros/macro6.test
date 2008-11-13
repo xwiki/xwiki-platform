@@ -1,0 +1,43 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Same a macro1.test but this time the macro is executed.
+.#-----------------------------------------------------
+{{velocity}}
+Some **content**
+{{/velocity}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker [velocity] [] [
+Some **content**
+]
+beginParagraph
+onWord [Some]
+onSpace
+beginFormat: [BOLD]
+onWord [content]
+endFormat: [BOLD]
+endParagraph
+endMacroMarker [velocity] [] [
+Some **content**
+]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<!--startmacro:velocity|-||-|
+Some **content**
+--><p>Some <strong>content</strong></p><!--stopmacro-->
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+{{velocity}}
+Some **content**
+{{/velocity}}
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><!--startmacro:velocity|-||-|
+Some **content**
+--><p>Some <strong>content</strong></p><!--stopmacro--></html> 

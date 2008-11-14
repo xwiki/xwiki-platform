@@ -35,4 +35,4 @@
     #end
   </table>
 </div>
-{{/xhtml}}--><div>    <h1>Hello John</h1>  <table><tr><td><ul><li>item<br/>        </li></ul></td></tr><tr><td><ul><li>item<br/>        </li></ul></td></tr></table></div><!--stopmacro-->
+{{/xhtml}}--><div><h1>Hello John</h1><table><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></table></div><!--stopmacro-->

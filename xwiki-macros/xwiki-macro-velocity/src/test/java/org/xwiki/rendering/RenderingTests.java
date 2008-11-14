@@ -35,15 +35,11 @@ public class RenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
+        RenderingTestSuite suite = new RenderingTestSuite("Test Velocity Macro");
 
-        suite.addTestsFromResource("link/links7", true);
-
-        suite.addTestsFromResource("macros/macro6", true);
-
-        suite.addTestsFromResource("macros/velocity/macrovelocity1", true);
-        suite.addTestsFromResource("macros/velocity/macrovelocity2", true);
-        suite.addTestsFromResource("macros/velocity/macrovelocity3", true);
+        suite.addTestsFromResource("macrovelocity1", true);
+        suite.addTestsFromResource("macrovelocity2", true);
+        suite.addTestsFromResource("macrovelocity3", true);
 
         return new RenderingPlexusTestSetup(suite);
     }

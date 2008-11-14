@@ -67,8 +67,9 @@
     <module>xwiki-observation</module>
     <module>xwiki-bridge</module>
     <module>xwiki-rendering</module>
+    <module>xwiki-macros</module>
     <module>xwiki-configuration</module>
     <module>xwiki-query</module>
-    <!-- module>xwiki-webdav</module -->
+    <module>xwiki-webdav</module>
   </modules>
 </project>

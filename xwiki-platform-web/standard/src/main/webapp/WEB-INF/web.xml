@@ -47,6 +47,12 @@
     <filter-class>com.xpn.xwiki.wysiwyg.server.filter.ConversionFilter</filter-class>
   </filter>
 
+  <!-- Filter used to 'steal' webdav requests made to the application root -->
+  <filter>
+    <filter-name>DavFilter</filter-name>
+    <filter-class>com.xpn.xwiki.plugin.webdav.DavFilter</filter-class>
+  </filter>
+
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the request data. -->
   <filter-mapping>
     <filter-name>Set Character Encoding</filter-name>
@@ -60,6 +66,11 @@
 
   <filter-mapping>
     <filter-name>ConversionFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>DavFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
@@ -143,6 +154,12 @@
     <servlet-class>com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService</servlet-class>
   </servlet>
 
+  <!-- WebDAV servlet -->
+  <servlet>
+   <servlet-name>webdav</servlet-name>
+   <servlet-class>com.xpn.xwiki.plugin.webdav.DavServlet</servlet-class>
+  </servlet>
+
   <!-- Unused mapping for now. In the future the correct mapping will be /* when the action servlet
        will be decommissioned in favor of the XWiki Action component --> 
   <servlet-mapping>
@@ -183,6 +200,11 @@
   <servlet-mapping>
     <servlet-name>WysiwygService</servlet-name>
     <url-pattern>/WysiwygService</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+   <servlet-name>webdav</servlet-name>
+   <url-pattern>/webdav/*</url-pattern>
   </servlet-mapping>
 
   <!-- We override the mime type definition for javascript and css files, as some containers don't

@@ -73,6 +73,7 @@
         <module>scheduler</module>
         <module>mailsender</module>
         <module>watchlist</module>
+        <module>webdav</module>
       </modules>
     </profile>
     <profile>

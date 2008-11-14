@@ -1192,6 +1192,7 @@ public class XWikiDocument implements DocumentModelBridge
     public int createNewObject(String classname, XWikiContext context) throws XWikiException
     {
         BaseObject object = BaseClass.newCustomClassInstance(classname, context);
+        object.setWiki(getDatabase());
         object.setName(getFullName());
         object.setClassName(classname);
         Vector<BaseObject> objects = getObjects(classname);
@@ -1314,6 +1315,7 @@ public class XWikiDocument implements DocumentModelBridge
     public void addObject(String classname, BaseObject object)
     {
         if (object != null) {
+            object.setWiki(getDatabase());
             object.setName(getFullName());
         }
         Vector<BaseObject> vobj = getObjects(classname);
@@ -1328,6 +1330,7 @@ public class XWikiDocument implements DocumentModelBridge
     public void setObject(String classname, int nb, BaseObject object)
     {
         if (object != null) {
+            object.setWiki(getDatabase());
             object.setName(getFullName());
         }
         Vector<BaseObject> objects = getObjects(classname);

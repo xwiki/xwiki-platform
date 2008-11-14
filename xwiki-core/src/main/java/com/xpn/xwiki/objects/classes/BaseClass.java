@@ -24,7 +24,6 @@ package com.xpn.xwiki.objects.classes;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -50,64 +49,77 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 
-
-public class BaseClass extends BaseCollection implements ClassInterface {
+public class BaseClass extends BaseCollection implements ClassInterface
+{
     private String customMapping;
+
     private String customClass;
+
     private String defaultWeb;
+
     private String defaultViewSheet;
+
     private String defaultEditSheet;
+
     private String validationScript;
+
     private String nameField;
 
     // This insures natural ordering between properties
-    public void addField(String name, PropertyInterface element) {
+    public void addField(String name, PropertyInterface element)
+    {
         Set properties = getPropertyList();
         if (!properties.contains(name)) {
-            if (((BaseCollection)element).getNumber()==0)
-                ((BaseCollection)element).setNumber(properties.size()+1);
+            if (((BaseCollection) element).getNumber() == 0)
+                ((BaseCollection) element).setNumber(properties.size() + 1);
         }
         super.addField(name, element);
     }
 
-    public PropertyInterface get(String name) {
+    public PropertyInterface get(String name)
+    {
         return safeget(name);
     }
 
-    public void put(String name, PropertyInterface property) {
+    public void put(String name, PropertyInterface property)
+    {
         safeput(name, property);
     }
 
-    public BaseProperty fromString(String value) {
-        return null;  //To change body of implemented methods use Options | File Templates.
+    public BaseProperty fromString(String value)
+    {
+        return null; // To change body of implemented methods use Options | File Templates.
     }
 
-    public BaseCollection newObject(XWikiContext context) throws XWikiException {
+    public BaseCollection newObject(XWikiContext context) throws XWikiException
+    {
         BaseObject bobj = newCustomClassInstance(context);
         bobj.setClassName(getName());
         return bobj;
     }
 
-    public BaseCollection fromMap(Map map, XWikiContext context) throws XWikiException {
+    public BaseCollection fromMap(Map map, XWikiContext context) throws XWikiException
+    {
         BaseCollection object = newObject(context);
         return fromMap(map, object);
     }
 
-    public BaseCollection fromMap(Map map, BaseCollection object) {
+    public BaseCollection fromMap(Map map, BaseCollection object)
+    {
         object.setClassName(getName());
         Iterator classit = getFieldList().iterator();
         while (classit.hasNext()) {
             PropertyClass property = (PropertyClass) classit.next();
             String name = property.getName();
             Object formvalues = map.get(name);
-            if (formvalues!=null) {
+            if (formvalues != null) {
                 BaseProperty objprop;
                 if (formvalues instanceof String[]) {
-                    objprop = property.fromStringArray(((String[])formvalues));
+                    objprop = property.fromStringArray(((String[]) formvalues));
                 } else {
                     objprop = property.fromString(formvalues.toString());
                 }
-                if (objprop!=null) {
+                if (objprop != null) {
                     objprop.setObject(object);
                     object.safeput(name, objprop);
                 }
@@ -116,17 +128,18 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return object;
     }
 
-    public BaseCollection fromValueMap(Map map, BaseCollection object) {
+    public BaseCollection fromValueMap(Map map, BaseCollection object)
+    {
         object.setClassName(getName());
         Iterator classit = getFieldList().iterator();
         while (classit.hasNext()) {
             PropertyClass property = (PropertyClass) classit.next();
             String name = property.getName();
             Object formvalue = map.get(name);
-            if (formvalue!=null) {
+            if (formvalue != null) {
                 BaseProperty objprop;
                 objprop = property.fromValue(formvalue);
-                if (objprop!=null) {
+                if (objprop != null) {
                     objprop.setObject(object);
                     object.safeput(name, objprop);
                 }
@@ -135,7 +148,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return object;
     }
 
-    public Object clone() {
+    public Object clone()
+    {
         BaseClass bclass = (BaseClass) super.clone();
         bclass.setCustomClass(getCustomClass());
         bclass.setCustomMapping(getCustomMapping());
@@ -146,7 +160,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return bclass;
     }
 
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
         if (!super.equals(obj))
             return false;
 
@@ -172,105 +187,109 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
         if (!getNameField().equals(bclass.getNameField()))
             return false;
-        
+
         return true;
     }
 
-    public void merge(BaseClass bclass) {
+    public void merge(BaseClass bclass)
+    {
     }
 
-    public Element toXML(BaseClass bclass) {
+    public Element toXML(BaseClass bclass)
+    {
         return toXML();
     }
 
-    public Element toXML() {
+    public Element toXML()
+    {
         Element cel = new DOMElement("class");
 
         Element el = new DOMElement("name");
-        el.addText((getName()==null) ? "" : getName());
+        el.addText((getName() == null) ? "" : getName());
         cel.add(el);
 
         el = new DOMElement("customClass");
-        el.addText((getCustomClass()==null) ? "" : getCustomClass());
+        el.addText((getCustomClass() == null) ? "" : getCustomClass());
         cel.add(el);
 
         el = new DOMElement("customMapping");
-        el.addText((getCustomMapping()==null) ? "" : getCustomMapping());
+        el.addText((getCustomMapping() == null) ? "" : getCustomMapping());
         cel.add(el);
 
         el = new DOMElement("defaultViewSheet");
-        el.addText((getDefaultViewSheet()==null) ? "" : getDefaultViewSheet());
+        el.addText((getDefaultViewSheet() == null) ? "" : getDefaultViewSheet());
         cel.add(el);
 
         el = new DOMElement("defaultEditSheet");
-        el.addText((getDefaultEditSheet()==null) ? "" : getDefaultEditSheet());
+        el.addText((getDefaultEditSheet() == null) ? "" : getDefaultEditSheet());
         cel.add(el);
 
         el = new DOMElement("defaultWeb");
-        el.addText((getDefaultWeb()==null) ? "" : getDefaultWeb());
+        el.addText((getDefaultWeb() == null) ? "" : getDefaultWeb());
         cel.add(el);
 
         el = new DOMElement("nameField");
-        el.addText((getNameField()==null) ? "" : getNameField());
+        el.addText((getNameField() == null) ? "" : getNameField());
         cel.add(el);
 
         el = new DOMElement("validationScript");
-        el.addText((getValidationScript()==null) ? "" : getValidationScript());
+        el.addText((getValidationScript() == null) ? "" : getValidationScript());
         cel.add(el);
 
-        // Iterate over values sorted by field name so that the values are 
+        // Iterate over values sorted by field name so that the values are
         // exported to XML in a consistent order.
         Iterator it = getSortedIterator();
         while (it.hasNext()) {
-            PropertyClass bprop = (PropertyClass)it.next();
+            PropertyClass bprop = (PropertyClass) it.next();
             cel.add(bprop.toXML());
         }
         return cel;
     }
 
-    public void fromXML(Element cel) throws XWikiException {
+    public void fromXML(Element cel) throws XWikiException
+    {
         try {
             int j = 1;
             setName(cel.element("name").getText());
             Element cclel = cel.element("customClass");
-            if (cclel!=null) {
+            if (cclel != null) {
                 setCustomClass(cclel.getText());
                 j++;
             }
             Element cmapel = cel.element("customMapping");
-            if (cmapel!=null) {
+            if (cmapel != null) {
                 setCustomMapping(cmapel.getText());
                 j++;
             }
             Element cdvsel = cel.element("defaultViewSheet");
-            if (cdvsel!=null) {
+            if (cdvsel != null) {
                 setDefaultViewSheet(cdvsel.getText());
                 j++;
             }
             Element cdesel = cel.element("defaultEditSheet");
-            if (cdesel!=null) {
+            if (cdesel != null) {
                 setDefaultViewSheet(cdesel.getText());
                 j++;
             }
             Element cdwel = cel.element("defaultWeb");
-            if (cdwel!=null) {
+            if (cdwel != null) {
                 setDefaultWeb(cdwel.getText());
                 j++;
             }
             Element cnfel = cel.element("nameField");
-            if (cnfel!=null) {
+            if (cnfel != null) {
                 setNameField(cnfel.getText());
                 j++;
             }
 
             Element valel = cel.element("validationScript");
-            if (valel!=null) {
+            if (valel != null) {
                 setValidationScript(valel.getText());
                 j++;
             }
 
             List list = cel.elements();
-            for (int i=j;i<list.size();i++) {
+            for (int i = j; i < list.size(); i++) {
                 Element pcel = (Element) list.get(i);
                 String name = pcel.getName();
                 String classType = pcel.element("classType").getText();
@@ -281,16 +300,19 @@ public class BaseClass extends BaseCollection implements ClassInterface {
                 safeput(name, property);
             }
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_PROPERTY_CLASS_INSTANCIATION, "Error instanciating property class", e, null);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
+                XWikiException.ERROR_XWIKI_CLASSES_PROPERTY_CLASS_INSTANCIATION, "Error instanciating property class",
+                e, null);
         }
     }
 
-    public void fromXML(String xml) throws XWikiException {
+    public void fromXML(String xml) throws XWikiException
+    {
         SAXReader reader = new SAXReader();
         Document domdoc;
 
-        if ((xml==null)||(xml.trim().equals("")))
-         return;
+        if ((xml == null) || (xml.trim().equals("")))
+            return;
 
         xml = xml.replaceAll("<>", "<unknown>");
         xml = xml.replaceAll("</>", "</unknown>");
@@ -299,18 +321,20 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             StringReader in = new StringReader(xml);
             domdoc = reader.read(in);
         } catch (DocumentException e) {
-            Object[] args = { xml };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING, "Error parsing xml {0}", e, args);
+            Object[] args = {xml};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml {0}", e, args);
         }
 
         Element docel = domdoc.getRootElement();
-        if (docel!=null) {
+        if (docel != null) {
             fromXML(docel);
         }
     }
 
-    public boolean addTextField(String fieldName, String fieldPrettyName, int size) {
-        if (get(fieldName)==null) {
+    public boolean addTextField(String fieldName, String fieldPrettyName, int size)
+    {
+        if (get(fieldName) == null) {
             StringClass text_class = new StringClass();
             text_class.setName(fieldName);
             text_class.setPrettyName(fieldPrettyName);
@@ -322,8 +346,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addPasswordField(String fieldName, String fieldPrettyName, int size) {
-        if (get(fieldName)==null) {
+    public boolean addPasswordField(String fieldName, String fieldPrettyName, int size)
+    {
+        if (get(fieldName) == null) {
             PasswordClass text_class = new PasswordClass();
             text_class.setName(fieldName);
             text_class.setPrettyName(fieldPrettyName);
@@ -335,8 +360,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType) {
-        if (get(fieldName)==null) {
+    public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType)
+    {
+        if (get(fieldName) == null) {
             BooleanClass boolean_class = new BooleanClass();
             boolean_class.setName(fieldName);
             boolean_class.setPrettyName(fieldPrettyName);
@@ -369,8 +395,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     /**
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public boolean addUsersField(String fieldName, String fieldPrettyName, int size,
-        boolean multiSelect)
+    public boolean addUsersField(String fieldName, String fieldPrettyName, int size, boolean multiSelect)
     {
         if (get(fieldName) == null) {
             UsersClass users_class = new UsersClass();
@@ -385,11 +410,13 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addLevelsField(String fieldName, String fieldPrettyName) {
+    public boolean addLevelsField(String fieldName, String fieldPrettyName)
+    {
         return addLevelsField(fieldName, fieldPrettyName, 3);
     }
 
-    public boolean addLevelsField(String fieldName, String fieldPrettyName,int size) {
+    public boolean addLevelsField(String fieldName, String fieldPrettyName, int size)
+    {
         if (get(fieldName) == null) {
             LevelsClass levels_class = new LevelsClass();
             levels_class.setName(fieldName);
@@ -400,14 +427,16 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             put(fieldName, levels_class);
             return true;
         }
-        return false ;
+        return false;
     }
 
-    public boolean addGroupsField(String fieldName, String fieldPrettyName) {
+    public boolean addGroupsField(String fieldName, String fieldPrettyName)
+    {
         return addGroupsField(fieldName, fieldPrettyName, 5);
     }
 
-    public boolean addGroupsField(String fieldName, String fieldPrettyName,int size) {
+    public boolean addGroupsField(String fieldName, String fieldPrettyName, int size)
+    {
         if (get(fieldName) == null) {
             GroupsClass groups_class = new GroupsClass();
             groups_class.setName(fieldName);
@@ -418,14 +447,17 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             put(fieldName, groups_class);
             return true;
         }
-        return false ;
+        return false;
     }
 
-    public boolean addTemplateField(String fieldName, String fieldPrettyName) {
+    public boolean addTemplateField(String fieldName, String fieldPrettyName)
+    {
         return addTextAreaField(fieldName, fieldPrettyName, 80, 15);
     }
-    public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows) {
-        if (get(fieldName)==null) {
+
+    public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows)
+    {
+        if (get(fieldName) == null) {
             TextAreaClass template_class = new TextAreaClass();
             template_class.setName(fieldName);
             template_class.setPrettyName(fieldPrettyName);
@@ -438,30 +470,37 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addStaticListField(String fieldName, String fieldPrettyName, String values) {
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, String values)
+    {
         return addStaticListField(fieldName, fieldPrettyName, 1, false, values);
     }
 
-    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String values) {
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        String values)
+    {
         return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, values, null);
     }
 
-    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String values, String displayType) {
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        String values, String displayType)
+    {
         return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, values, displayType, null);
     }
-    
+
     /**
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String values, String displayType, String separators) {
-        if (get(fieldName)==null) {
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        String values, String displayType, String separators)
+    {
+        if (get(fieldName) == null) {
             StaticListClass list_class = new StaticListClass();
             list_class.setName(fieldName);
             list_class.setPrettyName(fieldPrettyName);
             list_class.setSize(size);
             list_class.setMultiSelect(multiSelect);
             list_class.setValues(values);
-            if (displayType!=null) {
+            if (displayType != null) {
                 list_class.setDisplayType(displayType);
             }
             if (separators != null) {
@@ -475,8 +514,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addNumberField(String fieldName, String fieldPrettyName, int size, String type) {
-        if (get(fieldName)==null) {
+    public boolean addNumberField(String fieldName, String fieldPrettyName, int size, String type)
+    {
+        if (get(fieldName) == null) {
             NumberClass number_class = new NumberClass();
             number_class.setName(fieldName);
             number_class.setPrettyName(fieldPrettyName);
@@ -489,20 +529,23 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addDateField(String fieldName, String fieldPrettyName) {
+    public boolean addDateField(String fieldName, String fieldPrettyName)
+    {
         return addDateField(fieldName, fieldPrettyName, null, 1);
     }
 
-    public boolean addDateField(String fieldName, String fieldPrettyName, String dformat) {
+    public boolean addDateField(String fieldName, String fieldPrettyName, String dformat)
+    {
         return addDateField(fieldName, fieldPrettyName, dformat, 1);
     }
 
-    public boolean addDateField(String fieldName, String fieldPrettyName, String dformat, int emptyIsToday) {
-        if (get(fieldName)==null) {
+    public boolean addDateField(String fieldName, String fieldPrettyName, String dformat, int emptyIsToday)
+    {
+        if (get(fieldName) == null) {
             DateClass date_class = new DateClass();
             date_class.setName(fieldName);
             date_class.setPrettyName(fieldPrettyName);
-            if (dformat!=null) {
+            if (dformat != null) {
                 date_class.setDateFormat(dformat);
             }
             date_class.setObject(this);
@@ -513,12 +556,14 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addDBListField(String fieldName, String fieldPrettyName, String sql) {
+    public boolean addDBListField(String fieldName, String fieldPrettyName, String sql)
+    {
         return addDBListField(fieldName, fieldPrettyName, 1, false, sql);
     }
-    
-    public boolean addDBListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String sql) {
-        if (get(fieldName)==null) {
+
+    public boolean addDBListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String sql)
+    {
+        if (get(fieldName) == null) {
             DBListClass list_class = new DBListClass();
             list_class.setName(fieldName);
             list_class.setPrettyName(fieldPrettyName);
@@ -533,12 +578,15 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addDBTreeListField(String fieldName, String fieldPrettyName, String sql) {
+    public boolean addDBTreeListField(String fieldName, String fieldPrettyName, String sql)
+    {
         return addDBTreeListField(fieldName, fieldPrettyName, 1, false, sql);
     }
 
-    public boolean addDBTreeListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String sql) {
-        if (get(fieldName)==null) {
+    public boolean addDBTreeListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        String sql)
+    {
+        if (get(fieldName) == null) {
             DBTreeListClass list_class = new DBTreeListClass();
             list_class.setName(fieldName);
             list_class.setPrettyName(fieldPrettyName);
@@ -553,11 +601,13 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public void setCustomMapping(String customMapping) {
+    public void setCustomMapping(String customMapping)
+    {
         this.customMapping = customMapping;
     }
 
-    public String getCustomMapping() {
+    public String getCustomMapping()
+    {
         if ("XWiki.XWikiPreferences".equals(getName()))
             return "internal";
         if (customMapping == null)
@@ -565,126 +615,145 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return customMapping;
     }
 
-    public boolean hasCustomMapping() {
+    public boolean hasCustomMapping()
+    {
         String cMapping = getCustomMapping();
-        return (cMapping!=null)&&(!"".equals(cMapping));
+        return (cMapping != null) && (!"".equals(cMapping));
     }
 
-    public boolean hasExternalCustomMapping() {
+    public boolean hasExternalCustomMapping()
+    {
         String cMapping = getCustomMapping();
-        return (cMapping!=null)&&(!"".equals(cMapping))
-                &&(!"internal".equals(cMapping));
+        return (cMapping != null) && (!"".equals(cMapping)) && (!"internal".equals(cMapping));
     }
 
-    public boolean hasInternalCustomMapping() {
+    public boolean hasInternalCustomMapping()
+    {
         return "internal".equals(customMapping);
     }
 
-    public boolean isCustomMappingValid(XWikiContext context) throws XWikiException {
+    public boolean isCustomMappingValid(XWikiContext context) throws XWikiException
+    {
         return isCustomMappingValid(getCustomMapping(), context);
     }
 
-    public boolean isCustomMappingValid(String custommapping1, XWikiContext context) throws XWikiException {
-        if ((custommapping1!=null)&&(custommapping1.trim().length()>0))
-          return context.getWiki().getStore().isCustomMappingValid(this, custommapping1, context);
+    public boolean isCustomMappingValid(String custommapping1, XWikiContext context) throws XWikiException
+    {
+        if ((custommapping1 != null) && (custommapping1.trim().length() > 0))
+            return context.getWiki().getStore().isCustomMappingValid(this, custommapping1, context);
         else
-          return true;
+            return true;
     }
 
-    public List<String> getCustomMappingPropertyList(XWikiContext context) {
+    public List<String> getCustomMappingPropertyList(XWikiContext context)
+    {
         String custommapping1 = getCustomMapping();
-        if ((custommapping1!=null)&&(custommapping1.trim().length()>0))
-          return context.getWiki().getStore().getCustomMappingPropertyList(this);
+        if ((custommapping1 != null) && (custommapping1.trim().length() > 0))
+            return context.getWiki().getStore().getCustomMappingPropertyList(this);
         else
-          return new ArrayList<String>();
+            return new ArrayList<String>();
     }
 
-    public void setCustomClass(String customClass) {
+    public void setCustomClass(String customClass)
+    {
         this.customClass = customClass;
     }
 
-    public String getCustomClass() {
-        if (customClass==null)
-         return "";
+    public String getCustomClass()
+    {
+        if (customClass == null)
+            return "";
         return customClass;
     }
 
-    public BaseObject newCustomClassInstance(XWikiContext context) throws XWikiException {
+    public BaseObject newCustomClassInstance(XWikiContext context) throws XWikiException
+    {
         String customClass = getCustomClass();
         try {
-            if ((customClass==null)||(customClass.equals("")))
-             return new BaseObject();
+            if ((customClass == null) || (customClass.equals("")))
+                return new BaseObject();
             else
-             return (BaseObject) Class.forName(getCustomClass()).newInstance();
+                return (BaseObject) Class.forName(getCustomClass()).newInstance();
         } catch (Exception e) {
             Object[] args = {customClass};
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR,
-                    "Cannot instanciate custom class {0}", e, args);
+                XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}",
+                e, args);
         }
     }
 
-    public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException {
+    public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
+    {
         BaseClass bclass = context.getWiki().getClass(className, context);
-        BaseObject object = (bclass==null) ? new BaseObject() : bclass.newCustomClassInstance(context);
+        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
         return object;
     }
 
-    public String getDefaultWeb() {
-        if (defaultWeb==null)
-          return "";
+    public String getDefaultWeb()
+    {
+        if (defaultWeb == null)
+            return "";
         return defaultWeb;
     }
 
-    public void setDefaultWeb(String defaultWeb) {
+    public void setDefaultWeb(String defaultWeb)
+    {
         this.defaultWeb = defaultWeb;
     }
 
-    public String getDefaultViewSheet() {
-        if (defaultViewSheet==null)
-          return "";
+    public String getDefaultViewSheet()
+    {
+        if (defaultViewSheet == null)
+            return "";
         return defaultViewSheet;
     }
 
-    public void setDefaultViewSheet(String defaultViewSheet) {
+    public void setDefaultViewSheet(String defaultViewSheet)
+    {
         this.defaultViewSheet = defaultViewSheet;
     }
 
-    public String getDefaultEditSheet() {
-        if (defaultEditSheet==null)
-          return "";
+    public String getDefaultEditSheet()
+    {
+        if (defaultEditSheet == null)
+            return "";
         return defaultEditSheet;
     }
 
-    public void setDefaultEditSheet(String defaultEditSheet) {
+    public void setDefaultEditSheet(String defaultEditSheet)
+    {
         this.defaultEditSheet = defaultEditSheet;
     }
 
-    public String getNameField() {
-        if (nameField==null)
-          return "";
+    public String getNameField()
+    {
+        if (nameField == null)
+            return "";
         return nameField;
     }
 
-    public void setNameField(String nameField) {
+    public void setNameField(String nameField)
+    {
         this.nameField = nameField;
     }
 
-    public String makeQuery(XWikiCriteria query) {
+    public String makeQuery(XWikiCriteria query)
+    {
         List criteriaList = new ArrayList();
         Iterator classit = getFieldList().iterator();
         while (classit.hasNext()) {
             PropertyClass property = (PropertyClass) classit.next();
             String name = property.getName();
             Map map = query.getParameters(getName() + "_" + name);
-            if (map.size()>0) {
-              property.makeQuery(map, "", query, criteriaList);
+            if (map.size() > 0) {
+                property.makeQuery(map, "", query, criteriaList);
             }
         }
         return StringUtils.join(criteriaList.toArray(), " and ");
     }
 
-    public String displaySearchColumns(String prefix, XWikiQuery query, XWikiContext context) {
+    public String displaySearchColumns(String prefix, XWikiQuery query, XWikiContext context)
+    {
         select select = new select(prefix + "searchcolumns", 5);
         select.setMultiple(true);
         select.setName(prefix + "searchcolumns");
@@ -692,16 +761,16 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
         List list = Arrays.asList(getPropertyNames());
         Map prettynamesmap = new HashMap();
-        for (int i=0;i<list.size();i++) {
+        for (int i = 0; i < list.size(); i++) {
             String propname = (String) list.get(i);
             list.set(i, prefix + propname);
-            prettynamesmap.put(prefix + propname, ((PropertyClass)get(propname)).getPrettyName());
+            prettynamesmap.put(prefix + propname, ((PropertyClass) get(propname)).getPrettyName());
         }
 
         List selectlist = query.getDisplayProperties();
 
         // Add options from Set
-        for (Iterator it=list.iterator();it.hasNext();) {
+        for (Iterator it = list.iterator(); it.hasNext();) {
             String value = it.next().toString();
             String displayValue = (String) prettynamesmap.get(value);
             option option = new option(displayValue, displayValue);
@@ -715,7 +784,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return select.toString();
     }
 
-    public String displaySearchOrder(String prefix, XWikiQuery query, XWikiContext context) {
+    public String displaySearchOrder(String prefix, XWikiQuery query, XWikiContext context)
+    {
         select select = new select(prefix + "searchorder", 5);
         select.setMultiple(true);
         select.setName(prefix + "searchorder");
@@ -723,24 +793,24 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
         List list = Arrays.asList(getPropertyNames());
         Map prettynamesmap = new HashMap();
-        for (int i=0;i<list.size();i++) {
+        for (int i = 0; i < list.size(); i++) {
             String propname = (String) list.get(i);
             list.set(i, prefix + propname);
-            prettynamesmap.put(prefix + propname, ((PropertyClass)get(propname)).getPrettyName());
+            prettynamesmap.put(prefix + propname, ((PropertyClass) get(propname)).getPrettyName());
         }
 
         OrderClause order = null;
-        if ((query!=null)&&(query.getOrderProperties()!=null)&&(query.getOrderProperties().size()>0))
+        if ((query != null) && (query.getOrderProperties() != null) && (query.getOrderProperties().size() > 0))
             order = (OrderClause) query.getOrderProperties().get(0);
 
         // Add options from Set
-        for (Iterator it=list.iterator();it.hasNext();) {
+        for (Iterator it = list.iterator(); it.hasNext();) {
             String value = it.next().toString();
             String displayValue = (String) prettynamesmap.get(value);
             option option = new option(displayValue, displayValue);
             option.addElement(displayValue);
             option.setValue(value);
-            if ((order!=null)&&(value.equals(order.getProperty())))
+            if ((order != null) && (value.equals(order.getProperty())))
                 option.setSelected(true);
             select.addElement(option);
         }
@@ -748,21 +818,24 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return select.toString();
     }
 
-    public void setValidationScript(String validationScript) {
+    public void setValidationScript(String validationScript)
+    {
         this.validationScript = validationScript;
     }
 
-    public String getValidationScript() {
-        if (validationScript==null)
-         return "";
+    public String getValidationScript()
+    {
+        if (validationScript == null)
+            return "";
         else
-         return validationScript;
+            return validationScript;
     }
 
-    public boolean validateObject(BaseObject obj, XWikiContext context) throws XWikiException {
+    public boolean validateObject(BaseObject obj, XWikiContext context) throws XWikiException
+    {
         boolean isValid = true;
         Object[] props = getPropertyNames();
-        for (int i=0;i<props.length;i++) {
+        for (int i = 0; i < props.length; i++) {
             String propname = (String) props[i];
             BaseProperty property = (BaseProperty) obj.get(propname);
             PropertyClass propclass = (PropertyClass) get(propname);
@@ -770,33 +843,38 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         }
 
         String validSript = getValidationScript();
-        if ((validSript!=null)&&(!validSript.trim().equals("")))
-          isValid &= executeValidationScript(obj, validSript, context);
-        
+        if ((validSript != null) && (!validSript.trim().equals("")))
+            isValid &= executeValidationScript(obj, validSript, context);
+
         return isValid;
     }
 
-    private boolean executeValidationScript(BaseObject obj, String validationScript, XWikiContext context) throws XWikiException {
+    private boolean executeValidationScript(BaseObject obj, String validationScript, XWikiContext context)
+        throws XWikiException
+    {
         try {
-            XWikiValidationInterface validObject = (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
+            XWikiValidationInterface validObject =
+                (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
             return validObject.validateObject(obj, context);
         } catch (Throwable e) {
-             XWikiValidationStatus.addExceptionToContext(getName(), "", e, context);
-             return false;
+            XWikiValidationStatus.addExceptionToContext(getName(), "", e, context);
+            return false;
         }
     }
 
-    public void flushCache() {
+    public void flushCache()
+    {
         Object[] props = getPropertyNames();
-        for (int i=0;i<props.length;i++) {
+        for (int i = 0; i < props.length; i++) {
             String propname = (String) props[i];
             PropertyClass propclass = (PropertyClass) get(propname);
-            if (propclass!=null)
-             propclass.flushCache();
+            if (propclass != null)
+                propclass.flushCache();
         }
     }
 
-    public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context) {
+    public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
+    {
         ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
         BaseClass oldClass = (BaseClass) oldObject;
         Iterator itfields = this.getFieldList().iterator();
@@ -806,11 +884,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             PropertyClass oldProperty = (PropertyClass) oldClass.get(propertyName);
 
             if (oldProperty == null) {
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
-                            propertyName, "" , ""));
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "added", propertyName, "", ""));
             } else if (!oldProperty.equals(newProperty)) {
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
-                            propertyName, "", ""));
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed", propertyName, "", ""));
             }
         }
 
@@ -821,8 +897,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             PropertyClass newProperty = (PropertyClass) get(propertyName);
 
             if (newProperty == null) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
-                        propertyName, "" , ""));
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed", propertyName, "", ""));
             }
         }
 

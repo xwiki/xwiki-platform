@@ -45,7 +45,7 @@
   <module name="TreeWalker">
 
     <!-- Note: for some checks we have defined a warning severity instead of the default error
-         severity. This is because we'd like to make the build fail on error for thise checks
+         severity. This is because we'd like to make the build fail on error for those checks
          but there are errors to fix first -->
 
     <module name="AbstractClassName"/>

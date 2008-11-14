@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
@@ -50,6 +52,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable, Cloneable
 {
+    protected static final Log LOG = LogFactory.getLog(BaseClass.class);
+
     protected String className;
 
     protected Map fields = ListOrderedMap.decorate(new HashMap());
@@ -167,25 +171,30 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      */
     public BaseClass getxWikiClass(XWikiContext context)
     {
+        BaseClass baseClass = null;
+        
         if ((context == null) || (context.getWiki() == null)) {
-            return null;
+            return baseClass;
         }
 
         String name = getClassName();
         String wiki = getWiki();
+        if (wiki == null) {
+            context.getWiki();
+        }
 
         String database = context.getDatabase();
         try {
             context.setDatabase(wiki);
 
-            return context.getWiki().getClass(name, context);
+            baseClass = context.getWiki().getClass(name, context);
         } catch (Exception e) {
-            e.printStackTrace();
-
-            return null;
+            LOG.error("Failed to get class [" + name + "] from wiki [" + wiki + "]", e);
         } finally {
             context.setDatabase(database);
         }
+        
+        return baseClass;
     }
 
     public String getStringValue(String name)

@@ -33,22 +33,28 @@ public abstract class BaseElement implements ElementInterface, Serializable
     private static final Log LOG = LogFactory.getLog(BaseElement.class);
 
     private String name;
+
     private String prettyName;
+
     private String wiki;
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public String getPrettyName() {
+    public String getPrettyName()
+    {
         return prettyName;
     }
 
-    public void setPrettyName(String name) {
+    public void setPrettyName(String name)
+    {
         this.prettyName = name;
     }
 
@@ -59,7 +65,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
     {
         return wiki;
     }
-    
+
     /**
      * @param wiki the name of the wiki where this element is stored. If null, the context's wiki is used.
      */
@@ -70,36 +76,45 @@ public abstract class BaseElement implements ElementInterface, Serializable
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object el)
     {
-        if (el == null)
+        if (el == null) {
             return false;
+        }
 
         BaseElement element = (BaseElement) el;
 
         if (element.getName() == null) {
-            if (getName() != null)
+            if (getName() != null) {
                 return false;
-        } else if (!element.getName().equals(getName()))
+            }
+        } else if (!element.getName().equals(getName())) {
             return false;
+        }
 
         if (element.getPrettyName() == null) {
-            if (getPrettyName() != null)
+            if (getPrettyName() != null) {
                 return false;
-        } else if (!element.getPrettyName().equals(getPrettyName()))
+            }
+        } else if (!element.getPrettyName().equals(getPrettyName())) {
             return false;
+        }
 
         if (element.getWiki() == null) {
-            if (getWiki() != null)
+            if (getWiki() != null) {
                 return false;
-        } else if (!element.getWiki().equalsIgnoreCase(getWiki()))
+            }
+        } else if (!element.getWiki().equalsIgnoreCase(getWiki())) {
             return false;
+        }
 
-        if (!(element.getClass().equals(this.getClass())))
+        if (!(element.getClass().equals(this.getClass()))) {
             return false;
+        }
 
         return true;
     }
@@ -109,11 +124,12 @@ public abstract class BaseElement implements ElementInterface, Serializable
      * 
      * @see java.lang.Object#clone()
      */
+    @Override
     public Object clone()
     {
         BaseElement element = null;
         try {
-            element = (BaseElement) getClass().newInstance();
+            element = getClass().newInstance();
             element.setName(getName());
             element.setPrettyName(getPrettyName());
             element.setWiki(getWiki());
@@ -121,12 +137,13 @@ public abstract class BaseElement implements ElementInterface, Serializable
         } catch (Exception e) {
             // This should not happen
         }
+
         return null;
     }
 
     /**
-     * @return the syntax id of the document containing this element. If an error occurs while retrieving the
-     *         document a syntax id of "xwiki/1.0" is assumed.
+     * @return the syntax id of the document containing this element. If an error occurs while retrieving the document a
+     *         syntax id of "xwiki/1.0" is assumed.
      */
     public String getDocumentSyntaxId(XWikiContext context)
     {
@@ -138,6 +155,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
                 + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
             syntaxId = "xwiki/1.0";
         }
+
         return syntaxId;
     }
 }

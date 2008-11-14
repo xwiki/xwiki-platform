@@ -24,8 +24,6 @@ import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -144,11 +142,11 @@ public class XWikiLinkParser implements LinkParser
         // First, look for one of the known URI schemes
         int uriSchemeDelimiter = content.indexOf(":");
         if ((uriSchemeDelimiter > -1) && URI_PREFIXES.contains(content.substring(0, uriSchemeDelimiter))) {
-            try {
-                uri = new URI(content.toString()).toString();
-            } catch (URISyntaxException e) {
-                throw new ParseException("Invalid URI [" + content.toString() + "]", e);
-            }
+            // Note: we could have been tempted to use new URI() to validate the URI. The only downside
+            // is that we would need to encode the content with the defined XWiki encoding as otherwise
+            // it could contain invalid characters such as spaces. It's easier and better not to perform
+            // any checks here and instead let the browser handle the URI.
+            uri = content.toString();
             content.setLength(0);
         } else {
             // Look for a URL pattern

@@ -22,7 +22,6 @@
 package com.xpn.xwiki.objects;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +47,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable, Cloneable
+public abstract class BaseCollection extends BaseElement implements ObjectInterface, Cloneable
 {
     protected String className;
 
@@ -475,21 +474,23 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             return false;
         BaseCollection collection = (BaseCollection) coll;
         if (collection.getClassName() == null) {
-            if (getClassName() != null)
+            if (getClassName() != null) {
                 return false;
-        } else if (!collection.getClassName().equals(getClassName()))
+            }
+        } else if (!collection.getClassName().equals(getClassName())) {
             return false;
+        }
 
-        if (getFields().size() != collection.getFields().size())
+        if (getFields().size() != collection.getFields().size()) {
             return false;
+        }
 
-        Iterator itfields = getFields().keySet().iterator();
-        while (itfields.hasNext()) {
-            String name = (String) itfields.next();
-            Object prop = getFields().get(name);
-            Object prop2 = collection.getFields().get(name);
-            if (!prop.equals(prop2))
+        for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) getFields().entrySet()) {
+            Object prop = entry.getValue();
+            Object prop2 = collection.getFields().get(entry.getKey());
+            if (!prop.equals(prop2)) {
                 return false;
+            }
         }
 
         return true;
@@ -585,14 +586,14 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
-                            (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                                : pclass.displayView(propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(),
-                            "removed", propertyName, oldPropertyValue, ""));
+                            (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
+                                propertyName, oldCollection, context);
+                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "removed",
+                            propertyName, oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(),
-                            "removed", propertyName, oldProperty.toText(), ""));
+                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "removed",
+                            propertyName, oldProperty.toText(), ""));
                     }
                 }
             }

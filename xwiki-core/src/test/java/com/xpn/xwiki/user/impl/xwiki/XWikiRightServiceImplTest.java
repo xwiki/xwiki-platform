@@ -110,6 +110,8 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
         mockGlobalRightObj.stubs().method("getStringValue").with(eq("users")).will(returnValue(""));
         mockGlobalRightObj.stubs().method("getIntValue").with(eq("allow")).will(returnValue(1));
         mockGlobalRightObj.stubs().method("setNumber");
+        mockGlobalRightObj.stubs().method("setName");
+        mockGlobalRightObj.stubs().method("setWiki");
 
         doc.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
 

@@ -38,11 +38,21 @@ public abstract class BaseElement implements ElementInterface, Serializable
 
     private String wiki;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ElementInterface#getName()
+     */
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ElementInterface#setName(java.lang.String)
+     */
     public void setName(String name)
     {
         this.name = name;
@@ -50,7 +60,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
 
     public String getPrettyName()
     {
-        return prettyName;
+        return this.prettyName;
     }
 
     public void setPrettyName(String name)
@@ -63,7 +73,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
      */
     public String getWiki()
     {
-        return wiki;
+        return this.wiki;
     }
 
     /**

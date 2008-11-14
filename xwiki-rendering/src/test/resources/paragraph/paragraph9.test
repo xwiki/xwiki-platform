@@ -1,0 +1,61 @@
+.#-------------------------------------------------------------------------------
+.input|xhtml/1.0
+.# Verify newline/whitespace handling.
+.#-------------------------------------------------------------------------------
+<html><pre>
+  newline
+  newline
+</pre>
+<p> Some  <span>  text 
+</span> before
+<!--comment-->  another  <![CDATA[
+hello  world
+   ]]>
+</p>
+</html>
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+onVerbatimStandalone [
+  newline
+  newline
+]
+beginParagraph
+onWord [Some]
+onSpace
+onWord [text]
+onSpace
+onWord [before]
+onSpace
+onWord [another]
+onSpace
+onLineBreak
+onWord [hello]
+onSpace
+onSpace
+onWord [world]
+onLineBreak
+onSpace
+onSpace
+onSpace
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<pre>
+  newline
+  newline
+</pre><p>Some text before another <br/>hello &nbsp;world<br/>&nbsp;&nbsp;&nbsp;</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+{{{
+  newline
+  newline
+}}}
+
+Some text before another 
+hello  world
+   

@@ -1,6 +1,7 @@
 .#-------------------------------------------------------------------------------------
 .input|xhtml/1.0
 .# Verify that HTML entities can be parsed by the XHTML parser and are encoded properly
+.# Note that &nbsp; is transformed into a space.
 .#-------------------------------------------------------------------------------------
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -10,13 +11,15 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onWord [(((160)))(((732)))(((8364)))]
+onSpace
+onWord [(((732)))(((8364)))]
 endParagraph
 beginParagraph
-onWord [(((160)))(((732)))(((8364)))]
+onSpace
+onWord [(((732)))(((8364)))]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>&#160;&#732;&#8364;</p><p>&#160;&#732;&#8364;</p>
+<p>&nbsp;&#732;&#8364;</p><p>&nbsp;&#732;&#8364;</p>

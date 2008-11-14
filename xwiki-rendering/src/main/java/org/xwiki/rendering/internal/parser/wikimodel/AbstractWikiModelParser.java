@@ -37,7 +37,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
 {
     protected LinkParser linkParser;
 
-    public abstract IWikiParser createWikiModelParser();
+    public abstract IWikiParser createWikiModelParser() throws ParseException;
 
     public XDOM parse(Reader source) throws ParseException
     {

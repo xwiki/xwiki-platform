@@ -22,6 +22,8 @@ package org.xwiki.rendering.internal.macro.xhtml;
 import java.io.StringReader;
 import java.util.List;
 
+import org.wikimodel.wem.xhtml.filter.AccumulationXMLFilter;
+import org.wikimodel.wem.xhtml.filter.DTDXMLFilter;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.EntityResolver;
@@ -35,6 +37,11 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
+ * Allows inserting XHTML in wiki pages. If you need to insert HTML use the HTML Macro. This macro also
+ * accepts wiki syntax alongside XHTML elements (it's also possible to disable this feature using a macro
+ * parameter). When wiki syntax is used inside XML elements, the leading and trailing spaces and newlines
+ * are stripped.
+ *
  * @version $Id$
  * @since 1.5M2
  */
@@ -97,12 +104,25 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
 
         try {
             XMLReader xr = XMLReaderFactory.createXMLReader();
-            xr.setContentHandler(handler);
-            xr.setErrorHandler(handler);
-            xr.setEntityResolver(this.entityResolver);
+            
+            // Ignore SAX callbacks when the parser parses the DTD
+            DTDXMLFilter dtdFilter = new DTDXMLFilter(xr);
+            
+            // Add a XML Filter to accumulate onCharacters() calls since SAX
+            // parser may call it several times.
+            AccumulationXMLFilter accumulationFilter = new AccumulationXMLFilter(dtdFilter);
+
+            // Add a XML Filter to remove non-semantic white spaces. We need to do that since all WikiModel 
+            // events contain only semantic information.
+            XWikiXHTMLWhitespaceXMLFilter whitespaceFilter = new XWikiXHTMLWhitespaceXMLFilter(accumulationFilter,
+                !parameters.isEscapeWikiSyntax());
+            
+            whitespaceFilter.setContentHandler(handler);
+            whitespaceFilter.setErrorHandler(handler);
+            whitespaceFilter.setEntityResolver(this.entityResolver);
             
             // Allow access to CDATA and XML Comments.
-            xr.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
+            whitespaceFilter.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
 
             // Since XML can only have a single root node and since we want to allow users to put
             // content such as the following, we need to wrap the content in a root node:
@@ -115,7 +135,7 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
                     + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + "<root>" + content + "</root>";
 
-            xr.parse(new InputSource(new StringReader(normalizedContent)));
+            whitespaceFilter.parse(new InputSource(new StringReader(normalizedContent)));
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to parse content as XML [" + content + "]", e);
         }

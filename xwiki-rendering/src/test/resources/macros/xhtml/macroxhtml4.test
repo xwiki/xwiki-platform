@@ -1,25 +1,71 @@
-.#-------------------------------------------------------------------------------
+.#----------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that if there's a space before an XML element it's correctly preserved.
-.#-------------------------------------------------------------------------------
+.# Verify trimming of whitespaces/new lines when in wiki mode (wiki syntax allowed in element content)
+.# Note: whitespaces in PRE and CDATA element are preserved (except for leading and trailing ones)
+.#----------------------------------------------------------------------------------------------------
 {{xhtml}}
-<p>Some <span>text</span></p>
+<pre>
+  newline
+  newline
+</pre>
+<p> Some  <span>  text 
+</span>
+<!--comment-->  another  <![CDATA[
+hello  world
+   ]]>
+</p>
 {{/xhtml}}
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [xhtml] [] [
-<p>Some <span>text</span></p>
+<pre>
+  newline
+  newline
+</pre>
+<p> Some  <span>  text 
+</span>
+<!--comment-->  another  <![CDATA[
+hello  world
+   ]]>
+</p>
 ]
+beginXMLNode [pre]
+onWord [newline]
+onLineBreak
+onSpace
+onSpace
+onWord [newline]
+endXMLNode [pre]
 beginXMLNode [p]
 onWord [Some]
 onSpace
 beginXMLNode [span]
 onWord [text]
 endXMLNode [span]
+beginXMLNode [comment]
+endXMLNode [comment]
+onSpace
+onWord [another]
+onSpace
+beginXMLNode [CDATA]
+onWord [hello]
+onSpace
+onSpace
+onWord [world]
+endXMLNode [CDATA]
 endXMLNode [p]
 endMacroMarker [xhtml] [] [
-<p>Some <span>text</span></p>
+<pre>
+  newline
+  newline
+</pre>
+<p> Some  <span>  text 
+</span>
+<!--comment-->  another  <![CDATA[
+hello  world
+   ]]>
+</p>
 ]
 endDocument

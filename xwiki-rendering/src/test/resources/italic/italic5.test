@@ -20,7 +20,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p><em> This is italic</em></p>
+<p><em>&nbsp;This is italic</em></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -28,4 +28,5 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><em> This is italic</em></p></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><p><em>&nbsp;This is italic</em></p></html>

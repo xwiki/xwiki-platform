@@ -28,9 +28,10 @@ import org.xwiki.rendering.listener.Listener;
 public final class SpaceBlock extends AbstractBlock
 {
     public static final SpaceBlock SPACE_BLOCK = new SpaceBlock();
-
+    
     private SpaceBlock()
     {
+        // We need to keep this constructor to override the ones in AbstractBlock
     }
 
     public void traverse(Listener listener)

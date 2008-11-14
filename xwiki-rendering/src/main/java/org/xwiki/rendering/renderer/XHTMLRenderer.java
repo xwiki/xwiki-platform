@@ -67,8 +67,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * @see #originalPrinter
      */
     private WikiPrinter sectionTitlePrinter;
-
-    public class DelegateWikiPrinter implements WikiPrinter
+    
+    private class DelegateWikiPrinter implements WikiPrinter
     {
         private WikiPrinter printer;
 
@@ -391,7 +391,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onSpace()
     {
-        getXHTMLWikiPrinter().printXML(" ");
+        // The XHTML printer will decide whether to print a normal space or a &nbsp;
+        getXHTMLWikiPrinter().printSpace();
     }
 
     /**

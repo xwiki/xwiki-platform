@@ -1,8 +1,10 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
+.# This is not a quote since quote symbol must start the line
  >line
 
+.# This is not a quote either
 one > two
 .#-----------------------------------------------------
 .expect|event
@@ -24,7 +26,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p> &gt;line</p><p>one &gt; two</p>
+<p>&nbsp;&gt;line</p><p>one &gt; two</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -34,4 +36,5 @@ one > two
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p> &gt;line</p><p>one &gt; two</p></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><p>&nbsp;&gt;line</p><p>one &gt; two</p></html>

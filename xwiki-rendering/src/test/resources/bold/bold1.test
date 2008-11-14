@@ -21,7 +21,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>This is <strong> bold </strong></p>
+<p>This is <strong>&nbsp;bold&nbsp;</strong></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -29,4 +29,5 @@ This is ** bold **
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>This is <strong> bold </strong></p></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><p>This is <strong>&nbsp;bold&nbsp;</strong></p></html>

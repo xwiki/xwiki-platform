@@ -44,7 +44,6 @@ import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.xml.XMLCData;
 import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * XML SAX handler that converts XML events into Blocks.
@@ -62,20 +61,8 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
 
     private ParserUtils inlineConverter = new ParserUtils();
 
-    /**
-     * SAX parsers are allowed to call the characters() method several times in a row. Some parsers have a buffer of 8K
-     * (Crimson), others of 16K (Xerces) and others can even call characters() for every single character! Thus we need
-     * to accumulate the characters in a buffer before we process them.
-     */
-    private StringBuffer accumulationBuffer = new StringBuffer();
-
     private final MarkerBlock marker = new MarkerBlock();
 
-    /** 
-     * True if we're parsing the DTD section. When this happens we ignore comments and CDATA sections.
-     */
-    private boolean isInDTD;
-   
     private class MarkerBlock extends AbstractBlock
     {
         public void traverse(Listener listener)
@@ -102,37 +89,28 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException
     {
-        this.accumulationBuffer.append(ch, start, length);
-    }
+        String content = new String(ch, start, length);
+        
+        // If we've been told by the user to not render wiki syntax we simply pass the text as a Word block as is
+        if (this.escapeWikiSyntax) {
+            this.stack.push(new WordBlock(content));
+        } else {
 
-    private void processCharacters(char[] ch, int start, int length) throws SAXException
-    {
-        // Strip all new lines characters. We do this since this is the standard HTML behavior and otherwise this
-        // will generate NewLineBlocks.
-        String content = StringUtils.strip(new String(ch, start, length), "\n\r\t");
+            // Parse the content containing wiki syntax.
+            XDOM dom;
+            try {
+                dom = this.parser.parse(new StringReader(content));
+            } catch (ParseException e) {
+                throw new SAXException("Failed to parse [" + content + "]", e);
+            }
 
-        if (content.length() > 0) {
-            // If we've been told by the user to not render wiki syntax we simply pass the text as a Word block as is
-            if (this.escapeWikiSyntax) {
-                this.stack.push(new WordBlock(content));
-            } else {
+            // Remove any paragraph that might have been added since we don't want paragraphs.
+            // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
+            List<Block> children = dom.getChildren();
+            this.inlineConverter.removeTopLevelParagraph(children);
 
-                // Parse the content containing wiki syntax.
-                XDOM dom;
-                try {
-                    dom = this.parser.parse(new StringReader(content));
-                } catch (ParseException e) {
-                    throw new SAXException("Failed to parse [" + content + "]", e);
-                }
-
-                // Remove any paragraph that might have been added since we don't want paragraphs.
-                // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
-                List<Block> children = dom.getChildren();
-                this.inlineConverter.removeTopLevelParagraph(children);
-
-                for (Block block : children) {
-                    this.stack.push(block);
-                }
+            for (Block block : children) {
+                this.stack.push(block);
             }
         }
     }
@@ -146,8 +124,6 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException
     {
-        flushAccumulationBuffer();
-
         Map<String, String> map = new LinkedHashMap<String, String>();
         for (int i = 0; i < attributes.getLength(); i++) {
             // The XHTML DTD specifies some default value for some attributes. For example for a TD element
@@ -178,8 +154,6 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException
     {
-        flushAccumulationBuffer();
-
         // Pop the stack until we reach a marker block
         List<Block> nestedBlocks = generateListFromStack();
         this.stack.peek().addChildren(nestedBlocks);
@@ -187,9 +161,7 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
 
     public void comment(char[] value, int offset, int count) throws SAXException
     {
-        if (!isInDTD) {
-            this.stack.push(new XMLBlock(new XMLComment(new String(value, offset, count))));
-        }
+        this.stack.push(new XMLBlock(new XMLComment(new String(value, offset, count))));
     }
 
     /**
@@ -198,11 +170,8 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
      */
     public void startCDATA() throws SAXException
     {
-        if (!isInDTD) {
-            flushAccumulationBuffer();
-            this.stack.push(new XMLBlock(new XMLCData()));
-            this.stack.push(this.marker);
-        }
+        this.stack.push(new XMLBlock(new XMLCData()));
+        this.stack.push(this.marker);
     }
 
     /**
@@ -211,22 +180,19 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
      */
     public void endCDATA() throws SAXException
     {
-        if (!isInDTD) {
-            flushAccumulationBuffer();
-            // Pop the stack until we reach a marker block
-            List<Block> nestedBlocks = generateListFromStack();
-            this.stack.peek().addChildren(nestedBlocks);
-        }
+        // Pop the stack until we reach a marker block
+        List<Block> nestedBlocks = generateListFromStack();
+        this.stack.peek().addChildren(nestedBlocks);
     }
 
     public void startDTD(String arg0, String arg1, String arg2) throws SAXException
     {
-        this.isInDTD = true;
+        // Nothing to do
     }
 
     public void endDTD() throws SAXException
     {
-        this.isInDTD = false;
+        // Nothing to do
     }
 
     public void startEntity(String arg0) throws SAXException
@@ -252,14 +218,5 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
         }
         Collections.reverse(blocks);
         return blocks;
-    }
-    
-    private void flushAccumulationBuffer() throws SAXException
-    {
-        if (this.accumulationBuffer.length() > 0) {
-            processCharacters(this.accumulationBuffer.toString().toCharArray(), 0, 
-                this.accumulationBuffer.length());
-            this.accumulationBuffer.delete(0, this.accumulationBuffer.length());
-        }
     }
 }

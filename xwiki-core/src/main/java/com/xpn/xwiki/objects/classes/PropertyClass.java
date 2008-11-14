@@ -533,11 +533,14 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
             if (context.getUtil().match(regexp, value)) {
                 return true;
             }
-            XWikiValidationStatus.addErrorToContext((getObject() == null) ? "" : getObject().getClassName(), getName(),
+            XWikiValidationStatus.addErrorToContext((getObject() == null) ? "" : getObject().getName(), getName(),
                 getTranslatedPrettyName(context), getValidationMessage(), context);
+
             return false;
         } catch (Exception e) {
-            XWikiValidationStatus.addExceptionToContext(getObject().getClassName(), getName(), e, context);
+            XWikiValidationStatus.addExceptionToContext((getObject() == null) ? "" : getObject().getName(), getName(),
+                e, context);
+
             return false;
         }
     }

@@ -376,6 +376,20 @@ public class XWiki extends Api
     }
 
     /**
+     * API allowing to count the total number of documents that would be returned by a query.
+     * 
+     * @param wheresql Query to use, similar to the ones accepted by {@link #searchDocuments(String)}. If possible, it
+     *            should not contain <code>order by</code> or <code>group</code> clauses, since this kind of queries are
+     *            not portable.
+     * @return The number of documents that matched the query.
+     * @throws XWikiException if there was a problem executing the query.
+     */
+    public int countDocuments(String wheresql) throws XWikiException
+    {
+        return this.xwiki.getStore().countDocuments(wheresql, getXWikiContext());
+    }
+
+    /**
      * API allowing to search for document names matching a query return only a limited number of elements and skipping
      * the first rows. The query part is the same as searchDocuments
      * 
@@ -393,7 +407,7 @@ public class XWiki extends Api
 
     /**
      * Priviledged API allowing to search for document names matching a query return only a limited number of elements
-     * and skipping the first rows. The return values contain the list of columns spciefied in addition to the document
+     * and skipping the first rows. The return values contain the list of columns specified in addition to the document
      * space and name The query part is the same as searchDocuments
      * 
      * @param wheresql query to use similar to searchDocuments(wheresql)
@@ -482,6 +496,21 @@ public class XWiki extends Api
     public List<String> searchDocuments(String parametrizedSqlClause, List< ? > parameterValues) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(parametrizedSqlClause, parameterValues, getXWikiContext());
+    }
+
+    /**
+     * API allowing to count the total number of documents that would be returned by a parameterized query.
+     * 
+     * @param wheresql Parameterized query to use, similar to the ones accepted by
+     *            {@link #searchDocuments(String, List)}. If possible, it should not contain <code>order by</code> or
+     *            <code>group</code> clauses, since this kind of queries are not portable.
+     * @param parameterValues The parameter values that replace the question marks.
+     * @return The number of documents that matched the query.
+     * @throws XWikiException if there was a problem executing the query.
+     */
+    public int countDocuments(String parametrizedSqlClause, List< ? > parameterValues) throws XWikiException
+    {
+        return this.xwiki.getStore().countDocuments(parametrizedSqlClause, parameterValues, getXWikiContext());
     }
 
     /**

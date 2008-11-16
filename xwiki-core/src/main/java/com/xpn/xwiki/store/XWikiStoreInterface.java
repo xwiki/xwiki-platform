@@ -50,6 +50,18 @@ public interface XWikiStoreInterface
 
     List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
 
+    /**
+     * API allowing to count the total number of documents that would be returned by a query.
+     * 
+     * @param wheresql Query to use, similar to the ones accepted by {@link #searchDocuments(String, XWikiContext)}. It
+     *            should not contain <code>order by</code> or <code>group</code> clauses, since this kind of queries are
+     *            not portable.
+     * @param context The current request context.
+     * @return The number of documents that matched the query.
+     * @throws XWikiException if there was a problem executing the query.
+     */
+    int countDocuments(String wheresql, XWikiContext context) throws XWikiException;
+
     List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
 
     List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context)
@@ -91,6 +103,19 @@ public interface XWikiStoreInterface
      */
     List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues, XWikiContext context)
         throws XWikiException;
+
+    /**
+     * API allowing to count the total number of documents that would be returned by a parameterized query.
+     * 
+     * @param wheresql Parameterized query to use, similar to the ones accepted by
+     *            {@link #searchDocuments(String, List, XWikiContext)}. It should not contain <code>order by</code> or
+     *            <code>group</code> clauses, since this kind of queries are not portable.
+     * @param parameterValues The parameter values that replace the question marks.
+     * @return The number of documents that matched the query.
+     * @param context The current request context.
+     * @throws XWikiException if there was a problem executing the query.
+     */
+    int countDocuments(String parametrizedSqlClause, List parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * Search documents in the storing system.

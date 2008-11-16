@@ -251,6 +251,16 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
         return this.store.searchDocumentsNames(wheresql, context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiStoreInterface#countDocuments(String, XWikiContext)
+     */
+    public int countDocuments(String wheresql, XWikiContext context) throws XWikiException
+    {
+        return this.store.countDocuments(wheresql, context);
+    }
+
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -433,6 +443,17 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
         throws XWikiException
     {
         return this.store.searchDocumentsNames(parametrizedSqlClause, parameterValues, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiStoreInterface#countDocuments(String, List, XWikiContext)
+     */
+    public int countDocuments(String parametrizedSqlClause, List parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        return this.store.countDocuments(parametrizedSqlClause, parameterValues, context);
     }
 
     public XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException

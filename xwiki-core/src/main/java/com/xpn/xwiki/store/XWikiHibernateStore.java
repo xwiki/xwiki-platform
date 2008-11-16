@@ -2203,6 +2203,31 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiStoreInterface#countDocuments(String, XWikiContext)
+     */
+    public int countDocuments(String wheresql, XWikiContext context) throws XWikiException
+    {
+        String sql = createSQLQuery("select count(*)", wheresql);
+        List l = search(sql, 0, 0, context);
+        return ((Number) l.get(0)).intValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiStoreInterface#countDocuments(String, List, XWikiContext)
+     */
+    public int countDocuments(String parametrizedSqlClause, List parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        String sql = createSQLQuery("select count(*)", parametrizedSqlClause);
+        List l = searchDocumentsNamesInternal(sql, 0, 0, parameterValues, context);
+        return ((Number) l.get(0)).intValue();
+    }
+
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {

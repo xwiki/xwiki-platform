@@ -1210,6 +1210,29 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiStoreInterface#countDocuments(String, XWikiContext)
+     */
+    public int countDocuments(String wheresql, XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiStoreInterface#countDocuments(String, List, XWikiContext)
+     */
+    public int countDocuments(String parametrizedSqlClause, List parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return 0;
+    }
+
     public List searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException
     {
         notSupportedCall();

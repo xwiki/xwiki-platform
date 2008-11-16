@@ -171,7 +171,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public BaseClass getxWikiClass(XWikiContext context)
     {
         BaseClass baseClass = null;
-        
+
         if ((context == null) || (context.getWiki() == null)) {
             return baseClass;
         }
@@ -192,7 +192,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         } finally {
             context.setDatabase(database);
         }
-        
+
         return baseClass;
     }
 
@@ -378,8 +378,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public void setStringListValue(String name, List value)
     {
         ListProperty property = (ListProperty) safeget(name);
-        if (property == null)
+        if (property == null) {
             property = new StringListProperty();
+        }
         property.setValue(value);
         safeput(name, property);
     }
@@ -387,8 +388,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public void setDBStringListValue(String name, List value)
     {
         ListProperty property = (ListProperty) safeget(name);
-        if (property == null)
+        if (property == null) {
             property = new DBStringListProperty();
+        }
         property.setValue(value);
         safeput(name, property);
     }
@@ -479,8 +481,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     @Override
     public boolean equals(Object coll)
     {
-        if (!super.equals(coll))
+        if (!super.equals(coll)) {
             return false;
+        }
         BaseCollection collection = (BaseCollection) coll;
         if (collection.getClassName() == null) {
             if (getClassName() != null) {
@@ -534,8 +537,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         Iterator itfields = object.getPropertyList().iterator();
         while (itfields.hasNext()) {
             String name = (String) itfields.next();
-            if (safeget(name) == null)
+            if (safeget(name) == null) {
                 safeput(name, (PropertyInterface) ((BaseElement) object.safeget(name)).clone());
+            }
         }
     }
 

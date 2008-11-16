@@ -179,7 +179,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         String name = getClassName();
         String wiki = getWiki();
         if (wiki == null) {
-            context.getWiki();
+            wiki = context.getDatabase();
         }
 
         String database = context.getDatabase();

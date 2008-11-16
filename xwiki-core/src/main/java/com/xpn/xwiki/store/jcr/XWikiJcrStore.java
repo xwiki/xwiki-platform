@@ -569,7 +569,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException
     {
         try {
-            jcr.initWorkspace(wikiName);
+            this.jcr.initWorkspace(wikiName);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER,
                 "Cannot create new xwiki workspace: " + wikiName, e);
@@ -586,7 +586,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
         boolean available;
 
         try {
-            jcr.getSession(wikiName);
+            this.jcr.getSession(wikiName);
             available = false;
         } catch (RepositoryException e) {
             available = true;
@@ -1026,7 +1026,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
      */
     public org.xwiki.query.QueryManager getQueryManager()
     {
-        return queryManager;
+        return this.queryManager;
     }
 
     public void notSupportedCall()

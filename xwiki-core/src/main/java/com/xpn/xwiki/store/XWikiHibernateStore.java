@@ -35,6 +35,7 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.EntityMode;
@@ -50,6 +51,7 @@ import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -84,13 +86,11 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
-import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
 {
-
     private static final Log log = LogFactory.getLog(XWikiHibernateStore.class);
 
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
@@ -1924,8 +1924,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             Query query =
-                session
-                    .createQuery("select doc.fullName from XWikiDocument as doc where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '%')");
+                session.createQuery("select doc.fullName from XWikiDocument as doc "
+                    + "where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '%')");
             Iterator<String> it = query.list().iterator();
             List<String> list = new ArrayList<String>();
             while (it.hasNext()) {
@@ -2375,7 +2375,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         StringBuffer sql = new StringBuffer(queryPrefix);
 
         String normalizedWhereSQL;
-        if (whereSQL == null) {
+        if (StringUtils.isBlank(whereSQL)) {
             normalizedWhereSQL = "";
         } else {
             normalizedWhereSQL = whereSQL.trim();
@@ -2800,6 +2800,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     public QueryManager getQueryManager()
     {
-        return queryManager;
+        return this.queryManager;
     }
 }

@@ -1509,7 +1509,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public List<String> getClassList(XWikiContext context) throws XWikiException
     {
-        return getStore().getClassList(context);
+        List<String> result = getStore().getClassList(context);
+        Collections.sort(result);
+        return result;
     }
 
     /*

@@ -407,47 +407,16 @@ public class XWikiContext extends Hashtable<Object, Object>
         put("mainxwiki", str);
     }
 
-    /**
-     * Used to avoid recurrent loading of documents if there are recurrent usage of classes.
-     * 
-     * @param bclass the class to cache.
-     */
+    // Used to avoid recursive loading of documents if there are recursives usage of classes
     public void addBaseClass(BaseClass bclass)
     {
-        String className = bclass.getName();
-        if (bclass.getWiki() != null) {
-            StringBuffer sb = new StringBuffer(bclass.getWiki());
-            sb.append(":");
-            sb.append(className);
-            className = sb.toString();
-        } else if (getDatabase() != null) {
-            StringBuffer sb = new StringBuffer(getDatabase());
-            sb.append(":");
-            sb.append(className);
-            className = sb.toString();
-        }
-
-        this.classCache.put(className, bclass);
+        this.classCache.put(bclass.getName(), bclass);
     }
 
-    /**
-     * Used to avoid recurrent loading of documents if there are recurrent usage of classes.
-     * 
-     * @param name the local name (without the wiki identifier) of the xclass. The wiki identifier is taken from
-     *            {@link #getDatabase()}.
-     * @return the cached xclass or null if the cache does not contains any xclass.
-     */
+    // Used to avoid recursive loading of documents if there are recursives usage of classes
     public BaseClass getBaseClass(String name)
     {
-        String classname = name;
-        if (getDatabase() != null) {
-            StringBuffer sb = new StringBuffer(getDatabase());
-            sb.append(":");
-            sb.append(name);
-            classname = sb.toString();
-        }
-
-        return this.classCache.get(classname);
+        return this.classCache.get(name);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes

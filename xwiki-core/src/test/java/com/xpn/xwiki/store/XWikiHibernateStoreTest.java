@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
- *
+ * 
  * @version $Id$
  */
 public class XWikiHibernateStoreTest extends TestCase
@@ -31,27 +31,24 @@ public class XWikiHibernateStoreTest extends TestCase
     public void testGetColumnsForSelectStatement()
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-        assertEquals(", doc.date",
-            store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
-        assertEquals(", doc.date",
-            store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
-        assertEquals(", doc.date",
-            store.getColumnsForSelectStatement("where 1=1 order by doc.date"));
-        assertEquals(", doc.date, doc.name",
-            store.getColumnsForSelectStatement("where 1=1 order by doc.date, doc.name"));
-        assertEquals(", doc.date, doc.name",
-            store.getColumnsForSelectStatement("where 1=1 order by doc.date ASC, doc.name DESC"));
-        assertEquals("",
-            store.getColumnsForSelectStatement(", BaseObject as obj where obj.name=doc.fullName"));
+        assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
+        assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
+        assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date"));
+        assertEquals(", doc.date, doc.name", store
+            .getColumnsForSelectStatement("where 1=1 order by doc.date, doc.name"));
+        assertEquals(", doc.date, doc.name", store
+            .getColumnsForSelectStatement("where 1=1 order by doc.date ASC, doc.name DESC"));
+        assertEquals("", store.getColumnsForSelectStatement(", BaseObject as obj where obj.name=doc.fullName"));
     }
 
     public void testCreateSQLQuery()
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-        assertEquals("select distinct doc.space, doc.name from XWikiDocument as doc",
+        assertEquals(
+            "select distinct doc.space, doc.name from XWikiDocument as doc where (doc.hidden <> 1 or doc.hidden is null)",
             store.createSQLQuery("select distinct doc.space, doc.name", ""));
         assertEquals("select distinct doc.space, doc.name, doc.date from XWikiDocument as doc "
-            + "where 1=1 order by doc.date desc", store.createSQLQuery(
+            + "where (doc.hidden <> 1 or doc.hidden is null) and 1=1 order by doc.date desc", store.createSQLQuery(
             "select distinct doc.space, doc.name", "where 1=1 order by doc.date desc"));
     }
 }

@@ -117,7 +117,7 @@ public class XWikiDocument implements DocumentModelBridge
 {
     private static final Log log = LogFactory.getLog(XWikiDocument.class);
 
-    /** THe default wiki name to use when one isn't specified. */
+    /** The default wiki name to use when one isn't specified. */
     private static final String DEFAULT_WIKI_NAME = "xwiki";
 
     /**
@@ -174,6 +174,13 @@ public class XWikiDocument implements DocumentModelBridge
     private String database;
 
     private BaseObject tags;
+
+    /**
+     * Indicates whether the document is 'hidden', meaning that it should not be returned in public search results.
+     * WARNING: this is a temporary hack until the new data model is designed and implemented. No code should rely on or
+     * use this property, since it will be replaced with a generic metadata.
+     */
+    private boolean hidden = false;
 
     /**
      * Comment on the latest modification.
@@ -2018,7 +2025,7 @@ public class XWikiDocument implements DocumentModelBridge
         setComment(document.getComment());
         setMinorEdit(document.isMinorEdit());
         setSyntaxId(document.getSyntaxId());
-        setSyntaxId(document.getSyntaxId());
+        setHidden(document.isHidden());
 
         clonexWikiObjects(document);
         copyAttachments(document);
@@ -2071,6 +2078,7 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
             doc.setSyntaxId(getSyntaxId());
+            doc.setHidden(isHidden());
 
             doc.clonexWikiObjects(this);
             doc.copyAttachments(this);
@@ -2197,6 +2205,10 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         if (!getSyntaxId().equals(doc.getSyntaxId())) {
+            return false;
+        }
+
+        if (isHidden() != doc.isHidden()) {
             return false;
         }
 
@@ -2398,6 +2410,10 @@ public class XWikiDocument implements DocumentModelBridge
         el.addText(getSyntaxId());
         docel.add(el);
 
+        el = new DOMElement("hidden");
+        el.addText(String.valueOf(isHidden()));
+        docel.add(el);
+
         for (XWikiAttachment attach : getAttachmentList()) {
             docel.add(attach.toXML(bWithAttachmentContent, bWithVersions, context));
         }
@@ -2559,7 +2575,6 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void fromXML(Document domdoc, boolean withArchive) throws XWikiException
     {
-
         Element docel = domdoc.getRootElement();
         setName(getElement(docel, "name"));
         setSpace(getElement(docel, "web"));
@@ -2581,6 +2596,9 @@ public class XWikiDocument implements DocumentModelBridge
 
         String minorEdit = getElement(docel, "minorEdit");
         setMinorEdit(Boolean.valueOf(minorEdit).booleanValue());
+
+        String hidden = getElement(docel, "hidden");
+        setHidden(Boolean.valueOf(hidden).booleanValue());
 
         String strans = getElement(docel, "translation");
         if ((strans == null) || strans.equals("")) {
@@ -4588,5 +4606,34 @@ public class XWikiDocument implements DocumentModelBridge
     public String toString()
     {
         return getFullName();
+    }
+
+    /**
+     * Indicates whether the document should be 'hidden' or not, meaning that it should not be returned in public search
+     * results. WARNING: this is a temporary hack until the new data model is designed and implemented. No code should
+     * rely on or use this property, since it will be replaced with a generic metadata.
+     * 
+     * @param hidden The new value of the {@link #hidden} property.
+     */
+    public void setHidden(Boolean hidden)
+    {
+        if (hidden == null) {
+            this.hidden = false;
+        } else {
+            this.hidden = hidden;
+        }
+    }
+
+    /**
+     * Indicates whether the document is 'hidden' or not, meaning that it should not be returned in public search
+     * results. WARNING: this is a temporary hack until the new data model is designed and implemented. No code should
+     * rely on or use this property, since it will be replaced with a generic metadata.
+     * 
+     * @return <code>true</code> if the document is hidden and does not appear among the results of
+     *         {@link com.xpn.xwiki.api.XWiki#searchDocuments(String)}, <code>false</code> otherwise.
+     */
+    public Boolean isHidden()
+    {
+        return this.hidden;
     }
 }

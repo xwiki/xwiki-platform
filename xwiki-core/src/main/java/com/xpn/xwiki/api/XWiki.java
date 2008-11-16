@@ -20,23 +20,26 @@
 
 package com.xpn.xwiki.api;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.suigeneris.jrcs.diff.delta.Chunk;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.stats.impl.DocumentStats;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiEngineContext;
-import org.suigeneris.jrcs.diff.delta.Chunk;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.IOException;
-import java.lang.Object;
-import java.util.*;
 
 public class XWiki extends Api
 {
@@ -75,8 +78,9 @@ public class XWiki extends Api
      */
     public com.xpn.xwiki.XWiki getXWiki()
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             return this.xwiki;
+        }
         return null;
     }
 
@@ -111,7 +115,8 @@ public class XWiki extends Api
     {
         XWikiDocument doc = this.xwiki.getDocument(fullname, getXWikiContext());
         if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false) {
+            getXWikiContext()) == false)
+        {
             return null;
         }
 
@@ -127,13 +132,13 @@ public class XWiki extends Api
      */
     public List<DeletedDocument> getDeletedDocuments(String fullname, String lang) throws XWikiException
     {
-        XWikiDeletedDocument[] dds = this.xwiki.getDeletedDocuments(fullname, lang, context);
+        XWikiDeletedDocument[] dds = this.xwiki.getDeletedDocuments(fullname, lang, this.context);
         if (dds == null || dds.length == 0) {
             return Collections.emptyList();
         }
         List<DeletedDocument> result = new ArrayList<DeletedDocument>(dds.length);
         for (int i = 0; i < dds.length; i++) {
-            result.add(new DeletedDocument(dds[i], context));
+            result.add(new DeletedDocument(dds[i], this.context));
         }
         return result;
     }
@@ -146,11 +151,11 @@ public class XWiki extends Api
      */
     public DeletedDocument getDeletedDocument(String fullname, String lang, String index) throws XWikiException
     {
-        XWikiDeletedDocument dd = this.xwiki.getDeletedDocument(fullname, lang, Integer.parseInt(index), context);
+        XWikiDeletedDocument dd = this.xwiki.getDeletedDocument(fullname, lang, Integer.parseInt(index), this.context);
         if (dd == null) {
             return null;
         }
-        return new DeletedDocument(dd, context);
+        return new DeletedDocument(dd, this.context);
     }
 
     /**
@@ -176,7 +181,7 @@ public class XWiki extends Api
     public boolean checkAccess(String docname, String right)
     {
         try {
-            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, context);
+            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, this.context);
             return getXWikiContext().getWiki().checkAccess(right, doc, getXWikiContext());
         } catch (XWikiException e) {
             return false;
@@ -195,7 +200,8 @@ public class XWiki extends Api
     {
         XWikiDocument doc = this.xwiki.getDocument(web, fullname, getXWikiContext());
         if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false) {
+            getXWikiContext()) == false)
+        {
             return null;
         }
 
@@ -213,11 +219,13 @@ public class XWiki extends Api
      */
     public Document getDocument(Document doc, String rev) throws XWikiException
     {
-        if ((doc == null) || (doc.getDoc() == null))
+        if ((doc == null) || (doc.getDoc() == null)) {
             return null;
+        }
 
         if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false) {
+            getXWikiContext()) == false)
+        {
             // Finally we return null, otherwise showing search result is a real pain
             return null;
         }
@@ -337,26 +345,25 @@ public class XWiki extends Api
     /**
      * API allowing to search for document names matching a query. Examples:
      * <ul>
-     * <li>Query: <code>where doc.space='Main' order by doc.creationDate desc</code>. Result: All the documents in
-     * space 'Main' ordered by the creation date from the most recent</li>
-     * <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>. Result: All the documents
-     * containing 'sport' in their name ordered by document name</li>
-     * <li>Query: <code>where doc.content like '%sport%' order by doc.author</code> Result: All the documents
-     * containing 'sport' in their content ordered by the author</li>
+     * <li>Query: <code>where doc.space='Main' order by doc.creationDate desc</code>. Result: All the documents in space 'Main' ordered by the creation date from
+     * the most recent</li>
+     * <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>. Result: All the documents containing 'sport' in their name ordered by
+     * document name</li>
+     * <li>Query: <code>where doc.content like '%sport%' order by doc.author</code> Result: All the documents containing 'sport' in their content ordered by
+     * the author</li>
      * <li>Query: <code>where doc.creator = 'XWiki.LudovicDubost' order by doc.creationDate
-     *       desc</code>. Result: All
-     * the documents with creator LudovicDubost ordered by the creation date from the most recent</li>
-     * <li>Query: <code>where doc.author = 'XWiki.LudovicDubost' order by doc.date desc</code>. Result: All the
-     * documents with last author LudovicDubost ordered by the last modification date from the most recent.</li>
+     *       desc</code>. Result: All the documents with creator LudovicDubost ordered by the creation date
+     * from the most recent</li>
+     * <li>Query: <code>where doc.author = 'XWiki.LudovicDubost' order by doc.date desc</code>. Result: All the documents with last author LudovicDubost ordered by the
+     * last modification date from the most recent.</li>
      * <li>Query: <code>,BaseObject as obj where doc.fullName=obj.name and
-     *       obj.className='XWiki.XWikiComments' order by doc.date desc</code>.
-     * Result: All the documents with at least one comment ordered by the last modification date from the most recent</li>
+     *       obj.className='XWiki.XWikiComments' order by doc.date desc</code>. Result: All the documents with at least one comment ordered by the last modification date
+     * from the most recent</li>
      * <li>Query: <code>,BaseObject as obj, StringProperty as prop where
      *       doc.fullName=obj.name and obj.className='XWiki.XWikiComments' and obj.id=prop.id.id
      *       and prop.id.name='author' and prop.value='XWiki.LudovicDubost' order by doc.date
-     *       desc</code>.
-     * Result: All the documents with at least one comment from LudovicDubost ordered by the last modification date from
-     * the most recent</li>
+     *       desc</code>. Result: All the documents with at least one comment from
+     * LudovicDubost ordered by the last modification date from the most recent</li>
      * </ul>
      * 
      * @param wheresql Query to be run (either starting with ", BaseObject as obj where.." or by "where ..."
@@ -396,8 +403,7 @@ public class XWiki extends Api
      * @return List of Object[] with the column values of the matching rows
      * @throws XWikiException
      */
-    public List<String> searchDocuments(String wheresql, int nb, int start, String selectColumns)
-        throws XWikiException
+    public List<String> searchDocuments(String wheresql, int nb, int start, String selectColumns) throws XWikiException
     {
         if (hasProgrammingRights()) {
             return this.xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, getXWikiContext());
@@ -432,8 +438,8 @@ public class XWiki extends Api
     public List<Document> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start)
         throws XWikiException
     {
-        return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylanguage, nb, start,
-            getXWikiContext()));
+        return convert(this.xwiki.getStore()
+            .searchDocuments(wheresql, distinctbylanguage, nb, start, getXWikiContext()));
     }
 
     /**
@@ -536,7 +542,7 @@ public class XWiki extends Api
     {
         List<Document> result = new ArrayList<Document>();
         if (docs != null) {
-            for (Object obj : docs) {
+            for (java.lang.Object obj : docs) {
                 try {
                     if (obj instanceof XWikiDocument) {
                         XWikiDocument doc = (XWikiDocument) obj;
@@ -992,8 +998,9 @@ public class XWiki extends Api
      */
     public void flushCache()
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             this.xwiki.flushCache(getXWikiContext());
+        }
     }
 
     /**
@@ -1002,11 +1009,12 @@ public class XWiki extends Api
      */
     public void resetRenderingEngine()
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             try {
                 this.xwiki.resetRenderingEngine(getXWikiContext());
             } catch (XWikiException e) {
             }
+        }
     }
 
     /**
@@ -1056,8 +1064,9 @@ public class XWiki extends Api
                         "XWiki.XWikiPreferences", getXWikiContext());
             }
 
-            if (registerRight)
+            if (registerRight) {
                 return this.xwiki.createUser(withValidation, userRights, getXWikiContext());
+            }
             return -1;
 
         } catch (Exception e) {
@@ -1079,8 +1088,8 @@ public class XWiki extends Api
      * @return Success of Failure code (0 for success, -1 for missing programming rights, > 0 for other errors
      * @throws XWikiException
      */
-    public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName,
-        boolean failOnExist) throws XWikiException
+    public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName, boolean failOnExist)
+        throws XWikiException
     {
         return createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, "", null, failOnExist);
     }
@@ -1123,9 +1132,10 @@ public class XWiki extends Api
     public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName,
         String description, String language, boolean failOnExist) throws XWikiException
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             return this.xwiki.createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, language,
                 failOnExist, getXWikiContext());
+        }
         return -1;
     }
 
@@ -1150,8 +1160,9 @@ public class XWiki extends Api
      */
     public void addToAllGroup(String fullwikiname) throws XWikiException
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             this.xwiki.setUserDefaultGroup(fullwikiname, getXWikiContext());
+        }
     }
 
     /**
@@ -1167,8 +1178,9 @@ public class XWiki extends Api
     public void sendConfirmationMail(String xwikiname, String password, String email, String add_message,
         String contentfield) throws XWikiException
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             this.xwiki.sendConfirmationEmail(xwikiname, password, email, add_message, contentfield, getXWikiContext());
+        }
     }
 
     /**
@@ -1183,8 +1195,9 @@ public class XWiki extends Api
     public void sendConfirmationMail(String xwikiname, String password, String email, String contentfield)
         throws XWikiException
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             this.xwiki.sendConfirmationEmail(xwikiname, password, email, "", contentfield, getXWikiContext());
+        }
     }
 
     /**
@@ -1285,8 +1298,9 @@ public class XWiki extends Api
     public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikiLanguage, boolean clean)
         throws XWikiException
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             return this.xwiki.copyWikiWeb(web, sourceWiki, targetWiki, wikiLanguage, clean, getXWikiContext());
+        }
         return -1;
     }
 
@@ -1327,8 +1341,9 @@ public class XWiki extends Api
      */
     public String includeTopic(String topic, boolean pre) throws XWikiException
     {
-        if (pre)
+        if (pre) {
             return "{pre}" + this.xwiki.include(topic, false, getXWikiContext()) + "{/pre}";
+        }
         return this.xwiki.include(topic, false, getXWikiContext());
     }
 
@@ -1345,8 +1360,9 @@ public class XWiki extends Api
      */
     public String includeForm(String topic, boolean pre) throws XWikiException
     {
-        if (pre)
+        if (pre) {
             return "{pre}" + this.xwiki.include(topic, true, getXWikiContext()) + "{/pre}";
+        }
         return this.xwiki.include(topic, true, getXWikiContext());
     }
 
@@ -1415,8 +1431,9 @@ public class XWiki extends Api
     {
         StringBuffer buf = new StringBuffer();
         chunk.toString(buf, "", "\n");
-        if (source == true)
+        if (source == true) {
             return buf.toString();
+        }
 
         try {
             return this.xwiki.getRenderingEngine().renderText(buf.toString(), doc.getDoc(), getXWikiContext());
@@ -1799,7 +1816,7 @@ public class XWiki extends Api
      */
     public String getUserTimeZone()
     {
-        return this.xwiki.getUserTimeZone(context);
+        return this.xwiki.getUserTimeZone(this.context);
     }
 
     /**
@@ -1860,7 +1877,7 @@ public class XWiki extends Api
     public String getURLContent(String surl, String username, String password) throws IOException
     {
         try {
-            return this.xwiki.getURLContent(surl, username, password, context);
+            return this.xwiki.getURLContent(surl, username, password, this.context);
         } catch (Exception e) {
             LOG.warn("Failed to retrieve content from [" + surl + "]", e);
             return "";
@@ -1877,7 +1894,7 @@ public class XWiki extends Api
     public String getURLContent(String surl) throws IOException
     {
         try {
-            return this.xwiki.getURLContent(surl, context);
+            return this.xwiki.getURLContent(surl, this.context);
         } catch (Exception e) {
             LOG.warn("Failed to retrieve content from [" + surl + "]", e);
             return "";
@@ -1897,7 +1914,8 @@ public class XWiki extends Api
     public String getURLContent(String surl, String username, String password, int timeout) throws IOException
     {
         try {
-            return this.xwiki.getURLContent(surl, username, password, timeout, this.xwiki.getHttpUserAgent(context));
+            return this.xwiki.getURLContent(surl, username, password, timeout, this.xwiki
+                .getHttpUserAgent(this.context));
         } catch (Exception e) {
             return "";
         }
@@ -1914,7 +1932,7 @@ public class XWiki extends Api
     public String getURLContent(String surl, int timeout) throws IOException
     {
         try {
-            return this.xwiki.getURLContent(surl, timeout, this.xwiki.getHttpUserAgent(context));
+            return this.xwiki.getURLContent(surl, timeout, this.xwiki.getHttpUserAgent(this.context));
         } catch (Exception e) {
             return "";
         }
@@ -1932,7 +1950,7 @@ public class XWiki extends Api
     public byte[] getURLContentAsBytes(String surl, String username, String password) throws IOException
     {
         try {
-            return this.xwiki.getURLContentAsBytes(surl, username, password, context);
+            return this.xwiki.getURLContentAsBytes(surl, username, password, this.context);
         } catch (Exception e) {
             return null;
         }
@@ -1948,7 +1966,7 @@ public class XWiki extends Api
     public byte[] getURLContentAsBytes(String surl) throws IOException
     {
         try {
-            return this.xwiki.getURLContentAsBytes(surl, context);
+            return this.xwiki.getURLContentAsBytes(surl, this.context);
         } catch (Exception e) {
             return null;
         }
@@ -2034,7 +2052,7 @@ public class XWiki extends Api
      */
     public boolean hasEditComment()
     {
-        return this.xwiki.hasEditComment(context);
+        return this.xwiki.hasEditComment(this.context);
     }
 
     /**
@@ -2045,7 +2063,7 @@ public class XWiki extends Api
      */
     public boolean isEditCommentFieldHidden()
     {
-        return this.xwiki.isEditCommentFieldHidden(context);
+        return this.xwiki.isEditCommentFieldHidden(this.context);
     }
 
     /**
@@ -2056,7 +2074,7 @@ public class XWiki extends Api
      */
     public boolean isEditCommentSuggested()
     {
-        return this.xwiki.isEditCommentSuggested(context);
+        return this.xwiki.isEditCommentSuggested(this.context);
     }
 
     /**
@@ -2067,7 +2085,7 @@ public class XWiki extends Api
      */
     public boolean isEditCommentMandatory()
     {
-        return this.xwiki.isEditCommentMandatory(context);
+        return this.xwiki.isEditCommentMandatory(this.context);
     }
 
     /**
@@ -2075,7 +2093,7 @@ public class XWiki extends Api
      */
     public boolean hasMinorEdit()
     {
-        return this.xwiki.hasMinorEdit(context);
+        return this.xwiki.hasMinorEdit(this.context);
     }
 
     /**
@@ -2084,7 +2102,7 @@ public class XWiki extends Api
      */
     public boolean hasRecycleBin()
     {
-        return this.xwiki.hasRecycleBin(context);
+        return this.xwiki.hasRecycleBin(this.context);
     }
 
     /**
@@ -2101,9 +2119,12 @@ public class XWiki extends Api
             if (this.xwiki.exists(newFullName, getXWikiContext())
                 && !this.xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName,
                     getXWikiContext()))
+            {
                 return false;
+            }
             if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
-                getXWikiContext())) {
+                getXWikiContext()))
+            {
                 this.xwiki.renamePage(doc.getFullName(), newFullName, getXWikiContext());
             }
         } catch (XWikiException e) {
@@ -2131,10 +2152,11 @@ public class XWiki extends Api
      * @return An object instantiating this class
      * @throws XWikiException
      */
-    public Object parseGroovyFromString(String script) throws XWikiException
+    public java.lang.Object parseGroovyFromString(String script) throws XWikiException
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             return this.xwiki.parseGroovyFromString(script, getXWikiContext());
+        }
         return "groovy_missingrights";
     }
 
@@ -2146,11 +2168,12 @@ public class XWiki extends Api
      * @return An object instantiating this class
      * @throws XWikiException
      */
-    public Object parseGroovyFromPage(String script, String jarWikiPage) throws XWikiException
+    public java.lang.Object parseGroovyFromPage(String script, String jarWikiPage) throws XWikiException
     {
         XWikiDocument doc = this.xwiki.getDocument(script, getXWikiContext());
-        if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext()))
+        if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext())) {
             return this.xwiki.parseGroovyFromString(doc.getContent(), jarWikiPage, getXWikiContext());
+        }
         return "groovy_missingrights";
     }
 
@@ -2162,11 +2185,12 @@ public class XWiki extends Api
      * @return An object instanciating this class
      * @throws XWikiException
      */
-    public Object parseGroovyFromPage(String fullname) throws XWikiException
+    public java.lang.Object parseGroovyFromPage(String fullname) throws XWikiException
     {
         XWikiDocument doc = this.xwiki.getDocument(fullname, getXWikiContext());
-        if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext()))
+        if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext())) {
             return this.xwiki.parseGroovyFromString(doc.getContent(), getXWikiContext());
+        }
         return "groovy_missingrights";
     }
 
@@ -2469,7 +2493,7 @@ public class XWiki extends Api
     {
         // TODO: The implementation should be done in com.xpn.xwiki.XWiki as this class should
         // delegate all implementations to that Class.
-        return new Class(this.xwiki.getDocument(documentName, context).getxWikiClass(), context);
+        return new Class(this.xwiki.getDocument(documentName, this.context).getxWikiClass(), this.context);
     }
 
     /**
@@ -2480,7 +2504,7 @@ public class XWiki extends Api
      */
     public String getCounter(String name)
     {
-        XWikiEngineContext econtext = context.getEngineContext();
+        XWikiEngineContext econtext = this.context.getEngineContext();
         Integer counter = (Integer) econtext.getAttribute(name);
         if (counter == null) {
             counter = new Integer(0);
@@ -2498,7 +2522,7 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth() throws XWikiException
     {
-        return context.getWiki().getAuthService().checkAuth(context);
+        return this.context.getWiki().getAuthService().checkAuth(this.context);
     }
 
     /**
@@ -2513,7 +2537,7 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth(String username, String password, String rememberme) throws XWikiException
     {
-        return context.getWiki().getAuthService().checkAuth(username, password, rememberme, context);
+        return this.context.getWiki().getAuthService().checkAuth(username, password, rememberme, this.context);
     }
 
     /**
@@ -2542,6 +2566,6 @@ public class XWiki extends Api
      */
     public List<String> getConfiguredSyntaxes()
     {
-    	return this.xwiki.getConfiguredSyntaxes();
+        return this.xwiki.getConfiguredSyntaxes();
     }
 }

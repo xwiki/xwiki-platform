@@ -61,6 +61,9 @@ public class SkinAction extends XWikiAction
     /** The directory where the skins are placed in the webapp. */
     private static final String SKINS_DIRECTORY = "skins";
 
+    /** The encoding to use when reading text resources from the filesystem and when sending css/javascript responses. */
+    private static final String ENCODING = "UTF-8";
+
     /**
      * {@inheritDoc}
      * 
@@ -71,10 +74,14 @@ public class SkinAction extends XWikiAction
     {
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
+        // Since skin paths usually contain the name of skin document, it is likely that the context document belongs to
+        // the current skin.
         XWikiDocument doc = context.getDoc();
 
+        // The base skin could be either a filesystem directory, or an xdocument.
         String baseskin = xwiki.getBaseSkin(context, true);
         XWikiDocument baseskindoc = xwiki.getDocument(baseskin, context);
+        // The default base skin is always a filesystem directory.
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
 
         String path = request.getPathInfo();
@@ -84,6 +91,8 @@ public class SkinAction extends XWikiAction
                 + defaultbaseskin);
         }
 
+        // Since we don't know exactly what does the URL point at, meaning that we don't know where the skin identifier
+        // ends and where the path to the file starts, we must try to split at every '/' character.
         int idx = path.lastIndexOf(DELIMITER);
         boolean found = false;
         while (idx > 0) {
@@ -93,11 +102,13 @@ public class SkinAction extends XWikiAction
                     LOG.debug("Trying '" + filename + "'");
                 }
 
+                // Try on the current skin document.
                 if (renderSkin(filename, doc, context)) {
                     found = true;
                     break;
                 }
 
+                // Try on the base skin document, if it is not the same as above.
                 if (!doc.getName().equals(baseskin)) {
                     if (renderSkin(filename, baseskindoc, context)) {
                         found = true;
@@ -105,6 +116,7 @@ public class SkinAction extends XWikiAction
                     }
                 }
 
+                // Try on the default base skin, if it wasn't already tested above.
                 if (!(doc.getName().equals(defaultbaseskin) || baseskin.equals(defaultbaseskin))) {
                     // defaultbaseskin can only be on the filesystem, so don't try to use it as a
                     // skin document.
@@ -193,7 +205,9 @@ public class SkinAction extends XWikiAction
                 String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
                 Date modified = null;
                 if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
-                    byte[] newdata = context.getWiki().parseContent(new String(data), context).getBytes();
+                    // Always force UTF-8, as this is the assumed encoding for text files.
+                    String rawContent = new String(data, ENCODING);
+                    byte[] newdata = context.getWiki().parseContent(rawContent, context).getBytes(ENCODING);
                     // If the content contained velocity code, then it should not be cached
                     if (Arrays.equals(newdata, data)) {
                         modified = context.getWiki().getResourceLastModificationDate(path);
@@ -201,6 +215,7 @@ public class SkinAction extends XWikiAction
                         modified = new Date();
                         data = newdata;
                     }
+                    response.setCharacterEncoding(ENCODING);
                 } else {
                     modified = context.getWiki().getResourceLastModificationDate(path);
                 }
@@ -243,11 +258,15 @@ public class SkinAction extends XWikiAction
             XWiki xwiki = context.getWiki();
             XWikiResponse response = context.getResponse();
             String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+            // Since object fields are read as unicode strings, the result does not depend on the wiki encoding. Force
+            // the output to UTF-8.
+            response.setCharacterEncoding(ENCODING);
             if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
                 content = context.getWiki().parseContent(content, context);
             }
-            setupHeaders(response, mimetype, doc.getDate(), content.length());
-            response.getWriter().write(content);
+            byte[] data = content.getBytes(ENCODING);
+            setupHeaders(response, mimetype, doc.getDate(), data.length);
+            response.getOutputStream().write(data);
             return true;
         } else {
             LOG.debug("Object field not found or empty");
@@ -276,7 +295,9 @@ public class SkinAction extends XWikiAction
             byte[] data = attachment.getContent(context);
             String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
             if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
-                data = context.getWiki().parseContent(new String(data), context).getBytes();
+                // Always force UTF-8, as this is the assumed encoding for text files.
+                data = context.getWiki().parseContent(new String(data, ENCODING), context).getBytes(ENCODING);
+                response.setCharacterEncoding(ENCODING);
             }
             setupHeaders(response, mimetype, attachment.getDate(), data.length);
             response.getOutputStream().write(data);

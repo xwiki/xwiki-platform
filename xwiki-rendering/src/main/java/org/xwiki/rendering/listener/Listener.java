@@ -433,11 +433,9 @@ public interface Listener
     /**
      * An image.
      * 
-     * @param imageLocation the location of the image using the following format 
-     *        <code>[wiki:Space.Page]^imageName</code> where <code>imageName</code> is the name of the image
-     *        (for example "my.png").
+     * @param image the image definition (location, attachment name)
      * @param isFreeStandingURI if true then the image is defined directly as a URI in the text
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
-    void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters);
+    void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters);
 }

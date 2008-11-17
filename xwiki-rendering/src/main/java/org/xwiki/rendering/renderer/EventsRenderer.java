@@ -22,6 +22,7 @@ package org.xwiki.rendering.renderer;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
@@ -382,12 +383,13 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(String, boolean, Map)
+     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
      * @since 1.7M2
      */
-    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-       println("onImage: [" + imageLocation + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
+       println("onImage: " + (image.getDocumentName() != null ? "[" + image.getDocumentName() + "] " : "") 
+           + "[" + image.getAttachmentName() + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
     }
 
     public String getEscaped(String str)

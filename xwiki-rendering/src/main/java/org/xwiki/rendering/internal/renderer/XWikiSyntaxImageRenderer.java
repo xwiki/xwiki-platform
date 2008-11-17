@@ -17,30 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser;
+package org.xwiki.rendering.internal.renderer;
 
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.listener.Image;
 
 /**
- * Since we need to have wiki syntax-specific link parsers, this generic parser allows at least to the reference
- * displayed when using syntaxes other than XWiki (which has its specific link parser, see {@link XWikiLinkParser}),
- * while waiting for specialized link parsers to be written.
- *
+ * Generate a XWiki syntax string representation of an {@link Image}, using the format:
+ * <code>(optional document name)@(attachment name)</code>. 
+ *  
  * @version $Id$
- * @since 1.6RC1
+ * @since 1.7M3
  */
-public class GenericLinkParser implements LinkParser
+public class XWikiSyntaxImageRenderer
 {
-    /**
-     * {@inheritDoc}
-     * @see LinkParser#parse(String)
-     */
-    public Link parse(String rawLink) throws ParseException
+    public String renderImage(Image image)
     {
-        Link link = new Link();
-        link.setReference(rawLink);
-        return link;
+        String result;
+        if (image.getDocumentName() != null) {
+            result = image.getDocumentName() + "@" + image.getAttachmentName();
+        } else {
+            result = image.getAttachmentName();
+        }
+        return result;
     }
 }

@@ -23,10 +23,11 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
+import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
+import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Format;
@@ -45,6 +46,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 {
     private XWikiSyntaxLinkRenderer linkRenderer;
 
+    private XWikiSyntaxImageRenderer imageRenderer;
+    
     private boolean isFirstElementRendered = false;
 
     private StringBuffer listStyle = new StringBuffer();
@@ -81,6 +84,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
         this.macroPrinter = new XWikiMacroPrinter();
         this.linkRenderer = new XWikiSyntaxLinkRenderer();
+        this.imageRenderer = new XWikiSyntaxImageRenderer();
     }
 
     /**
@@ -775,12 +779,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(String, boolean, Map)
+     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
      */
-    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         Link link = new Link();
-        link.setReference("image:" + imageLocation);
+        link.setReference("image:" + this.imageRenderer.renderImage(image));
         link.setType(LinkType.URI);
         
         this.linkRenderer.beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);

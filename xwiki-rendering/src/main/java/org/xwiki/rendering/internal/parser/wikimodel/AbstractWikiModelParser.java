@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.parser.wikimodel;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
+import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -37,6 +38,8 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
 {
     protected LinkParser linkParser;
 
+    protected ImageParser imageParser;
+    
     public abstract IWikiParser createWikiModelParser() throws ParseException;
 
     public XDOM parse(Reader source) throws ParseException
@@ -44,7 +47,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
         IWikiParser parser = createWikiModelParser();
 
         // We pass the LinkParser corresponding to the syntax.
-        XDOMGeneratorListener listener = new XDOMGeneratorListener(this, this.linkParser);
+        XDOMGeneratorListener listener = new XDOMGeneratorListener(this, this.linkParser, this.imageParser);
 
         try {
             parser.parse(source, listener);

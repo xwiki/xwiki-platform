@@ -19,28 +19,25 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.parser.ImageParser;
 
 /**
- * Since we need to have wiki syntax-specific link parsers, this generic parser allows at least to the reference
- * displayed when using syntaxes other than XWiki (which has its specific link parser, see {@link XWikiLinkParser}),
- * while waiting for specialized link parsers to be written.
+ * Since we need to have wiki syntax-specific image parsers, this generic parser allows at least to the reference
+ * displayed when using syntaxes other than XWiki (which has its specific image parser, see {@link XWikiImageParser}),
+ * while waiting for specialized image parsers to be written.
  *
  * @version $Id$
- * @since 1.6RC1
+ * @since 1.7M3
  */
-public class GenericLinkParser implements LinkParser
+public class GenericImageParser implements ImageParser
 {
     /**
      * {@inheritDoc}
-     * @see LinkParser#parse(String)
+     * @see ImageParser#parse(String)
      */
-    public Link parse(String rawLink) throws ParseException
+    public Image parse(String imageLocation)
     {
-        Link link = new Link();
-        link.setReference(rawLink);
-        return link;
+        return new Image(null, imageLocation);
     }
 }

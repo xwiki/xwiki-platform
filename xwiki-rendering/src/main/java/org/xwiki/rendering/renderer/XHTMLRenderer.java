@@ -25,12 +25,14 @@ import java.util.Map;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
@@ -61,6 +63,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     private XHTMLWikiPrinter xhtmlWikiPrinter;
 
+    private XWikiSyntaxImageRenderer imageRenderer;
+    
     /**
      * The temporary Printer used to redirect all outputs when computing the section title.
      * 
@@ -112,6 +116,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         this.macroRenderer = new XHTMLMacroRenderer();
         this.configuration = configuration;
         this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
+        this.imageRenderer = new XWikiSyntaxImageRenderer();
     }
 
     /**
@@ -781,28 +786,18 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(String, boolean, Map)
+     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
      * @since 1.7M2
      */
-    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        // First we need to compute the image URL. Start by extracting the attachment name from the document name.
-        // The syntax format is: "(document name)@(attachment name)"
-        String documentName = null;
-        String attachmentName;
-        int attachmentSeparatorPosition = imageLocation.indexOf("@");
-        if (attachmentSeparatorPosition > -1) {
-            documentName = imageLocation.substring(0, attachmentSeparatorPosition);
-            attachmentName = imageLocation.substring(attachmentSeparatorPosition + 1);
-        } else {
-            attachmentName = imageLocation;
-        }
+        // First we need to compute the image URL.
         String imageURL;
         try {
-            imageURL = this.documentAccessBridge.getAttachmentURL(documentName, attachmentName);
+            imageURL = this.documentAccessBridge.getAttachmentURL(image.getDocumentName(), image.getAttachmentName());
         } catch (Exception e) {
             // TODO: Handle exceptions in a better manner
-            throw new RuntimeException("Failed to get attachment URL for [" + imageLocation + "]", e);
+            throw new RuntimeException("Failed to get attachment URL for [" + image + "]", e);
         }
         
         // Then add it as an attribute of the IMG element.
@@ -817,9 +812,14 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         // Add the other parameters as attributes
         attributes.putAll(parameters);
 
+        // If not ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
+        if (!parameters.containsKey("alt")) {
+            attributes.put("alt", image.getAttachmentName());
+        }
+        
         // And generate the XHTML IMG element. We need to save the image location in XML comment so that
         // it can be reconstructed later on when moving from XHTML to wiki syntax.
-        getXHTMLWikiPrinter().printXMLComment("startimage:" + imageLocation);
+        getXHTMLWikiPrinter().printXMLComment("startimage:" + this.imageRenderer.renderImage(image));
         getXHTMLWikiPrinter().printXMLElement("img", attributes);
         getXHTMLWikiPrinter().printXMLComment("stopimage");
     }

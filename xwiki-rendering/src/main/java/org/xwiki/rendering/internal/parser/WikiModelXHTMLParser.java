@@ -92,7 +92,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     	XhtmlParser parser = new XhtmlParser();
     	parser.setExtraHandlers(handlers);
     	parser.setEscapeHandler(new XWikiXhtmlEscapeHandler());
-    	parser.setCommentHandler(new XWikiCommentHandler(this, this.linkParser, this.printRendererFactory));
+    	parser.setCommentHandler(new XWikiCommentHandler(this, this.linkParser, this.imageParser, this.printRendererFactory));
     	
     	// Construct our own XML filter chain since we want to use our own Comment filter.
     	parser.setXmlReader(createXMLReader());

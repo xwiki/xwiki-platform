@@ -22,6 +22,7 @@ package org.xwiki.rendering.block;
 import java.util.Collections;
 import java.util.Map;
 
+import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Listener;
 
 /**
@@ -32,28 +33,28 @@ import org.xwiki.rendering.listener.Listener;
  */
 public class ImageBlock extends AbstractBlock
 {
-    private String imageLocation;
+    private Image image;
     
     /**
      * If true then the image is defined as a free standing URI directly in the text.
      */
     private boolean isFreeStandingURI;
 
-    public ImageBlock(String imageLocation, boolean isFreeStandingURI)
+    public ImageBlock(Image image, boolean isFreeStandingURI)
     {
-        this(imageLocation, isFreeStandingURI, Collections.<String, String>emptyMap());
+        this(image, isFreeStandingURI, Collections.<String, String>emptyMap());
     }
 
-    public ImageBlock(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    public ImageBlock(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         super(parameters);
-        this.imageLocation = imageLocation;
+        this.image = image;
         this.isFreeStandingURI = isFreeStandingURI;
     }
 
-    public String getImageLocation()
+    public Image getImage()
     {
-        return this.imageLocation;
+        return this.image;
     }
 
     /**
@@ -66,6 +67,6 @@ public class ImageBlock extends AbstractBlock
 
     public void traverse(Listener listener)
     {
-        listener.onImage(getImageLocation(), isFreeStandingURI(), getParameters());
+        listener.onImage(getImage(), isFreeStandingURI(), getParameters());
     }
 }

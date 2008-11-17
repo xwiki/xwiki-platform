@@ -366,11 +366,11 @@ public class ListenerDelegate implements Listener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.Listener#onImage(String, boolean, Map)
+     * @see org.xwiki.rendering.listener.Listener#onImage(Image, boolean, Map)
      * @since 1.7M2
      */
-    public void onImage(String imageLocation, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.listener.onImage(imageLocation, isFreeStandingURI, parameters);
+        this.listener.onImage(image, isFreeStandingURI, parameters);
     }
 }

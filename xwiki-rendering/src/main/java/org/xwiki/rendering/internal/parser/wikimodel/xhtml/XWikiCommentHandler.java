@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
+import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
 import org.wikimodel.wem.WikiReferenceParser;
@@ -26,6 +27,8 @@ import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.wikimodel.wem.xwiki.XWikiReferenceParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
+import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
@@ -47,18 +50,21 @@ public class XWikiCommentHandler extends CommentHandler
     
     private LinkParser linkParser;
     
+    private ImageParser imageParser;
+    
     private PrintRendererFactory printRendererFactory;
     
     private WikiReferenceParser referenceParser;
 
     private String commentContent;
     
-    public XWikiCommentHandler(Parser parser, LinkParser linkParser, PrintRendererFactory printRendererFactory)
+    public XWikiCommentHandler(Parser parser, LinkParser linkParser, ImageParser imageParser, PrintRendererFactory printRendererFactory)
     {
         this.parser = parser;
         this.linkParser = linkParser;
         this.printRendererFactory = printRendererFactory;
         this.referenceParser = new XWikiReferenceParser();
+        this.imageParser = imageParser;
     }
     
     @Override
@@ -82,7 +88,7 @@ public class XWikiCommentHandler extends CommentHandler
     
     private void handleLinkCommentStart(String content, TagStack stack)
     {
-        XDOMGeneratorListener listener = new XDOMGeneratorListener(this.parser, this.linkParser);
+        XDOMGeneratorListener listener = new XDOMGeneratorListener(this.parser, this.linkParser, this.imageParser);
         stack.setStackParameter("xdomGeneratorListener", listener);
         stack.setStackParameter("isInLink", true);
         this.commentContent = content.substring("startwikilink:".length());
@@ -124,9 +130,19 @@ public class XWikiCommentHandler extends CommentHandler
     {
         boolean isFreeStandingImage = (Boolean) stack.getStackParameter("isFreeStandingImage");
         WikiParameters params = (WikiParameters) stack.getStackParameter("imageParameters");
+        Image image = this.imageParser.parse(this.commentContent);
+        
         if (isFreeStandingImage) {
             stack.getScannerContext().onReference("image:" + this.commentContent);
         } else {
+            // Remove the ALT attribute if the content has the same value as the original image location
+            // This is because the XHTML renderer automatically adds an ALT attribute since it is mandatory
+            // in the XHTML specifications.
+            WikiParameter altParameter = params.getParameter("alt"); 
+            if (altParameter != null && altParameter.getValue().equals(image.getAttachmentName())) {
+                params = params.remove("alt");
+            }
+            
             WikiReference wikiReference = this.referenceParser.parse("image:" + this.commentContent
                 + (params.getSize() > 0 ? "||" + params.toString() : ""));
             stack.getScannerContext().onReference(wikiReference);

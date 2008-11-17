@@ -41,6 +41,7 @@ import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -61,6 +62,8 @@ public class XDOMGeneratorListener implements IWemListener
     private Parser parser;
     
     private LinkParser linkParser;
+    
+    private ImageParser imageParser;
 
     private class MarkerBlock extends AbstractBlock
     {
@@ -71,10 +74,11 @@ public class XDOMGeneratorListener implements IWemListener
 
     // TODO: Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links.
     // See http://code.google.com/p/wikimodel/issues/detail?id=87
-    public XDOMGeneratorListener(Parser parser, LinkParser linkParser)
+    public XDOMGeneratorListener(Parser parser, LinkParser linkParser, ImageParser imageParser)
     {
         this.parser = parser;
         this.linkParser = linkParser;
+        this.imageParser = imageParser;
     }
 
     public XDOM getDocument()
@@ -587,7 +591,7 @@ public class XDOMGeneratorListener implements IWemListener
         // The reason we get this event is because WikiModel handles links and images in the same manner. 
         if ((link.getType() == LinkType.URI) && (link.getReference().startsWith("image:"))) {
             String imageLocation = link.getReference().substring("image:".length());
-            resultBlock = new ImageBlock(imageLocation, isFreeStandingURI, parameters);
+            resultBlock = new ImageBlock(this.imageParser.parse(imageLocation), isFreeStandingURI, parameters);
         }
         
         return resultBlock;

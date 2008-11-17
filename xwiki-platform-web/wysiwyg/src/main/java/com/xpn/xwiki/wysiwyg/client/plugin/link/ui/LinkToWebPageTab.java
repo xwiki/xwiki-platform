@@ -20,130 +20,58 @@
 
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkGenerator;
 
 /**
  * Tab to add to the link dialog to get user data and produce a link to an external web page.
  * 
  * @version $Id$
  */
-public class LinkToWebPageTab extends AbstractHasLinkTab implements ClickListener
+public class LinkToWebPageTab extends AbstractExternalLinkTab
 {
     /**
-     * The text box where the user will insert the address of the web page.
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#buildUri()
      */
-    private final TextBox urlTextBox;
-
-    /**
-     * The link creation button.
-     */
-    private final Button createLinkButton;
-
-    /**
-     * Class constructor.
-     */
-    public LinkToWebPageTab()
+    protected String buildUri()
     {
-        Label urlLabel = new Label(Strings.INSTANCE.linkWebPageLabel());
-        Label labelLabel = new Label(Strings.INSTANCE.linkLabelLabel());        
-        createLinkButton = new Button(Strings.INSTANCE.linkCreateLinkButon());
-        createLinkButton.addClickListener(this);
+        String webPageAddress = getUriTextBox().getText().trim();
+        // If no protocol is specified add http by default
+        if (!webPageAddress.contains("://")) {
+            webPageAddress = "http://" + webPageAddress;
+        }
 
-        EnterListener enterListener = new EnterListener(createLinkButton);
-        urlTextBox = new TextBox();
-        urlTextBox.setText(Strings.INSTANCE.linkWebPageTextBox());
-        urlTextBox.addClickListener(this);
-        urlTextBox.addKeyboardListener(enterListener);
-        
-        getLabelTextBox().addKeyboardListener(enterListener);
-
-        FlowPanel mainPanel = new FlowPanel();
-        mainPanel.addStyleName("xLinkToUrl");
-        FlowPanel labelPanel = new FlowPanel();
-        labelPanel.addStyleName("label");
-        labelPanel.add(labelLabel);
-        labelPanel.add(getLabelTextBox());
-        FlowPanel urlPanel = new FlowPanel();
-        urlPanel.addStyleName("url");
-        urlPanel.add(urlLabel);
-        urlPanel.add(urlTextBox);
-        
-        mainPanel.add(labelPanel);
-        mainPanel.add(urlPanel);
-        mainPanel.add(createLinkButton);
-
-        initWidget(mainPanel);
+        return webPageAddress;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see AbstractExternalLinkTab#getErrorMessage()
      */
-    public void onClick(Widget sender)
+    protected String getErrorMessage()
     {
-        if (sender == createLinkButton) {
-            String url;
-            String webPageAddress = urlTextBox.getText();
-            if (!validateUserInput()) {
-                url = null;
-            } else {
-                // check if any protocol is use
-                if (webPageAddress.contains("://")) {
-                    url = webPageAddress;
-                } else {
-                    url = "http://" + webPageAddress;
-                }
-                setLink(LinkGenerator.getInstance().getExternalLink(getLinkLabel(), url));
-                getClickListeners().fireClick(this);
-            }
-        }
-        if (sender == urlTextBox) {
-            urlTextBox.selectAll();
-        }
+        return Strings.INSTANCE.linkWebPageAddressError();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see HasLink#initialize()
+     * @see AbstractExternalLinkTab#getInputDefaultText()
      */
-    public void initialize()
+    protected String getInputDefaultText()
     {
-        urlTextBox.setText(Strings.INSTANCE.linkWebPageTextBox());
-        if (getLabelTextBox().getText().trim().length() == 0) {
-            getLabelTextBox().setFocus(true);
-        } else {
-            urlTextBox.setFocus(true);
-        }
-        urlTextBox.selectAll();
+        return Strings.INSTANCE.linkWebPageTextBox();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see HasLink#validateUserInput()
+     * @see AbstractExternalLinkTab#getURILabel()
      */
-    public boolean validateUserInput()
+    protected String getURILabel()
     {
-        // Check the super class validation result
-        if (!super.validateUserInput()) {
-            return false;
-        }
-        // The url inserted by the user must not be void. Check that
-        if (this.urlTextBox.getText().trim().length() == 0
-            || this.urlTextBox.getText().equals(Strings.INSTANCE.linkWebPageTextBox())) {
-            Window.alert(Strings.INSTANCE.linkWebPageAddressError());
-            return false;
-        }
-        return true;
+        return Strings.INSTANCE.linkWebPageLabel();
     }
 }

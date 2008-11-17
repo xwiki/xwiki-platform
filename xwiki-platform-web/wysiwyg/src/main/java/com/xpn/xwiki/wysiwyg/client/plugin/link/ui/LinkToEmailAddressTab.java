@@ -19,22 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkGenerator;
 
 /**
  * Tab to add to the link dialog to get user data and produce an URL to an email address.
  * 
  * @version $Id$
  */
-public class LinkToEmailAddressTab extends AbstractHasLinkTab implements ClickListener
+public class LinkToEmailAddressTab extends AbstractExternalLinkTab
 {
     /**
      * URL protocol constant.
@@ -42,113 +34,47 @@ public class LinkToEmailAddressTab extends AbstractHasLinkTab implements ClickLi
     private static final String MAILTO = "mailto:";
 
     /**
-     * The text box where the user will insert the address of the web page.
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#buildUri()
      */
-    private final TextBox emailTextBox;
-
-    /**
-     * The link creation button.
-     */
-    private final Button createLinkButton;
-
-    /**
-     * Default constructor.
-     */
-    public LinkToEmailAddressTab()
+    protected String buildUri()
     {
-        Label emailLabel = new Label(Strings.INSTANCE.linkEmailLabel());
-        Label labelLabel = new Label(Strings.INSTANCE.linkLabelLabel());
-        createLinkButton = new Button(Strings.INSTANCE.linkCreateLinkButon());
-        createLinkButton.addClickListener(this);
-
-        EnterListener enterListener = new EnterListener(createLinkButton);
-        emailTextBox = new TextBox();
-        emailTextBox.setText(Strings.INSTANCE.linkEmailAddressTextBox());
-        emailTextBox.addClickListener(this);
-        emailTextBox.addKeyboardListener(enterListener);
-
-        getLabelTextBox().addKeyboardListener(enterListener);
-
-        FlowPanel mainPanel = new FlowPanel();
-        mainPanel.addStyleName("xLinkToUrl");
-        FlowPanel labelPanel = new FlowPanel();
-        labelPanel.addStyleName("label");
-        labelPanel.add(labelLabel);
-        labelPanel.add(getLabelTextBox());
-        FlowPanel emailPanel = new FlowPanel();
-        emailPanel.addStyleName("url");
-        emailPanel.add(emailLabel);
-        emailPanel.add(emailTextBox);
-        
-        mainPanel.add(labelPanel);
-        mainPanel.add(emailPanel);
-        mainPanel.add(createLinkButton);
-
-        initWidget(mainPanel);
+        String emailAddress = getUriTextBox().getText().trim();
+        // If url does not start with the desired protocol, add it
+        if (!emailAddress.startsWith(MAILTO)) {
+            emailAddress = MAILTO + emailAddress;
+        }
+        return emailAddress;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see AbstractExternalLinkTab#getErrorMessage()
      */
-    public void onClick(Widget sender)
+    protected String getErrorMessage()
     {
-        if (sender == createLinkButton) {
-            // try to create the link and close the dialog. Fail if the input does not validate
-            String url;
-            String emailAddress = emailTextBox.getText();
-            if (!validateUserInput()) {
-                url = null;
-            } else {
-                if (emailAddress.startsWith(MAILTO)) {
-                    url = emailAddress;
-                } else {
-                    url = MAILTO + emailAddress;
-                }
-                setLink(LinkGenerator.getInstance().getExternalLink(getLinkLabel(), url));
-                getClickListeners().fireClick(this);
-            }
-        }
-        if (sender == emailTextBox) {
-            emailTextBox.selectAll();
-        }
+        return Strings.INSTANCE.linkEmailAddressError();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see HasLink#initialize()
+     * @see AbstractExternalLinkTab#getInputDefaultText()
      */
-    public void initialize()
+    protected String getInputDefaultText()
     {
-        emailTextBox.setText(Strings.INSTANCE.linkEmailAddressTextBox());
-        // If there is label to set, set focus in the label field
-        if (getLabelTextBox().getText().trim().length() == 0) {
-            getLabelTextBox().setFocus(true);
-        } else {
-            emailTextBox.setFocus(true);
-        }
-        emailTextBox.selectAll();
+        return Strings.INSTANCE.linkEmailAddressTextBox();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see HasLink#validateUserInput()
+     * @see AbstractExternalLinkTab#getURILabel()
      */
-    public boolean validateUserInput()
+    protected String getURILabel()
     {
-        // Check the super class validation result
-        if (!super.validateUserInput()) {
-            return false;
-        }
-        // the email address must not be void. Check if this happens
-        if (this.emailTextBox.getText().trim().length() == 0
-            || this.emailTextBox.getText().equals(Strings.INSTANCE.linkEmailAddressTextBox())) {
-            Window.alert(Strings.INSTANCE.linkEmailAddressError());
-            return false;
-        }
-        return true;
+        return Strings.INSTANCE.linkEmailLabel();
     }
 }

@@ -42,6 +42,12 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
 {
     private DefaultXWikiRenderingEngine engine;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
+     */
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -49,23 +55,18 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         XWikiConfig config = new XWikiConfig();
 
         Mock mockServletContext = mock(ServletContext.class);
-        ByteArrayInputStream bais =
-            new ByteArrayInputStream("code=wiki:code:type:content".getBytes());
-        mockServletContext.stubs().method("getResourceAsStream")
-            .with(eq("/templates/macros.txt")).will(returnValue(bais));
-        mockServletContext.stubs().method("getResourceAsStream").with(
-            eq("/WEB-INF/oscache.properties")).will(
+        ByteArrayInputStream bais = new ByteArrayInputStream("code=wiki:code:type:content".getBytes());
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.txt")).will(
+            returnValue(bais));
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache.properties")).will(
             returnValue(new ByteArrayInputStream("".getBytes())));
-        mockServletContext.stubs().method("getResourceAsStream").with(
-            eq("/WEB-INF/oscache-local.properties")).will(
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache-local.properties")).will(
             returnValue(new ByteArrayInputStream("".getBytes())));
-        mockServletContext.stubs().method("getResourceAsStream").with(
-            eq("/skins/albatross/macros.vm")).will(
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/skins/albatross/macros.vm")).will(
             returnValue(new ByteArrayInputStream("".getBytes())));
-        mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.vm"))
-            .will(returnValue(new ByteArrayInputStream("".getBytes())));
-        XWikiServletContext engineContext =
-            new XWikiServletContext((ServletContext) mockServletContext.proxy());
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.vm")).will(
+            returnValue(new ByteArrayInputStream("".getBytes())));
+        XWikiServletContext engineContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
 
         XWiki xwiki = new XWiki(config, getContext(), engineContext, false);
         xwiki.setVersion("1.0");
@@ -104,19 +105,16 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
     }
 
     /**
-     * Test that links are preserved after rendering.
-     * XWIKI-2672
+     * Test that links are preserved after rendering. XWIKI-2672
      */
     public void testLinksAndCache() throws Exception
     {
         String link = "http://some:123/link";
-        String text =
-            "$context.setCacheDuration(1800)\n" +
-            link;
+        String text = "$context.setCacheDuration(1800)\n" + link;
         XWikiDocument document = new XWikiDocument();
 
         Utils.enablePlaceholders(getContext());
         String out = engine.renderText(text, document, getContext());
-        assertTrue( out.contains(link) );
+        assertTrue(out.contains(link));
     }
 }

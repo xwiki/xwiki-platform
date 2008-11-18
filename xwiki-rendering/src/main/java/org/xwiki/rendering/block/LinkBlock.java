@@ -101,4 +101,16 @@ public class LinkBlock extends AbstractFatherBlock
     {
         listener.endLink(getLink(), isFreeStandingURI(), getParameters());
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public Block clone()
+    {
+        LinkBlock clone = (LinkBlock) super.clone();
+        clone.link = getLink().clone();
+        return clone;
+    }
 }

@@ -130,6 +130,22 @@ public abstract class AbstractBlock implements Block
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.block.Block#replace(Block)
+     */
+    public void replace(List<Block> newBlocks)
+    {
+        List<Block> childrenBlocks = getParent().getChildren();
+        int pos = childrenBlocks.indexOf(this);
+        for (Block block : newBlocks) {
+            block.setParent(getParent());
+        }
+        childrenBlocks.addAll(pos, newBlocks);
+        childrenBlocks.remove(pos + newBlocks.size());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.block.Block#getChildren()
      */
     public List<Block> getChildren()
@@ -297,5 +313,31 @@ public abstract class AbstractBlock implements Block
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public Block clone()
+    {
+        AbstractBlock block;
+        try {
+            block = (AbstractBlock) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Should never happen
+            throw new RuntimeException("Failed to clone object", e);
+        }
+        block.parameters = new LinkedHashMap<String, String>(getParameters());
+        // Clone all children blocks. Note that we cannot use an iterator since we're going to change the objects 
+        // themselves. Using an iterator would lead to a ConcurrentModificationException
+        Object[] objectArray = getChildren().toArray();
+        block.childrenBlocks = new ArrayList<Block>();
+        for(Object object: objectArray) {
+            Block childBlock = (Block) object;
+            block.addChild((Block) childBlock.clone());
+        }
+        return block;
     }
 }

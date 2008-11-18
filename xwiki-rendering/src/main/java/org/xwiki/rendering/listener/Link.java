@@ -25,7 +25,7 @@ package org.xwiki.rendering.listener;
  * @version $Id: Link.java 10608 2008-06-23 12:25:23Z vmassol $
  * @since 1.5M2
  */
-public class Link
+public class Link implements Cloneable
 {
     /**
      * @see #getInterWikiAlias()
@@ -174,5 +174,22 @@ public class Link
         }
 
         return sb.toString();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public Link clone()
+    {
+        Link clone;
+        try {
+            clone = (Link) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Should never happen
+            throw new RuntimeException("Failed to clone object", e);
+        }
+        return clone;
     }
 }

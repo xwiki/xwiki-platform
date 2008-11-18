@@ -25,10 +25,27 @@ package org.xwiki.rendering.listener.xml;
  * @version $Id$
  * @since 1.7M2
  */
-public class XMLNode
+public class XMLNode implements Cloneable
 {
     public XMLNodeType getNodeType()
     {
         return XMLNodeType.UNKNOWN;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public XMLNode clone()
+    {
+        XMLNode clone;
+        try {
+            clone = (XMLNode) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Should never happen
+            throw new RuntimeException("Failed to clone object", e);
+        }
+        return clone;
     }
 }

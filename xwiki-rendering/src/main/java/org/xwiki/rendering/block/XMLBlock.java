@@ -58,4 +58,16 @@ public class XMLBlock extends AbstractFatherBlock
     {
         listener.endXMLNode(getXMLNode());
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public Block clone()
+    {
+        XMLBlock clone = (XMLBlock) super.clone();
+        clone.node = getXMLNode().clone();
+        return clone;
+    }
 }

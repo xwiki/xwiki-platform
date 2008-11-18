@@ -31,7 +31,7 @@ import org.xwiki.rendering.listener.Listener;
  * @version $Id$
  * @since 1.5M2
  */
-public interface Block
+public interface Block extends Cloneable
 {
     /**
      * Let the block send {@link Listener} events corresponding to its content. For example a Paragraph block will send
@@ -78,6 +78,13 @@ public interface Block
      */
     void insertChildAfter(Block blockToInsert, Block previousBlock);
 
+    /**
+     * Replaces the current block with the list of passed blocks.
+     * 
+     * @param newBlocks the new blocks to replace the current block with
+     */
+    void replace(List<Block> newBlocks);
+    
     /**
      * Get the parent block. All blocks have a parent and the top level parent is the {@link XDOM} object.
      * 
@@ -128,4 +135,10 @@ public interface Block
      * @since 1.6M1
      */
     <T extends Block> T getPreviousBlockByType(Class<T> blockClass, boolean recurse);
+    
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    Block clone();
 }

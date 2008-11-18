@@ -78,4 +78,16 @@ public class XMLElement extends XMLNode
         }
         return buffer.toString();
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public XMLNode clone()
+    {
+        XMLElement node = (XMLElement) super.clone();
+        node.attributes = new LinkedHashMap<String, String>(getAttributes());
+        return node;
+    }
 }

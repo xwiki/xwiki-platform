@@ -21,13 +21,19 @@ package org.xwiki.rendering.block;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.xml.XMLElement;
 
 import junit.framework.TestCase;
 
 /**
+ * Unit tests for Block manipulation, testing {@link AbstractBlock}.
+ * 
  * @version $Id$
  * @since 1.5M2
  */
@@ -86,5 +92,43 @@ public class BlockTest extends TestCase
         
         pb.insertChildBefore(wb, wb2);
         assertSame(wb, pb.getChildren().get(2));
+    }
+    
+    public void testReplaceBlock()
+    {
+        Block wb = new WordBlock("block");
+        Block parentBlock = new ParagraphBlock(Arrays.asList(wb));
+        
+        Block newBlock1 = new WordBlock("block1");
+        Block newBlock2 = new WordBlock("block2");
+        wb.replace(Arrays.asList(newBlock1, newBlock2));
+        
+        assertEquals(2, parentBlock.getChildren().size());
+        assertSame(newBlock1, parentBlock.getChildren().get(0));
+        assertSame(newBlock2, parentBlock.getChildren().get(1));
+    }
+    
+    public void testClone()
+    {
+        WordBlock wb = new WordBlock("block");
+        ImageBlock ib = new ImageBlock(new Image("document", "attachment"), true);
+        Link link = new Link();
+        link.setReference("reference");
+        LinkBlock lb = new LinkBlock(Arrays.asList((Block) new WordBlock("label")), link, false);
+        XMLBlock xb = new XMLBlock(new XMLElement("xml", Collections.singletonMap("key", "value")));
+        Block rootBlock = new ParagraphBlock(Arrays.asList((Block) wb, ib, lb, xb));
+
+        Block newRootBlock = rootBlock.clone();
+        
+        assertNotSame(rootBlock, newRootBlock);
+        assertNotSame(wb, newRootBlock.getChildren().get(0));
+        assertNotSame(ib, newRootBlock.getChildren().get(1));
+        assertNotSame(lb, newRootBlock.getChildren().get(2));
+        assertNotSame(lb, newRootBlock.getChildren().get(3));
+
+        assertEquals(wb.getWord(), ((WordBlock) newRootBlock.getChildren().get(0)).getWord());
+        assertNotSame(ib.getImage(), ((ImageBlock) newRootBlock.getChildren().get(1)).getImage());
+        assertNotSame(lb.getLink(), ((LinkBlock) newRootBlock.getChildren().get(2)).getLink());
+        assertNotSame(xb.getXMLNode(), ((XMLBlock) newRootBlock.getChildren().get(3)).getXMLNode());
     }
 }

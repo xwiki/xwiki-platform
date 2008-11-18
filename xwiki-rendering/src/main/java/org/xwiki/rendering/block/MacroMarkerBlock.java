@@ -40,11 +40,6 @@ public class MacroMarkerBlock extends AbstractFatherBlock
     private String name;
 
     /**
-     * The Macro parameters that we are preserving.
-     */
-    private Map<String, String> parameters;
-
-    /**
      * The Macro content that we are preserving.
      */
     private String content;
@@ -56,21 +51,14 @@ public class MacroMarkerBlock extends AbstractFatherBlock
 
     public MacroMarkerBlock(String name, Map<String, String> parameters, String content, List<Block> childBlocks)
     {
-        super(childBlocks);
+        super(childBlocks, parameters);
         this.name = name;
-        this.parameters = parameters;
         this.content = content;
     }
 
     public String getName()
     {
         return this.name;
-    }
-
-    @Override
-    public Map<String, String> getParameters()
-    {
-        return this.parameters;
     }
 
     public String getContent()

@@ -69,4 +69,16 @@ public class ImageBlock extends AbstractBlock
     {
         listener.onImage(getImage(), isFreeStandingURI(), getParameters());
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public Block clone()
+    {
+        ImageBlock clone = (ImageBlock) super.clone();
+        clone.image = getImage().clone();
+        return clone;
+    }
 }

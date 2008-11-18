@@ -25,7 +25,7 @@ package org.xwiki.rendering.listener;
  * @version $Id$
  * @since 1.7M3
  */
-public class Image
+public class Image implements Cloneable
 {
     /**
      * Name of the document containing the image attachment.
@@ -64,5 +64,22 @@ public class Image
     public String toString()
     {
         return "document = [" + getDocumentName() + "], attachment = [" + getAttachmentName() + "]";
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public Image clone()
+    {
+        Image clone;
+        try {
+            clone = (Image) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Should never happen
+            throw new RuntimeException("Failed to clone object", e);
+        }
+        return clone;
     }
 }

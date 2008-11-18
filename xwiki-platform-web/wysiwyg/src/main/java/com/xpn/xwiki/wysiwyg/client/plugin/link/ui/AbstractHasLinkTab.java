@@ -129,14 +129,15 @@ public abstract class AbstractHasLinkTab extends Composite implements HasLink
             labelTextBox.setText(labelText);
         }
     }
-    
+
     /**
-     * Sets the label for which this {@link HasLink} will generate the link HTML. 
+     * Sets the label for which this {@link HasLink} will generate the link HTML.
      * 
      * @param labelHTML the label's HTML value
-     * @param labelText the label's text value 
+     * @param labelText the label's text value
      */
-    public void setLabel(String labelHTML, String labelText) {
+    public void setLabel(String labelHTML, String labelText)
+    {
         setLabelHTML(labelHTML);
         setLabelText(labelText);
     }
@@ -144,7 +145,7 @@ public abstract class AbstractHasLinkTab extends Composite implements HasLink
     /**
      * {@inheritDoc}
      * 
-     * @see SourcesClickEvents#addClickListener(ClickListener)
+     * @see HasLink#addClickListener(ClickListener)
      */
     public void addClickListener(ClickListener listener)
     {
@@ -154,7 +155,7 @@ public abstract class AbstractHasLinkTab extends Composite implements HasLink
     /**
      * {@inheritDoc}
      * 
-     * @see SourcesClickEvents#removeClickListener(ClickListener)
+     * @see HasLink#removeClickListener(ClickListener)
      */
     public void removeClickListener(ClickListener listener)
     {

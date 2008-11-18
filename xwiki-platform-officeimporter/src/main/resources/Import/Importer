@@ -2,7 +2,7 @@
 
 <xwikidoc>
 <web>Import</web>
-<name>Converter</name>
+<name>Importer</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -48,50 +48,45 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </tags>
 </class>
-<name>Import.Converter</name>
+<name>Import.Importer</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
 <property>
 <tags/>
 </property>
 </object>
-<content>1 Office Converter
-
+<content>
+&lt;h1&gt;Office Importer Results!&lt;/h1&gt;
 ## Check the space
-#if(!$request.space || $request.space=="")
-	#error("You must input the target space name. Please [back&gt;Import.WebHome] to fill it.")
+#if(!$request.targetSpace || $request.targetSpace=="")
+	#error("Missing target space name. Please [go back&gt;Import.WebHome] and correct it.")
 #else
-	#set($space=$request.space)
+	#set($targetSpace=$request.targetSpace)
 #end
 
 ## Check the pagename
-#if(!$request.pagename || $request.pagename=="")
-	#error("You must input the target page name. Please [back&gt;Import.WebHome] to fill it.")
+#if(!$request.targetPage || $request.targetPage=="")
+	#error("Missing target page name. Please [go back&gt;Import.WebHome] and correct it.")
 #else
-	#set($pagename=$request.pagename)
+	#set($targetPage=$request.targetPage)
 #end
 
 ## Check the file path
 #set($fileUpload=$xwiki.fileupload)
-#set($filename=$fileUpload.getFileName("filepath"))
-#if(!$filename || $filename=="")
-	#error("You must input the file path to convert. Please [back&gt;Import.WebHome] to fill it.")
+#set($fileName=$fileUpload.getFileName("filePath"))
+#if(!$fileName || $fileName=="")
+	#error("Missing input file. Please [go back&gt;Import.WebHome] and correct it.")
 #end
 
 ## do convert
-#if(!$space || !$pagename || !$filename)
-	#error("Please [back&gt;Import.WebHome] to correct input.")
+#if(!$targetSpace || !$targetPage || !$fileName)
+	#error("Invalid input. Please [go back&gt;Import.WebHome] and correct it.")
 #else
-        #set($toXWikiSyntax=false)
-        #if($request.format == "xwiki")
-               #set($toXWikiSyntax=true)
-        #end
-	#set($sourceFileBytes=$fileUpload.getFileItemData("filepath"))
-	* Sourec file name: $filename
-	* target space: $space
-	* target page name: $pagename
-	#set($officeconverter=$xwiki.officeconverter)
-	$officeconverter.convert($sourceFileBytes, $filename, $space, $pagename, $toXWikiSyntax)
-	Conversion succeed. You can go to see the *[result&gt;$space.$pagename]*, or you can [go back&gt;Import.WebHome] to convert another document.
+	#set($fileContent=$fileUpload.getFileItemData("filePath"))
+	* Source Document: $fileName
+	* Target Space: $targetSpace
+	* Target Page: $targetPage	
+	$xwiki.officeimporter.importDocument($fileContent, $fileName, $targetSpace, $targetPage)
+	Conversion succeeded. You can view the *[result&gt;$targetSpace.$targetPage]*, or you can [go back&gt;Import.WebHome] to convert another document.
 #end</content>
 </xwikidoc>

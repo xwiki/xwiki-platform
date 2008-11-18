@@ -84,10 +84,10 @@
 #else
 	#set($fileContent=$fileUpload.getFileItemData("filePath"))
 	#set($options={"filterStyles":${request.filterStyles}})
-	#set($targetDocument="${targetSpace}.${targetPage}")
 	* Source Document: $fileName
-	* Target Document: $targetDocument
-	$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options)
+	* Target Space: $targetSpace
+	* Target Page: $targetPage	
+	$xwiki.officeimporter.importDocument($fileContent, $fileName, $targetSpace, $targetPage, $options)
 	Conversion succeeded. You can view the *[result&gt;$targetSpace.$targetPage]*, or you can [go back&gt;Import.WebHome] to convert another document.
 #end</content>
 </xwikidoc>

@@ -55,14 +55,13 @@
 <tags/>
 </property>
 </object>
-<content>1 Convert Office Document into XWiki
-
-&lt;form action='$xwiki.getURL("Import.Converter","view")' enctype="multipart/form-data" method="post"&gt;
-{table}&lt;p&gt;Office Document|&lt;input id="filepath" type="file" name="filepath" value="" size="40"/&gt;&lt;/p&gt;
-&lt;p&gt;Target Space|&lt;input name="space" type="textarea"/&gt;&lt;/p&gt;
-&lt;p&gt;Target PageName|&lt;input name="pagename" type="textarea"/&gt;&lt;/p&gt;
-&lt;p&gt;Result format|&lt;input type="radio" name="format" value="xhtml" checked="true"&gt;XHTML 1.0&lt;/input&gt;&lt;br/&gt;&lt;input type="radio" name="format" value="xwiki"&gt;XWiki Syntax 2.0&lt;/input&gt;&lt;/p&gt;
+<content> 
+&lt;h1&gt;XWiki Office Importer!&lt;/h1&gt;
+&lt;form action='$xwiki.getURL("Import.Importer","view")' enctype="multipart/form-data" method="post"&gt;
+{table}&lt;p&gt;Document|&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
+&lt;p&gt;Target Space|&lt;input name="targetSpace" type="textarea"/&gt;&lt;/p&gt;
+&lt;p&gt;Target Page|&lt;input name="targetPage" type="textarea"/&gt;&lt;/p&gt;
 {table}
-&lt;p&gt;&lt;input type="submit" value="Convert"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;input type="submit" value="Import"/&gt;&lt;/p&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

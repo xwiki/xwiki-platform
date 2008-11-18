@@ -791,6 +791,28 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         this.linkRenderer.endRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
+     * @since 1.7M3
+     */
+    public void beginError(String message, String description)
+    {
+        // Don't do anything since we don't want errors to be visible in XWiki syntax.
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endError(String, String)
+     * @since 1.7M3
+     */
+    public void endError(String message, String description)
+    {
+        // Don't do anything since we don't want errors to be visible in XWiki syntax.
+    }
+
     protected void printParameters(Map<String, String> parameters)
     {
         printParameters(parameters, true);

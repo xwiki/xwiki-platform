@@ -823,4 +823,28 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         getXHTMLWikiPrinter().printXMLElement("img", attributes);
         getXHTMLWikiPrinter().printXMLComment("stopimage");
     }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
+     * @since 1.7M3
+     */
+    public void beginError(String message, String description)
+    {
+        getXHTMLWikiPrinter().printXMLStartElement("span", new String[][] {{"class", "xwikierror"}});
+        getXHTMLWikiPrinter().printXML(message);
+        getXHTMLWikiPrinter().printXMLComment("errordescription:" + description);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endError(String, String)
+     * @since 1.7M3
+     */
+    public void endError(String message, String description)
+    {
+        getXHTMLWikiPrinter().printXMLEndElement("span");
+    }
 }

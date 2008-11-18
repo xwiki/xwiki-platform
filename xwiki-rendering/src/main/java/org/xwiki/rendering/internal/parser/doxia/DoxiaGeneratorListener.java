@@ -491,4 +491,26 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.figureGraphics(image.getAttachmentName());
         this.sink.figure_();
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
+     * @since 1.7M3
+     */
+    public void beginError(String message, String description)
+    {
+        // Nothing to do since Doxia doesn't support the notion of Error events.
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endError(String, String)
+     * @since 1.7M3
+     */
+    public void endError(String message, String description)
+    {
+        // Nothing to do since Doxia doesn't support the notion of Error events.
+    }
 }

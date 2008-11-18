@@ -392,6 +392,28 @@ public class EventsRenderer extends AbstractPrintRenderer
            + "[" + image.getAttachmentName() + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
+     * @since 1.7M3
+     */
+    public void beginError(String message, String description)
+    {
+        println("beginError: [" + message + "] [" + description + "]");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endError(String, String)
+     * @since 1.7M3
+     */
+    public void endError(String message, String description)
+    {
+        println("endError: [" + message + "] [" + description + "]");
+    }
+
     public String getEscaped(String str)
     {
         String printableStr;

@@ -19,7 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
@@ -328,7 +330,294 @@ public abstract class DOMUtils
      * in the inner HTML.
      * 
      * @param element element to set the inner HTML for
-     * @param html the html string to set
+     * @param html the HTML string to set
      */
     public abstract void setInnerHTML(Element element, String html);
+
+    /**
+     * @param alice A DOM node.
+     * @param bob A DOM node.
+     * @return The nearest common ancestor of the given nodes.
+     */
+    public Node getNearestCommonAncestor(Node alice, Node bob)
+    {
+        if (alice == bob) {
+            return alice;
+        }
+
+        // Build the chain of parents
+        List<Node> aliceAncestors = getAncestors(alice);
+        List<Node> bobAncestors = getAncestors(bob);
+
+        // Find where the parent chain differs
+        int count = Math.min(aliceAncestors.size(), bobAncestors.size());
+        int aliceIndex = aliceAncestors.size();
+        int bobIndex = bobAncestors.size();
+        Node ancestor = null;
+        while (count-- > 0 && aliceAncestors.get(--aliceIndex) == bobAncestors.get(--bobIndex)) {
+            ancestor = aliceAncestors.get(aliceIndex);
+        }
+        return ancestor;
+    }
+
+    /**
+     * @param node A DOM node.
+     * @return The list of ancestors of the given node, starting with it.
+     */
+    public List<Node> getAncestors(Node node)
+    {
+        List<Node> ancestors = new ArrayList<Node>();
+        Node ancestor = node;
+        while (ancestor != null) {
+            ancestors.add(ancestor);
+            ancestor = ancestor.getParentNode();
+        }
+        return ancestors;
+    }
+
+    /**
+     * Clones the contents of the given node. If node type is text, CDATA or comment then only the data between
+     * startOffset (including) and endOffset is kept. If node type is element then only the child nodes with indexes
+     * between startOffset (including) and endOffset are included in the document fragment returned.
+     * 
+     * @param node The DOM node whose contents will be cloned.
+     * @param startOffset the index of the first child to clone or the first character to include in the cloned
+     *            contents.
+     * @param endOffset specifies where the cloned contents end.
+     * @return the cloned contents of the given node, between start offset and end offset.
+     */
+    public DocumentFragment cloneNodeContents(Node node, int startOffset, int endOffset)
+    {
+        DocumentFragment contents = ((Document) node.getOwnerDocument()).createDocumentFragment();
+        switch (node.getNodeType()) {
+            case Node.TEXT_NODE:
+            case 4:
+                // CDATA
+            case 8:
+                // COMMENT
+                if (startOffset < endOffset) {
+                    Node clone = node.cloneNode(false);
+                    clone.setNodeValue(node.getNodeValue().substring(startOffset, endOffset));
+                    contents.appendChild(clone);
+                }
+                break;
+            case Node.ELEMENT_NODE:
+                for (int i = startOffset; i < endOffset; i++) {
+                    contents.appendChild(node.getChildNodes().getItem(i).cloneNode(true));
+                }
+                break;
+            default:
+                // ignore
+        }
+        return contents;
+    }
+
+    /**
+     * Clones the given DOM node, keeping only the contents between start and end offset. If node type is text, CDATA or
+     * comment then both offsets represent character indexes. Otherwise they represent child indexes.
+     * 
+     * @param node The DOM node to be cloned.
+     * @param startOffset specifies where to start the cloning.
+     * @param endOffset specifies where to end the cloning.
+     * @return A clone of the given node, containing only the contents between start and end offset.
+     */
+    public Node cloneNode(Node node, int startOffset, int endOffset)
+    {
+        Node clone = node.cloneNode(false);
+        switch (node.getNodeType()) {
+            case Node.TEXT_NODE:
+            case 4:
+                // CDATA
+            case 8:
+                // COMMENT
+                clone.setNodeValue(node.getNodeValue().substring(startOffset, endOffset));
+                return clone;
+            case Node.ELEMENT_NODE:
+                for (int i = startOffset; i < endOffset; i++) {
+                    clone.appendChild(node.getChildNodes().getItem(i).cloneNode(true));
+                }
+                return clone;
+            default:
+                throw new IllegalArgumentException("Unsupported node type!");
+        }
+    }
+
+    /**
+     * @param node A DOM node.
+     * @return the number of characters if the given node is a text, a CDATA section or a comment. Otherwise the
+     *         returned value is the number of child nodes.
+     */
+    public int getLength(Node node)
+    {
+        switch (node.getNodeType()) {
+            case Node.TEXT_NODE:
+            case 4:
+                // CDATA
+            case 8:
+                // COMMENT
+                return node.getNodeValue().length();
+            default:
+                return node.getChildNodes().getLength();
+        }
+    }
+
+    /**
+     * Clones the left or right side of the subtree rooted in the given node.
+     * 
+     * @param node The root of the subtree whose left or right side will be cloned.
+     * @param offset Marks the boundary between the left and the right subtrees. It can be either a character index or a
+     *            child index, depending on the type of the given node.
+     * @param left Specifies which of the subtrees to be cloned.
+     * @return The clone of the specified subtree.
+     */
+    public Node cloneNode(Node node, int offset, boolean left)
+    {
+        return left ? cloneNode(node, 0, offset) : cloneNode(node, offset, getLength(node));
+    }
+
+    /**
+     * Clones the node specified by its parent and its descendant, including only the left or right part of the tree
+     * whose separator is the path from the given descendant to the parent of the cloned node.
+     * 
+     * @param parent The parent of the cloned node.
+     * @param descendant A descendant of the cloned node.
+     * @param offset The offset within the given descendant. It can be either a character index or a child index
+     *            depending on the descendant node type.
+     * @param left Specifies which subtree to be cloned. Left and right subtrees are delimited by the path from the
+     *            given descendant to the parent of the cloned node.
+     * @return The clone of the specified subtree.
+     */
+    public Node cloneNode(Node parent, Node descendant, int offset, boolean left)
+    {
+        int delta = left ? -1 : +1;
+        int index = getNodeIndex(descendant) + delta;
+        Node clone = cloneNode(descendant, offset, left);
+        Node node = descendant.getParentNode();
+        while (node != parent) {
+            Node child = clone;
+            clone = cloneNode(node, index, left);
+            if (left || clone.getFirstChild() == null) {
+                clone.appendChild(child);
+            } else {
+                clone.insertBefore(child, clone.getFirstChild());
+            }
+            index = getNodeIndex(node) + delta;
+            node = node.getParentNode();
+        }
+        return clone;
+    }
+
+    /**
+     * @param parent The parent node of the retrieved child.
+     * @param descendant A descendant of the retrieved child.
+     * @return The child of the given parent, which has the specified descendant.
+     */
+    public Node getChild(Node parent, Node descendant)
+    {
+        Node child = descendant;
+        while (child != null && child.getParentNode() != parent) {
+            child = child.getParentNode();
+        }
+        return child;
+    }
+
+    /**
+     * Inserts the given child node after the reference node.
+     * 
+     * @param newChild The child node to be inserted.
+     * @param refChild The reference node.
+     */
+    public void insertAfter(Node newChild, Node refChild)
+    {
+        if (refChild.getNextSibling() != null) {
+            refChild.getParentNode().insertBefore(newChild, refChild.getNextSibling());
+        } else {
+            refChild.getParentNode().appendChild(newChild);
+        }
+    }
+
+    /**
+     * Deletes the contents of the given node between the specified offsets. If node type is text, CDATA or comment then
+     * only the data between startOffset (including) and endOffset is deleted. If node type is element then only the
+     * child nodes with indexes between startOffset (including) and endOffset are deleted.
+     * 
+     * @param node The DOM node whose contents will be deleted.
+     * @param startOffset the index of the first child or the first character to delete, depending on node type.
+     * @param endOffset specifies where to stop deleting content.
+     */
+    public void deleteNodeContents(Node node, int startOffset, int endOffset)
+    {
+        switch (node.getNodeType()) {
+            case Node.TEXT_NODE:
+            case 4:
+                // CDATA
+            case 8:
+                // COMMENT
+                if (startOffset < endOffset) {
+                    node.setNodeValue(node.getNodeValue().substring(0, startOffset)
+                        + node.getNodeValue().substring(endOffset));
+                }
+                break;
+            case Node.ELEMENT_NODE:
+                for (int i = startOffset; i < endOffset; i++) {
+                    node.removeChild(node.getChildNodes().getItem(startOffset));
+                }
+                break;
+            default:
+                // ignore
+        }
+    }
+
+    /**
+     * Deletes the left or right side of the subtree rooted in the given node.
+     * 
+     * @param node The root of the subtree whose left or right side will be deleted.
+     * @param offset Marks the boundary between the left and the right subtrees. It can be either a character index or a
+     *            child index, depending on the type of the given node.
+     * @param left Specifies which of the subtrees to be deleted.
+     */
+    public void deleteNodeContents(Node node, int offset, boolean left)
+    {
+        if (left) {
+            deleteNodeContents(node, 0, offset);
+        } else {
+            deleteNodeContents(node, offset, getLength(node));
+        }
+    }
+
+    /**
+     * Deletes left or right siblings of the given node.
+     * 
+     * @param node The DOM node whose left or right siblings will be deleted.
+     * @param left Specifies which siblings to delete.
+     */
+    public void deleteSiblings(Node node, boolean left)
+    {
+        Node sibling = left ? node.getPreviousSibling() : node.getNextSibling();
+        while (sibling != null) {
+            node.getParentNode().removeChild(sibling);
+            sibling = left ? node.getPreviousSibling() : node.getNextSibling();
+        }
+    }
+
+    /**
+     * Given a subtree specified by its root parent and one of the inner nodes, this method deletes the left or right
+     * part delimited by the path from the given descendant (inner node) to the root parent.
+     * 
+     * @param parent The parent node of the subtree's root.
+     * @param descendant An inner node within the specified subtree.
+     * @param offset The offset within the given descendant. It can be either a character index or a child index
+     *            depending on the descendant node type.
+     * @param left Specifies which side of the subtree to be deleted. Left and right parts are delimited by the path
+     *            from the given descendant to the parent of the subtree's root.
+     */
+    public void deleteNodeContents(Node parent, Node descendant, int offset, boolean left)
+    {
+        deleteNodeContents(descendant, offset, left);
+        Node node = descendant;
+        while (node.getParentNode() != parent) {
+            deleteSiblings(node, left);
+            node = node.getParentNode();
+        }
+    }
 }

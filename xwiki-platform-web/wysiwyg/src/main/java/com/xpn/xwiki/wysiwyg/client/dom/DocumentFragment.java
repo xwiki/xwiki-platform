@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom;
 
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Node;
 
 /**
@@ -35,5 +36,15 @@ public final class DocumentFragment extends Node
      */
     protected DocumentFragment()
     {
+    }
+
+    /**
+     * @return The HTML serialization of this DOM fragment.
+     */
+    public String getInnerHTML()
+    {
+        DivElement container = ((Document) getOwnerDocument()).xCreateDivElement();
+        container.appendChild(this);
+        return container.getInnerHTML();
     }
 }

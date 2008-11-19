@@ -20,6 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
 
@@ -86,4 +90,104 @@ public abstract class AbstractRange<R extends JavaScriptObject> implements Range
      *         equal to, or after the corresponding boundary-point of sourceRange.
      */
     protected abstract short compareBoundaryPoints(RangeCompare how, R sourceJSRange);
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#cloneContents()
+     */
+    public DocumentFragment cloneContents()
+    {
+        Node start = getStartContainer();
+        Node end = getEndContainer();
+        Node root = DOMUtils.getInstance().getNearestCommonAncestor(start, end);
+        int startOffset = getStartOffset();
+        int endOffset = getEndOffset();
+
+        if (start == end) {
+            return DOMUtils.getInstance().cloneNodeContents(root, startOffset, endOffset);
+        }
+
+        DocumentFragment contents = ((Document) root.getOwnerDocument()).createDocumentFragment();
+
+        int startIndex = startOffset;
+        if (start != root) {
+            contents.appendChild(DOMUtils.getInstance().cloneNode(root, start, startOffset, false));
+            startIndex = DOMUtils.getInstance().getNodeIndex(DOMUtils.getInstance().getChild(root, start)) + 1;
+        }
+
+        if (end != root) {
+            int endIndex = DOMUtils.getInstance().getNodeIndex(DOMUtils.getInstance().getChild(root, end));
+            contents.appendChild(DOMUtils.getInstance().cloneNodeContents(root, startIndex, endIndex));
+            contents.appendChild(DOMUtils.getInstance().cloneNode(root, end, endOffset, true));
+        } else {
+            contents.appendChild(DOMUtils.getInstance().cloneNodeContents(root, startIndex, endOffset));
+        }
+
+        return contents;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#deleteContents()
+     */
+    public void deleteContents()
+    {
+        Node start = getStartContainer();
+        Node end = getEndContainer();
+        Node root = DOMUtils.getInstance().getNearestCommonAncestor(start, end);
+        int startOffset = getStartOffset();
+        int endOffset = getEndOffset();
+
+        if (start == end) {
+            DOMUtils.getInstance().deleteNodeContents(root, startOffset, endOffset);
+        } else {
+            int startIndex = startOffset;
+            if (start != root) {
+                DOMUtils.getInstance().deleteNodeContents(root, start, startOffset, false);
+                startIndex = DOMUtils.getInstance().getNodeIndex(DOMUtils.getInstance().getChild(root, start)) + 1;
+            }
+
+            int endIndex = endOffset;
+            if (end != root) {
+                endIndex = DOMUtils.getInstance().getNodeIndex(DOMUtils.getInstance().getChild(root, end));
+                DOMUtils.getInstance().deleteNodeContents(root, end, endOffset, true);
+            }
+            DOMUtils.getInstance().deleteNodeContents(root, startIndex, endIndex);
+        }
+
+        setEnd(start, startOffset);
+        setStart(start, startOffset);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#getCommonAncestorContainer()
+     */
+    public Node getCommonAncestorContainer()
+    {
+        return DOMUtils.getInstance().getNearestCommonAncestor(getStartContainer(), getEndContainer());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#isCollapsed()
+     */
+    public boolean isCollapsed()
+    {
+        return getStartContainer() == getEndContainer() && getStartOffset() == getEndOffset();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#toHTML()
+     */
+    public String toHTML()
+    {
+        return cloneContents().getInnerHTML();
+    }
 }

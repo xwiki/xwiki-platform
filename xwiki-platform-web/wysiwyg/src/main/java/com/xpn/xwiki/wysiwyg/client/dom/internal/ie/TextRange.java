@@ -19,7 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.user.client.Random;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
@@ -58,6 +62,14 @@ public final class TextRange extends NativeRange
     }
 
     /**
+     * The list of all HTML tags that must be empty. All of them appear as <code>&lt;tagName/&gt;</code> in the HTML
+     * code.
+     */
+    public static final List<String> HTML_EMPTY_TAGS =
+        Arrays.asList(new String[] {"area", "base", "basefont", "br", "col", "frame", "hr", "img", "input", "isindex",
+            "link", "meta", "param", "nextid", "bgsound", "embed", "keygen", "spacer", "wbr"});
+
+    /**
      * Default constructor. Needs to be protected because all instances are created from JavaScript.
      */
     protected TextRange()
@@ -90,14 +102,25 @@ public final class TextRange extends NativeRange
     public static TextRange newInstance(ControlRange controlRange)
     {
         TextRange textRange = newInstance(controlRange.getOwnerDocument());
-        textRange.moveToElementText(controlRange.get(0));
+        textRange.setEndPoint(RangeCompare.START_TO_START, controlRange.get(0));
+        textRange.setEndPoint(RangeCompare.END_TO_END, controlRange.get(0));
         return textRange;
     }
 
     /**
      * @return The HTML source as a valid HTML fragment.
      */
-    public native String getHTML()
+    public String getHTML()
+    {
+        // We overwrite the default behavior because when we place the caret inside an empty element like span the
+        // htmlText property is wrongly set to "<span></span>", although pasting HTML code doesn't overwrite the span.
+        return isCollapsed() ? "" : xGetHTML();
+    }
+
+    /**
+     * @return The HTML source as a valid HTML fragment.
+     */
+    private native String xGetHTML()
     /*-{
         return this.htmlText;
     }-*/;
@@ -110,15 +133,24 @@ public final class TextRange extends NativeRange
      * 
      * @param html The HTML text to paste. The string can contain text and any combination of the HTML tags.
      */
-    public native void setHTML(String html)
-    /*-{
-        // We do this because IE trims the leading comment (if any) in the html, so we add a dummy text before it and 
-        // remove it afterwards. We need this when adding wikilinks for example, who's html start with a comment. Even 
+    public void setHTML(String html)
+    {
+        // We do this because IE trims the leading comment (if any) in the html, so we add a dummy text before it and
+        // remove it afterwards. We need this when adding wikilinks for example, who's html start with a comment. Even
         // if we hadn't the links, it is generally a good method to make sure that "what you set is what you get".
-        var id = 'org.xwiki.wysiwyg.iesucks';
-        this.pasteHTML('<span id="' + id + '">iesucks</span>' + html);
-        var marker = this.ownerDocument.getElementById(id);
-        marker.parentNode.removeChild(marker);
+        String id = "org.xwiki.wysiwyg.iesucks";
+        xSetHTML("<span id=\"" + id + "\">iesucks</span>" + html);
+        Node marker = getOwnerDocument().getElementById(id);
+        marker.getParentNode().removeChild(marker);
+    }
+
+    /**
+     * @param html The HTML text to paste.
+     * @see #setHTML(String)
+     */
+    private native void xSetHTML(String html)
+    /*-{
+        this.pasteHTML(html);
     }-*/;
 
     /**
@@ -143,7 +175,20 @@ public final class TextRange extends NativeRange
      * @param toStart if true moves the insertion point to the beginning of the text range. Otherwise, moves the
      *            insertion point to the end of the text range.
      */
-    public native void collapse(boolean toStart)
+    public void collapse(boolean toStart)
+    {
+        if (!isCollapsed()) {
+            xCollapse(toStart);
+        }
+    }
+
+    /**
+     * Moves the insertion point to the beginning or end of the current range.
+     * 
+     * @param toStart if true moves the insertion point to the beginning of the text range. Otherwise, moves the
+     *            insertion point to the end of the text range.
+     */
+    private native void xCollapse(boolean toStart)
     /*-{
         this.collapse(toStart);
     }-*/;
@@ -305,7 +350,25 @@ public final class TextRange extends NativeRange
      * 
      * @param element The element object to move to.
      */
-    public native void moveToElementText(Element element)
+    public void moveToElementText(Element element)
+    {
+        if (element.getInnerText().length() > 0 || element.getOffsetWidth() > 0
+            || HTML_EMPTY_TAGS.contains(element.getTagName().toLowerCase())) {
+            xMoveToElementText(element);
+        } else {
+            element.appendChild(getOwnerDocument().createTextNode(" "));
+            xMoveToElementText(element);
+            findText(" ", 0, 0);
+            setText("");
+        }
+    }
+
+    /**
+     * Moves the text range so that the start and end positions of the range encompass the text in the given element.
+     * 
+     * @param element The element object to move to.
+     */
+    private native void xMoveToElementText(Element element)
     /*-{
         this.moveToElementText(element);
     }-*/;
@@ -335,6 +398,42 @@ public final class TextRange extends NativeRange
     public void setEndPoint(RangeCompare how, TextRange range)
     {
         // In Internet Explorer the meaning of RangeCompare is reversed, so we reverse the end points.
+        switch (how) {
+            case END_TO_START:
+                // Move the start of this range to the end of the given range.
+                if (compareEndPoints(RangeCompare.END_TO_END, range) < 0) {
+                    // The end point needs to be updated also because other wise the start point will go beyond the end
+                    // point.
+                    setEndPoint(RangeCompare.END_TO_END.toString(), range);
+                }
+                break;
+            case START_TO_START:
+                // Move the start of this range to the start of the given range.
+                if (compareEndPoints(RangeCompare.START_TO_END, range) < 0) {
+                    // The end point needs to be updated also because other wise the start point will go beyond the end
+                    // point.
+                    setEndPoint(RangeCompare.END_TO_START.toString(), range);
+                }
+                break;
+            case END_TO_END:
+                // Move the end of this range to the end of the given range.
+                if (compareEndPoints(RangeCompare.END_TO_START, range) > 0) {
+                    // The start point needs to be updated also because other wise the end point will go before the
+                    // start point.
+                    setEndPoint(RangeCompare.START_TO_END.toString(), range);
+                }
+                break;
+            case START_TO_END:
+                // Move the end of this range to the start of the given range.
+                if (compareEndPoints(RangeCompare.START_TO_START, range) > 0) {
+                    // The start point needs to be updated also because other wise the end point will go before the
+                    // start point.
+                    setEndPoint(RangeCompare.START_TO_START.toString(), range);
+                }
+                break;
+            default:
+                // We shouldn't get here.
+        }
         setEndPoint(how.reverse().toString(), range);
     }
 
@@ -401,6 +500,7 @@ public final class TextRange extends NativeRange
         } else {
             throw new IllegalArgumentException("Expecting element or text node!");
         }
+        // We shift and not collapse because the reference range can change its end points after being collapsed.
         refRange.shift(Unit.CHARACTER, offset);
         this.setEndPoint(how, refRange);
     }
@@ -414,31 +514,43 @@ public final class TextRange extends NativeRange
     public void moveToTextNode(Text textNode)
     {
         if (textNode.getLength() == 0) {
-            // In Internet Explorer you cannot position the caret inside an empty text node. As a consequence we have to
-            // insert a space character. We have to do this in order to ensure that the implementation of W3C Range
-            // specification using IE's API is as powerful as the Mozilla one.
-            // @see http://forums.microsoft.com/msdn/ShowPost.aspx?postid=4097966
+            // We haven't found a way to place the caret inside an empty text node so far thus we add a space character.
+            // Let's use this hack till we find a proper solution, maybe using the code that is skipped below.
             textNode.setData(" ");
-        }
+            moveToTextNode(textNode);
 
-        int startOffset = 0;
-        Node refNode = textNode.getPreviousSibling();
-        // We look for a reference element. We first search for the closest element sibling to the left of the textNode.
-        // At the same time, we count the number of character we jump back.
-        while (refNode != null && refNode.getNodeType() != Node.ELEMENT_NODE) {
-            if (refNode.getNodeType() == Node.TEXT_NODE) {
-                startOffset += refNode.getNodeValue().length();
+            // NOTE: The following code manages to place both end points of this text range inside the empty text node,
+            // but unfortunately the end points don't remain there after the range is selected. We're keeping this code
+            // for later adjustments hopping that we'll be able to place the caret inside an empty text node.
+            if (true) {
+                // Skip the next part. To be revisited!
+                return;
             }
-            refNode = refNode.getPreviousSibling();
-        }
-        if (refNode == null) {
-            // Looks like textNode doesn't have any previous element siblings.
-            // Thus we use the parent element as the reference point.
-            refNode = textNode.getParentNode();
-        }
 
-        this.moveToElementText(Element.as(refNode));
-        this.shift(Unit.CHARACTER, startOffset);
+            // NOTE: This trick won't work in some case when the parent element contains comment child nodes.
+
+            // We search for a place holder text that isn't already contained by the parent element.
+            String placeholder = String.valueOf(Random.nextInt());
+            Element parent = (Element) textNode.getParentNode();
+            while (parent.getInnerText().contains(placeholder)) {
+                placeholder = String.valueOf(Random.nextInt());
+            }
+            // We insert the place holder text, find it and delete it.
+            textNode.setData(placeholder);
+            xMoveToElementText(parent);
+            findText(placeholder, 0, 0);
+            setText("");
+        } else {
+            // We create a reference element and we insert it before the given text node in order to place the start of
+            // the range after this element. In the end we remove the reference element.
+            Element refElement = getOwnerDocument().xCreateSpanElement().cast();
+            refElement.setInnerText(" ");
+            textNode.getParentNode().insertBefore(refElement, textNode);
+            moveToElementText(refElement);
+            collapse(false);
+            moveEnd(Unit.CHARACTER, textNode.getLength());
+            refElement.getParentNode().removeChild(refElement);
+        }
     }
 
     /**
@@ -460,4 +572,97 @@ public final class TextRange extends NativeRange
             return moveEnd(unit, count);
         }
     }
+
+    /**
+     * Searches for text in the document and positions the start and end points of the range to encompass the search
+     * string.<br/>
+     * The value passed for the searchScope parameter controls the part of the document, relative to the range, that is
+     * searched. The behavior of the findText method depends on whether the range is collapsed or not:
+     * <ul>
+     * <li>If the range is collapsed, passing a large positive number causes the text to the right of the range to be
+     * searched. Passing a large negative number causes the text to the left of the range to be searched.</li>
+     * <li>If the range is not collapsed, passing a large positive number causes the text to the right of the start of
+     * the range to be searched. Passing a large negative number causes the text to the left of the end of the range to
+     * be searched. Passing 0 causes only the text selected by the range to be searched.</li>
+     * </ul>
+     * A text range is not modified if the text specified for the findText method is not found.
+     * 
+     * @param text The text to find.
+     * @param searchScope The number of characters to search from the starting point of the range. A positive integer
+     *            indicates a forward search; a negative integer indicates a backward search.
+     * @param flags One or more of the following flags to indicate the type of search:
+     *            <table>
+     *            <tr>
+     *            <td>0</td>
+     *            <td>Default. Match partial words.</td>
+     *            </tr>
+     *            <tr>
+     *            <td>1</td>
+     *            <td>Match backwards.</td>
+     *            </tr>
+     *            <tr>
+     *            <td>2</td>
+     *            <td>Match whole words only.</td>
+     *            </tr>
+     *            <tr>
+     *            <td>4</td>
+     *            <td>Match case.</td>
+     *            </tr>
+     *            <tr>
+     *            <td>131072</td>
+     *            <td>Match bytes.</td>
+     *            </tr>
+     *            <tr>
+     *            <td>536870912</td>
+     *            <td>Match diacritical marks.</td>
+     *            </tr>
+     *            <tr>
+     *            <td>1073741824</td>
+     *            <td>Match Kashida character.</td>
+     *            </tr>
+     *            <tr>
+     *            <td>2147483648</td>
+     *            <td>Match AlefHamza character.</td>
+     *            </tr>
+     *            </table>
+     * @return true if the given text was found.
+     */
+    public native boolean findText(String text, int searchScope, int flags)
+    /*-{
+        return this.findText(text, searchScope, flags);
+    }-*/;
+
+    /**
+     * Tests if this text range equals the given text range.
+     * 
+     * @param other the text range to compare with this text range.
+     * @return true if the given text range is equal to this text rage.
+     */
+    public native boolean isEqual(TextRange other)
+    /*-{
+        return this.isEqual(other);
+    }-*/;
+
+    /**
+     * Tests whether one range is contained within another.
+     * 
+     * @param other The text range that might be contained in this text range.
+     * @return true if the given text range is contained within or is equal to this text range.
+     */
+    public native boolean inRange(TextRange other)
+    /*-{
+        return this.inRange(other);
+    }-*/;
+
+    /**
+     * @return true if this text range is collapsed.
+     */
+    public native boolean isCollapsed()
+    /*-{
+        // IE seems to forbid the selection of DOM elements with no inner text and with 0-width.
+        // We use this way to detect the collapsed state because when we place the caret inside 
+        // an empty element like span the htmlText property is wrongly set to "<span></span>".
+        // Thus we cannot use the htmlText property to detect the collapsed state.
+        return this.text.length == 0 && this.boundingWidth == 0;
+    }-*/;
 }

@@ -37,13 +37,13 @@ public class RangeTest extends AbstractWysiwygClientTest
         Document doc = Document.get().cast();
 
         DivElement container = doc.createDivElement();
-        container.setInnerHTML("<strong>aa</strong><em>bb</em>");
+        container.setInnerHTML("<strong>aa</strong>b<em>cc</em>");
         doc.getBody().appendChild(container);
 
         Range range = doc.createRange();
         range.setStart(container.getFirstChild().getFirstChild(), 1);
         range.setEnd(container.getLastChild().getFirstChild(), 1);
 
-        assertEquals("<strong>a</strong><em>b</em>", range.toHTML());
+        assertEquals("<strong>a</strong>b<em>c</em>", range.toHTML().toLowerCase());
     }
 }

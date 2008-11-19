@@ -94,4 +94,20 @@ public enum RangeCompare
                 return null;
         }
     }
+
+    /**
+     * @param firstEndPoint true for START and false for END.
+     * @param secondEndPoint true for START and false for END.
+     * @return the value associated with the specified end points.
+     */
+    public static RangeCompare valueOf(boolean firstEndPoint, boolean secondEndPoint)
+    {
+        if (firstEndPoint) {
+            // START_TO_
+            return secondEndPoint ? START_TO_START : START_TO_END;
+        } else {
+            // END_TO_
+            return secondEndPoint ? END_TO_START : END_TO_END;
+        }
+    }
 }

@@ -12,6 +12,14 @@ public interface Images extends ImageBundle
 {
     Images INSTANCE = (Images) GWT.create(Images.class);
 
+    /**
+     * This image was added just to prevent IE6 from crashing. It's a stupid fix but nevertheless it allows us to test
+     * the editor on IE6 till we find a better one.
+     * 
+     * @return An enchanted image to be used against IE6's black magic.
+     */
+    AbstractImagePrototype fixIE();
+
     @Resource("attachment.gif")
     AbstractImagePrototype attachment();
 

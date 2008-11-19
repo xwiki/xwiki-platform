@@ -106,7 +106,7 @@ public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
         selection.addRange(range);
         assertEquals("cd", selection.toString());
         assertTrue(insertHTML.execute(rta, "<!--x-->y<del>z</del>"));
-        assertEquals("<em>ab</em><!--x-->y<del>z</del><ins>ef</ins>", container.getInnerHTML());
+        assertEquals("<em>ab</em><!--x-->y<del>z</del><ins>ef</ins>", container.getInnerHTML().toLowerCase());
 
         finishTest();
     }
@@ -148,7 +148,7 @@ public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
         selection.addRange(range);
         assertEquals("ij", selection.toString());
         assertTrue(insertHTML.execute(rta, "#"));
-        assertEquals("<em>ab</em>#", container.getInnerHTML());
+        assertEquals("<em>ab</em>#", container.getInnerHTML().toLowerCase());
 
         finishTest();
     }
@@ -188,7 +188,7 @@ public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
         selection.addRange(range);
         assertEquals("y", selection.toString());
         assertTrue(insertHTML.execute(rta, "*2<em>=</em>1+"));
-        assertEquals("x*2<em>=</em>1+z", container.getInnerHTML());
+        assertEquals("x*2<em>=</em>1+z", container.getInnerHTML().toLowerCase());
 
         finishTest();
     }

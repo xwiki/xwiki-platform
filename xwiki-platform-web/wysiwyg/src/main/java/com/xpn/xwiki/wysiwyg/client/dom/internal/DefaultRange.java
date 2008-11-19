@@ -20,9 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
@@ -308,17 +306,4 @@ public class DefaultRange extends AbstractRange<JavaScriptObject>
     /*-{
         return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().toString();
     }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#toHTML()
-     */
-    public String toHTML()
-    {
-        DocumentFragment docFragment = cloneContents();
-        DivElement container = ((Document) docFragment.getOwnerDocument()).xCreateDivElement();
-        container.appendChild(docFragment);
-        return container.getInnerHTML();
-    }
 }

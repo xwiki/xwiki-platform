@@ -48,13 +48,15 @@ public class InsertHTMLExecutable implements Executable
     public boolean execute(RichTextArea rta, String param)
     {
         Selection selection = rta.getDocument().getSelection();
-        selection.getRangeAt(0).deleteContents();
+        Range range = selection.getRangeAt(0);
+        range.deleteContents();
+        assert (range.isCollapsed());
+        selection.removeAllRanges();
+        selection.addRange(range);
 
         Element container = rta.getDocument().xCreateDivElement().cast();
         container.xSetInnerHTML(param);
 
-        Range range = selection.getRangeAt(0);
-        assert (range.isCollapsed());
         Node rangeContainer = range.getCommonAncestorContainer();
         if (rangeContainer.getNodeType() == Node.ELEMENT_NODE) {
             if (range.getStartOffset() == rangeContainer.getChildNodes().getLength()) {

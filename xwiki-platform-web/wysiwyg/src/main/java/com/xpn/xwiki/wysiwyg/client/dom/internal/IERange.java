@@ -43,66 +43,6 @@ import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.TextRange.Unit;
 public final class IERange extends AbstractRange<NativeRange>
 {
     /**
-     * Utility class for locating the end points of a range inside the DOM tree.
-     */
-    private static class EndPointLocator
-    {
-        /**
-         * The base node. The other locator properties are relative to this node.
-         */
-        private final Node base;
-
-        /**
-         * The number of possible-cursor-positions, counting from the {@link #base} node.
-         */
-        private final int offset;
-
-        /**
-         * The direction to go from the {@link #base} node. If {@link #left} is true the end point is located
-         * {@link #offset} positions to the left of the {@link #base} node.
-         */
-        private final boolean left;
-
-        /**
-         * Creates a new instance with the specified values.
-         * 
-         * @param base The base node.
-         * @param offset The number of possible-cursor-positions, counting from the {@link #base} node.
-         * @param left The direction to go from the {@link #base} node.
-         */
-        public EndPointLocator(Node base, int offset, boolean left)
-        {
-            this.base = base;
-            this.offset = offset;
-            this.left = left;
-        }
-
-        /**
-         * @return the base node.
-         */
-        public Node getBase()
-        {
-            return base;
-        }
-
-        /**
-         * @return the number of possible-cursor-positions, counting from the {@link #base} node.
-         */
-        public int getOffset()
-        {
-            return offset;
-        }
-
-        /**
-         * @return the direction to go from the {@link #base} node.
-         */
-        public boolean isLeft()
-        {
-            return left;
-        }
-    }
-
-    /**
      * Creates a new instance that wraps the given native range object, which can be either a text range or a control
      * range.
      * 
@@ -156,16 +96,7 @@ public final class IERange extends AbstractRange<NativeRange>
     public DocumentFragment cloneContents()
     {
         if (getJSRange().isTextRange()) {
-            TextRange textRange = (TextRange) getJSRange();
-            Element container = textRange.getOwnerDocument().xCreateDivElement().cast();
-            container.setInnerHTML(textRange.getHTML());
-            DocumentFragment contents = textRange.getOwnerDocument().createDocumentFragment();
-            Node child = container.getFirstChild();
-            while (child != null) {
-                contents.appendChild(child);
-                child = container.getFirstChild();
-            }
-            return contents;
+            return super.cloneContents();
         } else {
             ControlRange controlRange = (ControlRange) getJSRange();
             DocumentFragment contents = controlRange.getOwnerDocument().createDocumentFragment();
@@ -221,14 +152,13 @@ public final class IERange extends AbstractRange<NativeRange>
     public void deleteContents()
     {
         if (getJSRange().isTextRange()) {
-            ((TextRange) getJSRange()).setHTML("");
+            super.deleteContents();
         } else {
             ControlRange range = (ControlRange) getJSRange();
-            for (int i = 0; i < range.getLength(); i++) {
-                Element element = range.get(i);
-                if (element.getParentNode() != null) {
-                    element.getParentNode().removeChild(element);
-                }
+            Element element = range.get(0);
+            collapse(true);
+            if (element.getParentNode() != null) {
+                element.getParentNode().removeChild(element);
             }
         }
     }
@@ -273,81 +203,10 @@ public final class IERange extends AbstractRange<NativeRange>
     public Node getCommonAncestorContainer()
     {
         if (getJSRange().isTextRange()) {
-            Node startContainer = getStartContainer();
-            // If the range is within a text node then the common ancestor container is that text node.
-            if (startContainer.getNodeType() == Node.TEXT_NODE
-                && (isCollapsed() || startContainer == getEndContainer())) {
-                return startContainer;
-            } else {
-                return ((TextRange) getJSRange()).getParentElement();
-            }
+            return super.getCommonAncestorContainer();
         } else {
             return ((ControlRange) getJSRange()).get(0).getParentNode();
         }
-    }
-
-    /**
-     * Utility method for retrieving the sibling of the given node in the specified direction. If right is true the next
-     * sibling is returned. Otherwise, the previous sibling is returned. (reduces cyclomatic complexity)
-     * 
-     * @param node The node whose sibling will be returned.
-     * @param right The direction to look for the sibling.
-     * @return The sibling of the specified node, in the specified direction.
-     */
-    private Node getSibling(Node node, boolean right)
-    {
-        return right ? node.getNextSibling() : node.getPreviousSibling();
-    }
-
-    /**
-     * Returns the locator for the specified end point.
-     * 
-     * @param start Specifies the end point.
-     * @return the locator of the start point, if start is true, or the locator of the end point, otherwise.
-     */
-    private EndPointLocator getEndPointLocator(boolean start)
-    {
-        // We use a collapsed text range to iterate through nodes.
-        TextRange cursor = ((TextRange) getJSRange()).duplicate();
-        if (!isCollapsed()) {
-            cursor.collapse(start);
-            if (start) {
-                cursor.moveEnd(Unit.CHARACTER, 1);
-            } else {
-                cursor.moveStart(Unit.CHARACTER, -1);
-            }
-        }
-        Element parent = cursor.getParentElement();
-        cursor.collapse(start);
-
-        // We iterate through neighbor nodes as long as we can and till the parent node changes.
-        // We count the number of possible-cursor-positions we jump.
-        int offset = 0;
-        int unitCount = start ? -1 : 1;
-        while (cursor.move(Unit.CHARACTER, unitCount) != 0 && cursor.getParentElement() == parent) {
-            offset++;
-        }
-
-        Node base;
-        Node currentParent = cursor.getParentElement();
-        if (currentParent == parent || currentParent.getParentNode() != parent) {
-            // We stopped because we couldn't move anymore or because we jumped outside of the parent node.
-            if (parent.hasChildNodes()) {
-                base = start ? parent.getFirstChild() : parent.getLastChild();
-            } else {
-                // The end point of this range is inside an empty element.
-                // The offset should be 0.
-                assert (offset == 0);
-                base = parent;
-            }
-        } else {
-            // We stopped because we entered inside a child element of the parent node.
-            base = currentParent;
-            // We need to jump over this node too.
-            offset++;
-        }
-
-        return new EndPointLocator(base, offset, !start);
     }
 
     /**
@@ -358,39 +217,24 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     private Node getEndPointContainer(boolean start)
     {
-        EndPointLocator locator = getEndPointLocator(start);
-        Node sibling = locator.getBase();
-        int offset = locator.getOffset();
-
-        // Between sibling and the end point container there are only text nodes and elements inside which we cannot
-        // position the cursor.
-        while (sibling != null) {
-            if (sibling.getNodeType() == Node.TEXT_NODE) {
-                if (offset <= sibling.getNodeValue().length()) {
-                    // We cannot move further to the left.
-                    return sibling;
+        TextRange currentRange = getJSRange().cast();
+        TextRange refRange = currentRange.duplicate();
+        refRange.collapse(start);
+        Element parent = refRange.getParentElement();
+        RangeCompare compareStart = RangeCompare.valueOf(true, start);
+        RangeCompare compareEnd = RangeCompare.valueOf(false, start);
+        Node child = parent.getFirstChild();
+        while (child != null) {
+            if (child.getNodeType() == Node.TEXT_NODE) {
+                refRange.moveToTextNode(Text.as(child));
+                if (currentRange.compareEndPoints(compareStart, refRange) >= 0
+                    && currentRange.compareEndPoints(compareEnd, refRange) <= 0) {
+                    return child;
                 }
-                // We jump over this text node.
-                offset -= sibling.getNodeValue().length();
-            } else if (--offset <= 0) {
-                // The current sibling is an element
-                // We can position the cursor between elements so we must decrease the number of
-                // possible-cursor-positions.
-
-                // The end point is before or after the current sibling.
-                Node nextSibling = getSibling(sibling, start);
-                // We prefer that the end point is inside a text node
-                if (nextSibling == null || nextSibling.getNodeType() == Node.ELEMENT_NODE) {
-                    // The end point is before the first child, after the last child or between elements.
-                    return sibling.getParentNode();
-                }
-                sibling = nextSibling;
-                continue;
             }
-            sibling = getSibling(sibling, start);
+            child = child.getNextSibling();
         }
-        // We should not get here.
-        return null;
+        return parent;
     }
 
     /**
@@ -417,41 +261,31 @@ public final class IERange extends AbstractRange<NativeRange>
      */
     private int getEndPointOffset(boolean start)
     {
-        EndPointLocator locator = getEndPointLocator(start);
-        Node sibling = locator.getBase();
-        int offset = locator.getOffset();
-        boolean zero = offset == 0;
-
-        // Between the found sibling and the end point container there are only text nodes and elements inside which we
-        // cannot position the cursor.
-        while (sibling != null) {
-            if (sibling.getNodeType() == Node.TEXT_NODE) {
-                if (offset <= sibling.getNodeValue().length()) {
-                    // We cannot move further to the left.
-                    return start ? offset : sibling.getNodeValue().length() - offset;
-                }
-                // We jump over this text node.
-                offset -= sibling.getNodeValue().length();
-            } else if (--offset <= 0) {
-                // The current sibling is an element
-                // We can position the cursor between elements so we must decrease the number of
-                // possible-cursor-positions.
-
-                // The range ends before the current sibling.
-                Node nextSibling = getSibling(sibling, start);
-                // We prefer that the end point is inside a text node.
-                if (nextSibling == null || nextSibling.getNodeType() == Node.ELEMENT_NODE) {
-                    // The end point is before the first child, after the last child or between elements.
-                    return DOMUtils.getInstance().getNodeIndex(sibling)
-                        + ((start && !zero) || (!start && zero) ? 1 : 0);
-                }
-                sibling = nextSibling;
-                continue;
+        Node container = getEndPointContainer(start);
+        TextRange currentRange = getJSRange().cast();
+        TextRange refRange = currentRange.duplicate();
+        RangeCompare whichEndPoints = RangeCompare.valueOf(start, true);
+        if (container.getNodeType() == Node.TEXT_NODE) {
+            refRange.moveToTextNode(Text.as(container));
+            while (refRange.compareEndPoints(whichEndPoints, currentRange) < 0 && refRange.getText().length() > 0) {
+                refRange.moveStart(Unit.CHARACTER, 1);
             }
-            sibling = getSibling(sibling, start);
+            return container.getNodeValue().length() - refRange.getText().length();
+        } else {
+            int offset = 0;
+            Node child = container.getFirstChild();
+            while (child != null) {
+                if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    refRange.moveToElementText(Element.as(child));
+                    if (refRange.compareEndPoints(whichEndPoints, currentRange) >= 0) {
+                        break;
+                    }
+                }
+                child = child.getNextSibling();
+                offset++;
+            }
+            return offset;
         }
-        // We should not get here.
-        return -1;
     }
 
     /**
@@ -522,8 +356,7 @@ public final class IERange extends AbstractRange<NativeRange>
     public boolean isCollapsed()
     {
         if (getJSRange().isTextRange()) {
-            TextRange textRange = (TextRange) getJSRange();
-            return textRange.getText().length() == 0 && textRange.getHTML().length() == 0;
+            return super.isCollapsed();
         } else {
             return false;
         }
@@ -700,20 +533,6 @@ public final class IERange extends AbstractRange<NativeRange>
         } else {
             // ControlRange
             return "";
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#toHTML()
-     */
-    public String toHTML()
-    {
-        if (getJSRange().isTextRange()) {
-            return ((TextRange) getJSRange()).getHTML();
-        } else {
-            return ((ControlRange) getJSRange()).get(0).getString();
         }
     }
 }

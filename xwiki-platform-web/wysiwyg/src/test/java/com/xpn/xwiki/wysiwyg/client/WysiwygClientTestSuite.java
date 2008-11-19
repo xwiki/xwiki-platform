@@ -27,6 +27,8 @@ import com.xpn.xwiki.wysiwyg.client.dom.DOMUtilsTest;
 import com.xpn.xwiki.wysiwyg.client.dom.DepthFirstPreOrderIteratorTest;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeTest;
 import com.xpn.xwiki.wysiwyg.client.dom.StyleTest;
+import com.xpn.xwiki.wysiwyg.client.dom.internal.IERangeTest;
+import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.TextRangeTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtensionTest;
@@ -61,6 +63,8 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(RangeTest.class);
         suite.addTestSuite(StyleTest.class);
         suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);
+        suite.addTestSuite(TextRangeTest.class);
+        suite.addTestSuite(IERangeTest.class);
 
         // plugin
         suite.addTestSuite(DefaultPluginFactoryManagerTest.class);

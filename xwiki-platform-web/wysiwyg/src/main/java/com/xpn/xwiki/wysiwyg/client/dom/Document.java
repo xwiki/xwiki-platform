@@ -260,10 +260,10 @@ public class Document extends com.google.gwt.dom.client.Document
     /**
      * @return the document element.
      */
-    public final Element getDocumentElement()
-    {
-        return this.getFirstChild().cast();
-    }
+    public final native Element getDocumentElement()
+    /*-{
+        return this.documentElement;
+    }-*/;
 
     /**
      * Creates an empty document fragment.<br/>

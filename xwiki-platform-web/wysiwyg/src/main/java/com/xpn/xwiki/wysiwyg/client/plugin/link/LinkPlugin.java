@@ -54,6 +54,21 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
     private PushButton unlink;
 
     /**
+     * The name of current wiki.
+     */
+    private String currentWiki;
+
+    /**
+     * The name of current space.
+     */
+    private String currentSpace;
+
+    /**
+     * The name of current page.
+     */
+    private String currentPage;
+
+    /**
      * The dialog for create a link.
      */
     private LinkDialog linkDialog;
@@ -81,6 +96,9 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
             link = new PushButton(Images.INSTANCE.link().createImage(), this);
             link.setTitle(Strings.INSTANCE.link());
             toolBarExtension.addFeature("link", link);
+            currentWiki = config.getParameter("wiki", "xwiki");
+            currentSpace = config.getParameter("space", "Main");
+            currentPage = config.getParameter("page", "WebHome");
         }
 
         if (getTextArea().getCommandManager().isSupported(Command.UNLINK)) {
@@ -187,7 +205,7 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
     /**
      * {@inheritDoc}
      * 
-     * @see PopupListener#onPopupClosed(PopupPanel, boolean)
+     * @see PopupListener#onPopupClosed(SourcesPopupEvents, boolean)
      */
     public void onPopupClosed(SourcesPopupEvents sender, boolean autoHide)
     {
@@ -204,7 +222,7 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
     private LinkDialog getLinkDialog()
     {
         if (linkDialog == null) {
-            linkDialog = new LinkDialog();
+            linkDialog = new LinkDialog(currentWiki, currentSpace, currentPage);
             linkDialog.addPopupListener(this);
         }
         return linkDialog;

@@ -112,13 +112,29 @@ public interface Strings extends Constants
 
     String undo();
 
+    String chooseWiki();
+
+    String chooseSpace();
+
+    String choosePage();
+
+    String chooseAnchor();
+
+    String chooseVersion();
+
+    String chooseAttachment();
+
     String link();
 
     String unlink();
 
     String linkCreateLinkButon();
 
+    String linkNewPageTab();
+
     String linkEmailTab();
+
+    String linkExistingPageTab();
 
     String linkWebPageTab();
     
@@ -128,13 +144,27 @@ public interface Strings extends Constants
 
     String linkEmailLabel();
 
+    String linkNewSpaceLabel();
+
+    String linkNewPageLabel();
+
     String linkEmailAddressTextBox();
 
     String linkWebPageTextBox();
 
+    String linkNewSpaceTextBox();
+
+    String linkNewPageTextBox();
+
+    String linkCreateNewSpaceText();
+
+    String linkNewSpaceError();
+
+    String linkNewPageError();
+
     String linkEmailAddressError();
 
     String linkWebPageAddressError();
-    
+   
     String linkNoLabelError();
 }

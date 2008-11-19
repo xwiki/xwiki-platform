@@ -67,6 +67,16 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
     private final LinkToEmailAddressTab linkToEmailAddressTab;
 
     /**
+     * Tab to get the link to a new page.
+     */
+    private final LinkToNewPageTab linkToNewPageTab;
+
+    /**
+     * Tab to get the link to an existing page.
+     */
+    private final LinkToExistingPageTab linkToExistingPageTab;
+
+    /**
      * This variable contains the index of the selected tab.
      */
     private int selectedTabIndex;
@@ -77,19 +87,28 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
     private boolean closeByCreateLink;
 
     /**
-     * Default constructor.
+     * Builds the dialog to take data from the user for the creation of a link.
+     * 
+     * @param currentWiki The name of current wiki.
+     * @param currentSpace The name of current space.
+     * @param currentPage The name of current page.
      */
-    public LinkDialog()
+    public LinkDialog(final String currentWiki, String currentSpace, String currentPage)
     {
         super(false, true);
         linkToWebPageTab = new LinkToWebPageTab();
         linkToEmailAddressTab = new LinkToEmailAddressTab();
+        linkToNewPageTab = new LinkToNewPageTab(currentWiki, currentSpace, currentPage);
+        linkToExistingPageTab = new LinkToExistingPageTab(currentWiki, currentSpace, currentPage);
 
         tabs = new TabPanel();
         tabs.addTabListener(this);
 
         addTab(linkToWebPageTab, Strings.INSTANCE.linkWebPageTab());
         addTab(linkToEmailAddressTab, Strings.INSTANCE.linkEmailTab());
+        addTab(linkToNewPageTab, Strings.INSTANCE.linkNewPageTab());
+        addTab(linkToExistingPageTab, Strings.INSTANCE.linkExistingPageTab());
+
         tabs.selectTab(0);
         selectedTabIndex = 0;
 
@@ -118,6 +137,12 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
         }
         if (linkToEmailAddressTab != null) {
             linkToEmailAddressTab.setLabel(labelHTML, labelText);
+        }
+        if (linkToNewPageTab != null) {
+            linkToNewPageTab.setLabel(labelHTML, labelText);
+        }
+        if (linkToExistingPageTab != null) {
+            linkToExistingPageTab.setLabel(labelHTML, labelText);
         }
     }
 

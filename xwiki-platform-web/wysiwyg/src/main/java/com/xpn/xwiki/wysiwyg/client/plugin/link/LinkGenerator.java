@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+
 /**
- * Generates html link blocks for all types of links. 
+ * Generates html link blocks for all types of links.
+ * 
  * @version $Id$
  */
 public final class LinkGenerator
@@ -57,18 +61,116 @@ public final class LinkGenerator
      */
     public String getExternalLink(String label, String externalURL)
     {
-        // <!--startwikilink:http://xwiki.org-->
-        // <span class="wikiexternallink">
-        // <a href="http://xwiki.org">label</a>
-        // </span>
-        // <!--stopwikilink-->
-
-        // <!--startwikilink:mailto:john@doe.com-->
-        // <span class="wikiexternallink">
-        // <a href="mailto:john@doe.com">label</a>
-        // </span>
-        // <!--stopwikilink-->
         return "<!--startwikilink:" + externalURL + "--><span class=\"wikiexternallink\"><a href=\"" + externalURL
             + "\">" + label + "</a></span><!--stopwikilink-->";
+    }
+
+    /**
+     * Generates link to a new wiki page.
+     * 
+     * @param label link label
+     * @param wikiName wiki of the targeted page
+     * @param spaceName space of the targeted page
+     * @param pageName name of the targeted page
+     * @param async callback to handle async call on the caller side 
+     * @return the html link block.
+     */
+    public String getNewPageLink(final String label, final String wikiName, final String spaceName,
+        final String pageName, final AsyncCallback<String> async)
+    {
+        WysiwygService.Singleton.getInstance().createPageURL(wikiName, spaceName, pageName, null, null,
+            new AsyncCallback<String>()
+            {
+                public void onFailure(Throwable arg0)
+                {
+                    async.onFailure(arg0);
+                }
+
+                public void onSuccess(String result)
+                {
+                    String link =
+                        "<!--startwikilink:" + getWikiPageReference(result, wikiName) + "-->"
+                            + "<span class=\"wikicreatelink\"><a href=\"" + result + "\">" + label
+                            + "</a></span><!--stopwikilink-->";
+                    async.onSuccess(link);
+                }
+            });
+        return "";
+    }
+
+    /**
+     * Generates link to an existing page.
+     * 
+     * @param label link label
+     * @param wikiName wiki of the targeted page
+     * @param spaceName space of the targeted page
+     * @param pageName name of the targeted page
+     * @param revision version of the page to link to
+     * @param anchor anchor in the page to link to
+     * @param async callback to handle async call on the caller side
+     * @return the html link block.
+     */
+    public String getExistingPageLink(final String label, final String wikiName, final String spaceName,
+        final String pageName, String revision, String anchor, final AsyncCallback<String> async)
+    {
+        WysiwygService.Singleton.getInstance().createPageURL(wikiName, spaceName, pageName, revision, anchor,
+            new AsyncCallback<String>()
+            {
+                public void onFailure(Throwable arg0)
+                {
+                    // pass it further
+                    async.onFailure(arg0);
+                }
+
+                public void onSuccess(String result)
+                {
+                    String link =
+                        "<!--startwikilink:" + getWikiPageReference(result, wikiName) + "-->"
+                            + "<span class=\"wikilink\"><a href=\"" + result + "\">" + label
+                            + "</a></span><!--stopwikilink-->";
+                    async.onSuccess(link);
+                }
+            });
+        return "";
+    }
+
+    /**
+     * Builds the reference of a wiki link, from the URL of the page as returned by the server.
+     * 
+     * @param url the URL of the page, as returned by the server
+     * @param wikiName the wiki name in which the page is located. Can be <code>null</code> if this is not a multiwiki.
+     * @return the wiki page reference, parsed from the returned url
+     */
+    private String getWikiPageReference(String url, String wikiName)
+    {
+        int paramsIndex = url.indexOf('?');
+        int hashIndex = url.indexOf('#');
+        // If the hash index is to the left of the qm index or the qm index is negative, copy from hash
+        if ((hashIndex < paramsIndex && hashIndex >= 0) || (paramsIndex < 0)) {
+            paramsIndex = hashIndex;
+        }
+        String params = "";
+        String strippedUrl = url;
+        if (paramsIndex > 0) {
+            params = url.substring(paramsIndex);
+            strippedUrl = url.substring(0, paramsIndex);
+        }
+        // get the page name and the space name to build the reference
+        String pageName = "";
+        int lastIndexOf = strippedUrl.lastIndexOf('/');
+        pageName = strippedUrl.substring(lastIndexOf + 1).trim();
+        if (pageName.length() == 0) {
+            pageName = "WebHome";
+        }
+        strippedUrl = lastIndexOf > 0 ? strippedUrl.substring(0, lastIndexOf) : "";
+        lastIndexOf = strippedUrl.lastIndexOf('/');
+        String spaceName = strippedUrl.substring(lastIndexOf + 1).trim();
+        if (spaceName.length() == 0) {
+            // default space. This shouldn't happen, though, since the server should return complete urls
+            spaceName = "Main";
+        }
+
+        return (wikiName != null && wikiName.length() > 0) ? wikiName + ":" + spaceName + "." + pageName + params
+            : spaceName + "." + pageName + params;
     }
 }

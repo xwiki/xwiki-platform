@@ -20,12 +20,18 @@
 package com.xpn.xwiki.wysiwyg.server;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.gwt.api.server.XWikiServiceImpl;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -40,7 +46,7 @@ import com.xpn.xwiki.wysiwyg.server.sync.SyncEngine;
  * 
  * @version $Id$
  */
-public class DefaultWysiwygService extends RemoteServiceServlet implements WysiwygService
+public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygService
 {
     /**
      * The object used to synchronize the content edited by multiple users when the real time feature of the editor is
@@ -132,5 +138,150 @@ public class DefaultWysiwygService extends RemoteServiceServlet implements Wysiw
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#isMultiWiki()
+     */
+    public Boolean isMultiWiki()
+    {
+        return getXWikiContext().getWiki().isVirtualMode();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#getVirtualWikiNames()
+     */
+    public List<String> getVirtualWikiNames()
+    {
+        List<String> virtualWikiNamesList = new ArrayList<String>();
+        try {
+            virtualWikiNamesList = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(getXWikiContext());
+            // put the current, default database if nothing is inside
+            if (virtualWikiNamesList.size() == 0) {
+                virtualWikiNamesList.add(getXWikiContext().getDatabase());
+            }
+            Collections.sort(virtualWikiNamesList);
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        }
+        return virtualWikiNamesList;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#getSpaceNames(String)
+     */
+    public List<String> getSpaceNames(String wikiName)
+    {
+        List<String> spaceNamesList = new ArrayList<String>();
+        String database = getXWikiContext().getDatabase();
+        try {
+            if (wikiName != null) {
+                getXWikiContext().setDatabase(wikiName);
+            }
+            spaceNamesList = getXWikiContext().getWiki().getSpaces(getXWikiContext());
+            Collections.sort(spaceNamesList);
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        } finally {
+            if (wikiName != null) {
+                getXWikiContext().setDatabase(database);
+            }
+        }
+        return spaceNamesList;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#getPageNames(String, String)
+     */
+    public List<String> getPageNames(String wikiName, String spaceName)
+    {
+        String database = getXWikiContext().getDatabase();
+        List<String> pagesFullNameList = null;
+        List<String> pagesNameList = new ArrayList<String>();
+        List<String> params = new ArrayList<String>();
+        params.add(spaceName);
+        String query = "where doc.space = ? order by doc.fullName asc";
+        try {
+            if (wikiName != null) {
+                getXWikiContext().setDatabase(wikiName);
+            }
+            pagesFullNameList =
+                getXWikiContext().getWiki().getStore().searchDocumentsNames(query, params, getXWikiContext());
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        } finally {
+            if (wikiName != null) {
+                getXWikiContext().setDatabase(database);
+            }
+        }
+        if (pagesFullNameList != null) {
+            for (String p : pagesFullNameList) {
+                pagesNameList.add(p.substring(params.get(0).length() + 1));
+            }
+        }
+        return pagesNameList;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#createPageURL(String, String, String, String)
+     */
+    public String createPageURL(String wikiName, String spaceName, String pageName, String revision, String anchor)
+    {
+        XWikiContext context = getXWikiContext();
+        String database = context.getDatabase();
+        String newPageName = pageName;
+        String newSpaceName = spaceName;
+        String pageURL = null;
+        try {
+            if (wikiName != null) {
+                context.setDatabase(wikiName);
+            }
+            // if we have no page name, link to the WebHome of whatever space
+            if (newPageName == null || newPageName.length() == 0) {
+                newPageName = "WebHome";
+            }
+            // if we have no space, link to the current doc's space
+            if (newSpaceName == null && newSpaceName.length() == 0) {
+                if ((newPageName == null || newPageName.length() == 0) && wikiName != null && wikiName.length() > 0) {
+                    // if we have no space set and no page but we have a wiki, then create a link to the mainpage of the
+                    // wiki
+                    newSpaceName = "Main";
+                } else {
+                    newSpaceName = context.getDoc().getSpace();
+                }
+            }
+
+            // clear the page and space name, to make sure we link to the right page
+            newPageName = context.getWiki().clearName(newPageName, context);
+            newSpaceName = context.getWiki().clearName(newSpaceName, context);
+
+            XWikiDocument requestedDocument = context.getWiki().getDocument(newSpaceName + "." + newPageName, context);
+            pageURL = requestedDocument.getURL("view", context);
+            // if we have revision, get document with revision, otherwise get simple document
+            if (revision != null && revision.length() > 0) {
+                requestedDocument = context.getWiki().getDocument(newSpaceName + "." + newPageName, context);
+                pageURL = requestedDocument.getURL("viewrev", "rev=" + revision, context);
+            }
+            if (anchor != null && anchor.length() > 0) {
+                pageURL += "#" + anchor;
+            }
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        } finally {
+            if (wikiName != null) {
+                getXWikiContext().setDatabase(database);
+            }
+        }
+        return pageURL;
     }
 }

@@ -19,12 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.client;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
 /**
- * Cache proxy for {@link WysiwygServiceAsync}.
+ * Cache proxy for {@link WysiwygServiceAsync}. This proxy is used to store on the client a set of values from the
+ * server that cannot change without server restart, therefore without the reload of the page that holds the reference
+ * to the {@link WysiwygService}.
  * 
  * @version $Id$
  */
@@ -34,6 +38,16 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * The cached service.
      */
     private final WysiwygServiceAsync service;
+
+    /**
+     * Caches the multiwiki property for this wiki.
+     */
+    private Boolean isMultiWiki;
+
+    /**
+     * Caches the list of the virtual wikis from this multiwiki.
+     */
+    private List<String> virtualWikiNamesList;
 
     /**
      * Creates a new cache proxy for the given service.
@@ -70,8 +84,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * 
      * @see WysiwygServiceAsync#syncEditorContent(Revision, String, int, AsyncCallback)
      */
-    public void syncEditorContent(Revision syncedRevision, String pageName, int version, 
-        AsyncCallback<SyncResult> async)
+    public void syncEditorContent(Revision syncedRevision, String pageName, int version, AsyncCallback<SyncResult> async)
     {
         service.syncEditorContent(syncedRevision, pageName, version, async);
     }
@@ -84,5 +97,88 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     public void toHTML(String source, String syntax, AsyncCallback<String> async)
     {
         service.toHTML(source, syntax, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#getPageNames(String, String, AsyncCallback)
+     */
+    public void getPageNames(String wikiName, String spaceName, AsyncCallback<List<String>> async)
+    {
+        service.getPageNames(wikiName, spaceName, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#getSpaceNames(String, AsyncCallback)
+     */
+    public void getSpaceNames(String wikiName, AsyncCallback<List<String>> async)
+    {
+        service.getSpaceNames(wikiName, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#getVirtualWikiNames(AsyncCallback)
+     */
+    public void getVirtualWikiNames(final AsyncCallback<List<String>> async)
+    {
+        if (virtualWikiNamesList == null) {
+            service.getVirtualWikiNames(new AsyncCallback<List<String>>()
+            {
+                public void onFailure(Throwable caught)
+                {
+                    async.onFailure(caught);
+                }
+
+                public void onSuccess(List<String> result)
+                {
+                    virtualWikiNamesList = result;
+                    async.onSuccess(virtualWikiNamesList);
+                }
+            });
+        } else {
+            async.onSuccess(virtualWikiNamesList);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#isMultiWiki(AsyncCallback)
+     */
+    public void isMultiWiki(final AsyncCallback<Boolean> async)
+    {
+        if (isMultiWiki == null) {
+            service.isMultiWiki(new AsyncCallback<Boolean>()
+            {
+                public void onFailure(Throwable caught)
+                {
+                    async.onFailure(caught);
+                }
+
+                public void onSuccess(Boolean result)
+                {
+                    isMultiWiki = result;
+                    async.onSuccess(isMultiWiki);
+                }
+            });
+        } else {
+            async.onSuccess(isMultiWiki);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#createPageURL(String, String, String, String, String, AsyncCallback)
+     */
+    public void createPageURL(String wikiName, String spaceName, String pageName, String revision, String anchor,
+        AsyncCallback<String> async)
+    {
+        service.createPageURL(wikiName, spaceName, pageName, revision, anchor, async);
     }
 }

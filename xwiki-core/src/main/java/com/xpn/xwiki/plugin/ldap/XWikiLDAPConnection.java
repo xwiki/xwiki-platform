@@ -23,6 +23,7 @@ package com.xpn.xwiki.plugin.ldap;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.io.UnsupportedEncodingException;
@@ -133,8 +134,6 @@ public class XWikiLDAPConnection
         if (port <= 0) {
             port = ssl ? LDAPConnection.DEFAULT_SSL_PORT : LDAPConnection.DEFAULT_PORT;
         }
-
-        int ldapVersion = LDAPConnection.LDAP_V3;
 
         try {
             if (ssl) {
@@ -293,8 +292,10 @@ public class XWikiLDAPConnection
             LDAPSearchConstraints cons = new LDAPSearchConstraints();
             cons.setTimeLimit(1000);
 
-            LOG.debug("LDAP search: baseDN=[" + baseDN + "] query=[" + query + "] attr=[" + attr + "] ldapScope=["
-                + ldapScope + "]");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("LDAP search: baseDN=[" + baseDN + "] query=[" + query + "] attr=[" + Arrays.asList(attr)
+                    + "] ldapScope=[" + ldapScope + "]");
+            }
 
             // filter return all attributes return attrs and values time out value
             searchResults = this.connection.search(baseDN, ldapScope, query, attr, false, cons);
@@ -312,19 +313,7 @@ public class XWikiLDAPConnection
 
             LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
 
-            for (Object attributeItem : attributeSet) {
-                LDAPAttribute attribute = (LDAPAttribute) attributeItem;
-                String attributeName = attribute.getName();
-
-                Enumeration allValues = attribute.getStringValues();
-
-                if (allValues != null) {
-                    while (allValues.hasMoreElements()) {
-                        String value = (String) allValues.nextElement();
-                        searchAttributeList.add(new XWikiLDAPSearchAttribute(attributeName, value));
-                    }
-                }
-            }
+            ldapToXWikiAttribute(searchAttributeList, attributeSet);
         } catch (LDAPException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("LDAP Search failed", e);
@@ -341,8 +330,34 @@ public class XWikiLDAPConnection
             }
         }
 
-        LOG.debug("LDAP search found attributes: " + searchAttributeList);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("LDAP search found attributes: " + searchAttributeList);
+        }
 
         return searchAttributeList;
+    }
+
+    /**
+     * Fill provided <code>searchAttributeList</code> with provided LDAP attributes.
+     * 
+     * @param searchAttributeList the XWiki attributes.
+     * @param attributeSet the LDAP attributes.
+     */
+    protected void ldapToXWikiAttribute(List<XWikiLDAPSearchAttribute> searchAttributeList,
+        LDAPAttributeSet attributeSet)
+    {
+        for (Object attributeItem : attributeSet) {
+            LDAPAttribute attribute = (LDAPAttribute) attributeItem;
+            String attributeName = attribute.getName();
+
+            Enumeration allValues = attribute.getStringValues();
+
+            if (allValues != null) {
+                while (allValues.hasMoreElements()) {
+                    String value = (String) allValues.nextElement();
+                    searchAttributeList.add(new XWikiLDAPSearchAttribute(attributeName, value));
+                }
+            }
+        }
     }
 }

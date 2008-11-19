@@ -136,6 +136,13 @@ pre.xwikierror {
     position: relative; /*word-wrap:break-word;*/
 }
 
+/* Used to signify a rendering error in the rendered page. Valid only with new rendering */
+.xwikirenderingerror {
+    background-color: #FF5555;
+    border: 1px #555555;
+    padding: 3px;
+}
+
 .main pre p {
     margin: 0;
 }

@@ -29,7 +29,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><strong>hello</strong></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext">= notheader</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -39,4 +39,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><strong>hello</strong></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext">= notheader</span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><span class="wikicreatelinktext"><!--startmacro:testsimplemacro|-||-|label-->label<!--stopmacro--></span><span class="wikicreatelinkqm">?</span></a></span><!--stopwikilink--></p></html>
+<html><p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p></html>

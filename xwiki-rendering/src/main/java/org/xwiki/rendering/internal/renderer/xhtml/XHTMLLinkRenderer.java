@@ -115,7 +115,6 @@ public class XHTMLLinkRenderer
 
                 printer.printXMLStartElement("span", spanAttributes);
                 printer.printXMLStartElement("a", aAttributes);
-                printer.printXMLStartElement("span", new String[][] {{"class", "wikicreatelinktext"}});
             }
         }        
     }
@@ -130,15 +129,6 @@ public class XHTMLLinkRenderer
             printer.printXMLEndElement("span");
         }
         
-        if (!link.isExternalLink()) {
-            if (link.getReference() != null && !this.documentAccessBridge.exists(link.getReference())) {
-                printer.printXMLEndElement("span");
-                printer.printXMLStartElement("span", new String[][] {{"class", "wikicreatelinkqm"}});
-                printer.printXML("?");
-                printer.printXMLEndElement("span");
-            }
-        }
-
         printer.printXMLEndElement("a");
         printer.printXMLEndElement("span");
         

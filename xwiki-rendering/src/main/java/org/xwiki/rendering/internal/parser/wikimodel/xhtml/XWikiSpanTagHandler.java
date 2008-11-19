@@ -39,13 +39,11 @@ public class XWikiSpanTagHandler extends SpanTagHandler
         // Ex: <a href="..."><span class="wikicreatelinktext">...</span><span class="wikicreatelinkqm">?</span></a>
         WikiParameter classParam = context.getParams().getParameter("class");
         if (classParam != null) {
-            if (classParam.getValue().contains("wikicreatelinkqm") 
-                || classParam.getValue().contains("wikigeneratedlinkcontent"))
+            if (classParam.getValue().contains("wikigeneratedlinkcontent"))
             {
                 setAccumulateContent(true);
             } else if (classParam.getValue().equals("wikilink") 
                 || classParam.getValue().equals("wikicreatelink")
-                || classParam.getValue().equals("wikicreatelinktext")
                 || classParam.getValue().equals("wikiexternallink"))
             {
                 // Nothing to do 
@@ -64,13 +62,11 @@ public class XWikiSpanTagHandler extends SpanTagHandler
     {
         WikiParameter classParam = context.getParams().getParameter("class");
         if (classParam != null) {
-            if (classParam.getValue().contains("wikicreatelinkqm") 
-                || classParam.getValue().contains("wikigeneratedlinkcontent"))
+            if (classParam.getValue().contains("wikigeneratedlinkcontent"))
             {
                 setAccumulateContent(false);
             } else if (classParam.getValue().equals("wikilink") 
                 || classParam.getValue().equals("wikicreatelink")
-                || classParam.getValue().equals("wikicreatelinktext")
                 || classParam.getValue().equals("wikiexternallink"))
             {
                 // Nothing to do 

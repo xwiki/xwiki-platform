@@ -506,6 +506,15 @@ ol.HEBREW { list-style-type: hebrew; }
     margin-left: 3px;
 }
 
+/* Needed for the new rendering with XWiki Syntax 2.0 since we're now using CSS for
+   displaying the question mark for unknown links */
+span.wikicreatelink a {
+  text-decoration: underline;
+  color: black;
+  background:transparent url("$xwiki.getSkinFile("qm-blue.png")") no-repeat scroll right center;
+  padding-right:13px;
+}
+
 .wiki-calendar-table * {
     text-align: center;
     border-collapse: collapse;
@@ -1946,11 +1955,16 @@ h5.xwikipaneltitle.hidden {
     color: #333;
 }
 
-div.xwikipanelcontents span.panelitem a.wikicreatelink span.wikicreatelinkqm {
+div.xwikipanelcontents a.wikicreatelink span.wikicreatelinkqm {
     background-color: #db6e26;
     color: #fff;
     margin: 0 2px;
     padding: 0 1px;
+}
+
+/* For new rendering, in order to display orange question marks for unknown links in panels */
+div.xwikipanelcontents span.wikicreatelink a {
+     background-image: url("$xwiki.getSkinFile("qm-orange.png")")
 }
 
 div.xwikipanelcontents ul.star {

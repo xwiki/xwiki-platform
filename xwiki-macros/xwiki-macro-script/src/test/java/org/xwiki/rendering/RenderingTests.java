@@ -37,7 +37,7 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
         
-        suite.addTestsFromResource("macros/script/script1", true);
+        // TODO: add tests
 
         return new ScriptRenderingPlexusTestSetup(suite);
     }

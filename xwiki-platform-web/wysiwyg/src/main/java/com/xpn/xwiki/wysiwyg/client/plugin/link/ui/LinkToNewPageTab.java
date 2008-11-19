@@ -158,7 +158,7 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
                 // Add the space creation option in the build list
                 int selectedIndex = getSpaceListBox().getSelectedIndex();
                 getSpaceListBox().insertItem(Strings.INSTANCE.linkCreateNewSpaceText(), 0);
-                getSpaceListBox().setSelectedIndex(selectedIndex);
+                getSpaceListBox().setSelectedIndex(selectedIndex + 1);
                 if (cb != null) {
                     cb.onSuccess(result);
                 }

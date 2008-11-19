@@ -293,10 +293,8 @@ public class XWikiLDAPConnection
             LDAPSearchConstraints cons = new LDAPSearchConstraints();
             cons.setTimeLimit(1000);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("LDAP search: baseDN=[" + baseDN + "] query=[" + query + "] attr=[" + attr + "] ldapScope=["
-                    + ldapScope + "]");
-            }
+            LOG.debug("LDAP search: baseDN=[" + baseDN + "] query=[" + query + "] attr=[" + attr + "] ldapScope=["
+                + ldapScope + "]");
 
             // filter return all attributes return attrs and values time out value
             searchResults = this.connection.search(baseDN, ldapScope, query, attr, false, cons);
@@ -343,9 +341,7 @@ public class XWikiLDAPConnection
             }
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("LDAP search found attributes: " + searchAttributeList);
-        }
+        LOG.debug("LDAP search found attributes: " + searchAttributeList);
 
         return searchAttributeList;
     }

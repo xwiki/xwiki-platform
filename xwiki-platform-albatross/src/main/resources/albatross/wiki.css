@@ -207,6 +207,16 @@ ol.HEBREW { list-style-type: hebrew; }
   margin: 0px;
   margin-left: 3px;
 }
+
+/* Needed for the new rendering with XWiki Syntax 2.0 since we're now using CSS for
+   displaying the question mark for unknown links */
+span.wikicreatelink a {
+  text-decoration: underline;
+  color: black;
+  background:transparent url(qm-blue.png) no-repeat scroll right center;
+  padding-right:13px;
+}
+
 .wiki-calendar-table *{
   text-align: center;
   border-collapse: collapse;

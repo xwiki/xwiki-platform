@@ -832,7 +832,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginError(String message, String description)
     {
-        getXHTMLWikiPrinter().printXMLStartElement("span", new String[][] {{"class", "xwikierror"}});
+        getXHTMLWikiPrinter().printXMLStartElement("span", new String[][] {{"class", "xwikirenderingerror"}});
         getXHTMLWikiPrinter().printXML(message);
         getXHTMLWikiPrinter().printXMLComment("errordescription:" + description);
     }

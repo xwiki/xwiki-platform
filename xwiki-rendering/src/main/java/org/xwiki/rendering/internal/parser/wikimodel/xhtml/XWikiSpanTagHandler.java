@@ -47,7 +47,7 @@ public class XWikiSpanTagHandler extends SpanTagHandler
                 || classParam.getValue().equals("wikiexternallink"))
             {
                 // Nothing to do 
-            } else if (classParam.getValue().equals("xwikierror")) {
+            } else if (classParam.getValue().equals("xwikirenderingerror")) {
                 setAccumulateContent(true);
             } else  {
                 super.begin(context);
@@ -70,7 +70,7 @@ public class XWikiSpanTagHandler extends SpanTagHandler
                 || classParam.getValue().equals("wikiexternallink"))
             {
                 // Nothing to do 
-            } else if (classParam.getValue().equals("xwikierror")) {
+            } else if (classParam.getValue().equals("xwikirenderingerror")) {
                 setAccumulateContent(false);
             } else {
                 super.end(context);

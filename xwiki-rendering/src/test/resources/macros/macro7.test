@@ -21,7 +21,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>Unknown <span class="xwikierror">Unknown macro: unknown<!--errordescription:The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.--><!--startmacro:unknown|-||-|--><!--stopmacro--></span> macro</p>
+<p>Unknown <span class="xwikirenderingerror">Unknown macro: unknown<!--errordescription:The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.--><!--startmacro:unknown|-||-|--><!--stopmacro--></span> macro</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -29,4 +29,4 @@ Unknown {{unknown/}} macro
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Unknown <span class="xwikierror">Unknown macro: unknown<!--errordescription:The "unknown" macro is not in the list of registered macros. Try checking the spelling or contact your administrator.--><!--startmacro:unknown|-||-|--><!--stopmacro--></span> macro</p></html>
+<html><p>Unknown <span class="xwikirenderingerror">Unknown macro: unknown<!--errordescription:The "unknown" macro is not in the list of registered macros. Try checking the spelling or contact your administrator.--><!--startmacro:unknown|-||-|--><!--stopmacro--></span> macro</p></html>

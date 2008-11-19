@@ -1,0 +1,31 @@
+.#-------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify behavior when a macro fails to execute
+.#-------------------------------------------------------------------------------------
+Execution {{testfailingmacro/}} error
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [Execution]
+onSpace
+beginError: [Failed to execute macro: testfailingmacro] [stack trace here]
+onMacroInline [testfailingmacro] [] []
+endError: [Failed to execute macro: testfailingmacro] [stack trace here]
+onSpace
+onWord [error]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>Execution <span class="xwikirenderingerror">Failed to execute macro: testfailingmacro<!--errordescription:stack trace here--><!--startmacro:testfailingmacro|-||-|--><!--stopmacro--></span> error</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+Execution {{testfailingmacro/}} error
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>Execution <span class="xwikirenderingerror">Failed to execute macro: testfailingmacro<!--errordescription:stack trace here--><!--startmacro:testfailingmacro|-||-|--><!--stopmacro--></span> error</p></html>

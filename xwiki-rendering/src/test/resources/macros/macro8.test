@@ -1,0 +1,33 @@
+.#-------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify behavior when a non inline macro is used inline.
+.#-------------------------------------------------------------------------------------
+Not inline {{testsimplemacro/}} macro
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [Not]
+onSpace
+onWord [inline]
+onSpace
+beginError: [Not an inline macro] [This macro can only be used by itself on a new line]
+onMacroInline [testsimplemacro] [] []
+endError: [Not an inline macro] [This macro can only be used by itself on a new line]
+onSpace
+onWord [macro]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>Not inline <span class="xwikirenderingerror">Not an inline macro<!--errordescription:This macro can only be used by itself on a new line--><!--startmacro:testsimplemacro|-||-|--><!--stopmacro--></span> macro</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+Not inline {{testsimplemacro/}} macro
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>Not inline <span class="xwikirenderingerror">Not an inline macro<!--errordescription:This macro can only be used by itself on a new line--><!--startmacro:testsimplemacro|-||-|--><!--stopmacro--></span> macro</p></html>

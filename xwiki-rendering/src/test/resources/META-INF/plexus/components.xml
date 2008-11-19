@@ -53,5 +53,11 @@
         <priority>500</priority>
       </configuration>
     </component>
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>testfailingmacro</role-hint>
+      <implementation>org.xwiki.rendering.internal.transformation.TestFailingMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
   </components>
 </component-set>

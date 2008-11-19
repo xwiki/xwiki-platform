@@ -71,10 +71,10 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
     private static final String DEFAULT_SYNTAX = "xwiki/2.0";
 
     private static final String DEFAULT_PLUGINS =
-        "separator sync text valign justify list indent undo format font color symbol";
+        "separator sync text valign justify list indent undo format font color symbol link";
 
     private static final String DEFAULT_TOOLBAR =
-        "bold italic underline strikethrough teletype | subscript superscript | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | sync";
+        "bold italic underline strikethrough teletype | subscript superscript | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | sync | link unlink";
 
     private final RichTextEditor ui;
 

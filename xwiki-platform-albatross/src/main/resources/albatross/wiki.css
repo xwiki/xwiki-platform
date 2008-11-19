@@ -401,3 +401,10 @@ a.footnoteBackRef{
 .pagedNavigation .pagedLink a:hover{
   color: #D70 !important;
 }
+
+/* Used to signify a rendering error in the rendered page. Valid only with new rendering */
+.xwikirenderingerror {
+    background-color: #FF5555;
+    border: 1px #555555;
+    padding: 3px;
+}

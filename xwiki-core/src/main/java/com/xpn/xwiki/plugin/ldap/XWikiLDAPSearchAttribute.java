@@ -29,4 +29,15 @@ public class XWikiLDAPSearchAttribute
         this.name = name;
         this.value = value;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return "{name=" + name + " value=" + value + "}";
+    }
 }

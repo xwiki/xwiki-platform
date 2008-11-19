@@ -122,8 +122,8 @@ public final class XWikiLDAPConfig
     }
 
     /**
-     * First try to retrieve value from XWiki Preferences and then from xwiki.cfg Syntax ldap_*name*
-     * (for XWiki Preferences) will be changed to ldap.*name* for xwiki.cfg.
+     * First try to retrieve value from XWiki Preferences and then from xwiki.cfg Syntax ldap_*name* (for XWiki
+     * Preferences) will be changed to ldap.*name* for xwiki.cfg.
      * 
      * @param prefName the name of the property in XWikiPreferences.
      * @param cfgName the name of the property in xwiki.cfg.
@@ -157,8 +157,8 @@ public final class XWikiLDAPConfig
     }
 
     /**
-     * First try to retrieve value from XWiki Preferences and then from xwiki.cfg Syntax ldap_*name*
-     * (for XWiki Preferences) will be changed to ldap.*name* for xwiki.cfg.
+     * First try to retrieve value from XWiki Preferences and then from xwiki.cfg Syntax ldap_*name* (for XWiki
+     * Preferences) will be changed to ldap.*name* for xwiki.cfg.
      * 
      * @param name the name of the property in XWikiPreferences.
      * @param def default value.
@@ -192,6 +192,10 @@ public final class XWikiLDAPConfig
             set = DEFAULT_GROUP_CLASSES;
         }
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ldap_group_classes: " + set);
+        }
+
         return set;
     }
 
@@ -217,6 +221,10 @@ public final class XWikiLDAPConfig
             set = DEFAULT_GROUP_MEMBERFIELDS;
         }
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ldap_group_memberfields: " + set);
+        }
+
         return set;
     }
 
@@ -231,8 +239,7 @@ public final class XWikiLDAPConfig
         Provider provider;
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        String className =
-            getLDAPParam("ldap_ssl.secure_provider", DEFAULT_SECUREPROVIDER, context);
+        String className = getLDAPParam("ldap_ssl.secure_provider", DEFAULT_SECUREPROVIDER, context);
 
         try {
             provider = (java.security.Provider) cl.loadClass(className).newInstance();
@@ -350,8 +357,7 @@ public final class XWikiLDAPConfig
                         attrListToFill.add(ldapattr);
                     }
                 } else {
-                    LOG.error("Error parsing ldap_fields_mapping attribute in xwiki.cfg: "
-                        + fields[j]);
+                    LOG.error("Error parsing ldap_fields_mapping attribute in xwiki.cfg: " + fields[j]);
                 }
             }
         }
@@ -366,11 +372,9 @@ public final class XWikiLDAPConfig
     public int getCacheExpiration(XWikiContext context)
     {
         try {
-            return context.getWiki().getXWikiPreferenceAsInt("ldap_groupcache_expiration",
-                context);
+            return context.getWiki().getXWikiPreferenceAsInt("ldap_groupcache_expiration", context);
         } catch (Exception e) {
-            return (int) context.getWiki().ParamAsLong(
-                "xwiki.authentication.ldap.groupcache_expiration", 21800);
+            return (int) context.getWiki().ParamAsLong("xwiki.authentication.ldap.groupcache_expiration", 21800);
         }
     }
 }

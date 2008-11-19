@@ -67,6 +67,7 @@
     <module>xwiki-observation</module>
     <module>xwiki-bridge</module>
     <module>xwiki-rendering</module>
+    <module>xwiki-script</module>
     <module>xwiki-macros</module>
     <module>xwiki-configuration</module>
     <module>xwiki-query</module>

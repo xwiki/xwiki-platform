@@ -1,0 +1,34 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{groovy}}
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+{{/groovy}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker [groovy] [] [
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+]
+beginList [BULLETED]
+beginListItem
+onWord [one]
+endListItem
+beginListItem
+onWord [two]
+endListItem
+endList [BULLETED]
+endMacroMarker [groovy] [] [
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+]
+endDocument

@@ -32,14 +32,12 @@ package com.xpn.xwiki.render.groovy;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
-import groovy.lang.MetaClassRegistry;
 import groovy.lang.Script;
 import groovy.lang.Writable;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
+
 import org.codehaus.groovy.control.CompilationFailedException;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
-import org.codehaus.groovy.runtime.DefaultGroovyStaticMethods;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.xwiki.cache.DisposableCacheValue;
 
@@ -57,49 +55,40 @@ import java.util.Map;
  * expressions in the template text much like the new JSP EL functionality. The variable 'out' is bound to the writer
  * that the template is being written to.
  */
-public class GroovyTemplateEngine extends TemplateEngine
+public class XWikiSimpleTemplateEngine extends TemplateEngine
 {
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
-     * @see groovy.util.TemplateEngine#createTemplate(java.io.Reader)
+     * @see groovy.text.SimpleTemplateEngine#createTemplate(java.io.Reader)
      */
-    public Template createTemplate(Reader reader) throws CompilationFailedException, ClassNotFoundException,
-        IOException
+    @Override
+    public Template createTemplate(Reader reader) throws CompilationFailedException, IOException
     {
-        com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate template =
-            new com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate();
+        XWikiSimpleTemplate template = new XWikiSimpleTemplate();
         GroovyShell shell = new GroovyShell();
         String script = template.parse(reader);
         template.script = shell.parse(script);
+
         return template;
     }
 
-    private static class SimpleTemplate implements Template, DisposableCacheValue
+    private static class XWikiSimpleTemplate implements Template, DisposableCacheValue
     {
         private Script script;
 
         private Binding binding;
 
-        private Map map;
-
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.xwiki.cache.DisposableCacheValue#dispose()
+         */
         public void dispose() throws Exception
         {
-            if (script != null) {
-                InvokerHelper.removeClass(script.getClass());
-                removeClass(script.getClass());
+            if (this.script != null) {
+                InvokerHelper.removeClass(this.script.getClass());
             }
-        }
-
-        /**
-         * Set the binding for the template. Keys will be converted to Strings.
-         * 
-         * @see groovy.text.Template#setBinding(java.util.Map)
-         */
-        public void setBinding(final Map map)
-        {
-            this.map = map;
-            binding = new Binding(map);
         }
 
         /**
@@ -109,27 +98,32 @@ public class GroovyTemplateEngine extends TemplateEngine
          */
         public Writer writeTo(Writer writer) throws IOException
         {
-            if (binding == null) {
-                binding = new Binding();
+            if (this.binding == null) {
+                this.binding = new Binding();
             }
-            Script scriptObject = InvokerHelper.createScript(script.getClass(), binding);
+            Script scriptObject = InvokerHelper.createScript(this.script.getClass(), this.binding);
             PrintWriter pw = new PrintWriter(writer);
             scriptObject.setProperty("out", pw);
             scriptObject.run();
             pw.flush();
+
             return writer;
         }
 
         /**
+         * {@inheritDoc}
+         * <p>
          * Convert the template and binding into a result String.
          * 
          * @see java.lang.Object#toString()
          */
+        @Override
         public String toString()
         {
             try {
                 StringWriter sw = new StringWriter();
                 writeTo(sw);
+
                 return sw.toString();
             } catch (Exception e) {
                 return e.toString();
@@ -147,9 +141,8 @@ public class GroovyTemplateEngine extends TemplateEngine
             }
             StringWriter sw = new StringWriter();
             startScript(sw);
-            boolean start = false;
-            int c;
-            while ((c = reader.read()) != -1) {
+
+            for (int c; (c = reader.read()) != -1;) {
                 if (c == '<') {
                     c = reader.read();
                     if (c != '%') {
@@ -177,7 +170,7 @@ public class GroovyTemplateEngine extends TemplateEngine
             }
             endScript(sw);
             String result = sw.toString();
-            // System.out.println( "source text:\n" + result );
+
             return result;
         }
 
@@ -199,8 +192,7 @@ public class GroovyTemplateEngine extends TemplateEngine
         private void groovyExpression(Reader reader, StringWriter sw) throws IOException
         {
             sw.write("\");out.print(\"${");
-            int c;
-            while ((c = reader.read()) != -1) {
+            for (int c; (c = reader.read()) != -1;) {
                 if (c == '%') {
                     c = reader.read();
                     if (c != '>') {
@@ -221,8 +213,7 @@ public class GroovyTemplateEngine extends TemplateEngine
         private void groovySection(Reader reader, StringWriter sw) throws IOException
         {
             sw.write("\");");
-            int c;
-            while ((c = reader.read()) != -1) {
+            for (int c; (c = reader.read()) != -1;) {
                 if (c == '%') {
                     c = reader.read();
                     if (c != '>') {
@@ -236,16 +227,28 @@ public class GroovyTemplateEngine extends TemplateEngine
             sw.write(";out.print(\"");
         }
 
+        /**
+         * {@inheritDoc}
+         * 
+         * @see groovy.text.Template#make()
+         */
         public Writable make()
         {
             return make(null);
         }
 
+        /**
+         * {@inheritDoc}
+         * 
+         * @see groovy.text.Template#make(java.util.Map)
+         */
         public Writable make(final Map map)
         {
             return new Writable()
             {
                 /**
+                 * {@inheritDoc}
+                 * <p>
                  * Write the template document with the set binding applied to the writer.
                  * 
                  * @see groovy.lang.Writable#writeTo(java.io.Writer)
@@ -263,19 +266,24 @@ public class GroovyTemplateEngine extends TemplateEngine
                     scriptObject.setProperty("out", pw);
                     scriptObject.run();
                     pw.flush();
+
                     return writer;
                 }
 
                 /**
+                 * {@inheritDoc}
+                 * <p>
                  * Convert the template and binding into a result String.
                  * 
                  * @see java.lang.Object#toString()
                  */
+                @Override
                 public String toString()
                 {
                     try {
                         StringWriter sw = new StringWriter();
                         writeTo(sw);
+
                         return sw.toString();
                     } catch (Exception e) {
                         return e.toString();
@@ -285,67 +293,8 @@ public class GroovyTemplateEngine extends TemplateEngine
         }
     }
 
-    protected static void clearMetaClassRegistry(MetaClassRegistry mcr)
-    {
-        Map map = (Map) com.xpn.xwiki.XWiki.getPrivateField(mcr, "metaClasses");
-        map.clear();
-        Map map2 = (Map) com.xpn.xwiki.XWiki.getPrivateField(mcr, "loaderMap");
-        map2.clear();
-
-        Class[] classes;
-        Object[] objects;
-
-        classes = new Class[1];
-        classes[0] = DefaultGroovyMethods.class.getClass();
-        objects = new Object[1];
-        objects[0] = DefaultGroovyMethods.class;
-        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "lookup", classes, objects);
-
-        classes = new Class[2];
-        classes[0] = DefaultGroovyMethods.class.getClass();
-        classes[1] = boolean.class;
-        objects = new Object[2];
-        objects[0] = DefaultGroovyMethods.class;
-        objects[1] = Boolean.TRUE;
-        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "registerMethods", classes, objects);
-
-        classes = new Class[1];
-        classes[0] = DefaultGroovyStaticMethods.class.getClass();
-        objects = new Object[1];
-        objects[0] = DefaultGroovyStaticMethods.class;
-        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "lookup", classes, objects);
-
-        classes = new Class[2];
-        classes[0] = DefaultGroovyStaticMethods.class.getClass();
-        classes[1] = boolean.class;
-        objects = new Object[2];
-        objects[0] = DefaultGroovyStaticMethods.class;
-        objects[1] = Boolean.FALSE;
-        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "registerMethods", classes, objects);
-
-        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "checkInitialised");
-    }
-
     public static void flushCache()
     {
-        // Clear up groovy registry
-        MetaClassRegistry mcr = MetaClassRegistry.getIntance(0);
-        clearMetaClassRegistry(mcr);
-        mcr = MetaClassRegistry.getIntance(1);
-        clearMetaClassRegistry(mcr);
-        mcr = InvokerHelper.getInstance().getMetaRegistry();
-        clearMetaClassRegistry(mcr);
         Introspector.flushCaches();
-    }
-
-    public static void removeClass(Class clazz)
-    {
-        // Clear up groovy registry
-        MetaClassRegistry mcr = MetaClassRegistry.getIntance(0);
-        mcr.removeMetaClass(clazz);
-        mcr = MetaClassRegistry.getIntance(1);
-        mcr.removeMetaClass(clazz);
-        mcr = InvokerHelper.getInstance().getMetaRegistry();
-        mcr.removeMetaClass(clazz);
     }
 }

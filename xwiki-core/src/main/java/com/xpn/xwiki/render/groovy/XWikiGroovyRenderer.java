@@ -29,6 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiInterpreter;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.Writable;
@@ -37,11 +38,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.component.manager.ComponentLookupException;
 
 import java.io.Writer;
 import java.util.ArrayList;
@@ -51,34 +54,39 @@ import java.util.Map;
 
 public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 {
-    private static final Log log = LogFactory.getLog(XWikiGroovyRenderer.class);
+    private static final Log LOG = LogFactory.getLog(XWikiGroovyRenderer.class);
 
     private Cache<Template> cache;
 
     private Cache<CachedGroovyClass> classCache;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.XWikiRenderer#flushCache()
+     */
     public void flushCache()
     {
-        if (cache != null) {
-            cache.removeAll();
+        if (this.cache != null) {
+            this.cache.removeAll();
         }
-        if (classCache != null) {
-            classCache.removeAll();
+        if (this.classCache != null) {
+            this.classCache.removeAll();
         }
 
-        GroovyTemplateEngine.flushCache();
+        XWikiSimpleTemplateEngine.flushCache();
 
-        cache = null;
-        classCache = null;
+        this.cache = null;
+        this.classCache = null;
     }
 
-    public Map prepareContext(XWikiContext context)
+    public Map<String, Object> prepareContext(XWikiContext context)
     {
         prepareCache(context);
 
-        Map gcontext = (Map) context.get("gcontext");
+        Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
         if (gcontext == null) {
-            gcontext = new HashMap();
+            gcontext = new HashMap<String, Object>();
             gcontext.put("xwiki", new XWiki(context.getWiki(), context));
             gcontext.put("request", context.getRequest());
             gcontext.put("response", context.getResponse());
@@ -124,13 +132,15 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
     public void initCache(int iCapacity, int iClassCapacity, XWikiContext context) throws XWikiException
     {
         try {
+            CacheManager cacheManager = (CacheManager) Utils.getComponentManager().lookup(CacheManager.ROLE);
+
             CacheConfiguration configuration = new CacheConfiguration();
             configuration.setConfigurationId("xwiki.groovy.content");
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(iCapacity);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            cache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+            this.cache = cacheManager.createNewLocalCache(configuration);
 
             configuration = new CacheConfiguration();
             configuration.setConfigurationId("xwiki.groovy.class");
@@ -138,8 +148,11 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             lru.setMaxEntries(iClassCapacity);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            classCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+            this.classCache = cacheManager.createNewLocalCache(configuration);
         } catch (CacheException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
+                "Failed to initilize caches", e);
+        } catch (ComponentLookupException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
                 "Failed to initilize caches", e);
         }
@@ -148,7 +161,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
     protected void prepareCache(XWikiContext context)
     {
         try {
-            if ((cache == null) || (classCache == null)) {
+            if ((this.cache == null) || (this.classCache == null)) {
                 initCache(context);
             }
         } catch (Exception e) {
@@ -165,9 +178,9 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         return render(content, contextdoc, contextdoc, context);
     }
 
-    public String evaluate(String content, String name, Map gcontext)
+    public String evaluate(String content, String name, Map<String, Object> gcontext)
     {
-        GroovyTemplateEngine engine = new GroovyTemplateEngine();
+        XWikiSimpleTemplateEngine engine = new XWikiSimpleTemplateEngine();
         Template template = null;
         boolean refresh = false;
 
@@ -178,12 +191,12 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         }
         try {
             if (!refresh) {
-                template = cache.get(content);
+                template = this.cache.get(content);
             }
 
             if (template == null) {
                 template = engine.createTemplate(content);
-                cache.set(content, template);
+                this.cache.set(content, template);
             }
 
             Writable writable = template.make(gcontext);
@@ -205,10 +218,19 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             text = com.xpn.xwiki.XWiki.getFormEncoded(xe.getFullMessage());
 
             return "<a href=\"\" onclick=\"document.getElementById('xwikierror').style.display='block'; return false;\">"
-                + title + "</a><div id=\"xwikierror\" style=\"display: none;\"><pre class=\"xwikierror\">\n" + text + "</pre></div>";
+                + title
+                + "</a><div id=\"xwikierror\" style=\"display: none;\"><pre class=\"xwikierror\">\n"
+                + text
+                + "</pre></div>";
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.XWikiRenderer#render(java.lang.String, com.xpn.xwiki.doc.XWikiDocument,
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
+     */
     public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context)
     {
         if (content.indexOf("<%") == -1) {
@@ -221,7 +243,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 
         prepareCache(context);
 
-        Map gcontext = null;
+        Map<String, Object> gcontext = null;
         try {
             String name = contextdoc.getFullName();
             gcontext = prepareContext(context);
@@ -245,8 +267,8 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 
     private void generateFunction(StringBuffer result, String param, String data, XWikiVirtualMacro macro)
     {
-        Map namedparams = new HashMap();
-        List unnamedparams = new ArrayList();
+        Map<String, String> namedparams = new HashMap<String, String>();
+        List<String> unnamedparams = new ArrayList<String>();
         if ((param != null) && (!param.trim().equals(""))) {
             String[] params = StringUtils.split(param, "|");
             for (int i = 0; i < params.length; i++) {
@@ -263,14 +285,14 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         result.append(macro.getFunctionName());
         result.append("(");
 
-        List macroparam = macro.getParams();
+        List<String> macroparam = macro.getParams();
         int j = 0;
         for (int i = 0; i < macroparam.size(); i++) {
-            String name = (String) macroparam.get(i);
-            String value = (String) namedparams.get(name);
+            String name = macroparam.get(i);
+            String value = namedparams.get(name);
             if (value == null) {
                 try {
-                    value = (String) unnamedparams.get(j);
+                    value = unnamedparams.get(j);
                     j++;
                 } catch (Exception e) {
                     value = "";
@@ -303,13 +325,19 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
                 XWikiDocument doc = context.getWiki().getDocument(inclDocName, context);
                 result.append(doc.getContent());
             } catch (XWikiException e) {
-                if (log.isErrorEnabled()) {
-                    log.error("Impossible to load groovy macros doc " + inclDocName);
+                if (LOG.isErrorEnabled()) {
+                    LOG.error("Impossible to load groovy macros doc " + inclDocName);
                 }
             }
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.XWikiRenderer#convertSingleLine(java.lang.String, java.lang.String, java.lang.String,
+     *      com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
+     */
     public String convertSingleLine(String macroname, String param, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {
@@ -319,6 +347,12 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         return result.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.XWikiRenderer#convertMultiLine(java.lang.String, java.lang.String, java.lang.String,
+     *      java.lang.String, com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
+     */
     public String convertMultiLine(String macroname, String param, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {
@@ -333,7 +367,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         prepareCache(context);
         ClassLoader parentClassLoader = (ClassLoader) context.get("parentclassloader");
         try {
-            CachedGroovyClass cgc = classCache.get(script);
+            CachedGroovyClass cgc = this.classCache.get(script);
             Class< ? > gc;
 
             if (cgc == null) {
@@ -341,7 +375,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
                     (parentClassLoader == null) ? new GroovyClassLoader() : new GroovyClassLoader(parentClassLoader);
                 gc = gcl.parseClass(script);
                 cgc = new CachedGroovyClass(gc);
-                classCache.set(script, cgc);
+                this.classCache.set(script, cgc);
             } else {
                 gc = cgc.getGroovyClass();
             }
@@ -355,23 +389,27 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 
     public class CachedGroovyClass implements DisposableCacheValue
     {
-        protected Class cl;
+        protected Class< ? > cl;
 
-        public CachedGroovyClass(Class cl)
+        public CachedGroovyClass(Class< ? > cl)
         {
             this.cl = cl;
         }
 
-        public Class getGroovyClass()
+        public Class< ? > getGroovyClass()
         {
-            return cl;
+            return this.cl;
         }
 
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.xwiki.cache.DisposableCacheValue#dispose()
+         */
         public void dispose() throws Exception
         {
-            if (cl != null) {
-                InvokerHelper.removeClass(cl);
-                GroovyTemplateEngine.removeClass(cl);
+            if (this.cl != null) {
+                InvokerHelper.removeClass(this.cl);
             }
         }
     }

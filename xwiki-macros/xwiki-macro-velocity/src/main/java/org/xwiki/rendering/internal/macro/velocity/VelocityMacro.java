@@ -19,26 +19,20 @@
  */
 package org.xwiki.rendering.internal.macro.velocity;
 
-import java.util.List;
 import java.io.StringWriter;
-import java.io.StringReader;
 
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.macro.script.AbstractScriptMacro;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.rendering.util.ParserUtils;
-import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public class VelocityMacro extends AbstractNoParameterMacro
+public class VelocityMacro extends AbstractScriptMacro<Object>
 {
     /**
      * The description of the macro.
@@ -51,42 +45,33 @@ public class VelocityMacro extends AbstractNoParameterMacro
     private VelocityManager velocityManager;
 
     /**
-     * Used to cleanup wiki parser result.
-     */
-    private ParserUtils parserUtils = new ParserUtils();
-
-    /**
-     * Injected by the Component Manager.
-     */
-    private Parser parser;
-
-    /**
      * Default constructor.
      */
     public VelocityMacro()
     {
-        super(DESCRIPTION);
+        super(new DefaultMacroDescriptor(DESCRIPTION));
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()
     {
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
+     * 
+     * @see org.xwiki.rendering.macro.script.AbstractScriptMacro#evaluate(java.lang.Object, java.lang.String,
+     *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
+    @Override
+    protected String evaluate(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        // 1) Run Velocity on macro block content
         StringWriter writer = new StringWriter();
 
         try {
@@ -97,23 +82,6 @@ public class VelocityMacro extends AbstractNoParameterMacro
             throw new MacroExecutionException("Failed to evaluate Velocity Macro for content [" + content + "]", e);
         }
 
-        String velocityResult = writer.toString();
-
-        // 2) Run the wiki syntax parser on the velocity-rendered content
-        XDOM parsedDom;
-        try {
-            parsedDom = this.parser.parse(new StringReader(velocityResult));
-        } catch (ParseException e) {
-            throw new MacroExecutionException("Failed to parse content [" + velocityResult + "] with Syntax parser ["
-                + this.parser.getSyntax() + "]", e);
-        }
-        
-        // 3) If in inline mode remove any top level paragraph
-        List<Block> result = parsedDom.getChildren();
-        if (context.isInlined()) {
-            this.parserUtils.removeTopLevelParagraph(result);
-        }
-
-        return result; 
+        return writer.toString();
     }
 }

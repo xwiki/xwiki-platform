@@ -17,31 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor;
+package org.xwiki.script;
+
+import javax.script.SimpleScriptContext;
+
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextInitializer;
+import org.xwiki.context.ExecutionContextInitializerException;
 
 /**
- * Describe a macro with no parameters.
+ * Allow registering the Script Context in the Execution Context object since it's shared during the whole execution of
+ * the current request.
  * 
  * @version $Id$
- * @since 1.6M1
  */
-public class DefaultMacroDescriptor extends AbstractMacroDescriptor
+public class ScriptExecutionContextInitializer implements ExecutionContextInitializer
 {
     /**
-     * @param description the description of the macro.
+     * The id under which the Script Context is stored in the Execution Context.
      */
-    public DefaultMacroDescriptor(String description)
-    {
-        super(description, Object.class);
-    }
+    public static final String REQUEST_SCRIPT_CONTEXT = "scriptContext";
 
     /**
-     * @param description the description of the macro.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
      */
-    public DefaultMacroDescriptor(String description, Class< ? > parametersBeanClass)
+    public void initialize(ExecutionContext executionContext) throws ExecutionContextInitializerException
     {
-        super(description, parametersBeanClass);
-
-        extractParameterDescriptorMap();
+        executionContext.setProperty(REQUEST_SCRIPT_CONTEXT, new SimpleScriptContext());
     }
 }

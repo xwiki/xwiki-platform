@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.xpn.xwiki.platform</groupId>
+    <artifactId>xwiki-core-parent</artifactId>
+    <version>1.7-SNAPSHOT</version>
+  </parent>
+  <groupId>org.xwiki.platform</groupId>
+  <artifactId>xwiki-core-script</artifactId>
+  <name>XWiki Platform - Core - Script</name>
+  <description>XWiki Platform - Core - Script</description>
+  <dependencies>
+  <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-context</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.script</groupId>
+      <artifactId>jsr223-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+</project>

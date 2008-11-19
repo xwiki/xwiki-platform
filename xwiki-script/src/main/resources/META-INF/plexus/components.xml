@@ -1,4 +1,7 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,32 +19,21 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.rendering.macro.descriptor;
+ *
+-->
 
-/**
- * Describe a macro with no parameters.
- * 
- * @version $Id$
- * @since 1.6M1
- */
-public class DefaultMacroDescriptor extends AbstractMacroDescriptor
-{
-    /**
-     * @param description the description of the macro.
-     */
-    public DefaultMacroDescriptor(String description)
-    {
-        super(description, Object.class);
-    }
-
-    /**
-     * @param description the description of the macro.
-     */
-    public DefaultMacroDescriptor(String description, Class< ? > parametersBeanClass)
-    {
-        super(description, parametersBeanClass);
-
-        extractParameterDescriptorMap();
-    }
-}
+<component-set>
+  <components>
+    <component>
+      <role>org.xwiki.script.ScriptContextManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.script.DefaultScriptContextManager</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.context.Execution</role>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

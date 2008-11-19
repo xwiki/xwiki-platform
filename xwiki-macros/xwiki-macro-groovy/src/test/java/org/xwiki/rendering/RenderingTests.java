@@ -17,31 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor;
+package org.xwiki.rendering;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+
+import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.rendering.scaffolding.ScriptRenderingPlexusTestSetup;
 
 /**
- * Describe a macro with no parameters.
+ * All Rendering integration tests defined in text files using a special format.
  * 
  * @version $Id$
- * @since 1.6M1
+ * @since 1.7M3
  */
-public class DefaultMacroDescriptor extends AbstractMacroDescriptor
+public class RenderingTests extends TestCase
 {
-    /**
-     * @param description the description of the macro.
-     */
-    public DefaultMacroDescriptor(String description)
+    public static Test suite() throws Exception
     {
-        super(description, Object.class);
-    }
+        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
 
-    /**
-     * @param description the description of the macro.
-     */
-    public DefaultMacroDescriptor(String description, Class< ? > parametersBeanClass)
-    {
-        super(description, parametersBeanClass);
+        suite.addTestsFromResource("macrogroovy1", true);
+        suite.addTestsFromResource("macrogroovy2", true);
 
-        extractParameterDescriptorMap();
+        return new ScriptRenderingPlexusTestSetup(suite);
     }
 }

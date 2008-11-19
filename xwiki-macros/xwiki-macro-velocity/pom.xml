@@ -11,7 +11,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering</artifactId>
+      <artifactId>xwiki-core-macro-script</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

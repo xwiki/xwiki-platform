@@ -1,0 +1,17 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify inline mode for Groovy macro
+.#-----------------------------------------------------
+= hello {{groovy}}print "world"{{/groovy}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginSection [1]
+onWord [hello]
+onSpace
+beginMacroMarker [groovy] [] [print "world"]
+onWord [world]
+endMacroMarker [groovy] [] [print "world"]
+endSection [1]
+endDocument

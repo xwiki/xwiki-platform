@@ -17,31 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor;
+package org.xwiki.rendering.macro.script;
+
+import org.xwiki.rendering.macro.descriptor.ParameterDescription;
 
 /**
- * Describe a macro with no parameters.
+ * Parameters for the {@link org.xwiki.rendering.internal.macro.code.ScriptMacro} Macro.
  * 
  * @version $Id$
- * @since 1.6M1
+ * @since 1.7M3
  */
-public class DefaultMacroDescriptor extends AbstractMacroDescriptor
+public class ScriptMacroParameters
 {
     /**
-     * @param description the description of the macro.
+     * The identifier of the script language.
      */
-    public DefaultMacroDescriptor(String description)
+    private String language;
+
+    /**
+     * @param language the identifier of the script language.
+     */
+    @ParameterDescription("the identifier of the script language (java, python, etc.)")
+    public void setLanguage(String language)
     {
-        super(description, Object.class);
+        this.language = language;
     }
 
     /**
-     * @param description the description of the macro.
+     * @return the identifier of the script language.
      */
-    public DefaultMacroDescriptor(String description, Class< ? > parametersBeanClass)
+    public String getLanguage()
     {
-        super(description, parametersBeanClass);
-
-        extractParameterDescriptorMap();
+        return this.language;
     }
 }

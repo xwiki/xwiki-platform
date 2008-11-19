@@ -17,31 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor;
+package org.xwiki.script;
+
+import javax.script.ScriptContext;
 
 /**
- * Describe a macro with no parameters.
+ * Initialize {@link ScriptContext}.
  * 
  * @version $Id$
- * @since 1.6M1
  */
-public class DefaultMacroDescriptor extends AbstractMacroDescriptor
+public interface ScriptContextInitializer
 {
     /**
-     * @param description the description of the macro.
+     * This component's role, used when code needs to look it up.
      */
-    public DefaultMacroDescriptor(String description)
-    {
-        super(description, Object.class);
-    }
+    String ROLE = ScriptContextInitializer.class.getName();
 
     /**
-     * @param description the description of the macro.
+     * Initialize provided {@link ScriptContext}.
+     * 
+     * @param context the {@link ScriptContext} to initialize.
      */
-    public DefaultMacroDescriptor(String description, Class< ? > parametersBeanClass)
-    {
-        super(description, parametersBeanClass);
-
-        extractParameterDescriptorMap();
-    }
+    void initialize(ScriptContext context);
 }

@@ -308,11 +308,6 @@
 
     <!-- Rendering -->
     <dependency>
-      <groupId>groovy</groupId>
-      <artifactId>groovy-all-1.0-jsr</artifactId>
-      <version>06</version>
-    </dependency>
-    <dependency>
       <groupId>radeox</groupId>
       <artifactId>radeox</artifactId>
       <version>1.0-b2</version>
@@ -548,6 +543,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-script</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-context</artifactId>
       <version>${pom.version}</version>
     </dependency>
@@ -574,6 +574,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-macro-velocity</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-macro-groovy</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

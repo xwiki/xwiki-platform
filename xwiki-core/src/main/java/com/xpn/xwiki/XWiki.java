@@ -4614,7 +4614,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     if (isExo()) {
                         authClass = "com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl";
                     } else if (isLDAP()) {
-                        authClass = "com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl";
+                        authClass = "com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl";
                     } else {
                         authClass = "com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl";
                     }

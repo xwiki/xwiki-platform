@@ -147,4 +147,9 @@ public interface DocumentAccessBridge
      * @throws Exception If the document or the attachment cannot be accessed
      */
     String getAttachmentURL(String documentName, String attachmentName) throws Exception;
+
+    /**
+     * @return true if the current document's author has programming rights.
+     */
+    boolean hasProgrammingRights();
 }

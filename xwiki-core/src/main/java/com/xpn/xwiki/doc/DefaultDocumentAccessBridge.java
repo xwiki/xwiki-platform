@@ -141,7 +141,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public String getPropertyType(String className, String propertyName) throws Exception
     {
         XWikiContext xcontext = getContext();
-        PropertyClass pc = xcontext.getWiki().getPropertyClassFromName(className+"_"+propertyName, xcontext);
+        PropertyClass pc = xcontext.getWiki().getPropertyClassFromName(className + "_" + propertyName, xcontext);
         if (pc == null) {
             return null;
         } else {
@@ -199,5 +199,17 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         return xcontext.getWiki().getAttachmentURL(
             documentName == null ? xcontext.getDoc().getFullName() : documentName, attachmentName, xcontext);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#hasProgrammingRights()
+     */
+    public boolean hasProgrammingRights()
+    {
+        XWikiContext xcontext = getContext();
+
+        return xcontext.getWiki().getRightService().hasProgrammingRights(xcontext.getDoc(), xcontext);
     }
 }

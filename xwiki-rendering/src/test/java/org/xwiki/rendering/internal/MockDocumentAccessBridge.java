@@ -47,7 +47,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
 
         return componentDescriptor;
     }
-    
+
     public String getDocumentContent(String documentName) throws Exception
     {
         return "Some content";
@@ -74,12 +74,11 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
         }
         return result;
     }
-    
+
     public String getAttachmentURL(String documentName, String attachmentName) throws Exception
     {
-        return "/xwiki/bin/download/" 
-            + (documentName == null ? "currentdoc" : documentName.replace(".", "/"))
-            + "/" + attachmentName;
+        return "/xwiki/bin/download/" + (documentName == null ? "currentdoc" : documentName.replace(".", "/")) + "/"
+            + attachmentName;
     }
 
     public String getProperty(String documentName, String className, int objectNumber, String propertyName)
@@ -111,5 +110,10 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
         throw new RuntimeException("Not implemented");
+    }
+
+    public boolean hasProgrammingRights()
+    {
+        return true;
     }
 }

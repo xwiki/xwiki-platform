@@ -350,11 +350,20 @@ public class XWikiLDAPConnection
             LDAPAttribute attribute = (LDAPAttribute) attributeItem;
             String attributeName = attribute.getName();
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("  - values for \"" + attributeName + "\"");
+            }
+
             Enumeration allValues = attribute.getStringValues();
 
             if (allValues != null) {
                 while (allValues.hasMoreElements()) {
                     String value = (String) allValues.nextElement();
+
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("    |- [" + value + "]");
+                    }
+
                     searchAttributeList.add(new XWikiLDAPSearchAttribute(attributeName, value));
                 }
             }

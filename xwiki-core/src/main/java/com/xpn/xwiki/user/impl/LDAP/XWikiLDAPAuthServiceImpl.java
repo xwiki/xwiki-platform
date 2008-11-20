@@ -741,7 +741,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         needsUpdate |= ldaXClass.updateLDAPObject(userProfile, ldapDN, ldapUid);
 
         if (needsUpdate) {
-            context.getWiki().saveDocument(userProfile, "Update user profile from LDAP", true, context);
+            context.getWiki().saveDocument(userProfile, "Synchronized user profile with LDAP server", true, context);
         }
     }
 

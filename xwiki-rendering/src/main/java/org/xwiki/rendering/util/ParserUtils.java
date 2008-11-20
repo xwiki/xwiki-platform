@@ -60,7 +60,7 @@ public class ParserUtils
     {
         List<Block> result;
         
-        // TODO: Use an inline parser. See http://jira.xwiki.org/jira/browse/XWIKI-2748
+        // TODO: Use an inline parser instead. See http://jira.xwiki.org/jira/browse/XWIKI-2748
 
         // We want the XWiki parser to consider we're inside a paragraph already since links can only
         // happen in paragraph and for example if there's a macro specified as the label it should
@@ -70,7 +70,16 @@ public class ParserUtils
         if (WikiModelXWikiParser.class.isAssignableFrom(parser.getClass())) {
             result = parser.parse(new StringReader("xwikimarker " + content)).getChildren();
         } else if (WikiModelXHTMLParser.class.isAssignableFrom(parser.getClass())) {
-            result = parser.parse(new StringReader("<p>xwikimarker " + content + "</p>")).getChildren();
+            // If the content is already inside a paragraph then simply add the "xwikimarker" prefix since
+            // otherwise we would have a paragrahp inside a paragraph which would break the reason for
+            // using a prefix.
+            String contentToParse = "<p>xwikimarker ";
+            if (content.startsWith("<p>")) {
+                contentToParse = contentToParse + content.substring(3);
+            } else {
+                contentToParse = contentToParse + content + "</p>";
+            }
+            result = parser.parse(new StringReader(contentToParse)).getChildren();
         } else {
             result = parser.parse(new StringReader(content)).getChildren();
         }

@@ -56,6 +56,9 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
                 (XDOMGeneratorListener) context.getTagStack().getStackParameter("xdomGeneratorListener");
             context.getTagStack().setScannerContext(new WikiScannerContext(listener));
             
+            // Ensure we simulate a new document being parsed
+            context.getScannerContext().beginDocument();
+            
             // Verify if it's a freestanding link and if so save the information so that we can get it in 
             // XWikiCommentHandler.
             if (isFreeStandingReference(context)) {
@@ -79,6 +82,9 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
     {
         boolean isInLink = (Boolean) context.getTagStack().getStackParameter("isInLink");
         if (isInLink) {
+            // Ensure we simulate a document parsing end
+            context.getScannerContext().endDocument();
+
             context.getTagStack().setScannerContext(this.originalContext);
         } else {
             super.end(context);

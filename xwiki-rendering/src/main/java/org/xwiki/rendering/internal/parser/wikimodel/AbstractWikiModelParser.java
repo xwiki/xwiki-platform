@@ -54,6 +54,6 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
         } catch (Exception e) {
             throw new ParseException("Failed to parse input source", e);
         }
-        return listener.getDocument();
+        return listener.getXDOM();
     }
 }

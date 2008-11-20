@@ -81,7 +81,7 @@ public class XDOMGeneratorListener implements IWemListener
         this.imageParser = imageParser;
     }
 
-    public XDOM getDocument()
+    public XDOM getXDOM()
     {
         return new XDOM(generateListFromStack());
     }

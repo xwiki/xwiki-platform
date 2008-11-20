@@ -100,7 +100,7 @@ public class XWikiCommentHandler extends CommentHandler
         XHTMLRenderer renderer = 
             (XHTMLRenderer) this.printRendererFactory.createRenderer(PrintRendererType.XHTML, printer);
         XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.getStackParameter("xdomGeneratorListener");
-        listener.getDocument().traverse(renderer);
+        listener.getXDOM().traverse(renderer);
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
         WikiParameters params = (WikiParameters) stack.getStackParameter("linkParameters");

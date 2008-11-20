@@ -741,7 +741,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         needsUpdate |= ldaXClass.updateLDAPObject(userProfile, ldapDN, ldapUid);
 
         if (needsUpdate) {
-            context.getWiki().saveDocument(userProfile, context);
+            context.getWiki().saveDocument(userProfile, "Update user profile from LDAP", true, context);
         }
     }
 
@@ -756,8 +756,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @return the created user.
      * @throws XWikiException error when creating XWiki user.
      */
-    protected XWikiDocument createUserFromLDAP(XWikiDocument userProfile, List<XWikiLDAPSearchAttribute> searchAttributes,
-        String ldapDN, String ldapUid, XWikiContext context) throws XWikiException
+    protected XWikiDocument createUserFromLDAP(XWikiDocument userProfile,
+        List<XWikiLDAPSearchAttribute> searchAttributes, String ldapDN, String ldapUid, XWikiContext context)
+        throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
@@ -789,7 +790,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if (ldapXClass.updateLDAPObject(createdUserProfile, ldapDN, ldapUid)) {
             context.getWiki().saveDocument(createdUserProfile, context);
         }
-        
+
         return createdUserProfile;
     }
 

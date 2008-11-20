@@ -27,15 +27,15 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>13</version>
   </parent>
   <artifactId>xwiki-shared-tests</artifactId>
   <name>XWiki Platform - Tools - Build - Shared Test</name>
-  <version>1.14-SNAPSHOT</version>
+  <version>1.14</version>
   <packaging>jar</packaging>
   <description>Test framework classes shared between functional test modules</description>
     <properties>
-    <platform.core.version>1.7-SNAPSHOT</platform.core.version>
+    <platform.core.version>1.7-milestone-2</platform.core.version>
   </properties>
   <dependencies>
     <dependency>
@@ -69,4 +69,10 @@
       <version>1.7.0</version>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-shared-tests-1.14</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-shared-tests-1.14</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-shared-tests-1.14</url>
+  </scm>
 </project>

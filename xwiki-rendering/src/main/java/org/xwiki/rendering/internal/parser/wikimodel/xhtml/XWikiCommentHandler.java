@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
+import java.util.Stack;
+
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
@@ -56,7 +58,11 @@ public class XWikiCommentHandler extends CommentHandler
     
     private WikiReferenceParser referenceParser;
 
-    private String commentContent;
+    /**
+     * We're using a stack so that we can have nested comment handling. For example when we have a link to an image
+     * we need nested comment support.
+     */
+    private Stack<String> commentContentStack = new Stack<String>();
     
     public XWikiCommentHandler(Parser parser, LinkParser linkParser, ImageParser imageParser, PrintRendererFactory printRendererFactory)
     {
@@ -91,7 +97,7 @@ public class XWikiCommentHandler extends CommentHandler
         XDOMGeneratorListener listener = new XDOMGeneratorListener(this.parser, this.linkParser, this.imageParser);
         stack.setStackParameter("xdomGeneratorListener", listener);
         stack.setStackParameter("isInLink", true);
-        this.commentContent = content.substring("startwikilink:".length());
+        this.commentContentStack.push(content.substring("startwikilink:".length()));
     }
 
     private void handleLinkCommentStop(String content, TagStack stack)
@@ -104,11 +110,12 @@ public class XWikiCommentHandler extends CommentHandler
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
         WikiParameters params = (WikiParameters) stack.getStackParameter("linkParameters");
+        String linkComment = this.commentContentStack.pop();
         if (isFreeStandingLink) {
-            stack.getScannerContext().onReference(this.commentContent);
+            stack.getScannerContext().onReference(linkComment);
         } else {
             WikiReference wikiReference = this.referenceParser.parse(
-                (printer.toString().length() > 0 ? printer.toString() + ">>" : "") + this.commentContent
+                (printer.toString().length() > 0 ? printer.toString() + ">>" : "") + linkComment
                 + (params.getSize() > 0 ? "||" + params.toString() : ""));
             stack.getScannerContext().onReference(wikiReference);
         }
@@ -117,23 +124,23 @@ public class XWikiCommentHandler extends CommentHandler
         stack.setStackParameter("isInLink", false);
         stack.setStackParameter("isFreeStandingLink", false);
         stack.setStackParameter("linkParameters", WikiParameters.EMPTY);
-        this.commentContent = null;
     }
 
     private void handleImageCommentStart(String content, TagStack stack)
     {
         stack.setStackParameter("isInImage", true);
-        this.commentContent = content.substring("startimage:".length());  
+        this.commentContentStack.push(content.substring("startimage:".length()));  
     }
     
     private void handleImageCommentStop(String content, TagStack stack)
     {
         boolean isFreeStandingImage = (Boolean) stack.getStackParameter("isFreeStandingImage");
         WikiParameters params = (WikiParameters) stack.getStackParameter("imageParameters");
-        Image image = this.imageParser.parse(this.commentContent);
+        String imageComment = this.commentContentStack.pop();
+        Image image = this.imageParser.parse(imageComment);
         
         if (isFreeStandingImage) {
-            stack.getScannerContext().onReference("image:" + this.commentContent);
+            stack.getScannerContext().onReference("image:" + imageComment);
         } else {
             // Remove the ALT attribute if the content has the same value as the original image location
             // This is because the XHTML renderer automatically adds an ALT attribute since it is mandatory
@@ -143,7 +150,7 @@ public class XWikiCommentHandler extends CommentHandler
                 params = params.remove("alt");
             }
             
-            WikiReference wikiReference = this.referenceParser.parse("image:" + this.commentContent
+            WikiReference wikiReference = this.referenceParser.parse("image:" + imageComment
                 + (params.getSize() > 0 ? "||" + params.toString() : ""));
             stack.getScannerContext().onReference(wikiReference);
         }
@@ -151,6 +158,5 @@ public class XWikiCommentHandler extends CommentHandler
         stack.setStackParameter("isInImage", false);
         stack.setStackParameter("isFreeStandingImage", false);
         stack.setStackParameter("imageParameters", WikiParameters.EMPTY);
-        this.commentContent = null;        
     }
 }

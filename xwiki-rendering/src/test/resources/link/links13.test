@@ -1,0 +1,27 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify that we can link to an image
+.#-----------------------------------------------------
+[[image:attach.png>>http://xwiki.org]]
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Reference = [http://xwiki.org]] [false]
+onImage: [attach.png] [true]
+endLink [Reference = [http://xwiki.org]] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org"><!--startimage:attach.png--><img src="/xwiki/bin/download/currentdoc/attach.png" class="wikimodel-freestanding" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+[[image:attach.png>>http://xwiki.org]]
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org"><!--startimage:attach.png--><img src="/xwiki/bin/download/currentdoc/attach.png" class="wikimodel-freestanding" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p></html>

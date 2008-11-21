@@ -32,7 +32,7 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
 /**
  * StyleSheet extension.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.7M2
  */
 public class CssExtension implements Extension

@@ -32,7 +32,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Wiki Document source for Skin Extensions. This is the standard source for Skin Extensions, using an XWiki object of
  * an extension class in a wiki document.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.7M2
  */
 public class SxDocumentSource implements SxSource

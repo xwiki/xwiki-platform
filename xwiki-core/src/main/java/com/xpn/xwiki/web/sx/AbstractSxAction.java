@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.sx.SxSource.CachePolicy;
  * Abstract Skin Extension action. Contains the logic to generate the response based on a extension source and a type of
  * extension that implementing classes must provide.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.7M2
  */
 public abstract class AbstractSxAction extends XWikiAction

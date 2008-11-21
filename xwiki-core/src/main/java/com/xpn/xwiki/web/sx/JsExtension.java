@@ -35,7 +35,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 /**
  * JavaScript extension.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.7M2
  */
 public class JsExtension implements Extension

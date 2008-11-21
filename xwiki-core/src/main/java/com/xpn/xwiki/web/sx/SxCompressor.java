@@ -23,7 +23,7 @@ package com.xpn.xwiki.web.sx;
 /**
  * Extension compressor.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.7M2
  */
 public interface SxCompressor

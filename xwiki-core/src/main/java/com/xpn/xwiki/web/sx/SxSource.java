@@ -24,7 +24,7 @@ package com.xpn.xwiki.web.sx;
  * Skin extension source. Can be a document, a resource file, or anything else.
  * 
  * @since 1.7M2
- * @version $Id: $
+ * @version $Id$
  */
 public interface SxSource
 {

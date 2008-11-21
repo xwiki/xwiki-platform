@@ -23,6 +23,7 @@ package com.xpn.xwiki.web.sx;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.MessageFormat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,30 +75,37 @@ public class JsExtension implements Extension
             public String compress(String source)
             {
                 try {
-                    JavaScriptCompressor compressor =
-                        new JavaScriptCompressor(new StringReader(source), new ErrorReporter()
+                    ErrorReporter reporter = new ErrorReporter()
+                    {
+                        public void error(String message, String filename, int lineNumber, String context, int column)
                         {
-                            public void error(String arg0, String arg1, int arg2, String arg3, int arg4)
-                            {
-                                LOG.warn("Error minimizing JSX object");
-                            }
+                            LOG.warn(MessageFormat.format("Error at line {2}, column {3}: {0}. Caused by: [{1}]",
+                                message, context, lineNumber, column));
+                        }
 
-                            public EvaluatorException runtimeError(String arg0, String arg1, int arg2, String arg3,
-                                int arg4)
-                            {
-                                return null;
-                            }
+                        public EvaluatorException runtimeError(String message, String filename, int lineNumber,
+                            String context, int column)
+                        {
+                            LOG.error(MessageFormat.format("Runtime error minimizing JSX object: {0}", message));
+                            return null;
+                        }
 
-                            public void warning(String arg0, String arg1, int arg2, String arg3, int arg4)
-                            {
-                            }
-
-                        });
+                        public void warning(String message, String filename, int lineNumber, String context, int column)
+                        {
+                            LOG.info(MessageFormat.format("Warning at line {2}, column {3}: {0}. Caused by: [{1}]",
+                                message, context, lineNumber, column));
+                        }
+                    };
+                    JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(source), reporter);
                     StringWriter out = new StringWriter();
                     compressor.compress(out, -1, true, false, false, false);
                     return out.toString();
-                } catch (IOException e) {
-                } catch (EvaluatorException e) {
+                } catch (IOException ex) {
+                    LOG.info("Failed to write the compressed output: " + ex.getMessage());
+                } catch (EvaluatorException ex) {
+                    LOG.info("Failed to parse the JS extension: " + ex.getMessage());
+                } catch (Exception ex) {
+                    LOG.warn("Failed to compress JS extension: " + ex.getMessage());
                 }
                 return source;
             }

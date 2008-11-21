@@ -56,6 +56,7 @@
   </build>
   <profiles>
     <profile>
+      <!-- The initialization is very slow because of Jython 2.5b0, it should be fixed in the final Jython 2.5 release (see http://wiki.python.org/jython/RoadMap). -->
       <id>ci</id>
       <activation>
         <!-- This property is automatically defined by the Maven release plugin when executing

@@ -43,6 +43,7 @@
       <requirements>
         <requirement>
           <role>org.xwiki.script.ScriptContextInitializer</role>
+          <field-name>scriptContextInitializerList</field-name>
         </requirement>
       </requirements>
     </component>

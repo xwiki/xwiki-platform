@@ -24,6 +24,7 @@ import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
@@ -92,6 +93,21 @@ public class UnlinkExecutable implements Executable
     }
 
     /**
+     * @param anchor the anchor to return the text range from
+     * @param rta the {@link RichTextArea} whose document we're using to create and extract ranges
+     * @return the textrange inside the passed the anchor.
+     */
+    private Range getAnchorTextRange(Element anchor, RichTextArea rta)
+    {
+        // get anchor's text range
+        Range anchorRange = rta.getDocument().createRange();
+        anchorRange.setStart(anchor, 0);
+        anchorRange.setEnd(anchor, anchor.getChildNodes().getLength());
+        Range anchorTextRange = DOMUtils.getInstance().getTextRange(anchorRange);
+        return anchorTextRange;
+    }
+
+    /**
      * Removes an anchor by replacing it with all its children.
      * 
      * @param anchor the anchor to remove
@@ -101,6 +117,25 @@ public class UnlinkExecutable implements Executable
      */
     private boolean removeAnchor(Element anchor, RichTextArea rta, Range textRange)
     {
+        Range anchorTextRange = getAnchorTextRange(anchor, rta);
+        boolean isBeginning = textRange.compareBoundaryPoints(RangeCompare.START_TO_START, anchorTextRange) <= 0;
+        boolean isEnd = textRange.compareBoundaryPoints(RangeCompare.END_TO_END, anchorTextRange) >= 0;
+        if (textRange.isCollapsed() && (isBeginning || isEnd)) {
+            // cursor it's at the beginning or at the end, move it out of the anchor
+            Range newRange = rta.getDocument().createRange();
+            if (isBeginning) {
+                newRange.setStartBefore(anchor);
+            }
+            if (isEnd) {
+                newRange.setStartAfter(anchor);
+            }
+            newRange.collapse(true);
+            // now set it on the document
+            rta.getDocument().getSelection().removeAllRanges();
+            rta.getDocument().getSelection().addRange(newRange);
+            return true;
+        }
+        // the selection is either not collapsed, not at the beginning or end. Remove the link
         // Store the current selection
         Node startNode = textRange.getStartContainer();
         int startOffset = textRange.getStartOffset();
@@ -136,12 +171,6 @@ public class UnlinkExecutable implements Executable
      */
     private boolean removeWikiLink(Node startComment, Element anchor, RichTextArea rta, Range textRange)
     {
-        // Store the current selection
-        Node startNode = textRange.getStartContainer();
-        int startOffset = textRange.getStartOffset();
-        Node endNode = textRange.getEndContainer();
-        int endOffset = textRange.getEndOffset();        
-        Node currentNode = anchor.getFirstChild();
         Node spanNode = startComment.getNextSibling();
         if (spanNode == null) {
             return false;
@@ -150,6 +179,33 @@ public class UnlinkExecutable implements Executable
         if (endComment == null) {
             return false;
         }
+        Range anchorTextRange = getAnchorTextRange(anchor, rta);
+        boolean isBeginning = textRange.compareBoundaryPoints(RangeCompare.START_TO_START, anchorTextRange) <= 0;
+        boolean isEnd = textRange.compareBoundaryPoints(RangeCompare.END_TO_END, anchorTextRange) >= 0;
+        if (textRange.isCollapsed() && (isBeginning || isEnd)) {
+            // cursor it's at the beginning or at the end, move it out of the anchor
+            Range newRange = rta.getDocument().createRange();
+            if (isBeginning) {
+                newRange.setStartBefore(startComment);
+            }
+            if (isEnd) {
+                newRange.setStartAfter(endComment);
+            }
+            newRange.collapse(true);
+            // now set it on the document
+            rta.getDocument().getSelection().removeAllRanges();
+            rta.getDocument().getSelection().addRange(newRange);
+            return true;
+        }
+        // Selection is not collapsed, not at the beginning or the end, move it out
+
+        // Store the current selection
+        Node startNode = textRange.getStartContainer();
+        int startOffset = textRange.getStartOffset();
+        Node endNode = textRange.getEndContainer();
+        int endOffset = textRange.getEndOffset();
+        // now start moving contents of the anchor outside
+        Node currentNode = anchor.getFirstChild();
         while (currentNode != null) {
             anchor.removeChild(currentNode);
             startComment.getParentNode().insertBefore(currentNode, startComment);

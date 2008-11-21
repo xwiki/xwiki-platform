@@ -21,11 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
@@ -222,24 +220,6 @@ public class UnlinkExecutable implements Executable
         rta.getDocument().getSelection().removeAllRanges();
         rta.getDocument().getSelection().addRange(newRange);
         return true;
-    }
-
-    /**
-     * Restores the current selection to the passed text range. To be used after the DOM operations to restore the
-     * selection in the text area. The selection will be set to the passed <code>textRange</code> to be sure that we are
-     * not trying to set the selection inside a removed element. We use just a range for the original selection since we
-     * use only the first range of the selection anyway.
-     * 
-     * @param rta the {@link RichTextArea} for which the selection restore is done
-     * @param textRange text range to set the first range of the selection to
-     */
-    private void restoreSelection(RichTextArea rta, Range textRange)
-    {
-        
-        Document doc = rta.getDocument();
-        Selection selection = doc.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(textRange);
     }
 
     /**

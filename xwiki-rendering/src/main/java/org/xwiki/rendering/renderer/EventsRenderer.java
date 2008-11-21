@@ -418,7 +418,9 @@ public class EventsRenderer extends AbstractPrintRenderer
     {
         String printableStr;
 
-        if (StringUtils.isAsciiPrintable(str)) {
+        if (str == null) {
+            printableStr = null;
+        } else  if (StringUtils.isAsciiPrintable(str)) {
             printableStr = str;
         } else {
             StringBuffer buffer = new StringBuffer();

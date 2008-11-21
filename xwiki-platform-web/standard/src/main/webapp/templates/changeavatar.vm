@@ -5,6 +5,7 @@
 ### TODO: Check dimensions
 ### TODO: Document version to return to? (rev and language)
 ###
+#template("xwikivars.vm")
 #if($doc.getObject("XWikiUsers") && ($context.user == $doc.fullName || $hasAdmin))
 #set($date = $doc.attachmentList.get(0).date)
 #set($name = $doc.attachmentList.get(0).filename)

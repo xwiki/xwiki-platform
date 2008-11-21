@@ -5378,8 +5378,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public List<String> getIncludedMacros(String defaultweb, String content, XWikiContext context)
     {
         try {
-            String pattern = "#includeMacros\\(\"(.*?)\"\\)";
-            List<String> list = context.getUtil().getUniqueMatches(content, pattern, 1);
+            String pattern = "#includeMacros[ ]*\\([ ]*([\"'])(.*?)\\1[ ]*\\)";
+            List<String> list = context.getUtil().getUniqueMatches(content, pattern, 2);
             for (int i = 0; i < list.size(); i++) {
                 try {
                     String name = list.get(i);

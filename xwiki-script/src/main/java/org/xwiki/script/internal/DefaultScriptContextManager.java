@@ -55,7 +55,7 @@ public class DefaultScriptContextManager extends AbstractLogEnabled implements S
     /**
      * The {@link ScriptContextInitializer} list used to initialize {@link ScriptContext}.
      */
-    private List<ScriptContextInitializer> scriptContextInitialiserList;
+    private List<ScriptContextInitializer> scriptContextInitializerList;
 
     /**
      * {@inheritDoc}
@@ -75,11 +75,11 @@ public class DefaultScriptContextManager extends AbstractLogEnabled implements S
     public void initialize() throws InitializationException
     {
         try {
-            this.scriptContextInitialiserList = this.componentManager.lookupList(ScriptContextInitializer.ROLE);
+            this.scriptContextInitializerList = this.componentManager.lookupList(ScriptContextInitializer.ROLE);
         } catch (ComponentLookupException e) {
             getLogger().error("Failed to lookup script context initializers", e);
 
-            this.scriptContextInitialiserList = Collections.emptyList();
+            this.scriptContextInitializerList = Collections.emptyList();
         }
     }
 
@@ -96,7 +96,7 @@ public class DefaultScriptContextManager extends AbstractLogEnabled implements S
             (ScriptContext) this.execution.getContext().getProperty(
                 ScriptExecutionContextInitializer.REQUEST_SCRIPT_CONTEXT);
 
-        for (ScriptContextInitializer scriptContextInitializer : this.scriptContextInitialiserList) {
+        for (ScriptContextInitializer scriptContextInitializer : this.scriptContextInitializerList) {
             scriptContextInitializer.initialize(scriptContext);
         }
 

@@ -27,13 +27,19 @@
     <component>
       <role>org.xwiki.script.ScriptContextManager</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.script.DefaultScriptContextManager</implementation>
+      <implementation>org.xwiki.script.internal.DefaultScriptContextManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
           <role>org.xwiki.context.Execution</role>
         </requirement>
       </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.context.ExecutionContextInitializer</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.script.internal.ScriptExecutionContextInitializer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
     </component>
   </components>
 </component-set>

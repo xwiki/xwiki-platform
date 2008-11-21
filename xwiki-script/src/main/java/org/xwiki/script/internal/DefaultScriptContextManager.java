@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.script;
+package org.xwiki.script.internal;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +31,8 @@ import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.script.ScriptContextInitializer;
+import org.xwiki.script.ScriptContextManager;
 
 /**
  * Default implementation of {@link ScriptContextManager}.

@@ -19,19 +19,10 @@
  */
 package org.xwiki.script.internal;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.script.ScriptContext;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
-import org.xwiki.script.ScriptContextInitializer;
 import org.xwiki.script.ScriptContextManager;
 
 /**
@@ -39,49 +30,12 @@ import org.xwiki.script.ScriptContextManager;
  * 
  * @version $Id$
  */
-public class DefaultScriptContextManager extends AbstractLogEnabled implements ScriptContextManager, Composable,
-    Initializable
+public class DefaultScriptContextManager extends AbstractLogEnabled implements ScriptContextManager
 {
     /**
      * Used to get and insert script context in current execution context.
      */
     private Execution execution;
-
-    /**
-     * Used to get all the {@link ScriptContextInitializer}.
-     */
-    private ComponentManager componentManager;
-
-    /**
-     * The {@link ScriptContextInitializer} list used to initialize {@link ScriptContext}.
-     */
-    private List<ScriptContextInitializer> scriptContextInitializerList;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        try {
-            this.scriptContextInitializerList = this.componentManager.lookupList(ScriptContextInitializer.ROLE);
-        } catch (ComponentLookupException e) {
-            getLogger().error("Failed to lookup script context initializers", e);
-
-            this.scriptContextInitializerList = Collections.emptyList();
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -92,14 +46,7 @@ public class DefaultScriptContextManager extends AbstractLogEnabled implements S
     {
         // The Script Context is set in ScriptRequestInterceptor, when the XWiki Request is initialized so we are
         // guaranteed it is defined when this method is called.
-        ScriptContext scriptContext =
-            (ScriptContext) this.execution.getContext().getProperty(
-                ScriptExecutionContextInitializer.REQUEST_SCRIPT_CONTEXT);
-
-        for (ScriptContextInitializer scriptContextInitializer : this.scriptContextInitializerList) {
-            scriptContextInitializer.initialize(scriptContext);
-        }
-
-        return scriptContext;
+        return (ScriptContext) this.execution.getContext().getProperty(
+            ScriptExecutionContextInitializer.REQUEST_SCRIPT_CONTEXT);
     }
 }

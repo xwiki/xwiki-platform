@@ -19,11 +19,14 @@
  */
 package org.xwiki.script.internal;
 
+import java.util.List;
+
 import javax.script.SimpleScriptContext;
 
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContextInitializerException;
+import org.xwiki.script.ScriptContextInitializer;
 
 /**
  * Allow registering the Script Context in the Execution Context object since it's shared during the whole execution of
@@ -39,12 +42,38 @@ public class ScriptExecutionContextInitializer implements ExecutionContextInitia
     public static final String REQUEST_SCRIPT_CONTEXT = "scriptContext";
 
     /**
+     * The {@link ScriptContextInitializer} list used to initialize {@link ScriptContext}.
+     */
+    private List<ScriptContextInitializer> scriptContextInitializerList;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
      */
     public void initialize(ExecutionContext executionContext) throws ExecutionContextInitializerException
     {
-        executionContext.setProperty(REQUEST_SCRIPT_CONTEXT, new SimpleScriptContext());
+        SimpleScriptContext context = new SimpleScriptContext()
+        {
+            /**
+             * {@inheritDoc}
+             * 
+             * @see javax.script.SimpleScriptContext#setAttribute(java.lang.String, java.lang.Object, int)
+             */
+            @Override
+            public void setAttribute(String name, Object value, int scope)
+            {
+                // Make sure the xwiki context is not replaced by script context
+                if (value != this) {
+                    super.setAttribute(name, value, scope);
+                }
+            }
+        };
+
+        executionContext.setProperty(REQUEST_SCRIPT_CONTEXT, context);
+
+        for (ScriptContextInitializer scriptContextInitializer : this.scriptContextInitializerList) {
+            scriptContextInitializer.initialize(context);
+        }
     }
 }

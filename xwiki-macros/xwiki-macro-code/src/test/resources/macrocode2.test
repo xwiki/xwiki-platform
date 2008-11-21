@@ -1,0 +1,54 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{code language=java}}
+<b>bold</b>
+<i>italic</i>
+{{/code}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker [code] [language=java] [
+<b>bold</b>
+<i>italic</i>
+]
+beginParagraph
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [<]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [b]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [>]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [bold]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [</]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [b]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [>]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onLineBreak
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [<]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [i]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [>]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [italic]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [</]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [i]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [>]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onLineBreak
+endParagraph
+endMacroMarker [code] [language=java] [
+<b>bold</b>
+<i>italic</i>
+]
+endDocument

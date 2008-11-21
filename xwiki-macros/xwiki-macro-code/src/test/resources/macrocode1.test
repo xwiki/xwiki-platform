@@ -1,0 +1,37 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{code}}
+<b>bold</b>
+<i>italic</i>
+{{/code}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker [code] [] [
+<b>bold</b>
+<i>italic</i>
+]
+beginParagraph
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [<b>]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [bold]
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [</b>]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onLineBreak
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [<i>]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [italic]
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [</i>]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+endParagraph
+endMacroMarker [code] [] [
+<b>bold</b>
+<i>italic</i>
+]
+endDocument

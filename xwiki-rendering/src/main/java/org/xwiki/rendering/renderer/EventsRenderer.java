@@ -22,12 +22,15 @@ package org.xwiki.rendering.renderer;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.xml.XMLNode;
 import org.apache.commons.lang.StringUtils;
 
@@ -388,8 +391,16 @@ public class EventsRenderer extends AbstractPrintRenderer
      */
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-       println("onImage: " + (image.getDocumentName() != null ? "[" + image.getDocumentName() + "] " : "") 
-           + "[" + image.getAttachmentName() + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
+        if (image.getType() == ImageType.DOCUMENT) {
+            DocumentImage documentImage = (DocumentImage) image;
+            println("onImage: " + (documentImage.getDocumentName() != null ? "[" 
+                + documentImage.getDocumentName() + "] " : "") + "[" + documentImage.getAttachmentName() + "] [" 
+                + isFreeStandingURI + "]" + serializeParameters(parameters));
+        } else {
+            URLImage urlImage = (URLImage) image;
+            println("onImage: [" + urlImage.getURL() + "] [" + isFreeStandingURI + "]" 
+                + serializeParameters(parameters));
+        }
     }
 
     /**

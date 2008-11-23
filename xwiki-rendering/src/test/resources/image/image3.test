@@ -1,0 +1,24 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+image:http://some/image.png
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onImage: [http://some/image.png] [true]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p><!--startimage:http://some/image.png--><img src="http://some/image.png" class="wikimodel-freestanding" alt="http://some/image.png"/><!--stopimage--></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+image:http://some/image.png
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p><!--startimage:http://some/image.png--><img src="http://some/image.png" class="wikimodel-freestanding" alt="http://some/image.png"/><!--stopimage--></p></html>

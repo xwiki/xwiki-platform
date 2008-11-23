@@ -20,6 +20,8 @@
 package org.xwiki.rendering.listener;
 
 /**
+ * The link type (a link to a document, a link to a URI, a link to an external interwiki).
+ * 
  * @version $Id$
  * @since 1.5M2
  */

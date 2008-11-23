@@ -19,11 +19,13 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.parser.ImageParser;
 
 /**
- * Parses XWiki image definitions, using the format:
+ * Parses XWiki image definitions, using either a URL (pointing to an imagep or the following format:
  * <code>[wiki:Space.Page]^imageName</code> where <code>imageName</code> is the name of the image attachment
  * (for example "my.png").
  * 
@@ -38,18 +40,25 @@ public class XWikiImageParser implements ImageParser
      */
     public Image parse(String imageLocation)
     {
+        Image result;
+
         // TODO: Shouldn't we store a DocumentIdentity object instead in Image and make sure that it's never null
         // by using the current document when not specified?
-        String documentName = null;
-        String attachmentName;
-        int attachmentSeparatorPosition = imageLocation.indexOf("@");
-        if (attachmentSeparatorPosition > -1) {
-            documentName = imageLocation.substring(0, attachmentSeparatorPosition);
-            attachmentName = imageLocation.substring(attachmentSeparatorPosition + 1);
+        if (imageLocation.startsWith("http://")) {
+            result = new URLImage(imageLocation);
         } else {
-            attachmentName = imageLocation;
+            String documentName = null;
+            String attachmentName;
+            int attachmentSeparatorPosition = imageLocation.indexOf("@");
+            if (attachmentSeparatorPosition > -1) {
+                documentName = imageLocation.substring(0, attachmentSeparatorPosition);
+                attachmentName = imageLocation.substring(attachmentSeparatorPosition + 1);
+            } else {
+                attachmentName = imageLocation;
+            }
+            result = new DocumentImage(documentName, attachmentName); 
         }
         
-        return new Image(documentName, attachmentName);
+        return result; 
     }
 }

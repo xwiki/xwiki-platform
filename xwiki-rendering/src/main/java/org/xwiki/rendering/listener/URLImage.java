@@ -17,35 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser;
-
-import org.xwiki.rendering.listener.DocumentImage;
-import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.URLImage;
-import org.xwiki.rendering.parser.ImageParser;
+package org.xwiki.rendering.listener;
 
 /**
- * Since we need to have wiki syntax-specific image parsers, this generic parser allows at least to the reference
- * displayed when using syntaxes other than XWiki (which has its specific image parser, see {@link XWikiImageParser}),
- * while waiting for specialized image parsers to be written.
- *
+ * Image located at a URL.
+ * 
  * @version $Id$
- * @since 1.7M3
+ * @since 1.7RC1
  */
-public class GenericImageParser implements ImageParser
+public class URLImage extends AbstractImage
 {
+    private String url;
+    
+    public URLImage(String url)
+    {
+        this.url = url;
+    }
+    
+    public String getURL()
+    {
+        return this.url;
+    }
+
     /**
      * {@inheritDoc}
-     * @see ImageParser#parse(String)
+     * @see AbstractImage#getType()
      */
-    public Image parse(String imageLocation)
+    public ImageType getType()
     {
-        Image result;
-        if (imageLocation.startsWith("http://")) {
-            result = new URLImage(imageLocation);
-        } else {
-            result = new DocumentImage(null, imageLocation);
-        }
-        return result;
+        return ImageType.URL;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractImage#getName()
+     */
+    public String getName()
+    {
+        return getURL();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return "document = [" + getURL() + "]";
     }
 }

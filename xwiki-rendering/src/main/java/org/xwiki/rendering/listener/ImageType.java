@@ -20,22 +20,12 @@
 package org.xwiki.rendering.listener;
 
 /**
- * Represents an image in a Document.
+ * The image type (an image located in a document, an image located at a URL).
  * 
  * @version $Id$
- * @since 1.7M3
+ * @since 1.7RC1
  */
-public interface Image extends Cloneable
+public enum ImageType
 {
-    /**
-     * @return the image type (image located in a Document or image located at a URL)
-     */
-    ImageType getType();
-
-    /**
-     * @return a name representing the image (it's used for example as the ALT text in the XHTML renderer)
-     */
-    String getName();
-    
-    Image clone();
+    DOCUMENT, URL
 }

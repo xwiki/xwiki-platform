@@ -19,7 +19,10 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
+import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.listener.ImageType;
+import org.xwiki.rendering.listener.URLImage;
 
 /**
  * Generate a XWiki syntax string representation of an {@link Image}, using the format:
@@ -33,10 +36,16 @@ public class XWikiSyntaxImageRenderer
     public String renderImage(Image image)
     {
         String result;
-        if (image.getDocumentName() != null) {
-            result = image.getDocumentName() + "@" + image.getAttachmentName();
+        if (image.getType() == ImageType.DOCUMENT) {
+            DocumentImage documentImage = (DocumentImage) image;
+            if (documentImage.getDocumentName() != null) {
+                result = documentImage.getDocumentName() + "@" + documentImage.getAttachmentName();
+            } else {
+                result = documentImage.getAttachmentName();
+            }
         } else {
-            result = image.getAttachmentName();
+            URLImage urlImage = (URLImage) image;
+            result = urlImage.getURL(); 
         }
         return result;
     }

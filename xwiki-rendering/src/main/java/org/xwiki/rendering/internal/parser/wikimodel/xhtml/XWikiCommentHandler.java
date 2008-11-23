@@ -146,7 +146,7 @@ public class XWikiCommentHandler extends CommentHandler
             // This is because the XHTML renderer automatically adds an ALT attribute since it is mandatory
             // in the XHTML specifications.
             WikiParameter altParameter = params.getParameter("alt"); 
-            if (altParameter != null && altParameter.getValue().equals(image.getAttachmentName())) {
+            if (altParameter != null && altParameter.getValue().equals(image.getName())) {
                 params = params.remove("alt");
             }
             

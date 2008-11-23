@@ -24,11 +24,14 @@ import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.listener.xml.XMLNode;
@@ -793,11 +796,13 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     {
         // First we need to compute the image URL.
         String imageURL;
-        try {
-            imageURL = this.documentAccessBridge.getAttachmentURL(image.getDocumentName(), image.getAttachmentName());
-        } catch (Exception e) {
-            // TODO: Handle exceptions in a better manner
-            throw new RuntimeException("Failed to get attachment URL for [" + image + "]", e);
+        if (image.getType() == ImageType.DOCUMENT) {
+            DocumentImage documentImage = (DocumentImage) image;
+            imageURL = this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), 
+                documentImage.getAttachmentName()); 
+        } else {
+            URLImage urlImage = (URLImage) image;
+            imageURL = urlImage.getURL();
         }
         
         // Then add it as an attribute of the IMG element.
@@ -814,7 +819,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
         // If not ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
         if (!parameters.containsKey("alt")) {
-            attributes.put("alt", image.getAttachmentName());
+            attributes.put("alt", image.getName());
         }
         
         // And generate the XHTML IMG element. We need to save the image location in XML comment so that

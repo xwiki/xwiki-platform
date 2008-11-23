@@ -798,8 +798,13 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         String imageURL;
         if (image.getType() == ImageType.DOCUMENT) {
             DocumentImage documentImage = (DocumentImage) image;
-            imageURL = this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), 
-                documentImage.getAttachmentName()); 
+             try {
+                 imageURL = this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), 
+                     documentImage.getAttachmentName());
+             } catch (Exception e) {
+                 // TODO: Handle exceptions in a better manner
+                 throw new RuntimeException("Failed to get attachment URL for [" + image + "]", e);
+             }
         } else {
             URLImage urlImage = (URLImage) image;
             imageURL = urlImage.getURL();

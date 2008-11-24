@@ -6,8 +6,8 @@
 .#---------------------------------------------------------------------------------------------------------
 ~*~*notbold~*~*
 <notag>"&'
-~[~[nolink~]~]
-~{~{nomacro~}~}
+~[~[nolink]]
+~{~{nomacro}}
 ~#~#nomono~#~#
 ~/~/noitalic~/~/
 ~-~-notrike~-~-
@@ -17,6 +17,10 @@
 ~* notlist
 ~1~1~*~. notlist
 ~=~= notheader
+[[[[>>reference]]
+[[whatever
+{{ whatever /}}
+{{whatever
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -38,14 +42,14 @@ onLineBreak
 onEscape [[]
 onEscape [[]
 onWord [nolink]
-onEscape []]
-onEscape []]
+onSpecialSymbol []]
+onSpecialSymbol []]
 onLineBreak
 onEscape [{]
 onEscape [{]
 onWord [nomacro]
-onEscape [}]
-onEscape [}]
+onSpecialSymbol [}]
+onSpecialSymbol [}]
 onLineBreak
 onEscape [#]
 onEscape [#]
@@ -98,19 +102,41 @@ onEscape [=]
 onEscape [=]
 onSpace
 onWord [notheader]
+onLineBreak
+beginLink [Reference = [reference]] [false]
+onSpecialSymbol [[]
+onSpecialSymbol [[]
+endLink [Reference = [reference]] [false]
+onLineBreak
+onSpecialSymbol [[]
+onSpecialSymbol [[]
+onWord [whatever]
+onLineBreak
+onSpecialSymbol [{]
+onSpecialSymbol [{]
+onSpace
+onWord [whatever]
+onSpace
+onSpecialSymbol [/]
+onSpecialSymbol [}]
+onSpecialSymbol [}]
+onLineBreak
+onSpecialSymbol [{]
+onSpecialSymbol [{]
+onWord [whatever]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>**notbold**<br/>&lt;notag&gt;"&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader</p>
+<p>**notbold**<br/>&lt;notag&gt;"&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference">[[</a></span><!--stopwikilink--><br/>[[whatever<br/>{{ whatever /}}<br/>{{whatever</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 ~*~*notbold~*~*
 <notag>"&'
-~[~[nolink~]~]
-~{~{nomacro~}~}
+~[~[nolink]]
+~{~{nomacro}}
 ~#~#nomono~#~#
 ~/~/noitalic~/~/
 ~-~-notrike~-~-
@@ -120,7 +146,11 @@ endDocument
 ~* notlist
 ~1~1~*~. notlist
 ~=~= notheader
+[[[[>>reference]]
+[[whatever
+{{ whatever /}}
+{{whatever
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>**notbold**<br/>&lt;notag&gt;"&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader</p></html>
+<html><p>**notbold**<br/>&lt;notag&gt;"&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference">[[</a></span><!--stopwikilink--><br/>[[whatever<br/>{{ whatever /}}<br/>{{whatever</p></html>

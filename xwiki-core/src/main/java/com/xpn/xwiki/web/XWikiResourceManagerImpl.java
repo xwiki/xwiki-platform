@@ -26,9 +26,18 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.Resource;
 import org.apache.velocity.runtime.resource.ResourceManagerImpl;
 
-public class XWikiResourceManagerImpl extends ResourceManagerImpl {
+public class XWikiResourceManagerImpl extends ResourceManagerImpl
+{
 
-    public Resource getResource(String string, int i, String string1) throws ResourceNotFoundException, ParseErrorException, Exception {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.apache.velocity.runtime.resource.ResourceManagerImpl#getResource(java.lang.String, int, java.lang.String)
+     */
+    @Override
+    public Resource getResource(String string, int i, String string1) throws ResourceNotFoundException,
+        ParseErrorException, Exception
+    {
         Resource result = super.getResource(string, i, string1);
         return result;
     }

@@ -20,6 +20,9 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
+import java.util.Collections;
+import java.util.Set;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -103,6 +106,16 @@ public class JsResourceSkinExtensionPlugin extends SkinExtensionPlugin
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
+    }
+
+    @Override
+    public Set<String> getAlwaysUsedExtensions(XWikiContext context)
+    {
+        // There is no mean to define an always used extension for something else than a document extension now,
+        // so for resources-based extensions, we return an emtpy set.
+        // An idea for the future could be to have an API for plugins and components to register always used resources
+        // extensions.
+        return Collections.emptySet();
     }
 
 }

@@ -65,6 +65,8 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
      */
     public abstract String getLink(String documentName, XWikiContext context);
 
+    public abstract Set<String> getAlwaysUsedExtensions(XWikiContext context);
+
     /**
      * {@inheritDoc}
      * 
@@ -73,7 +75,6 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
     public SkinExtensionPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
-        init(context);
     }
 
     /**
@@ -121,12 +122,25 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * @return
+     * @return a XHMTL fragment with all extensions imports statements for this request. This includes both extensions
+     *         that are defined as being "used always" and "on demand" extensions explicitely requested for this page.
      */
     public String getImportString(XWikiContext context)
     {
         StringBuilder iStr = new StringBuilder();
-        for (String docName : getRequestList(context)) {
+        // First, we add to the import string the extensions that should always be used.
+        if (context.getAction().equals("view") || context.getAction().equals("admin")) {
+            // TODO use a list of actions set by the extension instead.
+            for (String docName : getAlwaysUsedExtensions(context)) {
+                iStr.append(getLink(docName, context));
+            }
+        }
+        // Then, we add On-Demand extensions for this request, from which will substracted the extensions that were
+        // already in the "always use".
+        Set<String> requestList = getRequestList(context);
+        // remove all extensions already requested through "use always".
+        requestList.removeAll(getAlwaysUsedExtensions(context));
+        for (String docName : requestList) {
             iStr.append(getLink(docName, context));
         }
         return iStr.toString();

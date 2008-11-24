@@ -36,84 +36,101 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-public class XWikiServletResponse implements XWikiResponse {
+public class XWikiServletResponse implements XWikiResponse
+{
     private HttpServletResponse response;
 
-    public XWikiServletResponse(HttpServletResponse response) {
+    public XWikiServletResponse(HttpServletResponse response)
+    {
         this.response = response;
     }
 
-    public HttpServletResponse getHttpServletResponse () {
-        return response;
+    public HttpServletResponse getHttpServletResponse()
+    {
+        return this.response;
     }
 
-
-    public void sendRedirect(String redirect) throws IOException {
-        response.sendRedirect(redirect);
+    public void sendRedirect(String redirect) throws IOException
+    {
+        this.response.sendRedirect(redirect);
     }
 
-    public void setContentType(String type) {
-        response.setContentType(type);
+    public void setContentType(String type)
+    {
+        this.response.setContentType(type);
     }
 
-    public void setBufferSize(int i) {
-        response.setBufferSize(i);
+    public void setBufferSize(int i)
+    {
+        this.response.setBufferSize(i);
     }
 
-    public int getBufferSize() {
-        return response.getBufferSize();
+    public int getBufferSize()
+    {
+        return this.response.getBufferSize();
     }
 
-    public void flushBuffer() throws IOException {
-        response.flushBuffer();
+    public void flushBuffer() throws IOException
+    {
+        this.response.flushBuffer();
     }
 
-    public void resetBuffer() {
-        response.resetBuffer();
+    public void resetBuffer()
+    {
+        this.response.resetBuffer();
     }
 
-    public boolean isCommitted() {
-        return response.isCommitted();
+    public boolean isCommitted()
+    {
+        return this.response.isCommitted();
     }
 
-    public void reset() {
-        response.reset();
+    public void reset()
+    {
+        this.response.reset();
     }
 
-    public void setContentLength(int length) {
-        response.setContentLength(length);
+    public void setContentLength(int length)
+    {
+        this.response.setContentLength(length);
     }
 
-    public String getCharacterEncoding() {
-        return response.getCharacterEncoding();
+    public String getCharacterEncoding()
+    {
+        return this.response.getCharacterEncoding();
     }
 
-    public ServletOutputStream getOutputStream() throws IOException {
-        return response.getOutputStream();
+    public ServletOutputStream getOutputStream() throws IOException
+    {
+        return this.response.getOutputStream();
     }
 
-    public PrintWriter getWriter() throws IOException {
-        return response.getWriter();
+    public PrintWriter getWriter() throws IOException
+    {
+        return this.response.getWriter();
     }
 
-    public void setCharacterEncoding(String s) {
-        response.setCharacterEncoding(s);
+    public void setCharacterEncoding(String s)
+    {
+        this.response.setCharacterEncoding(s);
     }
 
-    public void addCookie(Cookie cookie) {
-        response.addCookie(cookie);
+    public void addCookie(Cookie cookie)
+    {
+        this.response.addCookie(cookie);
     }
 
-    public void addCookie(String cookieName, String cookieValue, int age) {
+    public void addCookie(String cookieName, String cookieValue, int age)
+    {
         Cookie cookie = new Cookie(cookieName, cookieValue);
         cookie.setVersion(1);
         cookie.setMaxAge(age);
-        response.addCookie(cookie);
+        this.response.addCookie(cookie);
     }
 
     /**
      * Remove a cookie.
-     *
+     * 
      * @param request The servlet request needed to find the cookie to remove
      * @param cookieName The name of the cookie that must be removed.
      */
@@ -127,129 +144,161 @@ public class XWikiServletResponse implements XWikiResponse {
         }
     }
 
-
-    public void setLocale(Locale locale) {
-        response.setLocale(locale);
+    public void setLocale(Locale locale)
+    {
+        this.response.setLocale(locale);
     }
 
-    public Locale getLocale() {
-        return response.getLocale();
+    public Locale getLocale()
+    {
+        return this.response.getLocale();
     }
 
-    public void setDateHeader(String name, long value) {
-        response.setDateHeader(name, value);
+    public void setDateHeader(String name, long value)
+    {
+        this.response.setDateHeader(name, value);
     }
 
-    public void setIntHeader(String name, int value) {
-        response.setIntHeader(name, value);
+    public void setIntHeader(String name, int value)
+    {
+        this.response.setIntHeader(name, value);
     }
 
-    public void setHeader(String name, String value) {
-        response.addHeader(name, value);
+    public void setHeader(String name, String value)
+    {
+        this.response.addHeader(name, value);
     }
 
-    public void addHeader(String name, String value) {
-        response.addHeader(name, value);
+    public void addHeader(String name, String value)
+    {
+        this.response.addHeader(name, value);
     }
 
-    public void addDateHeader(String name, long value) {
-        response.addDateHeader(name, value);
+    public void addDateHeader(String name, long value)
+    {
+        this.response.addDateHeader(name, value);
     }
 
-    public void addIntHeader(String name, int value) {
-        response.addIntHeader(name, value);
+    public void addIntHeader(String name, int value)
+    {
+        this.response.addIntHeader(name, value);
     }
 
-    public void setStatus(int i) {
-        response.setStatus(i);
-    }
-
-    /**
-     * @deprecated
-     */
-    public void setStatus(int i, String s) {
-        response.setStatus(i, s);
-    }
-
-    public boolean containsHeader(String name) {
-        return response.containsHeader(name);
-    }
-
-    public String encodeURL(String s) {
-        return response.encodeURL(s);
-    }
-
-    public String encodeRedirectURL(String s) {
-        return response.encodeRedirectURL(s);
+    public void setStatus(int i)
+    {
+        this.response.setStatus(i);
     }
 
     /**
      * @deprecated
      */
-    public String encodeUrl(String s) {
-        return response.encodeUrl(s);
+    @Deprecated
+    public void setStatus(int i, String s)
+    {
+        this.response.setStatus(i, s);
+    }
+
+    public boolean containsHeader(String name)
+    {
+        return this.response.containsHeader(name);
+    }
+
+    public String encodeURL(String s)
+    {
+        return this.response.encodeURL(s);
+    }
+
+    public String encodeRedirectURL(String s)
+    {
+        return this.response.encodeRedirectURL(s);
     }
 
     /**
      * @deprecated
      */
-    public String encodeRedirectUrl(String s) {
-        return response.encodeRedirectUrl(s);
+    @Deprecated
+    public String encodeUrl(String s)
+    {
+        return this.response.encodeUrl(s);
     }
 
-    public void sendError(int i, String s) throws IOException {
-        response.sendError(i, s);
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public String encodeRedirectUrl(String s)
+    {
+        return this.response.encodeRedirectUrl(s);
     }
 
-    public void sendError(int i) throws IOException {
-        response.sendError(i);
+    public void sendError(int i, String s) throws IOException
+    {
+        this.response.sendError(i, s);
+    }
+
+    public void sendError(int i) throws IOException
+    {
+        this.response.sendError(i);
     }
 
     /*
-    *  Portlet Functions
-    */
-    public void addProperty(String s, String s1) {
+     * Portlet Functions
+     */
+    public void addProperty(String s, String s1)
+    {
     }
 
-    public void setProperty(String s, String s1) {
+    public void setProperty(String s, String s1)
+    {
     }
 
-    public String getContentType() {
+    public String getContentType()
+    {
         return null;
     }
 
-    public OutputStream getPortletOutputStream() throws IOException {
+    public OutputStream getPortletOutputStream() throws IOException
+    {
         return null;
     }
 
-    public PortletURL createRenderURL() {
+    public PortletURL createRenderURL()
+    {
         return null;
     }
 
-    public PortletURL createActionURL() {
+    public PortletURL createActionURL()
+    {
         return null;
     }
 
-    public String getNamespace() {
+    public String getNamespace()
+    {
         return null;
     }
 
-    public void setTitle(String s) {
+    public void setTitle(String s)
+    {
     }
 
-    public void setWindowState(WindowState windowState) throws WindowStateException {
+    public void setWindowState(WindowState windowState) throws WindowStateException
+    {
     }
 
-    public void setPortletMode(PortletMode portletMode) throws PortletModeException {
+    public void setPortletMode(PortletMode portletMode) throws PortletModeException
+    {
     }
 
-    public void setRenderParameters(Map map) {
+    public void setRenderParameters(Map map)
+    {
     }
 
-    public void setRenderParameter(String s, String s1) {
+    public void setRenderParameter(String s, String s1)
+    {
     }
 
-    public void setRenderParameter(String s, String[] strings) {
+    public void setRenderParameter(String s, String[] strings)
+    {
     }
 
 }

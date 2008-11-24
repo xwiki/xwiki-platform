@@ -66,6 +66,7 @@ public class XWiki extends Api
     public XWiki(com.xpn.xwiki.XWiki xwiki, XWikiContext context)
     {
         super(context);
+
         this.xwiki = xwiki;
         this.statsService = new StatsService(context);
         this.criteriaService = new CriteriaService(context);
@@ -81,6 +82,7 @@ public class XWiki extends Api
         if (hasProgrammingRights()) {
             return this.xwiki;
         }
+
         return null;
     }
 
@@ -107,7 +109,7 @@ public class XWiki extends Api
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
-     * @param fullname Fullname of the XWiki document to be loaded
+     * @param fullname the full name of the XWiki document to be loaded
      * @return a Document object or null if it is not accessible
      * @throws XWikiException
      */
@@ -115,8 +117,7 @@ public class XWiki extends Api
     {
         XWikiDocument doc = this.xwiki.getDocument(fullname, getXWikiContext());
         if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false)
-        {
+            getXWikiContext()) == false) {
             return null;
         }
 
@@ -125,9 +126,9 @@ public class XWiki extends Api
     }
 
     /**
+     * @param fullname the {@link XWikiDocument#getFullName() name} of the document to search for.
+     * @param lang an optional {@link XWikiDocument#getLanguage() language} to filter results.
      * @return A list with all the deleted versions of a document in the recycle bin.
-     * @param fullname Tha {@link XWikiDocument#getFullName() name} of the document to search for.
-     * @param lang An optional {@link XWikiDocument#getLanguage() language} to filter results.
      * @throws XWikiException if any error
      */
     public List<DeletedDocument> getDeletedDocuments(String fullname, String lang) throws XWikiException
@@ -155,6 +156,7 @@ public class XWiki extends Api
         if (dd == null) {
             return null;
         }
+
         return new DeletedDocument(dd, this.context);
     }
 
@@ -191,8 +193,8 @@ public class XWiki extends Api
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
-     * @param web Space to use in case no space is defined in the fullname
-     * @param fullname Fullname or relative name of the document to load
+     * @param web Space to use in case no space is defined in the provided <code>fullname</code>
+     * @param fullname the full name or relative name of the document to load
      * @return a Document object or null if it is not accessible
      * @throws XWikiException
      */
@@ -200,13 +202,11 @@ public class XWiki extends Api
     {
         XWikiDocument doc = this.xwiki.getDocument(web, fullname, getXWikiContext());
         if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false)
-        {
+            getXWikiContext()) == false) {
             return null;
         }
 
-        Document newdoc = doc.newDocument(getXWikiContext());
-        return newdoc;
+        return doc.newDocument(getXWikiContext());
     }
 
     /**
@@ -224,19 +224,18 @@ public class XWiki extends Api
         }
 
         if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false)
-        {
+            getXWikiContext()) == false) {
             // Finally we return null, otherwise showing search result is a real pain
             return null;
         }
 
         try {
             XWikiDocument revdoc = this.xwiki.getDocument(doc.getDoc(), rev, getXWikiContext());
-            Document newdoc = revdoc.newDocument(getXWikiContext());
-            return newdoc;
+            return revdoc.newDocument(getXWikiContext());
         } catch (Exception e) {
             // Can't read versioned document
-            e.printStackTrace();
+            LOG.error("Failed to read versioned document", e);
+
             return null;
         }
     }
@@ -307,8 +306,8 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API allowing to run a search on the database returning a list of data This search is send to the
-     * store engine (Hibernate HQL, JCR XPATH or other)
+     * Privileged API allowing to run a search on the database returning a list of data This search is send to the store
+     * engine (Hibernate HQL, JCR XPATH or other)
      * 
      * @param wheresql Query to be run (HQL, XPath)
      * @return A list of rows (Object[])
@@ -1096,10 +1095,11 @@ public class XWiki extends Api
             if (registerRight) {
                 return this.xwiki.createUser(withValidation, userRights, getXWikiContext());
             }
-            return -1;
 
+            return -1;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to create user", e);
+
             return -2;
         }
 
@@ -1165,6 +1165,7 @@ public class XWiki extends Api
             return this.xwiki.createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, language,
                 failOnExist, getXWikiContext());
         }
+
         return -1;
     }
 
@@ -1310,6 +1311,7 @@ public class XWiki extends Api
             return this.xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force,
                 true, getXWikiContext());
         }
+
         return false;
     }
 
@@ -1330,6 +1332,7 @@ public class XWiki extends Api
         if (hasProgrammingRights()) {
             return this.xwiki.copyWikiWeb(web, sourceWiki, targetWiki, wikiLanguage, clean, getXWikiContext());
         }
+
         return -1;
     }
 
@@ -1373,6 +1376,7 @@ public class XWiki extends Api
         if (pre) {
             return "{pre}" + this.xwiki.include(topic, false, getXWikiContext()) + "{/pre}";
         }
+
         return this.xwiki.include(topic, false, getXWikiContext());
     }
 
@@ -1392,6 +1396,7 @@ public class XWiki extends Api
         if (pre) {
             return "{pre}" + this.xwiki.include(topic, true, getXWikiContext()) + "{/pre}";
         }
+
         return this.xwiki.include(topic, true, getXWikiContext());
     }
 
@@ -2147,18 +2152,17 @@ public class XWiki extends Api
         try {
             if (this.xwiki.exists(newFullName, getXWikiContext())
                 && !this.xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName,
-                    getXWikiContext()))
-            {
+                    getXWikiContext())) {
                 return false;
             }
             if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
-                getXWikiContext()))
-            {
+                getXWikiContext())) {
                 this.xwiki.renamePage(doc.getFullName(), newFullName, getXWikiContext());
             }
         } catch (XWikiException e) {
             return false;
         }
+
         return true;
     }
 
@@ -2540,6 +2544,7 @@ public class XWiki extends Api
         }
         counter = new Integer(counter.intValue() + 1);
         econtext.setAttribute(name, counter);
+
         return counter.toString();
     }
 

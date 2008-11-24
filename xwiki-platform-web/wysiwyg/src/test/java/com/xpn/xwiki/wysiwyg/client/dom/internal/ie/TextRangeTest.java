@@ -123,8 +123,10 @@ public class TextRangeTest extends AbstractWysiwygClientTest
         parent.appendChild(container.getOwnerDocument().createTextNode(""));
         textRange.moveToTextNode((Text) parent.getFirstChild());
         textRange.select();
+        assertEquals(" ", ((TextRange) NativeSelection.getInstance(textRange.getOwnerDocument()).createRange())
+            .getText());
         wrap(textRange);
-        assertEquals("a<em>|</em>b", container.getInnerHTML().toLowerCase());
+        assertEquals("a<em>| </em>b", container.getInnerHTML().toLowerCase());
 
         container.xSetInnerHTML("a<em><del></del></em>b");
         parent = container.getChildNodes().getItem(1).cast();

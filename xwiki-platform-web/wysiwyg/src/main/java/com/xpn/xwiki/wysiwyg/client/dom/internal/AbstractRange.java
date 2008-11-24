@@ -158,7 +158,7 @@ public abstract class AbstractRange<R extends JavaScriptObject> implements Range
         }
 
         setEnd(start, startOffset);
-        setStart(start, startOffset);
+        collapse(false);
     }
 
     /**

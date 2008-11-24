@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.google.gwt.dom.client.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.dom.SelectionManager;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.NativeSelection;

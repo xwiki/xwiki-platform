@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.dom;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
@@ -324,5 +323,79 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         DOMUtils.getInstance().deleteNodeContents(container,
             container.getFirstChild().getFirstChild().getFirstChild().getFirstChild(), 1, false);
         assertEquals("<span><em><del>w</del></em></span>", container.getInnerHTML().toLowerCase());
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#splitNode(Node, int)}.
+     */
+    public void testSplitNodeAtOffset()
+    {
+        container.setInnerHTML("xwiki");
+        Node rightNode = DOMUtils.getInstance().splitNode(container.getFirstChild(), 3);
+        assertEquals(container.getLastChild(), rightNode);
+        assertEquals(2, container.getChildNodes().getLength());
+        assertEquals("xwi", container.getFirstChild().getNodeValue());
+        assertEquals("ki", container.getLastChild().getNodeValue());
+
+        container.setInnerHTML("q<span><!--x--><em>w</em>e</span>rty");
+        rightNode = DOMUtils.getInstance().splitNode(container.getChildNodes().getItem(1), 0);
+        assertEquals("<span><!--x--><em>w</em>e</span>", Element.as(rightNode).getString().toLowerCase());
+        assertEquals("q<span></span><span><!--x--><em>w</em>e</span>rty", container.getInnerHTML().toLowerCase());
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#splitNode(Node, Node, int)}.
+     */
+    public void testSplitNodeUpwards()
+    {
+        container.setInnerHTML("u<del>v<strong><ins><!--x-->y</ins>z</strong><em>a</em></del>b");
+        Node rightNode =
+            DOMUtils.getInstance().splitNode(container,
+                container.getChildNodes().getItem(1).getChildNodes().getItem(1).getFirstChild(), 1);
+        assertEquals("<ins>y</ins>", Element.as(rightNode).getString().toLowerCase());
+        assertEquals("u<del>v<strong><ins><!--x--></ins></strong></del>"
+            + "<del><strong><ins>y</ins>z</strong><em>a</em></del>b", container.getInnerHTML().toLowerCase());
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#isFlowContainer(Node)}.
+     */
+    public void testIsFlowContainer()
+    {
+        container.setInnerHTML("<ul><li>foo</li></ul>");
+        assertTrue(DOMUtils.getInstance().isFlowContainer(container));
+        assertFalse(DOMUtils.getInstance().isFlowContainer(container.getFirstChild()));
+        assertTrue(DOMUtils.getInstance().isFlowContainer(container.getFirstChild().getFirstChild()));
+        assertFalse(DOMUtils.getInstance().isFlowContainer(container.getFirstChild().getFirstChild().getFirstChild()));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getNearestFlowContainer(Node)}.
+     */
+    public void testGetNearestFlowContainer()
+    {
+        container.setInnerHTML("x<del>y</del>z");
+        assertEquals(container, DOMUtils.getInstance().getNearestFlowContainer(
+            container.getChildNodes().getItem(1).getFirstChild()));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#insertAt(Node, Node, int)}.
+     */
+    public void testInsertAt()
+    {
+        container.xSetInnerHTML("<!--x-->y<em>z</em>");
+
+        Text text = container.getOwnerDocument().createTextNode(":").cast();
+        DOMUtils.getInstance().insertAt(container, text, container.getChildNodes().getLength());
+        assertEquals("<!--x-->y<em>z</em>:", container.getInnerHTML().toLowerCase());
+
+        text = container.getOwnerDocument().createTextNode("{").cast();
+        DOMUtils.getInstance().insertAt(container, text, 0);
+        assertEquals("{<!--x-->y<em>z</em>:", container.getInnerHTML().toLowerCase());
+
+        text = container.getOwnerDocument().createTextNode("}").cast();
+        DOMUtils.getInstance().insertAt(container, text, 2);
+        assertEquals("{<!--x-->}y<em>z</em>:", container.getInnerHTML().toLowerCase());
     }
 }

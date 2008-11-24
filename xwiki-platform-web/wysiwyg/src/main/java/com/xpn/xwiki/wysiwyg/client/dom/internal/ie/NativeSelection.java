@@ -20,7 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 
 /**
  * Wraps the selection JavaScript object provided by Internet Explorer.
@@ -89,5 +89,13 @@ public final class NativeSelection extends JavaScriptObject
     public native void empty()
     /*-{
         this.empty();
+    }-*/;
+
+    /**
+     * @return The document associated with this selection object.
+     */
+    public native Document getOwnerDocument()
+    /*-{
+        return this.ownerDocument;
     }-*/;
 }

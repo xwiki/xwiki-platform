@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.TextRange.Unit;
 
 /**
  * Base class for {@link TextRange} and {@link ControlRange}, the two types of range provided by Internet Explorer.
@@ -41,7 +42,29 @@ public class NativeRange extends JavaScriptObject
      * current object to be highlighted. When applied to a ControlRange object, the select method produces a shaded
      * rectangle around the elements in the control range.
      */
-    public final native void select()
+    public final void select()
+    {
+        if (this.isTextRange()) {
+            TextRange textRange = this.cast();
+            if (textRange.isCollapsed() && textRange.getParentElement().getInnerText().length() == 0) {
+                // We haven't found a way to place the caret inside an empty element so far thus we add a space
+                // character.
+                TextRange clone = textRange.duplicate();
+                clone.setText(" ");
+                clone.moveStart(Unit.CHARACTER, -1);
+                clone.xSelect();
+                return;
+            }
+        }
+        xSelect();
+    }
+
+    /**
+     * Makes the selection equal to the current object. When applied to a TextRange object, the select method causes the
+     * current object to be highlighted. When applied to a ControlRange object, the select method produces a shaded
+     * rectangle around the elements in the control range.
+     */
+    protected final native void xSelect()
     /*-{
         this.select();
     }-*/;

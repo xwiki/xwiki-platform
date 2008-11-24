@@ -37,6 +37,18 @@ import com.google.gwt.dom.client.Node;
 public abstract class DOMUtils
 {
     /**
+     * Common error message used when a particular node type is not supported by a method.
+     */
+    public static final String UNSUPPORTED_NODE_TYPE = "Unsupported node type!";
+
+    /**
+     * The list of all HTML elements that can have both in-line and block content, as specified by the strict DTD.<br/>
+     * NOTE: We added the body element since the editor allows you to write text directly on document body.
+     */
+    public static final String[] FLOW_CONTAINERS =
+        new String[] {"body", "li", "td", "div", "dd", "th", "object", "button", "fieldset"};
+
+    /**
      * The instance in use.
      */
     private static DOMUtils instance;
@@ -438,7 +450,7 @@ public abstract class DOMUtils
                 }
                 return clone;
             default:
-                throw new IllegalArgumentException("Unsupported node type!");
+                throw new IllegalArgumentException(UNSUPPORTED_NODE_TYPE);
         }
     }
 
@@ -618,6 +630,111 @@ public abstract class DOMUtils
         while (node.getParentNode() != parent) {
             deleteSiblings(node, left);
             node = node.getParentNode();
+        }
+    }
+
+    /**
+     * Splits the given DOM node at the specified offset.
+     * 
+     * @param node The node to be split.
+     * @param offset Specifies where to split. It can be either a character index or a child index depending on node
+     *            type.
+     * @return The node resulted after the split. It should be the next sibling of the given node.
+     */
+    public Node splitNode(Node node, int offset)
+    {
+        Node clone = node.cloneNode(false);
+        switch (node.getNodeType()) {
+            case Node.TEXT_NODE:
+            case 4:
+                // CDATA
+            case 8:
+                // COMMENT
+                clone.setNodeValue(node.getNodeValue().substring(offset));
+                node.setNodeValue(node.getNodeValue().substring(0, offset));
+                break;
+            case Node.ELEMENT_NODE:
+                Element.as(clone).removeAttribute("id");
+                for (int i = node.getChildNodes().getLength(); i > offset; i--) {
+                    clone.appendChild(node.getChildNodes().getItem(offset));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException(UNSUPPORTED_NODE_TYPE);
+        }
+        insertAfter(clone, node);
+        return clone;
+    }
+
+    /**
+     * Given a subtree specified by its root parent and one of the inner nodes, this method splits the subtree by the
+     * path from the given descendant (inner node) to the root parent.
+     * 
+     * @param parent The parent node of the subtree's root.
+     * @param descendant An inner node within the specified subtree.
+     * @param offset The offset within the given descendant. It can be either a character index or a child index
+     *            depending on the descendant node type.
+     * @return The node resulted from splitting the descendant.
+     */
+    public Node splitNode(Node parent, Node descendant, int offset)
+    {
+        if (descendant == parent) {
+            return descendant;
+        }
+        Node nextLevelSibling = splitNode(descendant, offset);
+        Node node = descendant;
+        while (node.getParentNode() != parent) {
+            splitNode(node.getParentNode(), getNodeIndex(node) + 1);
+            node = node.getParentNode();
+        }
+        return nextLevelSibling;
+    }
+
+    /**
+     * @param node A DOM node.
+     * @return true is the given node is an element that can have both in-line and block content.
+     */
+    public boolean isFlowContainer(Node node)
+    {
+        if (node.getNodeType() != Node.ELEMENT_NODE) {
+            return false;
+        }
+        String tagName = node.getNodeName().toLowerCase();
+        for (int i = 0; i < FLOW_CONTAINERS.length; i++) {
+            if (tagName.equals(FLOW_CONTAINERS[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param innerNode A DOM node.
+     * @return The nearest ancestor of the given node that can contain both in-line and block content.
+     */
+    public Node getNearestFlowContainer(Node innerNode)
+    {
+        Node node = innerNode;
+        while (node != null && !isFlowContainer(node)) {
+            node = node.getParentNode();
+        }
+        return node;
+    }
+
+    /**
+     * Inserts a node at the specified index under the given parent.
+     * 
+     * @param parent The parent node which will adopt the given node.
+     * @param newChild The node to be inserted.
+     * @param index Specifies the position inside the parent node where the new child should be placed.
+     */
+    public void insertAt(Node parent, Node newChild, int index)
+    {
+        int i = Math.max(0, index);
+        if (i >= parent.getChildNodes().getLength()) {
+            parent.appendChild(newChild);
+        } else {
+            parent.insertBefore(newChild, parent.getChildNodes().getItem(i));
         }
     }
 }

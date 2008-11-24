@@ -20,6 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 
@@ -88,4 +90,160 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
      * @param range Removes this range from the current selection.
      */
     protected abstract void removeRange(R range);
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#collapse(Node, int)
+     */
+    public void collapse(Node parentNode, int offset)
+    {
+        Range range = ((Document) parentNode.getOwnerDocument()).createRange();
+        range.setStart(parentNode, offset);
+        range.setEnd(parentNode, offset);
+        removeAllRanges();
+        addRange(range);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#collapseToEnd()
+     */
+    public void collapseToEnd()
+    {
+        // NOTE: We should collapse to the focus node, but since we don't know which is the focus node and which is the
+        // anchor node we collapse to the end point of the first range.
+        collapse(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#collapseToStart()
+     */
+    public void collapseToStart()
+    {
+        // NOTE: We should collapse to the anchor node, but since we don't know which is the focus node and which is the
+        // anchor node we collapse to the start point of the first range.
+        collapse(true);
+    }
+
+    /**
+     * Collapses this selection to the specified end point.
+     * 
+     * @param toStart Whether to collapse to the start or to the end point of the first range in this selection.
+     */
+    private void collapse(boolean toStart)
+    {
+        if (getRangeCount() > 0) {
+            Range range = getRangeAt(0);
+            range.collapse(toStart);
+            removeAllRanges();
+            addRange(range);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#deleteFromDocument()
+     */
+    public void deleteFromDocument()
+    {
+        if (getRangeCount() > 0) {
+            Range range = getRangeAt(0);
+            range.deleteContents();
+            removeAllRanges();
+            addRange(range);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#getAnchorNode()
+     */
+    public Node getAnchorNode()
+    {
+        // NOTE: We should return the anchor node, but since we don't know which is the focus node and which is the
+        // anchor node we return the start point of the first range.
+        if (getRangeCount() > 0) {
+            return getRangeAt(0).getStartContainer();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#getAnchorOffset()
+     */
+    public int getAnchorOffset()
+    {
+        // NOTE: We should return the anchor offset, but since we don't know which is the focus node and which is the
+        // anchor node we return the start offset of the first range.
+        if (getRangeCount() > 0) {
+            return getRangeAt(0).getStartOffset();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#getFocusNode()
+     */
+    public Node getFocusNode()
+    {
+        // NOTE: We should return the focus node, but since we don't know which is the focus node and which is the
+        // anchor node we return the end point of the first range.
+        if (getRangeCount() > 0) {
+            return getRangeAt(0).getEndContainer();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#getFocusOffset()
+     */
+    public int getFocusOffset()
+    {
+        // NOTE: We should return the focus offset, but since we don't know which is the focus node and which is the
+        // anchor node we return the end offset of the first range.
+        if (getRangeCount() > 0) {
+            return getRangeAt(0).getEndOffset();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#isCollapsed()
+     */
+    public boolean isCollapsed()
+    {
+        return getRangeCount() == 1 && getRangeAt(0).isCollapsed();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#toString()
+     */
+    public String toString()
+    {
+        if (getRangeCount() > 0) {
+            return getRangeAt(0).toString();
+        } else {
+            return null;
+        }
+    }
 }

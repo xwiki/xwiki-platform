@@ -410,8 +410,14 @@ public final class IERange extends AbstractRange<NativeRange>
             if (refNode.getNodeType() == Node.ELEMENT_NODE) {
                 if (offset > 0) {
                     setEndAfter(refNode.getChildNodes().getItem(offset - 1));
-                } else {
+                } else if (refNode.hasChildNodes()) {
+                    // The refNode must have child nodes if it is going to be the end container (following W3C Range
+                    // specification), but there is a special case (see below).
                     setEndBefore(refNode.getFirstChild());
+                } else {
+                    // This is a special case in IE when the body element is empty. This can happen when the rich text
+                    // area has no text inside.
+                    setEndAfter(refNode);
                 }
             } else if (refNode.getNodeType() == Node.TEXT_NODE) {
                 ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_END, refNode, offset);
@@ -463,8 +469,14 @@ public final class IERange extends AbstractRange<NativeRange>
             if (refNode.getNodeType() == Node.ELEMENT_NODE) {
                 if (offset < refNode.getChildNodes().getLength()) {
                     setStartBefore(refNode.getChildNodes().getItem(offset));
-                } else {
+                } else if (refNode.hasChildNodes()) {
+                    // The refNode must have child nodes if it is going to be the start container (following W3C Range
+                    // specification), but there is a special case (see below).
                     setStartAfter(refNode.getLastChild());
+                } else {
+                    // This is a special case in IE when the body element is empty. This can happen when the rich text
+                    // area has no text inside.
+                    setStartBefore(refNode);
                 }
             } else if (refNode.getNodeType() == Node.TEXT_NODE) {
                 ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_START, refNode, offset);

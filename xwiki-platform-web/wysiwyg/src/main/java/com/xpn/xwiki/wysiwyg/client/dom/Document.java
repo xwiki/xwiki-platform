@@ -23,6 +23,7 @@ import java.util.Iterator;
 
 import com.google.gwt.dom.client.BRElement;
 import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.HRElement;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.ParagraphElement;
@@ -130,6 +131,16 @@ public class Document extends com.google.gwt.dom.client.Document
     public final SpanElement xCreateSpanElement()
     {
         return xCreateElement("span").cast();
+    }
+
+    /**
+     * Creates a &lt;hr&gt; element.
+     * 
+     * @return the newly create element.
+     */
+    public final HRElement xCreateHRElement()
+    {
+        return xCreateElement("hr").cast();
     }
 
     /**

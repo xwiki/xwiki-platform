@@ -86,39 +86,6 @@ public final class IESelection extends AbstractSelection<NativeSelection, Native
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractSelection#collapse(Node, int)
-     */
-    public void collapse(Node parentNode, int offset)
-    {
-        // TODO
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#collapseToEnd()
-     */
-    public void collapseToEnd()
-    {
-        // TODO
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#collapseToStart()
-     */
-    public void collapseToStart()
-    {
-        // TODO
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see AbstractSelection#containsNode(Node, boolean)
      */
     public boolean containsNode(Node node, boolean partlyContained)
@@ -151,50 +118,6 @@ public final class IESelection extends AbstractSelection<NativeSelection, Native
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractSelection#getAnchorNode()
-     */
-    public Node getAnchorNode()
-    {
-        // TODO
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getAnchorOffset()
-     */
-    public int getAnchorOffset()
-    {
-        // TODO
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getFocusNode()
-     */
-    public Node getFocusNode()
-    {
-        // TODO
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getFocusOffset()
-     */
-    public int getFocusOffset()
-    {
-        // TODO
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see AbstractSelection#getRangeAt(int)
      */
     public Range getRangeAt(int index)
@@ -219,17 +142,6 @@ public final class IESelection extends AbstractSelection<NativeSelection, Native
     public int getRangeCount()
     {
         return 1;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#isCollapsed()
-     */
-    public boolean isCollapsed()
-    {
-        // TODO
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -283,15 +195,5 @@ public final class IESelection extends AbstractSelection<NativeSelection, Native
     {
         // TODO
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#toString()
-     */
-    public String toString()
-    {
-        return getRangeAt(0).toString();
     }
 }

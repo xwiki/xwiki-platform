@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.dom;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultSelectionManager;
 
 /**

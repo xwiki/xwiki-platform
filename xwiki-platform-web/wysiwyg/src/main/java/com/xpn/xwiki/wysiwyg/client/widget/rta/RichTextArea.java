@@ -25,7 +25,6 @@ import java.util.List;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.Text;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -329,27 +328,11 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
             selection.removeAllRanges();
 
             // Split the DOM subtree that has the previously found ancestor as root.
-            Node splitRightNode;
-            if (startContainer.getNodeType() == Node.TEXT_NODE) {
-                Text right = Text.as(startContainer);
-
-                if (startOffset > 0) {
-                    // Split the text node
-                    String leftData = right.getData().substring(0, startOffset);
-                    String rightData = right.getData().substring(startOffset);
-                    right.setData(rightData);
-                    Text left = getDocument().createTextNode(leftData);
-                    right.getParentNode().insertBefore(left, right);
-                }
-
-                // Split-up the rest of the subtree, till we reach the previously found ancestor.
-                splitRightNode = split(right, ancestor);
-            } else {
-                splitRightNode = split(startContainer.getChildNodes().getItem(startOffset), ancestor);
-            }
+            DOMUtils.getInstance().splitNode(ancestor, startContainer, startOffset);
 
             // Wrap left in-line siblings in a paragraph.
             Element leftParagraph = getDocument().xCreatePElement();
+            Node splitRightNode = DOMUtils.getInstance().getChild(ancestor, startContainer).getNextSibling();
             Node leftSibling = splitRightNode.getPreviousSibling();
             if (leftSibling != null && DOMUtils.getInstance().isInline(leftSibling)) {
                 leftParagraph.appendChild(leftSibling);
@@ -377,32 +360,5 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
             range.collapse(true);
             selection.addRange(range);
         }
-    }
-
-    /**
-     * Splits a DOM subtree.<br/>
-     * TODO: Move this code inside a command!!!
-     * 
-     * @param rightChild
-     * @param ancestor
-     * @return
-     */
-    private Node split(Node rightChild, Node ancestor)
-    {
-        // Split-up the rest of the subtree, till we reach the given ancestor.
-        while (rightChild.getParentNode() != ancestor) {
-            Node rightSubtree = rightChild.getParentNode();
-            // If we have left siblings then we split
-            if (rightChild.getPreviousSibling() != null) {
-                Node leftSubtree = rightSubtree.cloneNode(false);
-                rightSubtree.getParentNode().insertBefore(leftSubtree, rightSubtree);
-                // Move left siblings in left subtree
-                while (rightSubtree.getFirstChild() != rightChild) {
-                    leftSubtree.appendChild(rightSubtree.getFirstChild());
-                }
-            }
-            rightChild = rightSubtree;
-        }
-        return rightChild;
     }
 }

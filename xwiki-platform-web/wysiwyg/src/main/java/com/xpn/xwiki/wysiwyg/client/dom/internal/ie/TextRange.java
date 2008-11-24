@@ -514,18 +514,8 @@ public final class TextRange extends NativeRange
     public void moveToTextNode(Text textNode)
     {
         if (textNode.getLength() == 0) {
-            // We haven't found a way to place the caret inside an empty text node so far thus we add a space character.
-            // Let's use this hack till we find a proper solution, maybe using the code that is skipped below.
-            textNode.setData(" ");
-            moveToTextNode(textNode);
-
             // NOTE: The following code manages to place both end points of this text range inside the empty text node,
-            // but unfortunately the end points don't remain there after the range is selected. We're keeping this code
-            // for later adjustments hopping that we'll be able to place the caret inside an empty text node.
-            if (true) {
-                // Skip the next part. To be revisited!
-                return;
-            }
+            // but unfortunately the end points don't remain there after the range is selected.
 
             // NOTE: This trick won't work in some case when the parent element contains comment child nodes.
 

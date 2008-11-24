@@ -20,53 +20,27 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.AbstractExecutableTest;
 
 /**
  * Unit tests for {@link InsertHTMLExecutable}.
  * 
  * @version $Id$
  */
-public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
+public class InsertHTMLExecutableTest extends AbstractExecutableTest
 {
-    /**
-     * The rich text area on which we run the tests.
-     */
-    private RichTextArea rta;
-
-    /**
-     * The executable being tested.
-     */
-    private InsertHTMLExecutable insertHTML = new InsertHTMLExecutable();
-
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWysiwygClientTest#gwtSetUp()
+     * @see AbstractExecutableTest#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
-
-        rta = new RichTextArea();
-        RootPanel.get().add(rta);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractWysiwygClientTest#gwtTearDown()
-     */
-    protected void gwtTearDown() throws Exception
-    {
-        super.gwtTearDown();
-
-        RootPanel.get().remove(rta);
+        if (executable == null) {
+            executable = new InsertHTMLExecutable();
+        }
     }
 
     /**
@@ -80,7 +54,9 @@ public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
         {
             public void run()
             {
+                rta.setFocus(true);
                 doTestInsertBetweenChildren();
+                finishTest();
             }
         }).schedule(100);
     }
@@ -91,24 +67,16 @@ public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
      */
     private void doTestInsertBetweenChildren()
     {
-        rta.setFocus(true);
-
-        Element container = rta.getDocument().xCreateDivElement().cast();
-        rta.getDocument().getBody().appendChild(container);
-        container.xSetInnerHTML("<em>ab</em><strong>cd</strong><ins>ef</ins>");
+        rta.setHTML("<em>ab</em><strong>cd</strong><ins>ef</ins>");
 
         Range range = rta.getDocument().createRange();
-        range.setStartBefore(container.getChildNodes().getItem(1));
-        range.setEndAfter(container.getChildNodes().getItem(1));
+        range.setStartBefore(getBody().getChildNodes().getItem(1));
+        range.setEndAfter(getBody().getChildNodes().getItem(1));
+        select(range);
 
-        Selection selection = rta.getDocument().getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        assertEquals("cd", selection.toString());
-        assertTrue(insertHTML.execute(rta, "<!--x-->y<del>z</del>"));
-        assertEquals("<em>ab</em><!--x-->y<del>z</del><ins>ef</ins>", container.getInnerHTML().toLowerCase());
-
-        finishTest();
+        assertEquals("cd", rta.getDocument().getSelection().toString());
+        assertTrue(executable.execute(rta, "<!--x-->y<del>z</del>"));
+        assertEquals("<em>ab</em><!--x-->y<del>z</del><ins>ef</ins>", clean(rta.getHTML()));
     }
 
     /**
@@ -122,7 +90,9 @@ public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
         {
             public void run()
             {
+                rta.setFocus(true);
                 doTestInsertAfterLastChild();
+                finishTest();
             }
         }).schedule(100);
     }
@@ -133,24 +103,16 @@ public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
      */
     private void doTestInsertAfterLastChild()
     {
-        rta.setFocus(true);
-
-        Element container = rta.getDocument().xCreateDivElement().cast();
-        rta.getDocument().getBody().appendChild(container);
-        container.xSetInnerHTML("<em>ab</em><strong>ij</strong>");
+        rta.setHTML("<em>ab</em><strong>ij</strong>");
 
         Range range = rta.getDocument().createRange();
-        range.setStartBefore(container.getChildNodes().getItem(1));
-        range.setEndAfter(container.getChildNodes().getItem(1));
+        range.setStartBefore(getBody().getChildNodes().getItem(1));
+        range.setEndAfter(getBody().getChildNodes().getItem(1));
+        select(range);
 
-        Selection selection = rta.getDocument().getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        assertEquals("ij", selection.toString());
-        assertTrue(insertHTML.execute(rta, "#"));
-        assertEquals("<em>ab</em>#", container.getInnerHTML().toLowerCase());
-
-        finishTest();
+        assertEquals("ij", rta.getDocument().getSelection().toString());
+        assertTrue(executable.execute(rta, "#"));
+        assertEquals("<em>ab</em>#", clean(rta.getHTML()));
     }
 
     /**
@@ -163,7 +125,9 @@ public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
         {
             public void run()
             {
+                rta.setFocus(true);
                 doTestInsertInTextNode();
+                finishTest();
             }
         }).schedule(100);
     }
@@ -173,23 +137,15 @@ public class InsertHTMLExecutableTest extends AbstractWysiwygClientTest
      */
     private void doTestInsertInTextNode()
     {
-        rta.setFocus(true);
-
-        Element container = rta.getDocument().xCreateDivElement().cast();
-        rta.getDocument().getBody().appendChild(container);
-        container.xSetInnerHTML("xyz");
+        rta.setHTML("xyz");
 
         Range range = rta.getDocument().createRange();
-        range.setStart(container.getFirstChild(), 1);
-        range.setEnd(container.getFirstChild(), 2);
+        range.setStart(getBody().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild(), 2);
+        select(range);
 
-        Selection selection = rta.getDocument().getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        assertEquals("y", selection.toString());
-        assertTrue(insertHTML.execute(rta, "*2<em>=</em>1+"));
-        assertEquals("x*2<em>=</em>1+z", container.getInnerHTML().toLowerCase());
-
-        finishTest();
+        assertEquals("y", rta.getDocument().getSelection().toString());
+        assertTrue(executable.execute(rta, "*2<em>=</em>1+"));
+        assertEquals("x*2<em>=</em>1+z", clean(rta.getHTML()));
     }
 }

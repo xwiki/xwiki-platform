@@ -43,21 +43,19 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Internationalization service based on key/property values. The key is the id of the message being
- * looked for and the returned value is the message in the language requested. There are 3 sources
- * where properties are looked for (in the specified order):
+ * Internationalization service based on key/property values. The key is the id of the message being looked for and the
+ * returned value is the message in the language requested. There are 3 sources where properties are looked for (in the
+ * specified order):
  * <ol>
- * <li>If there's a "documentBundles" property in the XWiki Preferences page then the XWiki
- * documents listed there (separated by commas) are considered the source for properties</li>
- * <li>If there's a "xwiki.documentBundles" property in the XWiki configuration file (xwiki.cfg)
- * then the XWiki documents listed there (separated by commas) are considered for source for
- * properties</li>
+ * <li>If there's a "documentBundles" property in the XWiki Preferences page then the XWiki documents listed there
+ * (separated by commas) are considered the source for properties</li>
+ * <li>If there's a "xwiki.documentBundles" property in the XWiki configuration file (xwiki.cfg) then the XWiki
+ * documents listed there (separated by commas) are considered for source for properties</li>
  * <li>The Resource Bundle passed in the constructor</li>
  * </ol>
- * If the property is not found in any of these 3 sources then the key is returned in place of the
- * value. In addition the property values are cached for better performance but if one of the XWiki
- * documents containing the properties is modified, its content is cached again next time a key is
- * asked.
+ * If the property is not found in any of these 3 sources then the key is returned in place of the value. In addition
+ * the property values are cached for better performance but if one of the XWiki documents containing the properties is
+ * modified, its content is cached again next time a key is asked.
  * 
  * @version $Id$
  */
@@ -74,55 +72,50 @@ public class XWikiMessageTool
     private static final Logger LOG = Logger.getLogger(XWikiMessageTool.class);
 
     /**
-     * Property name used to defined internationalization document bundles in either XWikiProperties
-     * ("documentBundles") or in the xwiki.cfg configuration file ("xwiki.documentBundles").
+     * Property name used to defined internationalization document bundles in either XWikiProperties ("documentBundles")
+     * or in the xwiki.cfg configuration file ("xwiki.documentBundles").
      */
     private static final String KEY = "documentBundles";
 
     /**
      * Format string for the error message used to log load failures.
      */
-    private static final String LOAD_ERROR_MSG_FMT =
-        "Failed to load internationalization document bundle [ %s ].";
+    private static final String LOAD_ERROR_MSG_FMT = "Failed to load internationalization document bundle [ %s ].";
 
     /**
-     * The default Resource Bundle to fall back to if no document bundle is found when trying to get
-     * a key.
+     * The default Resource Bundle to fall back to if no document bundle is found when trying to get a key.
      */
     protected ResourceBundle bundle;
 
     /**
-     * The {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for
-     * loading documents.
+     * The {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading documents.
      */
     protected XWikiContext context;
 
     /**
-     * Cache properties loaded from the document bundles for maximum efficiency. The map is of type
-     * (Long, Properties) where Long is the XWiki document ids.
+     * Cache properties loaded from the document bundles for maximum efficiency. The map is of type (Long, Properties)
+     * where Long is the XWiki document ids.
      */
     private Map<Long, Properties> propsCache = new HashMap<Long, Properties>();
 
     /**
-     * Cache for saving the last modified dates of document bundles that have been loaded. This is
-     * used so that we can reload them if they've been modified since last time they were cached.
-     * The map is of type (Long, Date) where Long is the XWiki document ids.
+     * Cache for saving the last modified dates of document bundles that have been loaded. This is used so that we can
+     * reload them if they've been modified since last time they were cached. The map is of type (Long, Date) where Long
+     * is the XWiki document ids.
      */
     private Map<Long, Date> previousDates = new HashMap<Long, Date>();
 
     /**
-     * List of document bundles that have been modified since the last time they were cached. The
-     * Set contains Long objects which are the XWiki document ids. TODO: This instance variable
-     * should be removed as it's used internally and its state shouldn't encompass several calls to
-     * get().
+     * List of document bundles that have been modified since the last time they were cached. The Set contains Long
+     * objects which are the XWiki document ids. TODO: This instance variable should be removed as it's used internally
+     * and its state shouldn't encompass several calls to get().
      */
     private Set<Long> docsToRefresh = new HashSet<Long>();
 
     /**
-     * @param bundle the default Resource Bundle to fall back to if no document bundle is found when
-     *            trying to get a key
-     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
-     *            primitives for loading documents
+     * @param bundle the default Resource Bundle to fall back to if no document bundle is found when trying to get a key
+     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
+     *            documents
      */
     public XWikiMessageTool(ResourceBundle bundle, XWikiContext context)
     {
@@ -132,11 +125,9 @@ public class XWikiMessageTool
 
     /**
      * @param key the key identifying the message to look for
-     * @return the message in the defined language. The message should be a simple string without
-     *         any parameters. If you need to pass parameters see
-     *         {@link #get(String, java.util.List)}
-     * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
-     *      message
+     * @return the message in the defined language. The message should be a simple string without any parameters. If you
+     *         need to pass parameters see {@link #get(String, java.util.List)}
+     * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the message
      */
     public String get(String key)
     {
@@ -152,12 +143,12 @@ public class XWikiMessageTool
     }
 
     /**
-     * Find a translation and then replace any parameters found in the translation by the passed
-     * params parameters. The format is the one used by {@link java.text.MessageFormat}.
+     * Find a translation and then replace any parameters found in the translation by the passed params parameters. The
+     * format is the one used by {@link java.text.MessageFormat}.
      * <p>
-     * Note: The reason we're using a List instead of an Object array is because we haven't found
-     * how to easily create an Array in Velocity whereas a List is easily created. For example:
-     * <code>$msg.get("key", ["1", "2", "3"])</code>.
+     * Note: The reason we're using a List instead of an Object array is because we haven't found how to easily create
+     * an Array in Velocity whereas a List is easily created. For example: <code>$msg.get("key", ["1", "2", "3"])</code>
+     * .
      * </p>
      * 
      * @param key the key of the string to find
@@ -175,10 +166,9 @@ public class XWikiMessageTool
     }
 
     /**
-     * @return the list of internationalization document bundle names as a list of XWiki page names
-     *         ("Space.Document") or an empty list if no such documents have been found
-     * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
-     *      document bundles
+     * @return the list of internationalization document bundle names as a list of XWiki page names ("Space.Document")
+     *         or an empty list if no such documents have been found
+     * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the document bundles
      */
     protected List<String> getDocumentBundleNames()
     {
@@ -200,8 +190,7 @@ public class XWikiMessageTool
 
     /**
      * @return the internationalization document bundles (a list of {@XWikiDocument})
-     * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
-     *      document bundles
+     * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the document bundles
      */
     public List<XWikiDocument> getDocumentBundles()
     {
@@ -224,8 +213,7 @@ public class XWikiMessageTool
                         // The document listed as a document bundle doesn't exist. Do nothing
                         // and log.
                         LOG.warn("The document [" + docBundle.getFullName() + "] is listed "
-                            + "as an internationalization document bundle but it does not "
-                            + "exist.");
+                            + "as an internationalization document bundle but it does not " + "exist.");
                     }
                 }
             }
@@ -234,12 +222,12 @@ public class XWikiMessageTool
     }
 
     /**
-     * Helper method to help get a translated version of a document. It handles any exception raised
-     * to make it easy to use.
+     * Helper method to help get a translated version of a document. It handles any exception raised to make it easy to
+     * use.
      * 
      * @param documentName the document's name (eg Space.Document)
-     * @return the document object corresponding to the passed document's name. A translated version
-     *         of the document for the current Locale is looked for.
+     * @return the document object corresponding to the passed document's name. A translated version of the document for
+     *         the current Locale is looked for.
      */
     public XWikiDocument getDocumentBundle(String documentName)
     {
@@ -265,13 +253,13 @@ public class XWikiMessageTool
     }
 
     /**
-     * Helper method to help get a translated version of a document. It handles any exception raised
-     * to make it easy to use.
+     * Helper method to help get a translated version of a document. It handles any exception raised to make it easy to
+     * use.
      * 
      * @param documentName the document's name (eg Space.Document)
      * @param defaultLanguage default language
-     * @return the document object corresponding to the passed document's name. A translated version
-     *         of the document for the current Locale is looked for.
+     * @return the document object corresponding to the passed document's name. A translated version of the document for
+     *         the current Locale is looked for.
      */
     public List<XWikiDocument> getDocumentBundles(String documentName, String defaultLanguage)
     {
@@ -280,13 +268,11 @@ public class XWikiMessageTool
         if (documentName.length() != 0) {
             try {
                 // First, looks for a document suffixed by the language
-                XWikiDocument docBundle =
-                    this.context.getWiki().getDocument(documentName, this.context);
+                XWikiDocument docBundle = this.context.getWiki().getDocument(documentName, this.context);
                 XWikiDocument tdocBundle = docBundle.getTranslatedDocument(this.context);
                 list.add(tdocBundle);
                 if (!tdocBundle.getRealLanguage().equals(defaultLanguage)) {
-                    XWikiDocument defdocBundle =
-                        docBundle.getTranslatedDocument(defaultLanguage, this.context);
+                    XWikiDocument defdocBundle = docBundle.getTranslatedDocument(defaultLanguage, this.context);
                     if (tdocBundle != defdocBundle) {
                         list.add(defdocBundle);
                     }
@@ -328,8 +314,8 @@ public class XWikiMessageTool
     }
 
     /**
-     * Looks for a translation in the list of internationalization document bundles. It first checks
-     * if the translation can be found in the cache.
+     * Looks for a translation in the list of internationalization document bundles. It first checks if the translation
+     * can be found in the cache.
      * 
      * @param key the key identifying the translation
      * @return the translation or null if not found or if the passed key is null
@@ -351,14 +337,13 @@ public class XWikiMessageTool
                         this.docsToRefresh.remove(docId);
                     } else {
                         // gets from cache
-                        props = (Properties) this.propsCache.get(docId);
+                        props = this.propsCache.get(docId);
                     }
                     String translation = props.getProperty(key);
                     if (translation != null) {
                         returnValue = translation;
                         try {
-                            returnValue =
-                                new String(returnValue.getBytes("ISO-8859-1"), BYTE_ENCODING);
+                            returnValue = new String(returnValue.getBytes("ISO-8859-1"), BYTE_ENCODING);
                         } catch (UnsupportedEncodingException ex) {
                             LOG.error("Error recombining the value from bytes", ex);
                         }

@@ -53,7 +53,6 @@ endDocument
 1.; title2
 1.: definition2
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=60
 <html><ul><li>item1<dl><dt>title1</dt><dd>definition1</dd></dl></li></ul><ol><li>item2<dl><dt>title2</dt><dd>definition2</dd></dl></li></ol></html>

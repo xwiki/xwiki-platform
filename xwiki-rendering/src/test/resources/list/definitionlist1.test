@@ -48,9 +48,8 @@ endDocument
 ; title3
 : definition3
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=60
 <html><dl><dt>title1</dt><dd>definition1<dl><dt>title2</dt><dd>definition2</dd></dl></dd><dt>title3</dt><dd>definition3</dd></dl></html>
 .#-----------------------------------------------------
 .input|mediawiki/1.0

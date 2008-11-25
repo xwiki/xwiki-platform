@@ -54,7 +54,6 @@ endDocument
 :: 
 ::: indent3
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=60
 <html><dl><dd>indent1</dd></dl><dl><dd><dl><dd>indent2</dd></dl></dd></dl><dl><dd><dl><dd><dl><dd>indent3</dd></dl></dd></dl></dd></dl></html>

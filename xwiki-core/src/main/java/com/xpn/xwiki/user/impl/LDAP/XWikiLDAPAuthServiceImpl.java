@@ -367,18 +367,20 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if (ldapDn == null) {
             searchAttributes = ldapUtils.searchUserAttributesByUid(ldapUid, getAttributeNameTable(context));
 
-            for (XWikiLDAPSearchAttribute searchAttribute : searchAttributes) {
-                if ("dn".equals(searchAttribute.name)) {
-                    ldapDn = searchAttribute.value;
+            if (searchAttributes != null) {
+                for (XWikiLDAPSearchAttribute searchAttribute : searchAttributes) {
+                    if ("dn".equals(searchAttribute.name)) {
+                        ldapDn = searchAttribute.value;
 
-                    break;
+                        break;
+                    }
                 }
             }
         }
 
         if (ldapDn == null) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
-                "Can't find LDAP user DN.");
+                "Can't find LDAP user DN for [" + ldapUid + "]");
         }
 
         // ////////////////////////////////////////////////////////////////////

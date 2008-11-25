@@ -57,26 +57,6 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
     private final TabPanel tabs;
 
     /**
-     * The tab to get the link to a web page.
-     */
-    private final LinkToWebPageTab linkToWebPageTab;
-
-    /**
-     * The tab to get the link to an email address.
-     */
-    private final LinkToEmailAddressTab linkToEmailAddressTab;
-
-    /**
-     * Tab to get the link to a new page.
-     */
-    private final LinkToNewPageTab linkToNewPageTab;
-
-    /**
-     * Tab to get the link to an existing page.
-     */
-    private final LinkToExistingPageTab linkToExistingPageTab;
-
-    /**
      * This variable contains the index of the selected tab.
      */
     private int selectedTabIndex;
@@ -96,18 +76,18 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
     public LinkDialog(final String currentWiki, String currentSpace, String currentPage)
     {
         super(false, true);
-        linkToWebPageTab = new LinkToWebPageTab();
-        linkToEmailAddressTab = new LinkToEmailAddressTab();
-        linkToNewPageTab = new LinkToNewPageTab(currentWiki, currentSpace, currentPage);
-        linkToExistingPageTab = new LinkToExistingPageTab(currentWiki, currentSpace, currentPage);
+        LinkToWebPageTab linkToWebPageTab = new LinkToWebPageTab();
+        LinkToEmailAddressTab linkToEmailAddressTab = new LinkToEmailAddressTab();
+        LinkToNewPageTab linkToNewPageTab = new LinkToNewPageTab(currentWiki, currentSpace, currentPage);
+        LinkToExistingPageTab linkToExistingPageTab = new LinkToExistingPageTab(currentWiki, currentSpace, currentPage);
 
         tabs = new TabPanel();
         tabs.addTabListener(this);
 
-        addTab(linkToWebPageTab, Strings.INSTANCE.linkWebPageTab());
-        addTab(linkToEmailAddressTab, Strings.INSTANCE.linkEmailTab());
+        addTab(linkToExistingPageTab, Strings.INSTANCE.linkExistingPageTab());        
         addTab(linkToNewPageTab, Strings.INSTANCE.linkNewPageTab());
-        addTab(linkToExistingPageTab, Strings.INSTANCE.linkExistingPageTab());
+        addTab(linkToWebPageTab, Strings.INSTANCE.linkWebPageTab());
+        addTab(linkToEmailAddressTab, Strings.INSTANCE.linkEmailTab());        
 
         tabs.selectTab(0);
         selectedTabIndex = 0;
@@ -132,17 +112,12 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
      */
     public void setLabel(String labelHTML, String labelText)
     {
-        if (linkToWebPageTab != null) {
-            linkToWebPageTab.setLabel(labelHTML, labelText);
-        }
-        if (linkToEmailAddressTab != null) {
-            linkToEmailAddressTab.setLabel(labelHTML, labelText);
-        }
-        if (linkToNewPageTab != null) {
-            linkToNewPageTab.setLabel(labelHTML, labelText);
-        }
-        if (linkToExistingPageTab != null) {
-            linkToExistingPageTab.setLabel(labelHTML, labelText);
+        // pass the label to all the tabs in this dialog's tab panel
+        for (int i = 0; i < tabs.getWidgetCount(); i++) {
+            Widget tab = tabs.getWidget(i);
+            if (tab instanceof HasLink) {
+                ((HasLink) tab).setLabel(labelHTML, labelText);
+            }
         }
     }
 

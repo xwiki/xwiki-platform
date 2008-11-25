@@ -36,6 +36,14 @@ public interface HasLink extends SourcesClickEvents
     String getLink();
 
     /**
+     * Sets the label for which this {@link HasLink} will generate the link HTML.
+     * 
+     * @param labelHTML the label's HTML value
+     * @param labelText the label's text value
+     */
+    void setLabel(String labelHTML, String labelText);
+
+    /**
      * Some setup need for the moment when the widget will be display.
      */
     void initialize();

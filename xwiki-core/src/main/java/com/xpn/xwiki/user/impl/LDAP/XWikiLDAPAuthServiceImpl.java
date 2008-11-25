@@ -631,19 +631,17 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     /**
      * Add user name to provided XWiki group.
      * 
-     * @param userName the name of the user.
+     * @param xwikiUserName the full name of the user.
      * @param groupName the name of the group.
      * @param context the XWiki context.
      */
     // TODO move this methods in a toolkit for all platform.
-    protected void addUserToXWikiGroup(String userName, String groupName, XWikiContext context)
+    protected void addUserToXWikiGroup(String xwikiUserName, String groupName, XWikiContext context)
     {
         try {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(MessageFormat.format("Adding user {0} to xwiki group {1}", userName, groupName));
+                LOG.debug(MessageFormat.format("Adding user {0} to xwiki group {1}", xwikiUserName, groupName));
             }
-
-            String fullWikiUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + userName;
 
             BaseClass groupClass = context.getWiki().getGroupClass(context);
 
@@ -653,47 +651,45 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // Add a member object to document
             BaseObject memberObj = groupDoc.newObject(groupClass.getName(), context);
             Map<String, String> map = new HashMap<String, String>();
-            map.put(XWIKI_GROUP_MEMBERFIELD, fullWikiUserName);
+            map.put(XWIKI_GROUP_MEMBERFIELD, xwikiUserName);
             groupClass.fromMap(map, memberObj);
 
             // Save modifications
             context.getWiki().saveDocument(groupDoc, context);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug(MessageFormat.format("Finished adding user {0} to xwiki group {1}", userName, groupName));
+                LOG.debug(MessageFormat.format("Finished adding user {0} to xwiki group {1}", xwikiUserName, groupName));
             }
 
         } catch (Exception e) {
-            LOG.error(MessageFormat.format("Failed to add a user [{0}] to a group [{1}]", userName, groupName), e);
+            LOG.error(MessageFormat.format("Failed to add a user [{0}] to a group [{1}]", xwikiUserName, groupName), e);
         }
     }
 
     /**
      * Remove user name from provided XWiki group.
      * 
-     * @param userName the name of the user.
+     * @param xwikiUserName the full name of the user.
      * @param groupName the name of the group.
      * @param context the XWiki context.
      */
     // TODO move this methods in a toolkit for all platform.
-    protected void removeUserFromXWikiGroup(String userName, String groupName, XWikiContext context)
+    protected void removeUserFromXWikiGroup(String xwikiUserName, String groupName, XWikiContext context)
     {
         try {
-            String fullWikiUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + userName;
-
             String groupClassName = context.getWiki().getGroupClass(context).getName();
 
             // Get the XWiki document holding the objects comprising the group membership list
             XWikiDocument groupDoc = context.getWiki().getDocument(groupName, context);
 
             // Get and remove the specific group membership object for the user
-            BaseObject groupObj = groupDoc.getObject(groupClassName, XWIKI_GROUP_MEMBERFIELD, fullWikiUserName);
+            BaseObject groupObj = groupDoc.getObject(groupClassName, XWIKI_GROUP_MEMBERFIELD, xwikiUserName);
             groupDoc.removeObject(groupObj);
 
             // Save modifications
             context.getWiki().saveDocument(groupDoc, context);
         } catch (Exception e) {
-            LOG.error("Failed to remove a user from a group " + userName + " group: " + groupName, e);
+            LOG.error("Failed to remove a user from a group " + xwikiUserName + " group: " + groupName, e);
         }
     }
 

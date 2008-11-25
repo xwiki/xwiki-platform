@@ -1,17 +1,16 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Standard table
 .#-----------------------------------------------------
-|=|=col1|=col2
-|=line1|cell1.1|cell1.2
-|=line2|cell2.1|cell2.2
+|=col1|=col2
+|cell11|cell12
+|cell21|cell22
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginTable
 beginTableRow
-beginTableHeadCell
-endTableHeadCell
 beginTableHeadCell
 onWord [col1]
 endTableHeadCell
@@ -20,33 +19,19 @@ onWord [col2]
 endTableHeadCell
 endTableRow
 beginTableRow
-beginTableHeadCell
-onWord [line1]
-endTableHeadCell
 beginTableCell
-onWord [cell1]
-onSpecialSymbol [.]
-onWord [1]
+onWord [cell11]
 endTableCell
 beginTableCell
-onWord [cell1]
-onSpecialSymbol [.]
-onWord [2]
+onWord [cell12]
 endTableCell
 endTableRow
 beginTableRow
-beginTableHeadCell
-onWord [line2]
-endTableHeadCell
 beginTableCell
-onWord [cell2]
-onSpecialSymbol [.]
-onWord [1]
+onWord [cell21]
 endTableCell
 beginTableCell
-onWord [cell2]
-onSpecialSymbol [.]
-onWord [2]
+onWord [cell22]
 endTableCell
 endTableRow
 endTable
@@ -54,15 +39,14 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell1.1</td><td>cell1.2</td></tr><tr><th>line2</th><td>cell2.1</td><td>cell2.2</td></tr></table>
+<table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-|=|=col1|=col2
-|=line1|cell1.1|cell1.2
-|=line2|cell2.1|cell2.2
+|=col1|=col2
+|cell11|cell12
+|cell21|cell22
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: Fix http://code.google.com/p/wikimodel/issues/detail?id=15
-<html><table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell1.1</td><td>cell1.2</td></tr><tr><th>line2</th><td>cell2.1</td><td>cell2.2</td></tr></table></html>
+<html><table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table></html>

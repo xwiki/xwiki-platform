@@ -1,27 +1,60 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Tables with headers as lines and columns
 .#-----------------------------------------------------
-(% a="b" %)
-(% c="d" %)|=(% e="f" %) cell
+|=|=col1|=col2
+|=line1|cell11|cell12
+|=line2|cell21|cell22
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginTable [[a]=[b]]
-beginTableRow [[c]=[d]]
-beginTableHeadCell [[e]=[f]]
-onSpace
-onWord [cell]
-endTableHeadCell [[e]=[f]]
-endTableRow [[c]=[d]]
-endTable [[a]=[b]]
+beginTable
+beginTableRow
+beginTableHeadCell
+endTableHeadCell
+beginTableHeadCell
+onWord [col1]
+endTableHeadCell
+beginTableHeadCell
+onWord [col2]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableHeadCell
+onWord [line1]
+endTableHeadCell
+beginTableCell
+onWord [cell11]
+endTableCell
+beginTableCell
+onWord [cell12]
+endTableCell
+endTableRow
+beginTableRow
+beginTableHeadCell
+onWord [line2]
+endTableHeadCell
+beginTableCell
+onWord [cell21]
+endTableCell
+beginTableCell
+onWord [cell22]
+endTableCell
+endTableRow
+endTable
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<table a="b"><tr c="d"><th e="f">&nbsp;cell</th></tr></table>
+<table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell11</td><td>cell12</td></tr><tr><th>line2</th><td>cell21</td><td>cell22</td></tr></table>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-(% a="b" %)
-(% c="d" %)|=(% e="f" %) cell
+|=|=col1|=col2
+|=line1|cell11|cell12
+|=line2|cell21|cell22
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell11</td><td>cell12</td></tr><tr><th>line2</th><td>cell21</td><td>cell22</td></tr></table></html>

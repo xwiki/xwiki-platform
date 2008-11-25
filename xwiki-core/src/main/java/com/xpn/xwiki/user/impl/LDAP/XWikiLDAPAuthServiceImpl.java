@@ -106,7 +106,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // If we can't find the username field then we are probably on the login screen
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug("LDAP authentication failed: login null");
+                LOG.debug("The provided user is null."
+                    + " We don't try to authenticate, it probably means the user is in non logged mode.");
             }
 
             return null;
@@ -658,7 +659,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             context.getWiki().saveDocument(groupDoc, context);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug(MessageFormat.format("Finished adding user {0} to xwiki group {1}", xwikiUserName, groupName));
+                LOG
+                    .debug(MessageFormat
+                        .format("Finished adding user {0} to xwiki group {1}", xwikiUserName, groupName));
             }
 
         } catch (Exception e) {

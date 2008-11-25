@@ -753,7 +753,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endTableCell(Map<String, String> parameters)
     {
-
+        this.previousFormatParameters = null;
     }
 
     /**
@@ -763,7 +763,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endTableHeadCell(Map<String, String> parameters)
     {
-
+        this.previousFormatParameters = null;
     }
 
     /**

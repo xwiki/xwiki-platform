@@ -5,6 +5,10 @@
 |=col1|=col2
 |cell11|cell12
 |cell21|cell22
+
+!=col1!=col2
+!!cell11!!cell12
+!!cell21!!cell22
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -35,18 +39,48 @@ onWord [cell22]
 endTableCell
 endTableRow
 endTable
+beginTable
+beginTableRow
+beginTableHeadCell
+onWord [col1]
+endTableHeadCell
+beginTableHeadCell
+onWord [col2]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableCell
+onWord [cell11]
+endTableCell
+beginTableCell
+onWord [cell12]
+endTableCell
+endTableRow
+beginTableRow
+beginTableCell
+onWord [cell21]
+endTableCell
+beginTableCell
+onWord [cell22]
+endTableCell
+endTableRow
+endTable
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table>
+<table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table><table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 |=col1|=col2
 |cell11|cell12
 |cell21|cell22
+
+|=col1|=col2
+|cell11|cell12
+|cell21|cell22
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table></html>
+<html><table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table><table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table></html>

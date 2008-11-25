@@ -19,11 +19,17 @@
  */
 package org.xwiki.rendering.internal.macro.code;
 
+import java.io.StringReader;
+import java.util.Collections;
+import java.util.List;
+
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.VerbatimInlineBlock;
+import org.xwiki.rendering.block.VerbatimStandaloneBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
@@ -31,10 +37,6 @@ import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.parser.HighlightParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-
-import java.io.StringReader;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @version $Id$
@@ -90,10 +92,18 @@ public class CodeMacro extends AbstractMacro<CodeMacroParameters> implements Com
     {
         List<Block> result;
         try {
-            if (context.isInlined()) {
-                result = highlight(parameters, content);
+            if (CodeMacroParameters.LANGUAGE_NONE.equalsIgnoreCase(parameters.getLanguage())) {
+                if (context.isInlined()) {
+                    result = Collections.<Block> singletonList(new VerbatimInlineBlock(content));
+                } else {
+                    result = Collections.<Block> singletonList(new VerbatimStandaloneBlock(content));
+                }
             } else {
-                result = Collections.<Block> singletonList(new ParagraphBlock(highlight(parameters, content)));
+                if (context.isInlined()) {
+                    result = highlight(parameters, content);
+                } else {
+                    result = Collections.<Block> singletonList(new ParagraphBlock(highlight(parameters, content)));
+                }
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to highlight content", e);

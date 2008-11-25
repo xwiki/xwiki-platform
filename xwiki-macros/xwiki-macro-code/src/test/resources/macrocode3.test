@@ -1,0 +1,24 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{code language=none}}
+<b>bold</b>
+<i>italic</i>
+{{/code}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker [code] [language=none] [
+<b>bold</b>
+<i>italic</i>
+]
+onVerbatimStandalone [
+<b>bold</b>
+<i>italic</i>
+]
+endMacroMarker [code] [language=none] [
+<b>bold</b>
+<i>italic</i>
+]
+endDocument

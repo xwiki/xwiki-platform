@@ -1,5 +1,6 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Validate that the code macro is able to find the right language for provided content and highlight it.
 .#-----------------------------------------------------
 {{code}}
 <b>bold</b>

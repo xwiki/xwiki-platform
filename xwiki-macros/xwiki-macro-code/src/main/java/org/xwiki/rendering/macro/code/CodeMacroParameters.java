@@ -30,14 +30,14 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescription;
 public class CodeMacroParameters
 {
     /**
+     * Used to indicate that content should not be highlighted.
+     */
+    public static final String LANGUAGE_NONE = "none";
+
+    /**
      * The language identifier.
      */
     private String language;
-
-    /**
-     * Indicate if line number as to be printed.
-     */
-    private boolean linenos;
 
     /**
      * @param language the language identifier.
@@ -54,22 +54,5 @@ public class CodeMacroParameters
     public String getLanguage()
     {
         return this.language;
-    }
-
-    /**
-     * @param linenos indicate if line number as to be printed
-     */
-    @ParameterDescription("indicate if line number as to be printed")
-    public void setLinenos(boolean linenos)
-    {
-        this.linenos = linenos;
-    }
-
-    /**
-     * @return indicate if line number as to be printed
-     */
-    public boolean isLinenos()
-    {
-        return this.linenos;
     }
 }

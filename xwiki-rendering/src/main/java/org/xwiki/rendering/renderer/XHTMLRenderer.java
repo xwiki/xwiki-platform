@@ -712,7 +712,6 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void beginTable(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLStartElement("table", parameters);
-        getXHTMLWikiPrinter().printXMLStartElement("tbody");
     }
 
     /**
@@ -752,7 +751,6 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endTable(Map<String, String> parameters)
     {
-        getXHTMLWikiPrinter().printXMLEndElement("tbody");
         getXHTMLWikiPrinter().printXMLEndElement("table");
     }
 

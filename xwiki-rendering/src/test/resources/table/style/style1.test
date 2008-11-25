@@ -2,8 +2,8 @@
 .input|xwiki/2.0
 .#-----------------------------------------------------
 (% style="background-color:rgb(255,0,0)" %)
-|| col1 || col2
-|| line1 | cell1.2
+|= col1 |= col2
+|= line1 | cell1.2
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -38,4 +38,4 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<table style="background-color:rgb(255,0,0)"><tbody><tr><th>&nbsp;col1&nbsp;</th><th>&nbsp;col2</th></tr><tr><th>&nbsp;line1&nbsp;</th><td>&nbsp;cell1.2</td></tr></tbody></table>
+<table style="background-color:rgb(255,0,0)"><tr><th>&nbsp;col1&nbsp;</th><th>&nbsp;col2</th></tr><tr><th>&nbsp;line1&nbsp;</th><td>&nbsp;cell1.2</td></tr></table>

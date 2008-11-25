@@ -1,9 +1,9 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-|| col1 || col2
-|| line1 | cell1.1 | cell1.2
-|| line2 | cell2.1 | cell2.2
+|=|=col1|=col2
+|=line1|cell1.1|cell1.2
+|=line2|cell2.1|cell2.2
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -11,30 +11,24 @@ beginDocument
 beginTable
 beginTableRow
 beginTableHeadCell
-onSpace
-onWord [col1]
-onSpace
 endTableHeadCell
 beginTableHeadCell
-onSpace
+onWord [col1]
+endTableHeadCell
+beginTableHeadCell
 onWord [col2]
 endTableHeadCell
 endTableRow
 beginTableRow
 beginTableHeadCell
-onSpace
 onWord [line1]
-onSpace
 endTableHeadCell
 beginTableCell
-onSpace
 onWord [cell1]
 onSpecialSymbol [.]
 onWord [1]
-onSpace
 endTableCell
 beginTableCell
-onSpace
 onWord [cell1]
 onSpecialSymbol [.]
 onWord [2]
@@ -42,19 +36,14 @@ endTableCell
 endTableRow
 beginTableRow
 beginTableHeadCell
-onSpace
 onWord [line2]
-onSpace
 endTableHeadCell
 beginTableCell
-onSpace
 onWord [cell2]
 onSpecialSymbol [.]
 onWord [1]
-onSpace
 endTableCell
 beginTableCell
-onSpace
 onWord [cell2]
 onSpecialSymbol [.]
 onWord [2]
@@ -65,15 +54,15 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<table><tbody><tr><th>&nbsp;col1&nbsp;</th><th>&nbsp;col2</th></tr><tr><th>&nbsp;line1&nbsp;</th><td>&nbsp;cell1.1&nbsp;</td><td>&nbsp;cell1.2</td></tr><tr><th>&nbsp;line2&nbsp;</th><td>&nbsp;cell2.1&nbsp;</td><td>&nbsp;cell2.2</td></tr></tbody></table>
+<table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell1.1</td><td>cell1.2</td></tr><tr><th>line2</th><td>cell2.1</td><td>cell2.2</td></tr></table>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-|| col1 || col2
-|| line1 | cell1.1 | cell1.2
-|| line2 | cell2.1 | cell2.2
+|=|=col1|=col2
+|=line1|cell1.1|cell1.2
+|=line2|cell2.1|cell2.2
 .#-----------------------------------------------------
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html><table><tbody><tr><th>&nbsp;col1&nbsp;</th><th>&nbsp;col2</th></tr><tr><th>&nbsp;line1&nbsp;</th><td>&nbsp;cell1.1&nbsp;</td><td>&nbsp;cell1.2</td></tr><tr><th>&nbsp;line2&nbsp;</th><td>&nbsp;cell2.1&nbsp;</td><td>&nbsp;cell2.2</td></tr></tbody></table></html>
+.# TODO: Fix http://code.google.com/p/wikimodel/issues/detail?id=15
+<html><table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell1.1</td><td>cell1.2</td></tr><tr><th>line2</th><td>cell2.1</td><td>cell2.2</td></tr></table></html>

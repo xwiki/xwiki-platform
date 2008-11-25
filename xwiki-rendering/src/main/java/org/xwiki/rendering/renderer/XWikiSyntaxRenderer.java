@@ -718,7 +718,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginTableHeadCell(Map<String, String> parameters)
     {
-        print("||");
+        print("|=");
         printParameters(parameters, false);
     }
 

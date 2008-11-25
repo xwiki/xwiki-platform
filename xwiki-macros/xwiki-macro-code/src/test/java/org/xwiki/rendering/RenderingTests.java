@@ -35,7 +35,7 @@ public class RenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
+        RenderingTestSuite suite = new RenderingTestSuite("Test Code Macro");
         
         suite.addTestsFromResource("macrocode1", true);
         suite.addTestsFromResource("macrocode2", true);

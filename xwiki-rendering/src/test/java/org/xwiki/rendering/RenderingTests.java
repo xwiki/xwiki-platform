@@ -161,11 +161,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("misc/misc5", false);
         suite.addTestsFromResource("misc/misc6", false);
         suite.addTestsFromResource("encoding/encoding1", false);
-        suite.addTestsFromResource("encoding/encoding2", false);
         suite.addTestsFromResource("image/image1", false);
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
-
+        
         return new RenderingPlexusTestSetup(suite);
     }
 }

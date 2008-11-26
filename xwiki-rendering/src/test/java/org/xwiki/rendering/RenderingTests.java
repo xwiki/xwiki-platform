@@ -107,15 +107,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/toc/macrotoc3", true);
         suite.addTestsFromResource("macros/toc/macrotoc4", true);
 
-        // Other
-        suite.addTestsFromResource("escape/escape1", false);
-        suite.addTestsFromResource("escape/escape2", false);
-        suite.addTestsFromResource("escape/escape3", false);
-        suite.addTestsFromResource("horizontalline/horizontalline1", false);
-        suite.addTestsFromResource("horizontalline/horizontalline2", false);
-        suite.addTestsFromResource("horizontalline/horizontalline3", false);
-        suite.addTestsFromResource("horizontalline/horizontalline4", false);
-        suite.addTestsFromResource("horizontalline/horizontalline5", false);
+        // Links
         suite.addTestsFromResource("link/links1", false);
         suite.addTestsFromResource("link/links2", false);
         suite.addTestsFromResource("link/links3", false);
@@ -130,6 +122,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("link/links12", false);
         suite.addTestsFromResource("link/links13", false);
         suite.addTestsFromResource("link/links14", false);
+        
+        // Lists
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("list/list2", false);
         suite.addTestsFromResource("list/list3", false);
@@ -145,6 +139,16 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("list/definitionlist4", false);
         suite.addTestsFromResource("list/definitionlist5", false);
         suite.addTestsFromResource("list/definitionlist6", false);
+        
+        // Other
+        suite.addTestsFromResource("escape/escape1", false);
+        suite.addTestsFromResource("escape/escape2", false);
+        suite.addTestsFromResource("escape/escape3", false);
+        suite.addTestsFromResource("horizontalline/horizontalline1", false);
+        suite.addTestsFromResource("horizontalline/horizontalline2", false);
+        suite.addTestsFromResource("horizontalline/horizontalline3", false);
+        suite.addTestsFromResource("horizontalline/horizontalline4", false);
+        suite.addTestsFromResource("horizontalline/horizontalline5", false);
         suite.addTestsFromResource("section/section1", false);
         suite.addTestsFromResource("section/section2", false);
         suite.addTestsFromResource("section/section3", true);

@@ -1,8 +1,11 @@
 .#--------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify we can put URLs direclty in the text and that ~ character is not escaped
 .#--------------------------------------------------------------------------------
+.# Verify we can put URLs directly in the text and that ~ character is not escaped
 Some URL http://server/path/~user
+
+.# Ensure that unknown protocols don't make the link fail
+something://whatever
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
@@ -15,16 +18,22 @@ onSpace
 beginLink [Reference = [http://server/path/~user]] [true]
 endLink [Reference = [http://server/path/~user]] [true]
 endParagraph
+beginParagraph
+beginLink [Reference = [something://whatever]] [true]
+endLink [Reference = [something://whatever]] [true]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>Some URL <!--startwikilink:http://server/path/~user--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://server/path/~user"><span class="wikigeneratedlinkcontent">http://server/path/~user</span></a></span><!--stopwikilink--></p>
+<p>Some URL <!--startwikilink:http://server/path/~user--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://server/path/~user"><span class="wikigeneratedlinkcontent">http://server/path/~user</span></a></span><!--stopwikilink--></p><p><!--startwikilink:something://whatever--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="something://whatever"><span class="wikigeneratedlinkcontent">something://whatever</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 Some URL http://server/path/~user
+
+something://whatever
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Some URL <!--startwikilink:http://server/path/~user--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://server/path/~user"><span class="wikigeneratedlinkcontent">http://server/path/~user</span></a></span><!--stopwikilink--></p></html>
+<html><p>Some URL <!--startwikilink:http://server/path/~user--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://server/path/~user"><span class="wikigeneratedlinkcontent">http://server/path/~user</span></a></span><!--stopwikilink--></p><p><!--startwikilink:something://whatever--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="something://whatever"><span class="wikigeneratedlinkcontent">something://whatever</span></a></span><!--stopwikilink--></p></html>

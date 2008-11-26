@@ -24,7 +24,6 @@ import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -133,9 +132,8 @@ public class XWikiLinkParser implements LinkParser
      * @param content the string to parse. This parameter will be modified by the method to remove
      *                the parsed content.
      * @return the parsed URI or null if no URI was specified
-     * @throws ParseException if the URI is malformed
      */
-    protected String parseURI(StringBuffer content) throws ParseException
+    protected String parseURI(StringBuffer content)
     {
         String uri = null;
 
@@ -152,12 +150,9 @@ public class XWikiLinkParser implements LinkParser
             // Look for a URL pattern
             Matcher matcher = URL_SCHEME_PATTERN.matcher(content.toString());
             if (matcher.lookingAt()) {
-                // If a URL is specified then virtual wiki aliases and spaces should not be allowed.
-                try {
-                    uri = new URL(content.toString()).toString();
-                } catch (Exception e) {
-                    throw new ParseException("Invalid URL format [" + content.toString() + "]", e);
-                }
+                // We don't parse the URL since it can contain unknown protocol for the JVM but protocols known by the browser
+                // (such as skype:// for example).
+                uri = content.toString();
                 content.setLength(0);
             }
         }

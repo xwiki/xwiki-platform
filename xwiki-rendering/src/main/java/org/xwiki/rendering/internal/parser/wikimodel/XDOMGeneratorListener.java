@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -436,13 +438,16 @@ public class XDOMGeneratorListener implements IWemListener
             Block resultBlock;
             Link link = parseLink(reference);
 
-            // Verify if we have an image or a link. An image is identified by an "image:" uri
-            // The reason we get this event is because WikiModel handles links and images in the same manner. 
-            resultBlock = createImageBlock(link, isFreeStandingURI, parameters);
-            if (resultBlock == null) {
-                resultBlock = createLinkBlock(link, label, isFreeStandingURI, parameters); 
+            // If the link failed to be constructed do nothing since parseLink will have wrapped it in an Error Block
+            if (link != null) {
+                // Verify if we have an image or a link. An image is identified by an "image:" uri
+                // The reason we get this event is because WikiModel handles links and images in the same manner. 
+                resultBlock = createImageBlock(link, isFreeStandingURI, parameters);
+                if (resultBlock == null) {
+                    resultBlock = createLinkBlock(link, label, isFreeStandingURI, parameters); 
+                }
+                this.stack.push(resultBlock);
             }
-            this.stack.push(resultBlock);
         }
     }
     
@@ -571,8 +576,13 @@ public class XDOMGeneratorListener implements IWemListener
         try {
             link = this.linkParser.parse(reference);
         } catch (ParseException e) {
-            // TODO: Should we instead generate ErrorBlocks?
-            throw new RuntimeException("Failed to parse link [" + reference + "]", e);
+            // Wrap the error in an ErrorBLock
+            StringWriter writer = new StringWriter();
+            e.printStackTrace(new PrintWriter(writer));
+            ErrorBlock block = 
+                new ErrorBlock(Collections.<Block>emptyList(), "Invalid Link", writer.getBuffer().toString());
+            this.stack.push(block);
+            link = null;
         }
         return link;
     }

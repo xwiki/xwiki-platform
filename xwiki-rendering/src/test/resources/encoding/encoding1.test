@@ -1,28 +1,25 @@
-.#------------------------------------------------------------------------------
-.input|xwiki/2.0|skip
-.# Verify that accented characters HTML entered directly in the syntax is "escaped" and not rendered 
-.#------------------------------------------------------------------------------
-.# TODO: Support escaping in test framework to be able to enter non ASCII characters in test files
-(% param1="valüe" %)
-sôme äccénted chàracters
+.#-------------------------------------------------------------------------------------
+.input|xhtml/1.0
+.# Verify that HTML entities can be parsed by the XHTML parser and are encoded properly
+.# Note that &nbsp; is transformed into a space.
+.#-------------------------------------------------------------------------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><p>&nbsp;&tilde;&euro;</p><p param1="val&#252;e">&#160;&#732;&#8364;</p></html>
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
+beginParagraph
+onSpace
+onWord [(((732)))(((8364)))]
+endParagraph
 beginParagraph [[param1]=[val(((252)))e]]
-onWord [s(((244)))me]
 onSpace
-onWord [(((228)))cc(((233)))nted]
-onSpace
-onWord [ch(((224)))racters]
+onWord [(((732)))(((8364)))]
 endParagraph [[param1]=[val(((252)))e]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p param1="val&#252;e">s&#244;me &#228;cc&#233;nted ch&#224;racters</p>
-.#-----------------------------------------------------
-.expect|xwiki
-.#-----------------------------------------------------
-(% param1="valüe" %)
-sôme äccénted chàracters
+<p>&nbsp;&#732;&#8364;</p><p param1="val&#252;e">&nbsp;&#732;&#8364;</p>

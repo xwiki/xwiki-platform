@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>CategoriesCode</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1226789865000</creationDate>
+<date>1227669955000</date>
+<contentUpdateDate>1227669955000</contentUpdateDate>
+<version>29.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment>Updated from WebDAV</comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>true</hidden>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Blog.CategoriesCode</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>#includeMacros("Blog.BlogParameters")
+##
+##
+##
+#**
+ * Retrieves the list of blog entries from a given category. Entries belonging to subcategories
+ * are not returned.
+ * 
+ * @param category The name of the category (xdocument full name, for example 'MyBlog.Fishing').
+ * @param start In a paginated view, this is the index of the first entry displayed.
+ * @param start In a paginated view, this is the number of entries displayed in a page, i.e. the
+ *        maximum number of entries returned. Should be 0 to return all available entries.
+ * @param articles Return parameter, where the list of entries is placed.
+ * @param total Return parameter, where the total number of entries belonging to this category is
+ *        placed. Useful for a paginated view.
+ *#
+#macro(getEntriesForCategory $category $start $perPage $entries $total)
+  #set ($sql = ", BaseObject as obj, DateProperty published, DBStringListProperty as categories join prop.list as category where obj.name=doc.fullName and obj.className='${blogPostClassname}' and obj.id=categories.id.id and categories.id.name='category' and category='${category}'")
+  #set($entries = $xwiki.searchDocuments("${sql} order by published.value desc", $start, $perPage))
+  #set($total = $xwiki.countDocuments(${sql}))
+#end
+##
+##
+##
+#**
+ * Builds a tree of categories, respecting the parent&lt;-&gt;subcategory relation. Each node holds the
+ * full name of the category's document. The root of the tree is 'Blog.Categories'.
+ * 
+ * @param space The space where to search for categories. If this parameter is an emptry string or
+ *        null, all the categories in the wiki are returned.
+ * @param tree Return parameter, HashMap&lt;String, List&lt;String&gt;&gt; structure holding the categories
+ *        hierarchy, where the key is the name of a category, and the value contains the names of
+ *        all its subcategories. To obtain the full hierarchy, start with the key 'Blog.Categories'.
+ *#
+#macro(getCategoriesHierarchy $space $tree)
+  #set($tree = $util.hashMap)
+  #set($query = ', BaseObject obj where ')
+  #if("$!space" != '')
+    #set($query = "${query}doc.space = '${space}' and ")
+  #end
+  #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' order by doc.name")
+  #foreach($category in $xwiki.searchDocuments($query))
+    #set($categoryDoc = $xwiki.getDocument($category))
+    #set($categoryParent = "$!categoryDoc.parent")
+    #if ($categoryParent == "")
+      #set($categoryParent = $defaultCategoryParent)
+    #end
+    #if (!$tree.containsKey($categoryParent))
+      #set($discard = $tree.put($categoryParent, $util.arrayList))
+    #end
+    #set($discard = $tree.get($categoryParent).add($category))
+  #end
+#end
+##
+##
+##
+#**
+ * Displays the category hierarchy held in the &lt;tt&gt;tree&lt;/tt&gt; parameter.
+ *
+ * @param tree The category hierarchy HashMap&lt;String, List&lt;String&gt;&gt; structure, where the key
+ *        is the name of a category, and the value contains the names of all its subcategories.
+ * @param displayMethod Selects how to display the category tree. Possible values are:
+ *        &lt;ul&gt;
+ *        &lt;li&gt;&lt;em&gt;"simple"&lt;/em&gt;: tree with links to the category pages.&lt;/li&gt;
+ *        &lt;li&gt;&lt;em&gt;"selectable"&lt;/em&gt;: each category name in the tree is preceded by a checkbox.&lt;/li&gt;
+ *        &lt;li&gt;&lt;em&gt;"option"&lt;/em&gt;: wraps each category name in an &amp;lt;option&amp;gt; element, to be used
+ *          in a select box.&lt;/li&gt;
+ *        &lt;li&gt;&lt;em&gt;"editable"&lt;/em&gt;: displays links to delete and edit each category, if the rights
+ *          allow such actions.&lt;/li&gt;
+ *        &lt;/ul&gt;
+ *        For any other value, the default ("simple") is considered.
+ *#
+#macro(displayCategoriesHierarchy $tree $displayMethod)
+  #displayCategoriesHierarchyRecursive($tree $defaultCategoryParent 1 $displayMethod)
+#end
+##
+##
+##
+#**
+ * Displays recursively the category hierarchy held in the &lt;tt&gt;tree&lt;/tt&gt; parameter, starting at
+ * the node indicated by the &lt;tt&gt;root&lt;/tt&gt; parameter, which is on the &lt;tt&gt;level&lt;/tt&gt;th level in
+ * the tree.
+ *
+ * @param tree The category hierarchy HashMap&lt;String, List&lt;String&gt;&gt; structure, where the key
+ *        is the name of a category, and the value contains the names of all its subcategories.
+ * @param root The full name of the document containing the category that is to be considered the
+ *        root of the displayed subtree.
+ * @param level The current depth of the tree, used for proper indentation.
+ * @param displayMethod Selects how to display the category tree. Possible values are:
+ *        &lt;ul&gt;
+ *        &lt;li&gt;&lt;em&gt;"simple"&lt;/em&gt;: tree with links to the category pages.&lt;/li&gt;
+ *        &lt;li&gt;&lt;em&gt;"selectable"&lt;/em&gt;: each category name in the tree is preceded by a checkbox.&lt;/li&gt;
+ *        &lt;li&gt;&lt;em&gt;"option"&lt;/em&gt;: wraps each category name in an &amp;lt;option&amp;gt; element, to be used
+ *          in a select box.&lt;/li&gt;
+ *        &lt;li&gt;&lt;em&gt;"editable"&lt;/em&gt;: displays links to delete and edit each category, if the rights
+ *          allow such actions.&lt;/li&gt;
+ *        &lt;/ul&gt;
+ *        For any other value, the default ("simple") is considered.
+ *#
+#macro(displayCategoriesHierarchyRecursive $tree $root $level $displayMethod)
+  #if(!$processedCategories)
+    #set($processedCategories = $util.arrayList)
+  #end
+  #foreach($item in $tree.get($root))
+    #if(!$processedCategories.contains($item))
+      #set($discard = $processedCategories.add($item))
+      #displayCategory($item $level $displayMethod)
+      #displayCategoriesHierarchyRecursive($tree $item $mathtool.add($level, 1) $displayMethod)
+    #end
+  #end
+#end
+##
+##
+##
+#**
+ * Displays a category as part of a category hierarchy.
+ * 
+ * @param name The full name of the document containing the category to be displayed.
+ * @param level The depth where this category is in the tree, used for proper indentation.
+ * @param displayMethod Selects how to display the category tree. Possible values are:
+ *        &lt;ul&gt;
+ *        &lt;li&gt;&lt;em&gt;"simple"&lt;/em&gt;: tree with links to the category pages.&lt;/li&gt;
+ *        &lt;li&gt;&lt;em&gt;"selectable"&lt;/em&gt;: each category name in the tree is preceded by a checkbox.&lt;/li&gt;
+ *        &lt;li&gt;&lt;em&gt;"option"&lt;/em&gt;: wraps each category name in an &amp;lt;option&amp;gt; element, to be used
+ *          in a select box.&lt;/li&gt;
+ *        &lt;li&gt;&lt;em&gt;"editable"&lt;/em&gt;: displays links to delete and edit each category, if the rights
+ *          allow such actions.&lt;/li&gt;
+ *        &lt;/ul&gt;
+ *        For any other value, the default ("simple") is considered.
+ *#
+#macro(displayCategory $name $level $displayMethod)
+  #if("$!displayMethod" == "option")
+    #displayOptionCategory($name $level)
+  #elseif("$!displayMethod" == "selectable")
+    #displaySelectableCategory($name $level)
+  #elseif("$!displayMethod" == "editable")
+    #displayEditableCategory($name $level)
+  #else
+    #displaySimpleCategory($name $level)
+  #end
+#end
+##
+##
+##
+#**
+ * Displays a category as part of a category hierarchy, preceded by a checkbox that allows choosing
+ * this category for a blog entry.
+ * 
+ * @param name The full name of the document containing the category to be displayed.
+ * @param level The depth where this category is in the tree, used for proper indentation.
+ *#
+#macro(displaySelectableCategory $name $level)
+  #set($categoryDoc = $xwiki.getDocument($name))
+  #foreach($i in [1..$level])*#end &lt;label id='blog_category_${name}' title="#getCategoryDescription($categoryDoc)"&gt;&lt;input name="${blogPostClassname}_$!{entryObj.number}_category" value="$name" type="checkbox"#if($entryObj.getProperty('category').getValue().contains($name)) checked="checked" #end/&gt; #getCategoryName($categoryDoc)&lt;/label&gt;
+#end
+##
+##
+##
+#**
+ * Displays a category as part of a category hierarchy, followed by links for editing and deleting
+ * this category, if the current user has the rights to perform these actions.
+ * 
+ * @param name The full name of the document containing the category to be displayed.
+ * @param level The depth where this category is in the tree, used for proper indentation.
+ *#
+#macro(displayEditableCategory $name $level)
+  #set($categoryDoc = $xwiki.getDocument($name))
+  #foreach($i in [1..$level])*#end #getCategoryName($categoryDoc) &lt;a href="$doc.getURL('view', "action=delete&amp;amp;category=$name")"&gt;#toolImage('delete.png' 'delete ')&lt;/a&gt; &lt;a href="$categoryDoc.getURL('inline')"&gt;#toolImage('edit.png' 'edit ')&lt;/a&gt;
+#end
+##
+##
+##
+#**
+ * Displays a category as part of a category hierarchy, wrapped in an &amp;lt;option&amp;gt; element, to
+ *          be used in a select box.
+ * 
+ * @param name The full name of the document containing the category to be displayed.
+ * @param level The depth where this category is in the tree, used for proper indentation.
+ *#
+#macro(displayOptionCategory $name $level)
+  &lt;option id="blog_category_${name}_option" value="$name"&gt;#if($level &gt; 1)#foreach($i in [2..$level])&amp;nbsp;&amp;nbsp;#end#end#getCategoryName($xwiki.getDocument($name))&lt;/option&gt;
+#end
+##
+##
+##
+#**
+ * Displays a category as part of a category hierarchy, wrapped in a link.
+ * 
+ * @param name The full name of the document containing the category to be displayed.
+ * @param level The depth where this category is in the tree, used for proper indentation.
+ *#
+#macro(displaySimpleCategory $name $level)
+  #foreach($i in [1..$level])*#end [#getCategoryName($xwiki.getDocument($name))&gt;$name]
+#end
+##
+##
+##
+#**
+ * Prints the name of a category, indicated by its document.
+ * 
+ * @param categoryDoc The document containing the category to be displayed.
+ *#
+#macro(getCategoryName $categoryDoc)
+## Don't indent!
+#set($result = "$!categoryDoc.getObject(${blogCategoryClassname}).getProperty('name').value.trim()")##
+#if($result == '')
+#set($result = $categoryDoc.name)
+#end
+$result##
+#end
+##
+##
+##
+#**
+ * Prints the description of a category, indicated by its document.
+ * 
+ * @param categoryDoc The document containing the category to be displayed.
+ *#
+#macro(getCategoryDescription $categoryDoc)
+## Don't indent!
+$!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').value.trim()##
+#end
+##
+##
+##
+#**
+ * Generates a form for creating a new category. The form allows to enter the name of the new
+ * category, and select a parent category from the existing ones.
+ * 
+ * @param tree The category hierarchy HashMap&lt;String, List&lt;String&gt;&gt; structure, where the key
+ *        is the name of a category, and the value contains the names of all its subcategories.
+ * @todo When javascript is disabled, a link to "Manage categories" should be displayed instead.
+ *       This "form" should be created from javascript.
+ *#
+#macro(showCreateCategoryBox $tree)
+  &lt;form action="" method="post"&gt;
+  &lt;div class='create-category'&gt;
+    &lt;input type="hidden" name="action" value="create"/&gt;
+    &lt;label&gt;New category: &lt;input type="text" name="newCategoryName"&gt;&lt;/input&gt;&lt;/label&gt;
+    &lt;label&gt;Parent:
+      &lt;select name="newCategoryParent" id="blog_category_selectBox"&gt;
+        &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt;
+        $!processedCategories.clear()
+        #displayCategoriesHierarchy($tree 'option')
+      &lt;/select&gt;
+    &lt;/label&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="button" value="Add" id="blog_AddCategoryButton"&gt;&lt;/input&gt;&lt;/span&gt;
+  &lt;/div&gt;
+#end
+##
+##
+##
+#**
+ * Deletes a category, moving all the subcategories to its parent and removing this category from
+ * all existing blog entries.
+ * 
+ * @param category The full name of the document containing the category to be deleted.
+ *#
+#macro(deleteCategory $category)
+  #set($categoryDoc = $xwiki.getDocument($category))
+  #set($categoryParent = "$!categoryDoc.parent")
+  #if($categoryParent == '')
+    #set($categoryParent = "{$defaultCategoryParent}"))
+  #end
+  #set($query = ', BaseObject obj where ')
+  #if($space != '')
+    #set($query = "${query}doc.space = '${space}' and ")
+  #end
+  #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' and doc.parent = '$category' order by doc.name")
+  #foreach($item in $xwiki.searchDocuments($query))
+    #if($xwiki.hasAccessLevel('edit', $context.user, $item))
+      #set($subcategoryDoc = $xwiki.getDocument($item))
+      $subcategoryDoc.setParent($categoryParent)
+      $subcategoryDoc.save('Update category parent')
+    #end
+  #end
+  #set($query = ', BaseObject obj, DBStringListProperty categories join categories.list as category where ')
+  #if($space != '')
+    #set($query = "${query}doc.space = '${space}' and ")
+  #end
+  #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogPostClassname}' and doc.fullName &lt;&gt; 'Blog.BlogPostTemplate' and categories.id.id = obj.id and categories.id.name = 'category' and category = '$category' order by doc.name")
+  #foreach($item in $xwiki.searchDocuments($query))
+    #if($xwiki.hasAccessLevel('edit', $context.user, $item))
+      #set($blogEntryDoc = $xwiki.getDocument($item))
+      #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
+      $blogEntryDoc.save('Remove deleted category')
+    #end
+  #end
+  $categoryDoc.delete()
+#end</content>
+</xwikidoc>

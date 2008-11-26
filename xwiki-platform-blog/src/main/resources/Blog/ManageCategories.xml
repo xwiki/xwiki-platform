@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>ManageCategories</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.Categories</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1220506750000</creationDate>
+<date>1227250570000</date>
+<contentUpdateDate>1227250570000</contentUpdateDate>
+<version>1.1</version>
+<title>Manage blog categories</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<content>#set($space = "$!request.space")
+#includeMacros("Blog.CategoriesCode")
+
+1 Manage blog categories
+
+1.1 Existing categories
+#if ("$!request.action" == "delete")
+  #foreach($item in $request.getParameterValues("${blogPostClassname}__category"))
+    #deleteCategory($item)
+  #end
+#elseif("$!request.action" == "create")
+  #set($title = $request.newCategoryName)
+  #set($name = "${doc.space}.${title}")
+  $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${request.newCategoryParent}&amp;title=${title}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${doc.getURL()}"))
+#end
+&lt;form name="Add category" action="" method="post"&gt;
+&lt;div&gt;
+&lt;input type="hidden" name="action" value="delete"/&gt;
+#getCategoriesHierarchy("" $tree)
+#displayCategoriesHierarchy($tree 'selectable')
+  &lt;input type="hidden" name="manage" value="true"/&gt;
+  &lt;input type="submit" name="delete" value="Delete selected categories"/&gt;
+&lt;/div&gt;
+&lt;/form&gt;
+
+1.1 Add a category
+
+#showCreateCategoryBox($tree)</content>
+</xwikidoc>

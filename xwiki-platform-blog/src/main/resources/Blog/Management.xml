@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>Management</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1227677018000</creationDate>
+<date>1227680561000</date>
+<contentUpdateDate>1227680561000</contentUpdateDate>
+<version>1.1</version>
+<title>Manage blogs on this wiki</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<content>#includeMacros("Blog.BlogCode")
+##
+##
+## List existing blogs.
+## TODO: Display the number of articles in each blog
+## TODO: Provide some management links: delete, edit title, configure...
+##
+1 Existing blogs
+
+#foreach($item in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'")))
+  #getBlogTitle($item $title)
+  #if($title != "")
+    * [$title&gt;$item.fullName]
+  #else
+    * [$item.displayTitle&gt;$item.fullName]
+  #end
+#end
+##
+##
+## New blog
+##
+1 Create a new blog
+
+#set($title = "$!request.blogTitle")
+#if($title != '')
+  #set($space = "$!request.blogSpace")
+  #if($space == '')
+    #warning('No space provided. Please enter a valid space where the blog should be created.')
+  #else
+    #if("$!request.blogType" == 'main')
+      #set($blogDocName = "${space}.WebHome")
+    #else
+      #set($blogDocName = "${space}.Blog")
+    #end
+    #set($title = $util.encodeURI($title))
+    #set($parent = 'Main.WebHome')
+    $response.sendRedirect($xwiki.getURL($blogDocName, 'save', "parent=${parent}&amp;title=${title}&amp;template=${blogTemplate}&amp;${blogClassname}_0_title=${title}"))
+  #end
+#end
+##
+## Show the form
+&lt;form action="${xwiki.getURL('Blog.Management')}" id="newBlog" method="post"&gt;
+&lt;div&gt;
+&lt;dl&gt;
+  &lt;dt&gt;&lt;label for="blogSpace"&gt;Space:&lt;/label&gt;&lt;/dt&gt;
+  &lt;dd&gt;&lt;input type="text" name="blogSpace" value=""/&gt;&lt;/dd&gt;
+  &lt;dt&gt;&lt;label for="blogTitle"&gt;Title:&lt;/label&gt;&lt;/dt&gt;
+  &lt;dd&gt;&lt;input type="text" name="blogTitle" value="Blog title"/&gt;&lt;/dd&gt;
+  &lt;dt&gt;&lt;label for="blogType"&gt;Blog type:&lt;/label&gt;&lt;/dt&gt;
+  &lt;dd&gt;&lt;select name="blogType"&gt;
+    &lt;option value="inner" selected="selected"&gt;blog inside an existing space&lt;/option&gt;
+    &lt;option value="main"&gt;blog as the main content of a space&lt;/option&gt;
+  &lt;/select&gt;&lt;/dd&gt;
+&lt;/dl&gt;
+  &lt;input type="submit" value="Create"/&gt;
+&lt;/div&gt;
+&lt;/form&gt;
+</content></xwikidoc>

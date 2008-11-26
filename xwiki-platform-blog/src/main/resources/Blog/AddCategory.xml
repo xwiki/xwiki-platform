@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>AddCategory</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1220442481000</creationDate>
+<date>1226287319000</date>
+<contentUpdateDate>1226287319000</contentUpdateDate>
+<version>1.1</version>
+<title>Add a new category</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>true</hidden>
+<content>#set($space = "$!request.space")
+#if("$!request.name" != '')
+  #if($space != "")
+    #set($newCategoryDoc = $xwiki.getDocument("${space}.${request.name}"))
+  #else
+    #set($newCategoryDoc = $xwiki.getDocument("${request.name}"))
+  #end
+  #if($newCategoryDoc.isNew())
+    #set($newCategoryObj = $newCategoryDoc.newObject("Blog.CategoryClass"))
+    $newCategoryObj.set("name", $request.name)
+    $newCategoryObj.set("description", $request.description)
+    $newCategoryDoc.setParent($request.parent)
+    #set($content = "#includ")
+    #set($content = "${content}eForm('Blog.CategorySheet')")
+    $newCategoryDoc.setContent($content)
+    $newCategoryDoc.save()
+    #info("The category [$newCategoryDoc.name&gt;$newCategoryDoc.fullName] has been created.")
+  #else
+    $response.setStatus(409)
+    #warning("The category [$newCategoryDoc.name&gt;$newCategoryDoc.fullName] already exists.")
+  #end
+#end
+&lt;form name="Add category" action="" method="post"&gt;
+&lt;div&gt;
+#if($space != "")
+  &lt;input type="hidden" name="space" value="$space"/&gt;
+#end
+&lt;dl&gt;
+&lt;dt&gt;&lt;label for="name"&gt;Name:&lt;/label&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;input type="text" name="name" style="width: 95%"/&gt;&lt;/dd&gt;
+#if("$!parentCategory" == "")
+&lt;dt&gt;&lt;label for="parent"&gt;Parent category:&lt;/label&gt;&lt;/dt&gt;
+#set($sql = ", BaseObject obj where ")
+#if($space != "")
+  #set($sql = "${sql}doc.space = '${space}' and ")
+#end
+#set($sql = "${sql}obj.name = doc.fullName and obj.className = 'Blog.CategoryClass' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' order by doc.name")
+&lt;dd&gt;&lt;select name="parent"  style="width: 95%"&gt;
+&lt;option selected="selected" value="Blog.Categories"&gt;None&lt;/option&gt;
+#foreach($category in $xwiki.searchDocuments($sql))
+  &lt;option value="$category"&gt;$xwiki.getDocument($category).display('name', 'view')&lt;/option&gt;
+#end
+&lt;/select&gt;&lt;/dd&gt;
+#else
+&lt;dt&gt;&lt;input type="hidden" name="parent" value="$parentCategory"/&gt;&lt;/dt&gt;
+#end
+&lt;dt&gt;&lt;label for="description"&gt;Description:&lt;/label&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;textarea name="description" style="width: 95%"&gt;&lt;/textarea&gt;&lt;/dd&gt;
+&lt;dl&gt;
+&lt;input type="submit" value="Add"/&gt;
+&lt;/div&gt;
+&lt;/form&gt;</content>
+</xwikidoc>

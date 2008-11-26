@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>CreatePost</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1227218107000</creationDate>
+<date>1227681885000</date>
+<contentUpdateDate>1227681885000</contentUpdateDate>
+<version>1.1</version>
+<title>Create a new blog post</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>true</hidden>
+<content>#includeMacros("Blog.BlogParameters")
+$xwiki.jsx.use($blogScriptsDocumentName)
+#set($name = "$!request.entryTitle")
+#if($name != '')
+  #set($space = "$!request.entrySpace")
+  #if($space == '')
+    #set($space = 'Main')
+  #end
+  #set($postDocName = "${space}.${name}")
+  #set($parent = "${space}.Blog")
+  #set($title = $util.encodeURI($name))
+  $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "parent=${parent}&amp;title=${title}&amp;template=${blogPostTemplate}&amp;${blogPostClassname}_0_title=${title}"))
+#else
+  #set($space = "$!request.entrySpace")
+  #if($space == '')
+    #set($space = $doc.space)
+  #end
+1.1 Create a new post
+  &lt;form action="${xwiki.getURL('Blog.CreatePost')}" id="newBlogPost" method="post"&gt;
+  &lt;div&gt;
+  &lt;input type="hidden" name="entrySpace" value="$space"/&gt;
+  &lt;input type="text" name="entryTitle" value="Post title"/&gt;
+  &lt;input type="submit" value="Create"/&gt;
+  &lt;/div&gt;
+  &lt;/form&gt;
+#end</content>
+</xwikidoc>

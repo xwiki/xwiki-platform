@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>BlogStyle</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1218578405000</creationDate>
+<date>1227211446000</date>
+<contentUpdateDate>1227211446000</contentUpdateDate>
+<version>1.1</version>
+<title>Style enhancements for the blog application</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>true</hidden>
+<attachment>
+<filename>grey-grad.png</filename>
+<filesize>247</filesize>
+<author>xwiki:XWiki.Sergiu</author>
+<date>1220010607000</date>
+<version>1.1</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAAAEAAABkCAIAAADITs03AAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9gIHQsSFbnGi7gAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAZElEQVQY062PsQ3DQAwD77j/nL8GU1jOf1ykckFIgIgjxVorwK80QihBAgYbanTubdDDQ8QULs+w1EAjbtYzj4shDqMHY7pIeu/Dkm7e0//9Y3ucWYjTs3e/ejCYTI/9T/f39AEi1hSpIeTVZQAAAABJRU5ErkJggg==</content>
+</attachment>
+<attachment>
+<filename>edit.png</filename>
+<filesize>571</filesize>
+<author>XWiki.Admin</author>
+<date>1226239207000</date>
+<version>1.1</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAMAAAAMCGV4AAAAA3NCSVQICAjb4U/gAAAAyVBMVEVIUV77+Mi+sbf61UvDuHX5tbbjnjzM3eT52WT////rpLTtwn+vxc7+2Vbx17LptVv6xMKMdlTI197luIf+zin833HyzpynvMyvwtXxwWrDxpf/zMzHx73JusX4vLzmpUbvuMK/v4/ns2P/7HT+/rb/1yP83V3xxV7w06z/tbXx3bmRfly5yNj+3k/72djxrbS9tLvppELsuFXqwX7/vb3FvoL932Hztr3mqkv/2Cb//739xMPF1uO5zdXW4Ojuw4Dqt2jxxGDx27pz7fpTAAAAQ3RSTlP///////////8A////////////////////////////////////////////////////////////////////////////62td8AAAAAlwSFlzAAAPPAAADzwBFzqfWQAAAB90RVh0U29mdHdhcmUATWFjcm9tZWRpYSBGaXJld29ya3MgOLVo0ngAAACPSURBVAiZVcxrE4FAGIbhFa+8qyUpp1iHTQyVMHI+9f9/lKadrXF/uz48D8EyShFJoVnkuufSk+jOge+UdT02TQDl8eNlxRyASqfePLCeGoDcp7ckHA0CQ5P/Gy9hIqz1DczdrfhMMHt5wtyt1ccRoX2tonTzezg6ipnblyy/gcrbfX06fGNh0ln01lj6vx/RVxCnUNXlOgAAAABJRU5ErkJggg==</content>
+</attachment>
+<attachment>
+<filename>hide.png</filename>
+<filesize>654</filesize>
+<author>xwiki:XWiki.Marta</author>
+<date>1218583440000</date>
+<version>1.3</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAABMAAAAPCAYAAAAGRPQsAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH2AgMFhcZMVwzDwAAAhtJREFUOMulk19IU1Ecxz/nuqsst9xQ4mKQhkGEwXBmcMEVE3pIqofyZcXesjeLHvJBafaHisA5ZOyl9eBzD2FEEMIwqPZgxKJACTMH9dDCP1sO9M7rTi9jTHdB0O/L4ZzzO5/f75zf98A+tPR4WFbOxV5BuWhIqnVFpLFB/cCo2A3WARR3rClAMRcNfbEZK5iz37F1eFj7vY72NCasYO3ASeA4cAnorNh7n4uGfDZjBXPhJ2rzYTappeFuzLIyD3DW5/ONezwe+vr6Pk0lv3W9ejuNWdhg5topKkGGchD3cLjMsJXGNqAVaAHG+/v7c7quN7ycSnZNJma4euUiA8piFej864/Tpco/A9QAp0vX6nU4HA/j8bjh9/vrNU3jzpNn9J47w23mUc3sNpB66z7ZbPZoIpFwAhKYU4BlwAk05fN5vF5vncvlQkrJ1qbBoDJPbfHfNlDh+iCmaRIIBAACwBGgTQEWgLiU8rmu6y96enpQVRVFUXh3obUKlGj343a7SaVSjIyMAJBOp5FS3rRVPP6vZDL5dWJiotlut3evjg1Vgd60dHJMayIcDhOJRGhsbLwhpTwB1AOPyjAhxCwwK6VcvZxf7LboWjlrMBgczGQyW6XuzwkhYpamXR0bkjsrcg2NRkqxNSUjF4AfwKQQ4q/ld1oO35MHDtVSSH6w9NFuqgpcCg1Iu+Zk/c8aTQ+igv1qJTYq93LuP+oK4xWhf7BdAAAAAElFTkSuQmCC</content>
+</attachment>
+<attachment>
+<filename>delete.png</filename>
+<filesize>508</filesize>
+<author>XWiki.Admin</author>
+<date>1226239216000</date>
+<version>1.1</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAMAAAAMCGV4AAAAA3NCSVQICAjb4U/gAAAAmVBMVEXuHRz70rn1jGzzeVnxaUr2mnz////xYkXtjYDwUjjzpZHsfm3qaFfvjnrwRC/oZlnyrqHwclrybVDznonvhXP2g2XuiXXulYzuNSb1lnrod2vzZUzyWUTzc1TweGH3o4bxg2vvk4f4sJX1k3T1saH0dlftYU3uZk/0VUT3a0rshnv2h2r2pYzxk373a1L1rJr8077rcmL0fmC7aMRYAAAAM3RSTlP///////8A//////////////////////////////////////////////////////////8kCaIZAAAACXBIWXMAAA88AAAPPAEXOp9ZAAAAH3RFWHRTb2Z0d2FyZQBNYWNyb21lZGlhIEZpcmV3b3JrcyA4tWjSeAAAAJBJREFUCJlFz9sSwTAQBuDV6J9WKEJFUD0ORttB3//hpEnD3n07eyRAwccTIGxmzcQ+rEHqHVYvx4DXJ4Jq6nxhOU8LU4+yavXOcj/2A1E3BF1raY1SMybTA7zRDVJq/Ny3MuOy8DajBs1ifnV2k0WWxNvRK7cIn/MxuYOi3NEkLvRYE4QW0/1Lfhv7//9FwBc63Ay0bxaxrwAAAABJRU5ErkJggg==</content>
+</attachment>
+<attachment>
+<filename>publish.png</filename>
+<filesize>918</filesize>
+<author>XWiki.Admin</author>
+<date>1227211446000</date>
+<version>1.4</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALDgAACw4BQL7hQQAAAAd0SU1FB9gLFBQDMmLHzNQAAAMWSURBVDjLfZPNa1xlFMZ/7/3IZGaSTCfmg874ETMfmbEaQalaCokSdRWnkRTajS5cl/wHLnQhWEGbWbiwC4kLNwpWDSWYQBGKjhMxljYY4lDMNA2dhPloM3fuzL33va+LMNkIntWBc57n8JznHLG2tqYODw8RQvB/0a1rmobjOMzPz/cArtFsNpmbm/sPQCl1DOrmlmXRarXY3t5mcXHxKynld0a3KZ/Ps7CwwMrKChsbG+RyORzHQdd16vU6pVKJ2dlZPM9DSkk6nb64vr4+oHUnhsNh8vk8kUiEYDBINpulWCxSKBTIZDJ0Op0jsO+jlMJ1XYB+o0swNTVFMpmkUqlQr9ep1epMT0/j+z61DlzrO0fKDZLiEUIIlFJHO+lq7O3tpVwuY9s2k5OTtFoWmweQ+2yLK79avDNa5XqxxtuX/+DGlo3v+yiFMLpsu7u7lEoldMPA6XRYvjdM4tQ4+ctzlO67VCQ8HVO8+nqCzdv7XF0p8EoIYQA4jkMqlSIej9NoNPh5R9EX6MOIxyn+I9EQaEBbCX6762KEBhh/Y4aby9UxTQiBlJJGo8H+/j62bfPRj3s8fmocB4ESAk9ouJrGQQvOjel8eDrAwIkA5ciLcQNASnlsjy90hjJp7j2wqTZddg4cDi2PRkfx5YVhXhrSuFJsUWkZjD45giGEwPd9LMtC13W+tROU/t7mTsnil/czpAf7uXDd5oOzQc6OCD4p2iwWWtQePCQcNo9c8DwP0zRxXZdEVOC1JbHEKJeW6zwW0PjhrSCnhwSf/t5mzzd4LdPHxMQwzTZoQojuUSClJFu9xVAyxtjJXmYmo8x/3yRkaHy+0cYxDcIGjER0njlpMhhSGICSUhKNRkUkEkFKyUTgEdmn4ri+4kwywLs/tZhJ9NB0FaYu6HGgPxZi846jxOrq6lXDMNrVavWSlBLXdfF9n48rL/NeLgWOx3BI4PmgCXB8RVuYfL1yl4uDtzaPf3hpaembRqMxKKUUjuOY4SfGIl+Un33uzPMx3nwhiu2CqcHWfZtrN/c4f+L2X+7Onzf+BchmeRwmZjTiAAAAAElFTkSuQmCC</content>
+</attachment>
+<attachment>
+<filename>ajax-loader.gif</filename>
+<filesize>1711</filesize>
+<author>XWiki.Admin</author>
+<date>1226414875000</date>
+<version>1.3</version>
+<comment></comment>
+<content>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</content>
+</attachment>
+<attachment>
+<filename>show.png</filename>
+<filesize>605</filesize>
+<author>xwiki:XWiki.Marta</author>
+<date>1218583455000</date>
+<version>1.3</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAABMAAAAPCAYAAAAGRPQsAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH2AgMFhcmhzoeMgAAAepJREFUOMvlkkFI0wEUxn9b/FvEhP+isYNggQdxBtFskYd58CAmIWRGLdhp2KFEslEwKRyxdioIKoQViASDiqAuBSNqIUFEMIrlyWDIINiSP65tpG1+XWZISXUM+uDx4HuPD973PfhXYfvNbB+w9hNnb3KfgOLfiHUBe4AOYAjo3jCbAz4AD4DcZoIbsRcYDwQCGhsbUyaTeTOZuKGu3mF1HBzUxORllcvll16vV8DD5v4PbGn2dsAHdALT8Xh8eWRkZNuz17nWe0/mOHlkgLfv5nmfm6e8bO1K3Z3B4/F0WpbVUSgUcs2zATgAnACmnU6nZmdnvy4uLqpWq2n/4VFFr86ov79fgA4dH1V376CKxaIqlYoSiYSAFDC8bugS0ALsrFQq+Hw+h2maSKLxbYXHT5+TTqeJRqOYLU4+Ly0hiXq9TjAYBAgCbUC7HfgI3JZ0p6en535fXx+GYWC32xkIdLNSXeZoOMKXte28mHvFtSuXcLlcZLNZpqamAMjn80gaX/eMWCzmCIfDO9xu91a/399mGAYXL5zFaFRhtYrD3iB0bIjdba2kUikikQiWZZ0qlUoLpmnWgeu/xCnptKRbyWQyDWizCoVC5yWdk3RT0pk/Pq2kOODcIGJrpr8GrAILwCObzVbk/8J3glHRL2JrDgEAAAAASUVORK5CYII=</content>
+</attachment>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>onDemand=On demand|always=Always</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>Blog.BlogStyle</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>.blogDay {
+  padding: 10px 0;
+  margin-left: 128px;
+}
+.blogdate {
+  background: #f6f6f6 url($doc.getAttachmentURL('grey-grad.png')) left top repeat-x;
+  color:#777;
+  width: 94px;
+  float: left;
+  padding: 8px;
+  margin: 0px 8px 0px -128px;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-size: 120%;
+}
+.blogdate .month, .blogdate .year, .blogdate .day {
+  display: block;
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+.blogdate .day {
+  font-size: 250%;
+  font-weight: 900;
+  line-height: 110%;
+}
+.blog-entry-toolbox {
+  float: right;
+}
+.hentry {
+}
+.hentry + .hentry {
+  border-top: 1px solid #888;
+  padding-top: 2em;
+}
+.hidden-article, .hidden-article *, .unpublished-article, .unpublished-article *  {
+  color: #ddd !important;
+}
+.hentry .entry-title {
+  margin: 0px 0px 2px;
+}
+.hentry .entry-summary {
+  padding: 0 0 0.5em;
+  margin: 0px;
+}
+.hentry .entry-footer {
+  border-top: 1px solid #ddd;
+  margin: 0px 0px 2em;
+  font-size: 75%;
+  font-weight: normal;
+}
+div.publish-message{
+  background-image: url($doc.getAttachmentURL('publish.png'));
+  background-position: 6px center;
+}
+div.hide-message{
+  background-image: url($doc.getAttachmentURL('show.png'));
+  background-position: 6px center;
+}
+#Blog\.BlogPostClass_0_title {
+  font-size: 140%;
+  width: 100%;
+  font-weight: bold;
+}</code>
+</property>
+<property>
+<name>Blog style</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>
+</content></xwikidoc>

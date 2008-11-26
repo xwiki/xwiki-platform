@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>BlogCode</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1220389470000</creationDate>
+<date>1227682070000</date>
+<contentUpdateDate>1227682070000</contentUpdateDate>
+<version>1.1</version>
+<title>Macros for the Blog application</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>true</hidden>
+<content>#includeMacros("Blog.BlogParameters")
+##
+##
+##
+## Import the blog skin and javascripts.
+$xwiki.ssx.use($blogStyleDocumentName)
+$xwiki.jsx.use($blogScriptsDocumentName)
+##
+##
+##
+#**
+ * Shows blog information. Currently, only the blog title is displayed.
+ *#
+#macro(showBlogInfo)
+  #getBlogTitle($doc $title)
+  #if($title != "")
+    1 $title
+  #end
+#end
+##
+##
+##
+#**
+ * Retrieve the blog title.
+ * 
+ * @param blogDoc The blog document. It should contain a Blog.BlogClass object with the title property set.
+ * @param title The resulting title.
+ *#
+#macro(getBlogTitle $blogDoc $title)
+  #set($title = "$!{blogDoc.getObject('Blog.BlogClass').getProperty('title').value}")
+#end
+##
+##
+##
+#**
+ * Retrieves a list of entries to be displayed. The entries are part of the current space
+ * 
+ * @param entries The resulting list of entries to display, a list of XDocument names.
+ *#
+#macro(getBlogEntries $entries)
+  #set($visibilityFilter = " and (exists (from IntegerProperty hid where hid.id.id = obj.id and hid.id.name = 'hidden' and hid.value = 0) or not exists (from IntegerProperty hid where hid.id.id = obj.id and hid.id.name = 'hidden') or doc.creator = '$context.user')")
+  #set ($query = ", BaseObject obj, DateProperty published where doc.space = '${doc.space}' and obj.name = doc.fullName and obj.className = 'Blog.BlogPostClass' and published.id.id = obj.id and published.id.name = 'publishDate' ${visibilityFilter}")
+  #set($totalEntries = $xwiki.countDocuments(${query}))
+  ## TODO: Replace this with a blogPreferences
+  #set($defaultItemsPerPage = 10)
+  ## This macro is defined in the default macros.vm library. It also sets $itemsPerPage and $startAt.
+  #preparePagedViewParams($totalEntries $defaultItemsPerPage)
+  #set($entries = $xwiki.searchDocuments("${query} order by published.value desc", $itemsPerPage, $startAt))
+  ##
+  ##
+#end
+##
+##
+##
+#**
+ * Displays a list of entries.
+ * 
+ * @param entries The entries to display, a list of XDocument names.
+ * @param onlyExtract If &lt;tt&gt;true&lt;/tt&gt;, only display the extract of articles where available, otherwise display the full content.
+ *#
+#macro(displayBlog $entries $onlyExtract)
+  #set($blogDay = "")
+  &lt;div class="hfeed"&gt;
+  &lt;div class="blogDay"&gt;
+  #foreach ($entry in $entries)
+    #set($entryDoc = $xwiki.getDocument($entry))
+    ## This fails if the document is not accessible, due to access rights.
+    #if($entryDoc.fullName == $entry)
+      #getEntryObject($entryDoc $entryObj)
+      ## Although all entries should have one of the two objects, better check to be sure.
+      #if("$!{entryObj}" != '')
+        #getEntryDate($entryDoc $entryObj $entryDate)
+        ## Display a "calendar sheet" for each day. All entries posted on the same day share one such sheet.
+        #set($entryDateStr = $xwiki.formatDate($entryDate, 'yyyyMMMMdd'))
+        #if($blogDay != $entryDateStr)
+          #if($blogDay != '')
+            &lt;/div&gt;
+            &lt;div class="blogDay"&gt;
+          #end
+          #displayBlogDate($entryDate)
+          #set ($blogDay = $entryDateStr)
+        #end
+        ## Finally, display the entry.
+        #displayEntry($entryDoc $entryObj $onlyExtract)
+      #end
+    #end
+  #end
+  &lt;/div&gt; ## blogDay
+  &lt;/div&gt; ## hfeed
+#end
+##
+##
+##
+#**
+ * Get the entry object, either a new BlogPost or an old Article.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The resulting xobject of the blog post.
+ *#
+#macro(getEntryObject $entryDoc $entryObj)
+  #set($entryObj = '')
+  #set($entryObj = $entryDoc.getObject("${blogPostClassname}"))
+  #if("$!{entryObj}" == '')
+    #set($entryObj = $entryDoc.getObject("${oldArticleClassname}"))
+  #end
+#end
+##
+##
+##
+#**
+ * Gets the date associated with a blog entry. For published entries, this is the publication date.
+ * For unpublished entries and for old-style articles, this is the document creation date.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ * @param result The resulting date, a class extending &lt;tt&gt;java.util.Date&lt;/tt&gt;.
+ *#
+#macro(getEntryDate $entryDoc $entryObj $result)
+  ## The blog should be sorted by publication date, but unpublished entries don't have such a date.
+  #if("$!entryObj.getProperty('published').value" == "1")
+    #set($result = $entryObj.getProperty('publishDate').value)
+  #else
+    ## Fallback to the creation date
+    #set($result = $entryDoc.creationDate)
+  #end
+#end
+##
+##
+##
+#**
+ * Displays a date, nicely formatted as a calendar page.
+ * 
+ * @param date The date to display, a class extending &lt;tt&gt;java.util.Date&lt;/tt&gt;.
+ *#
+#macro(displayBlogDate $date)
+  #set($year = $xwiki.formatDate($date, "yyyy"))
+  #set($month = $xwiki.formatDate($date, "MMMM"))
+  #set($day = $xwiki.formatDate($date, "dd"))
+  &lt;h3 class="blogdate"&gt;## title="#formatdateISO($date)"&gt;
+    &lt;span class="month"&gt;$month&lt;/span&gt;
+    &lt;span class="day"&gt;$day&lt;/span&gt;
+    &lt;span class="year"&gt;$year&lt;/span&gt;
+  &lt;/h3&gt;
+#end
+##
+##
+##
+#**
+ * Displays a blog article: management tools, header, content, footer.
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ *#
+#macro(displayEntry $entryDoc $entryObj $onlyExtract)
+  ##
+  ## Only articles with an explicit hidden setting or an explicit unpublished setting are hidden
+  ##
+  #isPublished($entryObj $isPublished)
+  #isHidden($entryObj $isHidden)
+  #if($doc.fullName == $entryDoc.fullName)
+    &lt;div class="hentry single-article"&gt;
+  #else
+    &lt;div class="hentry#if(!$isPublished) unpublished-article#elseif($isHidden) hidden-article#end"&gt;
+  #end
+  #displayEntryTools($entryDoc $entryObj)
+  #displayEntryTitle($entryDoc $entryObj)
+  #if($doc.fullName == $entryDoc.fullName)
+    #if(!$isPublished)
+      #warning('This blog post is not published yet.')
+    #elseif($isHidden)
+      #warning('This blog post is hidden.')
+    #end
+  #end
+  #displayEntryContent($entryDoc $entryObj $onlyExtract)
+  #displayEntryFooter($entryDoc $entryObj)
+  &lt;/div&gt; ## hentry
+#end
+##
+##
+##
+#**
+ * Displays several "tools" for manipulating blog posts: hide/show, publish, edit.
+ * 
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ * @param isPublished The resulting boolean, true if the entry is considered published.
+ *#
+#macro(isPublished $entryObj $isPublished)
+  ## This should work for both old articles, which don't have the 'published' property at all, and
+  ## are considered published by default, and new entries, that should have 1 if published.
+  #set($isPublished = ("$!{entryObj.getProperty('published').value}" != '0'))
+#end
+##
+##
+##
+#**
+ * Displays several "tools" for manipulating blog posts: hide/show, publish, edit.
+ * 
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ * @param isHiddel The resulting boolean, true if the entry is considered hidden.
+ *#
+#macro(isHidden $entryObj $isHidden)
+  ## This should work for both old articles, which don't have the 'hidden' property at all, and
+  ## are considered visible by default, and new entries, that should have 1 if hidden.
+  #set($isHidden = ("$!{entryObj.getProperty('hidden').value}" == '1'))
+#end
+##
+##
+##
+#**
+ * Displays several "tools" for manipulating blog posts: hide/show, publish, edit.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ *#
+#macro(displayEntryTools $entryDoc $entryObj)
+  #if($context.action != 'preview')
+    &lt;div class="blog-entry-toolbox"&gt;
+    #displayPublishButton($entryDoc $entryObj)
+    #displayHideShowButton($entryDoc $entryObj)
+    #displayEditButton($entryDoc $entryObj)
+    #displayDeleteButton($entryDoc $entryObj)
+    &lt;/div&gt;
+  #end
+#end
+##
+##
+##
+#**
+ * Displays the hide or show button to the entry &lt;strong&gt;creator&lt;/strong&gt;, if the article is already published.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ * @todo AJAX calls.
+ *#
+#macro(displayHideShowButton $entryDoc $entryObj)
+  #isPublished($entryObj $isPublished)
+  #isHidden($entryObj $isHidden)
+  ## Only published articles can be hidden. Unpublished articles are considered already hidden.
+  #if($isPublished &amp;&amp; $entryDoc.creator == $context.user &amp;&amp; $xwiki.hasAccessLevel('edit', $context.user, $entryDoc.fullName))
+    #if ($isHidden)
+      &lt;a class="blog-tool-show" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;amp;comment=Made%20entry%20visible&amp;amp;xredirect=${thisURL}")" title="This blog post is not visible to other users. Make it visible"&gt;#toolImage('show.png', 'show ')&lt;/a&gt;##
+    #else
+      &lt;a class="blog-tool-hide" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;amp;comment=Hidden%20entry&amp;amp;xredirect=${thisURL}")" title="Hide this blog post from other users"&gt;#toolImage('hide.png' 'hide ')&lt;/a&gt;##
+    #end
+  #end
+#end
+#**
+ * Displays the publish button to the entry &lt;strong&gt;creator&lt;/strong&gt;, if the article is not published yet.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ * @todo AJAX calls.
+ *#
+#macro(displayPublishButton $entryDoc $entryObj)
+  #isPublished($entryObj $isPublished)
+  #if(!$isPublished &amp;&amp; $entryDoc.creator == $context.user &amp;&amp; $xwiki.hasAccessLevel("edit", $context.user, $entryDoc.fullName))
+    &lt;a href="$blogPublisher.getURL('view', "entryName=$entryDoc.fullName&amp;amp;xredirect=${thisURL}")" title="This blog post is not published yet. Publish it"&gt;#toolImage('publish.png' 'publish ')&lt;/a&gt;##
+  #end
+#end
+##
+##
+##
+#**
+ * Displays the edit button to those that can edit the article.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ *#
+#macro(displayEditButton $entryDoc $entryObj)
+  #if($xwiki.hasAccessLevel("edit", $context.user, $entryDoc.fullName))
+    &lt;a href="$entryDoc.getURL('inline')" title="Edit this blog post"&gt;#toolImage('edit.png' 'edit ')&lt;/a&gt;##
+  #end
+#end
+##
+##
+##
+#**
+ * Displays the delete button to those that can edit the article.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ * @todo AJAX calls.
+ *#
+#macro(displayDeleteButton $entryDoc $entryObj)
+  #if($xwiki.hasAccessLevel("delete", $context.user, $entryDoc.fullName))
+    &lt;a href="$entryDoc.getURL('delete')" title="Delete this blog post"&gt;#toolImage('delete.png' 'delete ')&lt;/a&gt;##
+  #end
+#end
+##
+##
+##
+#**
+ * Displays the title of the entry.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ *#
+#macro(displayEntryTitle $entryDoc $entryObj)
+  #if($doc.fullName == $entryDoc.fullName)
+    &lt;h1 class="entry-title"&gt;$entryDoc.display('title', 'view', $entryObj)&lt;/h1&gt;
+  #else
+    &lt;h4 class="entry-title"&gt;&lt;a href="$entryDoc.getURL()"&gt;$entryDoc.display('title', 'view', $entryObj)&lt;/a&gt;&lt;/h4&gt;
+  #end
+#end
+##
+##
+##
+#**
+ * Displays the body of the entry.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ *#
+#macro(displayEntryContent $entryDoc $entryObj $onlyExtract)
+  &lt;div class="#if($onlyExtract)entry-summary#{else}entry-content#end"&gt;
+  #if($onlyExtract)
+    #set($content = $entryDoc.display('extract', 'view', $entryObj))
+  #end
+  #if("$!content" == '')
+    #set($content = $entryDoc.display('content', 'view', $entryObj))
+#* Disabled until the content can be cleanly cut.
+*    #if($onlyExtract &amp;&amp; $content.length()&gt;$maxchars)
+*      #set($i = $content.lastIndexOf(" ", $maxchars))
+*      #set($i = $i + 1)
+*      #set($content = "${content.substring(0,$i)} *[...&gt;${entryDoc.fullName}]*")
+*    #end
+## *#
+  #else
+    #set($content = "${content} *[...&gt;${entryDoc.fullName}]*")
+  #end
+  ## $doc.display does not render non-1.0 syntaxes.
+  #if($!entryDoc.syntaxId == 'xwiki/1.0')
+    $content
+  #else
+    $entryDoc.getRenderedContent($content, $entryDoc.getSyntaxId())
+  #end
+  &lt;/div&gt; ## entry-content
+#end
+##
+##
+##
+#**
+ * Displays the footer of the entry.
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ *#
+#macro(displayEntryFooter $entryDoc $entryObj)
+  &lt;div class="entry-footer"&gt;
+  #isPublished($entryObj $isPublished)
+  #if($isPublished)
+    Posted by ##
+  #else
+    Created by ##
+  #end
+  &lt;address class="author vcard"&gt;#userfn($entryDoc.creator)&lt;/address&gt; ##
+  #getEntryDate($entryDoc $entryObj $entryDate)
+  at &lt;abbr class="published" title="#formatdateISO($entryDate)"&gt;$xwiki.formatDate($entryDate, "MMM dd, yyyy HH:mm")&lt;/abbr&gt;##
+  #listCategories($entryObj)##
+  ## Since the publish date and update date are not set at the exact same time, there could be a small difference
+  ## that we assume cannot be more than 3 seconds.
+  #if($entryDoc.date.time - $entryDate.time &gt; 3000)
+    | Modified by &lt;address class="author vcard"&gt;#userfn($entryDoc.author)&lt;/address&gt; ##
+    at &lt;abbr class="updated" title="#formatdateISO($entryDoc.date)"&gt;$xwiki.formatDate($entryDoc.date, "MMM dd, yyyy HH:mm")&lt;/abbr&gt; ##
+  #end
+  | [$entryDoc.comments.size() Comment(s)&gt;${entryDoc.fullName}#Comments] ##
+  | &lt;a href="$entryDoc.getURL("view")" rel="bookmark"&gt;Permalink&lt;/a&gt;
+  &lt;/div&gt; ## entry-footer
+#end
+##
+##
+##
+#**
+ * 
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ *#
+#macro(listCategories $entryObj)
+  #listNewCategories($entryObj)
+  #listOldCategories($entryObj)
+#end
+##
+##
+##
+#**
+ * 
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ *#
+#macro(listNewCategories $entryObj)
+  #if($entryObj.getxWikiClass().getName() == $blogPostClassname)
+    #set($categories = $entryObj.getProperty('category').value)
+    #set($first = true)
+    #if($categories.size() &gt; 0)
+      #foreach($category in $categories)
+## Do not indent
+#set($categoryDoc = $!xwiki.getDocument($category))
+#if(!$categoryDoc.isNew() &amp;&amp; $categoryDoc.getObject(${blogCategoryClassname}))
+#if($first)
+ in
+#set($first = false)
+#else, #end## if first
+&lt;a rel="tag" href="$xwiki.getURL(${category})"&gt;$!xwiki.getDocument($category).getObject($blogCategoryClassname).getProperty('name').value&lt;/a&gt;##
+#end## if isNew
+#end## foreach
+    #end
+  #end
+#end
+##
+##
+##
+#**
+ * 
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ *#
+#macro(listOldCategories $entryObj)
+  #if($entryObj.getxWikiClass().getName() == $oldArticleClassname)
+    #set($categories = $entryObj.getProperty('category').value)
+    #if($categories.size() &gt; 0) in
+      #foreach($category in $categories)
+        &lt;a href="$xwiki.getURL($oldBlogCategoryClassname, 'view', "category=$category")"&gt;$category&lt;/a&gt;##
+      #end
+    #end
+  #end
+#end
+##
+##
+##
+#**
+ * Displays blog pagination links (older and newer entries).
+ * 
+ * @param start The first item currently displayed.
+ * @param perPage The number of blog entries displayed.
+ * @param total The total number of entries.
+ *#
+#macro(displayNavigationLinks)
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  #if(($totalPages &gt; 1))
+    #set($queryString = "")
+    #foreach($p in $request.getParameterNames())
+      #if($p != 'page' &amp;&amp; $p != 'ipp')
+        #foreach($v in $request.getParameterValues($p))
+          #set($queryString = "${queryString}&amp;amp;${p}=${v}")
+        #end
+      #end
+    #end
+    &lt;div class="pagingLinks"&gt;
+    #if ($currentPageNumber &gt; 1)
+      #set($currentPageNumber = $currentPageNumber - 1)
+      &lt;span class="prevPage"&gt;*[&amp;laquo; Newer posts&gt;$doc.name?page=${currentPageNumber}&amp;amp;ipp=${itemsPerPage}$queryString]*&lt;/span&gt;
+      #set($currentPageNumber = $currentPageNumber + 1)
+    #end
+    #if ($currentPageNumber &lt; $totalPages)
+      #if ($currentPageNumber &gt; 1)
+        #sep()
+      #end
+      #set($currentPageNumber = $currentPageNumber + 1)
+      &lt;span class="nextPage"&gt;*[Older posts &amp;raquo;&gt;$doc.name?page=${currentPageNumber}&amp;amp;ipp=${itemsPerPage}$queryString]*&lt;/span&gt;
+      #set($currentPageNumber = $currentPageNumber - 1)
+    #end
+    &lt;span class="clear"&gt;&lt;/span&gt;
+    &lt;/div&gt; ## pagingLinks
+  #end
+#end
+##
+##
+##
+#**
+ * Displays a message box with "publish" icon.
+ * 
+ * @param message A text message concerning blog article publishing
+ *#
+#macro(publishMessageBox $message)
+&lt;div class="plainmessage publish-message"&gt;$message&lt;/div&gt;
+#end
+#**
+ * Displays a message box with "show/hide" icon.
+ * 
+ * @param message A text message concerning blog article hiding
+ *#
+#macro(hideMessageBox $message)
+&lt;div class="plainmessage hide-message"&gt;$message&lt;/div&gt;
+#end</content>
+</xwikidoc>

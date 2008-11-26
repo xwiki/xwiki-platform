@@ -1,0 +1,41 @@
+.#---------------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
+.# Specifically verify that the XHTML parser correctly escapes the ":" before the italic block since otherwise
+.# the generated text will be considered as a URL in xwiki wiki syntax.
+.# Also verifies that some text in XHTML that look like a URL is correctly escaped.
+.#---------------------------------------------------------------------------------------------------------
+something~://whatever//
+hello:~/~/world
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [something]
+onEscape [:]
+beginFormat: [ITALIC]
+onWord [whatever]
+endFormat: [ITALIC]
+onLineBreak
+onWord [hello]
+onSpecialSymbol [:]
+onEscape [/]
+onEscape [/]
+onWord [world]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>something:<em>whatever</em><br/>hello://world</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+something~://whatever//
+hello:~/~/world
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.# TODO: See http://jira.xwiki.org/jira/browse/XWIKI-2851
+.#-----------------------------------------------------
+<html><p>something:<em>whatever</em><br/>hello://world</p></html>

@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.LoadListenerCollection;
+import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.SourcesLoadEvents;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.widget.HiddenConfig;
@@ -40,9 +41,14 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 public class RichTextEditor extends Composite implements SourcesLoadEvents, FocusListener, ChangeListener
 {
     /**
+     * The menu bar.
+     */
+    protected MenuBar menu;
+
+    /**
      * The tool bar.
      */
-    protected final ToolBar toolbar;
+    protected ToolBar toolbar;
 
     /**
      * The rich text area.
@@ -70,8 +76,6 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
      */
     public RichTextEditor()
     {
-        toolbar = new ToolBar();
-
         textArea = new RichTextArea();
         textArea.addFocusListener(this);
         textArea.addChangeListener(this);
@@ -82,7 +86,6 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
         content.setDefaultValue("");
 
         FlowPanel container = new FlowPanel();
-        container.add(toolbar);
         container.add(textArea);
         container.add(content);
         container.add(config);
@@ -91,10 +94,26 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
     }
 
     /**
+     * @return the menu bar of this editor.
+     */
+    public MenuBar getMenu()
+    {
+        if (menu == null) {
+            menu = new MenuBar();
+            ((FlowPanel) textArea.getParent()).insert(menu, 0);
+        }
+        return menu;
+    }
+
+    /**
      * @return the tool bar of this editor.
      */
     public ToolBar getToolbar()
     {
+        if (toolbar == null) {
+            toolbar = new ToolBar();
+            ((FlowPanel) textArea.getParent()).insert(toolbar, menu == null ? 0 : 1);
+        }
         return toolbar;
     }
 

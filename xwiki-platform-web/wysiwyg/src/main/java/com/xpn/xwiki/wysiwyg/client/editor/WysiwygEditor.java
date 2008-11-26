@@ -28,6 +28,7 @@ import com.google.gwt.user.client.IncrementalCommand;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.LoadListener;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -68,6 +69,16 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
         }
     }
 
+    /**
+     * The string used to identify the tool bar extension point.
+     */
+    private static final String TOOLBAR_ROLE = "toolbar";
+
+    /**
+     * The string used to identify the menu bar extension point.
+     */
+    private static final String MENU_ROLE = "menu";
+
     private static final String DEFAULT_SYNTAX = "xwiki/2.0";
 
     private static final String DEFAULT_PLUGINS =
@@ -75,6 +86,13 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
 
     private static final String DEFAULT_TOOLBAR =
         "bold italic underline strikethrough teletype | subscript superscript | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | sync | link unlink";
+
+    private static final String DEFAULT_MENU = "link image table macro";
+
+    /**
+     * The regular expression used to express the separator for tool bar and menu bar feature names in configuration.
+     */
+    private static final String WHITE_SPACE_SEPARATOR = "\\s+";
 
     private final RichTextEditor ui;
 
@@ -249,6 +267,7 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
     {
         if (sender == ui) {
             loadPlugins();
+            fillMenu();
         }
     }
 
@@ -268,7 +287,8 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
             pm.load(pluginNames[i]);
         }
 
-        final String[] toolBarFeatures = config.getParameter("toolbar", DEFAULT_TOOLBAR).split("\\s+");
+        final String[] toolBarFeatures =
+            config.getParameter(TOOLBAR_ROLE, DEFAULT_TOOLBAR).split(WHITE_SPACE_SEPARATOR);
         boolean emptyGroup = true;
         boolean emptyLine = true;
         boolean uieNotFound = false;
@@ -325,6 +345,20 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
                 }
             } else {
                 uieNotFound = true;
+            }
+        }
+    }
+
+    /**
+     * Fills the menu of the editor.
+     */
+    private void fillMenu()
+    {
+        String[] entries = config.getParameter(MENU_ROLE, DEFAULT_MENU).split(WHITE_SPACE_SEPARATOR);
+        for (int i = 0; i < entries.length; i++) {
+            UIExtension uie = pm.getUIExtension(MENU_ROLE, entries[i]);
+            if (uie != null) {
+                ui.getMenu().addItem((MenuItem) uie.getUIObject(entries[i]));
             }
         }
     }

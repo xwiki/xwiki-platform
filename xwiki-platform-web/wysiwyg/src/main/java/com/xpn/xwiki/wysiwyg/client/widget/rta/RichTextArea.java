@@ -88,6 +88,14 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     private String name;
 
     /**
+     * The current event triggered on this rich text area. We need to store it because DOM.eventGetCurrentEvent() and
+     * Event.getCurrentEvent() return null for RichTextArea events.
+     * 
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3133
+     */
+    private Event currentEvent;
+
+    /**
      * Creates a new rich text area.
      */
     public RichTextArea()
@@ -246,6 +254,12 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      */
     public void onBrowserEvent(Event event)
     {
+        // We need to preview the event due to a GWT bug.
+        // @see http://code.google.com/p/google-web-toolkit/issues/detail?id=729
+        if (!previewEvent(event)) {
+            return;
+        }
+        currentEvent = event;
         if (event.getTypeInt() == Event.ONKEYDOWN) {
             if (shortcutKeys.contains(ShortcutKeyFactory.createShortcutKey(event))) {
                 event.preventDefault();
@@ -254,6 +268,29 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
             }
         }
         super.onBrowserEvent(event);
+        currentEvent = null;
+    }
+
+    /**
+     * We need to call DOM.previewEvent because there is a bug in GWT that prevents PopupPanel from previewing events
+     * generated in in-line frames like the one in behind of this rich text area.
+     * 
+     * @param event a handle to the event being previewed.
+     * @return <code>false</code> to cancel the event.
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=729
+     */
+    private native boolean previewEvent(Event event)
+    /*-{
+        return @com.google.gwt.user.client.DOM::previewEvent(Lcom/google/gwt/user/client/Event;)(event);
+    }-*/;
+
+    /**
+     * @return the current event triggered on this rich text area.
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3133
+     */
+    public Event getCurrentEvent()
+    {
+        return currentEvent;
     }
 
     /**

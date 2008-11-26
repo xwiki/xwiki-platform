@@ -20,6 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
 import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -27,14 +29,46 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.MenuItemUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
+/**
+ * WYSIWYG editor plug-in for inserting macros and for editing macro parameters.
+ * 
+ * @version $Id$
+ */
 public class MacroPlugin extends AbstractPlugin implements ClickListener
 {
-    private PushButton macro;
+    /**
+     * The tool bar button that opens the insert macro dialog.
+     */
+    private PushButton insertButton;
 
+    /**
+     * The macro menu, including sub-entries for macro specific operations.
+     */
+    private MenuItem macroMenu;
+
+    /**
+     * Menu entries for insert related operations.
+     */
+    private MenuBar insertMenu;
+
+    /**
+     * Menu entries for edit related operations.
+     */
+    private MenuBar editMenu;
+
+    /**
+     * User interface extension for the editor tool bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+
+    /**
+     * User interface extension for the editor menu bar.
+     */
+    private final MenuItemUIExtension menuExtension = new MenuItemUIExtension("menu");
 
     /**
      * {@inheritDoc}
@@ -45,10 +79,25 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
     {
         super.init(wysiwyg, textArea, config);
 
-        macro = new PushButton(Images.INSTANCE.macro().createImage(), this);
-        macro.setTitle(Strings.INSTANCE.macro());
+        insertButton = new PushButton(Images.INSTANCE.macro().createImage(), this);
+        insertButton.setTitle(Strings.INSTANCE.macro());
+        toolBarExtension.addFeature(MacroPluginFactory.getInstance().getPluginName(), insertButton);
 
-        toolBarExtension.addFeature("macro", macro);
+        insertMenu = new MenuBar(true);
+        insertMenu.addItem("Browse Macros...", (com.google.gwt.user.client.Command) null);
+        insertMenu.addSeparator();
+        insertMenu.addItem("Table Of Contents", (com.google.gwt.user.client.Command) null);
+        insertMenu.addItem("Information Box", (com.google.gwt.user.client.Command) null);
+        insertMenu.addItem("More...", (com.google.gwt.user.client.Command) null);
+
+        editMenu = new MenuBar(true);
+        editMenu.addItem("Edit Macro Properties", (com.google.gwt.user.client.Command) null);
+        editMenu.addItem("Delete Macro", (com.google.gwt.user.client.Command) null);
+
+        macroMenu = new MenuItem("Macro", insertMenu);
+        menuExtension.addFeature(MacroPluginFactory.getInstance().getPluginName(), macroMenu);
+
+        getUIExtensionList().add(menuExtension);
         getUIExtensionList().add(toolBarExtension);
     }
 
@@ -59,11 +108,21 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
      */
     public void destroy()
     {
-        macro.removeFromParent();
-        macro.removeClickListener(this);
-        macro = null;
+        insertButton.removeFromParent();
+        insertButton.removeClickListener(this);
+        insertButton = null;
+
+        insertMenu.clearItems();
+        insertMenu = null;
+
+        editMenu.clearItems();
+        editMenu = null;
+
+        macroMenu.getParentMenu().removeItem(macroMenu);
+        macroMenu = null;
 
         toolBarExtension.clearFeatures();
+        menuExtension.clearFeatures();
 
         super.destroy();
     }
@@ -75,13 +134,22 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
      */
     public void onClick(Widget sender)
     {
-        if (sender == macro) {
+        if (sender == insertButton) {
             onMacro();
         }
     }
 
+    /**
+     * Inserts the macro selected through a dialog in place of the current selection or at the current caret position.
+     */
     public void onMacro()
     {
         // TODO
+        // The following is just a proof of concept.
+        if (macroMenu.getSubMenu() == insertMenu) {
+            macroMenu.setSubMenu(editMenu);
+        } else {
+            macroMenu.setSubMenu(insertMenu);
+        }
     }
 }

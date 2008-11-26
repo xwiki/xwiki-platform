@@ -22,6 +22,6 @@ endDocument
 .#-----------------------------------------------------
 before{{{abc{{{123}}}cde}}}after
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
 <html><p>before<tt class="wikimodel-verbatim">abc{{{123}}}cde</tt>after</p></html>

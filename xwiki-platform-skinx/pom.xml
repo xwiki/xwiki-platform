@@ -27,11 +27,11 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>13-SNAPSHOT</version>
+    <version>12</version>
   </parent>
   <artifactId>xwiki-plugin-skinx</artifactId>
   <name>XWiki Platform - Plugins - Skin Extensions</name>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.4</version>
   <description>XWiki Platform - Plugins - Skin Extensions</description>
   <dependencies>
     <dependency>
@@ -49,4 +49,10 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-skinx-1.4</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-skinx-1.4</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-skinx-1.4</url>
+  </scm>
 </project>

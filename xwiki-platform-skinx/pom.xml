@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>12</version>
+    <version>13-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-skinx</artifactId>
   <name>XWiki Platform - Plugins - Skin Extensions</name>

@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.dom;
 import java.util.Iterator;
 
 import com.google.gwt.dom.client.BRElement;
+import com.google.gwt.dom.client.BaseElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HRElement;
 import com.google.gwt.dom.client.LinkElement;
@@ -131,6 +132,14 @@ public class Document extends com.google.gwt.dom.client.Document
     public final SpanElement xCreateSpanElement()
     {
         return xCreateElement("span").cast();
+    }
+
+    /**
+     * @return a new base element
+     */
+    public final BaseElement xCreateBaseElement()
+    {
+        return xCreateElement("base").cast();
     }
 
     /**
@@ -292,5 +301,31 @@ public class Document extends com.google.gwt.dom.client.Document
     public final native DocumentFragment createDocumentFragment()
     /*-{
         return this.createDocumentFragment();
+    }-*/;
+
+    /**
+     * Opens a document stream for writing.
+     */
+    public final native void open()
+    /*-{
+        this.open();
+    }-*/;
+
+    /**
+     * Closes a document stream for writing.
+     */
+    public final native void close()
+    /*-{
+        this.close();
+    }-*/;
+
+    /**
+     * Writes a string of text to a document stream opened by {@link #open()}.
+     * 
+     * @param html a string containing the HTML to be written to the document.
+     */
+    public final native void write(String html)
+    /*-{
+        this.write(html);
     }-*/;
 }

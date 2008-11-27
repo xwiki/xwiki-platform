@@ -53,6 +53,11 @@ public class DocumentTemplate
     private String bodyId;
 
     /**
+     * The base URL of the edited document.
+     */
+    private String baseURL;
+
+    /**
      * @return The array of style sheet URLs.
      */
     public String[] getStyleSheetURLs()
@@ -129,5 +134,23 @@ public class DocumentTemplate
     public void setBodyId(String bodyId)
     {
         this.bodyId = bodyId;
+    }
+
+    /**
+     * @return the base URL for the edited document.
+     */
+    public String getBaseURL()
+    {
+        return baseURL;
+    }
+
+    /**
+     * Sets the base URL for the edited document.
+     * 
+     * @param baseURL the URL to set
+     */
+    public void setBaseURL(String baseURL)
+    {
+        this.baseURL = baseURL;
     }
 }

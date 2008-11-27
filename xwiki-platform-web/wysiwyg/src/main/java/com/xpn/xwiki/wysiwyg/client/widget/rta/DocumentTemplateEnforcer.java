@@ -19,10 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
+import com.google.gwt.dom.client.BaseElement;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.user.client.Command;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 
 /**
@@ -79,8 +83,29 @@ class DocumentTemplateEnforcer implements Command
             head.appendChild(script);
         }
 
+        // Get existing base element
+        BaseElement baseElement;
+        NodeList<Element> baseElements = document.getElementsByTagName("base");
+        if (baseElements.getLength() > 0) {
+            // There already is a base element
+            baseElement = baseElements.getItem(0).cast();
+        } else {
+            baseElement = document.xCreateBaseElement();
+        }
+        // Set the document base to the URL of the template document
+        baseElement.setHref(template.getBaseURL());
+        if (baseElement.getParentNode() == null) {
+            DOMUtils.getInstance().insertAt(head, baseElement, 0);
+        }
+
         // Set the class and id attributes on body
         document.getBody().setId(template.getBodyId());
         document.getBody().setClassName(template.getBodyClassName());
+
+        // Reload the content of the document, to re-resolve the URLs after the baseURL change
+        String documentContent = document.getDocumentElement().getString();
+        document.open();
+        document.write(documentContent);
+        document.close();
     }
 }

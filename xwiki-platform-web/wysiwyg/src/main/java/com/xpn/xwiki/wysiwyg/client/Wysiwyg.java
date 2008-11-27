@@ -28,6 +28,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.Dictionary;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
@@ -35,7 +36,9 @@ import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorDebugger;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorFactory;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.util.internal.DefaultConfig;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.DocumentTemplate;
 
 /**
  * The class responsible for loading the WYSIWYG editors. It can be also viewed as the application context.
@@ -112,11 +115,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
             // Create the WYSIWYG Editor
             final WysiwygEditor editor = WysiwygEditorFactory.getInstance().newEditor(config, this);
-            editor.getUI().getTextArea().getDocumentTemplate().addStyleSheet(config.getParameter("stylesheet"));
-            editor.getUI().getTextArea().getDocumentTemplate().addStyleSheet(
-                GWT.getModuleBaseURL() + "RichTextArea.css");
-            editor.getUI().getTextArea().getDocumentTemplate().setBodyId("body");
-            editor.getUI().getTextArea().getDocumentTemplate().addBodyStyleName("main");
+            initDocumentTemplate(editor.getUI().getTextArea().getDocumentTemplate(), config);
             editor.getUI().getTextArea().setHTML(value);
             editor.getUI().getTextArea().setHeight(height);
             if (name != null) {
@@ -130,6 +129,24 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
                 RootPanel.get(containerId).add(editor.getUI());
             }
         }
+    }
+
+    /**
+     * Initializes the document template to use for the rich text area document.
+     * 
+     * @param template the template to initialize
+     * @param config configuration parameters
+     */
+    private void initDocumentTemplate(DocumentTemplate template, Config config)
+    {
+        String stylesheet = config.getParameter("stylesheet");
+        if (!StringUtils.isEmpty(stylesheet)) {
+            template.addStyleSheet(stylesheet);
+        }
+        template.addStyleSheet(GWT.getModuleBaseURL() + "RichTextArea.css");
+        template.setBodyId("body");
+        template.addBodyStyleName("main");
+        template.setBaseURL(Window.Location.getHref());
     }
 
     /**

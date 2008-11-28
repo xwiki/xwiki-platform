@@ -58,8 +58,6 @@ public interface Strings extends Constants
 
     String hr();
 
-    String image();
-
     String indent();
 
     String insertColAfter();
@@ -167,4 +165,18 @@ public interface Strings extends Constants
     String linkWebPageAddressError();
    
     String linkNoLabelError();
+    
+    String image();
+    
+    String fileUploadLabel();
+    
+    String fileChooseLabel();
+    
+    String fileListFetchError();
+    
+    String fileUploadSubmitLabel();
+    
+    String fileInsertImageButton();
+    
+    String fileUploadNoPathError();
 }

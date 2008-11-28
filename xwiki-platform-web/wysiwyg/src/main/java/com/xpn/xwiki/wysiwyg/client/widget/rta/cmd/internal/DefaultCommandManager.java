@@ -66,7 +66,6 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES.put(Command.INSERT_BR_ON_RETURN, new DefaultExecutable(Command.INSERT_BR_ON_RETURN.toString()));
         EXECUTABLES.put(Command.INSERT_HORIZONTAL_RULE, new InsertHRExecutable());
         EXECUTABLES.put(Command.INSERT_HTML, new InsertHTMLExecutable());
-        EXECUTABLES.put(Command.INSERT_IMAGE, new DefaultExecutable(Command.INSERT_IMAGE.toString()));
         EXECUTABLES.put(Command.INSERT_ORDERED_LIST, new DefaultExecutable(Command.INSERT_ORDERED_LIST.toString()));
         EXECUTABLES.put(Command.INSERT_PARAGRAPH, new DefaultExecutable(Command.INSERT_PARAGRAPH.toString()));
         EXECUTABLES.put(Command.INSERT_UNORDERED_LIST, new DefaultExecutable(Command.INSERT_UNORDERED_LIST.toString()));

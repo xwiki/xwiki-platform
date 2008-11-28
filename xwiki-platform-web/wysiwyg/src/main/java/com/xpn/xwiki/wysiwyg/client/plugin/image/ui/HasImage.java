@@ -17,49 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.image;
-
-import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
+package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 /**
- * Factory for {@link ImagePlugin}.
+ * Specifies a type that can hold data about an image attachment and pass it further. It can be a UI widget or a
+ * random object.
  * 
  * @version $Id$
  */
-public final class ImagePluginFactory extends AbstractPluginFactory
+public interface HasImage
 {
     /**
-     * The singleton factory instance.
+     * @return the name of the image file
      */
-    private static ImagePluginFactory instance;
+    String getImageFileName();
 
     /**
-     * Private constructor for the factory singleton.
+     * @return the url where the image file is stored
      */
-    private ImagePluginFactory()
-    {
-        super("image");
-    }
-
-    /**
-     * @return the singleton factory instance.
-     */
-    public static synchronized ImagePluginFactory getInstance()
-    {
-        if (instance == null) {
-            instance = new ImagePluginFactory();
-        }
-        return instance;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPluginFactory#newInstance()
-     */
-    public Plugin newInstance()
-    {
-        return new ImagePlugin();
-    }
+    String getImageURL();
 }

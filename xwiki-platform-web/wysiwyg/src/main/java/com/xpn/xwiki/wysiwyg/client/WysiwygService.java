@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -138,4 +139,16 @@ public interface WysiwygService extends RemoteService
      * @return the relative url to the resulted document.
      */
     String createPageURL(String wikiName, String spaceName, String pageName, String revision, String anchor);
+    
+    /**
+     * Returns all the image attachments from the page referred by its parameters. It can either get all the pictures in
+     * a page or in a space or in a wiki, depending on the values of its parameters. A null means a missing parameter on
+     * that position.
+     * 
+     * @param wikiName the name of the wiki to get images from
+     * @param spaceName the name of the space to get image attachments from
+     * @param pageName the name of the page to get image attachments from
+     * @return map of the image URLs and their corresponding filenames 
+     */
+    Map<String, String> getImageAttachments(String wikiName, String spaceName, String pageName);    
 }

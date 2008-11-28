@@ -22,14 +22,19 @@ package com.xpn.xwiki.wysiwyg.server;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.gwt.api.server.XWikiServiceImpl;
 import com.xpn.xwiki.web.Utils;
@@ -48,6 +53,11 @@ import com.xpn.xwiki.wysiwyg.server.sync.SyncEngine;
  */
 public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygService
 {
+    /**
+     * Default XWiki logger to report errors correctly.
+     */
+    private static final Log LOG = LogFactory.getLog(DefaultWysiwygService.class);
+
     /**
      * The object used to synchronize the content edited by multiple users when the real time feature of the editor is
      * activated.
@@ -283,5 +293,40 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             }
         }
         return pageURL;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#getImageAttachments(String, String, String)
+     */
+    public Map<String, String> getImageAttachments(String wikiName, String spaceName, String pageName)
+    {
+        XWikiContext context = getXWikiContext();
+        String database = context.getDatabase();
+        Map<String, String> imageAttachs = new HashMap<String, String>();
+        try {
+            if (wikiName != null) {
+                context.setDatabase(wikiName);
+            }
+            // get the document referred by the parameters
+            // TODO: handle missing space name or missing page name
+            XWikiDocument doc = context.getWiki().getDocument(spaceName + "." + pageName, context);
+            // TODO: handle attachment sort
+            for (XWikiAttachment attach : doc.getAttachmentList()) {
+                if (attach.getMimeType(getXWikiContext()).startsWith("image/")) {
+                    // it's an image, add it to the list
+                    imageAttachs.put(doc.getAttachmentURL(attach.getFilename(), context), attach.getFilename());
+                }
+            }
+            return imageAttachs;
+        } catch (XWikiException e) {
+            LOG.error("Error while getting the image attachments list", e);
+        } finally {
+            if (wikiName != null) {
+                getXWikiContext().setDatabase(database);
+            }
+        }
+        return null;
     }
 }

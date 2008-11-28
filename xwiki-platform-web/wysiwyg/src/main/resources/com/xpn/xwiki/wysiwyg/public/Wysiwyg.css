@@ -416,3 +416,44 @@
   border-color: #fff #aaa #aaa #fff;
   font-size: 12px;
 }
+
+/*
+ * Images plugin / dialog styles
+ */
+.xImagePreview {
+  width: 116px;
+  padding: 3px;
+  margin: 0px;
+  horizontal-align: middle;
+  display: inline;
+  float: left;
+}
+.xImagePreview img {
+  height: 90px;
+  width: 110px;
+  display: block;
+}
+
+div.clear {
+  clear: both;
+}
+
+.xInsertImageButton {
+  font-size: xx-small;
+  margin-top: 3px;
+  width: 110px
+}
+
+.xImagesContainerPanel {
+  width: 385px;
+  height: 300px;
+}
+
+.xImageDialogMain {
+  padding: 10px;
+}
+
+.xImageChooser .gwt-Label, .xUploadForm .gwt-Label {
+  font-weight: bold;
+  padding: 5px;  
+}

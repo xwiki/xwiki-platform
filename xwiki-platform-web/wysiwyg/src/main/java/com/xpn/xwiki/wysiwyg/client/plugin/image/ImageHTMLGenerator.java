@@ -19,47 +19,48 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.image;
 
-import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.HasImage;
 
 /**
- * Factory for {@link ImagePlugin}.
+ * Generates an HTML block for an image, given by it's URL and filename.
  * 
  * @version $Id$
  */
-public final class ImagePluginFactory extends AbstractPluginFactory
+public final class ImageHTMLGenerator
 {
     /**
-     * The singleton factory instance.
+     * The singleton instance of this class.
      */
-    private static ImagePluginFactory instance;
+    private static ImageHTMLGenerator instance;
 
     /**
-     * Private constructor for the factory singleton.
+     * Class constructor, private so that the class is a singleton.
      */
-    private ImagePluginFactory()
+    private ImageHTMLGenerator()
     {
-        super("image");
     }
 
     /**
-     * @return the singleton factory instance.
+     * @return the instance of this class.
      */
-    public static synchronized ImagePluginFactory getInstance()
+    public static synchronized ImageHTMLGenerator getInstance()
     {
         if (instance == null) {
-            instance = new ImagePluginFactory();
+            instance = new ImageHTMLGenerator();
         }
         return instance;
     }
 
     /**
-     * {@inheritDoc}
+     * Get an HTML image block for an image attached to the current document, that is, referred only through its
+     * filename.
      * 
-     * @see AbstractPluginFactory#newInstance()
+     * @param image the image description, through its filename and url.
+     * @return the HTML block for the passed image.
      */
-    public Plugin newInstance()
+    public String getAttachedImageHTML(HasImage image)
     {
-        return new ImagePlugin();
+        return "<!--startimage:" + image.getImageFileName() + "--><img src=\"" + image.getImageURL() + "\" alt=\""
+            + image.getImageFileName() + "\"/><!--stopimage-->";
     }
 }

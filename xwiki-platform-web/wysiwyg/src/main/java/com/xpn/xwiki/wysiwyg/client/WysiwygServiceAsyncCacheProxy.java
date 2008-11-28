@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -180,5 +181,16 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
         AsyncCallback<String> async)
     {
         service.createPageURL(wikiName, spaceName, pageName, revision, anchor, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#getImageAttachments(String, String, String, AsyncCallback)
+     */
+    public void getImageAttachments(String wikiName, String spaceName, String pageName,
+        AsyncCallback<Map<String, String>> async)
+    {
+        service.getImageAttachments(wikiName, spaceName, pageName, async);
     }
 }

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -116,4 +117,17 @@ public interface WysiwygServiceAsync
      */
     void createPageURL(String wikiName, String spaceName, String pageName, String revision, String anchor,
         AsyncCallback<String> async);
+
+    /**
+     * Returns all the image attachments from the page referred by its parameters. It can either get all the pictures in
+     * a page or in a space or in a wiki, depending on the values of its parameters. A null means a missing parameter on
+     * that position.
+     * 
+     * @param wikiName the name of the wiki to get images from
+     * @param spaceName the name of the space to get image attachments from
+     * @param pageName the name of the page to get image attachments from
+     * @param async object used for asynchronous communication between server and client. 
+     */
+    void getImageAttachments(String wikiName, String spaceName, String pageName,
+        AsyncCallback<Map<String, String>> async);
 }

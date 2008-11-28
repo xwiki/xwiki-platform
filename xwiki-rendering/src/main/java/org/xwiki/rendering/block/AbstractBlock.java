@@ -89,7 +89,7 @@ public abstract class AbstractBlock implements Block
     public void addChildren(List< ? extends Block> blocksToAdd)
     {
         for (Block blockToAdd : blocksToAdd) {
-            this.addChild(blockToAdd);
+            addChild(blockToAdd);
         }
     }
 

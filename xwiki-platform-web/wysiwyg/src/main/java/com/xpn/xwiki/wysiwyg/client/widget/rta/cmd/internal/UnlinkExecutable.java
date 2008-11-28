@@ -65,7 +65,7 @@ public class UnlinkExecutable implements Executable
         if (wrappingSpan == null || wrappingSpan.getNodeType() != Node.ELEMENT_NODE
             || !wrappingSpan.getNodeName().equalsIgnoreCase("span")) {
             // we have no span wrapping the anchor, is not a wikilink
-            boolean result = removeAnchor(Element.as(anchor), rta, range);
+            return removeAnchor(Element.as(anchor), rta, range);
         }
         // check the span class
         String spanClass = Element.as(wrappingSpan).getClassName();

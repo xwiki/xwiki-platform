@@ -97,7 +97,7 @@ public class CreateLinkExecutable implements Executable
      */
     public String getParameter(RichTextArea rta)
     {
-        // TODO Auto-generated method stub
+        // TODO Implement to get the parameters of an inserted link, to allow editing it.
         return null;
     }
 }

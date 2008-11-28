@@ -5737,7 +5737,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public Object parseGroovyFromPage(String fullName, String jarWikiPage, XWikiContext context) throws XWikiException
     {
-        return parseGroovyFromString(context.getWiki().getDocument(fullName, context).getContent(), context);
+        return parseGroovyFromString(context.getWiki().getDocument(fullName, context).getContent(), jarWikiPage, context);
     }
 
     public String getMacroList(XWikiContext context)

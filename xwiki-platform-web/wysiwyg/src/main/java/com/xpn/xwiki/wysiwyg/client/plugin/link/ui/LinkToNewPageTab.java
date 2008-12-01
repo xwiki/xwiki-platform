@@ -106,8 +106,8 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
     protected Panel buildWikiPanel(String currentWiki)
     {
         Panel wikiPanel = super.buildWikiPanel(currentWiki);
-        getWikiListBox().addChangeListener(this);
-        getWikiListBox().addKeyboardListener(new EnterListener(createLinkButton));
+        getWikiSelector().addChangeListener(this);
+        getWikiSelector().addKeyboardListener(new EnterListener(createLinkButton));
 
         return wikiPanel;
     }
@@ -120,8 +120,8 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
     protected Panel buildSpacePanel(String selectedWiki, String currentSpace)
     {
         Panel spacePanel = super.buildSpacePanel(selectedWiki, currentSpace);
-        getSpaceListBox().addChangeListener(this);
-        getSpaceListBox().addKeyboardListener(new EnterListener(createLinkButton));
+        getSpaceSelector().addChangeListener(this);
+        getSpaceSelector().addKeyboardListener(new EnterListener(createLinkButton));
         return spacePanel;
     }
 
@@ -140,11 +140,11 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWikiPageLinkTab#populateSpaceListBox(String, String, AsyncCallback)
+     * @see AbstractWikiPageLinkTab#populateSpaceSelector(String, String, AsyncCallback)
      */
-    protected void populateSpaceListBox(String selectedWiki, String currentSpace, final AsyncCallback<List<String>> cb)
+    protected void populateSpaceSelector(String selectedWiki, String currentSpace, final AsyncCallback<List<String>> cb)
     {
-        super.populateSpaceListBox(selectedWiki, currentSpace, new AsyncCallback<List<String>>()
+        super.populateSpaceSelector(selectedWiki, currentSpace, new AsyncCallback<List<String>>()
         {
             public void onFailure(Throwable caught)
             {
@@ -155,15 +155,24 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
 
             public void onSuccess(List<String> result)
             {
-                // Add the space creation option in the build list
-                int selectedIndex = getSpaceListBox().getSelectedIndex();
-                getSpaceListBox().insertItem(Strings.INSTANCE.linkCreateNewSpaceText(), 0);
-                getSpaceListBox().setSelectedIndex(selectedIndex + 1);
+                addNewSpaceOption();
                 if (cb != null) {
                     cb.onSuccess(result);
                 }
             }
         });
+    }
+
+    /**
+     * Adds the new space option in the space drop down. To be used when the space selector is updated to add the new
+     * option.
+     */
+    private void addNewSpaceOption()
+    {
+        // Add the space creation option in the build list
+        int selectedIndex = getSpaceSelector().getSelectedIndex();
+        getSpaceSelector().insertItem(Strings.INSTANCE.linkCreateNewSpaceText(), 0);
+        getSpaceSelector().setSelectedIndex(selectedIndex + 1);
     }
 
     /**
@@ -210,8 +219,8 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
         if (sender == createLinkButton) {
             if (validateUserInput()) {
                 // get the space name
-                String spaceName = getSpaceListBox().getItemText(getSpaceListBox().getSelectedIndex());
-                if (getSpaceListBox().getSelectedIndex() == 0) {
+                String spaceName = getSpaceSelector().getSelectedSpace();
+                if (getSpaceSelector().getSelectedIndex() == 0) {
                     spaceName = newSpaceNameTextBox.getText().trim();
                 }
 
@@ -219,8 +228,7 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
                 if (pageName.equals(Strings.INSTANCE.linkNewPageTextBox())) {
                     pageName = "";
                 }
-                String wikiName =
-                    isMultiWiki() ? getWikiListBox().getItemText(getWikiListBox().getSelectedIndex()) : null;
+                String wikiName = isMultiWiki() ? getWikiSelector().getSelectedWiki() : null;
                 LinkGenerator.getInstance().getNewPageLink(getLinkLabel(), wikiName, spaceName, pageName,
                     new AsyncCallback<String>()
                     {
@@ -246,13 +254,14 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
      */
     public void onChange(Widget sender)
     {
-        if (sender == getWikiListBox()) {
+        if (sender == getWikiSelector()) {
             // Wiki selection changed, update accordingly spaces list, which will trigger pages list update.
-            final String selectedWiki = getWikiListBox().getItemText(getWikiListBox().getSelectedIndex());
-            final String selectedSpace = getSpaceListBox().getItemText(getSpaceListBox().getSelectedIndex());
-            populateSpaceListBox(selectedWiki, selectedSpace, null);
+            final String selectedWiki = getWikiSelector().getSelectedWiki();
+            final String selectedSpace = getSpaceSelector().getSelectedSpace();
+            populateSpaceSelector(selectedWiki, selectedSpace, null);
         }
-        if (sender == getSpaceListBox() && getSpaceListBox().getSelectedIndex() == 0) {
+        if (sender == getSpaceSelector()
+            && getSpaceSelector().getSelectedSpace().trim().equals(Strings.INSTANCE.linkCreateNewSpaceText().trim())) {
             newSpacePanel.setVisible(true);
         } else {
             newSpacePanel.setVisible(false);
@@ -284,7 +293,7 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
         if (newPageNameTextBox.getText().equals(Strings.INSTANCE.linkNewPageTextBox())
             || newPageNameTextBox.getText().trim().length() == 0) {
             // If the page name wasn't set, then the space must have been set
-            if (getSpaceListBox().getSelectedIndex() == 0
+            if (getSpaceSelector().getSelectedSpace().trim().equals(Strings.INSTANCE.linkCreateNewSpaceText())
                 && (newSpaceNameTextBox.getText().equals(Strings.INSTANCE.linkNewSpaceTextBox()) || newSpaceNameTextBox
                     .getText().trim().length() == 0)) {
                 Window.alert(Strings.INSTANCE.linkNewSpaceError());
@@ -302,7 +311,7 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
     public void onFocus(Widget sender)
     {
         if (sender == newSpaceNameTextBox
-            && newSpaceNameTextBox.getText().trim().equals(Strings.INSTANCE.linkNewPageTextBox())) {
+            && newSpaceNameTextBox.getText().trim().equals(Strings.INSTANCE.linkNewSpaceTextBox())) {
             newSpaceNameTextBox.selectAll();
         } else if (sender == newPageNameTextBox
             && newPageNameTextBox.getText().trim().equals(Strings.INSTANCE.linkNewPageTextBox())) {

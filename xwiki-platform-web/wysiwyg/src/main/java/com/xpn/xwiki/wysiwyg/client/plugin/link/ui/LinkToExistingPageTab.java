@@ -28,12 +28,11 @@ import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkGenerator;
+import com.xpn.xwiki.wysiwyg.client.widget.PageSelector;
 
 /**
  * Tab to get the information from the user to create a link towards an existing page.
@@ -45,7 +44,7 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
     /**
      * List box with all the pages in the currently selected wiki and in the currently selected space.
      */
-    private ListBox pageListBox;
+    private PageSelector pageSelector;
 
     /**
      * Button to create a link to a wiki.
@@ -92,8 +91,8 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
         // get the panel built by the superclass
         Panel wikiPanel = super.buildWikiPanel(currentWiki);
         // add custom listeners and buttons
-        getWikiListBox().addChangeListener(this);
-        getWikiListBox().addKeyboardListener(new EnterListener(linkToWikiButton));
+        getWikiSelector().addChangeListener(this);
+        getWikiSelector().addKeyboardListener(new EnterListener(linkToWikiButton));
         wikiPanel.add(linkToWikiButton);
         return wikiPanel;
     }
@@ -108,8 +107,8 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
         // get the panel built by the superclass
         Panel spacePanel = super.buildSpacePanel(selectedWiki, currentSpace);
         // add custom buttons and listeners
-        getSpaceListBox().addChangeListener(this);
-        getSpaceListBox().addKeyboardListener(new EnterListener(linkToSpaceButton));
+        getSpaceSelector().addChangeListener(this);
+        getSpaceSelector().addKeyboardListener(new EnterListener(linkToSpaceButton));
         spacePanel.add(linkToSpaceButton);
 
         return spacePanel;
@@ -126,10 +125,10 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
         Panel pagePanel = new FlowPanel();
         Label choosePageLabel = new Label(Strings.INSTANCE.choosePage());
         pagePanel.add(choosePageLabel);
-        pageListBox = new ListBox();
-        pageListBox.addKeyboardListener(new EnterListener(linkToPageButton));
-        pagePanel.add(pageListBox);
-        populatePageListBox(selectedWiki, selectedSpace, currentPage);
+        pageSelector = new PageSelector(selectedWiki, selectedSpace);
+        pageSelector.addKeyboardListener(new EnterListener(linkToPageButton));
+        pagePanel.add(pageSelector);
+        populatePageSelector(selectedWiki, selectedSpace, currentPage);        
         pagePanel.add(linkToPageButton);
 
         return pagePanel;
@@ -160,28 +159,11 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
      * @param selectedSpace The name of the currently selected space
      * @param currentPage The name of the currently selected page, to restore selection.
      */
-    public void populatePageListBox(String selectedWiki, String selectedSpace, final String currentPage)
+    public void populatePageSelector(String selectedWiki, String selectedSpace, final String currentPage)
     {
-        pageListBox.clear();
-
-        WysiwygService.Singleton.getInstance().getPageNames(selectedWiki, selectedSpace,
-            new AsyncCallback<List<String>>()
-            {
-                public void onFailure(Throwable caught)
-                {
-                    throw new RuntimeException(caught.getMessage());
-                }
-
-                public void onSuccess(List<String> result)
-                {
-                    for (String s : result) {
-                        pageListBox.addItem(s);
-                        if (s.equals(currentPage)) {
-                            pageListBox.setSelectedIndex(pageListBox.getItemCount() - 1);
-                        }
-                    }
-                }
-            });
+        pageSelector.setWiki(selectedWiki);
+        pageSelector.setSpace(selectedSpace);
+        pageSelector.refreshList(currentPage);
     }
 
     /**
@@ -214,11 +196,11 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
             if (!isMultiWiki()) {
                 wikiName = null;
             } else {
-                wikiName = getWikiListBox().getItemText(getWikiListBox().getSelectedIndex());
+                wikiName = getWikiSelector().getSelectedWiki();
             }
             // Get the space name and the page name
-            spaceName = getSpaceListBox().getItemText(getSpaceListBox().getSelectedIndex());
-            pageName = pageListBox.getItemText(pageListBox.getSelectedIndex());
+            spaceName = getSpaceSelector().getSelectedSpace();
+            pageName = pageSelector.getSelectedPage();
 
             // If the senders are the wiki or space buttons, invalidate page (and space) choices.
             if (sender == linkToWikiButton) {
@@ -252,27 +234,26 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
      */
     public void onChange(Widget sender)
     {
-        if (sender == getWikiListBox()) {
+        if (sender == getWikiSelector()) {
             // Wiki selection changed, update accordingly spaces list, which will trigger pages list update.
-            final String selectedWiki = getWikiListBox().getItemText(getWikiListBox().getSelectedIndex());
-            final String selectedSpace = getSpaceListBox().getItemText(getSpaceListBox().getSelectedIndex());
-            populateSpaceListBox(selectedWiki, selectedSpace, new AsyncCallback<List<String>>()
+            final String selectedWiki = getWikiSelector().getSelectedWiki();
+            final String selectedSpace = getSpaceSelector().getSelectedSpace();
+            populateSpaceSelector(selectedWiki, selectedSpace, new AsyncCallback<List<String>>()
             {
                 public void onSuccess(List<String> result)
                 {
                     // populate the pages list box according to the newly selected space, after spaces list update
-                    populatePageListBox(selectedWiki, selectedSpace, pageListBox.getItemText(pageListBox
-                        .getSelectedIndex()));
+                    populatePageSelector(selectedWiki, selectedSpace, pageSelector.getSelectedPage());
                 }
 
                 public void onFailure(Throwable caught)
                 {
                 }
             });
-        } else if (sender == getSpaceListBox()) {
+        } else if (sender == getSpaceSelector()) {
             // Space selection changed, update page selection according.
-            String selectedSpace = getSpaceListBox().getItemText(getSpaceListBox().getSelectedIndex());
-            populatePageListBox(null, selectedSpace, pageListBox.getItemText(pageListBox.getSelectedIndex()));
+            String selectedSpace = getSpaceSelector().getSelectedSpace();
+            populatePageSelector(null, selectedSpace, pageSelector.getSelectedPage());
 
         }
     }

@@ -24,10 +24,11 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.widget.SpaceSelector;
+import com.xpn.xwiki.wysiwyg.client.widget.WikiSelector;
 
 /**
  * Superclass for the tabs getting wiki pages links (the existing page and the new page). This class will store common
@@ -40,12 +41,12 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
     /**
      * List box containing virtual wiki names.
      */
-    private ListBox wikiListBox;
+    private WikiSelector wikiSelector;
 
     /**
      * List box containing all the spaces in the selected wiki.
      */
-    private ListBox spaceListBox;
+    private SpaceSelector spaceSelector;
 
     /**
      * Whether the current wiki is part of a multiwiki or not.
@@ -73,7 +74,7 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
     protected Panel buildWikiPanel(final String currentWiki)
     {
         final Panel wikiPanel = new FlowPanel();
-        wikiListBox = new ListBox();
+        wikiSelector = new WikiSelector();
         // Check if this wiki is a multi wiki, to print the wikiPanel or not
         WysiwygService.Singleton.getInstance().isMultiWiki(new AsyncCallback<Boolean>()
         {
@@ -88,14 +89,14 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
                     wikiPanel.setVisible(false);
                     isMultiWiki = false;
                 } else {
-                    populateWikiListBox(currentWiki);
+                    populateWikiSelector(currentWiki);
                 }
 
             }
         });
         Label chooseWikiLabel = new Label(Strings.INSTANCE.chooseWiki());
         wikiPanel.add(chooseWikiLabel);
-        wikiPanel.add(wikiListBox);
+        wikiPanel.add(wikiSelector);
         return wikiPanel;
     }
 
@@ -104,26 +105,9 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
      * 
      * @param currentWiki the currently selected wiki, to restore selection.
      */
-    protected void populateWikiListBox(final String currentWiki)
+    protected void populateWikiSelector(final String currentWiki)
     {
-        wikiListBox.clear();
-        WysiwygService.Singleton.getInstance().getVirtualWikiNames(new AsyncCallback<List<String>>()
-        {
-            public void onFailure(Throwable caught)
-            {
-                throw new RuntimeException(caught.getMessage());
-            }
-
-            public void onSuccess(List<String> result)
-            {
-                for (int i = 0; i < result.size(); i++) {
-                    wikiListBox.addItem(result.get(i));
-                    if (result.get(i).equals(currentWiki)) {
-                        wikiListBox.setSelectedIndex(i);
-                    }
-                }
-            }
-        });
+        wikiSelector.refreshList(currentWiki);
     }
 
     /**
@@ -137,9 +121,9 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
         Panel spacePanel = new FlowPanel();
         Label chooseSpaceLabel = new Label(Strings.INSTANCE.chooseSpace());
         spacePanel.add(chooseSpaceLabel);
-        spaceListBox = new ListBox();
-        spacePanel.add(spaceListBox);
-        populateSpaceListBox(selectedWiki, currentSpace, null);
+        spaceSelector = new SpaceSelector(selectedWiki);
+        populateSpaceSelector(selectedWiki, currentSpace, null);
+        spacePanel.add(spaceSelector);
 
         return spacePanel;
     }
@@ -153,31 +137,11 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
      * @param cb callback to handle async call to caller level. Set this to null if there is no need for async call
      *            handle.
      */
-    protected void populateSpaceListBox(String selectedWiki, final String currentSpace,
+    protected void populateSpaceSelector(String selectedWiki, final String currentSpace,
         final AsyncCallback<List<String>> cb)
     {
-        spaceListBox.clear();
-        WysiwygService.Singleton.getInstance().getSpaceNames(selectedWiki, new AsyncCallback<List<String>>()
-        {
-            public void onFailure(Throwable caught)
-            {
-                throw new RuntimeException(caught.getMessage());
-            }
-
-            public void onSuccess(List<String> result)
-            {
-                // Add all options keeping selection
-                for (String s : result) {
-                    spaceListBox.addItem(s);
-                    if (s.equals(currentSpace)) {
-                        spaceListBox.setSelectedIndex(spaceListBox.getItemCount() - 1);
-                    }
-                }
-                if (cb != null) {
-                    cb.onSuccess(result);
-                }
-            }
-        });
+        spaceSelector.setWiki(selectedWiki);
+        spaceSelector.refreshList(currentSpace, cb);
     }
 
     /**
@@ -192,27 +156,27 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
             getLabelTextBox().setFocus(true);
         } else {
             if (isMultiWiki()) {
-                getWikiListBox().setFocus(true);
+                getWikiSelector().setFocus(true);
             } else {
-                getSpaceListBox().setFocus(true);
+                getSpaceSelector().setFocus(true);
             }
         }
     }
 
     /**
-     * @return the {@link ListBox} with the wiki names.
+     * @return the {@link WikiSelector} with the wiki names.
      */
-    protected ListBox getWikiListBox()
+    protected WikiSelector getWikiSelector()
     {
-        return wikiListBox;
+        return wikiSelector;
     }
 
     /**
-     * @return the {@link ListBox} with the space names in the selected wiki.
+     * @return the {@link SpaceSelector} with the space names in the selected wiki.
      */
-    protected ListBox getSpaceListBox()
+    protected SpaceSelector getSpaceSelector()
     {
-        return spaceListBox;
+        return spaceSelector;
     }
 
     /**

@@ -56,11 +56,15 @@ public final class ImageHTMLGenerator
      * filename.
      * 
      * @param image the image description, through its filename and url.
+     * @param spaceName name of the space of the page where the image is attached
+     * @param pageName name of the page where the image is attached
      * @return the HTML block for the passed image.
      */
-    public String getAttachedImageHTML(HasImage image)
+    public String getAttachedImageHTML(HasImage image, String spaceName, String pageName)
     {
-        return "<!--startimage:" + image.getImageFileName() + "--><img src=\"" + image.getImageURL() + "\" alt=\""
-            + image.getImageFileName() + "\"/><!--stopimage-->";
+        // TODO: allow to skip space and page if the block is for an image attached to the current document.
+        String imageReference = spaceName + "." + pageName + "@" + image.getImageFileName();
+        return "<!--startimage:" + imageReference + "--><img src=\"" + image.getImageURL() + "\" alt=\""
+            + imageReference + "\"/><!--stopimage-->";
     }
 }

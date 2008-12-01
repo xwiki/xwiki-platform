@@ -137,11 +137,9 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
     private ImageDialog getImageDialog()
     {
         if (imageDialog == null) {
-            String currentSpace = getConfig().getParameter("space", "Main");
-            String currentPage = getConfig().getParameter("page", "WebHome");
             imageDialog =
-                new ImageDialog(getConfig().getParameter("wiki", "xwiki"), currentSpace, currentPage, getConfig()
-                    .getParameter("fileuploadURL", "../../upload/" + currentSpace + "/" + currentPage));
+                new ImageDialog(getConfig().getParameter("wiki", "xwiki"), getConfig().getParameter("space", "Main"),
+                    getConfig().getParameter("page", "WebHome"));
             imageDialog.addPopupListener(this);
         }
         return imageDialog;

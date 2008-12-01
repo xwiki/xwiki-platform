@@ -19,6 +19,11 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 public class ImagePreviewWidget extends Composite implements SourcesClickEvents, HasImage
 {
     /**
+     * Variable holding the resize parameters of the image, so that the image thumbnail is resized on the server.
+     */
+    private final String resizeParameters = "width=110&height=90";
+
+    /**
      * The displayed image URL.
      */
     private String imageURL;
@@ -27,7 +32,7 @@ public class ImagePreviewWidget extends Composite implements SourcesClickEvents,
      * The displayed image file name.
      */
     private String imageName;
-
+    
     /**
      * Listeners collection to be able to fire the insert button click further.
      */
@@ -44,7 +49,7 @@ public class ImagePreviewWidget extends Composite implements SourcesClickEvents,
         this.imageURL = url;
         this.imageName = filename;
         clickListeners = new ClickListenerCollection();
-        Image image = new Image(url);
+        Image image = new Image(url + "?" + resizeParameters);
 
         Button insertImageButton = new Button(Strings.INSTANCE.fileInsertImageButton());
         insertImageButton.setStyleName("xInsertImageButton");

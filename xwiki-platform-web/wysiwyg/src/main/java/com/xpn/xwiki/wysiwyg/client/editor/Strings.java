@@ -179,4 +179,6 @@ public interface Strings extends Constants
     String fileInsertImageButton();
     
     String fileUploadNoPathError();
+    
+    String fileUpdateListButton();
 }

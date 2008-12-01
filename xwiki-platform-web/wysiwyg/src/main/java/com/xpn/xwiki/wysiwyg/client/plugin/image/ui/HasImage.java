@@ -20,8 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 /**
- * Specifies a type that can hold data about an image attachment and pass it further. It can be a UI widget or a
- * random object.
+ * Specifies a type that can hold data about an image attachment and pass it further. It can be a UI widget or a random
+ * object.
  * 
  * @version $Id$
  */

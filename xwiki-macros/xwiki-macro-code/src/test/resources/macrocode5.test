@@ -1,40 +1,35 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Validate that the code macro is able to find the right language for provided content and highlight it.
 .#-----------------------------------------------------
-{{code}}
-<b>bold</b>
-<i>italic</i>
-{{/code}}
+Some inline code macro: {{code language=html}}<b>bold</b><i>italic</i>{{/code}}
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [code] [] [
-<b>bold</b>
-<i>italic</i>
-]
-beginXMLNode [div] [class=code]
 beginParagraph
+onWord [Some]
+onSpace
+onWord [inline]
+onSpace
+onWord [code]
+onSpace
+onWord [macro]
+onSpecialSymbol [:]
+onSpace
+beginMacroMarker [code] [language=html] [<b>bold</b><i>italic</i>]
+beginFormat: [NONE] [[class]=[code]]
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [<b>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [bold]
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-onWord [</b>]
-endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-onLineBreak
-beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-onWord [<i>]
+onWord [</b><i>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [italic]
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [</i>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+endFormat: [NONE] [[class]=[code]]
+endMacroMarker [code] [language=html] [<b>bold</b><i>italic</i>]
 endParagraph
-endXMLNode [div] [class=code]
-endMacroMarker [code] [] [
-<b>bold</b>
-<i>italic</i>
-]
 endDocument

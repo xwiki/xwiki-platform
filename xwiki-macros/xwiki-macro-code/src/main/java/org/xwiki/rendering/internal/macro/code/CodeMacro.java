@@ -22,14 +22,19 @@ package org.xwiki.rendering.internal.macro.code;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.VerbatimInlineBlock;
 import org.xwiki.rendering.block.VerbatimStandaloneBlock;
+import org.xwiki.rendering.block.XMLBlock;
+import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
@@ -109,7 +114,19 @@ public class CodeMacro extends AbstractMacro<CodeMacroParameters> implements Com
             throw new MacroExecutionException("Failed to highlight content", e);
         }
 
-        return result;
+        Map<String, String> classParameter = Collections.singletonMap("class", "code");
+
+        Block boxBlock;
+        if (context.isInlined()) {
+            FormatBlock spanBlock = new FormatBlock(result, Format.NONE);
+            spanBlock.setParameters(classParameter);
+            
+            boxBlock = spanBlock;
+        } else {
+            boxBlock = new XMLBlock(result, new XMLElement("div", classParameter));
+        }
+
+        return Collections.singletonList(boxBlock);
     }
 
     /**

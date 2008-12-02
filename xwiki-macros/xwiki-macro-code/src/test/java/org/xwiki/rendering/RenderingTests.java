@@ -40,6 +40,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrocode1", true);
         suite.addTestsFromResource("macrocode2", true);
         suite.addTestsFromResource("macrocode3", true);
+        suite.addTestsFromResource("macrocode4", true);
+        suite.addTestsFromResource("macrocode5", true);
+        suite.addTestsFromResource("macrocode6", true);
 
         return new RenderingPlexusTestSetup(suite);
     }

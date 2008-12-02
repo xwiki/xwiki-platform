@@ -1,0 +1,518 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Testing real bigger and more complex code snippet
+.#-----------------------------------------------------
+{{code language=javascript}}
+// getJSON function by Juriy Zaytsev 
+// http://github.com/kangax/protolicious/tree/master/get_json.js
+(function(){
+  var id = 0, head = $$('head')[0], global = this;
+  global.getJSON = function(url, callback) {
+    var script = document.createElement('script'), token = '__jsonp' + id;
+ 
+    // callback should be a global function
+    global[token] = callback;
+ 
+    // url should have "?" parameter which is to be replaced with a global callback name
+    script.src = url.replace(/\?(&|$)/, '__jsonp' + id + '$1');
+ 
+    // clean up on load: remove script tag, null script variable and delete global callback function
+    script.onload = function() {
+      script.remove();
+      script = null;
+      delete global[token];
+    };
+    head.appendChild(script);
+ 
+    // callback name should be unique
+    id++;
+  }
+})();
+{{/code}}
+.#-----------------------------------------------------
+.expect|event
+.#----------------------------------------------------
+beginDocument
+beginMacroMarker [code] [language=javascript] [
+// getJSON function by Juriy Zaytsev 
+// http://github.com/kangax/protolicious/tree/master/get_json.js
+(function(){
+  var id = 0, head = $$('head')[0], global = this;
+  global.getJSON = function(url, callback) {
+    var script = document.createElement('script'), token = '__jsonp' + id;
+ 
+    // callback should be a global function
+    global[token] = callback;
+ 
+    // url should have "?" parameter which is to be replaced with a global callback name
+    script.src = url.replace(/\?(&|$)/, '__jsonp' + id + '$1');
+ 
+    // clean up on load: remove script tag, null script variable and delete global callback function
+    script.onload = function() {
+      script.remove();
+      script = null;
+      delete global[token];
+    };
+    head.appendChild(script);
+ 
+    // callback name should be unique
+    id++;
+  }
+})();
+]
+beginXMLNode [div] [class=code]
+beginParagraph
+beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onWord [//]
+onSpace
+onWord [getJSON]
+onSpace
+onWord [function]
+onSpace
+onWord [by]
+onSpace
+onWord [Juriy]
+onSpace
+onWord [Zaytsev]
+onSpace
+onLineBreak
+onWord [//]
+onSpace
+onWord [http://github.com/kangax/protolicious/tree/master/get_json.js]
+onLineBreak
+endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onWord [(]
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [function]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [(){]
+onLineBreak
+onSpace
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [var]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onSpace
+onWord [id]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [0]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [,]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+onWord [head]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+onWord [$$]
+onWord [(]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ['head']
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord [)[]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [0]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onWord []]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [,]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+onWord [global]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [this]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [;]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onLineBreak
+onSpace
+onSpace
+onWord [global]
+onWord [.]
+onWord [getJSON]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [function]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [(]
+onWord [url]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [,]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+onWord [callback]
+onWord [)]
+onSpace
+onWord [{]
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [var]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onSpace
+onWord [script]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #008000; ]]
+onWord [document]
+endFormat: [NONE] [[style]=[color: #008000; ]]
+onWord [.]
+onWord [createElement]
+onWord [(]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ['script']
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord [)]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [,]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+onWord [token]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ['__jsonp']
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [+]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+onWord [id]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [;]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onLineBreak
+onSpace
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onWord [//]
+onSpace
+onWord [callback]
+onSpace
+onWord [should]
+onSpace
+onWord [be]
+onSpace
+onWord [a]
+onSpace
+onWord [global]
+onSpace
+onWord [function]
+onLineBreak
+endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onSpace
+onSpace
+onSpace
+onSpace
+onWord [global]
+onWord [[]
+onWord [token]
+onWord []]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+onWord [callback]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [;]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onLineBreak
+onSpace
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onWord [//]
+onSpace
+onWord [url]
+onSpace
+onWord [should]
+onSpace
+onWord [have]
+onSpace
+onWord ["?"]
+onSpace
+onWord [parameter]
+onSpace
+onWord [which]
+onSpace
+onWord [is]
+onSpace
+onWord [to]
+onSpace
+onWord [be]
+onSpace
+onWord [replaced]
+onSpace
+onWord [with]
+onSpace
+onWord [a]
+onSpace
+onWord [global]
+onSpace
+onWord [callback]
+onSpace
+onWord [name]
+onLineBreak
+endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onSpace
+onSpace
+onSpace
+onSpace
+onWord [script]
+onWord [.]
+onWord [src]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+onWord [url]
+onWord [.]
+onWord [replace]
+onWord [(]
+beginFormat: [NONE] [[style]=[color: #BB6688; ]]
+onWord [/\?(&|$)/]
+endFormat: [NONE] [[style]=[color: #BB6688; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [,]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ['__jsonp']
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [+]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+onWord [id]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [+]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ['$1']
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord [);]
+onLineBreak
+onSpace
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onWord [//]
+onSpace
+onWord [clean]
+onSpace
+onWord [up]
+onSpace
+onWord [on]
+onSpace
+onWord [load:]
+onSpace
+onWord [remove]
+onSpace
+onWord [script]
+onSpace
+onWord [tag,]
+onSpace
+onWord [null]
+onSpace
+onWord [script]
+onSpace
+onWord [variable]
+onSpace
+onWord [and]
+onSpace
+onWord [delete]
+onSpace
+onWord [global]
+onSpace
+onWord [callback]
+onSpace
+onWord [function]
+onLineBreak
+endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onSpace
+onSpace
+onSpace
+onSpace
+onWord [script]
+onWord [.]
+onWord [onload]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [function]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [()]
+onSpace
+onWord [{]
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onWord [script]
+onWord [.]
+onWord [remove]
+onWord [();]
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onWord [script]
+onSpace
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [null]
+endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [;]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onWord [delete]
+onSpace
+onWord [global]
+onWord [[]
+onWord [token]
+onWord [];]
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+onWord [};]
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+onWord [head]
+onWord [.]
+onWord [appendChild]
+onWord [(]
+onWord [script]
+onWord [);]
+onLineBreak
+onSpace
+onLineBreak
+onSpace
+onSpace
+onSpace
+onSpace
+beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onWord [//]
+onSpace
+onWord [callback]
+onSpace
+onWord [name]
+onSpace
+onWord [should]
+onSpace
+onWord [be]
+onSpace
+onWord [unique]
+onLineBreak
+endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onSpace
+onSpace
+onSpace
+onSpace
+onWord [id]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [++;]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+onLineBreak
+onSpace
+onSpace
+onWord [}]
+onLineBreak
+onWord [})();]
+onLineBreak
+endParagraph
+endXMLNode [div] [class=code]
+endMacroMarker [code] [language=javascript] [
+// getJSON function by Juriy Zaytsev 
+// http://github.com/kangax/protolicious/tree/master/get_json.js
+(function(){
+  var id = 0, head = $$('head')[0], global = this;
+  global.getJSON = function(url, callback) {
+    var script = document.createElement('script'), token = '__jsonp' + id;
+ 
+    // callback should be a global function
+    global[token] = callback;
+ 
+    // url should have "?" parameter which is to be replaced with a global callback name
+    script.src = url.replace(/\?(&|$)/, '__jsonp' + id + '$1');
+ 
+    // clean up on load: remove script tag, null script variable and delete global callback function
+    script.onload = function() {
+      script.remove();
+      script = null;
+      delete global[token];
+    };
+    head.appendChild(script);
+ 
+    // callback name should be unique
+    id++;
+  }
+})();
+]
+endDocument

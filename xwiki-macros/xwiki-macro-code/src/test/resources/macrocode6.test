@@ -1,0 +1,25 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+Some inline code macro: {{code language=none}}<b>bold</b><i>italic</i>{{/code}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [Some]
+onSpace
+onWord [inline]
+onSpace
+onWord [code]
+onSpace
+onWord [macro]
+onSpecialSymbol [:]
+onSpace
+beginMacroMarker [code] [language=none] [<b>bold</b><i>italic</i>]
+beginFormat: [NONE] [[class]=[code]]
+onVerbatimInline [<b>bold</b><i>italic</i>]
+endFormat: [NONE] [[class]=[code]]
+endMacroMarker [code] [language=none] [<b>bold</b><i>italic</i>]
+endParagraph
+endDocument

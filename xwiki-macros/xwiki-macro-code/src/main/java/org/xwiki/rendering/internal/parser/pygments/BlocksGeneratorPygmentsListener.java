@@ -21,16 +21,14 @@ package org.xwiki.rendering.internal.parser.pygments;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.python.core.PyNone;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
-import org.xwiki.rendering.block.LineBreakBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Transforms Pygments tokens into XWiki Rendering blocks. This class is overwritten in python an methods are called
@@ -45,6 +43,11 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
      * The highlighted result block.
      */
     private List<Block> blocks = new ArrayList<Block>();
+    
+    /**
+     * Methods for helping in parsing.
+     */
+    private ParserUtils parserUtils = new ParserUtils();
 
     /**
      * @return the highlighted result block.
@@ -62,31 +65,23 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
      */
     public void format(String tokenType, String value, Map<String, Object> style)
     {
-        Block block = null;
-
         if (value == null || value.length() == 0) {
             return;
         }
 
-        if (value.charAt(0) == '\n' || value.charAt(0) == '\r') {
-            block = LineBreakBlock.LINE_BREAK_BLOCK;
-        } else {
-            WordBlock wordBlock = new WordBlock(value);
+        List<Block> blockList = this.parserUtils.parseInlineNonWiki(value);
 
+        if (!blockList.isEmpty()) {
             String styleParameter = formatStyle(style);
 
+            FormatBlock formatBlock = null;
             if (styleParameter.length() > 0) {
-                FormatBlock formatBlock = new FormatBlock(Collections.<Block> singletonList(wordBlock), Format.NONE);
+                formatBlock = new FormatBlock(blockList, Format.NONE);
                 formatBlock.setParameter("style", styleParameter);
-
-                block = formatBlock;
+                this.blocks.add(formatBlock);
             } else {
-                block = wordBlock;
+                blocks.addAll(blockList);
             }
-        }
-
-        if (block != null) {
-            this.blocks.add(block);
         }
     }
 

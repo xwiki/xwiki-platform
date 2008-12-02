@@ -39,10 +39,14 @@ import java.io.StringReader;
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.LineBreakBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.WikiModelXWikiParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -97,6 +101,48 @@ public class ParserUtils
         }
         
         return result;
+    }
+    
+    /**
+     * Parse a simple inline non wiki string to be able to insert it in the XDOM.
+     * 
+     * @param value the value to parse.
+     * @return the list of {@link Block} ({@link WordBlock}, {@link SpaceBlock}, {@link LineBreakBlock}).
+     * @since 1.7
+     */
+    public List<Block> parseInlineNonWiki(String value)
+    {
+        List<Block> blockList = new ArrayList<Block>();
+        StringBuffer word = new StringBuffer();
+        for (int i = 0; i < value.length(); ++i) {
+            char c = value.charAt(i);
+
+            if (c == '\n') {
+                if (word.length() > 0) {
+                    blockList.add(new WordBlock(word.toString()));
+                }
+                blockList.add(LineBreakBlock.LINE_BREAK_BLOCK);
+
+                word = new StringBuffer();
+            } else if (c == '\r') {
+                continue;
+            } else if (c == ' ') {
+                if (word.length() > 0) {
+                    blockList.add(new WordBlock(word.toString()));
+                }
+                blockList.add(SpaceBlock.SPACE_BLOCK);
+
+                word = new StringBuffer();
+            } else {
+                word.append(c);
+            }
+        }
+
+        if (word.length() > 0) {
+            blockList.add(new WordBlock(word.toString()));
+        }
+
+        return blockList;
     }
     
     /**

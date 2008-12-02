@@ -61,9 +61,6 @@ sup {}
 /* End of 9.2 */
 p {}
 pre {
-  font-family: "Arial", "Lucida", "Trebuchet MS", "Luxi Sans", "Helvetica", sans-serif;
-}
-pre.xwikierror {
   font-family: "Bitstream Vera Sans Mono", "Courier New", Monaco, Courier, monospace;  /* [3] */
   overflow: auto;
   background-color: #EEE;

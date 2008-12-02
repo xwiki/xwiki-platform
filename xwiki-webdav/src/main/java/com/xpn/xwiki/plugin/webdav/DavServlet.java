@@ -322,7 +322,7 @@ public class DavServlet extends AbstractWebdavServlet
         DavResource resource) throws ServletException, IOException, DavException
     {
         XWikiDavResource res = (XWikiDavResource) resource;
-        LOG.warn("Resource : [" + res.getDisplayName() + "] Method : [" + request.getMethod() + "]");
+        LOG.debug("Resource : [" + res.getDisplayName() + "] Method : [" + request.getMethod() + "]");
         return super.execute(request, response, method, resource);
     }
 }

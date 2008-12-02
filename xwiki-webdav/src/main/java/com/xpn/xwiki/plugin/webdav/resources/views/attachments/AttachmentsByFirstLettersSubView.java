@@ -69,7 +69,8 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
         String spaceName = getCollection().getDisplayName();
         if (next < tokens.length) {
@@ -98,8 +99,7 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
             List<String> docNames =
                 xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 0, 0, xwikiContext);
             for (String docName : docNames) {
-                if (xwikiContext.getWiki().getRightService().hasAccessLevel("view",
-                    xwikiContext.getUser(), docName, xwikiContext)) {
+                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
                     int dot = docName.lastIndexOf('.');
                     String pageName = docName.substring(dot + 1);
                     if (pageName.toUpperCase().startsWith(filter)) {

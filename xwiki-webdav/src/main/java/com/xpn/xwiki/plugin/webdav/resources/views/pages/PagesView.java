@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * This view lists all the documents organized by space.
@@ -43,7 +44,7 @@ import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
  * @version $Id$
  */
 public class PagesView extends AbstractDavView
-{   
+{
     /**
      * Logger instance.
      */
@@ -52,7 +53,8 @@ public class PagesView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
         if (next < tokens.length) {
             String spaceName = tokens[next];
@@ -89,11 +91,13 @@ public class PagesView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        // TODO : Need to check appropriate rights.
         PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) resource;
+        String homePage = space.getDisplayName() + ".WebHome";
+        XWikiDavUtils.checkAccess("edit", homePage, xwikiContext);
         try {
             XWikiDocument doc =
-                xwikiContext.getWiki().getDocument(space.getDisplayName() + ".WebHome", xwikiContext);
+                xwikiContext.getWiki().getDocument(space.getDisplayName() + ".WebHome",
+                    xwikiContext);
             doc.setContent("This page was created thorugh xwiki-webdav interface.");
             xwikiContext.getWiki().saveDocument(doc, xwikiContext);
         } catch (XWikiException e) {
@@ -106,12 +110,15 @@ public class PagesView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        // TODO : Need to check appropriate rights.
         PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) member;
         try {
             List<String> docNames =
                 xwikiContext.getWiki().getStore().searchDocumentsNames(
                     "where doc.web='" + space.getDisplayName() + "'", 0, 0, xwikiContext);
+            // Check if the user has delete rights on all child pages.
+            for (String docName : docNames) {
+                XWikiDavUtils.checkAccess("delete", docName, xwikiContext);
+            }
             for (String docName : docNames) {
                 XWikiDocument doc = xwikiContext.getWiki().getDocument(docName, xwikiContext);
                 xwikiContext.getWiki().deleteDocument(doc, xwikiContext);
@@ -135,5 +142,5 @@ public class PagesView extends AbstractDavView
     public String getSupportedMethods()
     {
         return "OPTIONS, GET, HEAD, POST, PROPFIND, MKCOL, PUT, LOCK, UNLOCK";
-    } 
+    }
 }

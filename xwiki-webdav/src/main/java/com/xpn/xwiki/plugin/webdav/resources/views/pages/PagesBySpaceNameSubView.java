@@ -47,7 +47,7 @@ import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
  * @version $Id$
  */
 public class PagesBySpaceNameSubView extends AbstractDavView
-{   
+{
     /**
      * Logger instance.
      */
@@ -56,7 +56,8 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
         if (next < tokens.length) {
             String token = tokens[next];
@@ -107,13 +108,15 @@ public class PagesBySpaceNameSubView extends AbstractDavView
             Set<String> subViewNames = new HashSet<String>();
             int subViewNameLength = XWikiDavUtils.getSubViewNameLength(docNames.size());
             for (String docName : docNames) {
-                int dot = docName.lastIndexOf('.');
-                String pageName = docName.substring(dot + 1);
-                if (subViewNameLength < pageName.length()) {
-                    subViewNames.add(pageName.substring(0, subViewNameLength).toUpperCase());
-                } else {
-                    // This is not good.
-                    subViewNames.add(pageName.toUpperCase());
+                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
+                    int dot = docName.lastIndexOf('.');
+                    String pageName = docName.substring(dot + 1);
+                    if (subViewNameLength < pageName.length()) {
+                        subViewNames.add(pageName.substring(0, subViewNameLength).toUpperCase());
+                    } else {
+                        // This is not good.
+                        subViewNames.add(pageName.toUpperCase());
+                    }
                 }
             }
             for (String subViewName : subViewNames) {
@@ -121,8 +124,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                     String modName =
                         XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX + subViewName
                             + XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX;
-                    PagesByFirstLettersSubView subView =
-                        new PagesByFirstLettersSubView();
+                    PagesByFirstLettersSubView subView = new PagesByFirstLettersSubView();
                     subView.init(this, modName, "/" + modName);
                     children.add(subView);
                 } catch (DavException e) {
@@ -142,12 +144,15 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     {
         if (resource instanceof DavPage) {
             String pName = ((DavPage) resource).getDisplayName();
-            try {
-                XWikiDocument childDoc = xwikiContext.getWiki().getDocument(pName, xwikiContext);
-                childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
-                xwikiContext.getWiki().saveDocument(childDoc, xwikiContext);
-            } catch (XWikiException e) {
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+            if (XWikiDavUtils.hasAccess("edit", pName, xwikiContext)) {
+                try {
+                    XWikiDocument childDoc =
+                        xwikiContext.getWiki().getDocument(pName, xwikiContext);
+                    childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
+                    xwikiContext.getWiki().saveDocument(childDoc, xwikiContext);
+                } catch (XWikiException e) {
+                    throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+                }
             }
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
@@ -161,13 +166,16 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     {
         if (member instanceof DavPage) {
             String pName = ((DavPage) member).getDisplayName();
-            try {
-                XWikiDocument childDoc = xwikiContext.getWiki().getDocument(pName, xwikiContext);
-                if (!childDoc.isNew()) {
-                    xwikiContext.getWiki().deleteDocument(childDoc, xwikiContext);
+            if (XWikiDavUtils.hasAccess("delete", pName, xwikiContext)) {
+                try {
+                    XWikiDocument childDoc =
+                        xwikiContext.getWiki().getDocument(pName, xwikiContext);
+                    if (!childDoc.isNew()) {
+                        xwikiContext.getWiki().deleteDocument(childDoc, xwikiContext);
+                    }
+                } catch (XWikiException e) {
+                    throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
                 }
-            } catch (XWikiException e) {
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
             }
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
@@ -179,7 +187,6 @@ public class PagesBySpaceNameSubView extends AbstractDavView
      */
     public void move(DavResource destination) throws DavException
     {
-        // TODO : Need to check appropriate rights.
         // We only support rename operation for the moment.
         if (destination instanceof PagesBySpaceNameSubView) {
             PagesBySpaceNameSubView dSpace = (PagesBySpaceNameSubView) destination;
@@ -190,6 +197,14 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                         List<String> docNames =
                             xwikiContext.getWiki().getStore().searchDocumentsNames(
                                 "where doc.web='" + this.name + "'", 0, 0, xwikiContext);
+                        // To rename an entire space, user should have delete rights on all the
+                        // documents in the current space and edit rights on all the documents that
+                        // will be created after the rename operation.
+                        for (String docName : docNames) {
+                            String newDocName = dSpace.getDisplayName() + "." + docName;
+                            XWikiDavUtils.checkAccess("delete", docName, xwikiContext);
+                            XWikiDavUtils.checkAccess("edit", newDocName, xwikiContext);
+                        }
                         for (String docName : docNames) {
                             XWikiDocument doc =
                                 xwikiContext.getWiki().getDocument(docName, xwikiContext);

@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * This view would list the last 20 modified pages.
@@ -43,7 +44,7 @@ import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
  * @version $Id$
  */
 public class WhatsnewView extends AbstractDavView
-{    
+{
     /**
      * Logger instance.
      */
@@ -52,7 +53,8 @@ public class WhatsnewView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
         if (next < tokens.length) {
             String docName = tokens[next];
@@ -78,8 +80,7 @@ public class WhatsnewView extends AbstractDavView
             List<String> docNames =
                 xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 20, 0, xwikiContext);
             for (String docName : docNames) {
-                if (xwikiContext.getWiki().getRightService().hasAccessLevel("view",
-                    xwikiContext.getUser(), docName, xwikiContext)) {
+                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
                     DavPage page = new DavPage();
                     page.init(this, docName, "/" + docName);
                     children.add(page);

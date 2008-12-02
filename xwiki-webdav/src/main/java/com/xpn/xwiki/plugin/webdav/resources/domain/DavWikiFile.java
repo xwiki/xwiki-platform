@@ -42,6 +42,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavFile;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * The dav resource used to represent the wiki content of an {@link XWikiDocument}.
@@ -49,7 +50,7 @@ import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavFile;
  * @version $Id$
  */
 public class DavWikiFile extends AbstractDavFile
-{   
+{
     /**
      * Logger instance.
      */
@@ -117,16 +118,21 @@ public class DavWikiFile extends AbstractDavFile
     public void spool(OutputContext outputContext) throws IOException
     {
         if (exists()) {
-            OutputStream out = outputContext.getOutputStream();
-            if (out != null) {
-                try {
-                    String content =
-                        this.name.equals(WIKI_TXT) ? parentDoc.getContent() : parentDoc
-                            .toXML(xwikiContext);
-                    out.write(content.getBytes());
-                    out.flush();
-                } catch (XWikiException ex) {
-                    throw new IOException(ex.getFullMessage());
+            // Protect against direct url referencing.
+            if (!XWikiDavUtils.hasAccess("view", parentDoc.getFullName(), xwikiContext)) {
+                throw new IOException("Access rights violation.");
+            } else {
+                OutputStream out = outputContext.getOutputStream();
+                if (out != null) {
+                    try {
+                        String content =
+                            this.name.equals(WIKI_TXT) ? parentDoc.getContent() : parentDoc
+                                .toXML(xwikiContext);
+                        out.write(content.getBytes());
+                        out.flush();
+                    } catch (XWikiException ex) {
+                        throw new IOException(ex.getFullMessage());
+                    }
                 }
             }
         }

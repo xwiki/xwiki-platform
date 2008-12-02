@@ -50,6 +50,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavResource;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -58,7 +59,7 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  */
 public class DavPage extends AbstractDavResource
-{    
+{
     /**
      * Logger instance.
      */
@@ -107,7 +108,8 @@ public class DavPage extends AbstractDavResource
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
         if (next < tokens.length) {
             boolean last = (next + 1 == tokens.length);
@@ -187,14 +189,17 @@ public class DavPage extends AbstractDavResource
     @SuppressWarnings("unchecked")
     public DavResourceIterator getMembers()
     {
+        // Protect against direct url referencing.
         List<DavResource> children = new ArrayList<DavResource>();
+        if(!XWikiDavUtils.hasAccess("view", this.name, xwikiContext)) {
+            return new DavResourceIteratorImpl(children);
+        }
         try {
             String sql = "where doc.parent='" + this.name + "'";
             List<String> docNames =
                 xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 0, 0, xwikiContext);
             for (String docName : docNames) {
-                if (xwikiContext.getWiki().getRightService().hasAccessLevel("view",
-                    xwikiContext.getUser(), docName, xwikiContext)) {
+                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
                     XWikiDocument childDoc =
                         xwikiContext.getWiki().getDocument(docName, xwikiContext);
                     DavPage page = new DavPage();
@@ -280,13 +285,10 @@ public class DavPage extends AbstractDavResource
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        // TODO : Need to check appropriate rights.
+        XWikiDavUtils.checkAccess("edit", this.name, xwikiContext);
         boolean isFile = (inputContext.getInputStream() != null);
         if (isFile) {
             try {
-                // Note : We can do more specific type checking here (a.k.a instanceof) to validate
-                // the resource parameter (it could be a XWikiDavWikiFile, XWikiDavAttachment or a
-                // XWikiDavTempFile) but for the moment i'm keeping it more generic.
                 String fName = resource.getDisplayName();
                 byte[] data = Util.getFileContentAsBytes(inputContext.getInputStream());
                 if (fName.equals(DavWikiFile.WIKI_TXT)) {
@@ -295,7 +297,7 @@ public class DavPage extends AbstractDavResource
                 } else if (fName.equals(DavWikiFile.WIKI_XML)) {
                     throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
                 } else if (fName.startsWith(".")) {
-                    DavTempFile tempFile = (DavTempFile) resource; 
+                    DavTempFile tempFile = (DavTempFile) resource;
                     tempFile.setdData(data);
                     getSessionResources().add(tempFile);
                 } else {
@@ -307,8 +309,8 @@ public class DavPage extends AbstractDavResource
                 throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
             }
         } else {
-            // Here also we're avoiding type checking.
             String pName = resource.getDisplayName();
+            XWikiDavUtils.checkAccess("edit", pName, xwikiContext);
             try {
                 XWikiDocument childDoc = xwikiContext.getWiki().getDocument(pName, xwikiContext);
                 childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
@@ -317,6 +319,7 @@ public class DavPage extends AbstractDavResource
             } catch (XWikiException e) {
                 throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
             }
+
         }
     }
 
@@ -325,8 +328,7 @@ public class DavPage extends AbstractDavResource
      */
     public void removeMember(DavResource member) throws DavException
     {
-        // TODO : Need to check appropriate rights.
-        // We're avoiding type checking (a.k.a instanceof) for the moment.
+        XWikiDavUtils.checkAccess("edit", this.name, xwikiContext);
         String mName = member.getDisplayName();
         if (mName.equals(DavWikiFile.WIKI_TXT) || mName.equals(DavWikiFile.WIKI_XML)) {
             // Wiki files cannot be deleted, but don't do anything! let the client assume that the
@@ -345,6 +347,7 @@ public class DavPage extends AbstractDavResource
         } else {
             try {
                 XWikiDocument childDoc = xwikiContext.getWiki().getDocument(mName, xwikiContext);
+                XWikiDavUtils.checkAccess("delete", childDoc.getFullName(), xwikiContext);
                 if (!childDoc.isNew()) {
                     xwikiContext.getWiki().deleteDocument(childDoc, xwikiContext);
                 }
@@ -359,6 +362,7 @@ public class DavPage extends AbstractDavResource
      */
     public void move(DavResource destination) throws DavException
     {
+        XWikiDavUtils.checkAccess("delete", this.name, xwikiContext);
         XWikiDavResource dResource = (XWikiDavResource) destination;
         String dSpaceName = null;
         String dPageName = null;
@@ -378,6 +382,12 @@ public class DavPage extends AbstractDavResource
                 List<String> childDocNames =
                     xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 0, 0,
                         xwikiContext);
+                // Validate access rights for the destination page.
+                XWikiDavUtils.checkAccess("edit", newDocName, xwikiContext);
+                // Validate access rights for all the renamed pages.
+                for (String childDocName : childDocNames) {
+                    XWikiDavUtils.checkAccess("edit", childDocName, xwikiContext);
+                }
                 doc.rename(newDocName, xwikiContext);
                 for (String childDocName : childDocNames) {
                     XWikiDocument childDoc =

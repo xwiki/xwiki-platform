@@ -55,14 +55,14 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
         if (next < tokens.length) {
             String token = tokens[next];
             if (token.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX)
                 && token.endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX)) {
-                AttachmentsByFirstLettersSubView subView =
-                    new AttachmentsByFirstLettersSubView();
+                AttachmentsByFirstLettersSubView subView = new AttachmentsByFirstLettersSubView();
                 subView.init(this, token.toUpperCase(), "/" + token.toUpperCase());
                 stack.push(subView);
                 subView.decode(stack, tokens, next + 1);
@@ -87,13 +87,15 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
             Set<String> subViewNames = new HashSet<String>();
             int subViewNameLength = XWikiDavUtils.getSubViewNameLength(docNames.size());
             for (String docName : docNames) {
-                int dot = docName.lastIndexOf('.');
-                String pageName = docName.substring(dot + 1);
-                if (subViewNameLength < pageName.length()) {
-                    subViewNames.add(pageName.substring(0, subViewNameLength).toUpperCase());
-                } else {
-                    // This is not good.
-                    subViewNames.add(pageName.toUpperCase());
+                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
+                    int dot = docName.lastIndexOf('.');
+                    String pageName = docName.substring(dot + 1);
+                    if (subViewNameLength < pageName.length()) {
+                        subViewNames.add(pageName.substring(0, subViewNameLength).toUpperCase());
+                    } else {
+                        // This is not good.
+                        subViewNames.add(pageName.toUpperCase());
+                    }
                 }
             }
             for (String subViewName : subViewNames) {

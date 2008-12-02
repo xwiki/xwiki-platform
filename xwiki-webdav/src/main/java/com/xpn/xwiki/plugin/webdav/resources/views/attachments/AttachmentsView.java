@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * This view list all documents containing attachments.
@@ -44,7 +45,7 @@ import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
  * @version $Id$
  */
 public class AttachmentsView extends AbstractDavView
-{       
+{
     /**
      * Logger instance.
      */
@@ -53,7 +54,8 @@ public class AttachmentsView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
         if (next < tokens.length) {
             String spaceName = tokens[next];
@@ -78,14 +80,15 @@ public class AttachmentsView extends AbstractDavView
                         xwikiContext);
             Set<String> spacesWithAttachments = new HashSet<String>();
             for (String docName : docNames) {
-                int dot = docName.lastIndexOf('.');
-                if (dot != -1) {
-                    spacesWithAttachments.add(docName.substring(0, dot));
+                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
+                    int dot = docName.lastIndexOf('.');
+                    if (dot != -1) {
+                        spacesWithAttachments.add(docName.substring(0, dot));
+                    }
                 }
             }
             for (String spaceName : spacesWithAttachments) {
-                AttachmentsBySpaceNameSubView subView =
-                    new AttachmentsBySpaceNameSubView();
+                AttachmentsBySpaceNameSubView subView = new AttachmentsBySpaceNameSubView();
                 subView.init(this, spaceName, "/" + spaceName);
                 children.add(subView);
             }

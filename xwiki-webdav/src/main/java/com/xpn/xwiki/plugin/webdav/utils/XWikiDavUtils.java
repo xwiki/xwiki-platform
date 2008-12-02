@@ -19,6 +19,13 @@
  */
 package com.xpn.xwiki.plugin.webdav.utils;
 
+import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.DavServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 
@@ -28,7 +35,12 @@ import com.xpn.xwiki.api.Document;
  * @version $Id$.
  */
 public final class XWikiDavUtils
-{       
+{
+    /**
+     * Logger instance.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(XWikiDavUtils.class);
+
     /**
      * Prefix used to indicate the beginning of a virtual grouping.
      */
@@ -48,42 +60,43 @@ public final class XWikiDavUtils
      * Signature used to identify a webdav url.
      */
     public static final String XWIKI_WEBDAV_SIGNATURE = "/xwiki/webdav/spaces/";
- 
+
     /**
      * Collection of role-hint values for various components internal to xwiki-webdav.
      */
-    public interface ResourceHint {
+    public interface ResourceHint
+    {
         /**
          * Root view.
          */
         public static final String ROOT = "root";
-        
+
         /**
          * Pages base view.
          */
         public static final String PAGES = "pages-baseview";
-        
+
         /**
          * Attachments base view.
          */
         public static final String ATTACHMENTS = "attachments-baseview";
-        
+
         /**
          * Home base view.
          */
         public static final String HOME = "home-baseview";
-        
+
         /**
          * Orphans base view.
          */
         public static final String ORPHANS = "orphans-baseview";
-        
+
         /**
          * Whatsnew base view.
          */
-        public static final String WHATSNEW = "whatsnew-baseview";       
-    } 
-    
+        public static final String WHATSNEW = "whatsnew-baseview";
+    }
+
     /**
      * Forbidden constructor.
      */
@@ -142,4 +155,49 @@ public final class XWikiDavUtils
         return webDAVUrl;
     }
 
+    /**
+     * Returns if the user (in the context) has the given access level on the document in question.
+     * 
+     * @param right Access level.
+     * @param docName Name of the document.
+     * @param context The {@link XWikiContext}.
+     * @return True if the user has the given access level for the document in question, false
+     *         otherwise.
+     */
+    public static boolean hasAccess(String right, String docName, XWikiContext context)
+    {
+        boolean hasAccess = false;
+        try {
+            if (context.getWiki().getRightService().hasAccessLevel(right, context.getUser(),
+                docName, context)) {
+                hasAccess = true;
+            }
+        } catch (XWikiException ex) {
+            logger.error("Error while validating access level.", ex);
+        }
+        return hasAccess;
+    }
+
+    /**
+     * Validates if the user (in the context) has the given access level on the document in
+     * question, if not, throws a {@link DavException}.
+     * 
+     * @param right Access level.
+     * @param docName Name of the document.
+     * @param context The {@link XWikiContext}.
+     * @throws DavException If the user doesn't have enough access rights on the given document or
+     *             if the access verification code fails.
+     */
+    public static void checkAccess(String right, String docName, XWikiContext context)
+        throws DavException
+    {
+        try {
+            if (!context.getWiki().getRightService().hasAccessLevel(right, context.getUser(),
+                docName, context)) {
+                throw new DavException(DavServletResponse.SC_FORBIDDEN);
+            }
+        } catch (XWikiException ex) {
+            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+        }
+    }
 }

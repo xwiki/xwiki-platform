@@ -41,6 +41,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavFile;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * The DAV resource representing an {@link XWikiAttachment}.
@@ -94,13 +95,18 @@ public class DavAttachment extends AbstractDavFile
     public void spool(OutputContext outputContext) throws IOException
     {
         if (exists()) {
-            OutputStream out = outputContext.getOutputStream();
-            if (null != out) {
-                try {
-                    out.write(this.attachment.getContent(xwikiContext));
-                    out.flush();
-                } catch (XWikiException ex) {
-                    throw new IOException(ex.getFullMessage());
+            // Protect against direct url referencing.
+            if (!XWikiDavUtils.hasAccess("view", attachment.getDoc().getName(), xwikiContext)) {
+                throw new IOException("Access rights violation.");
+            } else {
+                OutputStream out = outputContext.getOutputStream();
+                if (null != out) {
+                    try {
+                        out.write(this.attachment.getContent(xwikiContext));
+                        out.flush();
+                    } catch (XWikiException ex) {
+                        throw new IOException(ex.getFullMessage());
+                    }
                 }
             }
         }
@@ -111,6 +117,7 @@ public class DavAttachment extends AbstractDavFile
      */
     public void move(DavResource destination) throws DavException
     {
+        XWikiDavUtils.checkAccess("edit", attachment.getDoc().getName(), xwikiContext);
         if (destination instanceof DavAttachment) {
             DavAttachment dAttachment = (DavAttachment) destination;
             // Check if this is a rename operation.
@@ -213,5 +220,5 @@ public class DavAttachment extends AbstractDavFile
     public String getSupportedMethods()
     {
         return "OPTIONS, GET, HEAD, PROPFIND, PROPPATCH, COPY, DELETE, MOVE, LOCK, UNLOCK";
-    }   
+    }
 }

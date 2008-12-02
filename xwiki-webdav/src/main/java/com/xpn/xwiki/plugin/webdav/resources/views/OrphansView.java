@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * This view allows to view the other entry points in the wiki that are not linked to
@@ -45,7 +46,7 @@ import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
  * @version $Id$
  */
 public class OrphansView extends AbstractDavView
-{   
+{
     /**
      * Logger instance.
      */
@@ -54,7 +55,8 @@ public class OrphansView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
         if (next < tokens.length) {
             String docName = tokens[next];
@@ -80,8 +82,7 @@ public class OrphansView extends AbstractDavView
             List<String> docNames =
                 xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 0, 0, xwikiContext);
             for (String docName : docNames) {
-                if (xwikiContext.getWiki().getRightService().hasAccessLevel("view",
-                    xwikiContext.getUser(), docName, xwikiContext)) {
+                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
                     DavPage page = new DavPage();
                     page.init(this, docName, "/" + docName);
                     children.add(page);

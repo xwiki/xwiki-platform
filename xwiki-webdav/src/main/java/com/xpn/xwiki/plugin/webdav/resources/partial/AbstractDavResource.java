@@ -181,7 +181,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
     {
         HttpSession httpSession = xwikiContext.getRequest().getSession();
         if (httpSession.getAttribute(getResourcePath()) == null) {
-            httpSession.setAttribute(getResourcePath(), new ArrayList<DavResource>());
+            httpSession.setAttribute(getResourcePath(), new ArrayList<XWikiDavResource>());
         }
         return (List<XWikiDavResource>) httpSession.getAttribute(getResourcePath());
     }

@@ -21,27 +21,20 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
 import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.AbstractExecutableTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Unit tests for {@link InsertHTMLExecutable}.
  * 
  * @version $Id$
  */
-public class InsertHTMLExecutableTest extends AbstractExecutableTest
+public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
 {
     /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExecutableTest#gwtSetUp()
+     * The executable being tested.
      */
-    protected void gwtSetUp() throws Exception
-    {
-        super.gwtSetUp();
-        if (executable == null) {
-            executable = new InsertHTMLExecutable();
-        }
-    }
+    private Executable executable = new InsertHTMLExecutable();
 
     /**
      * Tests the {@link InsertHTMLExecutable} when the caret goes between DOM child nodes after the selection is
@@ -49,7 +42,7 @@ public class InsertHTMLExecutableTest extends AbstractExecutableTest
      */
     public void testInsertBetweenChildren()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
@@ -58,7 +51,7 @@ public class InsertHTMLExecutableTest extends AbstractExecutableTest
                 doTestInsertBetweenChildren();
                 finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**
@@ -85,7 +78,7 @@ public class InsertHTMLExecutableTest extends AbstractExecutableTest
      */
     public void testInsertAfterLastChild()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
@@ -94,7 +87,7 @@ public class InsertHTMLExecutableTest extends AbstractExecutableTest
                 doTestInsertAfterLastChild();
                 finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**
@@ -120,7 +113,7 @@ public class InsertHTMLExecutableTest extends AbstractExecutableTest
      */
     public void testInsertInTextNode()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
@@ -129,7 +122,7 @@ public class InsertHTMLExecutableTest extends AbstractExecutableTest
                 doTestInsertInTextNode();
                 finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**

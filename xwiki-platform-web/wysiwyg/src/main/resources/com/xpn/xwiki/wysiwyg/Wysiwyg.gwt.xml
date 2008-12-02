@@ -1,67 +1,93 @@
 <module>
-  <inherits name='com.google.gwt.user.User' />
-  <inherits name="com.google.gwt.i18n.I18N" />
-  <inherits name="com.google.gwt.http.HTTP" />
-  <inherits name="com.google.gwt.junit.JUnit" />
-  <inherits name="com.google.gwt.widgetideas.GlassPanel" />
-  <inherits name="com.xpn.xwiki.gwt.api.Api" />
+  <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+  <inherits name="com.google.gwt.http.HTTP"/>
+  <inherits name="com.google.gwt.junit.JUnit"/>
+  <inherits name="com.google.gwt.widgetideas.GlassPanel"/>
+  <inherits name="com.xpn.xwiki.gwt.api.Api"/>
 
-  <stylesheet src="Wysiwyg.css" />
-  <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg" />
+  <stylesheet src="Wysiwyg.css"/>
+  <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg"/>
 
   <!-- RangeFactory -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultRangeFactory">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultRangeFactory" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultRangeFactory"/>
   </replace-with>
 
   <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.IERangeFactory">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultRangeFactory" />
-    <when-property-is name="user.agent" value="ie6" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultRangeFactory"/>
+    <when-property-is name="user.agent" value="ie6"/>
   </replace-with>
 
   <!-- SelectionManager -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultSelectionManager">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultSelectionManager" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultSelectionManager"/>
   </replace-with>
 
   <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.IESelectionManager">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultSelectionManager" />
-    <when-property-is name="user.agent" value="ie6" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.internal.DefaultSelectionManager"/>
+    <when-property-is name="user.agent" value="ie6"/>
   </replace-with>
 
   <!-- DOMUtils -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.MozillaDOMUtils">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.DOMUtils" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.DOMUtils"/>
   </replace-with>
 
   <replace-with class="com.xpn.xwiki.wysiwyg.client.dom.internal.IEDOMUtils">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.DOMUtils" />
-    <when-property-is name="user.agent" value="ie6" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.dom.DOMUtils"/>
+    <when-property-is name="user.agent" value="ie6"/>
+  </replace-with>
+
+  <!-- RichTextArea -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplIE6">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
+    <when-property-is name="user.agent" value="ie6"/>
+  </replace-with>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplMozilla">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8"/>
+      <when-property-is name="user.agent" value="gecko"/>
+    </any>
+  </replace-with>
+
+  <!-- BehaviorAdjuster -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster"/>
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.MozillaBehaviorAdjuster">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster"/>
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8"/>
+      <when-property-is name="user.agent" value="gecko"/>
+    </any>
   </replace-with>
 
   <!-- Console -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.util.Console">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.Console" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.Console"/>
   </replace-with>
 
   <replace-with class="com.xpn.xwiki.wysiwyg.client.util.internal.FirebugConsole">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.Console" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.Console"/>
     <any>
-      <when-property-is name="user.agent" value="gecko1_8" />
-      <when-property-is name="user.agent" value="gecko" />
+      <when-property-is name="user.agent" value="gecko1_8"/>
+      <when-property-is name="user.agent" value="gecko"/>
     </any>
   </replace-with>
 
   <!-- BackColorExecutable -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BackColorExecutable">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BackColorExecutable" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BackColorExecutable"/>
   </replace-with>
 
   <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.HiliteColorExecutable">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BackColorExecutable" />
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BackColorExecutable"/>
     <any>
-      <when-property-is name="user.agent" value="gecko1_8" />
-      <when-property-is name="user.agent" value="gecko" />
+      <when-property-is name="user.agent" value="gecko1_8"/>
+      <when-property-is name="user.agent" value="gecko"/>
     </any>
   </replace-with>
 </module>

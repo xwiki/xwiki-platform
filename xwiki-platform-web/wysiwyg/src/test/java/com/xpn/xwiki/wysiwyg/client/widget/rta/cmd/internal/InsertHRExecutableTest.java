@@ -21,27 +21,20 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
 import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.AbstractExecutableTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Unit test for {@link InsertHRExecutable}.
  * 
  * @version $Id$
  */
-public class InsertHRExecutableTest extends AbstractExecutableTest
+public class InsertHRExecutableTest extends AbstractRichTextAreaTest
 {
     /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExecutableTest#gwtSetUp()
+     * The executable being tested.
      */
-    protected void gwtSetUp() throws Exception
-    {
-        super.gwtSetUp();
-        if (executable == null) {
-            executable = new InsertHRExecutable();
-        }
-    }
+    private Executable executable = new InsertHRExecutable();
 
     /**
      * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
@@ -49,7 +42,7 @@ public class InsertHRExecutableTest extends AbstractExecutableTest
      */
     public void testInsertAtCaret()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
@@ -58,7 +51,7 @@ public class InsertHRExecutableTest extends AbstractExecutableTest
                 doTestInsertAtCaret();
                 finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**
@@ -84,7 +77,7 @@ public class InsertHRExecutableTest extends AbstractExecutableTest
      */
     public void testReplaceSelection()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
@@ -93,7 +86,7 @@ public class InsertHRExecutableTest extends AbstractExecutableTest
                 doTestReplaceSelection();
                 finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**
@@ -124,7 +117,7 @@ public class InsertHRExecutableTest extends AbstractExecutableTest
      */
     public void testEmptyDocument()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
@@ -133,7 +126,7 @@ public class InsertHRExecutableTest extends AbstractExecutableTest
                 doTestEmptyDocument();
                 finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**
@@ -154,7 +147,7 @@ public class InsertHRExecutableTest extends AbstractExecutableTest
      */
     public void testReplaceElementText()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
@@ -163,7 +156,7 @@ public class InsertHRExecutableTest extends AbstractExecutableTest
                 doTestReplaceElementText();
                 finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**

@@ -22,26 +22,21 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.dom.client.Element;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.IFrameElement;
-import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ChangeListenerCollection;
 import com.google.gwt.user.client.ui.HasName;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyFactory;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultCommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.history.History;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.history.internal.DefaultHistory;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster;
 
 /**
  * Extends the rich text area provided by GWT to add support for advanced editing.
@@ -50,6 +45,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.history.internal.DefaultHistory;
  */
 public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements SourcesChangeEvents, HasName
 {
+    /**
+     * @see #setHTML(String)
+     */
+    public static final String DIRTY = "dirty";
+
     /**
      * The command manager that executes commands on this rich text area.
      */
@@ -73,16 +73,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     private final List<ShortcutKey> shortcutKeys = new ArrayList<ShortcutKey>();
 
     /**
-     * The document template that is applied on the edited document whenever the rich text area is loaded.
-     */
-    private final DocumentTemplate template = new DocumentTemplate();
-
-    /**
-     * Applies the {@link #template} on the {@link #getDocument()}.
-     */
-    private final DocumentTemplateEnforcer templateEnforcer = new DocumentTemplateEnforcer(this);
-
-    /**
      * The name of this rich text area. It could be used to submit the edited contents to the server.
      */
     private String name;
@@ -102,6 +92,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     {
         cm = new DefaultCommandManager(this);
         history = new DefaultHistory(this, 10);
+        addKeyboardListener((BehaviorAdjuster) GWT.create(BehaviorAdjuster.class));
     }
 
     /**
@@ -184,19 +175,23 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     }
 
     /**
+     * NOTE: If the current browser doesn't support rich text editing this method returns <code>null</code>. You should
+     * test the returned value and fail save to an appropriate behavior!<br/>
+     * The appropriate test would be: <code><pre>
+     * if (rta.isAttached() && rta.getDocument() == null) {
+     *   // The current browser doesn't support rich text editing.
+     * }
+     * </pre></code>
+     * 
      * @return The DOM document being edited with this rich text area.
      */
     public Document getDocument()
     {
-        return IFrameElement.as(getElement()).getContentDocument().cast();
-    }
-
-    /**
-     * @return The document template that is applied on the edited document when the rich text area is loading.
-     */
-    public DocumentTemplate getDocumentTemplate()
-    {
-        return template;
+        if (getElement().getTagName().equalsIgnoreCase("iframe")) {
+            return IFrameElement.as(getElement()).getContentDocument().cast();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -218,20 +213,15 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /**
      * {@inheritDoc}
      * 
-     * @see com.google.gwt.user.client.ui.RichTextArea#onLoad()
-     */
-    protected void onLoad()
-    {
-        DeferredCommand.addCommand(templateEnforcer);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see com.google.gwt.user.client.ui.RichTextArea#setHTML(String)
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3147
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
      */
     public void setHTML(String html)
     {
+        // We add a dirty attribute and set its value to true in order to be able to overcome the Issue 3156. Precisely,
+        // we test this attribute in the setHTMLImpl to avoid overwriting the contents when setHTML haven't been called.
+        getElement().setAttribute(DIRTY, String.valueOf(true));
         super.setHTML(html);
         changeListeners.fireChange(this);
     }
@@ -263,8 +253,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         if (event.getTypeInt() == Event.ONKEYDOWN) {
             if (shortcutKeys.contains(ShortcutKeyFactory.createShortcutKey(event))) {
                 event.preventDefault();
-            } else if (event.getKeyCode() == KeyboardListener.KEY_ENTER && !event.getShiftKey()) {
-                onEnter(event);
             }
         }
         super.onBrowserEvent(event);
@@ -291,111 +279,5 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public Event getCurrentEvent()
     {
         return currentEvent;
-    }
-
-    /**
-     * Handles the return key.<br/>
-     * TODO: Move this code inside a command!!!
-     * 
-     * @param event keyboard event.
-     */
-    public void onEnter(Event event)
-    {
-        Selection selection = getDocument().getSelection();
-        if (selection.getRangeCount() == 0) {
-            // We might not have an implementation of Selection for the current browser.
-            // This should be removed in the future.
-            return;
-        }
-        // We only take care of the first range.
-        // The other ranges will be removed from the selection but their text will remain untouched.
-        Range range = selection.getRangeAt(0);
-
-        Node ancestor = range.getStartContainer();
-        while (ancestor != null && DOMUtils.getInstance().isInline(ancestor)) {
-            ancestor = ancestor.getParentNode();
-        }
-
-        if (ancestor == null) {
-            // This shouln't happen!
-            return;
-        }
-        String display = DOMUtils.getInstance().getDisplay(ancestor);
-        if ("list-item".equalsIgnoreCase(display)) {
-            // ignore
-        } else if ("block".equalsIgnoreCase(display) && !"body".equalsIgnoreCase(ancestor.getNodeName())) {
-            if ("p".equalsIgnoreCase(ancestor.getNodeName())) {
-                Element paragraph = Element.as(ancestor);
-                if (paragraph.getInnerText().length() == 0) {
-                    // We are inside an empty paragraph. We'll behave as if the use pressed Shift+Return.
-                    event.preventDefault();
-
-                    // Delete the text from the first range and leave the text of the other ranges untouched.
-                    range.deleteContents();
-
-                    // Create the line break and insert it before the current range.
-                    Element br = getDocument().xCreateBRElement();
-                    Node refNode = range.getStartContainer();
-                    if (refNode.hasChildNodes()) {
-                        refNode = refNode.getChildNodes().getItem(range.getStartOffset());
-                    }
-                    refNode.getParentNode().insertBefore(br, refNode);
-
-                    // Update the current range
-                    selection.removeAllRanges();
-                    range = getDocument().createRange();
-                    range.setStartBefore(refNode);
-                    range.setEndBefore(refNode);
-                    selection.addRange(range);
-                } else {
-                    // The selection starts inside a non-empty paragraph so we leave the default behavior.
-                }
-            }
-        } else {
-            // We are not inside a paragraph so we change the default behavior.
-            event.preventDefault();
-
-            // Save the start container and offset to know later where to split the text.
-            Node startContainer = range.getStartContainer();
-            int startOffset = range.getStartOffset();
-
-            // Delete the text from the first range and leave the text of the other ranges untouched.
-            range.deleteContents();
-            // Reset the selection. We're going to move the cursor inside the new paragraph.
-            selection.removeAllRanges();
-
-            // Split the DOM subtree that has the previously found ancestor as root.
-            DOMUtils.getInstance().splitNode(ancestor, startContainer, startOffset);
-
-            // Wrap left in-line siblings in a paragraph.
-            Element leftParagraph = getDocument().xCreatePElement();
-            Node splitRightNode = DOMUtils.getInstance().getChild(ancestor, startContainer).getNextSibling();
-            Node leftSibling = splitRightNode.getPreviousSibling();
-            if (leftSibling != null && DOMUtils.getInstance().isInline(leftSibling)) {
-                leftParagraph.appendChild(leftSibling);
-                leftSibling = splitRightNode.getPreviousSibling();
-                while (leftSibling != null && DOMUtils.getInstance().isInline(leftSibling)) {
-                    leftParagraph.insertBefore(leftSibling, leftParagraph.getFirstChild());
-                    leftSibling = splitRightNode.getPreviousSibling();
-                }
-                ancestor.insertBefore(leftParagraph, splitRightNode);
-            }
-
-            // Wrap right in-line siblings in a paragraph.
-            Element rightParagraph = getDocument().xCreatePElement();
-            ancestor.replaceChild(rightParagraph, splitRightNode);
-            rightParagraph.appendChild(splitRightNode);
-            Node rightSibling = rightParagraph.getNextSibling();
-            while (rightSibling != null && DOMUtils.getInstance().isInline(rightSibling)) {
-                rightParagraph.appendChild(rightSibling);
-                rightSibling = rightParagraph.getNextSibling();
-            }
-
-            // Create the new range and move the cursor inside the new paragraph.
-            range = getDocument().createRange();
-            range.selectNodeContents(DOMUtils.getInstance().getFirstLeaf(rightParagraph));
-            range.collapse(true);
-            selection.addRange(range);
-        }
     }
 }

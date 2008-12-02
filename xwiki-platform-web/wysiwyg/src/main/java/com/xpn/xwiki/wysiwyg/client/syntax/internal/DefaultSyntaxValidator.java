@@ -66,6 +66,8 @@ public abstract class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("backcolor", Command.BACK_COLOR));
         addValidationRule(new DefaultValidationRule("link", Command.CREATE_LINK));
         addValidationRule(new DefaultValidationRule("unlink", Command.UNLINK));
+        addValidationRule(new DefaultValidationRule("hr", Command.INSERT_HORIZONTAL_RULE));
+        addValidationRule(new DefaultValidationRule("symbol", Command.INSERT_HTML));
         // FIXME : implement this in the table plugin when possible
         addValidationRule(new DefaultValidationRule("deletecol", new Command("deletecol")));
         addValidationRule(new DefaultValidationRule("deleterow", new Command("deleterow")));
@@ -73,7 +75,7 @@ public abstract class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("insertcolbefore", new Command("insertcolbefore")));
         addValidationRule(new DefaultValidationRule("insertrowafter", new Command("insertrowafter")));
         addValidationRule(new DefaultValidationRule("insertrowbefore", new Command("insertrowbefore")));
-        addValidationRule(new DefaultValidationRule("inserttable", new Command("inserttable")));        
+        addValidationRule(new DefaultValidationRule("inserttable", new Command("inserttable")));
     }
 
     private List<ValidationRule> getValidationRules(String feature)

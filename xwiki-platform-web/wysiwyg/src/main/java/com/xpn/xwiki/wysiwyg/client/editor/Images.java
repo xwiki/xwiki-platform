@@ -7,18 +7,12 @@ import com.google.gwt.user.client.ui.ImageBundle;
 /**
  * This {@link ImageBundle} is used for all the button icons. Using an image bundle allows all of these images to be
  * packed into a single image, which saves a lot of HTTP requests, drastically improving startup time.
+ * 
+ * @version $Id$
  */
 public interface Images extends ImageBundle
 {
     Images INSTANCE = (Images) GWT.create(Images.class);
-
-    /**
-     * This image was added just to prevent IE6 from crashing. It's a stupid fix but nevertheless it allows us to test
-     * the editor on IE6 till we find a better one.
-     * 
-     * @return An enchanted image to be used against IE6's black magic.
-     */
-    AbstractImagePrototype fixIE();
 
     @Resource("attachment.gif")
     AbstractImagePrototype attachment();

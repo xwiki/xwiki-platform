@@ -110,7 +110,8 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
      */
     public boolean canRedo()
     {
-        return currentEntry != null && currentEntry.getNextEntry() != null && !isDirty();
+        return textArea.getDocument() != null && currentEntry != null && currentEntry.getNextEntry() != null
+            && !isDirty();
     }
 
     /**
@@ -120,7 +121,8 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
      */
     public boolean canUndo()
     {
-        return currentEntry != null && (currentEntry.getPreviousEntry() != null || isDirty());
+        return textArea.getDocument() != null && currentEntry != null
+            && (currentEntry.getPreviousEntry() != null || isDirty());
     }
 
     /**
@@ -252,11 +254,14 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
      */
     private void save()
     {
-        if (!isEmpty() && !isDirty()) {
+        if ((!isEmpty() && !isDirty()) || textArea.getDocument() == null) {
             return;
         }
 
         Selection selection = textArea.getDocument().getSelection();
+        if (selection.getRangeCount() == 0) {
+            return;
+        }
         Range range = selection.getRangeAt(0);
 
         List<Integer> startPath = getPath(range.getStartContainer(), range.getStartOffset());

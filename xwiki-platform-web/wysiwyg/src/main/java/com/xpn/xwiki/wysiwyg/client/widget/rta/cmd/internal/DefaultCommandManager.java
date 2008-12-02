@@ -61,9 +61,8 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES.put(Command.FONT_NAME, new DefaultExecutable(Command.FONT_NAME.toString()));
         EXECUTABLES.put(Command.FONT_SIZE, new DefaultExecutable(Command.FONT_SIZE.toString()));
         EXECUTABLES.put(Command.FORE_COLOR, new DefaultExecutable(Command.FORE_COLOR.toString()));
-        EXECUTABLES.put(Command.FORMAT_BLOCK, (Executable) GWT.create(FormatBlockExecutable.class));
+        EXECUTABLES.put(Command.FORMAT_BLOCK, new FormatBlockExecutable());
         EXECUTABLES.put(Command.INDENT, new DefaultExecutable(Command.INDENT.toString()));
-        EXECUTABLES.put(Command.INSERT_BR_ON_RETURN, new DefaultExecutable(Command.INSERT_BR_ON_RETURN.toString()));
         EXECUTABLES.put(Command.INSERT_HORIZONTAL_RULE, new InsertHRExecutable());
         EXECUTABLES.put(Command.INSERT_HTML, new InsertHTMLExecutable());
         EXECUTABLES.put(Command.INSERT_ORDERED_LIST, new DefaultExecutable(Command.INSERT_ORDERED_LIST.toString()));
@@ -80,7 +79,6 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES.put(Command.REMOVE_FORMAT, new DefaultExecutable(Command.REMOVE_FORMAT.toString()));
         EXECUTABLES.put(Command.STRIKE_THROUGH, new StyleExecutable("del", null, Style.TEXT_DECORATION,
             Style.TextDecoration.LINE_THROUGH, false, true));
-        EXECUTABLES.put(Command.STYLE_WITH_CSS, new StyleWithCssExecutable());
         EXECUTABLES.put(Command.SUB_SCRIPT, new DefaultExecutable(Command.SUB_SCRIPT.toString()));
         EXECUTABLES.put(Command.SUPER_SCRIPT, new DefaultExecutable(Command.SUPER_SCRIPT.toString()));
         EXECUTABLES.put(Command.TELETYPE, new StyleExecutable("tt", null, Style.FONT_FAMILY, "monospace", true, true));

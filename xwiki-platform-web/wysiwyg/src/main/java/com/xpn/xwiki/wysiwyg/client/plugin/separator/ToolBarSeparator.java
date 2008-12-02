@@ -22,18 +22,28 @@ package com.xpn.xwiki.wysiwyg.client.plugin.separator;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 
 /**
  * User interface extension that provides ways of separating tool bar entries. We currently support a vertical bar
  * separator and a new line separator.
+ * 
+ * @version $Id$
  */
 public class ToolBarSeparator extends AbstractSeparator
 {
+    /**
+     * The string used in configurations to place a vertical bar on the tool bar.
+     */
     public static final String VERTICAL_BAR = "|";
 
+    /**
+     * The string used in configurations to split the tool bar in multiple lines.
+     */
     public static final String LINE_BREAK = "/";
 
+    /**
+     * Creates a new tool bar separator.
+     */
     public ToolBarSeparator()
     {
         // The extension point is the tool bar
@@ -43,7 +53,7 @@ public class ToolBarSeparator extends AbstractSeparator
     /**
      * {@inheritDoc}
      * 
-     * @see UIExtension#getFeatures()
+     * @see AbstractSeparator#getFeatures()
      */
     public String[] getFeatures()
     {
@@ -53,19 +63,22 @@ public class ToolBarSeparator extends AbstractSeparator
     /**
      * {@inheritDoc}
      * 
-     * @see UIExtension#getUIObject(String)
+     * @see AbstractSeparator#getUIObject(String)
      */
     public UIObject getUIObject(String feature)
     {
-        if ("|".equals(feature)) {
+        if (VERTICAL_BAR.equals(feature)) {
             return newVerticalBar();
-        } else if ("/".equals(feature)) {
+        } else if (LINE_BREAK.equals(feature)) {
             return newLineBreak();
         } else {
             return null;
         }
     }
 
+    /**
+     * @return a new vertical bar to separate the widgets placed on the tool bar.
+     */
     public Widget newVerticalBar()
     {
         FlowPanel separator = new FlowPanel();
@@ -73,6 +86,9 @@ public class ToolBarSeparator extends AbstractSeparator
         return separator;
     }
 
+    /**
+     * @return a new line break to split the tool bar in multiple lines.
+     */
     public Widget newLineBreak()
     {
         FlowPanel lineBreak = new FlowPanel();

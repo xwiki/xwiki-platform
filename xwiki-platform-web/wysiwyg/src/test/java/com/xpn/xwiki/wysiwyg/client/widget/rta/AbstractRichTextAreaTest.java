@@ -17,31 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd;
+package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
 import com.google.gwt.user.client.ui.RootPanel;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
- * Base class for {@link Executable} unit tests.
+ * Base class for tests running on a rich text area.
  * 
  * @version $Id$
  */
-public abstract class AbstractExecutableTest extends AbstractWysiwygClientTest
+public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest
 {
+    /**
+     * The number of milliseconds we delay the test finish. This delay is needed because in some browsers the rich text
+     * area is initialized after a timeout.
+     */
+    public static final int FINISH_DELAY = 200;
+
+    /**
+     * The number of milliseconds we delay the test start. This delay is needed because in some browsers the rich text
+     * area is initialized after a timeout and we want to start the test after the rich text area is fully initialized.
+     */
+    public static final int START_DELAY = 100;
+
     /**
      * The rich text area on which we run the tests.
      */
     protected RichTextArea rta;
-
-    /**
-     * The executable being tested.
-     */
-    protected Executable executable;
 
     /**
      * {@inheritDoc}

@@ -19,12 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.history;
 
-import com.google.gwt.user.client.ui.RootPanel;
-import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
+import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.util.Timer;
-import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -32,71 +29,45 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class HistoryTest extends AbstractWysiwygClientTest
+public class HistoryTest extends AbstractRichTextAreaTest
 {
-    /**
-     * Deferred {@link HistoryTest#testRestoreSelection()}.
-     */
-    public class TestRestoreSelection implements TimerListener
-    {
-        /**
-         * The rich text area whose history is being tested.
-         */
-        private RichTextArea rta;
-
-        /**
-         * Creates a new deferred test for {@link HistoryTest#testRestoreSelection()}.
-         * 
-         * @param rta The rich text area whose history is being tested.
-         */
-        public TestRestoreSelection(RichTextArea rta)
-        {
-            this.rta = rta;
-        }
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see TimerListener#onElapsed(Timer)
-         */
-        public void onElapsed(Timer sender)
-        {
-            rta.setHTML("<span>ab</span><span>cde</span>");
-            rta.setFocus(true);
-
-            Range range = rta.getDocument().getSelection().getRangeAt(0);
-            range.setEnd(rta.getDocument().getBody().getLastChild().getFirstChild(), 2);
-            range.setStart(rta.getDocument().getBody().getFirstChild().getFirstChild(), 1);
-            rta.getDocument().getSelection().removeAllRanges();
-            rta.getDocument().getSelection().addRange(range);
-
-            String selectedText = "bcd";
-            assertEquals(selectedText, rta.getDocument().getSelection().toString());
-
-            rta.getCommandManager().execute(Command.BOLD);
-            rta.getCommandManager().execute(Command.UNDO);
-            assertEquals(selectedText, rta.getDocument().getSelection().toString());
-
-            rta.getCommandManager().execute(Command.REDO);
-            assertEquals(selectedText, rta.getDocument().getSelection().toString());
-
-            finishTest();
-        }
-    }
-
     /**
      * Tests if undo and redo operations restore the previous selection.
      */
     public void testRestoreSelection()
     {
-        final RichTextArea rta = new RichTextArea();
-        RootPanel.get().add(rta);
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestRestoreSelection();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
 
-        // We need to delay the test because the rich text area is not initialized immediately.
-        Timer timer = new Timer();
-        timer.addTimerListener(new TestRestoreSelection(rta));
+    /**
+     * Tests if undo and redo operations restore the previous selection.
+     */
+    public void doTestRestoreSelection()
+    {
+        rta.setHTML("<span>ab</span><span>cde</span>");
 
-        delayTestFinish(300);
-        timer.schedule(100);
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
+        range.setEnd(rta.getDocument().getBody().getLastChild().getFirstChild(), 2);
+        range.setStart(rta.getDocument().getBody().getFirstChild().getFirstChild(), 1);
+        select(range);
+
+        String selectedText = "bcd";
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        rta.getCommandManager().execute(Command.BOLD);
+        rta.getCommandManager().execute(Command.UNDO);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        rta.getCommandManager().execute(Command.REDO);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
     }
 }

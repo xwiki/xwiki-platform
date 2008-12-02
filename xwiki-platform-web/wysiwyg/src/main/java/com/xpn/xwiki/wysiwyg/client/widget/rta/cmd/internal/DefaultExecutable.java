@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
@@ -91,6 +92,7 @@ public class DefaultExecutable implements Executable
      */
     public boolean isSupported(RichTextArea rta)
     {
-        return rta.getDocument().queryCommandSupported(command);
+        Document doc = rta.getDocument();
+        return doc != null && doc.queryCommandSupported(command);
     }
 }

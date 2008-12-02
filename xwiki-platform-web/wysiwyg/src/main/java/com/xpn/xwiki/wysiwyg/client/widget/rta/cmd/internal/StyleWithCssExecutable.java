@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
@@ -99,7 +100,9 @@ public class StyleWithCssExecutable implements Executable
      */
     public boolean isSupported(RichTextArea rta)
     {
-        return rta.getDocument().queryCommandSupported(Command.STYLE_WITH_CSS.toString())
-            || rta.getDocument().queryCommandSupported(USE_CSS.toString());
+        Document doc = rta.getDocument();
+        return doc != null
+            && (doc.queryCommandSupported(Command.STYLE_WITH_CSS.toString()) || doc.queryCommandSupported(USE_CSS
+                .toString()));
     }
 }

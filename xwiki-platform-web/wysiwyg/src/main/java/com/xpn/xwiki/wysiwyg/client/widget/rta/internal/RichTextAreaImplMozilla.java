@@ -17,49 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.separator;
+package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
-import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
- * Factory for {@link SeparatorPlugin}.
+ * Mozilla-specific implementation of rich-text editing.
  * 
  * @version $Id$
  */
-public final class SeparatorPluginFactory extends AbstractPluginFactory
+public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla
 {
     /**
-     * The singleton factory instance.
-     */
-    private static SeparatorPluginFactory instance;
-
-    /**
-     * Default constructor.
-     */
-    private SeparatorPluginFactory()
-    {
-        super("separator");
-    }
-
-    /**
-     * @return the singleton factory instance.
-     */
-    public static synchronized SeparatorPluginFactory getInstance()
-    {
-        if (instance == null) {
-            instance = new SeparatorPluginFactory();
-        }
-        return instance;
-    }
-
-    /**
-     * {@inheritDoc}
+     * {@inheritDoc}<br/>
+     * NOTE: Remove this method as soon as Issue 3156 is fixed.
      * 
-     * @see AbstractPluginFactory#newInstance()
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#setHTMLImpl(String)
+     * @see @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
      */
-    public Plugin newInstance()
+    protected void setHTMLImpl(String html)
     {
-        return new SeparatorPlugin();
+        if (String.valueOf(true).equals(elem.getAttribute(RichTextArea.DIRTY))) {
+            elem.removeAttribute(RichTextArea.DIRTY);
+            super.setHTMLImpl(html);
+        }
     }
 }

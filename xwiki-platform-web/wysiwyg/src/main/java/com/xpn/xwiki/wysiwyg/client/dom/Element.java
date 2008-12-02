@@ -76,6 +76,7 @@ public class Element extends com.google.gwt.dom.client.Element
      * 
      * @param html the html to set.
      * @see {@link DOMUtils#setInnerHTML(Element, String)}
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3146
      */
     public final void xSetInnerHTML(String html)
     {

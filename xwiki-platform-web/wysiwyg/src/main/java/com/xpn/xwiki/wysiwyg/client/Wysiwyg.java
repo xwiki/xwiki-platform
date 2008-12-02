@@ -25,10 +25,10 @@ import java.util.MissingResourceException;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.i18n.client.Dictionary;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
@@ -36,9 +36,8 @@ import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorDebugger;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorFactory;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.util.internal.DefaultConfig;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.DocumentTemplate;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * The class responsible for loading the WYSIWYG editors. It can be also viewed as the application context.
@@ -81,6 +80,9 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
      */
     private void loadUI()
     {
+        if (!isRichTextEditingSupported()) {
+            return;
+        }
         for (final Config config : getConfigs()) {
             String hookId = config.getParameter("hookId");
             if (hookId == null) {
@@ -92,19 +94,8 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
                 continue;
             }
 
-            Element input = hook;
-            String inputId = config.getParameter("inputId");
-            if (inputId != null) {
-                input = DOM.getElementById(inputId);
-                input = input == null ? hook : input;
-            }
-
             // Extract info from DOM
             String name = hook.getAttribute("name");
-            String value = input.getPropertyString("value");
-            if (value == null) {
-                value = input.getInnerHTML();
-            }
             String height = String.valueOf(Math.max(hook.getOffsetHeight(), 100)) + "px";
 
             // Prepare the DOM
@@ -114,12 +105,12 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
             hook.getParentElement().replaceChild(container, hook);
 
             // Create the WYSIWYG Editor
-            final WysiwygEditor editor = WysiwygEditorFactory.getInstance().newEditor(config, this);
-            initDocumentTemplate(editor.getUI().getTextArea().getDocumentTemplate(), config);
-            editor.getUI().getTextArea().setHTML(value);
-            editor.getUI().getTextArea().setHeight(height);
+            WysiwygEditor editor = WysiwygEditorFactory.getInstance().newEditor(config, this);
+            RichTextArea textArea = editor.getUI().getTextArea();
+            IFrameElement.as(textArea.getElement()).setSrc(config.getParameter("inputURL", "about:blank"));
+            textArea.setHeight(height);
             if (name != null) {
-                editor.getUI().getTextArea().setName(name);
+                textArea.setName(name);
             }
 
             // Insert the WYSIWYG Editor
@@ -132,21 +123,12 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     }
 
     /**
-     * Initializes the document template to use for the rich text area document.
-     * 
-     * @param template the template to initialize
-     * @param config configuration parameters
+     * @return true if the current browser supports rich text editing.
      */
-    private void initDocumentTemplate(DocumentTemplate template, Config config)
+    private boolean isRichTextEditingSupported()
     {
-        String stylesheet = config.getParameter("stylesheet");
-        if (!StringUtils.isEmpty(stylesheet)) {
-            template.addStyleSheet(stylesheet);
-        }
-        template.addStyleSheet(GWT.getModuleBaseURL() + "RichTextArea.css");
-        template.setBodyId("body");
-        template.addBodyStyleName("main");
-        template.setBaseURL(Window.Location.getHref());
+        RichTextArea rta = new RichTextArea(null, null);
+        return rta.getBasicFormatter() != null;
     }
 
     /**

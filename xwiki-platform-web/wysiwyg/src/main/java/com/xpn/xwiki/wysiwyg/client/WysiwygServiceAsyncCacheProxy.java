@@ -85,7 +85,8 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * 
      * @see WysiwygServiceAsync#syncEditorContent(Revision, String, int, AsyncCallback)
      */
-    public void syncEditorContent(Revision syncedRevision, String pageName, int version, AsyncCallback<SyncResult> async)
+    public void syncEditorContent(Revision syncedRevision, String pageName, int version, 
+        AsyncCallback<SyncResult> async)
     {
         service.syncEditorContent(syncedRevision, pageName, version, async);
     }

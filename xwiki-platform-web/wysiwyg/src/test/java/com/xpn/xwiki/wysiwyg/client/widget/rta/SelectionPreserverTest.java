@@ -20,8 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
@@ -32,7 +30,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class SelectionPreserverTest extends AbstractWysiwygClientTest
+public class SelectionPreserverTest extends AbstractRichTextAreaTest
 {
     /**
      * The selection preserver instance being tested.
@@ -40,34 +38,17 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
     private SelectionPreserver preserver;
 
     /**
-     * The rich text area whose selection should be preserved.
-     */
-    private RichTextArea rta;
-
-    /**
      * {@inheritDoc}
      * 
-     * @see AbstractWysiwygClientTest#gwtSetUp()
+     * @see AbstractRichTextAreaTest#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
 
-        rta = new RichTextArea();
-        RootPanel.get().add(rta);
-        preserver = new SelectionPreserver(rta);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractWysiwygClientTest#gwtTearDown()
-     */
-    protected void gwtTearDown() throws Exception
-    {
-        super.gwtTearDown();
-
-        RootPanel.get().remove(rta);
+        if (preserver == null) {
+            preserver = new SelectionPreserver(rta);
+        }
     }
 
     /**
@@ -75,14 +56,16 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
      */
     public void testPlainTextSelectionWithoutModification()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
+                rta.setFocus(true);
                 doTestPlainTextSelectionWithoutModification();
+                finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**
@@ -112,8 +95,6 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
 
         preserver.restoreSelection();
         assertEquals(selectedText, selection.toString());
-
-        finishTest();
     }
 
     /**
@@ -121,14 +102,16 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
      */
     public void testPlainTextSelectionWithHTMLInsertion()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
+                rta.setFocus(true);
                 doTestPlainTextSelectionWithHTMLInsertion();
+                finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**
@@ -136,8 +119,6 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
      */
     private void doTestPlainTextSelectionWithHTMLInsertion()
     {
-        rta.setFocus(true);
-
         Element container = rta.getDocument().xCreateDivElement().cast();
         container.appendChild(rta.getDocument().createTextNode("toucan"));
         rta.getDocument().getBody().appendChild(container);
@@ -156,8 +137,6 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
 
         preserver.restoreSelection();
         assertEquals("the To", selection.toString());
-
-        finishTest();
     }
 
     /**
@@ -167,14 +146,16 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
      */
     public void testTextRangeSelectionWithHTMLInsertion()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
+                rta.setFocus(true);
                 doTestTextRangeSelectionWithHTMLInsertion();
+                finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**
@@ -184,8 +165,6 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
      */
     private void doTestTextRangeSelectionWithHTMLInsertion()
     {
-        rta.setFocus(true);
-
         Element container = rta.getDocument().xCreateDivElement().cast();
         container.setInnerHTML("ab<em>cd</em>ef<ins>gh</ins>ij");
         rta.getDocument().getBody().appendChild(container);
@@ -204,8 +183,6 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
 
         preserver.restoreSelection();
         assertEquals("y", selection.toString());
-
-        finishTest();
     }
 
     /**
@@ -213,14 +190,16 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
      */
     public void testReplaceElement()
     {
-        delayTestFinish(300);
+        delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
+                rta.setFocus(true);
                 doTestReplaceElement();
+                finishTest();
             }
-        }).schedule(100);
+        }).schedule(START_DELAY);
     }
 
     /**
@@ -228,8 +207,6 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
      */
     private void doTestReplaceElement()
     {
-        rta.setFocus(true);
-
         Element container = rta.getDocument().xCreateDivElement().cast();
         container.setInnerHTML("ab<em>cd</em>ef");
         rta.getDocument().getBody().appendChild(container);
@@ -248,7 +225,5 @@ public class SelectionPreserverTest extends AbstractWysiwygClientTest
 
         preserver.restoreSelection();
         assertEquals("#", selection.toString());
-
-        finishTest();
     }
 }

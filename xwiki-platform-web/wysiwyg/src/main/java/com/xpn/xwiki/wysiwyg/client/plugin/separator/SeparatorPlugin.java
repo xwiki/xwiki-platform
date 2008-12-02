@@ -34,14 +34,26 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Utility plug-in for separating tool bar entries, menu entries and so on.
+ * 
+ * @version $Id$
  */
 public class SeparatorPlugin extends AbstractPlugin implements ClickListener
 {
+    /**
+     * The tool bar button used for inserting a new horizontal rule.
+     */
     private PushButton hr;
 
+    /**
+     * Tool bar extension that includes the horizontal rule button.
+     */
     private final FocusWidgetUIExtension toolBarFocusWidgets = new FocusWidgetUIExtension("toolbar");
 
-    private final CompositeUIExtension toolBarExtension = new CompositeUIExtension("toolbar");
+    /**
+     * Tool bar extension that includes {@link #toolBarFocusWidgets} and tool bar specific separators like the vertical
+     * bar and the line break.
+     */
+    private final CompositeUIExtension toolBarExtension = new CompositeUIExtension(toolBarFocusWidgets.getRole());
 
     /**
      * {@inheritDoc}
@@ -98,6 +110,9 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickListener
         }
     }
 
+    /**
+     * Inserts a horizontal rule in place of the current selection.
+     */
     public void onHorizontalRule()
     {
         if (hr.isEnabled()) {

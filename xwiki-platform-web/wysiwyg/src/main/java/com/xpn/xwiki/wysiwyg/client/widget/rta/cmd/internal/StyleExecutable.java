@@ -31,14 +31,13 @@ import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.dom.Text;
 import com.xpn.xwiki.wysiwyg.client.dom.TextFragment;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Applies in-line formatting to the current selection.
  * 
  * @version $Id$
  */
-public class StyleExecutable implements Executable
+public class StyleExecutable extends AbstractExecutable
 {
     /**
      * The name of the tag used for formatting.
@@ -127,7 +126,7 @@ public class StyleExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractExecutable#execute(RichTextArea, String)
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
@@ -349,43 +348,7 @@ public class StyleExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(RichTextArea)
-     */
-    public String getParameter(RichTextArea rta)
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isEnabled(RichTextArea)
-     */
-    public boolean isEnabled(RichTextArea rta)
-    {
-        Selection selection = rta.getDocument().getSelection();
-        for (int i = 0; i < selection.getRangeCount(); i++) {
-            if (!isEnabled(selection.getRangeAt(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @param range The range to be inspected.
-     * @return true if this executable can be execute on the given range.
-     */
-    private boolean isEnabled(Range range)
-    {
-        // Right now this executable is not restricted. We'll add here future restrictions.
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isExecuted(RichTextArea)
+     * @see AbstractExecutable#isExecuted(RichTextArea)
      */
     public boolean isExecuted(RichTextArea rta)
     {
@@ -420,16 +383,6 @@ public class StyleExecutable implements Executable
             }
             return true;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isSupported(RichTextArea)
-     */
-    public boolean isSupported(RichTextArea rta)
-    {
-        return true;
     }
 
     /**

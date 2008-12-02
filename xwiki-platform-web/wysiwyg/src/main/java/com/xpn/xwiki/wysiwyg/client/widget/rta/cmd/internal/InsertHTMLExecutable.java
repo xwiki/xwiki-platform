@@ -24,7 +24,6 @@ import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Inserts an HTML fragment in place of the current selection. We overwrite the default implementation provided by the
@@ -38,12 +37,12 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
  * 
  * @version $Id$
  */
-public class InsertHTMLExecutable implements Executable
+public class InsertHTMLExecutable extends AbstractExecutable
 {
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractExecutable#execute(RichTextArea, String)
      */
     public boolean execute(RichTextArea rta, String param)
     {
@@ -87,46 +86,6 @@ public class InsertHTMLExecutable implements Executable
 
         container.unwrap();
 
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#getParameter(RichTextArea)
-     */
-    public String getParameter(RichTextArea rta)
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isEnabled(RichTextArea)
-     */
-    public boolean isEnabled(RichTextArea rta)
-    {
-        return rta.getDocument().getSelection().getRangeCount() > 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isExecuted(RichTextArea)
-     */
-    public boolean isExecuted(RichTextArea rta)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isSupported(RichTextArea)
-     */
-    public boolean isSupported(RichTextArea rta)
-    {
         return true;
     }
 }

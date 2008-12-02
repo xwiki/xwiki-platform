@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.editor;
 
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -142,7 +144,14 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
     protected void onLoad()
     {
         super.onLoad();
-        loadListeners.fireLoad(this);
+        // We defer the notification in order to allow the rich text area to complete its initialization.
+        DeferredCommand.addCommand(new Command()
+        {
+            public void execute()
+            {
+                loadListeners.fireLoad(RichTextEditor.this);
+            }
+        });
     }
 
     /**

@@ -19,21 +19,218 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.Selection;
+import com.xpn.xwiki.wysiwyg.client.dom.Style;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
- * Formats the current selection as a block element with a particular tag name. We've added this class because Internet
- * Explorer's implementation is buggy and we need to use deferred binding for loading our custom implementation.
+ * Wraps the HTML fragment including the current selection in a specified block level element.
  * 
  * @version $Id$
  */
-public class FormatBlockExecutable extends DefaultExecutable
+public class FormatBlockExecutable extends AbstractExecutable
 {
     /**
-     * Creates a new executable of this type.
+     * {@inheritDoc}
+     * 
+     * @see AbstractExecutable#execute(RichTextArea, String)
      */
-    public FormatBlockExecutable()
+    public boolean execute(RichTextArea rta, String param)
     {
-        super(Command.FORMAT_BLOCK.toString());
+        Selection selection = rta.getDocument().getSelection();
+        Range[] ranges = new Range[selection.getRangeCount()];
+        for (int i = 0; i < selection.getRangeCount(); i++) {
+            ranges[i] = selection.getRangeAt(i);
+            execute(ranges[i], param);
+        }
+        selection.removeAllRanges();
+        for (int i = 0; i < ranges.length; i++) {
+            selection.addRange(ranges[i]);
+        }
+        return true;
+    }
+
+    /**
+     * Format as block the in-line contents of the given range, using the specified block tag. If the specified tag name
+     * is empty then the block format is removed (in-line formatting will be used instead).
+     * 
+     * @param range The range whose in-line contents will be formatted using the given tag.
+     * @param tagName The tag used for block formatting the in-line contents of the given range.
+     */
+    protected void execute(Range range, String tagName)
+    {
+        Node leaf = DOMUtils.getInstance().getFirstLeaf(range);
+        if (leaf == null) {
+            execute(range.getStartContainer(), range.getStartOffset(), tagName);
+        }
+        Node lastLeaf = DOMUtils.getInstance().getLastLeaf(range);
+        execute(leaf, tagName);
+        while (leaf != lastLeaf) {
+            leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+            execute(leaf, tagName);
+        }
+    }
+
+    /**
+     * Formats as block the in-line neighborhood of the given node, using the specified block tag. If the specified tag
+     * name is empty then the block format is removed (in-line formatting will be used instead).
+     * 
+     * @param node A DOM node.
+     * @param tagName The tag used for block formatting the in-line neighborhood of the given node.
+     */
+    protected void execute(Node node, String tagName)
+    {
+        execute(Element.as(node.getParentNode()), DOMUtils.getInstance().getNodeIndex(node), tagName);
+    }
+
+    /**
+     * Formats as block the in-line neighborhood of a node specified by its parent and its child index, using the
+     * specified block tag. If the specified tag name is empty then the block format is removed (in-line formatting will
+     * be used instead).
+     * 
+     * @param parent The parent of the in-line DOM nodes that will be grouped in a block node.
+     * @param offset Specifies the offset within the given parent node where to look for an in-line neighborhood.
+     * @param tagName The tag used for block formatting the in-line neighborhood of the specified node.
+     */
+    protected void execute(Node parent, int offset, String tagName)
+    {
+        Node ancestor = parent;
+        int index = offset;
+        if (DOMUtils.getInstance().isInline(parent)) {
+            ancestor = DOMUtils.getInstance().getFarthestInlineAncestor(parent);
+            index = DOMUtils.getInstance().getNodeIndex(ancestor);
+            ancestor = ancestor.getParentNode();
+        }
+
+        if (DOMUtils.getInstance().isFlowContainer(ancestor)) {
+            // Currently we have in-line formatting.
+            if (tagName.length() > 0) {
+                wrap(ancestor, index, tagName);
+            }
+        } else if (Style.Display.BLOCK.equalsIgnoreCase(DOMUtils.getInstance().getDisplay(ancestor))) {
+            // Currently we have block formatting.
+            if (tagName.length() == 0) {
+                Element.as(ancestor).unwrap();
+            } else if (!tagName.equalsIgnoreCase(ancestor.getNodeName())) {
+                replace(ancestor, tagName);
+            }
+        }
+    }
+
+    /**
+     * Wraps all in-line child nodes of the given parent node, whose indexes are around the specified offset. The
+     * element used to wrap the in-line contents has the given tag name.
+     * 
+     * @param parent The node whose in-line contents are wrapped in a block level element.
+     * @param offset The offset within the given node, around which in-line contents are looked for.
+     * @param tagName The name of the element used to wrap the in-line contents.
+     */
+    protected void wrap(Node parent, int offset, String tagName)
+    {
+        int startIndex = offset;
+        while (startIndex > 0 && DOMUtils.getInstance().isInline(parent.getChildNodes().getItem(startIndex - 1))) {
+            startIndex--;
+        }
+        int endIndex = offset;
+        while (endIndex < parent.getChildNodes().getLength()
+            && DOMUtils.getInstance().isInline(parent.getChildNodes().getItem(endIndex))) {
+            endIndex++;
+        }
+        Element element = ((Document) parent.getOwnerDocument()).xCreateElement(tagName);
+        for (int i = startIndex; i < endIndex; i++) {
+            element.appendChild(parent.getChildNodes().getItem(startIndex));
+        }
+        DOMUtils.getInstance().insertAt(parent, element, startIndex);
+    }
+
+    /**
+     * Replaces the given node with an element with the specified tag name, moving all the child nodes to the new
+     * element.
+     * 
+     * @param node The node to be replaced.
+     * @param tagName The name of the element that will replace the given node.
+     */
+    protected void replace(Node node, String tagName)
+    {
+        Element element = ((Document) node.getOwnerDocument()).xCreateElement(tagName);
+        Node child = node.getFirstChild();
+        while (child != null) {
+            element.appendChild(child);
+            child = node.getFirstChild();
+        }
+        node.getParentNode().replaceChild(element, node);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExecutable#getParameter(RichTextArea)
+     */
+    public String getParameter(RichTextArea rta)
+    {
+        Selection selection = rta.getDocument().getSelection();
+        String selectionFormat = null;
+        for (int i = 0; i < selection.getRangeCount(); i++) {
+            String rangeFormat = getFormat(selection.getRangeAt(i));
+            if (rangeFormat == null || (selectionFormat != null && rangeFormat != selectionFormat)) {
+                return null;
+            }
+            selectionFormat = rangeFormat;
+        }
+        return selectionFormat;
+    }
+
+    /**
+     * @param range A DOM range.
+     * @return the tag used for block formatting all the in-line content included in the given range. If the returned
+     *         string is empty it means there's no block formatting (in other words, in-line formatting). If the
+     *         returned string is null it means there are many types of block formatting used in the given range.
+     */
+    protected String getFormat(Range range)
+    {
+        Node leaf = DOMUtils.getInstance().getFirstLeaf(range);
+        if (leaf == null) {
+            return getFormat(range.getStartContainer());
+        }
+        String rangeFormat = getFormat(leaf);
+        Node lastLeaf = DOMUtils.getInstance().getLastLeaf(range);
+        while (leaf != lastLeaf) {
+            leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+            String leafFormat = getFormat(leaf);
+            if (rangeFormat == null) {
+                rangeFormat = leafFormat;
+            } else if (leafFormat != null && leafFormat != rangeFormat) {
+                return null;
+            }
+        }
+        return rangeFormat;
+    }
+
+    /**
+     * @param node A DOM node.
+     * @return the tag used for block formatting. If the returned string is empty it means there's no block formatting
+     *         (in other words, in-line formatting). If the returned string is null it means the given node doesn't
+     *         support block formatting.
+     */
+    protected String getFormat(Node node)
+    {
+        Node target = DOMUtils.getInstance().getFarthestInlineAncestor(node);
+        if (target == null) {
+            target = node;
+        } else {
+            target = target.getParentNode();
+        }
+        if (DOMUtils.getInstance().isFlowContainer(target)) {
+            return "";
+        } else if (Style.Display.BLOCK.equalsIgnoreCase(DOMUtils.getInstance().getDisplay(target))) {
+            return target.getNodeName().toLowerCase();
+        } else {
+            return null;
+        }
     }
 }

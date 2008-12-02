@@ -23,6 +23,8 @@ import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 
 /**
  * Abstract separator.
+ * 
+ * @version $Id$
  */
 public abstract class AbstractSeparator implements UIExtension
 {
@@ -31,6 +33,11 @@ public abstract class AbstractSeparator implements UIExtension
      */
     private final String role;
 
+    /**
+     * Creates a new separator for the given extension point.
+     * 
+     * @param role the name of the extension point for which the new separator is created.
+     */
     public AbstractSeparator(String role)
     {
         this.role = role;

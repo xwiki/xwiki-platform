@@ -343,6 +343,7 @@ public abstract class DOMUtils
      * 
      * @param element element to set the inner HTML for
      * @param html the HTML string to set
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3146
      */
     public abstract void setInnerHTML(Element element, String html);
 
@@ -735,6 +736,62 @@ public abstract class DOMUtils
             parent.appendChild(newChild);
         } else {
             parent.insertBefore(newChild, parent.getChildNodes().getItem(i));
+        }
+    }
+
+    /**
+     * Walks from the given node up to the root of the DOM tree as long as the ancestors are displayed in-line. Returns
+     * the last node in the walk.
+     * 
+     * @param node A DOM node.
+     * @return the farthest ancestor of the given node that is displayed in-line.
+     */
+    public Node getFarthestInlineAncestor(Node node)
+    {
+        Node ancestor = node;
+        Node inlineAncestor = null;
+        while (ancestor != null && isInline(ancestor)) {
+            inlineAncestor = ancestor;
+            ancestor = ancestor.getParentNode();
+        }
+        return inlineAncestor;
+    }
+
+    /**
+     * @param range A DOM range.
+     * @return the first leaf node that is partially or entirely included in the given range.
+     */
+    public Node getFirstLeaf(Range range)
+    {
+        if (range.getStartContainer().hasChildNodes()) {
+            if (range.isCollapsed()) {
+                return null;
+            } else if (range.getStartOffset() >= range.getStartContainer().getChildNodes().getLength()) {
+                return getNextLeaf(range.getStartContainer());
+            } else {
+                return getFirstLeaf(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
+            }
+        } else {
+            return range.getStartContainer();
+        }
+    }
+
+    /**
+     * @param range A DOM range.
+     * @return the last leaf node that is partially or entirely included in the given range.
+     */
+    public Node getLastLeaf(Range range)
+    {
+        if (range.getEndContainer().hasChildNodes()) {
+            if (range.isCollapsed()) {
+                return null;
+            } else if (range.getEndOffset() == 0) {
+                return getPreviousLeaf(range.getEndContainer());
+            } else {
+                return getLastLeaf(range.getEndContainer().getChildNodes().getItem(range.getEndOffset() - 1));
+            }
+        } else {
+            return range.getEndContainer();
         }
     }
 }

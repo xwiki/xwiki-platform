@@ -398,4 +398,51 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         DOMUtils.getInstance().insertAt(container, text, 2);
         assertEquals("{<!--x-->}y<em>z</em>:", container.getInnerHTML().toLowerCase());
     }
+
+    /**
+     * Unit test for {@link DOMUtils#getFarthestInlineAncestor(Node)}.
+     */
+    public void testGetFarthestInlineAncestor()
+    {
+        container.xSetInnerHTML("#<em>$</em>#");
+
+        assertEquals(container.getChildNodes().getItem(1), DOMUtils.getInstance().getFarthestInlineAncestor(
+            container.getChildNodes().getItem(1).getFirstChild()));
+        assertEquals(container.getChildNodes().getItem(1), DOMUtils.getInstance().getFarthestInlineAncestor(
+            container.getChildNodes().getItem(1)));
+        assertNull(DOMUtils.getInstance().getFarthestInlineAncestor(container));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getFirstLeaf(Range)} and {@link DOMUtils#getLastLeaf(Range)}.
+     */
+    public void testGetRangeFirstAndLastLeaf()
+    {
+        container.xSetInnerHTML("ab<em>c</em><del><strong>d</strong></del><ins>e</ins>f");
+        Range range = ((Document) container.getOwnerDocument()).createRange();
+
+        range.setStart(container.getFirstChild(), 1);
+        range.collapse(true);
+        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getFirstLeaf(range));
+        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getLastLeaf(range));
+
+        range.setEnd(container.getFirstChild(), 2);
+        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getFirstLeaf(range));
+        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getLastLeaf(range));
+
+        range.setEnd(container.getLastChild(), 1);
+        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getFirstLeaf(range));
+        assertEquals(container.getLastChild(), DOMUtils.getInstance().getLastLeaf(range));
+
+        range.setStart(container.getChildNodes().getItem(1), 1);
+        range.setEnd(container.getChildNodes().getItem(3), 0);
+        assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance()
+            .getFirstLeaf(range));
+        assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance()
+            .getLastLeaf(range));
+
+        range.collapse(true);
+        assertNull(DOMUtils.getInstance().getFirstLeaf(range));
+        assertNull(DOMUtils.getInstance().getLastLeaf(range));
+    }
 }

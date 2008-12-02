@@ -37,6 +37,7 @@ import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidatorTest;
 import com.xpn.xwiki.wysiwyg.client.util.TimerTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserverTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHRExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutableTest;
@@ -82,6 +83,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(TimerTest.class);
 
         // widget
+        suite.addTestSuite(RichTextAreaTest.class);
         suite.addTestSuite(HistoryTest.class);
         suite.addTestSuite(InsertHTMLExecutableTest.class);
         suite.addTestSuite(InsertHRExecutableTest.class);

@@ -25,7 +25,6 @@ import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Executable for the unlink command, to remove a link in the wiki document. The following rules apply:
@@ -37,7 +36,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
  * 
  * @version $Id$
  */
-public class UnlinkExecutable implements Executable
+public class UnlinkExecutable extends AbstractExecutable
 {
     /**
      * Hold the name of the anchor tag.
@@ -51,6 +50,8 @@ public class UnlinkExecutable implements Executable
 
     /**
      * {@inheritDoc}
+     * 
+     * @see AbstractExecutable#execute(RichTextArea, String)
      */
     public boolean execute(RichTextArea rta, String param)
     {
@@ -224,35 +225,17 @@ public class UnlinkExecutable implements Executable
 
     /**
      * {@inheritDoc}
-     */
-    public String getParameter(RichTextArea rta)
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
+     * 
+     * @see AbstractExecutable#isEnabled(RichTextArea)
      */
     public boolean isEnabled(RichTextArea rta)
     {
+        if (!super.isEnabled(rta)) {
+            return false;
+        }
+
         // Check the selection, to be either void or inside a link.
         Range range = DOMUtils.getInstance().getTextRange(rta.getDocument().getSelection().getRangeAt(0));
         return DOMUtils.getInstance().getFirstAncestor(range.getCommonAncestorContainer(), ANCHOR) != null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isExecuted(RichTextArea rta)
-    {
-        return !isEnabled(rta);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isSupported(RichTextArea rta)
-    {
-        return true;
     }
 }

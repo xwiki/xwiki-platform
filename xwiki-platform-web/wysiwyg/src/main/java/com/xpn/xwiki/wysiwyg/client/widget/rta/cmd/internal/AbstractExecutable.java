@@ -19,36 +19,53 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
- * Creates a link by inserting the link XHTML.
+ * Base class for all {@link Executable}s that manipulate a DOM document using the selection and range APIs.
  * 
  * @version $Id$
  */
-public class CreateLinkExecutable extends InsertHTMLExecutable
+public abstract class AbstractExecutable implements Executable
 {
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#isEnabled(RichTextArea)
+     * @see Executable#getParameter(RichTextArea)
+     */
+    public String getParameter(RichTextArea rta)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Executable#isEnabled(RichTextArea)
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        if (!super.isEnabled(rta)) {
-            return false;
-        }
+        return rta.getDocument().getSelection().getRangeCount() > 0;
+    }
 
-        String anchorTagName = "a";
-        // This option is enabled only if we're not in another or the selection does not touch an anchor
-        Range range = DOMUtils.getInstance().getTextRange(rta.getDocument().getSelection().getRangeAt(0));
-        // Check the parent first, for it's shorter
-        if (DOMUtils.getInstance().getFirstAncestor(range.getCommonAncestorContainer(), anchorTagName) != null) {
-            return false;
-        }
-        // if no anchor on ancestor, test all the nodes touched by the selection to not contain an anchor
-        return DOMUtils.getInstance().getFirstDescendant(range.cloneContents(), anchorTagName) == null;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Executable#isExecuted(RichTextArea)
+     */
+    public boolean isExecuted(RichTextArea rta)
+    {
+        return getParameter(rta) != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Executable#isSupported(RichTextArea)
+     */
+    public boolean isSupported(RichTextArea rta)
+    {
+        return rta.getDocument() != null;
     }
 }

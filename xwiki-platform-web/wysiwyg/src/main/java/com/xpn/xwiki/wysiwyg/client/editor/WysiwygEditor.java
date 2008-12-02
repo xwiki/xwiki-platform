@@ -44,6 +44,8 @@ import com.xpn.xwiki.wysiwyg.client.util.WithDeferredUpdate;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultExecutable;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.StyleWithCssExecutable;
 
 public class WysiwygEditor implements WithDeferredUpdate, MouseListener, KeyboardListener, CommandListener,
     ChangeListener, LoadListener
@@ -403,10 +405,16 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
 
             // Make sure the editor uses formatting tags instead of CSS.
             // This is a requirement for HTML to wiki conversion.
-            getUI().getTextArea().getCommandManager().execute(Command.STYLE_WITH_CSS, false);
+            StyleWithCssExecutable styleWithCss = new StyleWithCssExecutable();
+            if (styleWithCss.isSupported(getUI().getTextArea())) {
+                styleWithCss.execute(getUI().getTextArea(), String.valueOf(false));
+            }
 
             // Make sure pressing return generates a new paragraph.
-            getUI().getTextArea().getCommandManager().execute(Command.INSERT_BR_ON_RETURN, false);
+            DefaultExecutable insertBrOnReturn = new DefaultExecutable(Command.INSERT_BR_ON_RETURN.toString());
+            if (insertBrOnReturn.isSupported(getUI().getTextArea())) {
+                insertBrOnReturn.execute(getUI().getTextArea(), String.valueOf(false));
+            }
         }
 
         DeferredCommand.addCommand(new SyntaxValidationCommand());

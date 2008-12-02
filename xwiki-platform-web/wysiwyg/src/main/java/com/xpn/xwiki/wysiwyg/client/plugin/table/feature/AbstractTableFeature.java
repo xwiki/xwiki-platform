@@ -23,15 +23,15 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableFeature;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
  * This class partly implements the Executable and TableFeature interfaces. Table features must extend this class.
  * 
  * @version $Id$
  */
-public abstract class AbstractTableFeature implements TableFeature
+public abstract class AbstractTableFeature extends AbstractExecutable implements TableFeature
 {
     /**
      * Feature name (examples: inserttable, insertrowbefore).
@@ -47,11 +47,11 @@ public abstract class AbstractTableFeature implements TableFeature
      * Feature command.
      */
     private final Command command;
-    
+
     /**
      * Table plug-in.
      */
-    private final TablePlugin plugin;    
+    private final TablePlugin plugin;
 
     /**
      * Default constructor.
@@ -69,8 +69,8 @@ public abstract class AbstractTableFeature implements TableFeature
         this.button = button;
         button.setTitle(title);
         this.plugin = plugin;
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -89,7 +89,7 @@ public abstract class AbstractTableFeature implements TableFeature
     public PushButton getButton()
     {
         return button;
-    }    
+    }
 
     /**
      * {@inheritDoc}
@@ -104,43 +104,13 @@ public abstract class AbstractTableFeature implements TableFeature
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(RichTextArea)
-     */
-    public String getParameter(RichTextArea rta)
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isExecuted(RichTextArea)
-     */
-    public boolean isExecuted(RichTextArea rta)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isSupported(RichTextArea)
-     */
-    public boolean isSupported(RichTextArea rta)
-    {
-        return true;
-    }
-    
-    /**
-     * {@inheritDoc}
-     * 
      * @see TableFeature#getPlugin()
      */
     public TablePlugin getPlugin()
     {
         return plugin;
     }
-    
+
     /**
      * {@inheritDoc}
      * 

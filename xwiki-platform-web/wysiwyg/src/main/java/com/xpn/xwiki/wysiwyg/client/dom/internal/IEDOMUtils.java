@@ -101,6 +101,7 @@ public class IEDOMUtils extends DOMUtils
      * {@inheritDoc}
      * 
      * @see DOMUtils#setInnerHTML(Element, String)
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3146
      */
     public void setInnerHTML(Element element, String html)
     {

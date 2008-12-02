@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1223296875000</date>
-<contentUpdateDate>1223296875000</contentUpdateDate>
-<version>107.1</version>
+<date>1228223842000</date>
+<contentUpdateDate>1228223842000</contentUpdateDate>
+<version>2.1</version>
 <title>CreateNewWiki</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -22,6 +22,7 @@
 <comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -529,7 +530,7 @@
               &lt;select #if($listtemplate.size() == 0)disabled="disabled"#end name="wikitemplate" id="wikitemplate"&gt;
                 &lt;option value=""&gt;---&lt;/option&gt;
                 #foreach ($template in $listtemplate)
-                  &lt;option value="$template.wikiName"&gt;$template.wikiPrettyName&lt;/option&gt;
+                  &lt;option value="$template.wikiName"&gt;#if($template.wikiPrettyName != "")$template.wikiPrettyName#else$template.wikiName#end&lt;/option&gt;
                 #end
               &lt;/select&gt;
             &lt;/dd&gt;

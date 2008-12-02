@@ -1202,7 +1202,7 @@ body#body.editbody #globallinks #globalmenu .glink,
 /*IE*/
 
 #globaldoctitle {
-    display: none; /*pour Žviter pb dans IE -- a regler*/
+    display: none; /*pour ï¿½viter pb dans IE -- a regler*/
 }
 
 #globaldoctitle h1 {
@@ -2201,14 +2201,13 @@ span.pitemseparator {
     font-weight: bold;
 }
 
-.xwikipanelcontents dl dd table#xwikiincludeddocuments td {
-    padding: 2px 3px;
+.xwikipanelcontents dl dd table#xwikiincludeddocuments td {    
     border-top: 1px dotted #EEE;
 }
 
 .xwikipanelcontents dl dd table#xwikiincludeddocuments td a {
     display: block;
-    width: 155px;
+    width: 148px;
     position: relative;
     overflow: hidden;
 }

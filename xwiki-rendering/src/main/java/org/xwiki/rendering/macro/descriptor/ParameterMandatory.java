@@ -17,28 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
+package org.xwiki.rendering.macro.descriptor;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.rendering.scaffolding.ScriptRenderingPlexusTestSetup;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * Use this annotation to add a description to a macro parameters bean method.
  * 
  * @version $Id$
- * @since 1.7M3
+ * @since 1.7
  */
-public class RenderingTests extends TestCase
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ParameterMandatory
 {
-    public static Test suite() throws Exception
-    {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-
-        suite.addTestsFromResource("macroscript1", true);
-
-        return new ScriptRenderingPlexusTestSetup(suite);
-    }
+    
 }

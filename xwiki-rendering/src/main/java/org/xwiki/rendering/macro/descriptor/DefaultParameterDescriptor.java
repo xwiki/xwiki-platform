@@ -43,6 +43,12 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
     Class< ? > type;
 
     /**
+     * Indicate if the parameter is mandatory.
+     * @since 1.7
+     */
+    private boolean mandatory;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getName()
@@ -94,5 +100,25 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
     public void setType(Class< ? > type)
     {
         this.type = type;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#isMandatory()
+     * @since 1.7
+     */
+    public boolean isMandatory()
+    {
+        return this.mandatory;
+    }
+
+    /**
+     * @param mandatory indicate if the parameter is mandatory.
+     * @since 1.7
+     */
+    public void setMandatory(boolean mandatory)
+    {
+        this.mandatory = mandatory;
     }
 }

@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro.include;
 
 import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.ParameterMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
@@ -52,6 +53,7 @@ public class IncludeMacroParameters
     /**
      * @param document the name of the document to include.
      */
+    @ParameterMandatory
     @ParameterDescription("the name of the document to include")
     public void setDocument(String document)
     {

@@ -1,0 +1,70 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{script}}
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+{{/script}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker [script] [] [
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+]
+beginParagraph
+onWord [def]
+onSpace
+onWord [list]
+onSpace
+onSpecialSymbol [=]
+onSpace
+onSpecialSymbol [[]
+onSpecialSymbol ["]
+onWord [one]
+onSpecialSymbol ["]
+onSpecialSymbol [,]
+onSpace
+onSpecialSymbol ["]
+onWord [two]
+onSpecialSymbol ["]
+onSpecialSymbol []]
+onLineBreak
+onWord [list]
+onSpecialSymbol [.]
+onWord [each]
+onSpace
+onSpecialSymbol [{]
+onSpace
+onWord [item]
+onSpace
+onSpecialSymbol [-]
+onSpecialSymbol [>]
+onLineBreak
+onSpace
+onSpace
+onWord [println]
+onSpace
+onSpecialSymbol ["]
+onSpecialSymbol [*]
+onSpace
+onSpecialSymbol [$]
+onSpecialSymbol [{]
+onWord [item]
+onSpecialSymbol [}]
+onSpecialSymbol ["]
+onLineBreak
+onSpecialSymbol [}]
+endParagraph
+endMacroMarker [script] [] [
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+]
+endDocument

@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.script;
 
 import java.io.StringWriter;
+import java.util.List;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -29,6 +30,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.script.AbstractScriptMacro;
@@ -85,6 +87,23 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.macro.script.AbstractScriptMacro#execute(java.lang.Object, java.lang.String,
+     *      org.xwiki.rendering.transformation.MacroTransformationContext)
+     */
+    @Override
+    public List<Block> execute(ScriptMacroParameters parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        if (!canExecuteScript()) {
+            throw new MacroExecutionException("You don't have the right to execute this script");
+        }
+
+        return super.execute(parameters, content, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.macro.script.AbstractScriptMacro#evaluate(java.lang.Object, java.lang.String,
      *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
@@ -92,10 +111,6 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
     protected String evaluate(ScriptMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        if (!canExecuteScript()) {
-            throw new MacroExecutionException("You don't have the right to execute this script");
-        }
-
         String engineName;
 
         // 1) resolve script engine name
@@ -111,44 +126,45 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
             engineName = this.language;
         }
 
-        if (engineName == null) {
-            throw new MacroExecutionException("No language identifier provided");
-        }
+        String scriptResult;
+        if (engineName != null) {
+            // 2) execute script
+            try {
+                ScriptEngineManager sem = new ScriptEngineManager();
+                ScriptEngine engine = sem.getEngineByName(engineName);
 
-        // 2) execute script
-        try {
-            ScriptEngineManager sem = new ScriptEngineManager();
-            ScriptEngine engine = sem.getEngineByName(engineName);
+                if (engine != null) {
+                    ScriptContext scripContext = this.scriptContextManager.getScriptContext();
 
-            String scriptResult;
-            if (engine != null) {
-                ScriptContext scripContext = this.scriptContextManager.getScriptContext();
+                    StringWriter stringWriter = new StringWriter();
 
-                StringWriter stringWriter = new StringWriter();
+                    // set writer in script context
+                    scripContext.setWriter(stringWriter);
 
-                // set writer in script context
-                scripContext.setWriter(stringWriter);
+                    if (engine instanceof Compilable) {
+                        CompiledScript compiledScript = getCompiletScript(content, (Compilable) engine);
 
-                if (engine instanceof Compilable) {
-                    CompiledScript compiledScript = getCompiletScript(content, (Compilable) engine);
+                        compiledScript.eval(scripContext);
+                    } else {
+                        engine.eval(content, scripContext);
+                    }
 
-                    compiledScript.eval(scripContext);
+                    // remove writer script from context
+                    scripContext.setWriter(null);
+
+                    scriptResult = stringWriter.toString();
                 } else {
-                    engine.eval(content, scripContext);
+                    throw new MacroExecutionException("Can't find script engine with name [" + engineName + "]");
                 }
-
-                // remove writer script from context
-                scripContext.setWriter(null);
-
-                scriptResult = stringWriter.toString();
-            } else {
-                throw new MacroExecutionException("Can't find script engine with name [" + engineName + "]");
+            } catch (ScriptException e) {
+                throw new MacroExecutionException("Failed to evaluate Script Macro for content [" + content + "]", e);
             }
-
-            return scriptResult;
-        } catch (ScriptException e) {
-            throw new MacroExecutionException("Failed to evaluate Script Macro for content [" + content + "]", e);
+        } else {
+            // If no language identifier is provided, don't evaluate content
+            scriptResult = content;
         }
+
+        return scriptResult;
     }
 
     /**

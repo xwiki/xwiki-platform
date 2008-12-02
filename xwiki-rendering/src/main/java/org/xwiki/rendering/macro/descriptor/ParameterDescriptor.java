@@ -41,4 +41,10 @@ public interface ParameterDescriptor
      * @return the type of the parameter.
      */
     Class< ? > getType();
+
+    /**
+     * @return indicate if the parameter is mandatory.
+     * @since 1.7
+     */
+    boolean isMandatory();
 }

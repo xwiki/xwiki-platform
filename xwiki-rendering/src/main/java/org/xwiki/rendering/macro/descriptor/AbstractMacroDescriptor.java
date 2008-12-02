@@ -23,6 +23,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -61,7 +62,9 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
     }
 
     /**
-     * Extract parameters informations from {@link #parametersBeanClass} and insert it in {@link #parameterDescriptorMap}.
+     * Extract parameters informations from {@link #parametersBeanClass} and insert it in
+     * {@link #parameterDescriptorMap}.
+     * 
      * @since 1.7M2
      */
     protected void extractParameterDescriptorMap()
@@ -99,24 +102,41 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
         if (writeMethod != null) {
             Method readMethod = propertyDescriptor.getReadMethod();
 
-            String description;
+            ParameterDescription parameterDescription =
+                extractParameterAnnotation(writeMethod, readMethod, ParameterDescription.class);
 
-            ParameterDescription parameterDescription = writeMethod.getAnnotation(ParameterDescription.class);
+            desc.setDescription(parameterDescription != null ? parameterDescription.value() : propertyDescriptor
+                .getShortDescription());
 
-            if (parameterDescription == null && readMethod != null) {
-                parameterDescription = readMethod.getAnnotation(ParameterDescription.class);
-            }
+            ParameterMandatory parameterMandatory =
+                extractParameterAnnotation(writeMethod, readMethod, ParameterMandatory.class);
 
-            if (parameterDescription != null) {
-                description = parameterDescription.value();
-            } else {
-                description = propertyDescriptor.getShortDescription();
-            }
-
-            desc.setDescription(description);
+            desc.setMandatory(parameterMandatory != null);
 
             this.parameterDescriptorMap.put(desc.getName().toLowerCase(), desc);
         }
+    }
+
+    /**
+     * Get the parameter annotation. Try first on the setter then on the getter if no annotation has been found.
+     * 
+     * @param <T> the Class object corresponding to the annotation type.
+     * @param writeMethod the method that should be used to write the property value.
+     * @param readMethod the method that should be used to read the property value.
+     * @param annotationClass the Class object corresponding to the annotation type.
+     * @return this element's annotation for the specified annotation type if present on this element, else null.
+     * @since 1.7
+     */
+    protected <T extends Annotation> T extractParameterAnnotation(Method writeMethod, Method readMethod,
+        Class<T> annotationClass)
+    {
+        T parameterDescription = writeMethod.getAnnotation(annotationClass);
+
+        if (parameterDescription == null && readMethod != null) {
+            parameterDescription = readMethod.getAnnotation(annotationClass);
+        }
+
+        return parameterDescription;
     }
 
     /**

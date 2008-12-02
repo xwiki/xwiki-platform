@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro.id;
 
 import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.ParameterMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.id.IdMacro} Macro.
@@ -31,6 +32,7 @@ public class IdMacroParameters
 {
     private String name;
 
+    @ParameterMandatory
     @ParameterDescription("the identifier string")
     public void setName(String name)
     {

@@ -4,7 +4,7 @@
 <link type="text/css" rel="stylesheet" href="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/RichTextArea.css"/>
 ##TODO: The style sheet configuration is commented out for now because it affects the behavior of the new WYSIWYG editor in a very bad way. 
 ##This is temporary. See http://jira.xwiki.org/jira/browse/XWIKI-2721
-<link type="text/css" rel="stylesheet" href="${request.getRequestURL().substring(0, $request.getRequestURL().indexOf("/", 9))}${xwiki.getSkinFile("style.css")}"/>
+##<link type="text/css" rel="stylesheet" href="${request.getRequestURL().substring(0, $request.getRequestURL().indexOf("/", 9))}${xwiki.getSkinFile("style.css")}"/>
 </head>
 <body id="body" class="main">$tdoc.getRenderedContent($tdoc.content, $tdoc.getSyntaxId())</body>
 </html>

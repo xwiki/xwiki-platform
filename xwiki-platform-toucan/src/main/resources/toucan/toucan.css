@@ -125,7 +125,7 @@ a img {
     border: none;
 }
 
-pre.xwikierror {
+pre {
     background-color: #F1F7FF;
     border: 1px dotted #555555;
     float: left;

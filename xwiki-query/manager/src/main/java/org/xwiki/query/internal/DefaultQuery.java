@@ -17,11 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query;
+package org.xwiki.query.internal;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryExecutor;
 
 /**
  * Stores all information needed for execute a query.
@@ -128,9 +132,10 @@ public class DefaultQuery implements Query
     /**
      * {@inheritDoc}
      */
-    public void setWiki(String wiki)
+    public Query setWiki(String wiki)
     {
         this.wiki = wiki;
+        return this;
     }
 
     /**

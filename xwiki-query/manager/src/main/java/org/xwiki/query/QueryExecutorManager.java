@@ -19,28 +19,22 @@
  */
 package org.xwiki.query;
 
-import java.util.List;
+import java.util.Set;
 
 /**
- * Interface for execute a queries.
- * Components should be registered with hint = query language.
- * @see Query
+ * Executes queries for several languages.
+ * @see QueryExecutor
  * @version $Id$
- * @since 1.6M1
  */
-public interface QueryExecutor
+public interface QueryExecutorManager extends QueryExecutor
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    String ROLE = QueryExecutor.class.getName();
+    String ROLE = QueryExecutorManager.class.getName();
 
     /**
-     * @param <T> expected type of elements in the result list
-     * @param query query to execute
-     * @return result list of the query
-     * @throws QueryException if something goes wrong
-     * @see Query#execute()
+     * @return supported languages
      */
-    <T> List<T> execute(Query query) throws QueryException;
+    Set<String> getLanguages();
 }

@@ -17,11 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query;
+package org.xwiki.query.internal;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
+
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryExecutorManager;
+import org.xwiki.query.QueryManager;
 
 /**
  * This is default QueryManager implementation.
@@ -33,23 +36,16 @@ import java.util.Set;
 public class DefaultQueryManager implements QueryManager
 {
     /**
-     * Map from query language to its QueryExecutor.
-     * injected.
+     * {@link QueryExecutorManager} for execute Queries.
      */
-    private Map<String, QueryExecutor> executors;
-
-    /**
-     * QueryExecutor for named queries.
-     * injected.
-     */
-    private QueryExecutor namedQueryExecutor;
+    protected QueryExecutorManager queryExecutorManager;
 
     /**
      * {@inheritDoc}
      */
     public Set<String> getLanguages()
     {
-        return Collections.unmodifiableSet(this.executors.keySet());
+        return getQueryExecutorManager().getLanguages();
     }
 
     /**
@@ -66,7 +62,7 @@ public class DefaultQueryManager implements QueryManager
     public Query createQuery(String statement, String language) throws QueryException
     {
         if (hasLanguage(language)) {
-            return new DefaultQuery(statement, language, getExecutor(language));
+            return new DefaultQuery(statement, language, getQueryExecutorManager());
         } else {
             throw new QueryException("Language [" + language + "] is not supported", null, null);
         }
@@ -77,23 +73,14 @@ public class DefaultQueryManager implements QueryManager
      */
     public Query getNamedQuery(String queryName) throws QueryException
     {
-        return new DefaultQuery(queryName, getNamedQueryExecutor());
+        return new DefaultQuery(queryName, getQueryExecutorManager());
     }
 
     /**
-     * @param language query language
-     * @return {@link QueryExecutor} for this language
+     * @return {@link QueryExecutorManager}
      */
-    protected QueryExecutor getExecutor(String language)
+    protected QueryExecutorManager getQueryExecutorManager()
     {
-        return this.executors.get(language);
-    }
-
-    /**
-     * @return {@link QueryExecutor} for named queries.
-     */
-    protected QueryExecutor getNamedQueryExecutor()
-    {
-        return namedQueryExecutor;
+        return queryExecutorManager;
     }
 }

@@ -17,30 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query;
+package org.xwiki.query.internal;
 
-import java.util.List;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
 
 /**
- * Interface for execute a queries.
- * Components should be registered with hint = query language.
- * @see Query
+ * QueryManager implementation for use in scripts.
  * @version $Id$
- * @since 1.6M1
  */
-public interface QueryExecutor
+public class SecureQueryManager extends DefaultQueryManager
 {
     /**
-     * This component's role, used when code needs to look it up.
+     * @param statement XWQL statement
+     * @return Query
+     * @throws QueryException if any errors
+     * @see {@link #createQuery(String, String)}
      */
-    String ROLE = QueryExecutor.class.getName();
-
-    /**
-     * @param <T> expected type of elements in the result list
-     * @param query query to execute
-     * @return result list of the query
-     * @throws QueryException if something goes wrong
-     * @see Query#execute()
-     */
-    <T> List<T> execute(Query query) throws QueryException;
+    public Query xwql(String statement) throws QueryException
+    {
+        return createQuery(statement, Query.XWQL);
+    }    
 }

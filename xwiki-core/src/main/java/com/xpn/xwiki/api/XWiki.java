@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,6 +40,7 @@ import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 
 public class XWiki extends Api
@@ -2601,5 +2603,13 @@ public class XWiki extends Api
     public List<String> getConfiguredSyntaxes()
     {
         return this.xwiki.getConfiguredSyntaxes();
+    }
+
+    /**
+     * @return secure {@link QueryManager} for execute queries to store.
+     */
+    public QueryManager getQueryManager()
+    {
+        return (QueryManager) Utils.getComponent(QueryManager.ROLE, "secure");
     }
 }

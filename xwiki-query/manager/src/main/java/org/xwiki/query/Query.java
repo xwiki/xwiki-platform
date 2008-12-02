@@ -63,8 +63,9 @@ public interface Query
 
     /**
      * @param wiki virtual wiki to run the query. null is a current wiki.
+     * @return this query.
      */
-    void setWiki(String wiki);
+    Query setWiki(String wiki);
 
     /**
      * @return virtual wiki to run the query. null is a current wiki.

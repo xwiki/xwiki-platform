@@ -46,6 +46,13 @@ public interface QueryManager
     Query createQuery(String statement, String language) throws QueryException;
 
     /**
+     * @param queryName name of named query.
+     * @return Query object.
+     * @throws QueryException if there is no query with that name
+     */
+    Query getNamedQuery(String queryName) throws QueryException;
+
+    /**
      * @return supported languages.
      */
     Set<String> getLanguages();
@@ -55,11 +62,4 @@ public interface QueryManager
      * @return is language supported.
      */
     boolean hasLanguage(String language);
-
-    /**
-     * @param queryName name of named query.
-     * @return Query object.
-     * @throws QueryException if there is no query with that name
-     */
-    Query getNamedQuery(String queryName) throws QueryException;
 }

@@ -27,17 +27,12 @@
 ## The editor will replace the following text area with its own widget.
 ## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
 $xwiki.getTextArea($tdoc.content)
-## We separated the hook of the editor (the previous HTML text area) from editor's input source (the following hidden input)
-$xwiki.wysiwyg.getInput("htmlContent", $tdoc.content, $doc.syntaxId)
 <script type="text/javascript">
 //<![CDATA[
     var Wysiwyg0 = {
       hookId: 'content',
-      inputId: 'htmlContent',
+      inputURL: "${tdoc.getExternalURL("view", "xpage=wysiwyginput")}",
       syntax: "$doc.syntaxId",
-      // TODO: The style sheet configuration is commented out for now because it affects the behavior of the new WYSIWYG editor in a very bad way. 
-      // This is temporary. See http://jira.xwiki.org/jira/browse/XWIKI-2721
-      // stylesheet: "${request.getRequestURL().substring(0, $request.getRequestURL().indexOf("/", 9))}${xwiki.getSkinFile("style.css")}",
       plugins: 'separator text valign list indent undo format symbol link',
       toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink',
       debug: #if($request.debug)'true'#else'false'#end

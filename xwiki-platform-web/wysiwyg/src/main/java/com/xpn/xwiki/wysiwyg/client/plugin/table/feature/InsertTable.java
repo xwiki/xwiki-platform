@@ -19,11 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.dom.client.TableRowElement;
 import com.google.gwt.user.client.ui.PushButton;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
@@ -112,23 +115,44 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     public TableElement insertTable(RichTextArea rta, TableConfig config)
     {
         Range range = TableUtils.getInstance().getRange(rta.getDocument());
+        Selection selection = rta.getDocument().getSelection();
         TableElement table = rta.getDocument().createTableElement();
         TableRowElement row;
         TableCellElement cell;
 
-        // Create rows and columns according to the configuration
+        // Create a table with rows and columns according to the configuration
         for (int i = 0; i < config.getRowNumber(); i++) {
             row = table.insertRow(i);
             for (int j = 0; j < config.getColNumber(); j++) {
                 cell = row.insertCell(j);
-                cell.setInnerHTML(TableUtils.CELL_DEFAULTHTML);
+                // We're inserting some HTML content here because having empty cells is a source of issues with midas.
+                cell.setInnerHTML(TableUtils.CELL_DEFAULTHTML);                
             }
-        }
+        }        
 
-        // FIXME : improve node insertion based on current caret node info.
-        // DEPENDENCY : InsertBlockExecutable to be committed by mflorea.
-        // Append the table to the document.
-        range.getCommonAncestorContainer().appendChild(table);
+        // Leave the rest of the ranges intact.
+        selection.removeAllRanges();
+
+        // Delete the contents of the first range. The table will be inserted in place of the deleted text.
+        range.deleteContents();
+
+        // Split the DOM tree up to the nearest flow container, insert a table and place the caret inside the first cell.
+        Node start = range.getStartContainer();
+        int offset = range.getStartOffset();
+        Node flowContainer = DOMUtils.getInstance().getNearestFlowContainer(start);
+
+        if (flowContainer == start) {
+            DOMUtils.getInstance().insertAt(flowContainer, table, offset);
+            range.setEndAfter(table);
+        } else {
+            Node startNextLevelSibling = DOMUtils.getInstance().splitNode(flowContainer, start, offset);
+            DOMUtils.getInstance().insertAfter(table, DOMUtils.getInstance().getChild(flowContainer, start));
+            // We need to update the range after inserting the table because otherwise the caret might jump
+            // before it (this happens in IE for instance).
+            range.setEnd(startNextLevelSibling, 0);
+        }
+        range.collapse(false);
+        selection.addRange(range);
 
         return table;
     }

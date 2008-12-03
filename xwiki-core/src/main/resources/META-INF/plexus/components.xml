@@ -58,6 +58,18 @@
         </requirement>
       </requirements>
     </component>
+    <component>
+      <role>org.xwiki.bridge.XWikiAccessBridge</role>
+      <role-hint>default</role-hint>
+      <implementation>com.xpn.xwiki.DefaultXWikiAccessBridge</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.context.Execution</role>
+        </requirement>
+      </requirements>
+    </component>
     <!-- store components -->
     <component>
       <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>

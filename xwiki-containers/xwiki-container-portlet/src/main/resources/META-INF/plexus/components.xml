@@ -35,7 +35,7 @@
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
-          <role>org.xwiki.container.RequestInitializer</role>
+          <role>org.xwiki.container.RequestInitializerManager</role>
           <role-hint>default</role-hint>
         </requirement>
         <requirement>

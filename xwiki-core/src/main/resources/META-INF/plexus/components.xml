@@ -59,9 +59,9 @@
       </requirements>
     </component>
     <component>
-      <role>org.xwiki.bridge.XWikiAccessBridge</role>
+      <role>org.xwiki.bridge.SkinAccessBridge</role>
       <role-hint>default</role-hint>
-      <implementation>com.xpn.xwiki.DefaultXWikiAccessBridge</implementation>
+      <implementation>com.xpn.xwiki.DefaultSkinAccessBridge</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>

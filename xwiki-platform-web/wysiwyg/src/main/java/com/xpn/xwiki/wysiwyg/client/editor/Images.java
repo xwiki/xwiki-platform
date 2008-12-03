@@ -12,6 +12,9 @@ import com.google.gwt.user.client.ui.ImageBundle;
  */
 public interface Images extends ImageBundle
 {
+    /**
+     * An instance of this image bundle that can be used anywhere in the code to extract images.
+     */
     Images INSTANCE = (Images) GWT.create(Images.class);
 
     @Resource("attachment.gif")

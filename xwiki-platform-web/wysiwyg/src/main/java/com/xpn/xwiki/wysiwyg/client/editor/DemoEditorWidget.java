@@ -32,6 +32,11 @@ import com.xpn.xwiki.wysiwyg.client.diff.Diff;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.diff.ToString;
 
+/**
+ * Legacy code that might prove useful for the real time feature.
+ * 
+ * @version $Id$
+ */
 public class DemoEditorWidget extends Composite
 {
     private Wysiwyg wysiwyg;
@@ -196,7 +201,7 @@ public class DemoEditorWidget extends Composite
     }
 
     /**
-     * This will relocate the patches on rev2 based on changes in rev1
+     * This will relocate the patches on rev2 based on changes in rev1.
      * 
      * @param rev2
      * @param rev1

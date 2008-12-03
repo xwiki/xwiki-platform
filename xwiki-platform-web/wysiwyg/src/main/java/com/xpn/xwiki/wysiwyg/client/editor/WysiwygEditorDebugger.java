@@ -27,22 +27,56 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.util.Timer;
 import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
 
+/**
+ * Debugger for the {@link WysiwygEditor}. It displays the current HTML content of the debugged rich text area, the
+ * cleaned HTML, the corresponding wiki syntax as well as the rendering events triggered during the conversion to wiki
+ * syntax.
+ * 
+ * @version $Id$
+ */
 public class WysiwygEditorDebugger extends Composite implements TimerListener
 {
+    /**
+     * The editor being debugged.
+     */
     private WysiwygEditor editor;
 
+    /**
+     * Displays the corresponding wiki syntax.
+     */
     private TextArea wikiTextArea;
 
+    /**
+     * Displays the current HTML content.
+     */
     private TextArea dirtyHTMLTextArea;
 
+    /**
+     * Displays the corresponding XHTML content.
+     */
     private TextArea cleanHTMLTextArea;
 
+    /**
+     * Displays the rendering events triggered during the conversion to wiki syntax.
+     */
     private TextArea eventsTextArea;
 
+    /**
+     * Timer used to schedule periodically updates.
+     */
     private Timer timer;
 
+    /**
+     * The previous HTML content of the rich text area. We store it to detect when the content of the rich text area has
+     * change in order to refresh the debug text areas.
+     */
     private String previousHTML = "";
 
+    /**
+     * Creates a new debugger for the given editor.
+     * 
+     * @param editor The WYSIWYG editor being debugged.
+     */
     public WysiwygEditorDebugger(WysiwygEditor editor)
     {
         this.editor = editor;
@@ -51,24 +85,27 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
         panel.setWidth("100%");
         panel.add(editor.getUI());
 
+        String width = "400px";
+        String height = "220px";
+
         dirtyHTMLTextArea = new TextArea();
-        dirtyHTMLTextArea.setWidth("400px");
-        dirtyHTMLTextArea.setHeight("220px");
+        dirtyHTMLTextArea.setWidth(width);
+        dirtyHTMLTextArea.setHeight(height);
         panel.add(dirtyHTMLTextArea);
 
         cleanHTMLTextArea = new TextArea();
-        cleanHTMLTextArea.setWidth("400px");
-        cleanHTMLTextArea.setHeight("220px");
+        cleanHTMLTextArea.setWidth(width);
+        cleanHTMLTextArea.setHeight(height);
         panel.add(cleanHTMLTextArea);
 
         wikiTextArea = new TextArea();
-        wikiTextArea.setWidth("400px");
-        wikiTextArea.setHeight("220px");
+        wikiTextArea.setWidth(width);
+        wikiTextArea.setHeight(height);
         panel.add(wikiTextArea);
 
         eventsTextArea = new TextArea();
-        eventsTextArea.setWidth("400px");
-        eventsTextArea.setHeight("220px");
+        eventsTextArea.setWidth(width);
+        eventsTextArea.setHeight(height);
         panel.add(eventsTextArea);
 
         // get the transformed HTML Content
@@ -81,6 +118,9 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
         timer.scheduleRepeating(4000);
     }
 
+    /**
+     * Refreshes the debug text areas if the text in the rich text area has been changed.
+     */
     public void refreshData()
     {
         String currentHTML = editor.getUI().getTextArea().getHTML();

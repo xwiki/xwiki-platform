@@ -43,14 +43,33 @@ import com.xpn.xwiki.wysiwyg.client.syntax.internal.XHTMLSyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 
-public class WysiwygEditorFactory
+/**
+ * Factory for {@link WysiwygEditor}. Holds the responsibility of injecting the {@link PluginFactoryManager} and
+ * {@link SyntaxValidatorManager} in each editor created.
+ * 
+ * @version $Id$
+ */
+public final class WysiwygEditorFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static WysiwygEditorFactory instance;
 
+    /**
+     * The {@link SyntaxValidatorManager} injected in each editor created.
+     */
     private SyntaxValidatorManager svm;
 
+    /**
+     * The {@link PluginFactoryManager} injected in each editor created.
+     */
     private PluginFactoryManager pfm;
 
+    /**
+     * Initializes the {@link SyntaxValidatorManager} and {@link PluginFactoryManager} instances that will be injected
+     * in the future editors.
+     */
     private WysiwygEditorFactory()
     {
         svm = new DefaultSyntaxValidatorManager();
@@ -77,6 +96,9 @@ public class WysiwygEditorFactory
         // add additional PluginFactory for other plug-ins
     }
 
+    /**
+     * @return the singleton factory instance.
+     */
     public static synchronized WysiwygEditorFactory getInstance()
     {
         if (instance == null) {
@@ -85,6 +107,13 @@ public class WysiwygEditorFactory
         return instance;
     }
 
+    /**
+     * Creates a new editor for the given configuration in the specified context.
+     * 
+     * @param config The configuration object.
+     * @param wysiwyg The application context.
+     * @return the newly created WYSIWYG editor.
+     */
     public WysiwygEditor newEditor(Config config, Wysiwyg wysiwyg)
     {
         return new WysiwygEditor(wysiwyg, config, svm, pfm);

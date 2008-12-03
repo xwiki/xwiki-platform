@@ -47,18 +47,39 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultExecutable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.StyleWithCssExecutable;
 
+/**
+ * The controller part of the WYSIWYG editor.
+ * 
+ * @version $Id$
+ */
 public class WysiwygEditor implements WithDeferredUpdate, MouseListener, KeyboardListener, CommandListener,
     ChangeListener, LoadListener
 {
+    /**
+     * Iterates through the features placed on the tool bar and enables or disables them by following the syntax
+     * validation rules.
+     */
     private class SyntaxValidationCommand implements IncrementalCommand
     {
+        /**
+         * Iterator for the features placed on the tool bar. For each entry the key is the feature name and the value is
+         * the widget present on the tool bar.
+         */
         private final Iterator<Map.Entry<String, UIExtension>> iterator;
 
+        /**
+         * Default constructor. Initializes the iterator for the tool bar features.
+         */
         public SyntaxValidationCommand()
         {
             iterator = toolBarFeatures.entrySet().iterator();
         }
 
+        /**
+         * {@inheritDoc}
+         * 
+         * @see IncrementalCommand#execute()
+         */
         public boolean execute()
         {
             if (iterator.hasNext()) {
@@ -81,14 +102,33 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
      */
     private static final String MENU_ROLE = "menu";
 
+    /**
+     * The name of the syntax configuration parameter.
+     */
+    private static final String SYNTAX = "syntax";
+
+    /**
+     * Default syntax. Can be overwritten from the configuration.
+     */
     private static final String DEFAULT_SYNTAX = "xwiki/2.0";
 
+    /**
+     * The list of plug-ins that can be loaded by default. Can be overwritten from the configuration.
+     */
     private static final String DEFAULT_PLUGINS =
         "separator sync text valign justify list indent undo format font color symbol link";
 
+    /**
+     * The list of features that can be placed on the tool bar by default. Can be overwritten from the configuration.
+     */
     private static final String DEFAULT_TOOLBAR =
-        "bold italic underline strikethrough teletype | subscript superscript | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | sync | link unlink";
+        "bold italic underline strikethrough teletype | subscript superscript"
+            + " | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent"
+            + " | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | sync | link unlink";
 
+    /**
+     * The list of default menu entries. Can be overwritten from the configuration.
+     */
     private static final String DEFAULT_MENU = "link image table macro";
 
     /**
@@ -96,20 +136,45 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
      */
     private static final String WHITE_SPACE_SEPARATOR = "\\s+";
 
+    /**
+     * A reference to the user interface.
+     */
     private final RichTextEditor ui;
 
+    /**
+     * The configuration object.
+     */
     private final Config config;
 
+    /**
+     * The plug-in manager.
+     */
     private final PluginManager pm;
 
+    /**
+     * The syntax validator.
+     */
     private final SyntaxValidator sv;
 
+    /**
+     * The features that have been placed on the tool bar. The key is the feature name and the value is the widget that
+     * has been placed on the tool bar.
+     */
     private Map<String, UIExtension> toolBarFeatures;
 
-    private boolean loaded = false;
-
+    /**
+     * The index of the last update. It is used to apply only the last update from a queue of consecutive updates.
+     */
     private long updateIndex = -1;
 
+    /**
+     * Creates a new WYSIWYG editor.
+     * 
+     * @param wysiwyg The application context.
+     * @param config The configuration object.
+     * @param svm The syntax validation manager used for enabling or disabling plugin features.
+     * @param pfm The plugin factory manager used to instantiate plugins.
+     */
     public WysiwygEditor(Wysiwyg wysiwyg, Config config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
     {
         this.config = config;
@@ -117,7 +182,7 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
         ui = new RichTextEditor();
         ui.addLoadListener(this);
         ui.getConfig().addFlag("wysiwyg");
-        ui.getConfig().setParameter("syntax", config.getParameter("syntax", DEFAULT_SYNTAX));
+        ui.getConfig().setParameter(SYNTAX, config.getParameter(SYNTAX, DEFAULT_SYNTAX));
         ui.getTextArea().addMouseListener(this);
         ui.getTextArea().addKeyboardListener(this);
         ui.getTextArea().getCommandManager().addCommandListener(this);
@@ -268,29 +333,64 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
     public void onLoad(Widget sender)
     {
         if (sender == ui) {
+            initTextArea();
             loadPlugins();
             fillMenu();
+            fillToolBar();
+        }
+    }
+
+    /**
+     * Initializes the rich text area.
+     */
+    private void initTextArea()
+    {
+        // Make sure the editor uses formatting tags instead of CSS.
+        // This is a requirement for HTML to wiki conversion.
+        StyleWithCssExecutable styleWithCss = new StyleWithCssExecutable();
+        if (styleWithCss.isSupported(getUI().getTextArea())) {
+            styleWithCss.execute(getUI().getTextArea(), String.valueOf(false));
+        }
+
+        // Make sure pressing return generates a new paragraph.
+        DefaultExecutable insertBrOnReturn = new DefaultExecutable(Command.INSERT_BR_ON_RETURN.toString());
+        if (insertBrOnReturn.isSupported(getUI().getTextArea())) {
+            insertBrOnReturn.execute(getUI().getTextArea(), String.valueOf(false));
         }
     }
 
     /**
      * Loads the plugins specified in the configuration (or the default list of plugins if the configuration doesn't
-     * specify the <em>plugins</em> parameter) and fills the tool bar of the editor with the features specified in the
-     * configuration.
+     * specify the <em>plugins</em> parameter).
      */
     private void loadPlugins()
     {
-        if (this.toolBarFeatures != null) {
-            return;
-        }
-
-        String[] pluginNames = config.getParameter("plugins", DEFAULT_PLUGINS).split("\\s+");
+        String[] pluginNames = config.getParameter("plugins", DEFAULT_PLUGINS).split(WHITE_SPACE_SEPARATOR);
         for (int i = 0; i < pluginNames.length; i++) {
             pm.load(pluginNames[i]);
         }
+    }
 
-        final String[] toolBarFeatures =
-            config.getParameter(TOOLBAR_ROLE, DEFAULT_TOOLBAR).split(WHITE_SPACE_SEPARATOR);
+    /**
+     * Fills the menu of the editor.
+     */
+    private void fillMenu()
+    {
+        String[] entries = config.getParameter(MENU_ROLE, DEFAULT_MENU).split(WHITE_SPACE_SEPARATOR);
+        for (int i = 0; i < entries.length; i++) {
+            UIExtension uie = pm.getUIExtension(MENU_ROLE, entries[i]);
+            if (uie != null) {
+                ui.getMenu().addItem((MenuItem) uie.getUIObject(entries[i]));
+            }
+        }
+    }
+
+    /**
+     * Fills the tool bar of the editor with the features specified in the configuration.
+     */
+    private void fillToolBar()
+    {
+        String[] toolBarFeatures = config.getParameter(TOOLBAR_ROLE, DEFAULT_TOOLBAR).split(WHITE_SPACE_SEPARATOR);
         boolean emptyGroup = true;
         boolean emptyLine = true;
         boolean uieNotFound = false;
@@ -298,7 +398,7 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
         UIExtension lineBreak = null;
         this.toolBarFeatures = new HashMap<String, UIExtension>();
         for (int i = 0; i < toolBarFeatures.length; i++) {
-            UIExtension uie = pm.getUIExtension("toolbar", toolBarFeatures[i]);
+            UIExtension uie = pm.getUIExtension(TOOLBAR_ROLE, toolBarFeatures[i]);
             if (uie != null) {
                 if (ToolBarSeparator.VERTICAL_BAR.equals(toolBarFeatures[i])) {
                     if (emptyGroup && uieNotFound) {
@@ -352,20 +452,6 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
     }
 
     /**
-     * Fills the menu of the editor.
-     */
-    private void fillMenu()
-    {
-        String[] entries = config.getParameter(MENU_ROLE, DEFAULT_MENU).split(WHITE_SPACE_SEPARATOR);
-        for (int i = 0; i < entries.length; i++) {
-            UIExtension uie = pm.getUIExtension(MENU_ROLE, entries[i]);
-            if (uie != null) {
-                ui.getMenu().addItem((MenuItem) uie.getUIObject(entries[i]));
-            }
-        }
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see WithDeferredUpdate#getUpdateIndex()
@@ -400,23 +486,6 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
      */
     public void onUpdate()
     {
-        if (!loaded) {
-            loaded = true;
-
-            // Make sure the editor uses formatting tags instead of CSS.
-            // This is a requirement for HTML to wiki conversion.
-            StyleWithCssExecutable styleWithCss = new StyleWithCssExecutable();
-            if (styleWithCss.isSupported(getUI().getTextArea())) {
-                styleWithCss.execute(getUI().getTextArea(), String.valueOf(false));
-            }
-
-            // Make sure pressing return generates a new paragraph.
-            DefaultExecutable insertBrOnReturn = new DefaultExecutable(Command.INSERT_BR_ON_RETURN.toString());
-            if (insertBrOnReturn.isSupported(getUI().getTextArea())) {
-                insertBrOnReturn.execute(getUI().getTextArea(), String.valueOf(false));
-            }
-        }
-
         DeferredCommand.addCommand(new SyntaxValidationCommand());
     }
 
@@ -436,6 +505,6 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
      */
     public String getSyntax()
     {
-        return ui.getConfig().getParameter("syntax");
+        return ui.getConfig().getParameter(SYNTAX);
     }
 }

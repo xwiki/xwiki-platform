@@ -5,9 +5,14 @@ import com.google.gwt.i18n.client.Constants;
 
 /**
  * This {@link Constants} interface is used to make user interface strings internationalizable.
+ * 
+ * @version $Id$
  */
 public interface Strings extends Constants
 {
+    /**
+     * An instance of this string bundle that can be used anywhere in the code to obtain i18n strings.
+     */
     Strings INSTANCE = (Strings) GWT.create(Strings.class);
 
     String apply();
@@ -30,12 +35,12 @@ public interface Strings extends Constants
 
     String copy();
 
-    String cut();   
+    String cut();
 
     String deleteCol();
 
     String deleteRow();
-    
+
     String deleteTable();
 
     String font();
@@ -135,7 +140,7 @@ public interface Strings extends Constants
     String linkExistingPageTab();
 
     String linkWebPageTab();
-    
+
     String linkLabelLabel();
 
     String linkWebPageLabel();
@@ -163,9 +168,9 @@ public interface Strings extends Constants
     String linkEmailAddressError();
 
     String linkWebPageAddressError();
-   
+
     String linkNoLabelError();
-    
+
     String linkToWikiButtonTooltip();
 
     String linkToSpaceButtonTooltip();
@@ -203,18 +208,18 @@ public interface Strings extends Constants
     String linkNewPageTextBoxTooltip();
 
     String image();
-    
+
     String fileUploadLabel();
-    
+
     String fileChooseLabel();
-    
+
     String fileListFetchError();
-    
+
     String fileUploadSubmitLabel();
-    
+
     String fileInsertImageButton();
-    
+
     String fileUploadNoPathError();
-    
+
     String fileUpdateListButton();
 }

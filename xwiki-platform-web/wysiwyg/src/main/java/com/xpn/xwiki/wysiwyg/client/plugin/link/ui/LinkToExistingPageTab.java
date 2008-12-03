@@ -72,10 +72,13 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
     {
         linkToWikiButton = new Button(Strings.INSTANCE.linkCreateLinkButon());
         linkToWikiButton.addClickListener(this);
+        linkToWikiButton.setTitle(Strings.INSTANCE.linkToWikiButtonTooltip());
         linkToSpaceButton = new Button(Strings.INSTANCE.linkCreateLinkButon());
         linkToSpaceButton.addClickListener(this);
+        linkToSpaceButton.setTitle(Strings.INSTANCE.linkToSpaceButtonTooltip());
         linkToPageButton = new Button(Strings.INSTANCE.linkCreateLinkButon());
         linkToPageButton.addClickListener(this);
+        linkToPageButton.setTitle(Strings.INSTANCE.linkToExistingPageButtonTooltip());
 
         initWidget(buildMainPanel(defaultWiki, defaultSpace, defaultPage));
         addStyleName("xLinkToExistingPage");
@@ -108,6 +111,8 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
         Panel spacePanel = super.buildSpacePanel(selectedWiki, currentSpace);
         // add custom buttons and listeners
         getSpaceSelector().addChangeListener(this);
+        // change default tooltip for the spaces selector
+        getSpaceSelector().setTitle(Strings.INSTANCE.linkExistingSpacesListBoxTooltip());
         getSpaceSelector().addKeyboardListener(new EnterListener(linkToSpaceButton));
         spacePanel.add(linkToSpaceButton);
 
@@ -126,6 +131,7 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
         Label choosePageLabel = new Label(Strings.INSTANCE.choosePage());
         pagePanel.add(choosePageLabel);
         pageSelector = new PageSelector(selectedWiki, selectedSpace);
+        pageSelector.setTitle(Strings.INSTANCE.linkPageSelectorTooltip());
         pageSelector.addKeyboardListener(new EnterListener(linkToPageButton));
         pagePanel.add(pageSelector);
         populatePageSelector(selectedWiki, selectedSpace, currentPage);        
@@ -272,5 +278,15 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
         // No need to check anything in the current implementation because everything is a combobox, so user input is
         // "safe"
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractWikiPageLinkTab#getLabelTextBoxTooltip()
+     */
+    protected String getLabelTextBoxTooltip()
+    {
+        return Strings.INSTANCE.linkExistingPageLabelTextBoxTooltip();
     }
 }

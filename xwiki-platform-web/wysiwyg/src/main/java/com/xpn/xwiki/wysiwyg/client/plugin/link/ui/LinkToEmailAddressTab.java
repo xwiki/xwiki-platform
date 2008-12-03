@@ -47,6 +47,35 @@ public class LinkToEmailAddressTab extends AbstractExternalLinkTab
         }
         return emailAddress;
     }
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#getCreateLinkButtonTooltip()
+     */
+    protected String getCreateLinkButtonTooltip()
+    {
+        return Strings.INSTANCE.linkToEmailAddressButtonTooltip();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#getUriTextBoxTooltip()
+     */
+    protected String getUriTextBoxTooltip()
+    {
+        return Strings.INSTANCE.linkUriToEmailAddressTextBoxTooltip();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#getLabelTextBoxTooltip()
+     */
+    protected String getLabelTextBoxTooltip()
+    {
+        return Strings.INSTANCE.linkEmailAddressLabelTextBoxTooltip();
+    }
 
     /**
      * {@inheritDoc}

@@ -48,6 +48,36 @@ public class LinkToWebPageTab extends AbstractExternalLinkTab
     /**
      * {@inheritDoc}
      * 
+     * @see AbstractExternalLinkTab#getCreateLinkButtonTooltip()
+     */
+    protected String getCreateLinkButtonTooltip()
+    {
+        return Strings.INSTANCE.linkToWebPageButtonTooltip();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#getUriTextBoxTooltip()
+     */
+    protected String getUriTextBoxTooltip()
+    {
+        return Strings.INSTANCE.linkUriToWebPageTextBoxTooltip();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#getLabelTextBoxTooltip()
+     */
+    protected String getLabelTextBoxTooltip()
+    {
+        return Strings.INSTANCE.linkWebPageLabelTextBoxTooltip();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see AbstractExternalLinkTab#getErrorMessage()
      */
     protected String getErrorMessage()

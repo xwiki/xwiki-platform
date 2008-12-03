@@ -166,6 +166,42 @@ public interface Strings extends Constants
    
     String linkNoLabelError();
     
+    String linkToWikiButtonTooltip();
+
+    String linkToSpaceButtonTooltip();
+
+    String linkToNewPageButtonTooltip();
+
+    String linkToExistingPageButtonTooltip();
+
+    String linkToWebPageButtonTooltip();
+
+    String linkToEmailAddressButtonTooltip();
+
+    String linkWikiSelectorTooltip();
+
+    String linkSpaceSelectorTooltip();
+
+    String linkExistingSpacesListBoxTooltip();
+
+    String linkPageSelectorTooltip();
+
+    String linkExistingPageLabelTextBoxTooltip();
+
+    String linkNewPageLabelTextBoxTooltip();
+
+    String linkWebPageLabelTextBoxTooltip();
+
+    String linkEmailAddressLabelTextBoxTooltip();
+
+    String linkUriToEmailAddressTextBoxTooltip();
+
+    String linkUriToWebPageTextBoxTooltip();
+
+    String linkNewSpaceTextBoxTooltip();
+
+    String linkNewPageTextBoxTooltip();
+
     String image();
     
     String fileUploadLabel();

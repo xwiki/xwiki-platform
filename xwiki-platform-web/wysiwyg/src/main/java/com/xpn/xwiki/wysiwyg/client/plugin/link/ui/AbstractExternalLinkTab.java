@@ -38,13 +38,16 @@ public abstract class AbstractExternalLinkTab extends AbstractHasLinkTab impleme
         Label labelLabel = new Label(Strings.INSTANCE.linkLabelLabel());
         createLinkButton = new Button(Strings.INSTANCE.linkCreateLinkButon());
         createLinkButton.addClickListener(this);
+        createLinkButton.setTitle(getCreateLinkButtonTooltip());
 
         EnterListener enterListener = new EnterListener(createLinkButton);
         uriTextBox = new TextBox();
         uriTextBox.addFocusListener(this);
         uriTextBox.addKeyboardListener(enterListener);
+        uriTextBox.setTitle(getUriTextBoxTooltip());
 
         getLabelTextBox().addKeyboardListener(enterListener);
+        getLabelTextBox().setTitle(getLabelTextBoxTooltip());
 
         FlowPanel mainPanel = new FlowPanel();
         mainPanel.addStyleName("xLinkToUrl");
@@ -86,6 +89,30 @@ public abstract class AbstractExternalLinkTab extends AbstractHasLinkTab impleme
      * @return the URI to the external resource from the user input.
      */
     protected abstract String buildUri();
+
+    /**
+     * @return the tooltip for create link button.
+     */
+    protected String getCreateLinkButtonTooltip()
+    {
+        return "";
+    }
+
+    /**
+     * @return the tooltip for uri text box.
+     */
+    protected String getUriTextBoxTooltip()
+    {
+        return "";
+    }
+
+    /**
+     * @return the tooltip for label text box.
+     */
+    protected String getLabelTextBoxTooltip()
+    {
+        return "";
+    }
 
     /**
      * {@inheritDoc}

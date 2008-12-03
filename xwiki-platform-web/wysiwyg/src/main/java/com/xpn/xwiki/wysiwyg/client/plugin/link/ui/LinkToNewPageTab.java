@@ -73,6 +73,7 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
     public LinkToNewPageTab(String defaultWiki, String defaultSpace, String defaultPage)
     {
         createLinkButton = new Button(Strings.INSTANCE.linkCreateLinkButon(), this);
+        createLinkButton.setTitle(Strings.INSTANCE.linkToNewPageButtonTooltip());
 
         initWidget(buildMainPanel(defaultWiki, defaultSpace, defaultPage));
         addStyleName("xLinkToNewPage");
@@ -186,6 +187,7 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
         spaceInputPanel.add(newSpaceLabel);
         newSpaceNameTextBox = new TextBox();
         newSpaceNameTextBox.setText(Strings.INSTANCE.linkNewSpaceTextBox());
+        newSpaceNameTextBox.setTitle(Strings.INSTANCE.linkNewSpaceTextBoxTooltip());
         newSpaceNameTextBox.addFocusListener(this);
         spaceInputPanel.add(newSpaceNameTextBox);
 
@@ -201,6 +203,7 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
         Label newPageLabel = new Label(Strings.INSTANCE.linkNewPageLabel());
         newPagePanel.add(newPageLabel);
         newPageNameTextBox = new TextBox();
+        newPageNameTextBox.setTitle(Strings.INSTANCE.linkNewPageTextBoxTooltip());
         newPageNameTextBox.setText(Strings.INSTANCE.linkNewPageTextBox());
         newPageNameTextBox.addFocusListener(this);
         newPageNameTextBox.addKeyboardListener(new EnterListener(createLinkButton));
@@ -327,5 +330,16 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
     public void onLostFocus(Widget sender)
     {
         // ignore
+    }
+
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractWikiPageLinkTab#getLabelTextBoxTooltip()
+     */
+    protected String getLabelTextBoxTooltip()
+    {
+        return Strings.INSTANCE.linkNewPageLabelTextBoxTooltip();
     }
 }

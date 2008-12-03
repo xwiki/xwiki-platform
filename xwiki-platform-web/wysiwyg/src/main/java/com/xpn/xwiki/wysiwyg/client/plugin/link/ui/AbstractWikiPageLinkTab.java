@@ -62,6 +62,7 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
         Label labelLabel = new Label(Strings.INSTANCE.linkLabelLabel());
         labelPanel.add(labelLabel);
         labelPanel.add(getLabelTextBox());
+        getLabelTextBox().setTitle(getLabelTextBoxTooltip());
 
         return labelPanel;
     }
@@ -75,6 +76,7 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
     {
         final Panel wikiPanel = new FlowPanel();
         wikiSelector = new WikiSelector();
+        wikiSelector.setTitle(Strings.INSTANCE.linkWikiSelectorTooltip());
         // Check if this wiki is a multi wiki, to print the wikiPanel or not
         WysiwygService.Singleton.getInstance().isMultiWiki(new AsyncCallback<Boolean>()
         {
@@ -122,9 +124,9 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
         Label chooseSpaceLabel = new Label(Strings.INSTANCE.chooseSpace());
         spacePanel.add(chooseSpaceLabel);
         spaceSelector = new SpaceSelector(selectedWiki);
+        spaceSelector.setTitle(Strings.INSTANCE.linkSpaceSelectorTooltip());
         populateSpaceSelector(selectedWiki, currentSpace, null);
         spacePanel.add(spaceSelector);
-
         return spacePanel;
     }
 
@@ -175,7 +177,7 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
      * @return the {@link SpaceSelector} with the space names in the selected wiki.
      */
     protected SpaceSelector getSpaceSelector()
-    {
+    { 
         return spaceSelector;
     }
 
@@ -185,5 +187,13 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
     protected boolean isMultiWiki()
     {
         return isMultiWiki;
+    }
+
+    /**
+     * @return the tooltip for label text box.
+     */
+    protected String getLabelTextBoxTooltip()
+    {
+        return "";
     }
 }

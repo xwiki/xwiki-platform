@@ -20,6 +20,9 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
 import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.user.client.ui.LoadListener;
+import com.google.gwt.user.client.ui.LoadListenerCollection;
+import com.google.gwt.user.client.ui.SourcesLoadEvents;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
@@ -28,8 +31,15 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6
+public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6 implements
+    SourcesLoadEvents
 {
+    /**
+     * The collection of load listeners.<br/>
+     * NOTE: Stop firing load events as soon as GWT provides a way to detect that a rich text area has finished loading.
+     */
+    private final LoadListenerCollection loadListeners = new LoadListenerCollection();
+
     /**
      * {@inheritDoc}<br/>
      * NOTE: Remove this method as soon as Issue 3147 is fixed.
@@ -44,5 +54,39 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
             elem.removeAttribute(RichTextArea.DIRTY);
             ((Element) IFrameElement.as(elem).getContentDocument().getBody().cast()).xSetInnerHTML(html);
         }
+    }
+
+    /**
+     * {@inheritDoc}<br/>
+     * NOTE: Remove this method as soon as GWT provides a way to detect that a rich text area has finished loading.
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#onElementInitialized()
+     */
+    protected void onElementInitialized()
+    {
+        super.onElementInitialized();
+        // This is a workaround to be able to detect when the rich text area has finished loading. The sender is
+        // <code>null</code> because we don't have access to a widget.
+        loadListeners.fireLoad(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SourcesLoadEvents#addLoadListener(LoadListener)
+     */
+    public void addLoadListener(LoadListener listener)
+    {
+        loadListeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SourcesLoadEvents#removeLoadListener(LoadListener)
+     */
+    public void removeLoadListener(LoadListener listener)
+    {
+        loadListeners.remove(listener);
     }
 }

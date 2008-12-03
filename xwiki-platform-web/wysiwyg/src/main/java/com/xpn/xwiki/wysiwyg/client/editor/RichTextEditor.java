@@ -40,7 +40,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class RichTextEditor extends Composite implements SourcesLoadEvents, FocusListener, ChangeListener
+public class RichTextEditor extends Composite implements SourcesLoadEvents, FocusListener, ChangeListener, LoadListener
 {
     /**
      * The menu bar.
@@ -81,6 +81,10 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
         textArea = new RichTextArea();
         textArea.addFocusListener(this);
         textArea.addChangeListener(this);
+        // Workaround till GWT provides a way to detect when the rich text area has finished loading.
+        if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof SourcesLoadEvents) {
+            ((SourcesLoadEvents) textArea.getBasicFormatter()).addLoadListener(this);
+        }
 
         config = new HiddenConfig();
 
@@ -143,15 +147,36 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
      */
     protected void onLoad()
     {
-        super.onLoad();
-        // We defer the notification in order to allow the rich text area to complete its initialization.
-        DeferredCommand.addCommand(new Command()
-        {
-            public void execute()
+        if (textArea.getBasicFormatter() == null || !(textArea.getBasicFormatter() instanceof SourcesLoadEvents)) {
+            // We defer the notification in order to allow the rich text area to complete its initialization.
+            DeferredCommand.addCommand(new Command()
             {
-                loadListeners.fireLoad(RichTextEditor.this);
-            }
-        });
+                public void execute()
+                {
+                    loadListeners.fireLoad(RichTextEditor.this);
+                }
+            });
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see LoadListener#onLoad(Widget)
+     */
+    public void onLoad(Widget sender)
+    {
+        loadListeners.fireLoad(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see LoadListener#onError(Widget)
+     */
+    public void onError(Widget sender)
+    {
+        loadListeners.fireError(this);
     }
 
     /**

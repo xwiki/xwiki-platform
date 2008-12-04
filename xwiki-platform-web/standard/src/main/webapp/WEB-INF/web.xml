@@ -171,6 +171,11 @@
     <servlet-name>action</servlet-name>
     <url-pattern>/bin/*</url-pattern>
   </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>/subwiki/*</url-pattern>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>action</servlet-name>

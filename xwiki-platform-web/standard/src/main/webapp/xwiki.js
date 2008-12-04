@@ -5,7 +5,7 @@ Object.extend(Object.extend(Ajax.XWikiRequest.prototype, Ajax.Request.prototype)
 
     this.transport = Ajax.getTransport();
     this.setOptions(options);
-    this.baseUrl = "/xwiki/bin/view";
+    this.baseUrl = "/" + XWiki.webapppath + XWiki.servletpath + action;
 
     var onComplete = this.options.onComplete || Prototype.emptyFunction;
     this.options.onComplete = (function() {

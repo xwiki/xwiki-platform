@@ -11,7 +11,12 @@
 <script type="text/javascript" src="$xwiki.getSkinFile("suggest/ajaxSuggest.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("scripts/lightbox/lightbox.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("scripts/shortcuts.js", true)"></script>
-
+<script type="text/javascript">
+// <![CDATA[
+XWiki.webapppath = "${xwiki.webAppPath}";
+XWiki.servletpath = "${xwiki.servletPath}";
+// ]]>
+</script>
 #if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))
 <script type="text/javascript">
 // <![CDATA[

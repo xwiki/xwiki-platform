@@ -8,3 +8,23 @@
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
+beginDocument
+beginMacroMarker [box] [] [
+* one
+* two
+]
+beginXMLNode [div] [class=box]
+beginList [BULLETED]
+beginListItem
+onWord [one]
+endListItem
+beginListItem
+onWord [two]
+endListItem
+endList [BULLETED]
+endXMLNode [div] [class=box]
+endMacroMarker [box] [] [
+* one
+* two
+]
+endDocument

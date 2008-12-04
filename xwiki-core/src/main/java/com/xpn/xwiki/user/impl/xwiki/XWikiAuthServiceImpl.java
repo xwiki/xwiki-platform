@@ -83,25 +83,25 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 if (xwiki.Param("xwiki.authentication.defaultpage") != null) {
                     sconfig.setDefaultPage(xwiki.Param("xwiki.authentication.defaultpage"));
                 } else {
-                    sconfig.setDefaultPage("/bin/view/Main/WebHome");
+                    sconfig.setDefaultPage(context.getURLFactory().getURL(context.getURLFactory().createURL("Web", "WebHome", "view", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.loginpage") != null) {
                     sconfig.setLoginPage(xwiki.Param("xwiki.authentication.loginpage"));
                 } else {
-                    sconfig.setLoginPage("/bin/login/XWiki/XWikiLogin");
+                    sconfig.setLoginPage(context.getURLFactory().getURL(context.getURLFactory().createURL("XWiki", "XWikiLogin", "login", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.logoutpage") != null) {
                     sconfig.setLogoutPage(xwiki.Param("xwiki.authentication.logoutpage"));
                 } else {
-                    sconfig.setLogoutPage("/bin/logout/XWiki/XWikiLogout");
+                    sconfig.setLogoutPage(context.getURLFactory().getURL(context.getURLFactory().createURL("XWiki", "XWikiLogout", "logout", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.errorpage") != null) {
                     sconfig.setErrorPage(xwiki.Param("xwiki.authentication.errorpage"));
                 } else {
-                    sconfig.setErrorPage("/bin/loginerror/XWiki/XWikiLogin");
+                    sconfig.setErrorPage(context.getURLFactory().getURL(context.getURLFactory().createURL("XWiki", "XWikiLogin", "loginerror", context), context));
                 }
 
                 MyPersistentLoginManager persistent = new MyPersistentLoginManager();

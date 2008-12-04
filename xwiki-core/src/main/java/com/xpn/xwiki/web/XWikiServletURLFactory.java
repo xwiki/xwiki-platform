@@ -46,18 +46,15 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     protected String contextPath;
 
-    protected String servletPath;
-
     public XWikiServletURLFactory()
     {
     }
 
     // Used by tests
-    public XWikiServletURLFactory(URL serverURL, String servletPath, String actionPath)
+    public XWikiServletURLFactory(URL serverURL, String contextPath, String actionPath)
     {
         this.serverURL = serverURL;
-        this.contextPath = servletPath;
-        this.servletPath = actionPath;
+        this.contextPath = contextPath;
     }
 
     // Used by tests
@@ -78,35 +75,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             // Cannot initialize, probably running tests...
             return;
         }
-        String path = url.getPath();
-        String servletpath = context.getRequest().getServletPath();
 
-        this.contextPath = (context.getWiki() == null) ? "" : context.getWiki().Param("xwiki.servletpath", "");
-        if (this.contextPath.equals("")) {
-            try {
-                this.contextPath = context.getRequest().getContextPath();
-                // TODO We're using URL parts in a wrong way, since contextPath and servletPath are
-                // returned with a leading /, while we need a trailing /. This code moves the / from
-                // the beginning to the end.
-                // If the app is deployed as the ROOT ap, then there's no need to move the /.
-                if (this.contextPath.length() > 0) {
-                    this.contextPath = this.contextPath.substring(1) + "/";
-                }
-            } catch (Exception e) {
-                this.contextPath = path.substring(0, path.indexOf('/', 1) + 1);
-            }
-        }
-
-        this.servletPath = context.getWiki().Param("xwiki.actionpath", "");
-        if (this.servletPath.equals("")) {
-            if (servletpath.startsWith("/bin")) {
-                this.servletPath = "bin/";
-            } else if (context.getRequest().getServletPath().startsWith("/testbin")) {
-                this.servletPath = "testbin/";
-            } else {
-                this.servletPath = context.getWiki().Param("xwiki.defaultactionpath", "bin/");
-            }
-        }
+        this.contextPath = context.getWiki().getWebAppPath(context);
 
         try {
             this.serverURL = new URL(url, "/");
@@ -123,17 +93,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public String getContextPath()
     {
         return this.contextPath;
-    }
-
-    /**
-     * Returns the part of the URL identifying the servlet inside the web application, which is the Struts mapping name.
-     * In a normal install, that is <tt>bin/</tt>. Other usual values are <tt>xwiki/</tt> and <tt>testbin/</tt>.
-     * 
-     * @return The servlet path corresponding to the current request.
-     */
-    public String getServletPath()
-    {
-        return this.servletPath;
     }
 
     /**
@@ -216,8 +175,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         StringBuffer newpath = new StringBuffer(this.contextPath);
-        newpath.append(this.servletPath);
-
+        addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);
@@ -239,6 +197,16 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             // This should not happen
             return null;
         }
+    }
+
+    private void addServletPath(StringBuffer newpath, String xwikidb, XWikiContext context)
+    {
+        if (xwikidb == null) {
+            xwikidb = context.getDatabase();
+        }
+
+        String spath = context.getWiki().getServletPath(xwikidb, context);
+        newpath.append(spath);
     }
 
     private void addAction(StringBuffer newpath, String action, XWikiContext context)
@@ -334,7 +302,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context)
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
-        newpath.append(this.servletPath);
+        addServletPath(newpath, xwikidb, context);
         addAction(newpath, "skin", context);
         addSpace(newpath, web, "skin", context);
         addName(newpath, name, "skin", context);
@@ -389,7 +357,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         StringBuffer newpath = new StringBuffer(contextPath);
-        newpath.append(this.servletPath);
+        addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);
@@ -424,7 +392,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         String action = "downloadrev";
         StringBuffer newpath = new StringBuffer(this.contextPath);
-        newpath.append(this.servletPath);
+        addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);

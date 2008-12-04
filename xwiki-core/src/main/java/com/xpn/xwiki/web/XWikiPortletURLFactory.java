@@ -51,7 +51,6 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
         }
 
         contextPath = "xwiki/";
-        servletPath = "bin/";
     }
 
     /**

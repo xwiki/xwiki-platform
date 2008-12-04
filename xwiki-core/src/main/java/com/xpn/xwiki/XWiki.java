@@ -395,6 +395,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             } catch (Exception e) {
             }
 
+            // we will use an element of the path to get the host
+            // This only happens if the url is in the form contains /xwiki/wiki_wikiname/
+            if ("1".equals(xwiki.Param("xwiki.virtual.usepath", "0"))) {
+                String uri = request.getRequestURI();
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Request uri is: " + uri);
+                int vhi1 = uri.indexOf("/", 1);
+                int vhi2 = uri.indexOf("/", vhi1 + 1);
+                int vhi3 = uri.indexOf("/", vhi2 + 1);
+                String subwiki = uri.substring(vhi1 + 1, vhi2);
+                String virtualHost = uri.substring(vhi2 + 1, vhi3);
+                if (subwiki.equals("wiki"))
+                    host = virtualHost;
+            }
+
             if (host.equals("")) {
                 return xwiki;
             }
@@ -4230,6 +4245,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public URL getServerURL(String database, XWikiContext context) throws MalformedURLException
     {
         String serverurl = null;
+
+        // In virtual wiki path mode the server is the standard one
+        if ("1".equals(Param("xwiki.virtual.usepath", "0"))) {
+            return null;
+        }
+
         if (database != null) {
             String db = context.getDatabase();
             try {
@@ -4269,6 +4290,66 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } else {
             return null;
         }
+    }
+
+    public String getServletPath(String wikiName, XWikiContext context)
+    {
+        // unless we are in virtual wiki path mode we should return null
+        if (!context.getMainXWiki().equalsIgnoreCase(wikiName) && "1".equals(Param("xwiki.virtual.usepath", "0"))) {
+            String database = context.getDatabase();
+            try {
+                context.setDatabase(context.getMainXWiki());
+                XWikiDocument doc = getDocument(getServerWikiPage(wikiName), context);
+                BaseObject serverobject = doc.getObject("XWiki.XWikiServerClass");
+                if (serverobject != null) {
+                    String server = serverobject.getStringValue("server");
+                    return "wiki/" + server + "/";
+                }
+            } catch (Exception e) {
+                LOG.error("Failed to get URL for provided wiki [" + wikiName + "]", e);
+            } finally {
+                context.setDatabase(database);
+            }
+        }
+
+        String servletPath = Param("xwiki.servletpath", "");
+
+        if (context.getRequest() != null) {
+            String currentServletpath = context.getRequest().getServletPath();
+            if (servletPath.equals("")) {
+                if (currentServletpath.startsWith("/bin")) {
+                    servletPath = "bin/";
+                } else if (currentServletpath.startsWith("/testbin")) {
+                    servletPath = "testbin/";
+                } else {
+                    servletPath = Param("xwiki.defaultservletpath", "bin/");
+                }
+            }
+        }
+
+        return servletPath;
+    }
+
+    public String getWebAppPath(XWikiContext context)
+    {
+        String path = context.getURL().getPath();
+        String contextPath = Param("xwiki.webapppath", "");
+        if (contextPath.equals("")) {
+            try {
+                contextPath = context.getRequest().getContextPath();
+                // TODO We're using URL parts in a wrong way, since contextPath and servletPath are
+                // returned with a leading /, while we need a trailing /. This code moves the / from
+                // the beginning to the end.
+                // If the app is deployed as the ROOT ap, then there's no need to move the /.
+                if (contextPath.length() > 0) {
+                    contextPath = contextPath.substring(1) + "/";
+                }
+            } catch (Exception e) {
+                contextPath = path.substring(0, path.indexOf('/', 1) + 1);
+            }
+        }
+
+        return contextPath;
     }
 
     public String getURL(String fullname, String action, XWikiContext context) throws XWikiException
@@ -4423,18 +4504,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 // pass to it using the following algorithm:
                 // path info = requestURI - (contextPath + servletPath)
                 String path;
-                if (!request.getRequestURI().startsWith(request.getContextPath() + request.getServletPath())) {
+                String webapppath = getWebAppPath(context);
+                String servletpath = getServletPath(context.getDatabase(), context);
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Request URI: " + request.getRequestURI());
+                    LOG.debug("Webapp path: " + webapppath);
+                    LOG.debug("Servlet path: " + servletpath);
+                }
+
+                if (!request.getRequestURI().startsWith("/" + webapppath + servletpath)) {
                     LOG.warn("Request URI [" + request.getRequestURI() + "] should have matched " + "context path ["
-                        + request.getContextPath() + "] and servlet path [" + request.getServletPath() + "]");
+                        + webapppath + "] and servlet path [" + servletpath + "]");
                     // Even though this branch shouldn't get executed we never know what containers
                     // will return and thus in order to be safe we fall back to the previous
                     // behavior which was to use getPathInfo() for getting the path (with the
                     // potential issue with i18n encoding as stated above).
                     path = request.getPathInfo();
                 } else {
-                    path =
-                        request.getRequestURI().substring(
-                            request.getContextPath().length() + request.getServletPath().length());
+                    // we need to get rid of /xwiki/bin/ or /xwiki/wiki/wiki_wikiname/ in case of a XEM in usepath
+                    // mode
+                    path = request.getRequestURI().substring(webapppath.length() + servletpath.length());
                 }
 
                 // Fix error in some containers, which don't hide the jsessionid parameter from the

@@ -45,6 +45,9 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         super.setUp();
 
         this.context = new XWikiContext();
+        
+        this.context.setDatabase("xwiki");
+        this.context.setMainXWiki("xwiki");
 
         // We need to initialize the Component Manager so that the components can be looked up
         getContext().put(ComponentManager.class.getName(), getComponentManager());

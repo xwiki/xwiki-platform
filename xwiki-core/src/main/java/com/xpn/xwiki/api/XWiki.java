@@ -2612,4 +2612,38 @@ public class XWiki extends Api
     {
         return (QueryManager) Utils.getComponent(QueryManager.ROLE, "secure");
     }
+
+    /**
+     * API to get the Servlet path for the curriki wiki In mono wiki this is "bin/" or "xwiki/". In virtaul mode and is
+     * xwiki.virtual.usepath is enable in xwiki.cfg it's "wiki/wikiname/".
+     * 
+     * @param wikiName wiki for which to get the path
+     * @return The servlet path
+     */
+    public String getServletPath(String wikiName)
+    {
+        return this.xwiki.getServletPath(wikiName, this.context);
+    }
+
+    /**
+     * API to get the Servlet path for the curriki wiki In mono wiki this is "bin/" or "xwiki/". In virtaul mode and is
+     * xwiki.virtual.usepath is enable in xwiki.cfg it's "wiki/wikiname/".
+     * 
+     * @return The servlet path
+     */
+    public String getServletPath()
+    {
+        return this.xwiki.getServletPath(this.context.getDatabase(), this.context);
+    }
+
+    /**
+     * API to get the webapp path for the current wiki. This usually is "xwiki/". It can be configured in xwiki.cfg with
+     * the config xwiki.webapppath.
+     * 
+     * @return The servlet path
+     */
+    public String getWebAppPath()
+    {
+        return this.xwiki.getWebAppPath(this.context);
+    }
 }

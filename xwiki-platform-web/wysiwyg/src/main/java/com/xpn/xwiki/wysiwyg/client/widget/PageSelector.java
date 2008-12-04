@@ -121,6 +121,20 @@ public class PageSelector extends ListBox
     }
 
     /**
+     * Sets this selector on the specified page.
+     * 
+     * @param page the page to set as selected in this selector.
+     */
+    public void setSelectedPage(String page)
+    {
+        for (int i = 0; i < getItemCount(); i++) {
+            if (getItemText(i).equals(page)) {
+                setSelectedIndex(i);
+            }
+        }
+    }
+
+    /**
      * @return the wiki
      */
     public String getWiki()

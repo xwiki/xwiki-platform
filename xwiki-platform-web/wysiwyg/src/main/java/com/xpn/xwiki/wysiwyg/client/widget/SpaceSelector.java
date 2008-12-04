@@ -110,6 +110,20 @@ public class SpaceSelector extends ListBox
         }
         return null;
     }
+    
+    /**
+     * Sets this selector on the specified space.
+     * 
+     * @param space the space to set as selected in this selector.
+     */
+    public void setSelectedSpace(String space)
+    {
+        for (int i = 0; i < getItemCount(); i++) {
+            if (getItemText(i).equals(space)) {
+                setSelectedIndex(i);
+            }
+        }
+    }    
 
     /**
      * @return the wiki for this space selector.

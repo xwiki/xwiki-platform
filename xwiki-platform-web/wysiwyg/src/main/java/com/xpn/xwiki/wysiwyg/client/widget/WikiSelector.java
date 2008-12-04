@@ -91,4 +91,18 @@ public class WikiSelector extends ListBox
         }
         return null;
     }
+    
+    /**
+     * Sets this selector on the specified wiki.
+     * 
+     * @param wiki the wiki to set as selected in this selector.
+     */
+    public void setSelectedWiki(String wiki)
+    {
+        for (int i = 0; i < getItemCount(); i++) {
+            if (getItemText(i).equals(wiki)) {
+                setSelectedIndex(i);
+            }
+        }
+    }
 }

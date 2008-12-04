@@ -401,13 +401,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 String uri = request.getRequestURI();
                 if (LOG.isDebugEnabled())
                     LOG.debug("Request uri is: " + uri);
-                int vhi1 = uri.indexOf("/", 1);
-                int vhi2 = uri.indexOf("/", vhi1 + 1);
-                int vhi3 = uri.indexOf("/", vhi2 + 1);
-                String subwiki = uri.substring(vhi1 + 1, vhi2);
-                String virtualHost = uri.substring(vhi2 + 1, vhi3);
-                if (subwiki.equals("wiki"))
-                    host = virtualHost;
+                String[] vhi = uri.split("/");
+                if (vhi.length > 2 && vhi[2].equals("wiki")) {
+                    host = vhi[3];
+                }
             }
 
             if (host.equals("")) {

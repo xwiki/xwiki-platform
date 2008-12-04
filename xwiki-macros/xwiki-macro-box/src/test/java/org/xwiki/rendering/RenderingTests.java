@@ -38,6 +38,7 @@ public class RenderingTests extends TestCase
         RenderingTestSuite suite = new RenderingTestSuite("Test Box Macro");
 
         suite.addTestsFromResource("macrobox1", true);
+        suite.addTestsFromResource("macrobox2", true);
 
         return new RenderingPlexusTestSetup(suite);
     }

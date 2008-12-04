@@ -113,4 +113,13 @@ public class TreePrinter extends DepthFirstAdapter
             builder.append(getPrinter().where.toString());
         }
     }
+
+    @Override
+    public void caseACollectionMemberExpression(ACollectionMemberExpression node)
+    {
+        // "member of" fails on HQL, so use "in elements()"
+        builder.append(" in elements(");
+        node.getPath().apply(this);
+        builder.append(" )");
+    }
 }

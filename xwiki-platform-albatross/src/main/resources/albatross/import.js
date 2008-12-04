@@ -6,7 +6,7 @@ Ajax.XWikiRequest = Class.create(Ajax.Request, {
             this.action = action;
         else
             this.action = "view";
-        this.baseUrl = "${request.contextPath}/bin/" + action;
+        this.baseUrl = "/" + XWiki.webapppath + XWiki.servletpath + action;
 
         options = Object.clone(options);
 
@@ -35,7 +35,7 @@ Ajax.XWikiRequest = Class.create(Ajax.Request, {
     }
 });
 
-var XWiki = Class.create({
+var XWikiImport = Class.create({
     initialize: function(wikiUrl){this.wikiUrl = wikiUrl;},
     getSpaces: function(callBack){
         var params = '';

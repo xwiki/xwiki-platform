@@ -87,7 +87,7 @@ var XWiki = {
     for(var i=0;i<scriptTags.length;i++) {
       if(scriptTags[i].src && scriptTags[i].src.match(JSfileName)) {
         // var path = scriptTags[i].src.replace(JSfileName,scriptLibraryName) + '/';
-	  var path = '/xwiki/bin/download/XWiki/MySkin/';
+	  var path = '/' + XWiki.webapppath + XWiki.servletpath + 'download/XWiki/MySkin/';
 
 	  for (var j=0;j<libraries.length;j++) {
 	    this.require (path + libraries[j]);

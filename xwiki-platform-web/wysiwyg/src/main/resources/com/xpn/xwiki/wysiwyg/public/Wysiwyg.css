@@ -432,10 +432,17 @@
   height: 90px;
   width: 110px;
   display: block;
+  cursor: pointer;
+  border: solid 2px white;
 }
 
-div.clear {
+.xImagePreviewSelected img {
+  border: solid 2px #FFA500;
+}
+
+div.clearfloats {
   clear: both;
+  display: none;
 }
 
 .xInsertImageButton {
@@ -444,16 +451,37 @@ div.clear {
   width: 110px
 }
 
-.xImagesContainerPanel {
-  width: 385px;
-  height: 300px;
-}
-
 .xImageDialogMain {
-  padding: 10px;
+  padding: 6px;
 }
 
-.xImageChooser .gwt-Label, .xUploadForm .gwt-Label {
+.xImageDialogMain .gwt-TabPanel {
+  padding: 0;
+}
+
+.xImageDialogMain .gwt-TabPanelBottom {
+  width: 385px;
+}
+
+.xImagesContainerPanel {
+  height: 200px;
+}
+
+.xImageChooser .gwt-Label, .xUploadForm .gwt-Label, .xSettingsPanel .xSettingsLabel {
   font-weight: bold;
   padding: 5px;  
+}
+
+.xSizePanel .gwt-Label, .xHAlignPanel .gwt-Label, .xVAlignPanel .gwt-Label, .xAltPanel .gwt-Label {
+  display: inline;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.xSizePanel input {
+  width: 3em;
+}
+
+.xAlignLabel, .xInsertButton, .xSizePanel, .xAltPanel {
+  margin-top: 5px;
 }

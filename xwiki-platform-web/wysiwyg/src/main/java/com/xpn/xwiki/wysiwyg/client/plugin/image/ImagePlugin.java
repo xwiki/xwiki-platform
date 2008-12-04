@@ -33,6 +33,7 @@ import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
 import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -57,6 +58,11 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
      * The toolbar extension used to add the link buttons to the toolbar.
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+    
+    /**
+     * Selection preserver to store the selection before and after the dialog showing.
+     */
+    private SelectionPreserver selectionPreserver;    
 
     /**
      * {@inheritDoc}
@@ -67,14 +73,18 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
     {
         super.init(wysiwyg, textArea, config);
 
-        image = new PushButton(Images.INSTANCE.image().createImage(), this);
-        image.setTitle(Strings.INSTANCE.image());
-
-        getTextArea().addClickListener(this);
-        toolBarExtension.addFeature("image", image);
-        getUIExtensionList().add(toolBarExtension);
-
         textArea.getCommandManager().registerCommand(Command.INSERT_IMAGE, new InsertImageExecutable());
+        if (getTextArea().getCommandManager().isSupported(Command.INSERT_IMAGE)) {
+            image = new PushButton(Images.INSTANCE.image().createImage(), this);
+            image.setTitle(Strings.INSTANCE.image());
+            toolBarExtension.addFeature("image", image);
+        }
+        
+        if (toolBarExtension.getFeatures().length > 0) {
+            getTextArea().addClickListener(this);
+            getUIExtensionList().add(toolBarExtension);
+            selectionPreserver = new SelectionPreserver(textArea);
+        }
     }
 
     /**
@@ -120,11 +130,22 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
     public void onImage(boolean show)
     {
         if (show) {
+            // store current selection, we'll need it after to add the image in the right place
+            selectionPreserver.saveSelection();
+            // get selection, textify and set as the default alternative text
+            getImageDialog()
+                .setDefaultImageAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
             getImageDialog().center();
         } else {
-            String url = getImageDialog().getImageHTMLBlock();
-            if (url != null) {
-                getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, url);
+            // restore selection, dialog has closed
+            selectionPreserver.restoreSelection();
+            String imageHTML = getImageDialog().getImageHTMLBlock();
+            if (imageHTML != null) {
+                getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageHTML);
+                // restore selection, command has been executed
+                selectionPreserver.restoreSelection();
+            } else {
+                getTextArea().setFocus(true);
             }
         }
     }

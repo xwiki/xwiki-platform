@@ -20,10 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
-import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
 /**
@@ -129,5 +129,5 @@ public interface WysiwygServiceAsync
      * @param async object used for asynchronous communication between server and client. 
      */
     void getImageAttachments(String wikiName, String spaceName, String pageName,
-        AsyncCallback<Map<String, String>> async);
+        AsyncCallback<List<ImageConfig>> async);
 }

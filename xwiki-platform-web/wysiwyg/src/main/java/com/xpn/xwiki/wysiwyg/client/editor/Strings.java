@@ -217,9 +217,39 @@ public interface Strings extends Constants
 
     String fileUploadSubmitLabel();
 
-    String fileInsertImageButton();
+    String imageInsertButton();
 
     String fileUploadNoPathError();
 
     String fileUpdateListButton();
+
+    String imageSizeLabel();
+
+    String imageAlignmentLabel();
+
+    String imageHorizontalAlignmentLabel();
+
+    String imageVerticalAlignmentLabel();
+
+    String imageAlignLeftLabel();
+
+    String imageAlignCenterLabel();
+
+    String imageAlignRightLabel();
+
+    String imageAlignTopLabel();
+
+    String imageAlignMiddleLabel();
+
+    String imageAlignBottomLabel();
+
+    String imageSettingsLabel();
+
+    String imageAltTextLabel();
+
+    String imageSelectTabTitle();
+
+    String imageSettingsTabTitle();
+
+    String imageNoImageSelectedError();
 }

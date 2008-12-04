@@ -22,9 +22,7 @@ package com.xpn.xwiki.wysiwyg.server;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,6 +38,7 @@ import com.xpn.xwiki.gwt.api.server.XWikiServiceImpl;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
@@ -300,11 +299,11 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      * 
      * @see WysiwygService#getImageAttachments(String, String, String)
      */
-    public Map<String, String> getImageAttachments(String wikiName, String spaceName, String pageName)
+    public List<ImageConfig> getImageAttachments(String wikiName, String spaceName, String pageName)
     {
         XWikiContext context = getXWikiContext();
         String database = context.getDatabase();
-        Map<String, String> imageAttachs = new HashMap<String, String>();
+        List<ImageConfig> imageAttachs = new ArrayList<ImageConfig>();
         try {
             if (wikiName != null) {
                 context.setDatabase(wikiName);
@@ -315,8 +314,13 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             // TODO: handle attachment sort
             for (XWikiAttachment attach : doc.getAttachmentList()) {
                 if (attach.getMimeType(getXWikiContext()).startsWith("image/")) {
-                    // it's an image, add it to the list
-                    imageAttachs.put(doc.getAttachmentURL(attach.getFilename(), context), attach.getFilename());
+                    ImageConfig img = new ImageConfig();
+                    img.setImageFileName(attach.getFilename());
+                    img.setImageURL(doc.getAttachmentURL(attach.getFilename(), context));
+                    img.setWiki(wikiName);
+                    img.setPage(doc.getName());
+                    img.setSpace(doc.getSpace());
+                    imageAttachs.add(img);
                 }
             }
             return imageAttachs;

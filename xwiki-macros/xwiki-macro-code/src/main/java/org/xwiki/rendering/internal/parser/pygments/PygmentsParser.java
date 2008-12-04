@@ -135,7 +135,6 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
 
         this.pythonInterpreter.execfile(getClass().getClassLoader().getResourceAsStream(XDOMFORMATTER_PY));
 
-        // interpreter.exec("from pygments.formatters import XDOMFormatter");
         this.pythonInterpreter.exec("from pygments.lexers import guess_lexer");
         this.pythonInterpreter.exec("from pygments.util import ClassNotFound");
     }

@@ -17,43 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.code;
-
-import org.xwiki.rendering.macro.box.BoxMacroParameters;
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+package org.xwiki.rendering.macro.box;
 
 /**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.code.CodeMacro} Macro.
+ * Parameters for macro box.
  * 
  * @version $Id$
- * @since 1.7RC1
  */
-public class CodeMacroParameters extends BoxMacroParameters
+public class BoxMacroParameters
 {
-    /**
-     * Used to indicate that content should not be highlighted.
-     */
-    public static final String LANGUAGE_NONE = "none";
 
-    /**
-     * The language identifier.
-     */
-    private String language;
-
-    /**
-     * @param language the language identifier.
-     */
-    @ParameterDescription("the language identifier (java, python, etc.)")
-    public void setLanguage(String language)
-    {
-        this.language = language;
-    }
-
-    /**
-     * @return the language identifier.
-     */
-    public String getLanguage()
-    {
-        return this.language;
-    }
 }

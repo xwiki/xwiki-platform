@@ -17,43 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.code;
+package org.xwiki.rendering;
 
-import org.xwiki.rendering.macro.box.BoxMacroParameters;
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+import junit.framework.Test;
+import junit.framework.TestCase;
+
+import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
+import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 
 /**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.code.CodeMacro} Macro.
+ * All Rendering integration tests defined in text files using a special format.
  * 
  * @version $Id$
- * @since 1.7RC1
+ * @since 1.7M3
  */
-public class CodeMacroParameters extends BoxMacroParameters
+public class RenderingTests extends TestCase
 {
-    /**
-     * Used to indicate that content should not be highlighted.
-     */
-    public static final String LANGUAGE_NONE = "none";
-
-    /**
-     * The language identifier.
-     */
-    private String language;
-
-    /**
-     * @param language the language identifier.
-     */
-    @ParameterDescription("the language identifier (java, python, etc.)")
-    public void setLanguage(String language)
+    public static Test suite() throws Exception
     {
-        this.language = language;
-    }
+        RenderingTestSuite suite = new RenderingTestSuite("Test Box Macro");
 
-    /**
-     * @return the language identifier.
-     */
-    public String getLanguage()
-    {
-        return this.language;
+        suite.addTestsFromResource("macrobox1", true);
+
+        return new RenderingPlexusTestSetup(suite);
     }
 }

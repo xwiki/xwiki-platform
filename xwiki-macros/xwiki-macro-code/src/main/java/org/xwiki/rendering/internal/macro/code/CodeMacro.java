@@ -22,21 +22,14 @@ package org.xwiki.rendering.internal.macro.code;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.VerbatimInlineBlock;
 import org.xwiki.rendering.block.VerbatimStandaloneBlock;
-import org.xwiki.rendering.block.XMLBlock;
-import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.listener.xml.XMLElement;
-import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.parser.HighlightParser;
@@ -44,20 +37,17 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
+ * Highlight provided content depending of the content syntax.
+ * 
  * @version $Id$
  * @since 1.7RC1
  */
-public class CodeMacro extends AbstractMacro<CodeMacroParameters> implements Composable
+public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
 {
     /**
      * The description of the macro.
      */
     private static final String DESCRIPTION = "";
-
-    /**
-     * Used to get the highlight parser form provided language.
-     */
-    private ComponentManager componentManager;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -70,30 +60,23 @@ public class CodeMacro extends AbstractMacro<CodeMacroParameters> implements Com
     /**
      * {@inheritDoc}
      * 
-     * @see Composable#compose(ComponentManager)
+     * @see org.xwiki.rendering.macro.box.AbstractBoxMacro#getClassProperty()
      */
-    public void compose(ComponentManager componentManager)
+    @Override
+    protected String getClassProperty()
     {
-        this.componentManager = componentManager;
+        return "code";
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
+     * @see org.xwiki.rendering.internal.macro.box.DefaultBoxMacro#parseContent(org.xwiki.rendering.macro.box.BoxMacroParameters,
+     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public boolean supportsInlineMode()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
-    public List<Block> execute(CodeMacroParameters parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
+    @Override
+    protected List<Block> parseContent(CodeMacroParameters parameters, String content,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         List<Block> result;
         try {
@@ -114,19 +97,7 @@ public class CodeMacro extends AbstractMacro<CodeMacroParameters> implements Com
             throw new MacroExecutionException("Failed to highlight content", e);
         }
 
-        Map<String, String> classParameter = Collections.singletonMap("class", "code");
-
-        Block boxBlock;
-        if (context.isInlined()) {
-            FormatBlock spanBlock = new FormatBlock(result, Format.NONE);
-            spanBlock.setParameters(classParameter);
-            
-            boxBlock = spanBlock;
-        } else {
-            boxBlock = new XMLBlock(result, new XMLElement("div", classParameter));
-        }
-
-        return Collections.singletonList(boxBlock);
+        return result;
     }
 
     /**
@@ -145,7 +116,7 @@ public class CodeMacro extends AbstractMacro<CodeMacroParameters> implements Com
 
         if (parameters.getLanguage() != null) {
             try {
-                parser = (HighlightParser) this.componentManager.lookup(HighlightParser.ROLE, parameters.getLanguage());
+                parser = (HighlightParser) getComponentManager().lookup(HighlightParser.ROLE, parameters.getLanguage());
 
                 return parser.highlight(parameters.getLanguage(), new StringReader(content));
             } catch (ComponentLookupException e) {
@@ -158,7 +129,7 @@ public class CodeMacro extends AbstractMacro<CodeMacroParameters> implements Com
 
         getLogger().debug("Trying the default highlighting parser");
 
-        parser = (HighlightParser) this.componentManager.lookup(HighlightParser.ROLE, "default");
+        parser = (HighlightParser) getComponentManager().lookup(HighlightParser.ROLE, "default");
 
         return parser.highlight(parameters.getLanguage(), new StringReader(content));
     }

@@ -33,7 +33,11 @@
   <name>XWiki Platform - Core - Macro - Code</name>
   <description>XWiki Platform - Core - Macro - Code</description>
   <dependencies>
-    <!-- Required for code macro -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-macro-box</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.python</groupId>
       <artifactId>jython-standalone</artifactId>
@@ -42,7 +46,7 @@
     <dependency>
       <groupId>pygments</groupId>
       <artifactId>pygments</artifactId>
-      <version>1.11-xwiki</version>
+      <version>1.0-xwiki</version>
     </dependency>
   </dependencies>
   <build>

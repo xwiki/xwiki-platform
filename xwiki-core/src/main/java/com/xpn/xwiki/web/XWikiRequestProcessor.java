@@ -37,7 +37,12 @@ public class XWikiRequestProcessor extends org.apache.struts.action.RequestProce
 
         // Remove /wikiname/ part if the struts action is /wiki/
         if (httpServletRequest.getServletPath().equals("/wiki")) {
-            result = result.substring(result.indexOf("/", 1));
+            int wikiNameIndex = result.indexOf("/", 1);
+            if (wikiNameIndex == -1) {
+                result = "";
+            } else {
+                result = result.substring(result.indexOf("/", 1));
+            }
         }
 
         if (StringUtils.countMatches(result, "/") <= 2) {

@@ -4501,27 +4501,32 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 // pass to it using the following algorithm:
                 // path info = requestURI - (contextPath + servletPath)
                 String path;
-                String webapppath = getWebAppPath(context);
-                String servletpath = getServletPath(context.getDatabase(), context);
-
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Request URI: " + request.getRequestURI());
-                    LOG.debug("Webapp path: " + webapppath);
-                    LOG.debug("Servlet path: " + servletpath);
-                }
-
-                if (!request.getRequestURI().startsWith("/" + webapppath + servletpath)) {
+                
+                String uri = request.getRequestURI();
+                String contextPath = request.getContextPath();
+                String servletPath = request.getServletPath();
+                
+                if (!uri.startsWith(contextPath + servletPath)) {
                     LOG.warn("Request URI [" + request.getRequestURI() + "] should have matched " + "context path ["
-                        + webapppath + "] and servlet path [" + servletpath + "]");
+                        + contextPath + "] and servlet path [" + servletPath + "]");
                     // Even though this branch shouldn't get executed we never know what containers
                     // will return and thus in order to be safe we fall back to the previous
                     // behavior which was to use getPathInfo() for getting the path (with the
                     // potential issue with i18n encoding as stated above).
                     path = request.getPathInfo();
                 } else {
-                    // we need to get rid of /xwiki/bin/ or /xwiki/wiki/wiki_wikiname/ in case of a XEM in usepath
+                    // we need to get rid of /xwiki/bin/ or /xwiki/wiki/wikiname/ in case of a XEM in usepath
                     // mode
-                    path = request.getRequestURI().substring(webapppath.length() + servletpath.length());
+                    if ("1".equals(Param("xwiki.virtual.usepath", "0"))) {
+                        String[] vhi = uri.split("/");
+                        if (vhi.length > 2 && vhi[2].equals("wiki")) {
+                            path = uri.substring(vhi[0].length() + 1 + vhi[1].length() + 1 + vhi[2].length() + 1 + vhi[3].length());
+                        } else {
+                            path = uri.substring(contextPath.length() + servletPath.length());
+                        }
+                    } else {
+                        path = uri.substring(contextPath.length() + servletPath.length());
+                    }
                 }
 
                 // Fix error in some containers, which don't hide the jsessionid parameter from the

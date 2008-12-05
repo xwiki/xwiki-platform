@@ -2614,8 +2614,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to get the Servlet path for the curriki wiki In mono wiki this is "bin/" or "xwiki/". In virtaul mode and is
-     * xwiki.virtual.usepath is enable in xwiki.cfg it's "wiki/wikiname/".
+     * API to get the Servlet path for a given wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
+     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
      * 
      * @param wikiName wiki for which to get the path
      * @return The servlet path
@@ -2626,8 +2626,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to get the Servlet path for the curriki wiki In mono wiki this is "bin/" or "xwiki/". In virtaul mode and is
-     * xwiki.virtual.usepath is enable in xwiki.cfg it's "wiki/wikiname/".
+     * API to get the Servlet path for the current wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
+     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
      * 
      * @return The servlet path
      */
@@ -2638,7 +2638,7 @@ public class XWiki extends Api
 
     /**
      * API to get the webapp path for the current wiki. This usually is "xwiki/". It can be configured in xwiki.cfg with
-     * the config xwiki.webapppath.
+     * the config <tt>xwiki.webapppath</tt>.
      * 
      * @return The servlet path
      */

@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.client.widget;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.user.client.DOM;
 
 /**
  * Radio button widget to override the default GWT radio button to work around bug #458:
@@ -62,7 +61,7 @@ public class RadioButton extends com.google.gwt.user.client.ui.RadioButton
         NodeList<Element> innerInputList = this.getElement().getElementsByTagName(INPUT_TAG_NAME);
         if (innerInputList.getLength() > 0) {
             Element wrappedInput = innerInputList.getItem(0);
-            DOM.setElementAttribute((com.google.gwt.user.client.Element) wrappedInput, VALUE_ATTR_NAME, value);
+            wrappedInput.setAttribute(VALUE_ATTR_NAME, value);
         }
     }
 
@@ -74,7 +73,7 @@ public class RadioButton extends com.google.gwt.user.client.ui.RadioButton
         NodeList<Element> innerInputList = this.getElement().getElementsByTagName(INPUT_TAG_NAME);
         if (innerInputList.getLength() > 0) {
             Element wrappedInput = innerInputList.getItem(0);
-            return DOM.getElementAttribute((com.google.gwt.user.client.Element) wrappedInput, VALUE_ATTR_NAME);
+            return wrappedInput.getAttribute(VALUE_ATTR_NAME);
         }
         return "";
     }

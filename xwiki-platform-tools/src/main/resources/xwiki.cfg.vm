@@ -159,6 +159,20 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 #-# The name of the default URL factory that should be used.
 # xwiki.urlfactory.serviceclass=com.xpn.xwiki.web.XWikiURLFactoryServiceImpl
 
+#-# The name of the webapp to use in the generated URLs. The right value is taken from the request URL, so setting this
+#-# is not recommended in most cases. If set, the value should contain a trailing /, but not a leading one. For example:
+#-# xwiki.webapppath=xwiki/
+# xwiki.webapppath=
+#-# The default servlet mapping name to use in the generated URLs. The right value is taken from the request URL,
+#-# preserving the requested servlet mapping, so setting this is not recommended in most cases. If set, the value should
+#-# contain a trailing /, but not a leading one. For example:
+#-# xwiki.servletpath=bin/
+# xwiki.servletpath=
+#-# The fallback servlet mapping name to use in the generated URLs. Unlike xwiki.servletpath, this is the value used when
+#-# the correct setting could not be determined from the request URL. A good way to use this setting is to achieve short
+#-# URLs, see http://platform.xwiki.org/xwiki/bin/Main/ShortURLs
+# xwiki.defaultservletpath=bin/
+
 #-# Whether the /view/ part of the URL should be included if the target action is 'view'.
 # xwiki.showviewaction=1
 #-# The name of the default space. This is displayed when the URL specifies a document, but not a space, or neither.

@@ -19,23 +19,24 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.velocity.VelocityManager;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 {
@@ -72,7 +73,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
                 if (macrolist != null) {
                     com.xpn.xwiki.XWiki xwiki = context.getWiki();
                     for (String docname : macrolist) {
-                        LOG.debug("Pre-including macro topic " + docname);
+                        LOG.debug("Pre-including macro topic " + docname + " in context " + contextdoc.getFullName());
                         xwiki.include(docname, true, context);
                     }
                 }
@@ -140,11 +141,11 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         List<String> macroparam = macro.getParams();
         int j = 0;
         for (int i = 0; i < macroparam.size(); i++) {
-            String name = (String) macroparam.get(i);
-            String value = (String) namedparams.get(name);
+            String name = macroparam.get(i);
+            String value = namedparams.get(name);
             if (value == null) {
                 try {
-                    value = (String) unnamedparams.get(j);
+                    value = unnamedparams.get(j);
                     j++;
                 } catch (Exception e) {
                     value = "";

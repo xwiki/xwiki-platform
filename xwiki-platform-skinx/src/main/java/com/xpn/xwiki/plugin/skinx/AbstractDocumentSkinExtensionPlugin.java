@@ -233,7 +233,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends SkinExtensionP
     
     /**
      * Resets the list of "Use always" extensions every time a XAR is imported. This way, next time a page is rendered,
-     * such extensions will be retrieved from databse, and if one has been imported during last import, it will be taken
+     * such extensions will be retrieved from database, and if one has been imported during last import, it will be taken
      * into consideration. (We have to this since the importer does not generate DocChanged notification).
      * See http://jira.xwiki.org/jira/browse/XWIKI-2868
      * 

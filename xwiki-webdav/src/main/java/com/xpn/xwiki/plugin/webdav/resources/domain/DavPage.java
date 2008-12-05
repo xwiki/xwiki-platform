@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
@@ -191,7 +192,7 @@ public class DavPage extends AbstractDavResource
     {
         // Protect against direct url referencing.
         List<DavResource> children = new ArrayList<DavResource>();
-        if(!XWikiDavUtils.hasAccess("view", this.name, xwikiContext)) {
+        if (!XWikiDavUtils.hasAccess("view", this.name, xwikiContext)) {
             return new DavResourceIteratorImpl(children);
         }
         try {
@@ -295,7 +296,25 @@ public class DavPage extends AbstractDavResource
                     doc.setContent(new String(data));
                     xwikiContext.getWiki().saveDocument(doc, "Updated from WebDAV", xwikiContext);
                 } else if (fName.equals(DavWikiFile.WIKI_XML)) {
-                    throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+                    // These values should not be writable.
+                    String oldVersion = doc.getVersion();
+                    String oldContentAuthor = doc.getContentAuthor();
+                    // Keep for determining if the content was changed or not.
+                    String oldContent = doc.getContent();
+                    doc.fromXML(new String(data));
+                    // Ignore the version received in the XML. It will be automatically increased when saving the doc.
+                    doc.setVersion(oldVersion);
+                    // Don't allow setting the contentAuthor, as it determines the programming right.
+                    doc.setContentAuthor(oldContentAuthor);
+                    if (!StringUtils.equals(oldContent, doc.getContent())) {
+                        // Force setting the contentUpdateDate and contentAuthor if the content was changed.
+                        doc.setContentDirty(true);
+                    }
+                    // Force setting the current date and increasing the version
+                    doc.setMetaDataDirty(true);
+                    // Force setting the author. 
+                    doc.setAuthor(xwikiContext.getUser());
+                    xwikiContext.getWiki().saveDocument(doc, "Updated from WebDAV", xwikiContext);
                 } else if (fName.startsWith(".")) {
                     DavTempFile tempFile = (DavTempFile) resource;
                     tempFile.setdData(data);

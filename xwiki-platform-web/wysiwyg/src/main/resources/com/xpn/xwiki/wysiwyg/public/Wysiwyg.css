@@ -440,11 +440,6 @@
   border: solid 2px #FFA500;
 }
 
-div.clearfloats {
-  clear: both;
-  display: none;
-}
-
 .xInsertImageButton {
   font-size: xx-small;
   margin-top: 3px;

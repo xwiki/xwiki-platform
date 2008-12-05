@@ -145,6 +145,14 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 #-# Forbidden names that should not be allowed when creating a new wiki.
 # xwiki.virtual.reserved_wikis=
 
+#-# How virtual wikis are mapped to different URLs. If set to 0 (the default), then virtual wikis have different domain
+#-# names, in the format http://wikiname.myfarm.net/. If set to 1, then the domain is common for the entire farm, but the
+#-# path contains the wiki name, in the format http://myfarm.net/xwiki/wiki/wikiname/.
+#-# Note that you can configure the "/wiki/" part with xwiki.virtual.usepath.servletpath property.
+# xwiki.virtual.usepath=0
+
+#-# Configure the servlet action identifier for url path based multiwiki. It has also to be modified in web.xml.
+# xwiki.virtual.usepath.servletpath=wiki
 
 #---------------------------------------
 # URLs
@@ -184,10 +192,6 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 #-# Hide the /WebHome part of the URL when the document is the default one. Use 0 to hide, 1 to show.
 # xwiki.usedefaultaction=0
 
-#-# How virtual wikis are mapped to different URLs. If set to 0 (the default), then virtual wikis have different domain
-#-# names, in the format http://wikiname.myfarm.net/. If set to 1, then the domain is common for the entire farm, but the
-#-# path contains the wiki name, in the format http://myfarm.net/xwiki/wiki/wikiname/
-# xwiki.virtual.usepath=0
 
 #---------------------------------------
 # Users

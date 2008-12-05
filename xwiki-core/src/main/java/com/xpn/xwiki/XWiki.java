@@ -3168,7 +3168,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             String parent = request.getParameter("parent");
             String validkey = null;
 
-            if ("superadmin".equals(xwikiname)) {
+            if ("superadmin".equalsIgnoreCase(xwikiname)) {
                 return -8;
             }
             try {

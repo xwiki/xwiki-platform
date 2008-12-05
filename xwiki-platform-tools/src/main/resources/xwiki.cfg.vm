@@ -150,6 +150,12 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 # URLs
 #
 
+#-# The domain name to use when creating URLs to the default wiki. If set, the generated URLs will point to this server
+#-# instead of the requested one. It should contain schema, domain and (optional) port, and the trailing /. For example:
+#-# xwiki.home=http://www.xwiki.org/
+#-# xwiki.home=http://wiki.mycompany.net:8080/
+# xwiki.home=
+
 #-# The name of the default URL factory that should be used.
 # xwiki.urlfactory.serviceclass=com.xpn.xwiki.web.XWikiURLFactoryServiceImpl
 
@@ -164,6 +170,10 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 #-# Hide the /WebHome part of the URL when the document is the default one. Use 0 to hide, 1 to show.
 # xwiki.usedefaultaction=0
 
+#-# How virtual wikis are mapped to different URLs. If set to 0 (the default), then virtual wikis have different domain
+#-# names, in the format http://wikiname.myfarm.net/. If set to 1, then the domain is common for the entire farm, but the
+#-# path contains the wiki name, in the format http://myfarm.net/xwiki/wiki/wikiname/
+# xwiki.virtual.usepath=0
 
 #---------------------------------------
 # Users

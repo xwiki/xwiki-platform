@@ -273,7 +273,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     private List<String> configuredSyntaxes;
 
-    private static String getConfigPath() throws NamingException
+    public static String getConfigPath() throws NamingException
     {
         if (configPath == null) {
             try {
@@ -402,7 +402,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 if (LOG.isDebugEnabled())
                     LOG.debug("Request uri is: " + uri);
                 String[] vhi = uri.split("/");
-                if (vhi.length > 2 && vhi[2].equals("wiki")) {
+                if (vhi.length > 2 && vhi[2].equals(xwiki.Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
                     host = vhi[3];
                 }
             }
@@ -4519,7 +4519,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     // mode
                     if ("1".equals(Param("xwiki.virtual.usepath", "0"))) {
                         String[] vhi = uri.split("/");
-                        if (vhi.length > 2 && vhi[2].equals("wiki")) {
+                        if (vhi.length > 2 && vhi[2].equals(Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
                             path = uri.substring(vhi[0].length() + 1 + vhi[1].length() + 1 + vhi[2].length() + 1 + vhi[3].length());
                         } else {
                             path = uri.substring(contextPath.length() + servletPath.length());

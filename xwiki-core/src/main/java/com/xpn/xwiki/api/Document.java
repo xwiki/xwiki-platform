@@ -20,7 +20,6 @@
  */
 package com.xpn.xwiki.api;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.rcs.Version;
@@ -1721,7 +1719,7 @@ public class Document extends Api
             filename = filename.replaceAll("\\+", " ");
 
             if ((data != null) && (data.length > 0)) {
-                XWikiAttachment attachment = addAttachment(filename, data);
+                XWikiAttachment attachment = this.doc.addAttachment(filename, data, getXWikiContext());
                 getDoc().saveAttachmentContent(attachment, getXWikiContext());
                 // commenting because this was already done by addAttachment
                 // getDoc().getAttachmentList().add(attachment);
@@ -1736,39 +1734,26 @@ public class Document extends Api
         return nb;
     }
 
-    protected XWikiAttachment addAttachment(String fileName, InputStream iStream) throws XWikiException, IOException
+    public Attachment addAttachment(String fileName, InputStream iStream)
     {
-        ByteArrayOutputStream bAOut = new ByteArrayOutputStream();
-        IOUtils.copy(iStream, bAOut);
-        return addAttachment(fileName, bAOut.toByteArray());
+        try {
+            return new Attachment(this, this.doc.addAttachment(fileName, iStream, getXWikiContext()), getXWikiContext());
+        } catch (XWikiException e) {
+            // TODO Log the error and let the user know about it
+        } catch (IOException e) {
+            // TODO Log the error and let the user know about it
+        }
+        return null;
     }
 
-    protected XWikiAttachment addAttachment(String fileName, byte[] data) throws XWikiException
+    public Attachment addAttachment(String fileName, byte[] data)
     {
-        int i = fileName.indexOf("\\");
-        if (i == -1) {
-            i = fileName.indexOf("/");
+        try {
+            return new Attachment(this, this.doc.addAttachment(fileName, data, getXWikiContext()), getXWikiContext());
+        } catch (XWikiException e) {
+            // TODO Log the error and let the user know about it
         }
-        String filename = fileName.substring(i + 1);
-
-        // TODO : avoid name clearing when encoding problems will be solved
-        // JIRA : http://jira.xwiki.org/jira/browse/XWIKI-94
-        filename = getXWikiContext().getWiki().clearName(filename, false, true, getXWikiContext());
-
-        XWikiAttachment attachment = getDoc().getAttachment(filename);
-        if (attachment == null) {
-            attachment = new XWikiAttachment();
-            // TODO: Review this code and understand why it's needed.
-            // Add the attachment in the current doc
-            getDoc().getAttachmentList().add(attachment);
-        }
-
-        attachment.setContent(data);
-        attachment.setFilename(filename);
-        attachment.setAuthor(getXWikiContext().getUser());
-        // Add the attachment to the document
-        attachment.setDoc(getDoc());
-        return attachment;
+        return null;
     }
 
     public boolean validate() throws XWikiException

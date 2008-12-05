@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -47,6 +48,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -3031,9 +3033,45 @@ public class XWikiDocument implements DocumentModelBridge
         return null;
     }
 
+    public XWikiAttachment addAttachment(String fileName, InputStream iStream, XWikiContext context)
+        throws XWikiException, IOException
+    {
+        ByteArrayOutputStream bAOut = new ByteArrayOutputStream();
+        IOUtils.copy(iStream, bAOut);
+        return addAttachment(fileName, bAOut.toByteArray(), context);
+    }
+
+    public XWikiAttachment addAttachment(String fileName, byte[] data, XWikiContext context) throws XWikiException
+    {
+        int i = fileName.indexOf("\\");
+        if (i == -1) {
+            i = fileName.indexOf("/");
+        }
+        String filename = fileName.substring(i + 1);
+
+        // TODO : avoid name clearing when encoding problems will be solved
+        // JIRA : http://jira.xwiki.org/jira/browse/XWIKI-94
+        filename = context.getWiki().clearName(filename, false, true, context);
+
+        XWikiAttachment attachment = getAttachment(filename);
+        if (attachment == null) {
+            attachment = new XWikiAttachment();
+            // TODO: Review this code and understand why it's needed.
+            // Add the attachment in the current doc
+            getAttachmentList().add(attachment);
+        }
+
+        attachment.setContent(data);
+        attachment.setFilename(filename);
+        attachment.setAuthor(context.getUser());
+        // Add the attachment to the document
+        attachment.setDoc(this);
+        return attachment;
+    }
+
     public BaseObject getFirstObject(String fieldname)
     {
-        // Keeping this function with context null for compatibilit reasons
+        // Keeping this function with context null for compatibility reasons.
         // It should not be used, since it would miss properties which are only defined in the class
         // and not present in the object because the object was not updated
         return getFirstObject(fieldname, null);

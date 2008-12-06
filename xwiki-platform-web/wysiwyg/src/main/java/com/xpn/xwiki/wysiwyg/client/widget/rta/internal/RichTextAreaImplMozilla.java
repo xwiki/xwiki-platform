@@ -35,6 +35,8 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
     /**
      * The collection of load listeners.<br/>
      * NOTE: Stop firing load events as soon as GWT provides a way to detect that a rich text area has finished loading.
+     * 
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3059
      */
     private final LoadListenerCollection loadListeners = new LoadListenerCollection();
 
@@ -43,7 +45,7 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
      * NOTE: Remove this method as soon as Issue 3156 is fixed.
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#setHTMLImpl(String)
-     * @see @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
      */
     protected void setHTMLImpl(String html)
     {
@@ -52,6 +54,61 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
             super.setHTMLImpl(html);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#initElement()
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3176
+     */
+    public native void initElement()
+    /*-{
+        // Mozilla doesn't allow designMode to be set reliably until the iframe is fully loaded.
+        var _this = this;
+        var iframe = _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
+        _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::initializing = true;
+
+        var loaded = focused = false;
+
+        var enterDesignMode = function() {
+            iframe.contentWindow.onfocus = null;
+            iframe.contentWindow.onblur = null;
+            iframe.contentWindow.document.designMode = 'On';
+        };
+
+        iframe.onload = function() {
+            // Some Mozillae have the nasty habit of calling onload again when you set
+            // designMode, so let's avoid doing it more than once.
+            iframe.onload = null;
+
+            // Send notification that the iframe has finished loading.
+            _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
+            
+            if (focused) {
+                enterDesignMode();
+            } else {
+                loaded = true;
+            }
+        };
+
+        // Don't set designMode until the RTA actually gets focused. This is
+        // necessary because editing won't work on Mozilla if the iframe is
+        // *hidden, but attached*. Waiting for focus gets around this issue.
+        //
+        // Note: This onfocus will not conflict with the addEventListener('focus', ...) in RichTextAreaImplStandard.
+        // Note: The iframe should be attached when the following code is executed!
+        iframe.contentWindow.onfocus = function() {
+            if (loaded) {
+                enterDesignMode();
+            } else {
+                focused = true;
+            }
+        };
+
+        iframe.contentWindow.onblur = function() {
+            focused = false;
+        };
+    }-*/;
 
     /**
      * {@inheritDoc}<br/>

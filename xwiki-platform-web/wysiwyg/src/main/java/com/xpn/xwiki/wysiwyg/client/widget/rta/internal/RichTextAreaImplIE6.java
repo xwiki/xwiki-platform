@@ -37,6 +37,8 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
     /**
      * The collection of load listeners.<br/>
      * NOTE: Stop firing load events as soon as GWT provides a way to detect that a rich text area has finished loading.
+     * 
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3059
      */
     private final LoadListenerCollection loadListeners = new LoadListenerCollection();
 

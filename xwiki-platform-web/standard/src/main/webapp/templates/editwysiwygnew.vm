@@ -27,11 +27,21 @@
 ## The editor will replace the following text area with its own widget.
 ## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
 $xwiki.getTextArea($tdoc.content)
+## We put the $tdoc.content on the session to be available from wysiwyginput.vm 
+## because by using directly $tdoc.content in wysiwyginput.vm we can miss the content 
+## updates from this request, like when we switch from wiki editor to wysiwyg.
+#set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
+#if(!$wysiwygInput)
+#set($wysiwygInput = $util.getHashMap())
+$request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
+#end
+#set($wysiwygInputKey = $util.generateRandomString(4))
+#set($ok = $wysiwygInput.put($wysiwygInputKey, $tdoc.content))
 <script type="text/javascript">
 //<![CDATA[
     var Wysiwyg0 = {
       hookId: 'content',
-      inputURL: "${tdoc.getExternalURL("view", "xpage=wysiwyginput")}",
+      inputURL: "${tdoc.getExternalURL("view", "xpage=wysiwyginput&key=$wysiwygInputKey")}",
       syntax: "$doc.syntaxId",
       plugins: 'separator text valign list indent undo format symbol link',
       toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink',

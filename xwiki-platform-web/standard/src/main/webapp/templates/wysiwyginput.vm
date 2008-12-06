@@ -6,5 +6,15 @@
 ##This is temporary. See http://jira.xwiki.org/jira/browse/XWIKI-2721
 ##<link type="text/css" rel="stylesheet" href="${request.getRequestURL().substring(0, $request.getRequestURL().indexOf("/", 9))}${xwiki.getSkinFile("style.css")}"/>
 </head>
-<body id="body" class="main">$tdoc.getRenderedContent($tdoc.content, $tdoc.getSyntaxId())</body>
+## We don't use directly $tdoc.content because we could miss the content updates 
+## when we switch from wiki editor to wysiwyg.
+#set($content = $tdoc.content)
+#if($request.key)
+#set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
+#if($wysiwygInput.containsKey($request.key))
+#set($content = $wysiwygInput.get($request.key))
+#set($ok = $wysiwygInput.remove($request.key))
+#end
+#end
+<body id="body" class="main">$tdoc.getRenderedContent($content, $tdoc.getSyntaxId())</body>
 </html>

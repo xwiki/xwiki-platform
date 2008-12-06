@@ -228,7 +228,6 @@
   margin-left: 6px;
   padding: 3px 6px 3px 6px;
   cursor: pointer;
-  cursor: hand;
   color: black;
   font-weight: bold;
   text-align: center;
@@ -424,7 +423,6 @@
   width: 116px;
   padding: 3px;
   margin: 0px;
-  horizontal-align: middle;
   display: inline;
   float: left;
 }

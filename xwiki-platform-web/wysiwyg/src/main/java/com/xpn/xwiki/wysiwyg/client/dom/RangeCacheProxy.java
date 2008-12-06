@@ -178,7 +178,9 @@ public class RangeCacheProxy implements Range
     public Node getCommonAncestorContainer()
     {
         if (commonAncestorContainer == null) {
-            commonAncestorContainer = range.getCommonAncestorContainer();
+            // To gain speed we compute the common ancestor container based on the cached values.
+            commonAncestorContainer =
+                DOMUtils.getInstance().getNearestCommonAncestor(getStartContainer(), getEndContainer());
         }
         return commonAncestorContainer;
     }
@@ -254,7 +256,8 @@ public class RangeCacheProxy implements Range
     public boolean isCollapsed()
     {
         if (collapsed == null) {
-            collapsed = Boolean.valueOf(range.isCollapsed());
+            // To gain speed we compute the collapsed state based on the cached values.
+            collapsed = Boolean.valueOf(getStartContainer() == getEndContainer() && getStartOffset() == getEndOffset());
         }
         return collapsed.booleanValue();
     }

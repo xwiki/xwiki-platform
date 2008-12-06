@@ -120,7 +120,7 @@ public final class ImageHTMLGenerator
                 styleAttribute = "float: right; margin-left: 1em;";
                 break;
             case CENTER:
-                styleAttribute = "margin-right: auto; margin-left: auto;";
+                styleAttribute = "margin-right: auto; margin-left: auto; display: block;";
                 break;
             case TOP:
                 styleAttribute = "vertical-alignment: top;";
@@ -133,10 +133,6 @@ public final class ImageHTMLGenerator
                 break;
             default:
                 break;
-        }
-        if (alignment == ImageAlignment.LEFT || alignment == ImageAlignment.RIGHT 
-            || alignment == ImageAlignment.CENTER) {
-            styleAttribute += " display: block;";
         }
 
         return styleAttribute;

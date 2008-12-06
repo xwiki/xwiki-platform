@@ -300,7 +300,6 @@ public class SymbolPicker extends CompositeDialogBox implements ClickListener
         super(false, true);
 
         getDialog().setText(Strings.INSTANCE.charmap());
-        getDialog().setAnimationEnabled(true);
         getDialog().addStyleName("xSymbolPicker");
 
         symbolPalette = new SymbolPalette(SYMBOLS, SYMBOLS_PER_ROW, SYMBOLS_PER_COL);

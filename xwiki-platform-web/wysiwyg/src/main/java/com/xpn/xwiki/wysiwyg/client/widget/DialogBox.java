@@ -19,13 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget;
 
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHTML;
-import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
@@ -36,13 +34,15 @@ import com.google.gwt.widgetideas.client.GlassPanel;
 import com.xpn.xwiki.wysiwyg.client.dom.Style;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.util.DragAdaptor;
+import com.xpn.xwiki.wysiwyg.client.util.DragListener;
 
 /**
  * Generic dialog box with optimized dragging.
  * 
  * @version $Id$
  */
-public class DialogBox extends PopupPanel implements HasHTML, MouseListener, ClickListener
+public class DialogBox extends PopupPanel implements HasHTML, DragListener, ClickListener
 {
     /**
      * The style name used when the dialog is dragged.
@@ -85,16 +85,6 @@ public class DialogBox extends PopupPanel implements HasHTML, MouseListener, Cli
     private Widget child;
 
     /**
-     * Flag specifying whether this dialog is being dragged.
-     */
-    private boolean dragging;
-
-    /**
-     * Flag that indicates that the dragging process has started.
-     */
-    private boolean startDragging;
-
-    /**
      * The horizontal coordinate of the point where the drag started.
      */
     private int dragStartX;
@@ -135,7 +125,7 @@ public class DialogBox extends PopupPanel implements HasHTML, MouseListener, Cli
 
         caption = new HTML();
         caption.addStyleName("xCaption");
-        caption.addMouseListener(this);
+        (new DragAdaptor(caption)).addDragListener(this);
 
         closeButton = new PushButton(Images.INSTANCE.close().createImage(), this);
         closeButton.setTitle(Strings.INSTANCE.close());
@@ -238,6 +228,8 @@ public class DialogBox extends PopupPanel implements HasHTML, MouseListener, Cli
      */
     public boolean onEventPreview(Event event)
     {
+        // We need to preventDefault() on mouseDown events (outside of the DialogBox content) to keep text from being
+        // selected when it is dragged.
         if (event.getTypeInt() == Event.ONMOUSEDOWN) {
             if (caption.getElement().isOrHasChild(event.getTarget())) {
                 event.preventDefault();
@@ -249,78 +241,42 @@ public class DialogBox extends PopupPanel implements HasHTML, MouseListener, Cli
     /**
      * {@inheritDoc}
      * 
-     * @see MouseListener#onMouseDown(Widget, int, int)
+     * @see DragListener#onDragStart(Widget, int, int)
      */
-    public void onMouseDown(Widget sender, int x, int y)
+    public void onDragStart(Widget sender, int x, int y)
     {
-        dragging = true;
-        startDragging = true;
-        DOM.setCapture(caption.getElement());
         dragStartX = x;
         dragStartY = y;
+        panelTemp.setPixelSize(child.getOffsetWidth(), child.getOffsetHeight());
+        mainPanel.remove(child);
+        mainPanel.add(panelTemp);
+        addStyleName(DRAGGING_STYLE);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see MouseListener#onMouseEnter(Widget)
+     * @see DragListener#onDrag(Widget, int, int)
      */
-    public void onMouseEnter(Widget sender)
+    public void onDrag(Widget sender, int x, int y)
     {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseLeave(Widget)
-     */
-    public void onMouseLeave(Widget sender)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseMove(Widget, int, int)
-     */
-    public void onMouseMove(Widget sender, int x, int y)
-    {
-        onStartDragging();
-        if (dragging) {
+        if (sender == caption) {
             int absX = x + getAbsoluteLeft();
             int absY = y + getAbsoluteTop();
             setPopupPosition(absX - dragStartX, absY - dragStartY);
-            mainPanel.remove(child);
-            mainPanel.add(panelTemp);
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see MouseListener#onMouseUp(Widget, int, int)
+     * @see DragListener#onDragEnd(Widget, int, int)
      */
-    public void onMouseUp(Widget sender, int x, int y)
+    public void onDragEnd(Widget sender, int x, int y)
     {
-        dragging = false;
-        DOM.releaseCapture(caption.getElement());
         mainPanel.remove(panelTemp);
         mainPanel.add(child);
-        this.removeStyleName(DRAGGING_STYLE);
-    }
-
-    /**
-     * Initialize the dragging process.
-     */
-    private void onStartDragging()
-    {
-        if (startDragging) {
-            panelTemp.setPixelSize(child.getOffsetWidth(), child.getOffsetHeight());
-            startDragging = false;
-            this.addStyleName(DRAGGING_STYLE);
-        }
+        removeStyleName(DRAGGING_STYLE);
     }
 
     /**

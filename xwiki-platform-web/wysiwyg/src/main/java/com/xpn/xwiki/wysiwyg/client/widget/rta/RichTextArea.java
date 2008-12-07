@@ -92,7 +92,8 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     {
         cm = new DefaultCommandManager(this);
         history = new DefaultHistory(this, 10);
-        addKeyboardListener((BehaviorAdjuster) GWT.create(BehaviorAdjuster.class));
+        BehaviorAdjuster adjuster = (BehaviorAdjuster) GWT.create(BehaviorAdjuster.class);
+        adjuster.setTextArea(this);
     }
 
     /**

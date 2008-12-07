@@ -65,6 +65,13 @@
     </any>
   </replace-with>
 
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.IEBehaviorAdjuster">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+    </any>
+  </replace-with>  
+
   <!-- Console -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.util.Console">
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.Console"/>

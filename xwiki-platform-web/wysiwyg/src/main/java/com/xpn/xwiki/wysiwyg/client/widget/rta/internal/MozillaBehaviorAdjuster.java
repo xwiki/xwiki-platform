@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 
@@ -131,4 +132,17 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
             selection.addRange(range);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see BehaviorAdjuster#adjustDragDrop(Document)
+     */
+    public native void adjustDragDrop(Document document)
+    /*-{
+        // block default drag and drop mechanism to not allow content to be dropped on this document 
+        document.addEventListener("dragdrop", function(event) {
+            event.stopPropagation();
+        }, true);
+    }-*/;
 }

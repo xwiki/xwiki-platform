@@ -39,5 +39,10 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
         document.body.attachEvent("ondrop", function(event) {
             event.returnValue = false;
         });
+        // block dragging from this object too, because default behaviour is to cut & paste and 
+        // we loose content from the editor 
+        document.body.attachEvent("ondrag", function(event) {
+            event.returnValue = false;
+        });
     }-*/;
 }

@@ -20,6 +20,7 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +39,11 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.xmlrpc.model.XWikiExtendedId;
 import org.xwiki.xmlrpc.model.XWikiObject;
 import org.xwiki.xmlrpc.model.XWikiPage;
+import org.xwiki.xmlrpc.model.XWikiPageHistorySummary;
 import org.xwiki.xmlrpc.model.XWikiPageSummary;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 import org.xwiki.velocity.VelocityManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -46,6 +51,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -441,10 +447,8 @@ public class XWikiXmlRpcHandler
      * the semantics of the page title is that of the page name in an XWiki ID, we will be able to be confluence
      * compatible.
      * </p>
-     * </p>
-     * There are three possible cases: Let P=(id, space, title) the definition of a page. Let CP be the current page and
-     * NP the page to be stored (i.e. the page passed to storePage):
-     * </p>
+     * </p> There are three possible cases: Let P=(id, space, title) the definition of a page. Let CP be the current
+     * page and NP the page to be stored (i.e. the page passed to storePage): </p>
      * <p>
      * 1) CP=("Space.Name", "Space", "Title") NP=("Space.Name", "NewSpace", "Title") Here it is clear that the user
      * wants to "rename" the page by moving it to another space. So we rename the page to ("NewSpace.Name", "NewSpace",
@@ -561,8 +565,8 @@ public class XWikiXmlRpcHandler
                 /* This is a rename request */
 
                 /*
-                 * Given the conditions before, here we have that newSpace != "" AND newName != "", AND either newSpace !=
-                 * documentSpace OR newName != documentName.
+                 * Given the conditions before, here we have that newSpace != "" AND newName != "", AND either newSpace
+                 * != documentSpace OR newName != documentName.
                  */
                 String newSpace = page.getSpace();
                 String newName = page.getTitle();
@@ -1131,9 +1135,17 @@ public class XWikiXmlRpcHandler
         LOG.debug(String.format("User %s has called getObjects()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
+        String versionString = extendedId.getParameter("version");
+        int version = versionString != null ? Integer.parseInt(versionString) : 0;
+        String minorVersionString = extendedId.getParameter("minorVersion");
+        int minorVersion = minorVersionString != null ? Integer.parseInt(minorVersionString) : 1;
 
         if (xwiki.exists(extendedId.getBasePageId())) {
             Document doc = xwiki.getDocument(extendedId.getBasePageId());
+            
+            if (version != 0) {
+                doc = xwiki.getDocument(doc, String.format("%d.%d", version, minorVersion));
+            }
 
             if (doc != null) {
                 List result = new ArrayList();
@@ -1178,9 +1190,17 @@ public class XWikiXmlRpcHandler
         LOG.debug(String.format("User %s has called getObject()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
+        String versionString = extendedId.getParameter("version");
+        int version = versionString != null ? Integer.parseInt(versionString) : 0;
+        String minorVersionString = extendedId.getParameter("minorVersion");
+        int minorVersion = minorVersionString != null ? Integer.parseInt(minorVersionString) : 1;
 
         if (xwiki.exists(extendedId.getBasePageId())) {
             Document doc = xwiki.getDocument(extendedId.getBasePageId());
+            
+            if (version != 0) {
+                doc = xwiki.getDocument(doc, String.format("%d.%d", version, minorVersion));
+            }
 
             if (doc != null) {
                 XWikiObject xwikiObject = null;
@@ -1349,4 +1369,120 @@ public class XWikiXmlRpcHandler
 
         return result;
     }
+
+    /**
+     * Returns a list of XWikiPageHistorySummary containing all the pages that have been modified since a given date in
+     * all their versions.
+     * 
+     * @param token
+     * @param date The starting date
+     * @param numberOfResults The number of results to be returned
+     * @param start The start offset in the result set
+     * @param fromLatest True if the result set will list recent changed pages before.
+     * @return A list of XWikiPageHistorySummary
+     * @throws XmlRpcException
+     * @throws QueryException
+     */
+    public List getModifiedPagesHistory(String token, Date date, int numberOfResults, int start, boolean fromLatest)
+        throws XmlRpcException, QueryException
+    {
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
+        LOG.debug(String.format("User %s has called getModifiedPagesHistory()", user.getName()));
+
+        List result = new ArrayList();
+
+        String order = fromLatest ? "desc" : "asc";
+        String query =
+            String
+                .format(
+                    "select doc.fullName, rcs.id, rcs.date, rcs.author from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId=doc.id and rcs.date > :date order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
+                    order, order, order);
+
+        QueryManager queryManager = (QueryManager) Utils.getComponent(QueryManager.ROLE);
+        List<Object> queryResult =
+            queryManager.createQuery(query, Query.XWQL).bindValue("date", date).setLimit(numberOfResults).setOffset(
+                start).execute();
+
+        for (Object o : queryResult) {
+            Object[] fields = (Object[]) o;
+            String pageId = (String) fields[0];
+            XWikiRCSNodeId nodeId = (XWikiRCSNodeId) fields[1];
+            Timestamp timestamp = (Timestamp) fields[2];
+            String author = (String) fields[3];
+
+            XWikiPageHistorySummary pageHistory = new XWikiPageHistorySummary();
+            pageHistory.setId(pageId);
+            pageHistory.setVersion(nodeId.getVersion().at(0));
+            pageHistory.setMinorVersion(nodeId.getVersion().at(1));
+            pageHistory.setModified(new Date(timestamp.getTime()));
+            pageHistory.setModifier(author);
+
+            result.add(pageHistory.toRawMap());
+        }
+
+        return result;
+    }
+
+    /**
+     * This is a version of storePage that fails to store the page if the current version of the page doesn't match the
+     * one of the page passed as parameter (i.e., the page has been modified since the last getPage)
+     * 
+     * @param token
+     * @param pageMap A map representing the Page object to be stored.
+     * @param checkVersion True if the current version of the page and the one of the page passed as parameter must
+     *            match.
+     * @return A map representing an XWikiPage with updated information, or an XWikiPage whose fields are all empty if
+     *         there is a version mismatch.
+     * @throws XWikiException
+     * @throws XmlRpcException
+     */
+    public Map storePage(String token, Map pageMap, boolean checkVersion) throws XWikiException, XmlRpcException
+    {
+        if (checkVersion) {
+            XWikiPage page = new XWikiPage(pageMap);
+            Map currentPageMap = getPage(token, page.getId());
+            XWikiPage currentPage = new XWikiPage(currentPageMap);
+            if (currentPage.getVersion() == page.getVersion()
+                && currentPage.getMinorVersion() == page.getMinorVersion()) {
+                return storePage(token, pageMap);
+            }
+
+            return DomainObjectFactory.createEmptyXWikiPage().toRawMap();
+        } else {
+            return storePage(token, pageMap);
+        }
+
+    }
+
+    /**
+     * This is a version of storeObject that fails to store the object if the current version of the page associated to
+     * the object doesn't match the one of the object passed as parameter (i.e., the object's page has been modified
+     * since the last getObject)
+     * 
+     * @param token The authentication token.
+     * @param objectMap A map representing the XWikiObject to be updated/created.
+     * @param checkVersion True if the current version of the object's page and the one of the one passed as parameter
+     *            must match.
+     * @return A map representing the XWikiObject with the updated information, or an XWikiObject whose fields are all
+     *         empty if there is a version mismatch.
+     * @throws XmlRpcException
+     */
+    public Map storeObject(String token, Map objectMap, boolean checkVersion) throws XWikiException, XmlRpcException
+    {
+        if (checkVersion) {
+            XWikiObject object = new XWikiObject(objectMap);
+            Map currentPageMap = getPage(token, object.getPageId());
+            XWikiPage currentPage = new XWikiPage(currentPageMap);
+            if (currentPage.getVersion() == object.getPageVersion()
+                && currentPage.getMinorVersion() == object.getPageMinorVersion()) {
+                return storeObject(token, objectMap);
+            }
+
+            return DomainObjectFactory.createEmptyXWikiObject().toRawMap();
+        } else {
+            return storeObject(token, objectMap);
+        }
+    }
+
 }

@@ -20,6 +20,7 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -189,6 +190,30 @@ public class DomainObjectFactory
         return result;
     }
 
+    public static XWikiPage createEmptyXWikiPage()
+    {
+        XWikiPage result = new XWikiPage();
+
+        result.setId("");
+
+        result.setSpace("");
+        result.setParentId("");
+        result.setTitle("");
+        result.setUrl("");
+        result.setTranslations(new ArrayList<String>());
+        result.setVersion(0);
+        result.setMinorVersion(0);
+        result.setContent("");
+        result.setCreated(new Date());
+        result.setCreator("");
+        result.setModified(new Date());
+        result.setModifier("");
+        result.setHomePage(false);
+        result.setLanguage("");
+
+        return result;
+    }
+
     /**
      * Create a page history summary containing revision information about a document.
      * 
@@ -326,6 +351,8 @@ public class DomainObjectFactory
 
         XWikiObjectSummary result = new XWikiObjectSummary();
         result.setPageId(document.getFullName());
+        result.setPageVersion(document.getRCSVersion().at(0));
+        result.setPageMinorVersion(document.getRCSVersion().at(1));
         result.setClassName(object.getxWikiClass().getName());
         result.setId(object.getNumber());
         result.setPrettyName(prettyName);
@@ -359,11 +386,26 @@ public class DomainObjectFactory
 
         XWikiObject result = new XWikiObject();
         result.setPageId(document.getFullName());
+        result.setPageVersion(document.getRCSVersion().at(0));
+        result.setPageMinorVersion(document.getRCSVersion().at(1));
         result.setClassName(object.getxWikiClass().getName());
         result.setId(object.getNumber());
         result.setPrettyName(prettyName);
         result.setPropertyToValueMap(propertyToValueMap);
 
+        return result;
+    }
+    
+    public static XWikiObject createEmptyXWikiObject() {
+        XWikiObject result = new XWikiObject();
+        result.setPageId("");
+        result.setPageVersion(0);
+        result.setPageMinorVersion(0);
+        result.setClassName("");
+        result.setId(0);
+        result.setPrettyName("");
+        result.setPropertyToValueMap(new HashMap());
+        
         return result;
     }
 

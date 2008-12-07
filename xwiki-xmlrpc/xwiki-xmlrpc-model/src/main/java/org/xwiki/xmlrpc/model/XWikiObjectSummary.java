@@ -50,6 +50,22 @@ public class XWikiObjectSummary extends MapObject
         setString("pageId", pageId);
     }
     
+    public int getPageVersion() {
+        return getInt("pageVersion");        
+    }
+    
+    public void setPageVersion(int version) {
+        setInt("pageVersion", version);
+    }
+    
+    public int getPageMinorVersion() {
+        return getInt("pageMinorVersion");
+    }
+    
+    public void setPageMinorVersion(int minorVersion) {
+        setInt("pageMinorVersion", minorVersion);
+    }
+    
     public int getId() {
         return getInt("id");        
     }

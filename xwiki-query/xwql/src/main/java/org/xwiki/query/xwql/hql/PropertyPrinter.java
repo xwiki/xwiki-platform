@@ -21,6 +21,7 @@ package org.xwiki.query.xwql.hql;
 
 import org.xwiki.query.jpql.node.APath;
 import org.xwiki.query.jpql.node.PPath;
+import org.xwiki.query.jpql.node.PSelectExpression;
 import org.xwiki.query.jpql.node.TId;
 import org.xwiki.query.xwql.QueryContext.PropertyInfo;
 
@@ -44,7 +45,11 @@ public class PropertyPrinter
                     .append(prop.alias).append(".id.name").append("='").append(prop.name).append("'");
                 // rewrite nodes
                 for (PPath p : prop.locations) {
-                    p.replaceBy(new APath(new TId(prop.alias + "." + prop.getValueField())));
+                    String s = prop.alias + "." + prop.getValueField();
+                    if (className.endsWith("DBStringListProperty") && p.parent() instanceof PSelectExpression) {
+                        s = "elements("+s+")";
+                    }
+                    p.replaceBy(new APath(new TId(s)));
                 }
             }
         }

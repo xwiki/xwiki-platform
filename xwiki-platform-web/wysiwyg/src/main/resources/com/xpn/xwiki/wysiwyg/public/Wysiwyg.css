@@ -3,7 +3,9 @@
   clear:both;
   float:none;
   height:1px;
-  margin-right:0px;
+  line-height:1px;
+  font-size:1px;
+  margin:0px;
 }
 
 .xToolbar {
@@ -17,46 +19,50 @@
   height:23px;
 }
 
-.xToolbar .gwt-PushButton-up .gwt-Image,
-.xToolbar .gwt-PushButton-down .gwt-Image,
-.xToolbar .gwt-PushButton-up-hovering .gwt-Image,
-.xToolbar .gwt-PushButton-down-hovering .gwt-Image,
-.xToolbar .gwt-PushButton-up-disabled .gwt-Image,
-.xToolbar .gwt-PushButton-down-disabled .gwt-Image,
-.xToolbar .gwt-ToggleButton-up .gwt-Image,
-.xToolbar .gwt-ToggleButton-down .gwt-Image,
-.xToolbar .gwt-ToggleButton-up-hovering .gwt-Image,
-.xToolbar .gwt-ToggleButton-down-hovering .gwt-Image,
-.xToolbar .gwt-ToggleButton-up-disabled .gwt-Image,
-.xToolbar .gwt-ToggleButton-down-disabled .gwt-Image {
+.xToolbar .gwt-PushButton-up,
+.xToolbar .gwt-PushButton-down,
+.xToolbar .gwt-PushButton-up-hovering,
+.xToolbar .gwt-PushButton-down-hovering,
+.xToolbar .gwt-PushButton-up-disabled,
+.xToolbar .gwt-PushButton-down-disabled,
+.xToolbar .gwt-ToggleButton-up,
+.xToolbar .gwt-ToggleButton-down,
+.xToolbar .gwt-ToggleButton-up-hovering,
+.xToolbar .gwt-ToggleButton-down-hovering,
+.xToolbar .gwt-ToggleButton-up-disabled,
+.xToolbar .gwt-ToggleButton-down-disabled {
   border:1px solid #F0F0EE !important;
   cursor:default;
   height:20px;
-  margin-left:1px;
-  margin-top:1px;
-  margin-right:0px;
-  margin-bottom:0px;
   width:20px;
+  margin:1px 0px 0px 1px;
 }
 
-.xToolbar .gwt-PushButton-up-hovering .gwt-Image,
-.xToolbar .gwt-PushButton-down-hovering .gwt-Image,
-.xToolbar .gwt-ToggleButton-up-hovering .gwt-Image,
-.xToolbar .gwt-ToggleButton-down-hovering .gwt-Image {
+.xToolbar .gwt-PushButton-up-hovering,
+.xToolbar .gwt-PushButton-down-hovering,
+.xToolbar .gwt-ToggleButton-up-hovering,
+.xToolbar .gwt-ToggleButton-down-hovering {
   background-color:#B6BDD2 !important;
   border:1px solid #0A246A !important;
 }
 
-.xToolbar .gwt-ToggleButton-down .gwt-Image {
+.xToolbar .gwt-ToggleButton-down {
   border:1px solid #C0C0BB !important;
 }
 
-.xToolbar .gwt-PushButton-up-disabled .gwt-Image,
-.xToolbar .gwt-PushButton-down-disabled .gwt-Image,
-.xToolbar .gwt-ToggleButton-up-disabled .gwt-Image,
-.xToolbar .gwt-ToggleButton-down-disabled .gwt-Image {
-  opacity:0.3;
-  filter:alpha(opacity = 30); /* IE only */
+.xToolbar .gwt-PushButton-up-disabled,
+.xToolbar .gwt-PushButton-down-disabled,
+.xToolbar .gwt-ToggleButton-up-disabled,
+.xToolbar .gwt-ToggleButton-down-disabled {
+  opacity:0.4;
+}
+
+/* XWIKI-2915: WYSIWYG editor crashes on key press in IE6 */
+* html .xToolbar .gwt-PushButton-up-disabled,
+* html .xToolbar .gwt-PushButton-down-disabled,
+* html .xToolbar .gwt-ToggleButton-up-disabled,
+* html .xToolbar .gwt-ToggleButton-down-disabled {
+  background-color:#E6E6E6;
 }
 
 .xToolbar .gwt-ListBox {
@@ -75,7 +81,7 @@
   border-color:buttonshadow buttonhighlight buttonhighlight buttonshadow;
   border-style:solid;
   border-width:1px;
-  height:15px;
+  height:17px;
   margin:2px 2px 2px 4px;
   width:0px;
 }
@@ -188,7 +194,6 @@
 }
 
 * html .xDialogBox .xTitleBar {
-  /* IE6 */  
   width:100%;
 }
 
@@ -208,22 +213,27 @@
 .xDialogBox-dragging {
   background-color:#6666FF !important;
   border-style:dashed;
-  filter:alpha(opacity = 50) !important; /* IE */
-  opacity:0.5 !important; /* non-IE */	
+  opacity:0.5 !important;	
+}
+
+* html .xDialogBox-dragging {
+  filter:alpha(opacity=50) !important;
 }
 
 * html .gwt-PopupPanel .popupContent {
-  /* IE6 */
-  width: 1px; 
+  width: 1px;
 }
-/********styles for link********/
+
 .gwt-TabBar {
 }
+
 .gwt-TabBar .gwt-TabBarFirst {
   width: 5px;  /* first tab distance from the left */
 }
+
 .gwt-TabBar .gwt-TabBarRest {
 }
+
 .gwt-TabBar .gwt-TabBarItem {
   margin-left: 6px;
   padding: 3px 6px 3px 6px;
@@ -233,13 +243,16 @@
   text-align: center;
   background: #d0e4f6; 
 }
+
 .gwt-TabBar .gwt-TabBarItem-selected {
   cursor: default;
   background: #92c1f0;
 } 
+
 .gwt-TabPanel {
   padding: 6px;
 }
+
 .gwt-TabPanelBottom {
   border-color: #92c1f0;
   border-style: solid;
@@ -247,26 +260,34 @@
   overflow: hidden;
   padding: 6px;
 }
+
 .gwt-PopupPanel {
   background: white;
 }
 
-.xLinkToUrl .gwt-Label, .xLinkToNewPage .gwt-Label, .xLinkToExistingPage .gwt-Label {
+.xLinkToUrl .gwt-Label,
+.xLinkToNewPage .gwt-Label,
+.xLinkToExistingPage .gwt-Label {
   font-weight: bold;
   width: 300px;
   padding: 5px;
 }
-.xLinkToUrl .gwt-TextBox, .xLinkToNewPage .gwt-TextBox, .xLinkToExistingPage .gwt-TextBox { 
+
+.xLinkToUrl .gwt-TextBox,
+.xLinkToNewPage .gwt-TextBox,
+.xLinkToExistingPage .gwt-TextBox { 
   font-size: x-small;
   margin: 0 5px;
   width: 300px;
 }
 
-.xLinkToExistingPage .gwt-ListBox, .xLinkToNewPage .gwt-ListBox {
+.xLinkToExistingPage .gwt-ListBox,
+.xLinkToNewPage .gwt-ListBox {
   margin: 0 5px;
 }
 
-.xLinkToUrl .gwt-Button, .xLinkToNewPage .gwt-Button {
+.xLinkToUrl .gwt-Button,
+.xLinkToNewPage .gwt-Button {
   font-size: x-small;
   margin: 8px;
 }
@@ -416,9 +437,6 @@
   font-size: 12px;
 }
 
-/*
- * Images plugin / dialog styles
- */
 .xImagePreview {
   width: 116px;
   padding: 3px;
@@ -426,6 +444,7 @@
   display: inline;
   float: left;
 }
+
 .xImagePreview img {
   height: 90px;
   width: 110px;
@@ -460,12 +479,17 @@
   height: 200px;
 }
 
-.xImageChooser .gwt-Label, .xUploadForm .gwt-Label, .xSettingsPanel .xSettingsLabel {
+.xImageChooser .gwt-Label,
+.xUploadForm .gwt-Label,
+.xSettingsPanel .xSettingsLabel {
   font-weight: bold;
   padding: 5px;  
 }
 
-.xSizePanel .gwt-Label, .xHAlignPanel .gwt-Label, .xVAlignPanel .gwt-Label, .xAltPanel .gwt-Label {
+.xSizePanel .gwt-Label,
+.xHAlignPanel .gwt-Label,
+.xVAlignPanel .gwt-Label,
+.xAltPanel .gwt-Label {
   display: inline;
   margin-left: 1em;
   margin-right: 1em;
@@ -475,6 +499,9 @@
   width: 3em;
 }
 
-.xAlignLabel, .xInsertButton, .xSizePanel, .xAltPanel {
+.xAlignLabel,
+.xInsertButton,
+.xSizePanel,
+.xAltPanel {
   margin-top: 5px;
 }

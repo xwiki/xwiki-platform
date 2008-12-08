@@ -92,19 +92,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macro7", true);
         suite.addTestsFromResource("macros/macro8", true);
         suite.addTestsFromResource("macros/macro9", true);
-        suite.addTestsFromResource("macros/macrohtml", true);
-        suite.addTestsFromResource("macros/xhtml/macroxhtml1", true);
-        suite.addTestsFromResource("macros/xhtml/macroxhtml2", true);
-        suite.addTestsFromResource("macros/xhtml/macroxhtml3", true);
-        suite.addTestsFromResource("macros/xhtml/macroxhtml4", true);
-        suite.addTestsFromResource("macros/xhtml/macroxhtml5", true);
-        suite.addTestsFromResource("macros/xhtml/macroxhtml6", true);
-        suite.addTestsFromResource("macros/xhtml/macroxhtml7", true);
-        suite.addTestsFromResource("macros/xhtml/macroxhtml8", true);
-        suite.addTestsFromResource("macros/toc/macrotoc1", true);
-        suite.addTestsFromResource("macros/toc/macrotoc2", true);
-        suite.addTestsFromResource("macros/toc/macrotoc3", true);
-        suite.addTestsFromResource("macros/toc/macrotoc4", true);
 
         // Links
         suite.addTestsFromResource("link/links1", false);

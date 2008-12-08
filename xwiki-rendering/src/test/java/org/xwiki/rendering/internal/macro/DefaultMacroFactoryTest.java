@@ -26,7 +26,7 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro;
+import org.xwiki.rendering.internal.transformation.TestSimpleMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroFactory;
 import org.xwiki.rendering.parser.Syntax;
@@ -66,12 +66,12 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
 
     public void testGetExistingMacro() throws Exception
     {
-        this.factory.getMacro("xhtml", new Syntax(SyntaxType.XWIKI, "2.0"));
+        this.factory.getMacro("testsimplemacro", new Syntax(SyntaxType.XWIKI, "2.0"));
     }
 
     public void testMacroRegisteredForAGivenSyntaxOnly() throws Exception
     {
-        Macro< ? > macro = new XHTMLMacro();
+        Macro< ? > macro = new TestSimpleMacro();
         this.mockComponentManager.expects(once()).method("lookupMap").will(
             returnValue(Collections.singletonMap("macro/xwiki/2.0", macro)));
         this.factory.compose((ComponentManager) this.mockComponentManager.proxy());
@@ -83,8 +83,8 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
 
     public void testMacroRegisteredForAGivenSyntaxOverridesMacroRegisteredForAllSyntaxes() throws Exception
     {
-        Macro< ? > macro1 = new XHTMLMacro();
-        Macro< ? > macro2 = new XHTMLMacro();
+        Macro< ? > macro1 = new TestSimpleMacro();
+        Macro< ? > macro2 = new TestSimpleMacro();
         Map<String, Macro< ? >> macroDefinitions = new HashMap<String, Macro< ? >>();
         macroDefinitions.put("macro", macro1);
         macroDefinitions.put("macro/xwiki/2.0", macro2);

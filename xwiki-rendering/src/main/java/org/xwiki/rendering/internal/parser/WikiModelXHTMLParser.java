@@ -37,7 +37,6 @@ import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.macro.xhtml.XWikiXHTMLWhitespaceXMLFilter;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiCommentHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiHeaderTagHandler;

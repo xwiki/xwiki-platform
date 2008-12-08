@@ -52,4 +52,24 @@ public class TableConfig extends JavaScriptObject
     /*-{ 
         return this.cols; 
     }-*/;
+    
+    /**
+     * Size of table border.
+     * 
+     * @return size of border in pixels.
+     */
+    public final native int getBorderSize()
+    /*-{ 
+        return this.borderSize; 
+    }-*/;
+    
+    /**
+     * Does the table contain a header row.
+     * 
+     * @return true if the table has a header row.
+     */
+    public final native boolean hasHeader()
+    /*-{ 
+        return this.header; 
+    }-*/;
 }

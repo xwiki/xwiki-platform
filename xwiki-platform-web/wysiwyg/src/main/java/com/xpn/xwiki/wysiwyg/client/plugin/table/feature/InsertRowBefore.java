@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.TableCellElement;
+import com.google.gwt.dom.client.TableRowElement;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -77,6 +78,7 @@ public class InsertRowBefore extends AbstractTableFeature
     public boolean isEnabled(RichTextArea rta)
     {
         Node node = TableUtils.getInstance().getCaretNode(rta.getDocument());
-        return TableUtils.getInstance().getRow(node) != null;
+        TableRowElement row = TableUtils.getInstance().getRow(node); 
+        return  row != null && !TableUtils.getInstance().isHeaderRow(row);
     }
 }

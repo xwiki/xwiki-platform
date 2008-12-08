@@ -21,8 +21,13 @@ table {
   margin: 0;  
 }
 
-table td { 
-  border: 1px dotted gray !important;
+table td, table th { 
+  border: 1px dotted gray;
   padding: 3px;
   margin: 0;
+}
+
+table th {
+  text-align: left;
+  background-color: #F0F0EE;
 }

@@ -252,4 +252,24 @@ public interface Strings extends Constants
     String imageSettingsTabTitle();
 
     String imageNoImageSelectedError();
+    
+    String table();
+    
+    String tableRowsLabel();
+    
+    String tableRowsDefault();
+    
+    String tableColsLabel();
+    
+    String tableColsDefault();
+    
+    String tableBorderLabel();
+    
+    String tableBorderDefault();
+    
+    String tableHeaderLabel();
+    
+    String tablePixel();
+    
+    String tableInsertButton();
 }

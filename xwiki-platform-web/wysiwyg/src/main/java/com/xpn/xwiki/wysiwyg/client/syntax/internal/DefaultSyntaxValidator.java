@@ -71,6 +71,7 @@ public abstract class DefaultSyntaxValidator implements SyntaxValidator
         // FIXME : implement this in the table plugin when possible
         addValidationRule(new DefaultValidationRule("deletecol", new Command("deletecol")));
         addValidationRule(new DefaultValidationRule("deleterow", new Command("deleterow")));
+        addValidationRule(new DefaultValidationRule("deletetable", new Command("deletetable")));
         addValidationRule(new DefaultValidationRule("insertcolafter", new Command("insertcolafter")));
         addValidationRule(new DefaultValidationRule("insertcolbefore", new Command("insertcolbefore")));
         addValidationRule(new DefaultValidationRule("insertrowafter", new Command("insertrowafter")));

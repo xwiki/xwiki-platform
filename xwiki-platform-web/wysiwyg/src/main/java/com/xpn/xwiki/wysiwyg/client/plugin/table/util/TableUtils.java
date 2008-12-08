@@ -46,6 +46,11 @@ public final class TableUtils
      * HTML tag defining a table.
      */
     public static final String TABLE_NODENAME = "TABLE";
+    
+    /**
+     * HTML tag defining a table body.
+     */
+    public static final String TBODY_NODENAME = "TBODY";
 
     /**
      * HTML tag defining a table row.
@@ -56,6 +61,11 @@ public final class TableUtils
      * HTML tag defining a table cell.
      */
     public static final String COL_NODENAME = "TD";
+    
+    /**
+     * HTML tag defining a table heading cell.
+     */
+    public static final String COL_HNODENAME = "TH";
 
     /**
      * HTML to be inserted in newly created table cells.
@@ -157,16 +167,36 @@ public final class TableUtils
     {
         return (TableRowElement) DOMUtils.getInstance().getFirstAncestor(node, ROW_NODENAME);
     }
+    
+    /**
+     * Determine if the row is a header row. 
+     * A header row contains TH nodes describing their respective columns.
+     * 
+     * @param row the row to inspect.
+     * @return true if the row is a heading row.
+     */
+    public boolean isHeaderRow(TableRowElement row)
+    {
+        if (row.getCells().getLength() > 0 && COL_HNODENAME.equalsIgnoreCase(row.getCells().getItem(0).getNodeName())) {
+            return true;
+        }
+        return false;        
+    }
 
     /**
-     * Browse node ancestors and return the first table cell element.
+     * Browse node ancestors and return the first table cell element (TD or TH).
      * 
      * @param node the node to inspect.
      * @return the matching TableCellElement if any, null otherwise.
      */
     public TableCellElement getCell(Node node)
     {        
-        return (TableCellElement) DOMUtils.getInstance().getFirstAncestor(node, COL_NODENAME);
+        TableCellElement cell;
+        cell = (TableCellElement) DOMUtils.getInstance().getFirstAncestor(node, COL_NODENAME);
+        if (cell == null) {
+            cell = (TableCellElement) DOMUtils.getInstance().getFirstAncestor(node, COL_HNODENAME);
+        }
+        return cell;
     }
 
     /**
@@ -287,7 +317,14 @@ public final class TableUtils
         // Loop over table rows to create a new cell in each of them
         for (int i = 0; i < rows.getLength(); i++) {
             TableRowElement currentRow = rows.getItem(i);
-            TableCellElement newCell = currentRow.insertCell(index);
+            TableCellElement newCell;
+            
+            if (isHeaderRow(currentRow)) {
+                newCell = (TableCellElement) currentRow.insertBefore(doc.xCreateElement(COL_HNODENAME), 
+                    currentRow.getCells().getItem(index));
+            } else {
+                newCell = currentRow.insertCell(index);
+            }
             newCell.setInnerHTML(CELL_DEFAULTHTML);
         }
     }

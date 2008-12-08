@@ -20,17 +20,16 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.TableCellElement;
-import com.google.gwt.dom.client.TableElement;
-import com.google.gwt.dom.client.TableRowElement;
 import com.google.gwt.user.client.ui.PushButton;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.InsertTableDialog;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.TableConfigDialog;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
@@ -55,7 +54,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     /**
      * Table dialog.
      */
-    private InsertTableDialog dialog;
+    private TableConfigDialog dialog;
 
     /**
      * RTA Selection preserver.
@@ -80,10 +79,10 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      * 
      * @return the table wizard pop-up instance.
      */
-    public InsertTableDialog getDialog()
+    public TableConfigDialog getDialog()
     {
         if (dialog == null) {
-            dialog = new InsertTableDialog();
+            dialog = new TableConfigDialog();
             dialog.addPopupListener(this);
         }
         return dialog;
@@ -104,31 +103,59 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
             getDialog().center();
         }
     }
+    
+    /**
+     * Create a table from TableConfig configuration.
+     *
+     * @param doc currently edited document.
+     * @param config table configuration (row number, etc).
+     * @return the newly created table.
+     */
+    public Element createTable(Document doc, TableConfig config) 
+    {
+        Element table = doc.xCreateElement(TableUtils.TABLE_NODENAME);       
+        Element tbody = doc.xCreateElement(TableUtils.TBODY_NODENAME);
+        Element row;
+        Element cell;
+                        
+        table.appendChild(tbody);        
+
+        // Set table border
+        // table.setBorder(config.getBorderSize());
+        
+        // Create a table with rows and columns according to the configuration
+        for (int i = 0; i < config.getRowNumber(); i++) {
+            row = doc.xCreateElement(TableUtils.ROW_NODENAME);            
+            tbody.appendChild(row);                 
+            for (int j = 0; j < config.getColNumber(); j++) {
+                if (i == 0 && config.hasHeader()) {
+                    cell = doc.xCreateElement(TableUtils.COL_HNODENAME);
+                } else {
+                    cell = doc.xCreateElement(TableUtils.COL_NODENAME);                    
+                }                
+                cell.setInnerHTML(TableUtils.CELL_DEFAULTHTML);            
+                row.appendChild(cell);                
+            }
+        }
+        
+        return table;
+    }
 
     /**
      * Insert a HTML table in the editor.
      * 
      * @param rta WYSIWYG RichTextArea
      * @param config creation parameters.
-     * @return the newly created table.
      */
-    public TableElement insertTable(RichTextArea rta, TableConfig config)
+    public void insertTable(RichTextArea rta, TableConfig config)
     {
         Range range = TableUtils.getInstance().getRange(rta.getDocument());
         Selection selection = rta.getDocument().getSelection();
-        TableElement table = rta.getDocument().createTableElement();
-        TableRowElement row;
-        TableCellElement cell;
-
-        // Create a table with rows and columns according to the configuration
-        for (int i = 0; i < config.getRowNumber(); i++) {
-            row = table.insertRow(i);
-            for (int j = 0; j < config.getColNumber(); j++) {
-                cell = row.insertCell(j);
-                // We're inserting some HTML content here because having empty cells is a source of issues with midas.
-                cell.setInnerHTML(TableUtils.CELL_DEFAULTHTML);                
-            }
-        }        
+        Node start = range.getStartContainer();
+        int offset = range.getStartOffset();
+        Node flowContainer = DOMUtils.getInstance().getNearestFlowContainer(start);
+        Element table = createTable(rta.getDocument(), config);
+        Node nodeToSelect;
 
         // Leave the rest of the ranges intact.
         selection.removeAllRanges();
@@ -136,25 +163,24 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
         // Delete the contents of the first range. The table will be inserted in place of the deleted text.
         range.deleteContents();
 
-        // Split the DOM tree up to the nearest flow container, insert a table and place the caret inside the first cell.
-        Node start = range.getStartContainer();
-        int offset = range.getStartOffset();
-        Node flowContainer = DOMUtils.getInstance().getNearestFlowContainer(start);
-
+        // Insert the table in the DOM.
         if (flowContainer == start) {
             DOMUtils.getInstance().insertAt(flowContainer, table, offset);
-            range.setEndAfter(table);
         } else {
-            Node startNextLevelSibling = DOMUtils.getInstance().splitNode(flowContainer, start, offset);
+            DOMUtils.getInstance().splitNode(flowContainer, start, offset);
             DOMUtils.getInstance().insertAfter(table, DOMUtils.getInstance().getChild(flowContainer, start));
-            // We need to update the range after inserting the table because otherwise the caret might jump
-            // before it (this happens in IE for instance).
-            range.setEnd(startNextLevelSibling, 0);
         }
+        
+        // Find the first table cell to put the caret within.
+        if (config.hasHeader()) {            
+            nodeToSelect = DOMUtils.getInstance().getFirstDescendant(table, TableUtils.COL_HNODENAME);
+        } else {
+            nodeToSelect = DOMUtils.getInstance().getFirstDescendant(table, TableUtils.COL_NODENAME);
+        }
+        
+        range.selectNodeContents(nodeToSelect);
         range.collapse(false);
-        selection.addRange(range);
-
-        return table;
+        selection.addRange(range);                
     }
 
     /**
@@ -169,9 +195,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
             showDialog(rta);
         } else {
             // Insert the table element.
-            TableElement table = insertTable(rta, (TableConfig) TableConfig.fromJson(parameter));
-            // Put the caret in the first cell of the table.
-            TableUtils.getInstance().putCaretInNode(rta, table.getRows().getItem(0).getCells().getItem(0));
+            insertTable(rta, (TableConfig) TableConfig.fromJson(parameter));
         }
 
         return true;
@@ -197,7 +221,11 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
         if (!autoClosed && !getDialog().isCanceled()) {
             // Call the command again, passing the insertion configuration as a JSON object.
             getPlugin().getTextArea().getCommandManager().execute(getCommand(),
-                "{ rows:" + getDialog().getRowNumber() + ", cols: " + getDialog().getColNumber() + " }");
+                "{ rows:" + getDialog().getRowNumber()
+                + ", cols: " + getDialog().getColNumber()
+                + ", borderSize: " + getDialog().getBorderSize()
+                + ", header: " + getDialog().hasHeader()
+                + " }");
         } else {
             // We get here if the dialog has been closed by clicking the close button.
             // In this case we return the focus to the text area.

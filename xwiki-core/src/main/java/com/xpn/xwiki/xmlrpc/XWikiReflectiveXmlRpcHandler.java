@@ -65,7 +65,7 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
     public Object execute(final XmlRpcRequest request) throws XmlRpcException
     {
         XWikiContext context = null;
-        
+
         try {
             // Here we prepare the XWikiXmlRpcContext object and we put it in the config object so
             // that XMLRPC methods can get it. The config object is the same that is passed to the
@@ -81,7 +81,10 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
                 new XWikiServletContext(config.getServlet().getServletContext());
 
             context = Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiServletContext);
-            
+
+            // Initialize new Container subsystem
+            initializeContainerComponent(context);
+
             XWiki xwiki = XWiki.getXWiki(context);
             XWikiURLFactory urlf =
                 xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
@@ -89,9 +92,6 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
 
             // Here we set the prepared context
             config.setXmlRpcContext(new XWikiXmlRpcContext(context));
-
-            // Initialize new Container subsystem
-            initializeContainerComponent(context);
             
             // This performs the actual XMLRPC method invocation using all the logic we don't care
             // of :)

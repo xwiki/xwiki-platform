@@ -115,7 +115,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             if (this.documentAccessBridge.isDocumentViewable(documentName)) {
                 includedContent = this.documentAccessBridge.getDocumentContent(documentName);
             } else {
-                throw new MacroExecutionException("Current user can't read target document [" + documentName + "]");
+                throw new MacroExecutionException("Current user doesn't have view rights on document [" + documentName
+                    + "]");
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to get content for Document [" + documentName + "]", e);

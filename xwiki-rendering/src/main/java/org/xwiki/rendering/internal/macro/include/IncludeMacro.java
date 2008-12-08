@@ -80,7 +80,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()
@@ -112,7 +112,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // Retrieve the included document's content
         String includedContent = null;
         try {
-            includedContent = this.documentAccessBridge.getDocumentContent(documentName);
+            if (this.documentAccessBridge.isDocumentViewable(documentName)) {
+                includedContent = this.documentAccessBridge.getDocumentContent(documentName);
+            } else {
+                throw new MacroExecutionException("Current user can't read target document [" + documentName + "]");
+            }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to get content for Document [" + documentName + "]", e);
         }
@@ -139,7 +143,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         return result;
     }
 
-    private List<Block> executeWithNewContext(String includedDocumentName, String includedContent, 
+    private List<Block> executeWithNewContext(String includedDocumentName, String includedContent,
         MacroTransformation macroTransformation) throws MacroExecutionException
     {
         List<Block> result;

@@ -30,8 +30,14 @@ import org.xwiki.rendering.macro.descriptor.ParameterMandatory;
  */
 public class IdMacroParameters
 {
+    /**
+     * The identifier string.
+     */
     private String name;
 
+    /**
+     * @param name the identifier string.
+     */
     @ParameterMandatory
     @ParameterDescription("the identifier string")
     public void setName(String name)
@@ -39,6 +45,9 @@ public class IdMacroParameters
         this.name = name;
     }
 
+    /**
+     * @return the identifier string.
+     */
     public String getName()
     {
         return this.name;

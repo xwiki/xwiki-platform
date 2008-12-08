@@ -25,6 +25,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
@@ -210,6 +211,26 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         return xcontext.getWiki().getAttachmentURL(
             documentName == null ? xcontext.getDoc().getFullName() : documentName, attachmentName, xcontext);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#isDocumentViewable(java.lang.String)
+     */
+    public boolean isDocumentViewable(String documentName)
+    {
+        boolean isDocumentViewable = false;
+
+        XWikiContext xcontext = getContext();
+        try {
+            isDocumentViewable =
+                xcontext.getWiki().getRightService().hasAccessLevel("view", xcontext.getUser(), documentName, xcontext);
+        } catch (XWikiException e) {
+            // Do nothing
+        }
+
+        return isDocumentViewable;
     }
 
     /**

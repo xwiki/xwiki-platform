@@ -161,6 +161,12 @@ public interface DocumentAccessBridge
     String getAttachmentURL(String documentName, String attachmentName) throws Exception;
 
     /**
+     * @param documentName the name of the document to access.
+     * @return true if current user can view provided document.
+     */
+    boolean isDocumentViewable(String documentName);
+
+    /**
      * @return true if the current document's author has programming rights.
      */
     boolean hasProgrammingRights();

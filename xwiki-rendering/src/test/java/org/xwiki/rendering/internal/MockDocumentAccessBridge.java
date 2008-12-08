@@ -57,7 +57,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         return "Some translated content";
     }
-    
+
     public String getDocumentContentForDefaultLanguage(String documentName) throws Exception
     {
         return "Some content";
@@ -115,6 +115,11 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
         throw new RuntimeException("Not implemented");
+    }
+
+    public boolean isDocumentViewable(String documentName)
+    {
+        return true;
     }
 
     public boolean hasProgrammingRights()

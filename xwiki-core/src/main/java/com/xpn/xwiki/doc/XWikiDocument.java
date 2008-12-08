@@ -73,10 +73,10 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRendererType;
-import org.xwiki.rendering.renderer.WikiPrinter;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.XWiki;

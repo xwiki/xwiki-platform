@@ -53,6 +53,7 @@ public class IncludeMacroTest extends AbstractScriptRenderingTestCase
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.ROLE, "include");
         Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
+        mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
         macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
 
@@ -85,6 +86,7 @@ public class IncludeMacroTest extends AbstractScriptRenderingTestCase
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include");
         Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
+        mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(
             returnValue("{{velocity}}$myvar{{/velocity}}"));
         macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());

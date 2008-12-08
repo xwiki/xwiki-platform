@@ -47,6 +47,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.ROLE, "include");
         Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
+        mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
         macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
 

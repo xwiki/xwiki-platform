@@ -58,6 +58,13 @@
 }
 
 /* XWIKI-2915: WYSIWYG editor crashes on key press in IE6 */
+html>body .xToolbar .gwt-PushButton-up-disabled,
+html>body .xToolbar .gwt-PushButton-down-disabled,
+html>body .xToolbar .gwt-ToggleButton-up-disabled,
+html>body .xToolbar .gwt-ToggleButton-down-disabled {
+  filter:alpha(opacity=40);
+  zoom:1;
+}
 * html .xToolbar .gwt-PushButton-up-disabled,
 * html .xToolbar .gwt-PushButton-down-disabled,
 * html .xToolbar .gwt-ToggleButton-up-disabled,

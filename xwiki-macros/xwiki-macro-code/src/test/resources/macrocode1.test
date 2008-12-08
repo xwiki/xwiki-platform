@@ -1,6 +1,7 @@
 .#-----------------------------------------------------
-.input|xwiki/2.0
+.input|xwiki/2.0|skip
 .# Validate that the code macro is able to find the right language for provided content and highlight it.
+.# SKIP: Since Jython 2.5 is too slow to run most of Pygments lexers in good conditions, this feature is disabled.
 .#-----------------------------------------------------
 {{code}}
 <b>bold</b>

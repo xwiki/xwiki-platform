@@ -127,7 +127,9 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
             }
         }
 
-        getLogger().debug("Trying the default highlighting parser");
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug("Trying the default highlighting parser");
+        }
 
         parser = (HighlightParser) getComponentManager().lookup(HighlightParser.ROLE, "default");
 

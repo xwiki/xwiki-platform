@@ -1,6 +1,7 @@
 .#-----------------------------------------------------
-.input|xwiki/2.0
+.input|xwiki/2.0|skip
 .# Testing real bigger and more complex code snippet
+.# SKIP: Since Jython 2.5 is too slow to run Pygments javascript lexers in good conditions, this feature is disabled.
 .#-----------------------------------------------------
 {{code language=javascript}}
 // getJSON function by Juriy Zaytsev 

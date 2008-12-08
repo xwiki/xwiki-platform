@@ -63,6 +63,7 @@
     </dependency>
   </dependencies>
   <modules>
+    <module>xwiki-macro-id</module>
     <module>xwiki-macro-script</module>
     <module>xwiki-macro-velocity</module>
     <module>xwiki-macro-groovy</module>

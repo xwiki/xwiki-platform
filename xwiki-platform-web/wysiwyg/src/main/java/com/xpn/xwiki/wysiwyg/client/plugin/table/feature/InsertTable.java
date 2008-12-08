@@ -223,7 +223,6 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
             getPlugin().getTextArea().getCommandManager().execute(getCommand(),
                 "{ rows:" + getDialog().getRowNumber()
                 + ", cols: " + getDialog().getColNumber()
-                + ", borderSize: " + getDialog().getBorderSize()
                 + ", header: " + getDialog().hasHeader()
                 + " }");
         } else {

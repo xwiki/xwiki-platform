@@ -27,7 +27,7 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
-import org.xwiki.rendering.renderer.XHTMLWikiPrinter;
+import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
  * Renders a XWiki Link into XHTML.

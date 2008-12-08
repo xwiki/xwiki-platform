@@ -194,11 +194,6 @@ public class WikiModelGeneratorListener implements Listener
         // TODO: Find what to do... For now don't render XML elements
     }
 
-    public void onEscape(String escapedString)
-    {
-        this.wikimodelListener.onEscape(escapedString);
-    }
-
     public void onLineBreak()
     {
         this.wikimodelListener.onLineBreak();

@@ -31,9 +31,9 @@ import junit.framework.TestSuite;
 import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
-import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererType;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
  * @version $Id: $

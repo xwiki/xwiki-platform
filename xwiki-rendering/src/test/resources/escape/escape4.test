@@ -1,41 +1,62 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
 .# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
-.# Specifically verify that the XHTML parser correctly escapes the ":" before the italic block since otherwise
-.# the generated text will be considered as a URL in xwiki wiki syntax.
-.# Also verifies that some text in XHTML that look like a URL is correctly escaped.
+.# Perform checks on URI and URLs.
 .#---------------------------------------------------------------------------------------------------------
 something~://whatever//
 hello:~/~/world
+image~:something
+attach~:something
+mailto~:something
+dummy:something
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
 onWord [something]
-onEscape [:]
+onSpecialSymbol [:]
 beginFormat: [ITALIC]
 onWord [whatever]
 endFormat: [ITALIC]
 onLineBreak
 onWord [hello]
 onSpecialSymbol [:]
-onEscape [/]
-onEscape [/]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
 onWord [world]
+onLineBreak
+onWord [image]
+onSpecialSymbol [:]
+onWord [something]
+onLineBreak
+onWord [attach]
+onSpecialSymbol [:]
+onWord [something]
+onLineBreak
+onWord [mailto]
+onSpecialSymbol [:]
+onWord [something]
+onLineBreak
+onWord [dummy]
+onSpecialSymbol [:]
+onWord [something]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>something:<em>whatever</em><br/>hello://world</p>
+<p>something:<em>whatever</em><br/>hello://world<br/>image:something<br/>attach:something<br/>mailto:something<br/>dummy:something</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 something~://whatever//
 hello:~/~/world
+image~:something
+attach~:something
+mailto~:something
+dummy:something
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
-.# TODO: See http://jira.xwiki.org/jira/browse/XWIKI-2851
+.input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>something:<em>whatever</em><br/>hello://world</p></html>
+<html><p>something:<em>whatever</em><br/>hello://world<br/>image:something<br/>attach:something<br/>mailto:something<br/>dummy:something</p></html>

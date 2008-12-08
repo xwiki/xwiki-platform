@@ -17,22 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.renderer.printer;
 
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.renderer.PrintRenderer;
 
 /**
- * Make it easy to create {@link PrintRenderer}. The main reason is because Print renderers cannot be components
- * since they have some state (the {@link WikiPrinter}). Thus all dependent components required to construct
- * a Print renderer have to be passed manually to its constructor. Since the implementation of this interface is a
- * component it's automatically injected all components required to construct the Print renderers.
+ * Printer for {@link PrintRenderer}s.
  *
- * @version $Id: $
- * @since 1.6M2
+ * @version $Id: $ 
+ * @since 1.6M1
  */
-public interface PrintRendererFactory
+public interface WikiPrinter
 {
-    String ROLE = PrintRendererFactory.class.getName();
-    
-    PrintRenderer createRenderer(PrintRendererType type, WikiPrinter printer);
+    void print(String text);
+
+    void println(String text);
 }

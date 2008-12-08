@@ -35,6 +35,10 @@ import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.MonitoringWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
@@ -75,35 +79,6 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     private WikiPrinter sectionTitlePrinter;
     
-    private class DelegateWikiPrinter implements WikiPrinter
-    {
-        private WikiPrinter printer;
-
-        private boolean hasContentBeenPrinted;
-
-        public DelegateWikiPrinter(WikiPrinter printer)
-        {
-            this.printer = printer;
-        }
-
-        public void print(String text)
-        {
-            this.hasContentBeenPrinted = true;
-            this.printer.print(text);
-        }
-
-        public void println(String text)
-        {
-            this.hasContentBeenPrinted = true;
-            this.printer.println(text);
-        }
-
-        public boolean hasContentBeenPrinted()
-        {
-            return this.hasContentBeenPrinted;
-        }
-    }
-
     /**
      * @param printer the object to which to write the XHTML output to
      * @param documentAccessBridge see {@link #documentAccessBridge}
@@ -125,7 +100,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractPrintRenderer#pushPrinter(org.xwiki.rendering.renderer.WikiPrinter)
+     * @see org.xwiki.rendering.renderer.AbstractPrintRenderer#pushPrinter(org.xwiki.rendering.renderer.printer.WikiPrinter)
      */
     @Override
     protected void pushPrinter(WikiPrinter wikiPrinter)
@@ -297,7 +272,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.linkRenderer.beginRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, parameters);
-        pushPrinter(new DelegateWikiPrinter(getPrinter()));
+        pushPrinter(new MonitoringWikiPrinter(getPrinter()));
     }
 
     /**
@@ -307,9 +282,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        DelegateWikiPrinter printer = (DelegateWikiPrinter) getPrinter();
+        MonitoringWikiPrinter printer = (MonitoringWikiPrinter) getPrinter();
         popPrinter();
-        this.linkRenderer.endRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, !printer.hasContentBeenPrinted);
+        this.linkRenderer.endRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, !printer.hasContentBeenPrinted());
     }
 
     /**
@@ -375,7 +350,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         String sectionTitle = this.sectionTitlePrinter.toString();
         popPrinter();
         processBeginSection(level, sectionTitle, parameters);
-        print(sectionTitle);
+        getPrinter().print(sectionTitle);
 
         int levelAsInt = level.getAsInt();
         getXHTMLWikiPrinter().printXMLEndElement("span");
@@ -411,16 +386,6 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void onSpecialSymbol(char symbol)
     {
         getXHTMLWikiPrinter().printXML("" + symbol);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.Renderer#onEscape(String)
-     */
-    public void onEscape(String escapedString)
-    {
-        getXHTMLWikiPrinter().printXML(escapedString);
     }
 
     /**

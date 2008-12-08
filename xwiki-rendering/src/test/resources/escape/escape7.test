@@ -1,0 +1,43 @@
+.#---------------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
+.# Perform checks for link escapes.
+.#---------------------------------------------------------------------------------------------------------
+~[~[nolink]]
+[[[[>>reference]]
+~[~[whatever
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onSpecialSymbol [[]
+onSpecialSymbol [[]
+onWord [nolink]
+onSpecialSymbol []]
+onSpecialSymbol []]
+onLineBreak
+beginLink [Reference = [reference]] [false]
+onSpecialSymbol [[]
+onSpecialSymbol [[]
+endLink [Reference = [reference]] [false]
+onLineBreak
+onSpecialSymbol [[]
+onSpecialSymbol [[]
+onWord [whatever]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>[[nolink]]<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference">[[</a></span><!--stopwikilink--><br/>[[whatever</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+~[~[nolink]]
+[[[[>>reference]]
+~[~[whatever
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>[[nolink]]<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference">[[</a></span><!--stopwikilink--><br/>[[whatever</p></html>

@@ -1,37 +1,48 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
+.# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
+.# Perform checks for escapes in lists. 
 .#---------------------------------------------------------------------------------------------------------
-single ~~ tilde
-not newline ~\~\
+~* notlist
+~11*. notlist
+.# Ensure that we don't escape the "*" below since it's not at the beginning of a line and thus cannot be
+.# confused for a list item.
+//something// * notlist
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onWord [single]
+onSpecialSymbol [*]
 onSpace
-onSpecialSymbol [~]
-onSpace
-onWord [tilde]
+onWord [notlist]
 onLineBreak
-onWord [not]
+onWord [11]
+onSpecialSymbol [*]
+onSpecialSymbol [.]
 onSpace
-onWord [newline]
+onWord [notlist]
+onLineBreak
+beginFormat: [ITALIC]
+onWord [something]
+endFormat: [ITALIC]
 onSpace
-onSpecialSymbol [\]
-onSpecialSymbol [\]
+onSpecialSymbol [*]
+onSpace
+onWord [notlist]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>single ~ tilde<br/>not newline \\</p>
+<p>* notlist<br/>11*. notlist<br/><em>something</em> * notlist</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-single ~~ tilde
-not newline ~\~\
+~* notlist
+~11*. notlist
+//something// * notlist
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>single ~ tilde<br/>not newline \\</p></html>
+<html><p>* notlist<br/>11*. notlist<br/><em>something</em> * notlist</p></html>

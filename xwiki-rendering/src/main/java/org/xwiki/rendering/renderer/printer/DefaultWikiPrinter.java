@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.renderer.printer;
 
 /**
  * Printer using a {@link StringBuffer} as the underlying output target.
@@ -45,6 +45,8 @@ public class DefaultWikiPrinter implements WikiPrinter
     }
 
     /**
+     * This method is protected to allow classes extending this one to override what a new line is.
+     * 
      * @return a new line symbols
      */
     protected String getEOL()

@@ -1,0 +1,29 @@
+.#---------------------------------------------------------------------------------------------------------
+.input|xhtml/1.0
+.# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
+.# Perform check for ensuring a "{" before a macro is escaped in order to prevent confusing it for a
+.# verbatim block.
+.#---------------------------------------------------------------------------------------------------------
+<html><p>{<!--startmacro:macro|-||-|--><!--stopmacro-->}</p></html>
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onSpecialSymbol [{]
+onMacroInline [macro] [] []
+onSpecialSymbol [}]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>{<!--startmacro:macro|-||-|--><!--stopmacro-->}</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+~{{{macro/}}}
+.#---------------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.#---------------------------------------------------------------------------------------------------------
+~{{{macro/}}}

@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.renderer.xhtml;
 import java.util.Map;
 
 import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
-import org.xwiki.rendering.renderer.XHTMLWikiPrinter;
+import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
  * Renders a XWiki Macro into XHTML.

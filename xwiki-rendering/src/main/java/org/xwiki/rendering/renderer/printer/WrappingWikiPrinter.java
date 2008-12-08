@@ -17,44 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.renderer.printer;
 
 /**
- * A WikiPrinter implementation which does not do anything.
- * 
+ * Wraps a wiki printer.
+ *  
  * @version $Id$
+ * @since 1.7
  */
-public class VoidWikiPrinter implements WikiPrinter
+public class WrappingWikiPrinter implements WikiPrinter
 {
-    /**
-     * Unique instance of {@link VoidWikiPrinter}.
-     */
-    public static final VoidWikiPrinter VOIDWIKIPRINTER = new VoidWikiPrinter();
+    private WikiPrinter printer;
 
-    /**
-     * Use {@link #VOIDWIKIPRINTER}.
-     */
-    private VoidWikiPrinter()
+    public WrappingWikiPrinter(WikiPrinter printer)
     {
+        this.printer = printer;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.WikiPrinter#print(java.lang.String)
-     */
     public void print(String text)
     {
-        // Don't do anything
+        getWrappedPrinter().print(text);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.WikiPrinter#println(java.lang.String)
-     */
     public void println(String text)
     {
-        // Don't do anything
+        getWrappedPrinter().println(text);
+    }
+
+    public WikiPrinter getWrappedPrinter()
+    {
+        return this.printer;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return getWrappedPrinter().toString();
     }
 }

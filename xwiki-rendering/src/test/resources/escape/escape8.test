@@ -1,37 +1,36 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
+.# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
+.# Perform checks for macro escapes.
 .#---------------------------------------------------------------------------------------------------------
-single ~~ tilde
-not newline ~\~\
+~{~{nomacro}}
+~{~{whatever
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onWord [single]
-onSpace
-onSpecialSymbol [~]
-onSpace
-onWord [tilde]
+onSpecialSymbol [{]
+onSpecialSymbol [{]
+onWord [nomacro]
+onSpecialSymbol [}]
+onSpecialSymbol [}]
 onLineBreak
-onWord [not]
-onSpace
-onWord [newline]
-onSpace
-onSpecialSymbol [\]
-onSpecialSymbol [\]
+onSpecialSymbol [{]
+onSpecialSymbol [{]
+onWord [whatever]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>single ~ tilde<br/>not newline \\</p>
+<p>{{nomacro}}<br/>{{whatever</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-single ~~ tilde
-not newline ~\~\
+~{~{nomacro}}
+~{~{whatever
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>single ~ tilde<br/>not newline \\</p></html>
+<html><p>{{nomacro}}<br/>{{whatever</p></html>

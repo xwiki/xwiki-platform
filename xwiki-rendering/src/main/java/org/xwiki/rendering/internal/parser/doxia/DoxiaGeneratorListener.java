@@ -211,13 +211,6 @@ public class DoxiaGeneratorListener implements Listener
         // TODO: Find out what to do...
     }
 
-    public void onEscape(String escapedString)
-    {
-        // Note: Doxia doesn't differentiate between escape and verbatim.
-        // TODO: Add a jira issue for Doxia to differentiate between both
-        onVerbatimInline(escapedString);
-    }
-
     public void onLineBreak()
     {
         this.sink.lineBreak();

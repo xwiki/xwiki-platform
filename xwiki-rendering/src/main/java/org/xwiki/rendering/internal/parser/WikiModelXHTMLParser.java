@@ -31,7 +31,6 @@ import org.wikimodel.wem.xhtml.filter.AccumulationXMLFilter;
 import org.wikimodel.wem.xhtml.filter.DTDXMLFilter;
 import org.wikimodel.wem.xhtml.filter.XHTMLWhitespaceXMLFilter;
 import org.wikimodel.wem.xhtml.handler.TagHandler;
-import org.wikimodel.wem.xwiki.XWikiXhtmlEscapeHandler;
 import org.xml.sax.XMLReader;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Syntax;
@@ -91,7 +90,6 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     	
     	XhtmlParser parser = new XhtmlParser();
     	parser.setExtraHandlers(handlers);
-    	parser.setEscapeHandler(new XWikiXhtmlEscapeHandler());
     	parser.setCommentHandler(new XWikiCommentHandler(this, this.linkParser, this.imageParser, this.printRendererFactory));
     	
     	// Construct our own XML filter chain since we want to use our own Comment filter.

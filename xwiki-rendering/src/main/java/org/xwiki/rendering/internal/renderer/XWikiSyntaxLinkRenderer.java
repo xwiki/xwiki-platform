@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.renderer.WikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
  * Logic to render a XWiki Link into XWiki syntax.

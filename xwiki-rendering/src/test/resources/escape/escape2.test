@@ -1,156 +1,88 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
 .# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
-.# Also verify that special XML symbols (<, >, ", &) are correctly handled. Note that apostrophe (&apos;)
-.# is not a legal entity and thus isn't escaped.
+.# Perform checks for formatting elements.
 .#---------------------------------------------------------------------------------------------------------
 ~*~*notbold~*~*
-<notag>"&'
-~[~[nolink]]
-~{~{nomacro}}
 ~#~#nomono~#~#
 ~/~/noitalic~/~/
 ~-~-notrike~-~-
 ~_~_nounderscore~_~_
 ~^~^nosuper~^~^
 ~,~,nosub~,~,
-~* notlist
-~1~1~*~. notlist
-~=~= notheader
-[[[[>>reference]]
-[[whatever
-{{ whatever /}}
-{{whatever
+~{~{~{notverbatim}}}
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onEscape [*]
-onEscape [*]
+onSpecialSymbol [*]
+onSpecialSymbol [*]
 onWord [notbold]
-onEscape [*]
-onEscape [*]
+onSpecialSymbol [*]
+onSpecialSymbol [*]
 onLineBreak
-onSpecialSymbol [<]
-onWord [notag]
-onSpecialSymbol [>]
-onSpecialSymbol ["]
-onSpecialSymbol [&]
-onSpecialSymbol [']
-onLineBreak
-onEscape [[]
-onEscape [[]
-onWord [nolink]
-onSpecialSymbol []]
-onSpecialSymbol []]
-onLineBreak
-onEscape [{]
-onEscape [{]
-onWord [nomacro]
-onSpecialSymbol [}]
-onSpecialSymbol [}]
-onLineBreak
-onEscape [#]
-onEscape [#]
+onSpecialSymbol [#]
+onSpecialSymbol [#]
 onWord [nomono]
-onEscape [#]
-onEscape [#]
+onSpecialSymbol [#]
+onSpecialSymbol [#]
 onLineBreak
-onEscape [/]
-onEscape [/]
-onWord [noitalic]
-onEscape [/]
-onEscape [/]
-onLineBreak
-onEscape [-]
-onEscape [-]
-onWord [notrike]
-onEscape [-]
-onEscape [-]
-onLineBreak
-onEscape [_]
-onEscape [_]
-onWord [nounderscore]
-onEscape [_]
-onEscape [_]
-onLineBreak
-onEscape [^]
-onEscape [^]
-onWord [nosuper]
-onEscape [^]
-onEscape [^]
-onLineBreak
-onEscape [,]
-onEscape [,]
-onWord [nosub]
-onEscape [,]
-onEscape [,]
-onLineBreak
-onEscape [*]
-onSpace
-onWord [notlist]
-onLineBreak
-onEscape [1]
-onEscape [1]
-onEscape [*]
-onEscape [.]
-onSpace
-onWord [notlist]
-onLineBreak
-onEscape [=]
-onEscape [=]
-onSpace
-onWord [notheader]
-onLineBreak
-beginLink [Reference = [reference]] [false]
-onSpecialSymbol [[]
-onSpecialSymbol [[]
-endLink [Reference = [reference]] [false]
-onLineBreak
-onSpecialSymbol [[]
-onSpecialSymbol [[]
-onWord [whatever]
-onLineBreak
-onSpecialSymbol [{]
-onSpecialSymbol [{]
-onSpace
-onWord [whatever]
-onSpace
 onSpecialSymbol [/]
-onSpecialSymbol [}]
-onSpecialSymbol [}]
+onSpecialSymbol [/]
+onWord [noitalic]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
+onLineBreak
+onSpecialSymbol [-]
+onSpecialSymbol [-]
+onWord [notrike]
+onSpecialSymbol [-]
+onSpecialSymbol [-]
+onLineBreak
+onSpecialSymbol [_]
+onSpecialSymbol [_]
+onWord [nounderscore]
+onSpecialSymbol [_]
+onSpecialSymbol [_]
+onLineBreak
+onSpecialSymbol [^]
+onSpecialSymbol [^]
+onWord [nosuper]
+onSpecialSymbol [^]
+onSpecialSymbol [^]
+onLineBreak
+onSpecialSymbol [,]
+onSpecialSymbol [,]
+onWord [nosub]
+onSpecialSymbol [,]
+onSpecialSymbol [,]
 onLineBreak
 onSpecialSymbol [{]
 onSpecialSymbol [{]
-onWord [whatever]
+onSpecialSymbol [{]
+onWord [notverbatim]
+onSpecialSymbol [}]
+onSpecialSymbol [}]
+onSpecialSymbol [}]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>**notbold**<br/>&lt;notag&gt;"&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference">[[</a></span><!--stopwikilink--><br/>[[whatever<br/>{{ whatever /}}<br/>{{whatever</p>
+<p>**notbold**<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>{{{notverbatim}}}</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
 ~*~*notbold~*~*
-<notag>"&'
-~[~[nolink]]
-~{~{nomacro}}
 ~#~#nomono~#~#
 ~/~/noitalic~/~/
 ~-~-notrike~-~-
 ~_~_nounderscore~_~_
 ~^~^nosuper~^~^
 ~,~,nosub~,~,
-~* notlist
-~1~1~*~. notlist
-~=~= notheader
-[[[[>>reference]]
-[[whatever
-{{ whatever /}}
-{{whatever
+~{~{~{notverbatim}}}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>**notbold**<br/>&lt;notag&gt;"&amp;'<br/>[[nolink]]<br/>{{nomacro}}<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>* notlist<br/>11*. notlist<br/>== notheader<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference">[[</a></span><!--stopwikilink--><br/>[[whatever<br/>{{ whatever /}}<br/>{{whatever</p></html>
+<html><p>**notbold**<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>{{{notverbatim}}}</p></html>

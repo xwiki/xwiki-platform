@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.parser.wikimodel;
 
 import org.wikimodel.wem.IWikiPrinter;
-import org.xwiki.rendering.renderer.WikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
  * Bridge so that WikiModel listeners can be used and so that they output their results to a XWiki {@link WikiPrinter}

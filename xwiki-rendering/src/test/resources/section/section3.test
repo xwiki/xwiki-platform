@@ -83,7 +83,7 @@ onWord [header]
 endSection [1]
 beginSection [1]
 onWord [key]
-onEscape [=]
+onSpecialSymbol [=]
 onWord [value]
 endSection [1]
 endDocument

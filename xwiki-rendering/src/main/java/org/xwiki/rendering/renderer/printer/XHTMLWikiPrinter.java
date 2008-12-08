@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.renderer.printer;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -32,6 +32,8 @@ import org.dom4j.tree.DefaultEntity;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.xwiki.rendering.internal.renderer.printer.WikiWriter;
+import org.xwiki.rendering.internal.renderer.printer.XHTMLWriter;
 
 /**
  * Base toolkit class for all XHTML-based renderers. This printer handles whitespaces so that it prints "&nbsp;"

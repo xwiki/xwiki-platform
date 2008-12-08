@@ -1,37 +1,38 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
+.# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
+.# Perform checks for escapes in sections. 
 .#---------------------------------------------------------------------------------------------------------
-single ~~ tilde
-not newline ~\~\
+= inheader ~= =
+
+~== notheader
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
+beginSection [1]
+onWord [inheader]
+onSpace
+onSpecialSymbol [=]
+endSection [1]
 beginParagraph
-onWord [single]
+onSpecialSymbol [=]
+onSpecialSymbol [=]
 onSpace
-onSpecialSymbol [~]
-onSpace
-onWord [tilde]
-onLineBreak
-onWord [not]
-onSpace
-onWord [newline]
-onSpace
-onSpecialSymbol [\]
-onSpecialSymbol [\]
+onWord [notheader]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>single ~ tilde<br/>not newline \\</p>
+<h1 id="Hinheader"><span>inheader =</span></h1><p>== notheader</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-single ~~ tilde
-not newline ~\~\
+= inheader ~= =
+
+~== notheader
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>single ~ tilde<br/>not newline \\</p></html>
+<html><h1 id="Hinheader"><span>inheader =</span></h1><p>== notheader</p></html>

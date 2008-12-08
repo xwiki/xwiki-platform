@@ -23,10 +23,10 @@ import org.xwiki.rendering.renderer.XHTMLRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererType;
-import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.renderer.TexRenderer;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.bridge.DocumentAccessBridge;
 

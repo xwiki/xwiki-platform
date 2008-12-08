@@ -118,11 +118,6 @@ public class ListenerDelegate implements Listener
         this.listener.endXMLNode(node);
     }
 
-    public void onEscape(String escapedString)
-    {
-        this.listener.onEscape(escapedString);
-    }
-
     public void onLineBreak()
     {
         this.listener.onLineBreak();

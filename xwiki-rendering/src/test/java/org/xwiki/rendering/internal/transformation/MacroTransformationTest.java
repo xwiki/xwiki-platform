@@ -30,8 +30,8 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroStandaloneBlock;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.renderer.WikiPrinter;
-import org.xwiki.rendering.renderer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 public class MacroTransformationTest extends AbstractRenderingTestCase
 {

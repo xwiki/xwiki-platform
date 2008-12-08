@@ -17,22 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.renderer.printer;
 
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
- * Make it easy to create {@link PrintRenderer}. The main reason is because Print renderers cannot be components
- * since they have some state (the {@link WikiPrinter}). Thus all dependent components required to construct
- * a Print renderer have to be passed manually to its constructor. Since the implementation of this interface is a
- * component it's automatically injected all components required to construct the Print renderers.
- *
- * @version $Id: $
- * @since 1.6M2
+ * A WikiPrinter implementation which does not do anything.
+ * 
+ * @version $Id$
  */
-public interface PrintRendererFactory
+public class VoidWikiPrinter implements WikiPrinter
 {
-    String ROLE = PrintRendererFactory.class.getName();
-    
-    PrintRenderer createRenderer(PrintRendererType type, WikiPrinter printer);
+    /**
+     * Unique instance of {@link VoidWikiPrinter}.
+     */
+    public static final VoidWikiPrinter VOIDWIKIPRINTER = new VoidWikiPrinter();
+
+    /**
+     * Use {@link #VOIDWIKIPRINTER}.
+     */
+    private VoidWikiPrinter()
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.WikiPrinter#print(java.lang.String)
+     */
+    public void print(String text)
+    {
+        // Don't do anything
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.WikiPrinter#println(java.lang.String)
+     */
+    public void println(String text)
+    {
+        // Don't do anything
+    }
 }

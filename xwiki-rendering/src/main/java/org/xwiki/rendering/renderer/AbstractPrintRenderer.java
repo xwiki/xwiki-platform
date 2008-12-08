@@ -21,7 +21,7 @@ package org.xwiki.rendering.renderer;
 
 import java.util.Stack;
 
-import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
  * Common methods for all {@link org.xwiki.rendering.renderer.PrintRenderer} implementations.
@@ -29,23 +29,13 @@ import org.xwiki.component.logging.AbstractLogEnabled;
  * @version $Id$
  * @since 1.6M2
  */
-public abstract class AbstractPrintRenderer extends AbstractLogEnabled implements PrintRenderer
+public abstract class AbstractPrintRenderer extends AbstractRenderer implements PrintRenderer
 {
     private Stack<WikiPrinter> printers = new Stack<WikiPrinter>();
 
     public AbstractPrintRenderer(WikiPrinter printer)
     {
         this.pushPrinter(printer);
-    }
-
-    protected void print(String text)
-    {
-        getPrinter().print(text);
-    }
-
-    protected void println(String text)
-    {
-        getPrinter().println(text);
     }
 
     /**
@@ -74,25 +64,5 @@ public abstract class AbstractPrintRenderer extends AbstractLogEnabled implement
     protected void popPrinter()
     {
         this.printers.pop();
-    }
-
-    /**
-     * Switch current writer with a writer which do nothing.
-     */
-    protected void pushVoidPrinter()
-    {
-        if (getPrinter() != VoidWikiPrinter.VOIDWIKIPRINTER) {
-            pushPrinter(VoidWikiPrinter.VOIDWIKIPRINTER);
-        }
-    }
-
-    /**
-     * Restore current printer.
-     */
-    protected void popVoidPrinter()
-    {
-        if (getPrinter() == VoidWikiPrinter.VOIDWIKIPRINTER) {
-            popPrinter();
-        }
     }
 }

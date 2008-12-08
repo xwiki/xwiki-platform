@@ -33,10 +33,10 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRendererType;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
  * Handle Link and Macro definitions in comments (we store links in a comment since otherwise there are situations

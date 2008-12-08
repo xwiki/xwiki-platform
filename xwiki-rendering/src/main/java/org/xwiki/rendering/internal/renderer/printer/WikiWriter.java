@@ -17,10 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.internal.renderer.printer;
 
 import java.io.IOException;
 import java.io.Writer;
+
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
  * Bridge so that {@link WikiPrinter} can be used in a tools supporting {@link Writer} api.

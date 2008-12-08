@@ -1,4 +1,4 @@
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.internal.renderer.printer;
 
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;

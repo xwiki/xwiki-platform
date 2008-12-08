@@ -348,7 +348,9 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void onEscape(String str)
     {
-        this.stack.push(new EscapeBlock(str));
+        // The WikiModel XWiki parser has been modified not to generate any onEscape event so do nothing here. 
+        // This is because we believe that WikiModel should not have an escape event since it's the 
+        // responsibility of Renderers to perform escaping as required. 
     }
 
     public void onExtensionBlock(String extensionName, WikiParameters params)

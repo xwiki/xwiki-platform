@@ -21,11 +21,13 @@ package com.xpn.xwiki.doc;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
@@ -241,5 +243,48 @@ public class XWikiDocumentTest extends MockObjectTestCase
         BaseObject object = BaseClass.newCustomClassInstance("XWiki.XWikiUsers", this.context);
         doc.addObject("XWiki.XWikiUsers", object);
         assertEquals("XWikiDocument.addObject does not set the object's name", doc.getFullName(), object.getName());
+    }
+
+    public void testObjectNumbersAfterXMLRoundrip() throws XWikiException
+    {
+        String classname = XWikiConstant.TAG_CLASS;
+        BaseClass tagClass = new BaseClass();
+        tagClass.setName(classname);
+        tagClass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, "", "checkbox");
+
+        XWikiDocument doc = new XWikiDocument("test", "document");
+        this.mockXWiki.stubs().method("getClass").will(returnValue(tagClass));
+        this.mockXWiki.stubs().method("getEncoding").will(returnValue("iso-8859-1"));
+
+        BaseObject object = BaseClass.newCustomClassInstance(classname, this.context);
+        doc.addObject(classname, object);
+
+        object = BaseClass.newCustomClassInstance(classname, this.context);
+        doc.addObject(classname, object);
+
+        object = BaseClass.newCustomClassInstance(classname, this.context);
+        doc.addObject(classname, object);
+
+        doc.getObjects(classname).set(1, null);
+
+        String docXML = doc.toXML(this.context);
+        XWikiDocument docFromXML = new XWikiDocument();
+        docFromXML.fromXML(docXML);
+
+        Vector<BaseObject> objects = doc.getObjects(classname);
+        Vector<BaseObject> objectsFromXML = docFromXML.getObjects(classname);
+
+        assertNotNull(objects);
+        assertNotNull(objectsFromXML);
+
+        assertTrue(objects.size() == objectsFromXML.size());
+
+        for (int i = 0; i < objects.size(); i++) {
+            if (objects.get(i) == null) {
+                assertNull(objectsFromXML.get(i));
+            } else {
+                assertTrue(objects.get(i).getNumber() == objectsFromXML.get(i).getNumber());
+            }
+        }
     }
 }

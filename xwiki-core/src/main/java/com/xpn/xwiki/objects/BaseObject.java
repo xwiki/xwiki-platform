@@ -206,6 +206,10 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         }
 
         setName(oel.element("name").getText());
+        String number = oel.element("number").getText();
+        if (number != null) {
+            setNumber(Integer.parseInt(number));
+        }
         List list = oel.elements("property");
         for (int i = 0; i < list.size(); i++) {
             Element pcel = (Element) ((Element) list.get(i)).elements().get(0);

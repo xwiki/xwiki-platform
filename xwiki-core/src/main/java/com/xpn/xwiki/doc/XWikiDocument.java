@@ -2660,7 +2660,7 @@ public class XWikiDocument implements DocumentModelBridge
             Element objel = (Element) objels.get(i);
             BaseObject bobject = new BaseObject();
             bobject.fromXML(objel);
-            addObject(bobject.getClassName(), bobject);
+            setObject(bobject.getClassName(), bobject.getNumber(), bobject);
         }
 
         // We have been reading from XML so the document does not need a new version when saved

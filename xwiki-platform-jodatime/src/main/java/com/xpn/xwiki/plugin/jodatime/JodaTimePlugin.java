@@ -20,8 +20,13 @@
 
 package com.xpn.xwiki.plugin.jodatime;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.Locale;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.MutableDateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -29,9 +34,9 @@ import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
- * Plugin for manipulating dates from velocity scripts inside xwiki documents. It is based on the
- * <a href="http://joda-time.sourceforge.net/">JodaTime framework</a>, a quality replacement for the
- * Java date and time classes.
+ * Plugin for manipulating dates from velocity scripts inside xwiki documents. It is based on the <a
+ * href="http://joda-time.sourceforge.net/">JodaTime framework</a>, a quality replacement for the Java date and time
+ * classes.
  * 
  * @see JodaTimePluginApi
  */
@@ -39,7 +44,7 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
 {
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public JodaTimePlugin(String name, String className, XWikiContext context)
@@ -50,9 +55,10 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
      */
+    @Override
     public String getName()
     {
         return "jodatime";
@@ -60,9 +66,10 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
      */
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new JodaTimePluginApi((JodaTimePlugin) plugin, context);
@@ -71,8 +78,100 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      */
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);
+    }
+
+    /**
+     * @see org.joda.time.DateTime#DateTime()
+     */
+    public DateTime getDateTime()
+    {
+        return new DateTime();
+    }
+
+    /**
+     * @see org.joda.time.DateTime#DateTime(int, int, int, int, int, int, int)
+     */
+    public DateTime getDateTime(int year, int monthOfYear, int dayOfMonth, int hourOfDay, int minuteOfHour,
+        int secondOfMinute, int millisOfSecond)
+    {
+        return new DateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+    }
+
+    /**
+     * @see org.joda.time.DateTime#DateTime(long)
+     */
+    public DateTime getDateTime(long instant)
+    {
+        return new DateTime(instant);
+    }
+
+    /**
+     * @see org.joda.time.MutableDateTime#MutableDateTime()
+     */
+    public MutableDateTime getMutableDateTime()
+    {
+        return new MutableDateTime();
+    }
+
+    /**
+     * @see org.joda.time.MutableDateTime#MutableDateTime(int, int, int, int, int, int, int)
+     */
+    public MutableDateTime getMutableDateTime(int year, int monthOfYear, int dayOfMonth, int hourOfDay,
+        int minuteOfHour, int secondOfMinute, int millisOfSecond)
+    {
+        return new MutableDateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, secondOfMinute,
+            millisOfSecond);
+    }
+
+    /**
+     * @see org.joda.time.MutableDateTime#MutableDateTime(long)
+     */
+    public MutableDateTime getMutableDateTime(long instant)
+    {
+        return new MutableDateTime(instant);
+    }
+
+    /**
+     * @see org.joda.time.format.DateTimeFormat#forPattern(String)
+     */
+    public DateTimeFormatter getDateTimeFormatterForPattern(String pattern, XWikiContext context)
+    {
+        return DateTimeFormat.forPattern(pattern).withLocale((Locale) context.get("locale"));
+    }
+
+    /**
+     * @see org.joda.time.format.DateTimeFormat#forStyle(String)
+     */
+    public DateTimeFormatter getDateTimeFormatterForStyle(String style, XWikiContext context)
+    {
+        return DateTimeFormat.forStyle(style).withLocale((Locale) context.get("locale"));
+    }
+
+    /**
+     * @see org.joda.time.DateTimeZone#forID(String)
+     */
+    public DateTimeZone getTimezone(String locationOrOffset)
+    {
+        return DateTimeZone.forID(locationOrOffset);
+    }
+
+    /**
+     * @see org.joda.time.DateTimeZone#forOffsetHours(int)
+     */
+    public DateTimeZone getTimezone(int offsetHours)
+    {
+        return DateTimeZone.forOffsetHours(offsetHours);
+    }
+
+    /**
+     * @see org.joda.time.DateTimeZone#forOffsetHoursMinutes(int, int)
+     */
+    public DateTimeZone getTimezone(int offsetHours, int offsetMinutes)
+    {
+        return DateTimeZone.forOffsetHoursMinutes(offsetHours, offsetMinutes);
     }
 }

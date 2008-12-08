@@ -20,128 +20,124 @@
 
 package com.xpn.xwiki.plugin.jodatime;
 
-import java.util.Locale;
-
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.MutableDateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.plugin.PluginApi;
 
 /**
  * Api for the JodaTimePlugin
  */
-public class JodaTimePluginApi extends Api
+public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
 {
-    /**
-     * the plugin instance
-     */
-    private JodaTimePlugin plugin;
-
     public JodaTimePluginApi(JodaTimePlugin plugin, XWikiContext context)
     {
-        super(context);
-        setPlugin(plugin);
-    }
-
-    /**
-     * @see #plugin
-     */
-    public JodaTimePlugin getPlugin()
-    {
-        if (hasProgrammingRights()) {
-            return plugin;
-        }
-        return null;
-    }
-
-    /**
-     * @see #plugin
-     */
-    public void setPlugin(JodaTimePlugin plugin)
-    {
-        this.plugin = plugin;
+        super(plugin, context);
     }
 
     /**
      * @see org.joda.time.DateTime#DateTime()
+     * @see JodaTimePlugin#getDateTime()
      */
     public DateTime getDateTime()
     {
-        return new DateTime();
+        return getInternalPlugin().getDateTime();
     }
 
     /**
      * @see org.joda.time.DateTime#DateTime(int, int, int, int, int, int, int)
+     * @see JodaTimePlugin#getDateTime(int, int, int, int, int, int, int)
      */
-    public DateTime getDateTime(int year, int monthOfYear, int dayOfMonth, int hourOfDay,
-        int minuteOfHour, int secondOfMinute, int millisOfSecond)
+    public DateTime getDateTime(int year, int monthOfYear, int dayOfMonth, int hourOfDay, int minuteOfHour,
+        int secondOfMinute, int millisOfSecond)
     {
-        return new DateTime(year,
-            monthOfYear,
-            dayOfMonth,
-            hourOfDay,
-            minuteOfHour,
-            secondOfMinute,
+        return getInternalPlugin().getDateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, secondOfMinute,
             millisOfSecond);
     }
 
     /**
      * @see org.joda.time.DateTime#DateTime(long)
+     * @see JodaTimePlugin#getDateTime(long)
      */
     public DateTime getDateTime(long instant)
     {
-        return new DateTime(instant);
+        return getInternalPlugin().getDateTime(instant);
     }
 
     /**
      * @see org.joda.time.MutableDateTime#MutableDateTime()
+     * @see JodaTimePlugin#getMutableDateTime()
      */
     public MutableDateTime getMutableDateTime()
     {
-        return new MutableDateTime();
+        return getInternalPlugin().getMutableDateTime();
     }
 
     /**
      * @see org.joda.time.MutableDateTime#MutableDateTime(int, int, int, int, int, int, int)
+     * @see JodaTimePlugin#getMutableDateTime(int, int, int, int, int, int, int)
      */
-    public MutableDateTime getMutableDateTime(int year, int monthOfYear, int dayOfMonth,
-        int hourOfDay, int minuteOfHour, int secondOfMinute, int millisOfSecond)
+    public MutableDateTime getMutableDateTime(int year, int monthOfYear, int dayOfMonth, int hourOfDay,
+        int minuteOfHour, int secondOfMinute, int millisOfSecond)
     {
-        return new MutableDateTime(year,
-            monthOfYear,
-            dayOfMonth,
-            hourOfDay,
-            minuteOfHour,
-            secondOfMinute,
-            millisOfSecond);
+        return getInternalPlugin().getMutableDateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour,
+            secondOfMinute, millisOfSecond);
     }
 
     /**
      * @see org.joda.time.MutableDateTime#MutableDateTime(long)
+     * @see JodaTimePlugin#getMutableDateTime(long)
      */
     public MutableDateTime getMutableDateTime(long instant)
     {
-        return new MutableDateTime(instant);
+        return getInternalPlugin().getMutableDateTime(instant);
     }
 
     /**
      * @see org.joda.time.format.DateTimeFormat#forPattern(String)
+     * @see JodaTimePlugin#getDateTimeFormatterForPattern(String, XWikiContext)
      */
     public DateTimeFormatter getDateTimeFormatterForPattern(String pattern)
     {
-        return DateTimeFormat.forPattern(pattern).withLocale(
-            (Locale) getXWikiContext().get("locale"));
+        return getInternalPlugin().getDateTimeFormatterForPattern(pattern, getXWikiContext());
     }
 
     /**
      * @see org.joda.time.format.DateTimeFormat#forStyle(String)
+     * @see JodaTimePlugin#getDateTimeFormatterForStyle(String, XWikiContext)
      */
     public DateTimeFormatter getDateTimeFormatterForStyle(String style)
     {
-        return DateTimeFormat.forStyle(style)
-            .withLocale((Locale) getXWikiContext().get("locale"));
+        return getInternalPlugin().getDateTimeFormatterForStyle(style, getXWikiContext());
+    }
+
+    /**
+     * @see org.joda.time.DateTimeZone#forID(String)
+     * @see JodaTimePlugin#getTimezone(String)
+     */
+    public DateTimeZone getTimezone(String locationOrOffset)
+    {
+        return getInternalPlugin().getTimezone(locationOrOffset);
+    }
+
+    /**
+     * @see org.joda.time.DateTimeZone#forOffsetHours(int)
+     * @see JodaTimePlugin#getTimezone(int)
+     */
+    public DateTimeZone getTimezone(int offsetHours)
+    {
+        return getInternalPlugin().getTimezone(offsetHours);
+    }
+
+    /**
+     * @see org.joda.time.DateTimeZone#forOffsetHoursMinutes(int, int)
+     * @see JodaTimePlugin#getTimezone(int, int)
+     */
+    public DateTimeZone getTimezone(int offsetHours, int offsetMinutes)
+    {
+        return getInternalPlugin().getTimezone(offsetHours, offsetMinutes);
     }
 }

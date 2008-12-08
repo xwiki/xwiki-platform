@@ -54,6 +54,17 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public String getDocumentContent(String documentName) throws Exception
     {
         XWikiContext xcontext = getContext();
+        return getDocumentContent(documentName, xcontext.getLanguage());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocumentContentForDefaultLanguage(java.lang.String)
+     */
+    public String getDocumentContentForDefaultLanguage(String documentName) throws Exception
+    {
+        XWikiContext xcontext = getContext();
         return xcontext.getWiki().getDocument(documentName, xcontext).getContent();
     }
 

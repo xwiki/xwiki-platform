@@ -43,13 +43,25 @@ public interface DocumentAccessBridge
     boolean exists(String documentName) throws Exception;
 
     /**
-     * Retrieves the textual content of the document.
+     * Retrieves the textual content of the document, in the current language.
      * 
      * @param documentName The name of the document to access.
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.
      */
     String getDocumentContent(String documentName) throws Exception;
+
+    /**
+     * Retrieves the textual content of the document, in the document's default language.
+     * <p>
+     * Note: you should always use {@link #getDocumentContent(String)} unless you really need specifically the
+     * document's content for default language of the document.
+     * 
+     * @param documentName The name of the document to access.
+     * @return The document's content.
+     * @throws Exception If the document cannot be accessed.
+     */
+    String getDocumentContentForDefaultLanguage(String documentName) throws Exception;
 
     /**
      * Retrieves the textual content of the document, in the given language.

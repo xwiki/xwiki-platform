@@ -57,6 +57,11 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         return "Some translated content";
     }
+    
+    public String getDocumentContentForDefaultLanguage(String documentName) throws Exception
+    {
+        return "Some content";
+    }
 
     public boolean exists(String documentName) throws Exception
     {

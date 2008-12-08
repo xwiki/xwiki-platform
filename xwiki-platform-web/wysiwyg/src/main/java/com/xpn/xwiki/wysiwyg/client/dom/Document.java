@@ -328,4 +328,51 @@ public class Document extends com.google.gwt.dom.client.Document
     /*-{
         this.write(html);
     }-*/;
+
+    /**
+     * Registers a new listener for changes to <code>innerHTML</code> property of element within this document.
+     * 
+     * @param listener The listener to be registered.
+     */
+    public final native void addInnerHTMLListener(InnerHTMLListener listener)
+    /*-{
+        if (!this.innerHTMLListeners) {
+            this.innerHTMLListeners = [];
+        }
+        this.innerHTMLListeners.push(listener);
+    }-*/;
+
+    /**
+     * Stop sending notifications to the given listener when the <code>innerHTML</code> property, of some element
+     * included in this document, changes.
+     * 
+     * @param listener The listener to be unregistered.
+     */
+    public final native void removeInnerHTMLListener(InnerHTMLListener listener)
+    /*-{
+        if (this.innerHTMLListeners) {
+            for (var i = 0; i < this.innerHTMLListeners.length; i++) {
+                if (this.innerHTMLListeners[i] == listener) {
+                    this.innerHTMLListeners.splice(i, 1);
+                }
+            }
+        }
+    }-*/;
+
+    /**
+     * Notify all listeners of the change to the given element's <code>innerHTML</code> property.<br/>
+     * NOTE: Keep this method accessible only from within this package because only {@link Element} should call it.
+     * 
+     * @param element The element whose <code>innerHTML</code> property has changed.
+     */
+    final native void fireInnerHTMLChange(Element element)
+    /*-{
+        if (this.innerHTMLListeners) {
+            for (var i = 0; i < this.innerHTMLListeners.length; i++) {
+                this.innerHTMLListeners[i].
+    @com.xpn.xwiki.wysiwyg.client.dom.InnerHTMLListener::onInnerHTMLChange(Lcom/xpn/xwiki/wysiwyg/client/dom/Element;)
+    (element);
+            }
+        }
+    }-*/;
 }

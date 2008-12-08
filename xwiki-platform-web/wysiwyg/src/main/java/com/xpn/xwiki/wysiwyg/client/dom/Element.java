@@ -31,6 +31,11 @@ import com.google.gwt.dom.client.Node;
 public class Element extends com.google.gwt.dom.client.Element
 {
     /**
+     * The text used in an element's meta data as a place holder for that element's outer HTML.
+     */
+    public static final String INNER_HTML_PLACEHOLDER = "com.xpn.xwiki.wysiwyg.client.dom.Element#placeholder";
+
+    /**
      * Default constructor. Needs to be protected because all instances are created from JavaScript.
      */
     protected Element()
@@ -72,7 +77,7 @@ public class Element extends com.google.gwt.dom.client.Element
     }
 
     /**
-     * Set inner HTML in cross browser manner.
+     * Set inner HTML in cross browser manner and notify the owner document.
      * 
      * @param html the html to set.
      * @see {@link DOMUtils#setInnerHTML(Element, String)}
@@ -81,6 +86,16 @@ public class Element extends com.google.gwt.dom.client.Element
     public final void xSetInnerHTML(String html)
     {
         DOMUtils.getInstance().setInnerHTML(this, html);
+        ((Document) getOwnerDocument()).fireInnerHTMLChange(this);
+    }
+
+    /**
+     * @return the extended inner HTML of this element, which includes meta data.
+     */
+    public final String xGetInnerHTML()
+    {
+        // TODO
+        return null;
     }
 
     /**
@@ -99,4 +114,22 @@ public class Element extends com.google.gwt.dom.client.Element
         }
         this.getParentNode().removeChild(this);
     }
+
+    /**
+     * @return the meta data associated with this element.
+     */
+    public final native DocumentFragment getMetaData()
+    /*-{
+        return this.metaData;
+    }-*/;
+
+    /**
+     * Sets the meta data of this element.
+     * 
+     * @param metaData a document fragment with additional information regarding this element.
+     */
+    public final native void setMetaData(DocumentFragment metaData)
+    /*-{
+        this.metaData = metaData;
+    }-*/;
 }

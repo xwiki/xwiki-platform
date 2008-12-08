@@ -115,7 +115,7 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
             // Add a XML Filter to remove non-semantic white spaces. We need to do that since all WikiModel 
             // events contain only semantic information.
             XWikiXHTMLWhitespaceXMLFilter whitespaceFilter = new XWikiXHTMLWhitespaceXMLFilter(accumulationFilter,
-                !parameters.isEscapeWikiSyntax());
+                parameters.getWiki());
             
             whitespaceFilter.setContentHandler(handler);
             whitespaceFilter.setErrorHandler(handler);
@@ -154,9 +154,9 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
     protected XMLBlockConverterHandler createContentHandler(XHTMLMacroParameters xhtmlParameters)
         throws MacroExecutionException
     {
-        // Check if the user has asked to escape wiki syntax or not
-        boolean escapeWikiSyntax = xhtmlParameters.isEscapeWikiSyntax();
+        // Check if the user has asked to interpret wiki syntax or not.
+        boolean interpretWikiSyntax = xhtmlParameters.getWiki();
 
-        return new XMLBlockConverterHandler(this.parser, escapeWikiSyntax);
+        return new XMLBlockConverterHandler(this.parser, interpretWikiSyntax);
     }
 }

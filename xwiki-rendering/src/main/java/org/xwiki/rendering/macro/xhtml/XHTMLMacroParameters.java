@@ -30,24 +30,24 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescription;
 public class XHTMLMacroParameters
 {
     /**
-     * Indicate if the user has asked to escape wiki syntax or not.
+     * Indicate if the user has asked to interpret wiki syntax or not.
      */
-    private boolean escapeWikiSyntax;
+    private boolean wiki = true;
 
     /**
-     * @param escapeWikiSyntax indicate if the user has asked to escape wiki syntax or not.
+     * @param interpretWikiSyntax indicate if the user has asked to interpret wiki syntax or not
      */
-    @ParameterDescription("indicate if the user has asked to escape wiki syntax or not")
-    public void setEscapeWikiSyntax(boolean escapeWikiSyntax)
+    @ParameterDescription("indicate if the wiki syntax in the macro will be interpreted or not")
+    public void setWiki(boolean interpretWikiSyntax)
     {
-        this.escapeWikiSyntax = escapeWikiSyntax;
+        this.wiki = interpretWikiSyntax;
     }
 
     /**
-     * @return indicate if the user has asked to escape wiki syntax or not.
+     * @return if the user has asked to interpret wiki syntax or not
      */
-    public boolean isEscapeWikiSyntax()
+    public boolean getWiki()
     {
-        return this.escapeWikiSyntax;
+        return this.wiki;
     }
 }

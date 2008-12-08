@@ -55,7 +55,7 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
 {
     private Parser parser;
 
-    private boolean escapeWikiSyntax;
+    private boolean interpretWikiSyntax;
 
     private Stack<Block> stack = new Stack<Block>();
 
@@ -70,10 +70,10 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
         }
     }
 
-    public XMLBlockConverterHandler(Parser parser, boolean escapeWikiSyntax)
+    public XMLBlockConverterHandler(Parser parser, boolean interpretWikiSyntax)
     {
         this.parser = parser;
-        this.escapeWikiSyntax = escapeWikiSyntax;
+        this.interpretWikiSyntax = interpretWikiSyntax;
     }
 
     public Block getRootBlock()
@@ -92,7 +92,7 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
         String content = new String(ch, start, length);
         
         // If we've been told by the user to not render wiki syntax we simply pass the text as a Word block as is
-        if (this.escapeWikiSyntax) {
+        if (!this.interpretWikiSyntax) {
             this.stack.push(new WordBlock(content));
         } else {
 

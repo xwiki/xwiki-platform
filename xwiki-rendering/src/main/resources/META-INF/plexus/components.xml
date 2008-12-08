@@ -330,14 +330,5 @@
         <priority>2000</priority>
       </configuration>
     </component>
-    <component>
-      <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>id</role-hint>
-      <implementation>org.xwiki.rendering.internal.macro.id.IdMacro</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <configuration>
-        <priority>20</priority>
-      </configuration>
-    </component>
   </components>
 </component-set>

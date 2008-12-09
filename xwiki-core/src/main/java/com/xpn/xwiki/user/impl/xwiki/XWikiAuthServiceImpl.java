@@ -20,14 +20,13 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
-import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.xpn.xwiki.user.api.XWikiUser;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,11 +36,14 @@ import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.List;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
+import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
@@ -51,15 +53,15 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException
     {
-        if (authenticator != null) {
-            return authenticator;
+        if (this.authenticator != null) {
+            return this.authenticator;
         }
 
         try {
             XWiki xwiki = context.getWiki();
 
             if ("basic".equals(xwiki.Param("xwiki.authentication"))) {
-                authenticator = new MyBasicAuthenticator();
+                this.authenticator = new MyBasicAuthenticator();
                 SecurityConfig sconfig = new SecurityConfig(false);
                 sconfig.setAuthMethod("BASIC");
                 if (xwiki.Param("xwiki.authentication.realmname") != null) {
@@ -67,9 +69,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 } else {
                     sconfig.setRealmName("XWiki");
                 }
-                authenticator.init(null, sconfig);
+                this.authenticator.init(null, sconfig);
             } else {
-                authenticator = new MyFormAuthenticator();
+                this.authenticator = new MyFormAuthenticator();
                 SecurityConfig sconfig = new SecurityConfig(false);
 
                 sconfig.setAuthMethod("FORM");
@@ -83,25 +85,29 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 if (xwiki.Param("xwiki.authentication.defaultpage") != null) {
                     sconfig.setDefaultPage(xwiki.Param("xwiki.authentication.defaultpage"));
                 } else {
-                    sconfig.setDefaultPage(context.getURLFactory().getURL(context.getURLFactory().createURL("Web", "WebHome", "view", context), context));
+                    sconfig.setDefaultPage(context.getURLFactory().getURL(
+                        context.getURLFactory().createURL("Web", "WebHome", "view", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.loginpage") != null) {
                     sconfig.setLoginPage(xwiki.Param("xwiki.authentication.loginpage"));
                 } else {
-                    sconfig.setLoginPage(context.getURLFactory().getURL(context.getURLFactory().createURL("XWiki", "XWikiLogin", "login", context), context));
+                    sconfig.setLoginPage(context.getURLFactory().getURL(
+                        context.getURLFactory().createURL("XWiki", "XWikiLogin", "login", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.logoutpage") != null) {
                     sconfig.setLogoutPage(xwiki.Param("xwiki.authentication.logoutpage"));
                 } else {
-                    sconfig.setLogoutPage(context.getURLFactory().getURL(context.getURLFactory().createURL("XWiki", "XWikiLogout", "logout", context), context));
+                    sconfig.setLogoutPage(context.getURLFactory().getURL(
+                        context.getURLFactory().createURL("XWiki", "XWikiLogout", "logout", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.errorpage") != null) {
                     sconfig.setErrorPage(xwiki.Param("xwiki.authentication.errorpage"));
                 } else {
-                    sconfig.setErrorPage(context.getURLFactory().getURL(context.getURLFactory().createURL("XWiki", "XWikiLogin", "loginerror", context), context));
+                    sconfig.setErrorPage(context.getURLFactory().getURL(
+                        context.getURLFactory().createURL("XWiki", "XWikiLogin", "loginerror", context), context));
                 }
 
                 MyPersistentLoginManager persistent = new MyPersistentLoginManager();
@@ -112,8 +118,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     persistent.setCookiePath(xwiki.Param("xwiki.authentication.cookiepath"));
                 }
                 if (xwiki.Param("xwiki.authentication.cookiedomains") != null) {
-                    String[] cdomains =
-                        StringUtils.split(xwiki.Param("xwiki.authentication.cookiedomains"), ",");
+                    String[] cdomains = StringUtils.split(xwiki.Param("xwiki.authentication.cookiedomains"), ",");
                     persistent.setCookieDomains(cdomains);
                 }
 
@@ -130,49 +135,41 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 }
 
                 if (xwiki.Param("xwiki.authentication.encryptionalgorithm") != null) {
-                    persistent.setEncryptionAlgorithm(xwiki
-                        .Param("xwiki.authentication.encryptionalgorithm"));
+                    persistent.setEncryptionAlgorithm(xwiki.Param("xwiki.authentication.encryptionalgorithm"));
                 }
 
                 if (xwiki.Param("xwiki.authentication.encryptionmode") != null) {
-                    persistent.setEncryptionMode(xwiki
-                        .Param("xwiki.authentication.encryptionmode"));
+                    persistent.setEncryptionMode(xwiki.Param("xwiki.authentication.encryptionmode"));
                 }
 
                 if (xwiki.Param("xwiki.authentication.encryptionpadding") != null) {
-                    persistent.setEncryptionPadding(xwiki
-                        .Param("xwiki.authentication.encryptionpadding"));
+                    persistent.setEncryptionPadding(xwiki.Param("xwiki.authentication.encryptionpadding"));
                 }
 
                 if (xwiki.Param("xwiki.authentication.validationKey") != null) {
-                    persistent
-                        .setValidationKey(xwiki.Param("xwiki.authentication.validationKey"));
+                    persistent.setValidationKey(xwiki.Param("xwiki.authentication.validationKey"));
                 }
 
                 if (xwiki.Param("xwiki.authentication.encryptionKey") != null) {
-                    persistent
-                        .setEncryptionKey(xwiki.Param("xwiki.authentication.encryptionKey"));
+                    persistent.setEncryptionKey(xwiki.Param("xwiki.authentication.encryptionKey"));
                 }
 
                 sconfig.setPersistentLoginManager(persistent);
 
                 MyFilterConfig fconfig = new MyFilterConfig();
                 if (xwiki.Param("xwiki.authentication.loginsubmitpage") != null) {
-                    fconfig.setInitParameter("loginSubmitPattern", xwiki
-                        .Param("xwiki.authentication.loginsubmitpage"));
+                    fconfig.setInitParameter("loginSubmitPattern", xwiki.Param("xwiki.authentication.loginsubmitpage"));
                 } else {
-                    fconfig.setInitParameter("loginSubmitPattern",
-                        "/loginsubmit/XWiki/XWikiLogin");
+                    fconfig.setInitParameter("loginSubmitPattern", "/loginsubmit/XWiki/XWikiLogin");
                 }
 
-                authenticator.init(fconfig, sconfig);
+                this.authenticator.init(fconfig, sconfig);
             }
 
-            return authenticator;
+            return this.authenticator;
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                XWikiException.ERROR_XWIKI_USER_INIT, "Cannot initialize authentication system",
-                e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
+                "Cannot initialize authentication system", e);
         }
     }
 
@@ -195,8 +192,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
 
         XWikiAuthenticator auth = getAuthenticator(context);
-        SecurityRequestWrapper wrappedRequest =
-            new SecurityRequestWrapper(request, null, null, auth.getAuthMethod());
+        SecurityRequestWrapper wrappedRequest = new SecurityRequestWrapper(request, null, null, auth.getAuthMethod());
         // We need to make we will not user the principal
         // associated with the app server session
         wrappedRequest.setUserPrincipal(null);
@@ -230,8 +226,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 }
                 // If we're in a non-main wiki & the user is global,
                 // switch to the global wiki and delete locks held there.
-                if (xwiki.isVirtualMode()
-                    && !context.getMainXWiki().equals(context.getDatabase())
+                if (xwiki.isVirtualMode() && !context.getMainXWiki().equals(context.getDatabase())
                     && user.getName().startsWith(context.getMainXWiki() + ":")) {
                     String cdb = context.getDatabase();
                     // switch to main wiki.
@@ -239,8 +234,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     try {
                         xwiki.getHibernateStore().beginTransaction(context);
                         Session session = xwiki.getHibernateStore().getSession(context);
-                        String sql =
-                            "delete from XWikiLock as lock where lock.userName=:userName";
+                        String sql = "delete from XWikiLock as lock where lock.userName=:userName";
                         Query query = session.createQuery(sql);
                         String localName = user.getName().substring(user.getName().indexOf(":") + 1);
                         query.setString("userName", localName);
@@ -291,8 +285,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
      * 
      * @return null if the user is not authenticated properly
      */
-    public XWikiUser checkAuth(String username, String password, String rememberme,
-        XWikiContext context) throws XWikiException
+    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
+        throws XWikiException
     {
         HttpServletRequest request = null;
         HttpServletResponse response = null;
@@ -310,11 +304,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
 
         XWikiAuthenticator auth = getAuthenticator(context);
-        SecurityRequestWrapper wrappedRequest =
-            new SecurityRequestWrapper(request, null, null, auth.getAuthMethod());
+        SecurityRequestWrapper wrappedRequest = new SecurityRequestWrapper(request, null, null, auth.getAuthMethod());
         try {
-            if (!auth.processLogin(username, password, rememberme, wrappedRequest, response,
-                context)) {
+            if (!auth.processLogin(username, password, rememberme, wrappedRequest, response, context)) {
                 return null;
             }
 
@@ -353,13 +345,12 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
      * 
      * @see XWikiAuthService#authenticate(String,String,XWikiContext)
      */
-    public Principal authenticate(String username, String password, XWikiContext context)
-        throws XWikiException
+    public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException
     {
         /*
-         * This method was returning null on failure so I preserved that behaviour, while adding the
-         * exact error messages to the context given as argument. However, the right way to do this
-         * would probably be to throw XWikiException-s.
+         * This method was returning null on failure so I preserved that behaviour, while adding the exact error
+         * messages to the context given as argument. However, the right way to do this would probably be to throw
+         * XWikiException-s.
          */
 
         if (username == null) {
@@ -461,8 +452,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             // username in any case. For case-sensitive databases (like HSQLDB) they'll need to
             // enter it exactly as they've created it.
             String sql = "select distinct doc.fullName from XWikiDocument as doc";
-            Object[][] whereParameters =
-                new Object[][] { {"doc.space", "XWiki"}, {"doc.name", username}};
+            Object[][] whereParameters = new Object[][] { {"doc.space", "XWiki"}, {"doc.name", username}};
 
             List list = context.getWiki().search(sql, whereParameters, context);
             if (list.size() == 0) {
@@ -475,8 +465,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         return user;
     }
 
-    protected boolean checkPassword(String username, String password, XWikiContext context)
-        throws XWikiException
+    protected boolean checkPassword(String username, String password, XWikiContext context) throws XWikiException
     {
         try {
             boolean result = false;
@@ -485,8 +474,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             if (doc.getObject("XWiki.XWikiUsers") != null) {
                 String passwd = doc.getStringValue("XWiki.XWikiUsers", "password");
                 password =
-                    ((PasswordClass) context.getWiki().getClass("XWiki.XWikiUsers", context)
-                        .getField("password")).getEquivalentPassword(passwd, password);
+                    ((PasswordClass) context.getWiki().getClass("XWiki.XWikiUsers", context).getField("password"))
+                        .getEquivalentPassword(passwd, password);
 
                 result = (password.equals(passwd));
             }
@@ -515,9 +504,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
         if (param == null || "".equals(param)) {
             try {
-                param =
-                    context.getWiki().Param(
-                        "xwiki.authentication." + StringUtils.replace(name, "auth_", "."));
+                param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "auth_", "."));
             } catch (Exception e) {
             }
         }
@@ -542,8 +529,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 }
                 if ("ldap".equals(createuser)) {
                     // Let's create the user from ldap
-                    LDAPPlugin ldapplugin =
-                        (LDAPPlugin) context.getWiki().getPlugin("ldap", context);
+                    LDAPPlugin ldapplugin = (LDAPPlugin) context.getWiki().getPlugin("ldap", context);
                     if (ldapplugin != null) {
                         if (log.isDebugEnabled()) {
                             log.debug("Creating user from ldap for user " + user);
@@ -551,8 +537,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                         ldapplugin.createUserFromLDAP(wikiname, user, null, null, context);
                     } else {
                         if (log.isErrorEnabled()) {
-                            log
-                                .error("Impossible to create user from LDAP because LDAP plugin is not activated");
+                            log.error("Impossible to create user from LDAP because LDAP plugin is not activated");
                         }
                     }
                 } else if ("empty".equals(createuser)) {

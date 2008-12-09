@@ -154,7 +154,7 @@
 <category/>
 </property>
 <property>
-<content>The content appears on the article page. The extract will appear on the home and category pages. If there is no extract the first 400 characters of the content are used instead.</content>
+<content></content>
 </property>
 <property>
 <extract></extract>

@@ -53,8 +53,10 @@
   #template('tagedit.vm')
   #isPublished($entryObj $isPublished)
   #if($isPublished)
-    #publishMessageBox("This article was published on ${doc.display('publishDate', 'edit', $entryObj)}")
-    #hideMessageBox("Hide article $doc.display('hidden', 'edit', $entryObj)")
+    #if($doc.creator == $context.user)
+      #publishMessageBox("This article was published on ${doc.display('publishDate', 'edit', $entryObj)}")
+      #hideMessageBox("Hide article $doc.display('hidden', 'edit', $entryObj)")
+    #end
   #else
     #publishMessageBox("This article is not published yet. *Publish ${doc.display('published', 'edit', $entryObj)}*")
     &lt;input type="hidden" name="${entryObj.getxWikiClass().getName()}_${entryObj.number}_publishDate" value="$xwiki.formatDate($util.date, 'dd/MM/yyyy HH:mm:ss')"/&gt;

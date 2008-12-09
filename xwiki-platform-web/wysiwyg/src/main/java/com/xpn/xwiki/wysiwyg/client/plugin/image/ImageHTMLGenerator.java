@@ -68,7 +68,7 @@ public final class ImageHTMLGenerator
         String imageReference = getImageReference(imageConfig, currentWiki, currentSpace, currentPage);
         String styleAttribute = imageConfig.getAlignment() != null ? getAlignmentStyle(imageConfig.getAlignment()) : "";
         return "<!--startimage:" + imageReference + "--><img src=\"" + imageConfig.getImageURL() + "\" alt=\""
-            + ((imageConfig.getTooltip() != null) ? imageConfig.getTooltip() : imageReference) + "\" "
+            + ((imageConfig.getTooltip() != null) ? imageConfig.getTooltip() : imageConfig.getImageFileName()) + "\" "
             + ((styleAttribute.length() > 0) ? "style=\"" + styleAttribute + "\" " : "")
             + ((imageConfig.getWidth() != null) ? "width=\"" + imageConfig.getWidth() + "\" " : "")
             + ((imageConfig.getHeight() != null) ? "height=\"" + imageConfig.getHeight() + "\" " : "")

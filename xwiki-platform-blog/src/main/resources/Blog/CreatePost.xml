@@ -23,7 +23,7 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogParameters")
+<content>#includeMacros("Blog.BlogCode")
 $xwiki.jsx.use($blogScriptsDocumentName)
 #set($name = "$!request.entryTitle")
 #if($name != '')
@@ -31,8 +31,9 @@ $xwiki.jsx.use($blogScriptsDocumentName)
   #if($space == '')
     #set($space = 'Main')
   #end
-  #set($postDocName = "${space}.${name}")
-  #set($parent = "${space}.Blog")
+  #set($postDocName = "${space}.${name.replaceAll('[.]', '')}")
+  #getBlogDocument($space $blogDoc)
+  #set($parent = $blogDoc.fullName)
   #set($title = $util.encodeURI($name))
   $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "parent=${parent}&amp;title=${title}&amp;template=${blogPostTemplate}&amp;${blogPostClassname}_0_title=${title}"))
 #else

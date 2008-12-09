@@ -37,9 +37,40 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * Shows blog information. Currently, only the blog title is displayed.
  *#
 #macro(showBlogInfo)
-  #getBlogTitle($doc $title)
+  #getBlogDocument($doc.space $blogDoc)
+  #getBlogTitle($blogDoc $title)
   #if($title != "")
     1 $title
+  #end
+#end
+##
+##
+##
+#**
+ * Retrieve the blog document, which usually is either &lt;Space&gt;.WebHome for whole-spaces blogs, or &lt;Space&gt;.Blog for 
+ * in-space blogs. If none of these documents contains a blog object, then the first (alphabetically) document in the
+ * target space that contains one is returned. Finally, if no document in the current space contains a blog object, then
+ * Blog.WebHome is returned as the default blog.
+ * 
+ * @param space The space where to search.
+ * @param blogDoc The resulting XDocument.
+ *#
+#macro(getBlogDocument $space $blogDoc)
+  ## First, try the Space.WebHome, for a whole-space blog
+  #set($blogDoc = $xwiki.getDocument("${space}.WebHome"))
+  #if(!$blogDoc.getObject($blogClassname))
+    ## Second, try the Space.Blog document
+    #set($blogDoc = $xwiki.getDocument("${space}.Blog"))
+    #if(!$blogDoc.getObject($blogClassname))
+      ## Third, try searching for a blog document in the current space
+      #set($blogDocs = $xwiki.searchDocuments(", BaseObject obj where doc.space = '${space}' and obj.name = doc.fullName and obj.className = '$blogClassname' order by doc.name"))
+      #if($blogDocs.size() > 0)
+        #set($blogDoc = $xwiki.getDocument($blogDocs.get(0)))
+      #else
+        ## Last, fallback to Blog.WebHome, the default blog
+        #set($blogDoc = $xwiki.getDocument('Blog.WebHome'))
+      #end
+    #end
   #end
 #end
 ##
@@ -52,7 +83,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * @param title The resulting title.
  *#
 #macro(getBlogTitle $blogDoc $title)
-  #set($title = "$!{blogDoc.getObject('Blog.BlogClass').getProperty('title').value}")
+  #set($title = "$!{blogDoc.getObject(${blogClassname}).getProperty('title').value}")
 #end
 ##
 ##
@@ -63,14 +94,19 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * @param entries The resulting list of entries to display, a list of XDocument names.
  *#
 #macro(getBlogEntries $entries)
-  #set($visibilityFilter = " and (exists (from IntegerProperty hid where hid.id.id = obj.id and hid.id.name = 'hidden' and hid.value = 0) or not exists (from IntegerProperty hid where hid.id.id = obj.id and hid.id.name = 'hidden') or doc.creator = '$context.user')")
-  #set ($query = ", BaseObject obj, DateProperty published where doc.space = '${doc.space}' and obj.name = doc.fullName and obj.className = 'Blog.BlogPostClass' and published.id.id = obj.id and published.id.name = 'publishDate' ${visibilityFilter}")
+  #set ($query = ", BaseObject obj, IntegerProperty isPublished, IntegerProperty hidden, DateProperty publishDate 
+    where doc.space = '${doc.space}' and
+      obj.name = doc.fullName and obj.className = 'Blog.BlogPostClass' and
+      publishDate.id.id = obj.id and publishDate.id.name = 'publishDate' and
+      isPublished.id.id = obj.id and isPublished.id.name = 'published' and
+      hidden.id.id = obj.id and hidden.id.name = 'hidden' and
+      (doc.creator = '$context.user' or (isPublished.value = 1 and hidden.value = 0))")
   #set($totalEntries = $xwiki.countDocuments(${query}))
   ## TODO: Replace this with a blogPreferences
   #set($defaultItemsPerPage = 10)
   ## This macro is defined in the default macros.vm library. It also sets $itemsPerPage and $startAt.
   #preparePagedViewParams($totalEntries $defaultItemsPerPage)
-  #set($entries = $xwiki.searchDocuments("${query} order by published.value desc", $itemsPerPage, $startAt))
+  #set($entries = $xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt))
   ##
   ##
 #end
@@ -262,9 +298,9 @@ $xwiki.jsx.use($blogScriptsDocumentName)
   ## Only published articles can be hidden. Unpublished articles are considered already hidden.
   #if($isPublished &amp;&amp; $entryDoc.creator == $context.user &amp;&amp; $xwiki.hasAccessLevel('edit', $context.user, $entryDoc.fullName))
     #if ($isHidden)
-      &lt;a class="blog-tool-show" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;amp;comment=Made%20entry%20visible&amp;amp;xredirect=${thisURL}")" title="This blog post is not visible to other users. Make it visible"&gt;#toolImage('show.png', 'show ')&lt;/a&gt;##
+      &lt;a class="blog-tool-show" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;amp;comment=Made%20entry%20visible&amp;amp;xredirect=${util.encodeURI($thisURL)}")" title="This blog post is not visible to other users. Make it visible"&gt;#toolImage('show.png', 'show ')&lt;/a&gt;##
     #else
-      &lt;a class="blog-tool-hide" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;amp;comment=Hidden%20entry&amp;amp;xredirect=${thisURL}")" title="Hide this blog post from other users"&gt;#toolImage('hide.png' 'hide ')&lt;/a&gt;##
+      &lt;a class="blog-tool-hide" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;amp;comment=Hidden%20entry&amp;amp;xredirect=${util.encodeURI($thisURL)}")" title="Hide this blog post from other users"&gt;#toolImage('hide.png' 'hide ')&lt;/a&gt;##
     #end
   #end
 #end
@@ -278,7 +314,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
 #macro(displayPublishButton $entryDoc $entryObj)
   #isPublished($entryObj $isPublished)
   #if(!$isPublished &amp;&amp; $entryDoc.creator == $context.user &amp;&amp; $xwiki.hasAccessLevel("edit", $context.user, $entryDoc.fullName))
-    &lt;a href="$blogPublisher.getURL('view', "entryName=$entryDoc.fullName&amp;amp;xredirect=${thisURL}")" title="This blog post is not published yet. Publish it"&gt;#toolImage('publish.png' 'publish ')&lt;/a&gt;##
+    &lt;a href="$blogPublisher.getURL('view', "entryName=${util.encodeURI($entryDoc.fullName)}&amp;amp;xredirect=${util.encodeURI($thisURL)}")" title="This blog post is not published yet. Publish it"&gt;#toolImage('publish.png' 'publish ')&lt;/a&gt;##
   #end
 #end
 ##
@@ -387,8 +423,8 @@ $xwiki.jsx.use($blogScriptsDocumentName)
     | Modified by &lt;address class="author vcard"&gt;#userfn($entryDoc.author)&lt;/address&gt; ##
     at &lt;abbr class="updated" title="#formatdateISO($entryDoc.date)"&gt;$xwiki.formatDate($entryDoc.date, "MMM dd, yyyy HH:mm")&lt;/abbr&gt; ##
   #end
-  | [$entryDoc.comments.size() Comment(s)&gt;${entryDoc.fullName}#Comments] ##
-  | &lt;a href="$entryDoc.getURL("view")" rel="bookmark"&gt;Permalink&lt;/a&gt;
+  | &lt;a href="$entryDoc.getURL('view', '#Comments')"&gt;$entryDoc.comments.size() Comment(s)&lt;/a&gt; ##
+  | &lt;a href="$entryDoc.getURL('view')" rel="bookmark"&gt;Permalink&lt;/a&gt;
   &lt;/div&gt; ## entry-footer
 #end
 ##

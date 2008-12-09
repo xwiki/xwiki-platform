@@ -21,6 +21,7 @@
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.io.IOException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.List;
 
@@ -85,29 +86,30 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 if (xwiki.Param("xwiki.authentication.defaultpage") != null) {
                     sconfig.setDefaultPage(xwiki.Param("xwiki.authentication.defaultpage"));
                 } else {
-                    sconfig.setDefaultPage(context.getURLFactory().getURL(
-                        context.getURLFactory().createURL("Web", "WebHome", "view", context), context));
+                    sconfig.setDefaultPage(stripContextPathFromURL(context.getURLFactory().createURL(
+                        context.getWiki().getDefaultWeb(context), context.getWiki().getDefaultPage(context), "view",
+                        context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.loginpage") != null) {
                     sconfig.setLoginPage(xwiki.Param("xwiki.authentication.loginpage"));
                 } else {
-                    sconfig.setLoginPage(context.getURLFactory().getURL(
-                        context.getURLFactory().createURL("XWiki", "XWikiLogin", "login", context), context));
+                    sconfig.setLoginPage(stripContextPathFromURL(context.getURLFactory().createURL("XWiki",
+                        "XWikiLogin", "login", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.logoutpage") != null) {
                     sconfig.setLogoutPage(xwiki.Param("xwiki.authentication.logoutpage"));
                 } else {
-                    sconfig.setLogoutPage(context.getURLFactory().getURL(
-                        context.getURLFactory().createURL("XWiki", "XWikiLogout", "logout", context), context));
+                    sconfig.setLogoutPage(stripContextPathFromURL(context.getURLFactory().createURL("XWiki",
+                        "XWikiLogout", "logout", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.errorpage") != null) {
                     sconfig.setErrorPage(xwiki.Param("xwiki.authentication.errorpage"));
                 } else {
-                    sconfig.setErrorPage(context.getURLFactory().getURL(
-                        context.getURLFactory().createURL("XWiki", "XWikiLogin", "loginerror", context), context));
+                    sconfig.setErrorPage(stripContextPathFromURL(context.getURLFactory().createURL("XWiki",
+                        "XWikiLogin", "loginerror", context), context));
                 }
 
                 MyPersistentLoginManager persistent = new MyPersistentLoginManager();
@@ -552,5 +554,24 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 }
             }
         }
+    }
+
+    /**
+     * The authentication library we are using (SecurityFilter) requires that its URLs do not contain the context path,
+     * in order to be usable with <tt>RequestDispatcher.forward</tt>. Since our URL factory include the context path in
+     * the generated URLs, we use this method to remove (if needed) the context path.
+     * 
+     * @param url The URL to process.
+     * @param context The ubiquitous XWiki request context.
+     * @return A <code>String</code> representation of the contextpath-free URL.
+     */
+    protected String stripContextPathFromURL(URL url, XWikiContext context)
+    {
+        String contextPath = context.getWiki().getWebAppPath(context);
+        // XWiki uses contextPath in the wrong way, putting a / at the end, and not at the start. Fix this here.
+        if (contextPath.endsWith("/") && !contextPath.startsWith("/")) {
+            contextPath = "/" + StringUtils.chop(contextPath);
+        }
+        return StringUtils.removeStart(context.getURLFactory().getURL(url, context), contextPath);
     }
 }

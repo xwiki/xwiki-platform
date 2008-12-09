@@ -180,9 +180,13 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
             }
         }
         FileInputStream fis = new FileInputStream(ofile);
-        byte[] result = new byte[(int) ofile.length()];
-        fis.read(result);
-        return result;
+        try {
+            byte[] result = new byte[(int) ofile.length()];
+            fis.read(result);
+            return result;
+        } finally {
+            fis.close();
+        }
     }
 
     public byte[] readDotImage(File ofile) throws FileNotFoundException, IOException
@@ -250,7 +254,23 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
     public String getDotImageURL(String content, boolean dot, XWikiContext context) throws IOException
     {
-        String filename = writeDotImage(content, "png", dot);
+        return getDotResultURL(content, dot, "png", context);
+    }
+
+    /**
+     * <p>
+     * Executes graphviz and returns the url for the produced file.
+     * </p>
+     * 
+     * @param content GraphViz source code. View http://www.graphviz.org/doc/info/lang.html for the language
+     *            specification.
+     * @param dot Whether the dot engine should be used instead of the neato engine. Other engines are not supported.
+     * @param format Any GraphViz output format. View http://www.graphviz.org/doc/info/output.html for more information.
+     * @param context XWikiContext
+     */
+    public String getDotResultURL(String content, boolean dot, String format, XWikiContext context) throws IOException
+    {
+        String filename = writeDotImage(content, format, dot);
         return context.getDoc().getAttachmentURL(filename, "dot", context);
     }
 }

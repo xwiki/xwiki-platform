@@ -1,19 +1,19 @@
 .#-------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that the escapeWikiSyntax parameter works and escapes wiki syntax.
+.# Verify that the "wiki" parameter works and escapes wiki syntax when false.
 .#-------------------------------------------------------------------------------
-{{xhtml escapeWikiSyntax="true"}}
+{{xhtml wiki="false"}}
 **some escaped text**
 {{/xhtml}}
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [xhtml] [escapeWikiSyntax=true] [
+beginMacroMarker [xhtml] [wiki=false] [
 **some escaped text**
 ]
 onWord [**some escaped text**]
-endMacroMarker [xhtml] [escapeWikiSyntax=true] [
+endMacroMarker [xhtml] [wiki=false] [
 **some escaped text**
 ]
 endDocument

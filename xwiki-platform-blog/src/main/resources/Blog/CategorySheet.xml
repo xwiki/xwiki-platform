@@ -24,6 +24,7 @@
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>true</hidden>
 <content>#includeMacros("Blog.BlogCode")
+#includeMacros("Blog.CategoriesCode")
 1 $doc.display("name")
 #info("$doc.display('description')")
 

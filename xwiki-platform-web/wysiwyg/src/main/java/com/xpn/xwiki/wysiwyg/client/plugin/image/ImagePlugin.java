@@ -58,11 +58,11 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
      * The toolbar extension used to add the link buttons to the toolbar.
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
-    
+
     /**
      * Selection preserver to store the selection before and after the dialog showing.
      */
-    private SelectionPreserver selectionPreserver;    
+    private SelectionPreserver selectionPreserver;
 
     /**
      * {@inheritDoc}
@@ -79,7 +79,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
             image.setTitle(Strings.INSTANCE.image());
             toolBarExtension.addFeature("image", image);
         }
-        
+
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().addClickListener(this);
             getUIExtensionList().add(toolBarExtension);
@@ -137,12 +137,12 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
                 .setDefaultImageAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
             getImageDialog().center();
         } else {
-            // restore selection, dialog has closed
-            selectionPreserver.restoreSelection();
+            // restore selection but don't reset the state of the preserver, dialog has closed
+            selectionPreserver.restoreSelection(false);
             String imageHTML = getImageDialog().getImageHTMLBlock();
             if (imageHTML != null) {
                 getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageHTML);
-                // restore selection, command has been executed
+                // restore selection and reset the state of the preserver, command has been executed
                 selectionPreserver.restoreSelection();
             } else {
                 getTextArea().setFocus(true);

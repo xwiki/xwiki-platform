@@ -19,16 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.format;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -36,32 +31,27 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link RichTextEditor} plug-in for formatting text. It can be used to format text as heading 1 to 5. It installs a
+ * {@link RichTextArea} plug-in for formatting text. It can be used to format text as heading 1 to 5. It installs a
  * select on the tool bar and updates its status depending on the current cursor position.
+ * 
+ * @version $Id$
  */
 public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListener
 {
-    private static final Map<String, Integer> INDEX;
-
+    /**
+     * The list of formatting levels.
+     */
     private ListBox levels;
 
+    /**
+     * Tool bar extension that includes the list of formatting levels.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
-
-    static {
-        int i = 0;
-        INDEX = new HashMap<String, Integer>();
-        INDEX.put("p", new Integer(i++));
-        INDEX.put("h1", new Integer(i++));
-        INDEX.put("h2", new Integer(i++));
-        INDEX.put("h3", new Integer(i++));
-        INDEX.put("h4", new Integer(i++));
-        INDEX.put("h5", new Integer(i++));
-    }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractStatefullPlugin#init(Wysiwyg, RichTextArea, Config)
      */
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
@@ -73,12 +63,13 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
             levels.setVisibleItemCount(1);
             levels.setTitle(Strings.INSTANCE.format());
 
-            levels.addItem(Strings.INSTANCE.normal(), "p");
-            levels.addItem(Strings.INSTANCE.h1(), "h1");
-            levels.addItem(Strings.INSTANCE.h2(), "h2");
-            levels.addItem(Strings.INSTANCE.h3(), "h3");
-            levels.addItem(Strings.INSTANCE.h4(), "h4");
-            levels.addItem(Strings.INSTANCE.h5(), "h5");
+            levels.addItem(Strings.INSTANCE.formatInline(), "");
+            levels.addItem(Strings.INSTANCE.formatParagraph(), "p");
+            levels.addItem(Strings.INSTANCE.formatHeader1(), "h1");
+            levels.addItem(Strings.INSTANCE.formatHeader2(), "h2");
+            levels.addItem(Strings.INSTANCE.formatHeader3(), "h3");
+            levels.addItem(Strings.INSTANCE.formatHeader4(), "h4");
+            levels.addItem(Strings.INSTANCE.formatHeader5(), "h5");
 
             toolBarExtension.addFeature("format", levels);
             getUIExtensionList().add(toolBarExtension);
@@ -92,7 +83,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#destroy()
+     * @see AbstractStatefullPlugin#destroy()
      */
     public void destroy()
     {
@@ -123,6 +114,9 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
         }
     }
 
+    /**
+     * Change the formatting level of the text surrounding the current selection.
+     */
     public void onFormat()
     {
         if (levels.isEnabled()) {
@@ -140,19 +134,15 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
     {
         if (levels != null) {
             String level = getTextArea().getCommandManager().getStringValue(Command.FORMAT_BLOCK);
-            boolean failSafe = true;
             if (level != null) {
-                Integer index = INDEX.get(level.toLowerCase());
-                if (index != null) {
-                    levels.setSelectedIndex(index.intValue());
-                    failSafe = false;
+                for (int i = 0; i < levels.getItemCount(); i++) {
+                    if (levels.getValue(i).equalsIgnoreCase(level)) {
+                        levels.setSelectedIndex(i);
+                        return;
+                    }
                 }
             }
-            if (failSafe) {
-                // In case no formatting has been specified (before executing format block command) we consider
-                // it to be a paragraph.
-                levels.setSelectedIndex(0);
-            }
+            levels.setSelectedIndex(-1);
         }
     }
 }

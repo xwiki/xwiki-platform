@@ -36,13 +36,13 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest
      * The number of milliseconds we delay the test finish. This delay is needed because in some browsers the rich text
      * area is initialized after a timeout.
      */
-    public static final int FINISH_DELAY = 200;
+    public static final int FINISH_DELAY = 400;
 
     /**
      * The number of milliseconds we delay the test start. This delay is needed because in some browsers the rich text
      * area is initialized after a timeout and we want to start the test after the rich text area is fully initialized.
      */
-    public static final int START_DELAY = 100;
+    public static final int START_DELAY = 300;
 
     /**
      * The rich text area on which we run the tests.

@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 
@@ -38,52 +42,103 @@ import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 public class SelectionPreserver
 {
     /**
-     * The rich text area whose selection is preserved.
+     * Marks the end points of a range within its document so that it can be restored.
+     */
+    private static class RangePlaceHolder
+    {
+        /**
+         * Marks the left boundary of the range.
+         */
+        private final Node start;
+
+        /**
+         * If it's greater than zero then it specifies the left offset within the next sibling of the start marker.
+         * Otherwise the range starts immediately after the start marker.
+         */
+        private final int startOffset;
+
+        /**
+         * Marks the right boundary of the range.
+         */
+        private final Node end;
+
+        /**
+         * If it's greater than zero then it specifies the right offset within the previous sibling of the end marker.
+         * Otherwise the range ends just before the end marker.
+         */
+        private final int endOffset;
+
+        /**
+         * Marks the end points of the given range within its document so that it can be restored.
+         * 
+         * @param range The range to be marked within its document.
+         */
+        public RangePlaceHolder(Range range)
+        {
+            Node startContainer = range.getStartContainer();
+            start = ((Document) startContainer.getOwnerDocument()).xCreateSpanElement();
+            if (startContainer.getNodeType() == Node.ELEMENT_NODE) {
+                DOMUtils.getInstance().insertAt(startContainer, start, range.getStartOffset());
+                range.setStartAfter(start);
+                startOffset = -1;
+            } else {
+                startContainer.getParentNode().insertBefore(start, startContainer);
+                startOffset = range.getStartOffset();
+            }
+            Node endContainer = range.getEndContainer();
+            end = ((Document) endContainer.getOwnerDocument()).xCreateSpanElement();
+            if (endContainer.getNodeType() == Node.ELEMENT_NODE) {
+                DOMUtils.getInstance().insertAt(endContainer, end, range.getEndOffset());
+                range.setEndBefore(end);
+                endOffset = -1;
+            } else {
+                DOMUtils.getInstance().insertAfter(end, endContainer);
+                endOffset = DOMUtils.getInstance().getLength(endContainer) - range.getEndOffset();
+            }
+        }
+
+        /**
+         * @return {@link #start}
+         */
+        public Node getStart()
+        {
+            return start;
+        }
+
+        /**
+         * @return {@link #startOffset}
+         */
+        public int getStartOffset()
+        {
+            return startOffset;
+        }
+
+        /**
+         * @return {@link #end}
+         */
+        public Node getEnd()
+        {
+            return end;
+        }
+
+        /**
+         * @return {@link #endOffset}
+         */
+        public int getEndOffset()
+        {
+            return endOffset;
+        }
+    }
+
+    /**
+     * The rich text area whose selection is being preserved.
      */
     private final RichTextArea rta;
 
     /**
-     * The parent of the start container.
-     * 
-     * @see Range#getStartContainer()
+     * The list of saved range place holders.
      */
-    private Node startParent;
-
-    /**
-     * The index of the start container within its parent node.
-     * 
-     * @see Range#getStartContainer()
-     */
-    private int startIndex;
-
-    /**
-     * The start offset.
-     * 
-     * @see Range#getStartOffset()
-     */
-    private int startOffset;
-
-    /**
-     * The parent of the end container.
-     * 
-     * @see Range#getEndContainer()
-     */
-    private Node endParent;
-
-    /**
-     * The number of siblings to the left of the end container. In other words, the right-index (relative to the last
-     * child) of the end container within its parent node.
-     * 
-     * @see Range#getEndContainer()
-     */
-    private int endIndex;
-
-    /**
-     * The right-offset, relative to the last child or last character (depending on end container's node type).
-     * 
-     * @see Range#getEndOffset()
-     */
-    private int endOffset;
+    private final List<RangePlaceHolder> placeHolders = new ArrayList<RangePlaceHolder>();
 
     /**
      * Creates a new selection preserver for the specified rich text area.
@@ -96,49 +151,72 @@ public class SelectionPreserver
     }
 
     /**
-     * Saves the first range in the current selection for later changes. The selection is taken from the target
-     * document.
+     * Removes the markers from the document and clears the list of saved range place holders.
+     */
+    public void clearPlaceHolders()
+    {
+        for (int i = 0; i < placeHolders.size(); i++) {
+            RangePlaceHolder placeHolder = placeHolders.get(i);
+            DOMUtils.getInstance().detach(placeHolder.getStart());
+            DOMUtils.getInstance().detach(placeHolder.getEnd());
+        }
+        placeHolders.clear();
+    }
+
+    /**
+     * Saves the current selection for later changes. The selection is taken from the underlying rich text area.
      * 
-     * @see #range
      * @see #restoreSelection()
      */
     public void saveSelection()
     {
-        Range range = rta.getDocument().getSelection().getRangeAt(0);
-
-        Node start = range.getStartContainer();
-        startParent = start.getParentNode();
-        startIndex = DOMUtils.getInstance().getNodeIndex(start);
-        startOffset = range.getStartOffset();
-
-        Node end = range.getEndContainer();
-        endParent = end.getParentNode();
-        endIndex = endParent.getChildNodes().getLength() - DOMUtils.getInstance().getNodeIndex(end);
-        if (end.getNodeType() == Node.TEXT_NODE) {
-            endOffset = end.getNodeValue().length() - range.getEndOffset();
-        } else {
-            endOffset = end.getChildNodes().getLength() - range.getEndOffset();
+        clearPlaceHolders();
+        Selection selection = rta.getDocument().getSelection();
+        for (int i = 0; i < selection.getRangeCount(); i++) {
+            placeHolders.add(new RangePlaceHolder(selection.getRangeAt(i)));
         }
     }
 
     /**
-     * Restores the saved selection on the target document.
+     * Restores the saved selection on the underlying rich text area and resets the state of the selection preserver.
      * 
-     * @see #range
      * @see #saveSelection()
      */
     public void restoreSelection()
     {
-        Range range = rta.getDocument().createRange();
-        range.setStart(startParent.getChildNodes().getItem(startIndex), startOffset);
-        Node end = endParent.getChildNodes().getItem(endParent.getChildNodes().getLength() - endIndex);
-        if (end.getNodeType() == Node.TEXT_NODE) {
-            range.setEnd(end, end.getNodeValue().length() - endOffset);
-        } else {
-            range.setEnd(end, end.getChildNodes().getLength() - endOffset);
-        }
+        restoreSelection(true);
+    }
+
+    /**
+     * Restores the saved selection on the underlying rich text area. You can specify if the selection preserver should
+     * reset its state. When you're calling this method multiple times for the same selection it's more convenient to
+     * keep the state between the calls rather than call {@link #saveSelection()} before.
+     * 
+     * @param reset true if you want to reset the state of the selection preserver, false otherwise.
+     * @see #saveSelection()
+     */
+    public void restoreSelection(boolean reset)
+    {
         Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();
-        selection.addRange(range);
+        for (int i = 0; i < placeHolders.size(); i++) {
+            RangePlaceHolder placeHolder = placeHolders.get(i);
+            Range range = rta.getDocument().createRange();
+            if (placeHolder.getStartOffset() >= 0) {
+                range.setStart(placeHolder.getStart().getNextSibling(), placeHolder.getStartOffset());
+            } else {
+                range.setStartAfter(placeHolder.getStart());
+            }
+            if (placeHolder.getEndOffset() >= 0) {
+                Node prevSibling = placeHolder.getEnd().getPreviousSibling();
+                range.setEnd(prevSibling, DOMUtils.getInstance().getLength(prevSibling) - placeHolder.getEndOffset());
+            } else {
+                range.setEndBefore(placeHolder.getEnd());
+            }
+            selection.addRange(range);
+        }
+        if (reset) {
+            clearPlaceHolders();
+        }
     }
 }

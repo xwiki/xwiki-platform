@@ -27,6 +27,7 @@ import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.dom.Style;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 
 /**
  * Wraps the HTML fragment including the current selection in a specified block level element.
@@ -42,16 +43,15 @@ public class FormatBlockExecutable extends AbstractExecutable
      */
     public boolean execute(RichTextArea rta, String param)
     {
+        SelectionPreserver preserver = new SelectionPreserver(rta);
+        preserver.saveSelection();
+
         Selection selection = rta.getDocument().getSelection();
-        Range[] ranges = new Range[selection.getRangeCount()];
         for (int i = 0; i < selection.getRangeCount(); i++) {
-            ranges[i] = selection.getRangeAt(i);
-            execute(ranges[i], param);
+            execute(selection.getRangeAt(i), param);
         }
-        selection.removeAllRanges();
-        for (int i = 0; i < ranges.length; i++) {
-            selection.addRange(ranges[i]);
-        }
+
+        preserver.restoreSelection();
         return true;
     }
 

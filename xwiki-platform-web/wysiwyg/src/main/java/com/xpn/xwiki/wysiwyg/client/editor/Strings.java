@@ -29,8 +29,6 @@ public interface Strings extends Constants
 
     String close();
 
-    String code();
-
     String colorPicker();
 
     String copy();
@@ -51,15 +49,19 @@ public interface Strings extends Constants
 
     String format();
 
-    String h1();
+    String formatInline();
 
-    String h2();
+    String formatParagraph();
 
-    String h3();
+    String formatHeader1();
 
-    String h4();
+    String formatHeader2();
 
-    String h5();
+    String formatHeader3();
+
+    String formatHeader4();
+
+    String formatHeader5();
 
     String hr();
 
@@ -86,8 +88,6 @@ public interface Strings extends Constants
     String justifyRight();
 
     String macro();
-
-    String normal();
 
     String ol();
 

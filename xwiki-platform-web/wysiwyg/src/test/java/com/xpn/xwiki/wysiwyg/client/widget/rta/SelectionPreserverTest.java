@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
 import com.google.gwt.user.client.Timer;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -73,13 +72,11 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     private void doTestPlainTextSelectionWithoutModification()
     {
-        Element container = rta.getDocument().xCreateDivElement().cast();
-        container.appendChild(rta.getDocument().createTextNode("xwiki"));
-        rta.getDocument().getBody().appendChild(container);
+        rta.setHTML("xwiki");
 
         Range range = rta.getDocument().createRange();
-        range.setStart(container.getFirstChild(), 1);
-        range.setEnd(container.getFirstChild(), 3);
+        range.setStart(getBody().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild(), 3);
         String selectedText = "wi";
 
         Selection selection = rta.getDocument().getSelection();
@@ -119,13 +116,11 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     private void doTestPlainTextSelectionWithHTMLInsertion()
     {
-        Element container = rta.getDocument().xCreateDivElement().cast();
-        container.appendChild(rta.getDocument().createTextNode("toucan"));
-        rta.getDocument().getBody().appendChild(container);
+        rta.setHTML("toucan");
 
         Range range = rta.getDocument().createRange();
-        range.setStart(container.getFirstChild(), 0);
-        range.setEnd(container.getFirstChild(), 2);
+        range.setStart(getBody().getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild(), 2);
 
         Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();
@@ -165,13 +160,11 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     private void doTestTextRangeSelectionWithHTMLInsertion()
     {
-        Element container = rta.getDocument().xCreateDivElement().cast();
-        container.setInnerHTML("ab<em>cd</em>ef<ins>gh</ins>ij");
-        rta.getDocument().getBody().appendChild(container);
+        rta.setHTML("ab<em>cd</em>ef<ins>gh</ins>ij");
 
         Range range = rta.getDocument().createRange();
-        range.setStart(container.getChildNodes().getItem(1).getFirstChild(), 1);
-        range.setEnd(container.getChildNodes().getItem(3).getFirstChild(), 2);
+        range.setStart(getBody().getChildNodes().getItem(1).getFirstChild(), 1);
+        range.setEnd(getBody().getChildNodes().getItem(3).getFirstChild(), 2);
 
         Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();
@@ -207,13 +200,11 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     private void doTestReplaceElement()
     {
-        Element container = rta.getDocument().xCreateDivElement().cast();
-        container.setInnerHTML("ab<em>cd</em>ef");
-        rta.getDocument().getBody().appendChild(container);
+        rta.setHTML("ab<em>cd</em>ef");
 
         Range range = rta.getDocument().createRange();
-        range.setStartBefore(container.getChildNodes().getItem(1));
-        range.setEndAfter(container.getChildNodes().getItem(1));
+        range.setStartBefore(getBody().getChildNodes().getItem(1));
+        range.setEndAfter(getBody().getChildNodes().getItem(1));
 
         Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();

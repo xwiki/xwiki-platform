@@ -150,12 +150,14 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
                 getSymbolPicker().center();
             }
         } else {
-            // We restore the selection in the target document before closing the dialog.
-            selectionPreserver.restoreSelection();
+            // We restore the selection in the target document before closing the dialog, without resetting the state of
+            // the preserver.
+            selectionPreserver.restoreSelection(false);
             String character = getSymbolPicker().getSymbol();
             if (character != null) {
                 getTextArea().getCommandManager().execute(Command.INSERT_HTML, character);
-                // We restore the selection once again to have the inserted symbol selected.
+                // We restore the selection once again to have the inserted symbol selected, this time resetting the
+                // state of the preserver.
                 selectionPreserver.restoreSelection();
             } else {
                 // We get here if the symbol picker has been closed by clicking the close button.

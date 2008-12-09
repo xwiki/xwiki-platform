@@ -17,49 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.format;
+package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
-import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
+import com.google.gwt.user.client.Timer;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
- * Factory for {@link FormatPlugin}.
+ * Unit tests for {@link FormatBlockExecutable}.
  * 
  * @version $Id$
  */
-public final class FormatPluginFactory extends AbstractPluginFactory
+public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
 {
     /**
-     * The singleton factory instance.
+     * The executable being tested.
      */
-    private static FormatPluginFactory instance;
+    private Executable executable = new FormatBlockExecutable();
 
     /**
-     * Default constructor.
-     */
-    private FormatPluginFactory()
-    {
-        super("format");
-    }
-
-    /**
-     * @return the singleton factory instance.
-     */
-    public static synchronized FormatPluginFactory getInstance()
-    {
-        if (instance == null) {
-            instance = new FormatPluginFactory();
-        }
-        return instance;
-    }
-
-    /**
-     * {@inheritDoc}
      * 
-     * @see AbstractPluginFactory#newInstance()
      */
-    public Plugin newInstance()
+    public void testHeaderAroundCaret()
     {
-        return new FormatPlugin();
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                // TODO
+                finishTest();
+            }
+        }).schedule(START_DELAY);
     }
 }

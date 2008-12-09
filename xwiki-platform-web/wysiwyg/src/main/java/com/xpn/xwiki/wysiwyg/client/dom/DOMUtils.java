@@ -794,4 +794,16 @@ public abstract class DOMUtils
             return range.getEndContainer();
         }
     }
+
+    /**
+     * Removes the given node from its parent.
+     * 
+     * @param node A DOM node.
+     */
+    public void detach(Node node)
+    {
+        if (node != null && node.getParentNode() != null) {
+            node.getParentNode().removeChild(node);
+        }
+    }
 }

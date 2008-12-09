@@ -218,6 +218,8 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
     {
+        // We restore the selection on the text area because it may have been lost when the dialog was opened.
+        selectionPreserver.restoreSelection();
         if (!autoClosed && !getDialog().isCanceled()) {
             // Call the command again, passing the insertion configuration as a JSON object.
             getPlugin().getTextArea().getCommandManager().execute(getCommand(),
@@ -228,7 +230,6 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
         } else {
             // We get here if the dialog has been closed by clicking the close button.
             // In this case we return the focus to the text area.
-            selectionPreserver.restoreSelection();
             getPlugin().getTextArea().setFocus(true);
         }
     }

@@ -67,12 +67,13 @@ public class FormatBlockExecutable extends AbstractExecutable
         Node leaf = DOMUtils.getInstance().getFirstLeaf(range);
         if (leaf == null) {
             execute(range.getStartContainer(), range.getStartOffset(), tagName);
-        }
-        Node lastLeaf = DOMUtils.getInstance().getLastLeaf(range);
-        execute(leaf, tagName);
-        while (leaf != lastLeaf) {
-            leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+        } else {
+            Node lastLeaf = DOMUtils.getInstance().getLastLeaf(range);
             execute(leaf, tagName);
+            while (leaf != lastLeaf) {
+                leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+                execute(leaf, tagName);
+            }
         }
     }
 

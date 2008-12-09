@@ -20,6 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
 import com.google.gwt.user.client.Timer;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
 
 /**
  * Unit tests for {@link RichTextArea}.
@@ -57,5 +59,36 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         String html = "<!--x--><em>test</em>";
         rta.setHTML(html);
         assertEquals(html, clean(rta.getHTML()));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getFirstLeaf(Range)} and {@link DOMUtils#getLastLeaf(Range)}. We put the test here
+     * because we needed an empty document.
+     */
+    public void testGetRangeFirstAndLastLeafWithEmptyBody()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestGetRangeFirstAndLastLeafWithEmptyBody();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getFirstLeaf(Range)} and {@link DOMUtils#getLastLeaf(Range)}. We put the test here
+     * because we needed an empty document.
+     */
+    public void doTestGetRangeFirstAndLastLeafWithEmptyBody()
+    {
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
+        assertEquals(getBody(), range.getCommonAncestorContainer());
+        assertEquals(0, range.getStartOffset());
+        assertNull(null, DOMUtils.getInstance().getFirstLeaf(range));
+        assertNull(null, DOMUtils.getInstance().getLastLeaf(range));
     }
 }

@@ -445,4 +445,18 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         assertNull(DOMUtils.getInstance().getFirstLeaf(range));
         assertNull(DOMUtils.getInstance().getLastLeaf(range));
     }
+
+    /**
+     * Unit test for {@link DOMUtils#detach(Node)}.
+     */
+    public void testDetach()
+    {
+        container.setInnerHTML("1<span>2</span>3");
+        Node node = container.getChildNodes().getItem(1);
+        DOMUtils.getInstance().detach(node);
+        assertNull(node.getParentNode());
+        assertEquals("13", container.getInnerHTML());
+        // The following shoudn't fail.
+        DOMUtils.getInstance().detach(node);
+    }
 }

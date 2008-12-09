@@ -31,14 +31,19 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
 {
     /**
+     * Heading level 1.
+     */
+    public static final String H1 = "h1";
+
+    /**
      * The executable being tested.
      */
     private Executable executable = new FormatBlockExecutable();
 
     /**
-     * 
+     * @see http://jira.xwiki.org/jira/browse/XWIKI-2730
      */
-    public void testHeaderAroundCaret()
+    public void testInsertHeaderOnEmptyDocument()
     {
         delayTestFinish(FINISH_DELAY);
         (new Timer()
@@ -46,9 +51,19 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
             public void run()
             {
                 rta.setFocus(true);
-                // TODO
+                doTestInsertHeaderOnEmptyDocument();
                 finishTest();
             }
         }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see http://jira.xwiki.org/jira/browse/XWIKI-2730
+     */
+    public void doTestInsertHeaderOnEmptyDocument()
+    {
+        assertTrue(executable.execute(rta, H1));
+        assertTrue(new InsertHTMLExecutable().execute(rta, "Title 1"));
+        assertEquals(H1, executable.getParameter(rta));
     }
 }

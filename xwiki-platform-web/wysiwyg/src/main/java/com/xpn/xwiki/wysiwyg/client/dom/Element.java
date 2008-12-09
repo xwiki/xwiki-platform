@@ -99,20 +99,32 @@ public class Element extends com.google.gwt.dom.client.Element
     }
 
     /**
+     * Places all the children of this element in a document fragment and returns it.<br/>
+     * NOTE: The element will remain empty after this method call.
+     * 
+     * @return A document fragment containing all the descendants of this element.
+     */
+    public final DocumentFragment extractContents()
+    {
+        DocumentFragment contents = ((Document) getOwnerDocument()).createDocumentFragment();
+        Node child = getFirstChild();
+        while (child != null) {
+            contents.appendChild(child);
+            child = getFirstChild();
+        }
+        return contents;
+    }
+
+    /**
      * Replaces this element with its child nodes. In other words, all the child nodes of this element are moved to its
      * parent node and the element is removed from its parent.
      */
     public final void unwrap()
     {
-        if (this.getParentNode() == null || this.getParentNode().getNodeType() == Node.DOCUMENT_NODE) {
+        if (getParentNode() == null || getParentNode().getNodeType() == Node.DOCUMENT_NODE) {
             return;
         }
-        Node child = this.getFirstChild();
-        while (child != null) {
-            this.getParentNode().insertBefore(child, this);
-            child = this.getFirstChild();
-        }
-        this.getParentNode().removeChild(this);
+        getParentNode().replaceChild(extractContents(), this);
     }
 
     /**

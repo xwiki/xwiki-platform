@@ -19,35 +19,30 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom;
 
-import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
 /**
- * A fragment of a DOM document.<br/>
- * We've added this class because at the time of writing GWT doesn't offer a similar implementation.
+ * Unit tests for {@link DocumentFragment}.
  * 
  * @version $Id$
- * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2955
  */
-public final class DocumentFragment extends Node
+public class DocumentFragmentTest extends AbstractWysiwygClientTest
 {
     /**
-     * Default constructor. Needs to be protected because all instances are created from JavaScript.
+     * Unit test for {@link DocumentFragment#getInnerHTML()}.
      */
-    protected DocumentFragment()
+    public void testGetInnerHTML()
     {
-    }
+        DocumentFragment df = ((Document) Document.get()).createDocumentFragment();
 
-    /**
-     * @return The HTML serialization of this DOM fragment.
-     */
-    public String getInnerHTML()
-    {
-        Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
-        // We avoid attaching a clone to limit the memory used.
-        container.appendChild(this);
-        String innerHTML = container.getInnerHTML();
-        // We restore the document fragment.
-        appendChild(container.extractContents());
-        return innerHTML;
+        Element element = Document.get().createDelElement().cast();
+        element.setInnerHTML("a<!--x-->b<em>c</em>d");
+
+        Text text = Document.get().createTextNode("#").cast();
+
+        df.appendChild(element);
+        df.appendChild(text);
+        assertEquals(element.getString() + text.getData(), df.getInnerHTML());
+        assertEquals(2, df.getChildNodes().getLength());
     }
 }

@@ -25,6 +25,7 @@ import junit.framework.TestSuite;
 import com.google.gwt.junit.tools.GWTTestSuite;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtilsTest;
 import com.xpn.xwiki.wysiwyg.client.dom.DepthFirstPreOrderIteratorTest;
+import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragmentTest;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeTest;
 import com.xpn.xwiki.wysiwyg.client.dom.StyleTest;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.IERangeTest;
@@ -63,6 +64,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
 
         // dom
         suite.addTestSuite(DOMUtilsTest.class);
+        suite.addTestSuite(DocumentFragmentTest.class);
         suite.addTestSuite(RangeTest.class);
         suite.addTestSuite(StyleTest.class);
         suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);

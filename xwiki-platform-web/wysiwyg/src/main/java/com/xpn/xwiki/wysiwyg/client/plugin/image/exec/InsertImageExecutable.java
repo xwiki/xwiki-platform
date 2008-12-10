@@ -19,11 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.image.exec;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
 
 /**
@@ -31,58 +29,12 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable
  * 
  * @version $Id$
  */
-public class InsertImageExecutable implements Executable
+public class InsertImageExecutable extends InsertHTMLExecutable
 {
     /**
-     * Insert HTML executable to use for the insertion of the image HTML blocks. Cannot extend it because we need to get
-     * it in a cross browser manner.
-     */
-    private Executable insertHTMLExecutable;
-
-    /**
-     * Default constructor, creating a {@link DefaultExecutable} for the <code>inserthtml</code> command.
-     */
-    public InsertImageExecutable()
-    {
-        // Create the InsertHTML cross-browser executable
-        insertHTMLExecutable = GWT.create(InsertHTMLExecutable.class);
-    }
-
-    /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
-     */
-    public boolean execute(RichTextArea rta, String param)
-    {
-        return insertHTMLExecutable.execute(rta, param);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#getParameter(RichTextArea)
-     */
-    public String getParameter(RichTextArea rta)
-    {
-        // TODO Implement to be able to get the parameters of an inserted image, to be able to edit it.
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isEnabled(RichTextArea)
-     */
-    public boolean isEnabled(RichTextArea rta)
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isExecuted(RichTextArea)
+     * @see InsertHTMLExecutable#isExecuted(RichTextArea)
      */
     public boolean isExecuted(RichTextArea rta)
     {
@@ -90,7 +42,7 @@ public class InsertImageExecutable implements Executable
         Range currentRange = rta.getDocument().getSelection().getRangeAt(0);
         Node startContainer = currentRange.getStartContainer();
         Node endContainer = currentRange.getEndContainer();
-        
+
         if (startContainer == endContainer && (currentRange.getEndOffset() - currentRange.getStartOffset() == 1)) {
             // Check that the node inside is an image
             Node nodeInside = startContainer.getChildNodes().getItem(currentRange.getEndOffset() - 1);
@@ -100,15 +52,4 @@ public class InsertImageExecutable implements Executable
         }
         return false;
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isSupported(RichTextArea)
-     */
-    public boolean isSupported(RichTextArea rta)
-    {
-        return insertHTMLExecutable.isSupported(rta);
-    }
-
 }

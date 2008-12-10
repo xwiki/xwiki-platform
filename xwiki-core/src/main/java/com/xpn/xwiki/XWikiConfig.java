@@ -75,4 +75,32 @@ public class XWikiConfig extends Properties
     {
         return StringUtils.split(getProperty(param, ""), " ,");
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This method trims the spaces arond the value.
+     * </p>
+     * 
+     * @see java.util.Properties#getProperty(java.lang.String, java.lang.String)
+     */
+    @Override
+    public String getProperty(String key, String defaultValue)
+    {
+        return StringUtils.trim(super.getProperty(key, defaultValue));
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This method trims the spaces arond the value.
+     * </p>
+     * 
+     * @see java.util.Properties#getProperty(java.lang.String)
+     */
+    @Override
+    public String getProperty(String key)
+    {
+        return getProperty(key, null);
+    }
 }

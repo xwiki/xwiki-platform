@@ -101,6 +101,6 @@ public class XWikiConfig extends Properties
     @Override
     public String getProperty(String key)
     {
-        return getProperty(key, null);
+        return StringUtils.trim(super.getProperty(key));
     }
 }

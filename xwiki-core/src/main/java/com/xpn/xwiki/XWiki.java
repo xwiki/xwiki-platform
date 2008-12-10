@@ -4697,12 +4697,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 LOG.info("Initializing AuthService...");
 
                 String authClass = Param("xwiki.authentication.authclass");
-                if (authClass != null) {
+                if (!StringUtils.isEmpty(authClass)) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Using custom AuthClass " + authClass + ".");
                     }
                 } else {
-
                     if (isExo()) {
                         authClass = "com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl";
                     } else if (isLDAP()) {
@@ -4714,23 +4713,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Using default AuthClass " + authClass + ".");
                     }
-
                 }
 
                 try {
-
                     this.authService = (XWikiAuthService) Class.forName(authClass).newInstance();
-
                     LOG.debug("Initialized AuthService using Relfection.");
-
                 } catch (Exception e) {
-
                     LOG.warn("Failed to initialize AuthService " + authClass
                         + " using Reflection, trying default implementations using 'new'.", e);
-
-                    // e.printStackTrace(); - not needed? -LBlaze
-
-                    // LDAP support wasn't here before, I assume it should be? -LBlaze
 
                     if (isExo()) {
                         this.authService = new ExoAuthServiceImpl();
@@ -4745,7 +4735,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                             .debug("Initialized AuthService " + this.authService.getClass().getName()
                                 + " using 'new'.");
                     }
-
                 }
             }
             return this.authService;

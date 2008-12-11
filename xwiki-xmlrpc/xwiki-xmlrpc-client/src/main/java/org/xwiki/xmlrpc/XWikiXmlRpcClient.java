@@ -326,7 +326,7 @@ public class XWikiXmlRpcClient
      * @return A Page object containing all the information.
      * @throws XmlRpcException
      */
-    private XWikiPage getPage(String pageId, Integer version, Integer minorVersion) throws XmlRpcException
+    public XWikiPage getPage(String pageId, Integer version, Integer minorVersion) throws XmlRpcException
     {
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         extendedId.setParameter("version", version.toString());

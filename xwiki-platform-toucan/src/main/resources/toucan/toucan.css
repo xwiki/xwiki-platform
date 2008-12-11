@@ -275,11 +275,17 @@ span.edit_section {
 }
 
 #xwikimaincontainerinner .code {
-    font-family: courier, courier new, monospace;
-    white-space: pre;
-    margin: 1em 0;
-    padding: 0 1px;
-    overflow: auto;
+	font-family: courier, courier new, monospace;
+	white-space: pre;
+	margin: 1em 0;
+	padding: 0 1px;
+	overflow: auto;
+	background-color: #F1F7FF;
+	border: 1px dotted #555555;
+}
+
+#xwikimaincontainerinner .code  p {
+	font-family: courier, courier new, monospace;
 }
 
 .java-keyword {

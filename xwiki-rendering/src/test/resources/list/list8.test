@@ -4,7 +4,7 @@
 (% param1="value1" param2="value2" %)
 * item
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginList [BULLETED] [[param1]=[value1][param2]=[value2]]
@@ -14,11 +14,11 @@ endListItem
 endList [BULLETED] [[param1]=[value1][param2]=[value2]]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <ul param1="value1" param2="value2"><li>item</li></ul>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 (% param1="value1" param2="value2" %)
 * item

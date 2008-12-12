@@ -12,7 +12,7 @@
 = unclosed header
 = key~=value =
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginSection [6]
@@ -88,11 +88,11 @@ onWord [value]
 endSection [1]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <h6 id="HTitlelevel6"><span>Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1-5"><span>Title level 1</span></h1><h1 id="HTitlelevel1-6"><span>Title level 1</span></h1><p>some text</p><h1 id="Hunclosedheader"><span>unclosed header</span></h1><h1 id="Hkeyvalue"><span>key=value</span></h1>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 ====== Title level 6 ======
 

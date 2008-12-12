@@ -8,7 +8,7 @@
 (% a="b" %)
 (% c="d" %)!=(% e="f" %)(% g="h" %)cell1!!(% i="j" %)(% k="l" %)cell2
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginTable [[a]=[b]]
@@ -41,11 +41,11 @@ endTableRow [[c]=[d]]
 endTable [[a]=[b]]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <table a="b"><tr c="d"><th e="f"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table><table a="b"><tr c="d"><th e="f"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 (% a="b" %)
 (% c="d" %)|=(% e="f" %)(% g="h" %)cell1|(% i="j" %)(% k="l" %)cell2

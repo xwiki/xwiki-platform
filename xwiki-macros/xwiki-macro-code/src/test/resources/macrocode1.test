@@ -8,7 +8,7 @@
 <i>italic</i>
 {{/code}}
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [code] [] [

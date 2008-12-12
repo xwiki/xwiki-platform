@@ -1894,4 +1894,15 @@ public class Document extends Api
     {
         return this.doc.getSyntaxId();
     }
+    
+    /**
+     * Convert the current document content from its current syntax to the new syntax passed as parameter.
+     * 
+     * @param targetSyntaxId the syntax to convert to (eg "xwiki/2.0", "xhtml/1.0", etc)
+     * @throws XWikiException if an exception occurred during the conversion process
+     */
+    public void convertSyntax(String targetSyntaxId) throws XWikiException
+    {
+        this.doc.convertSyntax(targetSyntaxId);
+    }
 }

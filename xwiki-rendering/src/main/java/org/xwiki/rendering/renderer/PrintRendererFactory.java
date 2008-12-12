@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.renderer;
 
+import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
@@ -34,5 +35,5 @@ public interface PrintRendererFactory
 {
     String ROLE = PrintRendererFactory.class.getName();
     
-    PrintRenderer createRenderer(PrintRendererType type, WikiPrinter printer);
+    PrintRenderer createRenderer(Syntax targetSyntax, WikiPrinter printer);
 }

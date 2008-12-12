@@ -8,7 +8,7 @@ list.each { item ->
 }
 {{/script}}
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [script] [] [

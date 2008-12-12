@@ -10,7 +10,7 @@ paragraph
 
 
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 onEmptyLines [1]
@@ -20,11 +20,11 @@ endParagraph
 onEmptyLines [2]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <div class="wikimodel-emptyline"></div><p>paragraph</p><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 
 paragraph

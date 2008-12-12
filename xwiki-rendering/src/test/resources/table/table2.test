@@ -10,7 +10,7 @@
 !=line1!!cell11!!cell12
 !=line2!!cell21!!cell22
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginTable
@@ -83,11 +83,11 @@ endTableRow
 endTable
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell11</td><td>cell12</td></tr><tr><th>line2</th><td>cell21</td><td>cell22</td></tr></table><table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell11</td><td>cell12</td></tr><tr><th>line2</th><td>cell21</td><td>cell22</td></tr></table>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 |=|=col1|=col2
 |=line1|cell11|cell12

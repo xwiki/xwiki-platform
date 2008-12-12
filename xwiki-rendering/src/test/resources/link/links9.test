@@ -3,7 +3,7 @@
 .#-----------------------------------------------------
 This is a mailto:content element
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -20,11 +20,11 @@ onWord [element]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>This is a <!--startwikilink:mailto:content--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="mailto:content"><span class="wikigeneratedlinkcontent">mailto:content</span></a></span><!--stopwikilink--> element</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 This is a mailto:content element
 .#-----------------------------------------------------

@@ -10,7 +10,7 @@ attach~:something
 mailto~:something
 dummy:something
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -44,11 +44,11 @@ onWord [something]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>something:<em>whatever</em><br/>hello://world<br/>image:something<br/>attach:something<br/>mailto:something<br/>dummy:something</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 something~://whatever//
 hello:~/~/world

@@ -3,7 +3,7 @@
 .#-----------------------------------------------------
 [[Space.ExistingPage]]
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -12,11 +12,11 @@ endLink [Reference = [Space.ExistingPage]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p><!--startwikilink:Space.ExistingPage--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 [[Space.ExistingPage]]
 .#-----------------------------------------------------

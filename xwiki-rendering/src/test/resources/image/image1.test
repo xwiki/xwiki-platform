@@ -4,7 +4,7 @@
 [[image:my.png||param1="value1" param2="value2"]]
 [[image:Space.ExistingPage@my.png]]
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -14,11 +14,11 @@ onImage: [Space.ExistingPage] [my.png] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p><!--startimage:my.png--><img src="/xwiki/bin/download/currentdoc/my.png" param1="value1" param2="value2" alt="my.png"/><!--stopimage--><br/><!--startimage:Space.ExistingPage@my.png--><img src="/xwiki/bin/download/Space/ExistingPage/my.png" alt="my.png"/><!--stopimage--></p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 [[image:my.png||param1="value1" param2="value2"]]
 [[image:Space.ExistingPage@my.png]]

@@ -3,7 +3,7 @@
 .#-----------------------------------------------------
 Some inline code macro: {{code language=html}}<b>bold</b><i>italic</i>{{/code}}
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph

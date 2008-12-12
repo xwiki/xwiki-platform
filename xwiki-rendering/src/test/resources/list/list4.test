@@ -4,7 +4,7 @@
 * Item
 This is not a paragraph
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginList [BULLETED]
@@ -24,11 +24,11 @@ endListItem
 endList [BULLETED]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <ul><li>Item<br/>This is not a paragraph</li></ul>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 * Item
 This is not a paragraph

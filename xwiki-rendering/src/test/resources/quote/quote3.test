@@ -4,7 +4,7 @@
 (% param1="value1" param2="value2" %)
 >line
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginQuotation [[param1]=[value1][param2]=[value2]]
@@ -14,11 +14,11 @@ endQuotationLine
 endQuotation [[param1]=[value1][param2]=[value2]]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <blockquote param1="value1" param2="value2">line</blockquote>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 (% param1="value1" param2="value2" %)
 >line

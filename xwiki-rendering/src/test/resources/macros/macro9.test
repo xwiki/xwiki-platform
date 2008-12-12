@@ -4,7 +4,7 @@
 .#-------------------------------------------------------------------------------------
 Execution {{testfailingmacro/}} error
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -18,11 +18,11 @@ onWord [error]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>Execution <span class="xwikirenderingerror">Failed to execute macro: testfailingmacro<!--errordescription:stack trace here--><!--startmacro:testfailingmacro|-||-|--><!--stopmacro--></span> error</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 Execution {{testfailingmacro/}} error
 .#-----------------------------------------------------

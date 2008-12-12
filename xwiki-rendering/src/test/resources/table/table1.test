@@ -10,7 +10,7 @@
 !!cell11!!cell12
 !!cell21!!cell22
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginTable
@@ -67,11 +67,11 @@ endTableRow
 endTable
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table><table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 |=col1|=col2
 |cell11|cell12

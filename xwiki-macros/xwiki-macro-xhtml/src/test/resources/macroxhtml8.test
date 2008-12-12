@@ -8,7 +8,7 @@
 <!-- comment2 -->
 {{/xhtml}}
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [xhtml] [] [
@@ -30,7 +30,7 @@ endMacroMarker [xhtml] [] [
 ]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <!--startmacro:xhtml|-||-|
 <!-- comment1 -->

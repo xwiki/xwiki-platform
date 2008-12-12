@@ -74,7 +74,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.PrintRendererType;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -469,7 +468,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
             renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
         } else {
-            renderedContent = getRenderedContentUsingNewRenderingModule(this.content);
+            renderedContent = performSyntaxConversion(getContent(), getSyntaxId(), "xhtml/1.0");
         }
         return renderedContent;
     }
@@ -492,7 +491,7 @@ public class XWikiDocument implements DocumentModelBridge
             if (syntaxId.equalsIgnoreCase("xwiki/1.0")) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
-                result = getRenderedContentUsingNewRenderingModule(text);
+                result = performSyntaxConversion(text, getSyntaxId(), "xhtml/1.0");
             }
         } catch (XWikiException e) {
             // Failed to render for some reason. This method should normally throw an exception but this
@@ -515,29 +514,6 @@ public class XWikiDocument implements DocumentModelBridge
     public String getRenderedContent(String text, XWikiContext context)
     {
         return getRenderedContent(text, "xwiki/1.0", context);
-    }
-
-    /**
-     * Renders the passed content using the new Rendering architecture.
-     */
-    private String getRenderedContentUsingNewRenderingModule(String content) throws XWikiException
-    {
-        TransformationManager transformations = (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
-        XDOM dom;
-        try {
-            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
-            dom = parser.parse(new StringReader(content));
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
-            transformations.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(getSyntaxId()));
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to render content using new rendering system", e);
-        }
-        PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
-        WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(factory.createRenderer(PrintRendererType.XHTML, printer));
-
-        return printer.toString();
     }
 
     public String getEscapedContent(XWikiContext context) throws XWikiException
@@ -4673,5 +4649,46 @@ public class XWikiDocument implements DocumentModelBridge
     public Boolean isHidden()
     {
         return this.hidden;
+    }
+    
+    /**
+     * Convert the current document content from its current syntax to the new syntax passed as parameter.
+     * 
+     * @param targetSyntaxId the syntax to convert to (eg "xwiki/2.0", "xhtml/1.0", etc)
+     * @throws XWikiException if an exception occurred during the conversion process
+     */
+    public void convertSyntax(String targetSyntaxId) throws XWikiException
+    {
+        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntaxId));
+    }
+
+    /**
+     * Convert the passed content from the passed syntax to the passed new syntax.
+     * 
+     * @param content the content to convert
+     * @param currentSyntaxId the syntax of the current content to convert
+     * @param targetSyntaxId the new syntax after the conversion
+     * @return the converted content in the new syntax
+     * @throws XWikiException if an exception occurred during the conversion process
+     */
+    private String performSyntaxConversion(String content, String currentSyntaxId, String targetSyntaxId) 
+        throws XWikiException
+    {
+        WikiPrinter printer;
+        try {
+            TransformationManager transformations = (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, currentSyntaxId);
+            XDOM dom = parser.parse(new StringReader(content));
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
+            transformations.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
+            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
+            printer = new DefaultWikiPrinter();
+            dom.traverse(factory.createRenderer(syntaxFactory.createSyntaxFromIdString(targetSyntaxId), printer));
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to convert document to syntax [" + targetSyntaxId + "]", e);
+        }
+
+        return printer.toString();
     }
 }

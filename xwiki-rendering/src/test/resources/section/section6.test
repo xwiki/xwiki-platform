@@ -5,7 +5,7 @@
 (% param="value" %)
 = header
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginSection [1] [[param]=[value]]
@@ -13,11 +13,11 @@ onWord [header]
 endSection [1] [[param]=[value]]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <h1 id="Hheader" param="value"><span>header</span></h1>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 (% param="value" %)
 = header =

@@ -3,7 +3,7 @@
 .#-----------------------------------------------------
 [[label>>Space.UnknownPage]]
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -13,11 +13,11 @@ endLink [Reference = [Space.UnknownPage]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage">label</a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 [[label>>Space.UnknownPage]]
 .#-----------------------------------------------------

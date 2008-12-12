@@ -9,7 +9,7 @@
 .# confused for a list item.
 //something// * notlist
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -33,11 +33,11 @@ onWord [notlist]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>* notlist<br/>11*. notlist<br/><em>something</em> * notlist</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 ~* notlist
 ~11*. notlist

@@ -7,7 +7,7 @@
 
 ~== notheader
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginSection [1]
@@ -23,11 +23,11 @@ onWord [notheader]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <h1 id="Hinheader"><span>inheader =</span></h1><p>== notheader</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 = inheader ~= =
 

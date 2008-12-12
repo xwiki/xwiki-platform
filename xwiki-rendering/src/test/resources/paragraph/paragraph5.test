@@ -4,7 +4,7 @@
 Paragraph
 = Header =
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -15,11 +15,11 @@ onWord [Header]
 endSection [1]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>Paragraph</p><h1 id="HHeader"><span>Header</span></h1>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 Paragraph
 

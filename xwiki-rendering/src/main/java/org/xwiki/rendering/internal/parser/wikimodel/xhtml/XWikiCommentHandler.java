@@ -33,8 +33,9 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.PrintRendererType;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
@@ -104,7 +105,7 @@ public class XWikiCommentHandler extends CommentHandler
     {
         DefaultWikiPrinter printer = new DefaultWikiPrinter();            
         XHTMLRenderer renderer = 
-            (XHTMLRenderer) this.printRendererFactory.createRenderer(PrintRendererType.XHTML, printer);
+            (XHTMLRenderer) this.printRendererFactory.createRenderer(new Syntax(SyntaxType.XHTML, "1.0"), printer);
         XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.getStackParameter("xdomGeneratorListener");
         listener.getXDOM().traverse(renderer);
 

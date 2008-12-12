@@ -4,7 +4,7 @@
 .#-----------------------------------------------------
 [[image:attach.png>>http://xwiki.org]]
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -14,11 +14,11 @@ endLink [Reference = [http://xwiki.org]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org"><!--startimage:attach.png--><img src="/xwiki/bin/download/currentdoc/attach.png" class="wikimodel-freestanding" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 [[image:attach.png>>http://xwiki.org]]
 .#-----------------------------------------------------

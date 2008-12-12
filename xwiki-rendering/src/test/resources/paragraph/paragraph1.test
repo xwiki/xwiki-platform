@@ -13,7 +13,7 @@ third paragraph
 
 fourth paragraph
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -40,11 +40,11 @@ onWord [paragraph]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>first<br/>paragraph</p><p>second paragraph</p><div class="wikimodel-emptyline"></div><p>third paragraph</p><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div><p>fourth paragraph</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 first
 paragraph

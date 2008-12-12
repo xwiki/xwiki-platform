@@ -11,7 +11,7 @@ definition2
 
 paragraph2
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -32,11 +32,11 @@ onWord [paragraph2]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><p>paragraph2</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 paragraph1
 

@@ -23,7 +23,7 @@ hello
 
 world
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -56,11 +56,11 @@ onWord [world]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>hello</p><hr/><p>world</p><p>hello</p><hr/><p>world</p><p>hello</p><hr/><p>world</p><p>hello</p><hr/><p>world</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 hello
 

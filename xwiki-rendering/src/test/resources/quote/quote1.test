@@ -10,7 +10,7 @@ line1bis
 
 paragraph
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -41,11 +41,11 @@ onWord [paragraph]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>paragraph</p><blockquote>line1<br/>line1bis<blockquote>line2<blockquote>line3</blockquote>line4</blockquote></blockquote><p>paragraph</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 paragraph
 

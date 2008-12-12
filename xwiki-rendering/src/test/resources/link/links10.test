@@ -7,7 +7,7 @@ Some URL http://server/path/~user
 .# Ensure that unknown protocols don't make the link fail
 something://whatever
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -24,11 +24,11 @@ endLink [Reference = [something://whatever]] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>Some URL <!--startwikilink:http://server/path/~user--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://server/path/~user"><span class="wikigeneratedlinkcontent">http://server/path/~user</span></a></span><!--stopwikilink--></p><p><!--startwikilink:something://whatever--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="something://whatever"><span class="wikigeneratedlinkcontent">something://whatever</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 Some URL http://server/path/~user
 

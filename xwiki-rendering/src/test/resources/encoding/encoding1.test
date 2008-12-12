@@ -7,7 +7,7 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html><p>&nbsp;&tilde;&euro;</p><p param1="val&#252;e">&#160;&#732;&#8364;</p></html>
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -20,6 +20,6 @@ onWord [(((732)))(((8364)))]
 endParagraph [[param1]=[val(((252)))e]]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>&nbsp;&#732;&#8364;</p><p param1="val&#252;e">&nbsp;&#732;&#8364;</p>

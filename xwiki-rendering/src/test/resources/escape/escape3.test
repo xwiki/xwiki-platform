@@ -4,7 +4,7 @@
 single ~~ tilde
 not newline ~\~\
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -23,11 +23,11 @@ onSpecialSymbol [\]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>single ~ tilde<br/>not newline \\</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 single ~~ tilde
 not newline ~\~\

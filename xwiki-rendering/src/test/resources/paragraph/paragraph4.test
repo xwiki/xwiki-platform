@@ -4,7 +4,7 @@
 paragraph
 {{macro/}}
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -13,11 +13,11 @@ endParagraph
 onMacroStandalone [macro] [] []
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>paragraph</p><!--startmacro:macro|-||-|--><!--stopmacro-->
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 paragraph
 

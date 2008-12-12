@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
+import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.PrintRendererType;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.renderer.TexRenderer;
@@ -31,7 +31,7 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.bridge.DocumentAccessBridge;
 
 /**
- * Easily create Print renderers instances.
+ * Easily create Print Renderers instances.
  *
  * @version $Id: $
  * @since 1.6M2
@@ -43,25 +43,20 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
 
     private RenderingConfiguration renderingConfiguration;
 
-    public PrintRenderer createRenderer(PrintRendererType type, WikiPrinter printer)
+    public PrintRenderer createRenderer(Syntax targetSyntax, WikiPrinter printer)
     {
         PrintRenderer result;
 
-        switch (type) {
-            case XHTML:
-                result = new XHTMLRenderer(printer, this.documentAccessBridge, this.renderingConfiguration);
-                break;
-            case XWIKISYNTAX:
-                result = new XWikiSyntaxRenderer(printer);
-                break;
-            case EVENTS:
-                result = new EventsRenderer(printer);
-                break;
-            case TEX:
-                result = new TexRenderer(printer);
-                break;
-            default:
-                throw new RuntimeException("Invalid Renderer type [" + type + "]");
+        if (targetSyntax.toIdString().equals("xhtml/1.0")) {
+            result = new XHTMLRenderer(printer, this.documentAccessBridge, this.renderingConfiguration);
+        } else if (targetSyntax.toIdString().equals("xwiki/2.0")) {
+            result = new XWikiSyntaxRenderer(printer);
+        } else if (targetSyntax.toIdString().equals("event/1.0")) {
+            result = new EventsRenderer(printer);
+        } else if (targetSyntax.toIdString().equals("tex/1.0")) {
+            result = new TexRenderer(printer);
+        } else {
+            throw new RuntimeException("No renderer found for target syntax [" + targetSyntax + "]");
         }
 
         return result;

@@ -30,9 +30,11 @@ import junit.framework.TestSuite;
 
 import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
+import org.xwiki.rendering.internal.parser.DefaultSyntaxFactory;
 import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.PrintRendererType;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
@@ -43,11 +45,13 @@ public class RenderingTestSuite extends TestSuite
 {
     private DefaultPrintRendererFactory rendererFactory;
 
+    private SyntaxFactory syntaxFactory;
+    
     private class Data
     {
         public Map<String, String> inputs = new HashMap<String, String>();
 
-        public Map<PrintRendererType, String> expectations = new HashMap<PrintRendererType, String>();
+        public Map<Syntax, String> expectations = new HashMap<Syntax, String>();
     }
 
     public RenderingTestSuite(String name) throws Exception
@@ -56,6 +60,7 @@ public class RenderingTestSuite extends TestSuite
         this.rendererFactory = new DefaultPrintRendererFactory();
         this.rendererFactory.setDocumentAccessBridge(new MockDocumentAccessBridge());
         this.rendererFactory.setRenderingConfiguration(new DefaultRenderingConfiguration());
+        this.syntaxFactory = new DefaultSyntaxFactory();
     }
 
     public void addTestsFromResource(String testResourceName, boolean runTransformations) throws Exception
@@ -66,11 +71,11 @@ public class RenderingTestSuite extends TestSuite
         // Create a test case for each input and for each expectation so that each test is executed separately
         // and reported separately by the JUnit test runner.
         for (String parserId : data.inputs.keySet()) {
-            for (PrintRendererType rendererType : data.expectations.keySet()) {
-                PrintRenderer renderer = this.rendererFactory.createRenderer(rendererType, new DefaultWikiPrinter());
+            for (Syntax targetSyntax : data.expectations.keySet()) {
+                PrintRenderer renderer = this.rendererFactory.createRenderer(targetSyntax, new DefaultWikiPrinter());
                 RenderingTestCase testCase =
                     new RenderingTestCase(computeTestName(testResourceName, parserId, renderer), data.inputs
-                        .get(parserId), data.expectations.get(rendererType), parserId, renderer, runTransformations);
+                        .get(parserId), data.expectations.get(targetSyntax), parserId, renderer, runTransformations);
                 addTest(testCase);
             }
         }
@@ -164,7 +169,7 @@ public class RenderingTestSuite extends TestSuite
         if (map == inputs) {
             map.put(keyName, buffer.toString());
         } else {
-            map.put(PrintRendererType.fromString(keyName), buffer.toString());
+            map.put(this.syntaxFactory.createSyntaxFromIdString(keyName), buffer.toString());
         }
     }
 

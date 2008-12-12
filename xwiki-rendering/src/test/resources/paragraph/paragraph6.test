@@ -15,7 +15,7 @@
 .# i.e. world only has param7=valueB and NOT param6=valueA
 (% param6="valueA" %)hello (% param7="valueB" %)world
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph [[param1]=[value1][param2]=[value2]]
@@ -54,11 +54,11 @@ endFormat: [NONE] [[param7]=[valueB]]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello&nbsp;</span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4">&nbsp;world</span></p><p><span param6="valueA">hello&nbsp;</span><span param7="valueB">world</span></p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 (% param1="value1" param2="value2" %)
 (% param3="value3" %)hello(%%) world

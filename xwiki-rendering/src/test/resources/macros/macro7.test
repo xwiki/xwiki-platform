@@ -5,7 +5,7 @@
 .#-------------------------------------------------------------------------------------
 Unknown {{unknown/}} macro
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -19,11 +19,11 @@ onWord [macro]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>Unknown <span class="xwikirenderingerror">Unknown macro: unknown<!--errordescription:The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.--><!--startmacro:unknown|-||-|--><!--stopmacro--></span> macro</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 Unknown {{unknown/}} macro
 .#-----------------------------------------------------

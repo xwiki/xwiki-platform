@@ -7,7 +7,7 @@
 
 ::: indent3
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginDefinitionList
@@ -39,11 +39,11 @@ endDefinitionDescription
 endDefinitionList
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <dl><dd>indent1</dd></dl><dl><dd><dl><dd>indent2</dd></dl></dd></dl><dl><dd><dl><dd><dl><dd>indent3</dd></dl></dd></dl></dd></dl>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 : indent1
 

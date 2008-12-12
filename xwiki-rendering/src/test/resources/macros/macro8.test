@@ -4,7 +4,7 @@
 .#-------------------------------------------------------------------------------------
 Not inline {{testsimplemacro/}} macro
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -20,11 +20,11 @@ onWord [macro]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>Not inline <span class="xwikirenderingerror">Not an inline macro<!--errordescription:This macro can only be used by itself on a new line--><!--startmacro:testsimplemacro|-||-|--><!--stopmacro--></span> macro</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 Not inline {{testsimplemacro/}} macro
 .#-----------------------------------------------------

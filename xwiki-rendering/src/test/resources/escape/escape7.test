@@ -7,7 +7,7 @@
 [[[[>>reference]]
 ~[~[whatever
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -28,11 +28,11 @@ onWord [whatever]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <p>[[nolink]]<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference">[[</a></span><!--stopwikilink--><br/>[[whatever</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 ~[~[nolink]]
 [[[[>>reference]]

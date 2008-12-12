@@ -13,7 +13,7 @@
 
 not ;definition: something
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginDefinitionList
@@ -69,11 +69,11 @@ onWord [something]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt>uri:not definition</dt></dl><p>;title: not definition</p><p>not ;definition: something</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 ; title: not definition
 

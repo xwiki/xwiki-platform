@@ -4,7 +4,7 @@
 = Title level 1
 Some paragraph
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginSection [1]
@@ -21,11 +21,11 @@ onWord [paragraph]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <h1 id="HTitlelevel1"><span>Title level 1</span></h1><p>Some paragraph</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 = Title level 1 =
 

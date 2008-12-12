@@ -6,7 +6,7 @@
 <h2>header</h2>
 <p>paragraph</p>
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginSection [2]
@@ -17,6 +17,6 @@ onWord [paragraph]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
 <h2 id="Hheader"><span>header</span></h2><p>paragraph</p>

@@ -27,7 +27,6 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.PrintRendererType;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -79,7 +78,8 @@ public class XWikiHTMLConverter implements HTMLConverter
 
             WikiPrinter printer = new DefaultWikiPrinter();
             PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
-            XHTMLRenderer renderer = (XHTMLRenderer) factory.createRenderer(PrintRendererType.XHTML, printer);
+            XHTMLRenderer renderer = (XHTMLRenderer) factory.createRenderer(
+                new Syntax(SyntaxType.XHTML, "1.0"), printer);
             dom.traverse(renderer);
 
             return printer.toString();

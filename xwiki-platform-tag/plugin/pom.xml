@@ -63,7 +63,6 @@
         <module>lucene</module>
         <module>activitystream</module>
         <module>invitationmanager</module>
-        <module>webdav</module>
       </modules>
     </profile>
     <profile>
@@ -73,7 +72,6 @@
         <module>scheduler</module>
         <module>mailsender</module>
         <module>watchlist</module>
-        <module>webdav</module>
       </modules>
     </profile>
     <profile>

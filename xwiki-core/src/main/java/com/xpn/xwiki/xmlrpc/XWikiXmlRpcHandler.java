@@ -342,7 +342,7 @@ public class XWikiXmlRpcHandler
 
             if (!xwiki.exists(pageFullName)) {
                 LOG.warn(String.format("[Page '%s' appears to be in space '%s' but no information is available.]",
-                    pageName));
+                    pageName, spaceKey));
             } else {
                 Document doc = xwiki.getDocument(pageFullName);
 

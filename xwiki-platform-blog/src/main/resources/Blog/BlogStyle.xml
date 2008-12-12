@@ -201,6 +201,8 @@
 }
 .hentry .entry-title {
   margin: 0px 0px 2px;
+  padding: 0;
+  clear: none;
 }
 .hentry .entry-summary {
   padding: 0 0 0.5em;

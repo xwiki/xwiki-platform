@@ -97,7 +97,10 @@
 <cache>long</cache>
 </property>
 <property>
-<code>/* #includeMacros("Blog.BlogParameters") */
+<code>## includeMacros outputs a {pre}{/pre}, which normally is consumed by Radeox, but since the skin extensions are not
+## rendered, this would remain in the source as invalid JavaScript code, which causes the whole extension to fail. The
+## workaround is to wrap it in a comment, which will be discarded when minimizing the output.
+/* #includeMacros("Blog.BlogParameters") */
 
 if(!XWiki) {
   XWiki = new Object();

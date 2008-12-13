@@ -23,10 +23,11 @@
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
     <meta http-equiv="imagetoolbar" content="no"/>
-#if($context.action=="view")
-## Universal edit button http://universaleditbutton.org
-   <link rel="alternate" type="application/x-wiki" title="Edit" href="$doc.getURL("edit")" />
-#end
+    #if($context.action=="view")
+      ## Universal edit button http://universaleditbutton.org
+      <link rel="alternate" type="application/x-wiki" title="Edit" href="$doc.getURL("edit")" />
+    #end
+    <meta name="page" content="$doc.fullName"/>
     $xwiki.parseContent($!xwiki.getWebPreference("meta"))
     #template("stylesheets.vm")
     #template("analytics.vm")

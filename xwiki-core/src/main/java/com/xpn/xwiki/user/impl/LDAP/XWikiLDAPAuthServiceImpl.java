@@ -717,9 +717,14 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         BaseObject userObj = userProfile.getObject(userClass.getName());
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Start synchronising LDAP profile [" + searchAttributes + "] with user profile based on mapping "
+                + userMappings);
+        }
+
         Map<String, String> map = new HashMap<String, String>();
         for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
-            String key = userMappings.get(lattr.name);
+            String key = userMappings.get(lattr.name.toLowerCase());
             if (key == null || userClass.get(key) == null) {
                 continue;
             }
@@ -767,10 +772,16 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         BaseClass userClass = context.getWiki().getUserClass(context);
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Start synchronising LDAP profile [" + searchAttributes + "] with user profile based on mapping "
+                + userMappings);
+        }
+
         Map<String, String> map = new HashMap<String, String>();
         for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
             String lval = lattr.value;
-            String xattr = userMappings.get(lattr.name);
+            String xattr = userMappings.get(lattr.name.toLowerCase());
+
             if (xattr == null) {
                 continue;
             }

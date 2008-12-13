@@ -326,7 +326,8 @@ public final class XWikiLDAPConfig
     }
 
     /**
-     * Get mapping between XWiki users attributes and LDAP users attributes.
+     * Get mapping between XWiki users attributes and LDAP users attributes. The key in the Map is lower cased to easily
+     * support any case.
      * 
      * @param attrListToFill the list to fill with extracted LDAP fields to use in LDAP search.
      * @param context the XWiki context.
@@ -347,7 +348,7 @@ public final class XWikiLDAPConfig
                     String xwikiattr = field[0].replace(" ", "");
                     String ldapattr = field[1].replace(" ", "");
 
-                    userMappings.put(ldapattr, xwikiattr);
+                    userMappings.put(ldapattr.toLowerCase(), xwikiattr);
 
                     if (attrListToFill != null) {
                         attrListToFill.add(ldapattr);

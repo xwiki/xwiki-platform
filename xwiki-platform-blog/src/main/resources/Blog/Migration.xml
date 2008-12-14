@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>Migration</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.Management</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1229212898000</creationDate>
+<date>1229214636000</date>
+<contentUpdateDate>1229214636000</contentUpdateDate>
+<version>1.1</version>
+<title>Blog migration</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>true</hidden>
+<content>#if($request.migrate)
+  #set($newContent = '#includeForm("Blog.BlogPostSheet")')
+  #set($query = ", BaseObject obj where obj.name = doc.fullName and obj.className = 'XWiki.ArticleClass'")
+  #foreach($article in $xwiki.searchDocuments($query))
+    #if($xwiki.hasAccessLevel('edit', $context.user, $article))
+      #set($articleDoc = $xwiki.getDocument($article))
+    #set($articleObj = $articleDoc.getObject('XWiki.ArticleClass'))
+      #set($entryObj = $articleDoc.newObject('Blog.BlogPostClass'))
+      #foreach($property in ['title', 'content', 'extract', 'category'])
+        $!entryObj.set($property, $articleObj.getProperty($property).value)
+      #end
+      $!entryObj.set('published', 1)
+      $!entryObj.set('publishDate', $articleDoc.creationDate)
+      $!entryObj.set('hidden', 0)
+      #set($discard = $articleDoc.removeObjects('XWiki.ArticleClass'))
+      $articleDoc.setContent($newContent)
+      $!articleDoc.save("Migrated old blog article to the new blog application", true)
+      * Updated [$entryObj.title&gt;$article]
+    #else
+      * Skipping protected document [$article]
+    #end
+  #end
+  Done. [Back to the blog&gt;Blog.WebHome]
+#else
+  Please confirm that you want to migrate old articles to the new blog application:
+  &lt;form action="$doc.getURL()" method="post"&gt;
+    &lt;div&gt;&lt;input type="submit" name="migrate" value="Confirm"&gt;&lt;/div&gt;
+  &lt;/form&gt;
+  [Back to the blog&gt;Blog.WebHome]
+#end</content>
+</xwikidoc>

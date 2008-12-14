@@ -40,7 +40,7 @@
       #set($discard = $articleDoc.removeObjects('XWiki.ArticleClass'))
       $articleDoc.setContent($newContent)
       $!articleDoc.save("Migrated old blog article to the new blog application", true)
-      * Updated [$entryObj.title&gt;$article]
+      * Updated [$entryObj.title&gt;$article] (in space [$articleDoc.space>${articleDoc.space}.WebHome])
     #else
       * Skipping protected document [$article]
     #end

@@ -38,8 +38,8 @@ import com.xpn.xwiki.wysiwyg.client.plugin.text.TextPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.undo.UndoPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.valign.VerticalAlignPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
+import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManager;
-import com.xpn.xwiki.wysiwyg.client.syntax.internal.XHTMLSyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 
@@ -73,7 +73,8 @@ public final class WysiwygEditorFactory
     private WysiwygEditorFactory()
     {
         svm = new DefaultSyntaxValidatorManager();
-        svm.addSyntaxValidator(new XHTMLSyntaxValidator());
+        svm.addSyntaxValidator(new DefaultSyntaxValidator("html/4.01"));
+        svm.addSyntaxValidator(new DefaultSyntaxValidator("xhtml/1.0"));
         svm.addSyntaxValidator(new XWikiSyntaxValidator());
         // add additional SyntaxValidator for other syntaxes
 

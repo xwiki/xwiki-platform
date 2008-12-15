@@ -407,20 +407,32 @@ public final class IERange extends AbstractRange<NativeRange>
     public void setEnd(Node refNode, int offset)
     {
         if (getJSRange().isTextRange()) {
-            if (refNode.getNodeType() == Node.ELEMENT_NODE) {
-                if (offset > 0) {
-                    setEndAfter(refNode.getChildNodes().getItem(offset - 1));
-                } else if (refNode.hasChildNodes()) {
-                    // The refNode must have child nodes if it is going to be the end container (following W3C Range
-                    // specification), but there is a special case (see below).
-                    setEndBefore(refNode.getFirstChild());
-                } else {
-                    // This is a special case in IE when the body element is empty. This can happen when the rich text
-                    // area has no text inside.
+            switch (refNode.getNodeType()) {
+                case Node.ELEMENT_NODE:
+                    if (offset > 0) {
+                        setEndAfter(refNode.getChildNodes().getItem(offset - 1));
+                    } else if (refNode.hasChildNodes()) {
+                        // The refNode must have child nodes if it is going to be the end container (following W3C Range
+                        // specification), but there is a special case (see below).
+                        setEndBefore(refNode.getFirstChild());
+                    } else {
+                        // This is a special case in IE when the body element is empty. This can happen when the rich
+                        // text area has no text inside.
+                        setEndAfter(refNode);
+                    }
+                    break;
+                case Node.TEXT_NODE:
+                    ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_END, refNode, offset);
+                    break;
+                case 4:
+                    // CDATA
+                case 8:
+                    // COMMENT
+                    // Since IE's text range cannot end inside a comment or CDATA node, we place the end point after.
                     setEndAfter(refNode);
-                }
-            } else if (refNode.getNodeType() == Node.TEXT_NODE) {
-                ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_END, refNode, offset);
+                    break;
+                default:
+                    throw new IllegalArgumentException(DOMUtils.UNSUPPORTED_NODE_TYPE);
             }
         } else {
             collapse(true);
@@ -466,20 +478,33 @@ public final class IERange extends AbstractRange<NativeRange>
     public void setStart(Node refNode, int offset)
     {
         if (getJSRange().isTextRange()) {
-            if (refNode.getNodeType() == Node.ELEMENT_NODE) {
-                if (offset < refNode.getChildNodes().getLength()) {
-                    setStartBefore(refNode.getChildNodes().getItem(offset));
-                } else if (refNode.hasChildNodes()) {
-                    // The refNode must have child nodes if it is going to be the start container (following W3C Range
-                    // specification), but there is a special case (see below).
-                    setStartAfter(refNode.getLastChild());
-                } else {
-                    // This is a special case in IE when the body element is empty. This can happen when the rich text
-                    // area has no text inside.
-                    setStartBefore(refNode);
-                }
-            } else if (refNode.getNodeType() == Node.TEXT_NODE) {
-                ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_START, refNode, offset);
+            switch (refNode.getNodeType()) {
+                case Node.ELEMENT_NODE:
+                    if (offset < refNode.getChildNodes().getLength()) {
+                        setStartBefore(refNode.getChildNodes().getItem(offset));
+                    } else if (refNode.hasChildNodes()) {
+                        // The refNode must have child nodes if it is going to be the start container (following W3C
+                        // Range specification), but there is a special case (see below).
+                        setStartAfter(refNode.getLastChild());
+                    } else {
+                        // This is a special case in IE when the body element is empty. This can happen when the rich
+                        // text area has no text inside.
+                        setStartBefore(refNode);
+                    }
+                    break;
+                case Node.TEXT_NODE:
+                    ((TextRange) getJSRange()).setEndPoint(RangeCompare.START_TO_START, refNode, offset);
+                    break;
+                case 4:
+                    // CDATA
+                case 8:
+                    // COMMENT
+                    // Since IE's text range cannot start inside a comment or CDATA node, we place the start point
+                    // before.
+                    setEndBefore(refNode);
+                    break;
+                default:
+                    throw new IllegalArgumentException(DOMUtils.UNSUPPORTED_NODE_TYPE);
             }
         } else {
             collapse(false);

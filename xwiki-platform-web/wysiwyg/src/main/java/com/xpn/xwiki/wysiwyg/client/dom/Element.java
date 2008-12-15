@@ -91,11 +91,56 @@ public class Element extends com.google.gwt.dom.client.Element
 
     /**
      * @return the extended inner HTML of this element, which includes meta data.
+     * @see #getInnerHTML()
      */
     public final String xGetInnerHTML()
     {
-        // TODO
-        return null;
+        if (getFirstChildElement() == null) {
+            return getInnerHTML();
+        } else {
+            StringBuffer innerHTML = new StringBuffer();
+            Node child = getFirstChild();
+            do {
+                switch (child.getNodeType()) {
+                    case Node.TEXT_NODE:
+                        innerHTML.append(child.getNodeValue());
+                        break;
+                    case Node.ELEMENT_NODE:
+                        innerHTML.append(Element.as(child).xGetString());
+                        break;
+                    default:
+                        Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
+                        container.appendChild(child.cloneNode(true));
+                        innerHTML.append(container.getInnerHTML());
+                        break;
+                }
+                child = child.getNextSibling();
+            } while (child != null);
+            return innerHTML.toString();
+        }
+    }
+
+    /**
+     * @return the extended outer HTML of this element, which includes meta data.
+     * @see #getString()
+     */
+    public final String xGetString()
+    {
+        String outerHTML;
+        if (hasChildNodes()) {
+            Element clone = Element.as(cloneNode(false));
+            clone.setInnerHTML(INNER_HTML_PLACEHOLDER);
+            outerHTML = clone.getString();
+            outerHTML = outerHTML.replace(INNER_HTML_PLACEHOLDER, xGetInnerHTML());
+        } else {
+            outerHTML = getString();
+        }
+        DocumentFragment metaData = getMetaData();
+        if (metaData != null) {
+            return metaData.getInnerHTML().replace(INNER_HTML_PLACEHOLDER, outerHTML);
+        } else {
+            return outerHTML;
+        }
     }
 
     /**
@@ -144,4 +189,17 @@ public class Element extends com.google.gwt.dom.client.Element
     /*-{
         this.metaData = metaData;
     }-*/;
+
+    /**
+     * @return true if HTML Strict DTD specifies that this element must be empty.
+     */
+    public final boolean mustBeEmpty()
+    {
+        for (int i = 0; i < DOMUtils.HTML_EMPTY_TAGS.length; i++) {
+            if (DOMUtils.HTML_EMPTY_TAGS[i].equalsIgnoreCase(getTagName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta;
 import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
 
 /**
  * Unit tests for {@link RichTextArea}.
@@ -85,10 +86,42 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
      */
     public void doTestGetRangeFirstAndLastLeafWithEmptyBody()
     {
+        rta.setHTML("");
         Range range = rta.getDocument().getSelection().getRangeAt(0);
         assertEquals(getBody(), range.getCommonAncestorContainer());
         assertEquals(0, range.getStartOffset());
-        assertNull(null, DOMUtils.getInstance().getFirstLeaf(range));
-        assertNull(null, DOMUtils.getInstance().getLastLeaf(range));
+        assertEquals(getBody(), DOMUtils.getInstance().getFirstLeaf(range));
+        assertEquals(getBody(), DOMUtils.getInstance().getLastLeaf(range));
+    }
+
+    /**
+     * Unit test for {@link Range#setStartAfter(com.google.gwt.dom.client.Node)}. We put the test here because we needed
+     * an empty document.
+     */
+    public void testRangeSetStartAfterWithEmptyBody()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestGetRangeFirstAndLastLeafWithEmptyBody();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Unit test for {@link Range#setStartAfter(com.google.gwt.dom.client.Node)}. We put the test here because we needed
+     * an empty document.
+     */
+    public void doTestRangeSetStartAfterWithEmptyBody()
+    {
+        rta.setHTML("");
+        getBody().appendChild(rta.getDocument().xCreateSpanElement());
+        rta.getDocument().getSelection().getRangeAt(0).setStartAfter(getBody().getFirstChild());
+        assertTrue(new InsertHTMLExecutable().execute(rta, "*"));
+        assertEquals("<span></span>*", clean(rta.getHTML()));
     }
 }

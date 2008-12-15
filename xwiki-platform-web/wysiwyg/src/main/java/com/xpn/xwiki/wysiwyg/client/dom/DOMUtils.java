@@ -49,6 +49,28 @@ public abstract class DOMUtils
         new String[] {"body", "li", "td", "div", "dd", "th", "object", "button", "fieldset"};
 
     /**
+     * The list of all HTML tags that must be empty. All of them appear as <code>&lt;tagName/&gt;</code> in the HTML
+     * code.<br/>
+     * NOTE: We had to move this array from Element because there is a problem with static field initialization for
+     * classes extending JavaScriptObject.
+     * 
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3192
+     */
+    public static final String[] HTML_EMPTY_TAGS =
+        new String[] {"area", "base", "basefont", "br", "col", "frame", "hr", "img", "input", "isindex", "link",
+            "meta", "param", "nextid", "bgsound", "embed", "keygen", "spacer", "wbr"};
+
+    /**
+     * Constant for the comment node type.
+     */
+    public static final short COMMENT_NODE = 8;
+
+    /**
+     * Constant for the CDATA node type.
+     */
+    public static final short CDATA_NODE = 4;
+
+    /**
      * The instance in use.
      */
     private static DOMUtils instance;
@@ -214,6 +236,8 @@ public abstract class DOMUtils
     public String getDisplay(Node node)
     {
         switch (node.getNodeType()) {
+            case CDATA_NODE:
+            case COMMENT_NODE:
             case Node.TEXT_NODE:
                 return Style.Display.INLINE;
             case Node.ELEMENT_NODE:
@@ -232,51 +256,26 @@ public abstract class DOMUtils
      */
     public Range getTextRange(Range range)
     {
-        if (range.isCollapsed()) {
-            return range.cloneRange();
-        } else if ("".equals(range.toString())) {
-            Range textRange = range.cloneRange();
-            if (textRange.getStartContainer().getNodeType() == Node.TEXT_NODE) {
-                textRange.collapse(true);
-            } else {
-                textRange.collapse(false);
+        Range textRange = range.cloneRange();
+        Node firstLeaf = getFirstLeaf(range);
+        if (firstLeaf != null) {
+            Node lastLeaf = getLastLeaf(range);
+            // Find the first text node in the range and start the range there.
+            while (firstLeaf != lastLeaf && firstLeaf.getNodeType() != Node.TEXT_NODE) {
+                firstLeaf = getNextLeaf(firstLeaf);
             }
-            return textRange;
-        } else {
-            Range textRange = range.cloneRange();
-
-            // Find the first text node in the range and start the range there
-            if (range.getStartContainer().getNodeType() != Node.TEXT_NODE) {
-                Node leaf;
-                if (range.getStartOffset() == range.getStartContainer().getChildNodes().getLength()) {
-                    // The start point is either inside an empty node or after the last child of a node.
-                    leaf = getNextLeaf(range.getStartContainer());
-                } else {
-                    leaf = getFirstLeaf(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
-                }
-                while (leaf.getNodeType() != Node.TEXT_NODE) {
-                    leaf = getNextLeaf(leaf);
-                }
-                textRange.setStart(leaf, 0);
+            if (firstLeaf.getNodeType() == Node.TEXT_NODE && firstLeaf != textRange.getStartContainer()) {
+                textRange.setStart(firstLeaf, 0);
             }
-
-            // Find the last text node in the range and end the range there
-            if (range.getEndContainer().getNodeType() != Node.TEXT_NODE) {
-                Node leaf;
-                if (range.getEndOffset() == 0) {
-                    // The end point is either inside an empty node or before the first child of a node.
-                    leaf = getPreviousLeaf(range.getStartContainer());
-                } else {
-                    leaf = getLastLeaf(range.getEndContainer().getChildNodes().getItem(range.getEndOffset() - 1));
-                }
-                while (leaf.getNodeType() != Node.TEXT_NODE) {
-                    leaf = getPreviousLeaf(leaf);
-                }
-                textRange.setEnd(leaf, leaf.getNodeValue().length());
+            // Find the last text node in the range and end the range there.
+            while (lastLeaf != firstLeaf && lastLeaf.getNodeType() != Node.TEXT_NODE) {
+                lastLeaf = getPreviousLeaf(lastLeaf);
             }
-
-            return textRange;
+            if (lastLeaf.getNodeType() == Node.TEXT_NODE && lastLeaf != textRange.getEndContainer()) {
+                textRange.setEnd(lastLeaf, lastLeaf.getNodeValue().length());
+            }
         }
+        return textRange;
     }
 
     /**
@@ -403,11 +402,9 @@ public abstract class DOMUtils
     {
         DocumentFragment contents = ((Document) node.getOwnerDocument()).createDocumentFragment();
         switch (node.getNodeType()) {
+            case CDATA_NODE:
+            case COMMENT_NODE:
             case Node.TEXT_NODE:
-            case 4:
-                // CDATA
-            case 8:
-                // COMMENT
                 if (startOffset < endOffset) {
                     Node clone = node.cloneNode(false);
                     clone.setNodeValue(node.getNodeValue().substring(startOffset, endOffset));
@@ -438,11 +435,9 @@ public abstract class DOMUtils
     {
         Node clone = node.cloneNode(false);
         switch (node.getNodeType()) {
+            case CDATA_NODE:
+            case COMMENT_NODE:
             case Node.TEXT_NODE:
-            case 4:
-                // CDATA
-            case 8:
-                // COMMENT
                 clone.setNodeValue(node.getNodeValue().substring(startOffset, endOffset));
                 return clone;
             case Node.ELEMENT_NODE:
@@ -463,11 +458,9 @@ public abstract class DOMUtils
     public int getLength(Node node)
     {
         switch (node.getNodeType()) {
+            case CDATA_NODE:
+            case COMMENT_NODE:
             case Node.TEXT_NODE:
-            case 4:
-                // CDATA
-            case 8:
-                // COMMENT
                 return node.getNodeValue().length();
             default:
                 return node.getChildNodes().getLength();
@@ -561,11 +554,9 @@ public abstract class DOMUtils
     public void deleteNodeContents(Node node, int startOffset, int endOffset)
     {
         switch (node.getNodeType()) {
+            case CDATA_NODE:
+            case COMMENT_NODE:
             case Node.TEXT_NODE:
-            case 4:
-                // CDATA
-            case 8:
-                // COMMENT
                 if (startOffset < endOffset) {
                     node.setNodeValue(node.getNodeValue().substring(0, startOffset)
                         + node.getNodeValue().substring(endOffset));
@@ -646,11 +637,9 @@ public abstract class DOMUtils
     {
         Node clone = node.cloneNode(false);
         switch (node.getNodeType()) {
+            case CDATA_NODE:
+            case COMMENT_NODE:
             case Node.TEXT_NODE:
-            case 4:
-                // CDATA
-            case 8:
-                // COMMENT
                 clone.setNodeValue(node.getNodeValue().substring(offset));
                 node.setNodeValue(node.getNodeValue().substring(0, offset));
                 break;
@@ -806,4 +795,12 @@ public abstract class DOMUtils
             node.getParentNode().removeChild(node);
         }
     }
+
+    /**
+     * Prepares the given range to be selected. Due to cross-browser inconsistencies in Range implementation we might
+     * have to adapt a range object before applying it to the current selection.
+     * 
+     * @param range The DOM range to be normalized.
+     */
+    public abstract void normalize(Range range);
 }

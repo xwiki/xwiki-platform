@@ -78,10 +78,31 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         assertEquals(range.toString(), textRange.toString());
 
         assertEquals(Node.TEXT_NODE, textRange.getStartContainer().getNodeType());
-        // assertEquals(0, textRange.getStartOffset());
-
         assertEquals(Node.TEXT_NODE, textRange.getEndContainer().getNodeType());
-        // assertEquals(2, textRange.getEndOffset());
+
+        // The following may fail in IE.
+        assertEquals(0, textRange.getStartOffset());
+        assertEquals(2, textRange.getEndOffset());
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getTextRange(Range)} when the input range ends inside a comment node.
+     */
+    public void testGetTextRangeFromARangeEndingInAComment()
+    {
+        container.setInnerHTML("a<!--xy-->");
+
+        Range range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(container.getFirstChild(), container.getFirstChild().getNodeValue().length());
+        range.setEnd(container.getLastChild(), container.getLastChild().getNodeValue().length());
+
+        Range textRange = DOMUtils.getInstance().getTextRange(range);
+
+        assertEquals(range.toString(), textRange.toString());
+        assertEquals(Node.TEXT_NODE, textRange.getStartContainer().getNodeType());
+        assertEquals(textRange.getStartContainer(), textRange.getEndContainer());
+        assertEquals(1, textRange.getStartOffset());
+        assertEquals(1, textRange.getEndOffset());
     }
 
     /**
@@ -436,8 +457,8 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
 
         range.setStart(container.getChildNodes().getItem(1), 1);
         range.setEnd(container.getChildNodes().getItem(3), 0);
-        assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance()
-            .getFirstLeaf(range));
+        assertEquals("IE fails because both end points of the range fall inside the nearest text nodes.", container
+            .getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance().getFirstLeaf(range));
         assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance()
             .getLastLeaf(range));
 
@@ -454,8 +475,8 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         container.setInnerHTML("1<span>2</span>3");
         Node node = container.getChildNodes().getItem(1);
         DOMUtils.getInstance().detach(node);
-        assertNull(node.getParentNode());
         assertEquals("13", container.getInnerHTML());
+        assertNull("IE fails because orphan nodes are attached to a document fragment.", node.getParentNode());
         // The following shoudn't fail.
         DOMUtils.getInstance().detach(node);
     }

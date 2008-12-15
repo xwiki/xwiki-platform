@@ -26,13 +26,17 @@ import com.google.gwt.junit.tools.GWTTestSuite;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtilsTest;
 import com.xpn.xwiki.wysiwyg.client.dom.DepthFirstPreOrderIteratorTest;
 import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragmentTest;
+import com.xpn.xwiki.wysiwyg.client.dom.DocumentTest;
+import com.xpn.xwiki.wysiwyg.client.dom.ElementTest;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeTest;
 import com.xpn.xwiki.wysiwyg.client.dom.StyleTest;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.IERangeTest;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.TextRangeTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtensionTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManagerTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRuleTest;
@@ -64,7 +68,9 @@ public class WysiwygClientTestSuite extends GWTTestSuite
 
         // dom
         suite.addTestSuite(DOMUtilsTest.class);
+        suite.addTestSuite(DocumentTest.class);
         suite.addTestSuite(DocumentFragmentTest.class);
+        suite.addTestSuite(ElementTest.class);
         suite.addTestSuite(RangeTest.class);
         suite.addTestSuite(StyleTest.class);
         suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);
@@ -75,6 +81,8 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(DefaultPluginFactoryManagerTest.class);
         suite.addTestSuite(DefaultPluginManagerTest.class);
         suite.addTestSuite(FocusWidgetUIExtensionTest.class);
+        suite.addTestSuite(ImageMetaDataExtractorTest.class);
+        suite.addTestSuite(LinkMetaDataExtractorTest.class);
 
         // syntax
         suite.addTestSuite(DefaultSyntaxValidatorManagerTest.class);

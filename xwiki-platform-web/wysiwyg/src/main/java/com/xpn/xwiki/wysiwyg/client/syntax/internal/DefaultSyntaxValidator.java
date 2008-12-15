@@ -31,13 +31,28 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Base class for syntax-specific validators. It includes by default syntax-independent rules.
+ * 
+ * @version $Id$
  */
-public abstract class DefaultSyntaxValidator implements SyntaxValidator
+public class DefaultSyntaxValidator implements SyntaxValidator
 {
+    /**
+     * The underlying syntax protected by this validator. A syntax validator should ensure that the HTML output of the
+     * editor can be converted to its underlying syntax without loss of information. It does so by restricting those
+     * features that create HTML constructs which cannot be converted to the underlying suntax.
+     */
     private String syntax;
 
+    /**
+     * The map of validation rules. The key is the feature name.
+     */
     private Map<String, List<ValidationRule>> rules = new HashMap<String, List<ValidationRule>>();
 
+    /**
+     * Creates a new validator for the given syntax.
+     * 
+     * @param syntax {@link #syntax}
+     */
     public DefaultSyntaxValidator(String syntax)
     {
         this.syntax = syntax;
@@ -79,6 +94,10 @@ public abstract class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("inserttable", new Command("inserttable")));
     }
 
+    /**
+     * @param feature The name of a feature.
+     * @return The list of rules that apply to the given feature.
+     */
     private List<ValidationRule> getValidationRules(String feature)
     {
         List<ValidationRule> featureRules = rules.get(feature);
@@ -89,6 +108,10 @@ public abstract class DefaultSyntaxValidator implements SyntaxValidator
         return featureRules;
     }
 
+    /**
+     * @param feature The name if a feature.
+     * @return true if this validator know any rule that apply to the given feature.
+     */
     private boolean hasValidationRules(String feature)
     {
         List<ValidationRule> featureRules = rules.get(feature);

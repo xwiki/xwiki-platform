@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
@@ -46,12 +45,8 @@ public class InsertHTMLExecutable extends AbstractExecutable
      */
     public boolean execute(RichTextArea rta, String param)
     {
-        Selection selection = rta.getDocument().getSelection();
-        Range range = selection.getRangeAt(0);
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
         range.deleteContents();
-        assert (range.isCollapsed());
-        selection.removeAllRanges();
-        selection.addRange(range);
 
         Element container = rta.getDocument().xCreateDivElement().cast();
         container.xSetInnerHTML(param);

@@ -75,6 +75,7 @@ public class SelectionPreserver
          */
         public RangePlaceHolder(Range range)
         {
+            DOMUtils.getInstance().normalize(range);
             Node startContainer = range.getStartContainer();
             start = ((Document) startContainer.getOwnerDocument()).xCreateSpanElement();
             if (startContainer.getNodeType() == Node.ELEMENT_NODE) {
@@ -86,7 +87,7 @@ public class SelectionPreserver
                 startOffset = range.getStartOffset();
             }
             Node endContainer = range.getEndContainer();
-            end = ((Document) endContainer.getOwnerDocument()).xCreateSpanElement();
+            end = start.cloneNode(true);
             if (endContainer.getNodeType() == Node.ELEMENT_NODE) {
                 DOMUtils.getInstance().insertAt(endContainer, end, range.getEndOffset());
                 range.setEndBefore(end);

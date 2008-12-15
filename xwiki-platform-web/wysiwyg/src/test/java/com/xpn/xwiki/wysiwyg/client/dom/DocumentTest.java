@@ -19,35 +19,43 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom;
 
-import com.google.gwt.dom.client.Node;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
 /**
- * A fragment of a DOM document.<br/>
- * We've added this class because at the time of writing GWT doesn't offer a similar implementation.
+ * Unit tests for {@link Document}.
  * 
  * @version $Id$
- * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2955
  */
-public final class DocumentFragment extends Node
+public class DocumentTest extends AbstractWysiwygClientTest
 {
     /**
-     * Default constructor. Needs to be protected because all instances are created from JavaScript.
+     * Unit test for {@link Document#fireInnerHTMLChange(Element)}.
      */
-    protected DocumentFragment()
+    public void testFireInnerHTMLChange()
     {
-    }
+        final List<Element> elements = new ArrayList<Element>();
+        InnerHTMLListener listener = new InnerHTMLListener()
+        {
+            public void onInnerHTMLChange(Element element)
+            {
+                elements.add(element);
+            }
+        };
 
-    /**
-     * @return The HTML serialization of this DOM fragment.
-     */
-    public String getInnerHTML()
-    {
-        Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
-        // We avoid attaching a clone to limit the memory used.
-        container.appendChild(this);
-        String innerHTML = container.xGetInnerHTML();
-        // We restore the document fragment.
-        appendChild(container.extractContents());
-        return innerHTML;
+        Document doc = Document.get().cast();
+        Element element = doc.createDivElement().cast();
+        element.xSetInnerHTML("1");
+
+        doc.addInnerHTMLListener(listener);
+        element.xSetInnerHTML("2");
+
+        doc.removeInnerHTMLListener(listener);
+        element.xSetInnerHTML("3");
+
+        assertEquals(1, elements.size());
+        assertEquals(element, elements.get(0));
     }
 }

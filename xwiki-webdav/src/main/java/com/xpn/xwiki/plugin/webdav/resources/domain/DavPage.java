@@ -284,7 +284,9 @@ public class DavPage extends AbstractDavResource
      */
     public void move(DavResource destination) throws DavException
     {
-        getContext().checkAccess("delete", this.name);
+        // Renaming a page requires edit rights on the current document, delete rights on the
+        // target document (if it exists) and edit rights on all the children of current document.
+        getContext().checkAccess("edit", this.name);
         XWikiDavResource dResource = (XWikiDavResource) destination;
         String dSpaceName = null;
         String dPageName = null;
@@ -302,8 +304,10 @@ public class DavPage extends AbstractDavResource
             String sql = "where doc.parent='" + this.name + "'";
             List<String> childDocNames = getContext().searchDocumentsNames(sql);
             // Validate access rights for the destination page.
-            getContext().checkAccess("edit", newDocName);
-            // Validate access rights for all the renamed pages.
+            if (getContext().exists(newDocName)) {
+                getContext().checkAccess("delete", newDocName);
+            }
+            // Validate access rights for all the child pages.
             for (String childDocName : childDocNames) {
                 getContext().checkAccess("edit", childDocName);
             }

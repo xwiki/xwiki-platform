@@ -168,11 +168,10 @@ public class PagesBySpaceNameSubView extends AbstractDavView
             removeTempResource((DavTempFile) member);
         } else if (member instanceof DavPage) {
             String pName = ((DavPage) member).getDisplayName();
-            if (getContext().hasAccess("delete", pName)) {
-                XWikiDocument childDoc = getContext().getDocument(pName);
-                if (!childDoc.isNew()) {
-                    getContext().deleteDocument(childDoc);
-                }
+            getContext().checkAccess("delete", pName);
+            XWikiDocument childDoc = getContext().getDocument(pName);
+            if (!childDoc.isNew()) {
+                getContext().deleteDocument(childDoc);
             }
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
@@ -192,13 +191,15 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                 if (getCollection().equals(dSpace.getCollection())) {
                     String sql = "where doc.web='" + this.name + "'";
                     List<String> docNames = getContext().searchDocumentsNames(sql);
-                    // To rename an entire space, user should have delete rights on all the
-                    // documents in the current space and edit rights on all the documents that
-                    // will be created after the rename operation.
+                    // To rename an entire space, user should have edit rights on all the
+                    // documents in the current space and delete rights on all the documents that
+                    // will be replaced (if they exist).
                     for (String docName : docNames) {
                         String newDocName = dSpace.getDisplayName() + "." + docName;
-                        getContext().checkAccess("delete", docName);
-                        getContext().checkAccess("edit", newDocName);
+                        getContext().checkAccess("edit", docName);
+                        if (getContext().exists(newDocName)) {
+                            getContext().checkAccess("delete", newDocName);
+                        }
                     }
                     for (String docName : docNames) {
                         XWikiDocument doc = getContext().getDocument(docName);

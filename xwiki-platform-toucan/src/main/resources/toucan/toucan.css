@@ -274,6 +274,14 @@ span.edit_section {
     font-size: inherit;
 }
 
+#xwikimaincontainerinner .box {
+	margin: 1em 0;
+	padding: 0 1px;
+	overflow: auto;
+	background-color: #F1F7FF;
+	border: 1px dotted #555555;
+}
+
 #xwikimaincontainerinner .code {
 	font-family: courier, courier new, monospace;
 	white-space: pre;
@@ -284,7 +292,7 @@ span.edit_section {
 	border: 1px dotted #555555;
 }
 
-#xwikimaincontainerinner .code  p {
+#xwikimaincontainerinner .code p {
 	font-family: courier, courier new, monospace;
 }
 

@@ -215,12 +215,25 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
     private static List<Integer> getPath(Node node, int offset)
     {
         List<Integer> path = new ArrayList<Integer>();
-        if (node.getNodeType() == Node.TEXT_NODE) {
-            path.add(Text.as(node).getOffset() + offset);
-        } else if (offset == node.getChildNodes().getLength()) {
-            path.add(DOMUtils.getInstance().getNormalizedChildCount(node));
-        } else {
-            path.add(DOMUtils.getInstance().getNormalizedNodeIndex(node.getChildNodes().getItem(offset)));
+        switch (node.getNodeType()) {
+            case 4:
+                // CDATA_SECTION_NODE
+            case 8:
+                // COMMENT_NODE
+                path.add(offset);
+                break;
+            case Node.TEXT_NODE:
+                path.add(Text.as(node).getOffset() + offset);
+                break;
+            case Node.ELEMENT_NODE:
+                if (offset == node.getChildNodes().getLength()) {
+                    path.add(DOMUtils.getInstance().getNormalizedChildCount(node));
+                } else {
+                    path.add(DOMUtils.getInstance().getNormalizedNodeIndex(node.getChildNodes().getItem(offset)));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException(DOMUtils.UNSUPPORTED_NODE_TYPE);
         }
         Node ancestor = node;
         while (ancestor.getParentNode() != null) {

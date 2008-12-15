@@ -34,6 +34,14 @@
     </component>
     <component>
       <role>com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter</role>
+      <role-hint>html/4.01</role-hint>
+      <implementation>
+        com.xpn.xwiki.wysiwyg.server.converter.internal.FakeHTMLConverter
+      </implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter</role>
       <role-hint>xwiki/2.0</role-hint>
       <implementation>
         com.xpn.xwiki.wysiwyg.server.converter.internal.XWikiHTMLConverter

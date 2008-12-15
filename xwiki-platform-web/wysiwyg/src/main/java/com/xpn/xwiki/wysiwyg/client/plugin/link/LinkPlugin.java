@@ -93,6 +93,10 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
             getTextArea().addClickListener(this);
             getUIExtensionList().add(toolBarExtension);
             selectionPreserver = new SelectionPreserver(textArea);
+            LinkMetaDataExtractor extractor = new LinkMetaDataExtractor();
+            // do the initial extracting on the loaded document
+            extractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
+            getTextArea().getDocument().addInnerHTMLListener(extractor);
         }
     }
 
@@ -161,20 +165,20 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
             // show the dialog
             getLinkDialog().center();
         } else {
-            // restore selection to be sure to execute the command on the right selection, but don't reset the state of
-            // the preserver
-            selectionPreserver.restoreSelection(false);
             String url = getLinkDialog().getLink();
             if (url != null) {
+                // restore selection to be sure to execute the command on the right selection, but don't reset the state
+                // of the preserver
+                selectionPreserver.restoreSelection(false);
                 getTextArea().getCommandManager().execute(Command.CREATE_LINK, url);
-                // restore the selection once again to select the inserted text, this time resetting the state of the
-                // preserver.
-                selectionPreserver.restoreSelection();
             } else {
                 // We get here if the link dialog has been closed by clicking the close button.
                 // In this case we return the focus to the text area.
                 getTextArea().setFocus(true);
             }
+            // restore the selection once again to select the inserted text or to have the initial selection back in
+            // place, this time resetting the state of the preserver.
+            selectionPreserver.restoreSelection();
         }
     }
 

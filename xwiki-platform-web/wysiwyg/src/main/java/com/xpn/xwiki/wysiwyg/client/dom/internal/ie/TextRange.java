@@ -19,11 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Random;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
@@ -60,14 +58,6 @@ public final class TextRange extends NativeRange
          */
         TEXTEDIT
     }
-
-    /**
-     * The list of all HTML tags that must be empty. All of them appear as <code>&lt;tagName/&gt;</code> in the HTML
-     * code.
-     */
-    public static final List<String> HTML_EMPTY_TAGS =
-        Arrays.asList(new String[] {"area", "base", "basefont", "br", "col", "frame", "hr", "img", "input", "isindex",
-            "link", "meta", "param", "nextid", "bgsound", "embed", "keygen", "spacer", "wbr"});
 
     /**
      * Default constructor. Needs to be protected because all instances are created from JavaScript.
@@ -352,8 +342,7 @@ public final class TextRange extends NativeRange
      */
     public void moveToElementText(Element element)
     {
-        if (element.getInnerText().length() > 0 || element.getOffsetWidth() > 0
-            || HTML_EMPTY_TAGS.contains(element.getTagName().toLowerCase())) {
+        if (element.getInnerText().length() > 0 || element.getOffsetWidth() > 0 || element.mustBeEmpty()) {
             xMoveToElementText(element);
         } else {
             element.appendChild(getOwnerDocument().createTextNode(" "));
@@ -492,17 +481,26 @@ public final class TextRange extends NativeRange
      */
     public void setEndPoint(RangeCompare how, Node refNode, int offset)
     {
-        TextRange refRange = this.duplicate();
-        if (refNode.getNodeType() == Node.ELEMENT_NODE) {
-            refRange.moveToElementText(Element.as(refNode));
-        } else if (refNode.getNodeType() == Node.TEXT_NODE) {
-            refRange.moveToTextNode(Text.as(refNode));
-        } else {
-            throw new IllegalArgumentException("Expecting element or text node!");
+        TextRange refRange = duplicate();
+        switch (refNode.getNodeType()) {
+            case Node.ELEMENT_NODE:
+                refRange.moveToElementText(Element.as(refNode));
+                break;
+            case Node.TEXT_NODE:
+                refRange.moveToTextNode(Text.as(refNode));
+                break;
+            case 4:
+                // CDATA
+            case 8:
+                // COMMENT
+                refRange.moveToCommentNode(refNode);
+                break;
+            default:
+                throw new IllegalArgumentException(DOMUtils.UNSUPPORTED_NODE_TYPE);
         }
         // We shift and not collapse because the reference range can change its end points after being collapsed.
         refRange.shift(Unit.CHARACTER, offset);
-        this.setEndPoint(how, refRange);
+        setEndPoint(how, refRange);
     }
 
     /**
@@ -540,6 +538,41 @@ public final class TextRange extends NativeRange
             collapse(false);
             moveEnd(Unit.CHARACTER, textNode.getLength());
             refElement.getParentNode().removeChild(refElement);
+        }
+    }
+
+    /**
+     * Since IE's text range cannot start or end inside a comment, we try to wrap the given comment node.
+     * 
+     * @param comment The comment node to be wrapped by this text range.
+     */
+    public void moveToCommentNode(Node comment)
+    {
+        Node rightSibling = comment.getNextSibling();
+        while (rightSibling != null && rightSibling.getNodeType() != Node.ELEMENT_NODE
+            && rightSibling.getNodeType() != Node.TEXT_NODE) {
+            rightSibling = rightSibling.getNextSibling();
+        }
+
+        Node leftSibling = comment.getPreviousSibling();
+        while (leftSibling != null && leftSibling.getNodeType() != Node.ELEMENT_NODE
+            && leftSibling.getNodeType() != Node.TEXT_NODE) {
+            leftSibling = leftSibling.getPreviousSibling();
+        }
+
+        if (leftSibling == rightSibling) {
+            moveToElementText(Element.as(comment.getParentNode()));
+        } else {
+            if (rightSibling != null) {
+                setEndPoint(RangeCompare.START_TO_END, rightSibling);
+            } else {
+                setEndPoint(RangeCompare.END_TO_END, comment.getParentNode());
+            }
+            if (leftSibling != null) {
+                setEndPoint(RangeCompare.END_TO_START, leftSibling);
+            } else {
+                setEndPoint(RangeCompare.START_TO_START, comment.getParentNode());
+            }
         }
     }
 

@@ -178,7 +178,7 @@ public class FormatBlockExecutable extends AbstractExecutable
         String selectionFormat = null;
         for (int i = 0; i < selection.getRangeCount(); i++) {
             String rangeFormat = getFormat(selection.getRangeAt(i));
-            if (rangeFormat == null || (selectionFormat != null && rangeFormat != selectionFormat)) {
+            if (rangeFormat == null || (selectionFormat != null && !selectionFormat.equals(rangeFormat))) {
                 return null;
             }
             selectionFormat = rangeFormat;
@@ -205,7 +205,7 @@ public class FormatBlockExecutable extends AbstractExecutable
             String leafFormat = getFormat(leaf);
             if (rangeFormat == null) {
                 rangeFormat = leafFormat;
-            } else if (leafFormat != null && leafFormat != rangeFormat) {
+            } else if (leafFormat != null && !leafFormat.equals(rangeFormat)) {
                 return null;
             }
         }

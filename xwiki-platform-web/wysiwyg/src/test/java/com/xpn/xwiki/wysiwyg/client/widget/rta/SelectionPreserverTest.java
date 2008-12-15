@@ -217,4 +217,65 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         preserver.restoreSelection();
         assertEquals("#", selection.toString());
     }
+
+    /**
+     * Tests the preserver when the edited document is empty and the user takes no action between save and restore.
+     */
+    public void testEmptyDocumentWithoutAction()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestEmptyDocumentWithoutAction();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests the preserver when the edited document is empty and the user takes no action between save and restore.
+     */
+    private void doTestEmptyDocumentWithoutAction()
+    {
+        rta.setHTML("");
+        assertEquals("", rta.getDocument().getSelection().toString());
+        preserver.saveSelection();
+        preserver.restoreSelection();
+        assertEquals("", rta.getDocument().getSelection().toString());
+    }
+
+    /**
+     * Tests the preserver when the edited document is empty and the user takes an editing action which affects the
+     * selected content, between save and restore.
+     */
+    public void testEmptyDocumentWithAction()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestEmptyDocumentWithAction();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests the preserver when the edited document is empty and the user takes an editing action which affects the
+     * selected content, between save and restore.
+     */
+    private void doTestEmptyDocumentWithAction()
+    {
+        rta.setHTML("");
+        preserver.saveSelection();
+        String symbol = "*";
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, symbol));
+        preserver.restoreSelection();
+        assertEquals(symbol, rta.getDocument().getSelection().toString());
+    }
 }

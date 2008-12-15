@@ -249,4 +249,16 @@ public class TextRangeTest extends AbstractWysiwygClientTest
         wrap(textRange);
         assertEquals("r\r\n<div><!--x-->|a<em>#</em></div>|q", container.getInnerHTML().toLowerCase());
     }
+
+    /**
+     * Unit test for {@link TextRange#moveToCommentNode(com.google.gwt.dom.client.Node)}.
+     */
+    public void testMoveToCommentNode()
+    {
+        container.setInnerHTML("a<!--x-->b");
+        textRange.moveToCommentNode(container.getChildNodes().getItem(1));
+        textRange.setHTML("*");
+        // Currently we cannot wrap the comment node.
+        assertEquals("a*<!--x-->b", container.getInnerHTML());
+    }
 }

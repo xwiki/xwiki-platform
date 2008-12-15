@@ -390,7 +390,8 @@ public class IERangeTest extends AbstractWysiwygClientTest
         container.xSetInnerHTML("a<div><!--x-->b<em>#</em></div>c");
         Range range = ((Document) container.getOwnerDocument()).createRange();
         range.selectNodeContents(container.getChildNodes().getItem(1));
-        assertEquals(((Element) container.getChildNodes().getItem(1)).getString(), range.toHTML());
+        assertEquals("IE fails because leading comments are not included in the range.", ((Element) container
+            .getChildNodes().getItem(1)).xGetInnerHTML(), range.toHTML());
     }
 
     /**

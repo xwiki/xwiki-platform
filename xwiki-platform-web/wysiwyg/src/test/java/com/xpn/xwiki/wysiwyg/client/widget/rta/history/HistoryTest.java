@@ -56,18 +56,61 @@ public class HistoryTest extends AbstractRichTextAreaTest
         rta.setHTML("<span>ab</span><span>cde</span>");
 
         Range range = rta.getDocument().getSelection().getRangeAt(0);
-        range.setEnd(rta.getDocument().getBody().getLastChild().getFirstChild(), 2);
-        range.setStart(rta.getDocument().getBody().getFirstChild().getFirstChild(), 1);
+        range.setEnd(getBody().getLastChild().getFirstChild(), 2);
+        range.setStart(getBody().getFirstChild().getFirstChild(), 1);
         select(range);
 
         String selectedText = "bcd";
         assertEquals(selectedText, rta.getDocument().getSelection().toString());
 
-        rta.getCommandManager().execute(Command.BOLD);
-        rta.getCommandManager().execute(Command.UNDO);
+        assertTrue(rta.getCommandManager().execute(Command.BOLD));
+        assertTrue(rta.getCommandManager().execute(Command.UNDO));
         assertEquals(selectedText, rta.getDocument().getSelection().toString());
 
-        rta.getCommandManager().execute(Command.REDO);
+        assertTrue(rta.getCommandManager().execute(Command.REDO));
         assertEquals(selectedText, rta.getDocument().getSelection().toString());
+    }
+
+    /**
+     * Tests if undo and redo operations restore the previous selection even when it ends within a comment node.
+     */
+    public void testRestoreSelectionEndingInAComment()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestRestoreSelectionEndingInAComment();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if undo and redo operations restore the previous selection even when it ends within a comment node.
+     */
+    public void doTestRestoreSelectionEndingInAComment()
+    {
+        rta.setHTML("ab<!--x-->c");
+
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
+        range.setEnd(getBody().getChildNodes().getItem(1), 1);
+        range.setStart(getBody().getFirstChild(), 1);
+        select(range);
+
+        String selectedText = "b";
+        // NOTE: It seems there is a bug in Mozilla's Selection implementation that prevents us from calling toString
+        // directly on the selection when it starts or ends inside a comment node. Calling toString on a range seems to
+        // work though.
+        assertEquals(selectedText, rta.getDocument().getSelection().getRangeAt(0).toString());
+
+        assertTrue(rta.getCommandManager().execute(Command.BOLD));
+        assertTrue(rta.getCommandManager().execute(Command.UNDO));
+        assertEquals(selectedText, rta.getDocument().getSelection().getRangeAt(0).toString());
+
+        assertTrue(rta.getCommandManager().execute(Command.REDO));
+        assertEquals(selectedText, rta.getDocument().getSelection().getRangeAt(0).toString());
     }
 }

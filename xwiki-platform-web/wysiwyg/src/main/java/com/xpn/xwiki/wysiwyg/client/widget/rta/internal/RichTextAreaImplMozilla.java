@@ -19,9 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
+import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.LoadListenerCollection;
 import com.google.gwt.user.client.ui.SourcesLoadEvents;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
@@ -42,7 +44,8 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
 
     /**
      * {@inheritDoc}<br/>
-     * NOTE: Remove this method as soon as Issue 3156 is fixed.
+     * NOTE: Remove this method as soon as Issue 3156 is fixed. <br />
+     * We also need this method to be able to hook simplification of the DOM tree storing meta data in elements.
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#setHTMLImpl(String)
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
@@ -51,8 +54,19 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
     {
         if (String.valueOf(true).equals(elem.getAttribute(RichTextArea.DIRTY))) {
             elem.removeAttribute(RichTextArea.DIRTY);
-            super.setHTMLImpl(html);
+            ((Element) IFrameElement.as(elem).getContentDocument().getBody().cast()).xSetInnerHTML(html);
         }
+    }
+
+    /**
+     * {@inheritDoc} <br />
+     * NOTE: We need this method to be able to hook simplification of the DOM tree storing meta data in elements.
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#getHTMLImpl()
+     */
+    protected String getHTMLImpl()
+    {
+        return ((Element) IFrameElement.as(elem).getContentDocument().getBody().cast()).xGetInnerHTML();
     }
 
     /**

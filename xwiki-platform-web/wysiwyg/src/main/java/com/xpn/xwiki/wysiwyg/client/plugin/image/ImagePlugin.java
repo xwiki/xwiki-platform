@@ -84,6 +84,10 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
             getTextArea().addClickListener(this);
             getUIExtensionList().add(toolBarExtension);
             selectionPreserver = new SelectionPreserver(textArea);
+            ImageMetaDataExtractor extractor = new ImageMetaDataExtractor();
+            // do the initial extracting on the loaded document
+            extractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
+            getTextArea().getDocument().addInnerHTMLListener(new ImageMetaDataExtractor());
         }
     }
 
@@ -137,16 +141,17 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
                 .setDefaultImageAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
             getImageDialog().center();
         } else {
-            // restore selection but don't reset the state of the preserver, dialog has closed
-            selectionPreserver.restoreSelection(false);
             String imageHTML = getImageDialog().getImageHTMLBlock();
             if (imageHTML != null) {
+                // restore the selection before executing the command, without resetting the state of the preserver.
+                selectionPreserver.restoreSelection(false);
                 getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageHTML);
-                // restore selection and reset the state of the preserver, command has been executed
-                selectionPreserver.restoreSelection();
             } else {
                 getTextArea().setFocus(true);
             }
+            // restore the selection (once again) to select the inserted image or to have the initial selection back in
+            // place, resetting the state of the preserver.
+            selectionPreserver.restoreSelection();
         }
     }
 

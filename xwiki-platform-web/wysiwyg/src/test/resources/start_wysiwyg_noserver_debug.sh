@@ -1,7 +1,7 @@
 #!/bin/bash
 
-XE_VERSION=1.7-SNAPSHOT
-GWT_VERSION=1.5.2;
+XE_VERSION=1.8-SNAPSHOT
+GWT_VERSION=1.5.3;
 
 APP_DIR=`dirname $0`/webapps/xwiki;
 LIB_DIR=$APP_DIR/WEB-INF/lib;

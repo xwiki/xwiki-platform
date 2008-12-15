@@ -363,7 +363,7 @@ xwiki.authentication.ldap.base_DN=
 # xwiki.authentication.ldap.group_memberfields=member,uniqueMember
 
 #-# retrieve the following fields from LDAP and store them in the XWiki user object (xwiki-attribute=ldap-attribute)
-xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,fullname=fullName,email=mail
+xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email=mail
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# on every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.

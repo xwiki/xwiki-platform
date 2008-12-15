@@ -21,27 +21,20 @@ package com.xpn.xwiki.plugin.webdav.resources.domain;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.OutputContext;
-import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavFile;
-import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * The DAV resource representing an {@link XWikiAttachment}.
@@ -67,17 +60,21 @@ public class DavAttachment extends AbstractDavFile
         }
         if (exists()) {
             String timeStamp = DavConstants.creationDateFormat.format(attachment.getDate());
-            davPropertySet.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, timeStamp));
+            getProperties().add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, timeStamp));
             timeStamp = DavConstants.modificationDateFormat.format(attachment.getDate());
-            davPropertySet
-                .add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, timeStamp));
-            davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETETAG, timeStamp));
-            davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, attachment
-                .getMimeType(xwikiContext)));
-            davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE,
-                attachment.getDoc().getLanguage()));
-            davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH,
-                attachment.getFilesize()));
+            getProperties().add(
+                new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, timeStamp));
+            getProperties().add(new DefaultDavProperty(DavPropertyName.GETETAG, timeStamp));
+            getProperties().add(
+                new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, getContext().getMimeType(
+                    attachment)));
+            getProperties().add(
+                new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, attachment.getDoc()
+                    .getLanguage()));
+            getProperties()
+                .add(
+                    new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, attachment
+                        .getFilesize()));
         }
     }
 
@@ -94,19 +91,23 @@ public class DavAttachment extends AbstractDavFile
      */
     public void spool(OutputContext outputContext) throws IOException
     {
+        // Protect against direct url referencing.
+        if (!getContext().hasAccess("view", attachment.getDoc().getFullName())) {
+            throw new IOException("Access rights violation.");
+        }
+        outputContext.setContentLanguage(attachment.getDoc().getLanguage());
+        outputContext.setContentLength(attachment.getFilesize());
+        outputContext.setContentType(getContext().getMimeType(attachment));
+        outputContext.setETag(DavConstants.modificationDateFormat.format(getModificationTime()));
+        outputContext.setModificationTime(getModificationTime());
         if (exists()) {
-            // Protect against direct url referencing.
-            if (!XWikiDavUtils.hasAccess("view", attachment.getDoc().getName(), xwikiContext)) {
-                throw new IOException("Access rights violation.");
-            } else {
-                OutputStream out = outputContext.getOutputStream();
-                if (null != out) {
-                    try {
-                        out.write(this.attachment.getContent(xwikiContext));
-                        out.flush();
-                    } catch (XWikiException ex) {
-                        throw new IOException(ex.getFullMessage());
-                    }
+            OutputStream out = outputContext.getOutputStream();
+            if (null != out) {
+                try {
+                    out.write(getContext().getContent(attachment));
+                    out.flush();
+                } catch (DavException ex) {
+                    throw new IOException(ex.getMessage());
                 }
             }
         }
@@ -117,42 +118,16 @@ public class DavAttachment extends AbstractDavFile
      */
     public void move(DavResource destination) throws DavException
     {
-        XWikiDavUtils.checkAccess("edit", attachment.getDoc().getName(), xwikiContext);
+        getContext().checkAccess("edit", attachment.getDoc().getFullName());
         if (destination instanceof DavAttachment) {
             DavAttachment dAttachment = (DavAttachment) destination;
             // Check if this is a rename operation.
             if (dAttachment.getCollection().equals(getCollection())) {
-                try {
-                    // First remove the current attachment (we have it in memory).
-                    XWikiDocument owner = attachment.getDoc();
-                    owner.deleteAttachment(attachment, xwikiContext);
-                    // Rename the (in memory) attachment.
-                    attachment.setFilename(dAttachment.getDisplayName());
-                    // Add the attachment back to owner doc.
-                    owner.getAttachmentList().add(attachment);
-                    attachment.setDoc(owner);
-                    owner.saveAttachmentContent(attachment, xwikiContext);
-                    xwikiContext.getWiki().saveDocument(owner, xwikiContext);
-                } catch (XWikiException e) {
-                    throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
-                }
+                getContext().moveAttachment(attachment, attachment.getDoc(),
+                    dAttachment.getDisplayName());
             } else if (dAttachment.getCollection() instanceof DavPage) {
                 XWikiDocument dDoc = ((DavPage) dAttachment.getCollection()).getDocument();
-                try {
-                    // Again remove the current attachment (we have it in memory).
-                    XWikiDocument owner = attachment.getDoc();
-                    owner.deleteAttachment(attachment, xwikiContext);
-                    xwikiContext.getWiki().saveDocument(owner, xwikiContext);
-                    // Rename the (in memory) attachment.
-                    attachment.setFilename(dAttachment.getDisplayName());
-                    // Add the attachment to destination document.
-                    dDoc.getAttachmentList().add(attachment);
-                    attachment.setDoc(dDoc);
-                    dDoc.saveAttachmentContent(attachment, xwikiContext);
-                    xwikiContext.getWiki().saveDocument(dDoc, xwikiContext);
-                } catch (XWikiException e) {
-                    throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
-                }
+                getContext().moveAttachment(attachment, dDoc, dAttachment.getDisplayName());
             } else {
                 throw new DavException(DavServletResponse.SC_BAD_REQUEST);
             }
@@ -164,61 +139,11 @@ public class DavAttachment extends AbstractDavFile
     /**
      * {@inheritDoc}
      */
-    public void copy(DavResource destination, boolean shallow) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public MultiStatusResponse alterProperties(DavPropertySet setProperties,
-        DavPropertyNameSet removePropertyNames) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public MultiStatusResponse alterProperties(List changeList) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeProperty(DavPropertyName propertyName) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setProperty(DavProperty property) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public long getModificationTime()
     {
         if (exists()) {
             return attachment.getDate().getTime();
         }
         return IOUtil.UNDEFINED_TIME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, PROPFIND, PROPPATCH, COPY, DELETE, MOVE, LOCK, UNLOCK";
     }
 }

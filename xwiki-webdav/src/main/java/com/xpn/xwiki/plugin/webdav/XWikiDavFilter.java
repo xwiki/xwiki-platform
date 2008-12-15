@@ -37,16 +37,16 @@ import org.apache.jackrabbit.webdav.DavMethods;
  * 
  * @version $Id$
  */
-public class DavFilter implements Filter
+public class XWikiDavFilter implements Filter
 {
     /**
      * {@inheritDoc}
      */
-    public void destroy()
+    public void init(FilterConfig filterConfig) throws ServletException
     {
-        // Nothing to be destroyed.
+        // Nothing to be initialized.
     }
-
+    
     /**
      * {@inheritDoc}
      * <p>
@@ -67,12 +67,12 @@ public class DavFilter implements Filter
         }
         chain.doFilter(request, response);
     }
-
+    
     /**
      * {@inheritDoc}
      */
-    public void init(FilterConfig filterConfig) throws ServletException
+    public void destroy()
     {
-        // Nothing to be initialized.
+        // Nothing to be destroyed.
     }
 }

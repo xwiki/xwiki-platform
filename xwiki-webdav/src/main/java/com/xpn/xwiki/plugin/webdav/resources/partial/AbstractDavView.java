@@ -20,18 +20,12 @@
 package com.xpn.xwiki.plugin.webdav.resources.partial;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.OutputContext;
-import org.apache.jackrabbit.webdav.property.DavProperty;
-import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
 
 
 /**
@@ -45,43 +39,9 @@ public abstract class AbstractDavView extends AbstractDavResource
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
-    public MultiStatusResponse alterProperties(List changeList) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public MultiStatusResponse alterProperties(DavPropertySet setProperties,
-        DavPropertyNameSet removePropertyNames) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void copy(DavResource destination, boolean shallow) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public boolean exists()
     {
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getHref()
-    {
-        return locator.getHref(true);
     }
 
     /**
@@ -104,22 +64,6 @@ public abstract class AbstractDavView extends AbstractDavResource
      * {@inheritDoc}
      */
     public void move(DavResource destination) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeProperty(DavPropertyName propertyName) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setProperty(DavProperty property) throws DavException
     {
         throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
     }

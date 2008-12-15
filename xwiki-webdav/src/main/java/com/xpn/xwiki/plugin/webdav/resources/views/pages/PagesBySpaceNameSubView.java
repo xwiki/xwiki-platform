@@ -34,10 +34,10 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
@@ -60,19 +60,19 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         throws DavException
     {
         if (next < tokens.length) {
-            String token = tokens[next];
-            // First check if this is an indirect access request,
-            // virtual groupings start with an "_" and end with an "_".
-            if (token.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX)
-                && token.endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX)) {
+            String nextToken = tokens[next];
+            if (isTempResource(nextToken)) {
+                super.decode(stack, tokens, next);
+            } else if (nextToken.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX)
+                && nextToken.endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX)) {
                 PagesByFirstLettersSubView subView = new PagesByFirstLettersSubView();
-                subView.init(this, token.toUpperCase(), "/" + token.toUpperCase());
+                subView.init(this, nextToken.toUpperCase(), "/" + nextToken.toUpperCase());
                 stack.push(subView);
                 subView.decode(stack, tokens, next + 1);
             } else {
                 // This has to be a page name (Direct access).
                 DavPage page = new DavPage();
-                page.init(this, this.name + "." + token, "/" + token);
+                page.init(this, this.name + "." + nextToken, "/" + nextToken);
                 stack.push(page);
                 page.decode(stack, tokens, next + 1);
             }
@@ -85,12 +85,12 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     public boolean exists()
     {
         try {
-            List<String> spaces = xwikiContext.getWiki().getSpaces(xwikiContext);
+            List<String> spaces = getContext().getSpaces();
             if (spaces.contains(name)) {
                 return true;
             }
-        } catch (XWikiException e) {
-            LOG.error("Unexpected Error : ", e);
+        } catch (DavException ex) {
+            LOG.error("Unexpected Error : ", ex);
         }
         return false;
     }
@@ -102,13 +102,12 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     {
         List<DavResource> children = new ArrayList<DavResource>();
         try {
-            List<String> docNames =
-                xwikiContext.getWiki().getStore().searchDocumentsNames(
-                    "where doc.web='" + this.name + "'", 0, 0, xwikiContext);
+            String sql = "where doc.web='" + this.name + "'";
+            List<String> docNames = getContext().searchDocumentsNames(sql);
             Set<String> subViewNames = new HashSet<String>();
             int subViewNameLength = XWikiDavUtils.getSubViewNameLength(docNames.size());
             for (String docName : docNames) {
-                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
+                if (getContext().hasAccess("view", docName)) {
                     int dot = docName.lastIndexOf('.');
                     String pageName = docName.substring(dot + 1);
                     if (subViewNameLength < pageName.length()) {
@@ -131,8 +130,12 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                     LOG.error("Unexpected Error : ", e);
                 }
             }
-        } catch (XWikiException e) {
-            LOG.error("Unexpected Error : ", e);
+        } catch (DavException ex) {
+            LOG.error("Unexpected Error : ", ex);
+        }
+        // In-memory resources.
+        for (DavResource sessionResource : getVirtualMembers()) {
+            children.add(sessionResource);
         }
         return new DavResourceIteratorImpl(children);
     }
@@ -142,17 +145,14 @@ public class PagesBySpaceNameSubView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        if (resource instanceof DavPage) {
+        if (resource instanceof DavTempFile) {
+            addTempResource((DavTempFile) resource, inputContext);
+        } else if (resource instanceof DavPage) {
             String pName = ((DavPage) resource).getDisplayName();
-            if (XWikiDavUtils.hasAccess("edit", pName, xwikiContext)) {
-                try {
-                    XWikiDocument childDoc =
-                        xwikiContext.getWiki().getDocument(pName, xwikiContext);
-                    childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
-                    xwikiContext.getWiki().saveDocument(childDoc, xwikiContext);
-                } catch (XWikiException e) {
-                    throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
-                }
+            if (getContext().hasAccess("edit", pName)) {
+                XWikiDocument childDoc = getContext().getDocument(pName);
+                childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
+                getContext().saveDocument(childDoc);
             }
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
@@ -164,17 +164,14 @@ public class PagesBySpaceNameSubView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        if (member instanceof DavPage) {
+        if (member instanceof DavTempFile) {
+            removeTempResource((DavTempFile) member);
+        } else if (member instanceof DavPage) {
             String pName = ((DavPage) member).getDisplayName();
-            if (XWikiDavUtils.hasAccess("delete", pName, xwikiContext)) {
-                try {
-                    XWikiDocument childDoc =
-                        xwikiContext.getWiki().getDocument(pName, xwikiContext);
-                    if (!childDoc.isNew()) {
-                        xwikiContext.getWiki().deleteDocument(childDoc, xwikiContext);
-                    }
-                } catch (XWikiException e) {
-                    throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+            if (getContext().hasAccess("delete", pName)) {
+                XWikiDocument childDoc = getContext().getDocument(pName);
+                if (!childDoc.isNew()) {
+                    getContext().deleteDocument(childDoc);
                 }
             }
         } else {
@@ -193,26 +190,20 @@ public class PagesBySpaceNameSubView extends AbstractDavView
             if (!dSpace.exists()) {
                 // Now check whether this is a rename operation.
                 if (getCollection().equals(dSpace.getCollection())) {
-                    try {
-                        List<String> docNames =
-                            xwikiContext.getWiki().getStore().searchDocumentsNames(
-                                "where doc.web='" + this.name + "'", 0, 0, xwikiContext);
-                        // To rename an entire space, user should have delete rights on all the
-                        // documents in the current space and edit rights on all the documents that
-                        // will be created after the rename operation.
-                        for (String docName : docNames) {
-                            String newDocName = dSpace.getDisplayName() + "." + docName;
-                            XWikiDavUtils.checkAccess("delete", docName, xwikiContext);
-                            XWikiDavUtils.checkAccess("edit", newDocName, xwikiContext);
-                        }
-                        for (String docName : docNames) {
-                            XWikiDocument doc =
-                                xwikiContext.getWiki().getDocument(docName, xwikiContext);
-                            String newDocName = dSpace.getDisplayName() + "." + doc.getName();
-                            doc.rename(newDocName, xwikiContext);
-                        }
-                    } catch (XWikiException e) {
-                        throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+                    String sql = "where doc.web='" + this.name + "'";
+                    List<String> docNames = getContext().searchDocumentsNames(sql);
+                    // To rename an entire space, user should have delete rights on all the
+                    // documents in the current space and edit rights on all the documents that
+                    // will be created after the rename operation.
+                    for (String docName : docNames) {
+                        String newDocName = dSpace.getDisplayName() + "." + docName;
+                        getContext().checkAccess("delete", docName);
+                        getContext().checkAccess("edit", newDocName);
+                    }
+                    for (String docName : docNames) {
+                        XWikiDocument doc = getContext().getDocument(docName);
+                        String newDocName = dSpace.getDisplayName() + "." + doc.getName();
+                        getContext().renameDocument(doc, newDocName);
                     }
                 } else {
                     // Actual moves (perhaps from one view to another) is not
@@ -225,21 +216,5 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, POST, PROPFIND, PROPPATCH, MKCOL, COPY, PUT, DELETE, MOVE, LOCK, UNLOCK";
     }
 }

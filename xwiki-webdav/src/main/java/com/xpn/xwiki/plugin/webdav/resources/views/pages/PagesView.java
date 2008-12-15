@@ -32,11 +32,10 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
-import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * This view lists all the documents organized by space.
@@ -48,7 +47,7 @@ public class PagesView extends AbstractDavView
     /**
      * Logger instance.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(PagesView.class);
+    private static final Logger logger = LoggerFactory.getLogger(PagesView.class);
 
     /**
      * {@inheritDoc}
@@ -57,11 +56,15 @@ public class PagesView extends AbstractDavView
         throws DavException
     {
         if (next < tokens.length) {
-            String spaceName = tokens[next];
-            PagesBySpaceNameSubView subView = new PagesBySpaceNameSubView();
-            subView.init(this, spaceName, "/" + spaceName);
-            stack.push(subView);
-            subView.decode(stack, tokens, next + 1);
+            String nextToken = tokens[next];
+            if (isTempResource(nextToken)) {
+                super.decode(stack, tokens, next);
+            } else {
+                PagesBySpaceNameSubView subView = new PagesBySpaceNameSubView();
+                subView.init(this, nextToken, "/" + nextToken);
+                stack.push(subView);
+                subView.decode(stack, tokens, next + 1);
+            }
         }
     }
 
@@ -72,16 +75,18 @@ public class PagesView extends AbstractDavView
     {
         List<DavResource> children = new ArrayList<DavResource>();
         try {
-            List<String> spaceNames = xwikiContext.getWiki().getSpaces(xwikiContext);
+            List<String> spaceNames = getContext().getSpaces();
             for (String spaceName : spaceNames) {
                 PagesBySpaceNameSubView subView = new PagesBySpaceNameSubView();
                 subView.init(this, spaceName, "/" + spaceName);
                 children.add(subView);
             }
-        } catch (XWikiException e) {
-            LOG.error("Unexpected Error : ", e);
         } catch (DavException e) {
-            LOG.error("Unexpected Error : ", e);
+            logger.error("Unexpected Error : ", e);
+        }
+        // In-memory resources.
+        for (DavResource sessionResource : getVirtualMembers()) {
+            children.add(sessionResource);
         }
         return new DavResourceIteratorImpl(children);
     }
@@ -91,17 +96,17 @@ public class PagesView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) resource;
-        String homePage = space.getDisplayName() + ".WebHome";
-        XWikiDavUtils.checkAccess("edit", homePage, xwikiContext);
-        try {
-            XWikiDocument doc =
-                xwikiContext.getWiki().getDocument(space.getDisplayName() + ".WebHome",
-                    xwikiContext);
+        if (resource instanceof DavTempFile) {
+            addTempResource((DavTempFile) resource, inputContext);
+        } else if (resource instanceof PagesBySpaceNameSubView) {
+            PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) resource;
+            String homePage = space.getDisplayName() + ".WebHome";
+            getContext().checkAccess("edit", homePage);
+            XWikiDocument doc = getContext().getDocument(space.getDisplayName() + ".WebHome");
             doc.setContent("This page was created thorugh xwiki-webdav interface.");
-            xwikiContext.getWiki().saveDocument(doc, xwikiContext);
-        } catch (XWikiException e) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+            getContext().saveDocument(doc);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }
     }
 
@@ -110,37 +115,22 @@ public class PagesView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) member;
-        try {
-            List<String> docNames =
-                xwikiContext.getWiki().getStore().searchDocumentsNames(
-                    "where doc.web='" + space.getDisplayName() + "'", 0, 0, xwikiContext);
+        if (member instanceof DavTempFile) {
+            removeTempResource((DavTempFile) member);
+        } else if (member instanceof PagesBySpaceNameSubView) {
+            PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) member;
+            String sql = "where doc.web='" + space.getDisplayName() + "'";
+            List<String> docNames = getContext().searchDocumentsNames(sql);
             // Check if the user has delete rights on all child pages.
             for (String docName : docNames) {
-                XWikiDavUtils.checkAccess("delete", docName, xwikiContext);
+                getContext().checkAccess("delete", docName);
             }
             for (String docName : docNames) {
-                XWikiDocument doc = xwikiContext.getWiki().getDocument(docName, xwikiContext);
-                xwikiContext.getWiki().deleteDocument(doc, xwikiContext);
+                XWikiDocument doc = getContext().getDocument(docName);
+                getContext().deleteDocument(doc);
             }
-        } catch (XWikiException e) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, POST, PROPFIND, MKCOL, PUT, LOCK, UNLOCK";
     }
 }

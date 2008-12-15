@@ -25,6 +25,7 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.io.InputContext;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
 
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
@@ -65,6 +66,22 @@ public class HomeView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
+    public long getModificationTime()
+    {        
+        return mPage.getModificationTime();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public DavPropertySet getProperties()
+    {
+        return mPage.getProperties();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public DavResourceIterator getMembers()
     {
         return mPage.getMembers();
@@ -93,20 +110,4 @@ public class HomeView extends AbstractDavView
     {
         return mPage.exists();
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, POST, PROPFIND, PROPPATCH, MKCOL, PUT, LOCK, UNLOCK";
-    } 
 }

@@ -28,31 +28,20 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
-import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
-import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavResource;
-import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
-import com.xpn.xwiki.util.Util;
 
 /**
  * The collection resource which represents a page {@link XWikiDocument} of XWiki.
@@ -64,7 +53,7 @@ public class DavPage extends AbstractDavResource
     /**
      * Logger instance.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(DavPage.class);
+    private static final Logger logger = LoggerFactory.getLogger(DavPage.class);
 
     /**
      * The name of the space to which this page belongs to.
@@ -89,21 +78,17 @@ public class DavPage extends AbstractDavResource
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
-        try {
-            this.doc = xwikiContext.getWiki().getDocument(this.name, xwikiContext);
-        } catch (XWikiException e) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
-        }
+        this.doc = getContext().getDocument(this.name);
         String timeStamp = DavConstants.creationDateFormat.format(doc.getCreationDate());
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, timeStamp));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, timeStamp));
         timeStamp = DavConstants.modificationDateFormat.format(doc.getContentUpdateDate());
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, timeStamp));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETETAG, timeStamp));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE,
-            "text/directory"));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, doc
-            .getLanguage()));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, 0));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, timeStamp));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETETAG, timeStamp));
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, "text/directory"));
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, doc.getLanguage()));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, 0));
     }
 
     /**
@@ -117,16 +102,11 @@ public class DavPage extends AbstractDavResource
             String nextToken = tokens[next];
             String relativePath = "/" + nextToken;
             int dot = nextToken.indexOf('.');
-            if (dot != -1) {
-                if (dot == 0) {
-                    // For the moment we'll assume that it can only be a file.
-                    DavTempFile davTempFile = new DavTempFile();
-                    davTempFile.init(this, nextToken, relativePath);
-                    stack.push(davTempFile);
-                } else if (!last
-                    || xwikiContext.getWiki().exists(nextToken, xwikiContext)
-                    || DavMethods.isCreateCollectionRequest((DavServletRequest) xwikiContext
-                        .getRequest().getHttpServletRequest())) {
+            if (isTempResource(nextToken)) {
+                super.decode(stack, tokens, next);
+            } else if (dot != -1) {
+                if (!last || getContext().exists(nextToken)
+                    || getContext().isCreateCollectionRequest()) {
                     DavPage davPage = new DavPage();
                     davPage.init(this, nextToken, relativePath);
                     stack.push(davPage);
@@ -142,11 +122,8 @@ public class DavPage extends AbstractDavResource
                     stack.push(attachment);
                 }
             } else {
-                if (!last
-                    || xwikiContext.getWiki().exists(this.spaceName + "." + nextToken,
-                        xwikiContext)
-                    || DavMethods.isCreateCollectionRequest((DavServletRequest) xwikiContext
-                        .getRequest().getHttpServletRequest())) {
+                if (!last || getContext().exists(this.spaceName + "." + nextToken)
+                    || getContext().isCreateCollectionRequest()) {
                     DavPage davPage = new DavPage();
                     davPage.init(this, this.spaceName + "." + nextToken, relativePath);
                     stack.push(davPage);
@@ -171,38 +148,20 @@ public class DavPage extends AbstractDavResource
     /**
      * {@inheritDoc}
      */
-    public boolean isCollection()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void spool(OutputContext outputContext) throws IOException
-    {
-        throw new IOException("Spooling is not supported yet.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
     public DavResourceIterator getMembers()
     {
         // Protect against direct url referencing.
         List<DavResource> children = new ArrayList<DavResource>();
-        if (!XWikiDavUtils.hasAccess("view", this.name, xwikiContext)) {
+        if (!getContext().hasAccess("view", this.name)) {
             return new DavResourceIteratorImpl(children);
         }
         try {
             String sql = "where doc.parent='" + this.name + "'";
-            List<String> docNames =
-                xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 0, 0, xwikiContext);
+            List<String> docNames = getContext().searchDocumentsNames(sql);
             for (String docName : docNames) {
-                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
-                    XWikiDocument childDoc =
-                        xwikiContext.getWiki().getDocument(docName, xwikiContext);
+                if (getContext().hasAccess("view", docName)) {
+                    XWikiDocument childDoc = getContext().getDocument(docName);
                     DavPage page = new DavPage();
                     if (childDoc.getSpace().equals(this.spaceName)) {
                         page.init(this, docName, "/" + childDoc.getName());
@@ -222,7 +181,7 @@ public class DavPage extends AbstractDavResource
                 "select attach.filename from XWikiAttachment as attach, "
                     + "XWikiDocument as doc where attach.docId=doc.id and doc.fullName='"
                     + this.name + "'";
-            List attachments = xwikiContext.getWiki().getStore().search(sql, 0, 0, xwikiContext);
+            List attachments = getContext().search(sql);
             for (int i = 0; i < attachments.size(); i++) {
                 String filename = (String) attachments.get(i);
                 DavAttachment attachment = new DavAttachment();
@@ -230,55 +189,13 @@ public class DavPage extends AbstractDavResource
                 children.add(attachment);
             }
             // In-memory resources.
-            for (DavResource sessionResource : getSessionResources()) {
+            for (DavResource sessionResource : getVirtualMembers()) {
                 children.add(sessionResource);
             }
-        } catch (XWikiException e) {
-            LOG.error("Unexpected Error : ", e);
         } catch (DavException e) {
-            LOG.error("Unexpected Error : ", e);
+            logger.error("Unexpected Error : ", e);
         }
         return new DavResourceIteratorImpl(children);
-    }
-
-    /**
-     * Adds an attachment to the {@link XWikiDocument} represented by this resource.
-     * 
-     * @param fileName Name of this attachment.
-     * @param data Data to be put into the attachment (file content).
-     * @param doc The document to which the attachment is made.
-     * @param xwikiContext XWiki context.
-     * @throws XWikiException Indicates an internal error.
-     */
-    protected void addAttachment(String fileName, byte[] data, XWikiDocument doc,
-        XWikiContext xwikiContext) throws XWikiException
-    {
-        int i = fileName.indexOf("\\");
-        if (i == -1) {
-            i = fileName.indexOf("/");
-        }
-        String filename = fileName.substring(i + 1);
-
-        // TODO : avoid name clearing when encoding problems will be solved
-        // JIRA : http://jira.xwiki.org/jira/browse/XWIKI-94
-        // filename =
-        // xwikiContext.getWiki().clearName(filename, false, true, xwikiContext);
-
-        XWikiAttachment attachment = doc.getAttachment(filename);
-        if (attachment == null) {
-            attachment = new XWikiAttachment();
-            // Add the attachment in the current doc
-            doc.getAttachmentList().add(attachment);
-        }
-
-        attachment.setContent(data);
-        attachment.setFilename(filename);
-        attachment.setAuthor(xwikiContext.getUser());
-        // Add the attachment to the document
-        attachment.setDoc(doc);
-        doc.saveAttachmentContent(attachment, xwikiContext);
-        xwikiContext.getWiki().saveDocument(doc, "Attachment " + filename + " added",
-            xwikiContext);
     }
 
     /**
@@ -286,59 +203,51 @@ public class DavPage extends AbstractDavResource
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        XWikiDavUtils.checkAccess("edit", this.name, xwikiContext);
+        getContext().checkAccess("edit", this.name);
         boolean isFile = (inputContext.getInputStream() != null);
-        if (isFile) {
-            try {
-                String fName = resource.getDisplayName();
-                byte[] data = Util.getFileContentAsBytes(inputContext.getInputStream());
-                if (fName.equals(DavWikiFile.WIKI_TXT)) {
-                    doc.setContent(new String(data));
-                    xwikiContext.getWiki().saveDocument(doc, "Updated from WebDAV", xwikiContext);
-                } else if (fName.equals(DavWikiFile.WIKI_XML)) {
-                    // These values should not be writable.
-                    String oldVersion = doc.getVersion();
-                    String oldContentAuthor = doc.getContentAuthor();
-                    // Keep for determining if the content was changed or not.
-                    String oldContent = doc.getContent();
-                    doc.fromXML(new String(data));
-                    // Ignore the version received in the XML. It will be automatically increased when saving the doc.
-                    doc.setVersion(oldVersion);
-                    // Don't allow setting the contentAuthor, as it determines the programming right.
-                    doc.setContentAuthor(oldContentAuthor);
-                    if (!StringUtils.equals(oldContent, doc.getContent())) {
-                        // Force setting the contentUpdateDate and contentAuthor if the content was changed.
-                        doc.setContentDirty(true);
-                    }
-                    // Force setting the current date and increasing the version
-                    doc.setMetaDataDirty(true);
-                    // Force setting the author. 
-                    doc.setAuthor(xwikiContext.getUser());
-                    xwikiContext.getWiki().saveDocument(doc, "Updated from WebDAV", xwikiContext);
-                } else if (fName.startsWith(".")) {
-                    DavTempFile tempFile = (DavTempFile) resource;
-                    tempFile.setdData(data);
-                    getSessionResources().add(tempFile);
-                } else {
-                    addAttachment(fName, data, doc, xwikiContext);
+        if (resource instanceof DavTempFile) {
+            addTempResource((DavTempFile) resource, inputContext);
+        } else if (resource instanceof DavPage) {
+            String pName = resource.getDisplayName();
+            getContext().checkAccess("edit", pName);
+            XWikiDocument childDoc = getContext().getDocument(pName);
+            childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
+            childDoc.setParent(this.name);
+            getContext().saveDocument(childDoc);
+        } else if (isFile) {
+            String fName = resource.getDisplayName();
+            byte[] data = getContext().getFileContentAsBytes(inputContext.getInputStream());
+            if (fName.equals(DavWikiFile.WIKI_TXT)) {
+                doc.setContent(new String(data));
+                getContext().saveDocument(doc);
+            } else if (fName.equals(DavWikiFile.WIKI_XML)) {
+                // These values should not be writable.
+                String oldVersion = doc.getVersion();
+                String oldContentAuthor = doc.getContentAuthor();
+                // Keep for determining if the content was changed or not.
+                String oldContent = doc.getContent();
+                getContext().fromXML(doc, new String(data));
+                // Ignore the version received in the XML. It will be automatically increased
+                // when saving the doc.
+                doc.setVersion(oldVersion);
+                // Don't allow setting the contentAuthor, as it determines the programming
+                // right.
+                doc.setContentAuthor(oldContentAuthor);
+                if (!StringUtils.equals(oldContent, doc.getContent())) {
+                    // Force setting the contentUpdateDate and contentAuthor if the content was
+                    // changed.
+                    doc.setContentDirty(true);
                 }
-            } catch (IOException e) {
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
-            } catch (XWikiException e) {
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+                // Force setting the current date and increasing the version
+                doc.setMetaDataDirty(true);
+                // Force setting the author.
+                doc.setAuthor(getContext().getUser());
+                getContext().saveDocument(doc);
+            } else {
+                getContext().addAttachment(doc, data, fName);
             }
         } else {
-            String pName = resource.getDisplayName();
-            XWikiDavUtils.checkAccess("edit", pName, xwikiContext);
-            try {
-                XWikiDocument childDoc = xwikiContext.getWiki().getDocument(pName, xwikiContext);
-                childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
-                childDoc.setParent(this.name);
-                xwikiContext.getWiki().saveDocument(childDoc, xwikiContext);
-            } catch (XWikiException e) {
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
-            }
-
+            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -347,32 +256,26 @@ public class DavPage extends AbstractDavResource
      */
     public void removeMember(DavResource member) throws DavException
     {
-        XWikiDavUtils.checkAccess("edit", this.name, xwikiContext);
+        getContext().checkAccess("edit", this.name);
         String mName = member.getDisplayName();
-        if (mName.equals(DavWikiFile.WIKI_TXT) || mName.equals(DavWikiFile.WIKI_XML)) {
+        if (member instanceof DavTempFile) {
+            removeTempResource((DavTempFile) member);
+        } else if (member instanceof DavWikiFile) {
             // Wiki files cannot be deleted, but don't do anything! let the client assume that the
             // delete was a success. This is required since some clients try to delete the file
             // before saving a new (edited) file or when deleting the parent. Still, problems might
             // arise if the client tries to verify the delete by re requesting the resource in which
             // case we'll need yet another (elegant) workaround.
-        } else if (mName.startsWith(".")) {
-            getSessionResources().remove(member);
-        } else if (doc.getAttachment(mName) != null) {
-            try {
-                doc.deleteAttachment(doc.getAttachment(mName), xwikiContext);
-            } catch (XWikiException e) {
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+        } else if (member instanceof DavAttachment) {
+            getContext().deleteAttachment(doc.getAttachment(mName));
+        } else if (member instanceof DavPage) {
+            XWikiDocument childDoc = getContext().getDocument(mName);
+            getContext().checkAccess("delete", childDoc.getFullName());
+            if (!childDoc.isNew()) {
+                getContext().deleteDocument(childDoc);
             }
         } else {
-            try {
-                XWikiDocument childDoc = xwikiContext.getWiki().getDocument(mName, xwikiContext);
-                XWikiDavUtils.checkAccess("delete", childDoc.getFullName(), xwikiContext);
-                if (!childDoc.isNew()) {
-                    xwikiContext.getWiki().deleteDocument(childDoc, xwikiContext);
-                }
-            } catch (XWikiException e) {
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
-            }
+            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -381,7 +284,7 @@ public class DavPage extends AbstractDavResource
      */
     public void move(DavResource destination) throws DavException
     {
-        XWikiDavUtils.checkAccess("delete", this.name, xwikiContext);
+        getContext().checkAccess("delete", this.name);
         XWikiDavResource dResource = (XWikiDavResource) destination;
         String dSpaceName = null;
         String dPageName = null;
@@ -393,91 +296,42 @@ public class DavPage extends AbstractDavResource
             dSpaceName = this.spaceName;
             dPageName = dResource.getDisplayName();
         }
-        try {
-            List<String> spaces = xwikiContext.getWiki().getSpaces(xwikiContext);
-            if (spaces.contains(dSpaceName)) {
-                String newDocName = dSpaceName + "." + dPageName;
-                String sql = "where doc.parent='" + this.name + "'";
-                List<String> childDocNames =
-                    xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 0, 0,
-                        xwikiContext);
-                // Validate access rights for the destination page.
-                XWikiDavUtils.checkAccess("edit", newDocName, xwikiContext);
-                // Validate access rights for all the renamed pages.
-                for (String childDocName : childDocNames) {
-                    XWikiDavUtils.checkAccess("edit", childDocName, xwikiContext);
-                }
-                doc.rename(newDocName, xwikiContext);
-                for (String childDocName : childDocNames) {
-                    XWikiDocument childDoc =
-                        xwikiContext.getWiki().getDocument(childDocName, xwikiContext);
-                    childDoc.setParent(newDocName);
-                    xwikiContext.getWiki().saveDocument(childDoc, xwikiContext);
-                }
-            } else {
-                throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+        List<String> spaces = getContext().getSpaces();
+        if (spaces.contains(dSpaceName)) {
+            String newDocName = dSpaceName + "." + dPageName;
+            String sql = "where doc.parent='" + this.name + "'";
+            List<String> childDocNames = getContext().searchDocumentsNames(sql);
+            // Validate access rights for the destination page.
+            getContext().checkAccess("edit", newDocName);
+            // Validate access rights for all the renamed pages.
+            for (String childDocName : childDocNames) {
+                getContext().checkAccess("edit", childDocName);
             }
-        } catch (XWikiException e) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+            getContext().renameDocument(doc, newDocName);
+            for (String childDocName : childDocNames) {
+                XWikiDocument childDoc = getContext().getDocument(childDocName);
+                childDoc.setParent(newDocName);
+                getContext().saveDocument(childDoc);
+            }
+        } else {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void copy(DavResource destination, boolean shallow) throws DavException
+    public boolean isCollection()
     {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
+        return true;
     }
 
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
-    public MultiStatusResponse alterProperties(List changeList) throws DavException
+    public void spool(OutputContext outputContext) throws IOException
     {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public MultiStatusResponse alterProperties(DavPropertySet setProperties,
-        DavPropertyNameSet removePropertyNames) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeProperty(DavPropertyName propertyName) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setProperty(DavProperty property) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getHref()
-    {
-        return locator.getHref(false);
+        throw new IOException("Collection resources can't be spooled");
     }
 
     /**
@@ -489,14 +343,6 @@ public class DavPage extends AbstractDavResource
             return doc.getContentUpdateDate().getTime();
         }
         return IOUtil.UNDEFINED_TIME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, PROPFIND, PROPPATCH, COPY, DELETE, MOVE, LOCK, UNLOCK";
     }
 
     /**

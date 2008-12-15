@@ -36,7 +36,7 @@ public class XWikiDavSessionProvider implements DavSessionProvider
     /**
      * Logger instance.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(XWikiDavSessionProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(XWikiDavSessionProvider.class);
 
     /**
      * {@inheritDoc}
@@ -50,7 +50,7 @@ public class XWikiDavSessionProvider implements DavSessionProvider
             workspaceName = null;
         }
         DavSession ds = new XWikiDavSession();
-        LOG.debug("Attaching session '" + ds + "' to request '" + request + "'");
+        logger.debug("Attaching session '" + ds + "' to request '" + request + "'");
         request.setDavSession(ds);
         return true;
     }
@@ -67,7 +67,7 @@ public class XWikiDavSessionProvider implements DavSessionProvider
             for (String token : lockTokens) {
                 session.removeLockToken(token);
             }
-            LOG.debug("Releasing session '" + ds + "' from request '" + request + "'");
+            logger.debug("Releasing session '" + ds + "' from request '" + request + "'");
         } else {
             // session is null. nothing to be done.
         }

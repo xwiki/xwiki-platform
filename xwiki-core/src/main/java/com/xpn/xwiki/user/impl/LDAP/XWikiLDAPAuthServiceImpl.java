@@ -322,7 +322,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 LOG.debug("Checking if the user belongs to the user group: " + filterGroupDN);
             }
 
-            ldapDn = ldapUtils.isUserInGroup(ldapUid, filterGroupDN, context);
+            ldapDn = ldapUtils.isUidInGroup(ldapUid, filterGroupDN, context);
 
             if (ldapDn == null) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
@@ -341,7 +341,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 LOG.debug("Checking if the user does not belongs to the exclude group: " + excludeGroupDN);
             }
 
-            if (ldapUtils.isUserInGroup(ldapUid, excludeGroupDN, context) != null) {
+            if (ldapUtils.isUidInGroup(ldapUid, excludeGroupDN, context) != null) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
                     "LDAP user {0} should not belong to LDAP group {1}.", null, new Object[] {ldapUid, filterGroupDN});
             }
@@ -564,68 +564,21 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             }
         }
 
-        // retrieve list of all groups
-        List<String> allxwikigroups =
-            (List<String>) context.getWiki().getGroupService(context).getAllMatchedGroups(null, false, 0, 0, null,
-                context);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("All defined XWiki groups: ");
-
-            for (String xwikiGroupName : allxwikigroups) {
-                LOG.debug(xwikiGroupName);
-            }
-        }
+        Collection<String> xwikiUserGroupList =
+            context.getWiki().getGroupService(context).getAllGroupsNamesForMember(xwikiUserName, 0, 0, context);
 
         // go through mapped groups to locate the user
         for (Map.Entry<String, Set<String>> entry : groupMappings.entrySet()) {
-            String groupDN = entry.getKey();
-            Set<String> xwikiGroupNameSet = entry.getValue();
+            String xwikiGrouNamep = entry.getKey();
+            Set<String> groupDNSet = entry.getValue();
 
-            for (String xwikiGroupName : xwikiGroupNameSet) {
-                // check if group is in list of all groups
-                if (!allxwikigroups.contains(xwikiGroupName)) {
-                    if (LOG.isWarnEnabled()) {
-                        LOG.warn("XWiki group not found:" + xwikiGroupName);
-                    }
-
-                    continue;
+            if (xwikiUserGroupList.contains(xwikiGrouNamep)) {
+                if (!ldapUtils.isMemberOfGroups(userDN, groupDNSet, context)) {
+                    removeUserFromXWikiGroup(xwikiUserName, xwikiGrouNamep, context);
                 }
-
-                Map<String, String> groupMembers = ldapUtils.getGroupMembers(groupDN, context);
-
-                if (groupMembers != null) {
-                    syncGroupMembership(xwikiUserName, userDN, xwikiGroupName, userGroups, groupMembers, context);
-                }
-            }
-        }
-    }
-
-    /**
-     * Synchronize user XWiki membership with it's LDAP membership for provided group.
-     * 
-     * @param xwikiUserName the name of the user.
-     * @param userDN the LDAP DN of the user.
-     * @param xwikiGroupName the name of the XWiki group.
-     * @param userGroups the XWiki groups of user.
-     * @param groupMembers the members of LDAP group.
-     * @param context the XWiki context.
-     */
-    protected void syncGroupMembership(String xwikiUserName, String userDN, String xwikiGroupName,
-        Collection<String> userGroups, Map<String, String> groupMembers, XWikiContext context)
-    {
-        if (groupMembers.containsKey(userDN.toLowerCase())) {
-            // add to group if not there
-            if (!userGroups.contains(xwikiGroupName)) {
-                addUserToXWikiGroup(xwikiUserName, xwikiGroupName, context);
-            }
-        } else {
-            // remove from group if there
-            if (userGroups.contains(xwikiGroupName)) {
-                removeUserFromXWikiGroup(xwikiUserName, xwikiGroupName, context);
-
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Finished removing xwiki group " + xwikiGroupName + " from user " + xwikiUserName);
+            } else {
+                if (ldapUtils.isMemberOfGroups(userDN, groupDNSet, context)) {
+                    addUserToXWikiGroup(xwikiUserName, xwikiGrouNamep, context);
                 }
             }
         }

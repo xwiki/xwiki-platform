@@ -63,110 +63,112 @@ public class XWikiLDAPConfigTest extends TestCase
 
     private static final XWikiConfig CONFIG = new XWikiConfig();
 
-    private static final Map<String, String> RESULT_CFG_USERMAPPING =
-        new Hashtable<String, String>();
+    private static final Map<String, String> RESULT_CFG_USERMAPPING = new Hashtable<String, String>();
 
-    private static final Map<String, String> RESULT_PREF_USERMAPPING =
-        new Hashtable<String, String>();
+    private static final Map<String, String> RESULT_PREF_USERMAPPING = new Hashtable<String, String>();
 
-    private static final Map<String, Set<String>> RESULT_CFG_GROUPMAPPING =
-        new Hashtable<String, Set<String>>();
-    
-    private static final Map<String, Set<String>> RESULT_PREF_GROUPMAPPING =
-        new Hashtable<String, Set<String>>();
-   
+    private static final Map<String, Set<String>> RESULT_CFG_GROUPMAPPING = new Hashtable<String, Set<String>>();
+
+    private static final Map<String, Set<String>> RESULT_PREF_GROUPMAPPING = new Hashtable<String, Set<String>>();
+
     private static final Collection<String> RESULT_CFG_GROUPCLASSES = new HashSet<String>();
-    
+
     private static final Collection<String> RESULT_PREF_GROUPCLASSES = new HashSet<String>();
-    
+
     private static final Collection<String> RESULT_CFG_GROUPMEMBERFIELDS = new HashSet<String>();
-    
+
     private static final Collection<String> RESULT_PREF_GROUPMEMBERFIELDS = new HashSet<String>();
 
-    private static void addProperty(String prefName, String cfgName, String prefValue,
-        String cfgValue)
+    private static void addProperty(String prefName, String cfgName, String prefValue, String cfgValue)
     {
         PREFERENCES.put(prefName, prefValue);
         CONFIG.setProperty(cfgName, cfgValue);
     }
 
     static {
-        CONFIG.setProperty("xwiki.authentication.ldap.authclass",
-            "com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl");
+        CONFIG.setProperty("xwiki.authentication.ldap.authclass", "com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl");
 
         addProperty("ldap", "xwiki.authentication.ldap", "0", "1");
         addProperty("ldap_server", "xwiki.authentication.ldap.server", "localhost", "127.0.0.1");
         addProperty("ldap_port", "xwiki.authentication.ldap.port", "10000", "11111");
         addProperty("ldap_check_level", "xwiki.authentication.ldap.check_level", "0", "1");
-        addProperty("ldap_base_DN", "xwiki.authentication.ldap.base_DN", "o=sevenSeas",
-            "o=sevenSeas2");
-        addProperty("ldap_bind_DN", "xwiki.authentication.ldap.bind_DN",
-            "cn={0},ou=people,o=sevenSeas", "cn={0},ou=people,o=sevenSeas2");
+        addProperty("ldap_base_DN", "xwiki.authentication.ldap.base_DN", "o=sevenSeas", "o=sevenSeas2");
+        addProperty("ldap_bind_DN", "xwiki.authentication.ldap.bind_DN", "cn={0},ou=people,o=sevenSeas",
+            "cn={0},ou=people,o=sevenSeas2");
         addProperty("ldap_bind_pass", "xwiki.authentication.ldap.bind_pass", "{1}", "{1}2");
         addProperty("ldap_UID_attr", "xwiki.authentication.ldap.UID_attr", "uid", "uid2");
-        addProperty("ldap_groupcache_expiration",
-            "xwiki.authentication.ldap.groupcache_expiration", "10000", "11111");
+        addProperty("ldap_groupcache_expiration", "xwiki.authentication.ldap.groupcache_expiration", "10000", "11111");
         addProperty("ldap_user_group", "xwiki.authentication.ldap.user_group", "0", "1");
-        addProperty("ldap_validate_password", "xwiki.authentication.ldap.validate_password", "1",
-            "0");
+        addProperty("ldap_validate_password", "xwiki.authentication.ldap.validate_password", "1", "0");
         addProperty("ldap_update_user", "xwiki.authentication.ldap.update_user", "0", "1");
         addProperty("ldap_trylocal", "xwiki.authentication.ldap.trylocal", "0", "1");
-        addProperty("ldap_mode_group_sync", "xwiki.authentication.ldap.mode_group_sync",
-            "always", "create");
+        addProperty("ldap_mode_group_sync", "xwiki.authentication.ldap.mode_group_sync", "always", "create");
 
-        addProperty("ldap_fields_mapping", "xwiki.authentication.ldap.fields_mapping",
-            "name=uid,last_name=sn", "name=uid2,last_name=sn2");
+        addProperty("ldap_fields_mapping", "xwiki.authentication.ldap.fields_mapping", "name=uid,last_name=sn",
+            "name=uid2,last_name=sn2");
 
         RESULT_PREF_USERMAPPING.put("uid", "name");
         RESULT_PREF_USERMAPPING.put("sn", "last_name");
         RESULT_CFG_USERMAPPING.put("uid2", "name");
         RESULT_CFG_USERMAPPING.put("sn2", "last_name");
 
-        addProperty("ldap_group_mapping", "xwiki.authentication.ldap.group_mapping",
-            XADMINGROUP_FULLNAME + "=" + LDAPTOTOGRP_DN + "|" + XADMINGROUP_FULLNAME + "="
-                + LDAPTITIGRP_DN + "|" + XADMINGROUP2_FULLNAME + "=" + LDAPTOTOGRP_DN + "|"
-                + XADMINGROUP2_FULLNAME + "=" + LDAPTITIGRP_DN, XADMINGROUP_FULLNAME + "="
-                + LDAPTOTOGRP2_DN + "|" + XADMINGROUP_FULLNAME + "=" + LDAPTITIGRP2_DN + "|"
-                + XADMINGROUP2_FULLNAME + "=" + LDAPTOTOGRP2_DN + "|" + XADMINGROUP2_FULLNAME
-                + "=" + LDAPTITIGRP2_DN);
+        addProperty("ldap_group_mapping", "xwiki.authentication.ldap.group_mapping", XADMINGROUP_FULLNAME + "="
+            + LDAPTOTOGRP_DN + "|" + XADMINGROUP_FULLNAME + "=" + LDAPTITIGRP_DN + "|" + XADMINGROUP2_FULLNAME + "="
+            + LDAPTOTOGRP_DN + "|" + XADMINGROUP2_FULLNAME + "=" + LDAPTITIGRP_DN, XADMINGROUP_FULLNAME + "="
+            + LDAPTOTOGRP2_DN + "|" + XADMINGROUP_FULLNAME + "=" + LDAPTITIGRP2_DN + "|" + XADMINGROUP2_FULLNAME + "="
+            + LDAPTOTOGRP2_DN + "|" + XADMINGROUP2_FULLNAME + "=" + LDAPTITIGRP2_DN);
 
-        Set<String> xgroups = new HashSet<String>();
-        xgroups.add(XADMINGROUP_FULLNAME);
-        xgroups.add(XADMINGROUP2_FULLNAME);
+        Set<String> ldapgroups = new HashSet<String>();
+        ldapgroups.add(LDAPTOTOGRP_DN);
+        ldapgroups.add(LDAPTITIGRP_DN);
 
-        RESULT_PREF_GROUPMAPPING.put(LDAPTOTOGRP_DN, xgroups);
-        RESULT_PREF_GROUPMAPPING.put(LDAPTITIGRP_DN, xgroups);
-        RESULT_CFG_GROUPMAPPING.put(LDAPTOTOGRP2_DN, xgroups);
-        RESULT_CFG_GROUPMAPPING.put(LDAPTITIGRP2_DN, xgroups);
-        
+        RESULT_PREF_GROUPMAPPING.put(XADMINGROUP_FULLNAME, ldapgroups);
+        RESULT_PREF_GROUPMAPPING.put(XADMINGROUP2_FULLNAME, ldapgroups);
+
+        Set<String> ldapgroups2 = new HashSet<String>();
+        ldapgroups2.add(LDAPTOTOGRP2_DN);
+        ldapgroups2.add(LDAPTITIGRP2_DN);
+
+        RESULT_CFG_GROUPMAPPING.put(XADMINGROUP_FULLNAME, ldapgroups2);
+        RESULT_CFG_GROUPMAPPING.put(XADMINGROUP2_FULLNAME, ldapgroups2);
+
         RESULT_PREF_GROUPCLASSES.add("groupclass1");
         RESULT_PREF_GROUPCLASSES.add("groupclass2");
         RESULT_CFG_GROUPCLASSES.add("groupclass12");
-        
-        addProperty("ldap_group_classes", "xwiki.authentication.ldap.group_classes", "groupclass1,groupclass2", "groupclass12");
-        
+
+        addProperty("ldap_group_classes", "xwiki.authentication.ldap.group_classes", "groupclass1,groupclass2",
+            "groupclass12");
+
         RESULT_PREF_GROUPMEMBERFIELDS.add("groupmemberfield1");
         RESULT_PREF_GROUPMEMBERFIELDS.add("groupmemberfield2");
         RESULT_CFG_GROUPMEMBERFIELDS.add("groupmemberfield12");
-        
-        addProperty("ldap_group_memberfields", "xwiki.authentication.ldap.group_memberfields", "groupmemberfield1,groupmemberfield2", "groupmemberfield12");
+
+        addProperty("ldap_group_memberfields", "xwiki.authentication.ldap.group_memberfields",
+            "groupmemberfield1,groupmemberfield2", "groupmemberfield12");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
     protected void setUp() throws XWikiException
     {
         this.prefContext = new XWikiContext();
 
         new XWiki(new XWikiConfig(), this.prefContext)
         {
-            public void initXWiki(XWikiConfig config, XWikiContext context,
-                XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
+            @Override
+            public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context,
+                boolean noupdate) throws XWikiException
             {
                 context.setWiki(this);
                 setConfig(config);
             }
 
-            public String getXWikiPreference(String prefname, String default_value,
-                XWikiContext context)
+            @Override
+            public String getXWikiPreference(String prefname, String default_value, XWikiContext context)
             {
                 return PREFERENCES.get(prefname);
             }
@@ -176,15 +178,16 @@ public class XWikiLDAPConfigTest extends TestCase
 
         new XWiki(CONFIG, this.cfgContext)
         {
-            public void initXWiki(XWikiConfig config, XWikiContext context,
-                XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
+            @Override
+            public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context,
+                boolean noupdate) throws XWikiException
             {
                 context.setWiki(this);
                 setConfig(config);
             }
 
-            public String getXWikiPreference(String prefname, String default_value,
-                XWikiContext context)
+            @Override
+            public String getXWikiPreference(String prefname, String default_value, XWikiContext context)
             {
                 return default_value;
             }
@@ -196,18 +199,16 @@ public class XWikiLDAPConfigTest extends TestCase
 
     public void testGetLDAPParam1()
     {
-        assertEquals("0", XWikiLDAPConfig.getInstance().getLDAPParam("ldap",
-            "xwiki.authentication.ldap", null, prefContext));
-        assertEquals("1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap",
-            "xwiki.authentication.ldap", null, cfgContext));
+        assertEquals("0", XWikiLDAPConfig.getInstance().getLDAPParam("ldap", "xwiki.authentication.ldap", null,
+            prefContext));
+        assertEquals("1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap", "xwiki.authentication.ldap", null,
+            cfgContext));
     }
 
     public void testGetLDAPParam2()
     {
-        assertEquals("localhost", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null,
-            prefContext));
-        assertEquals("127.0.0.1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null,
-            cfgContext));
+        assertEquals("localhost", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null, prefContext));
+        assertEquals("127.0.0.1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null, cfgContext));
     }
 
     public void testIsLDAPEnabled()
@@ -224,13 +225,11 @@ public class XWikiLDAPConfigTest extends TestCase
 
     public void testGetGroupMappings()
     {
-        Map<String, Set<String>> prefMapping =
-            XWikiLDAPConfig.getInstance().getGroupMappings(prefContext);
+        Map<String, Set<String>> prefMapping = XWikiLDAPConfig.getInstance().getGroupMappings(prefContext);
 
         assertEquals(RESULT_PREF_GROUPMAPPING, prefMapping);
 
-        Map<String, Set<String>> cfgMapping =
-            XWikiLDAPConfig.getInstance().getGroupMappings(cfgContext);
+        Map<String, Set<String>> cfgMapping = XWikiLDAPConfig.getInstance().getGroupMappings(cfgContext);
 
         assertEquals(RESULT_CFG_GROUPMAPPING, cfgMapping);
     }
@@ -239,11 +238,10 @@ public class XWikiLDAPConfigTest extends TestCase
     {
         List<String> prefAttrList = new ArrayList<String>();
 
-        Map<String, String> prefMapping =
-            XWikiLDAPConfig.getInstance().getUserMappings(prefAttrList, prefContext);
+        Map<String, String> prefMapping = XWikiLDAPConfig.getInstance().getUserMappings(prefAttrList, prefContext);
 
-        assertEquals("uid", (String) prefAttrList.get(0));
-        assertEquals("sn", (String) prefAttrList.get(1));
+        assertEquals("uid", prefAttrList.get(0));
+        assertEquals("sn", prefAttrList.get(1));
 
         assertEquals(RESULT_PREF_USERMAPPING, prefMapping);
 
@@ -251,11 +249,10 @@ public class XWikiLDAPConfigTest extends TestCase
 
         List<String> cfgAttrList = new ArrayList<String>();
 
-        Map<String, String> cfgMapping =
-            XWikiLDAPConfig.getInstance().getUserMappings(cfgAttrList, cfgContext);
+        Map<String, String> cfgMapping = XWikiLDAPConfig.getInstance().getUserMappings(cfgAttrList, cfgContext);
 
-        assertEquals("uid2", (String) cfgAttrList.get(0));
-        assertEquals("sn2", (String) cfgAttrList.get(1));
+        assertEquals("uid2", cfgAttrList.get(0));
+        assertEquals("sn2", cfgAttrList.get(1));
 
         assertEquals(RESULT_CFG_USERMAPPING, cfgMapping);
     }

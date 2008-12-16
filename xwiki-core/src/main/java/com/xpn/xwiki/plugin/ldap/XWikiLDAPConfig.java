@@ -279,12 +279,13 @@ public final class XWikiLDAPConfig
 
         return port;
     }
-
+    
     /**
      * Get mapping between XWiki groups names and LDAP groups names.
      * 
      * @param context the XWiki context.
-     * @return the mapping between XWiki users and LDAP users.
+     * @return the mapping between XWiki users and LDAP users. The key is the XWiki group, and the value is the list of
+     *         mapped LDAP groups.
      */
     public Map<String, Set<String>> getGroupMappings(XWikiContext context)
     {
@@ -306,17 +307,17 @@ public final class XWikiLDAPConfig
                     String xwikigroup = mapping.substring(0, splitIndex);
                     String ldapgroup = mapping.substring(splitIndex + 1);
 
-                    Set<String> xwikigroups = groupMappings.get(ldapgroup);
+                    Set<String> ldapGroups = groupMappings.get(xwikigroup);
 
-                    if (xwikigroups == null) {
-                        xwikigroups = new HashSet<String>();
-                        groupMappings.put(ldapgroup, xwikigroups);
+                    if (ldapGroups == null) {
+                        ldapGroups = new HashSet<String>();
+                        groupMappings.put(xwikigroup, ldapGroups);
                     }
 
-                    xwikigroups.add(xwikigroup);
+                    ldapGroups.add(ldapgroup);
 
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Groupmapping found: " + xwikigroup + " " + ldapgroup);
+                        LOG.debug("Groupmapping found: " + xwikigroup + " " + ldapGroups);
                     }
                 }
             }

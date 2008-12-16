@@ -326,8 +326,8 @@ public class XWikiLDAPUtils
      * Get all members of a given group based on the groupDN. If the group contains subgroups get these members as well.
      * Retrieve an identifier for each member.
      * 
-     * @param groupDN the group to retrieve the members of and scan for subgroups. If <code>groupDN</code> is a user
-     *            DN or UID, it is added to the <code>memberMap</code> and it will return false.
+     * @param groupDN the group to retrieve the members of and scan for subgroups. If <code>groupDN</code> is a user DN
+     *            or UID, it is added to the <code>memberMap</code> and it will return false.
      * @param memberMap the result: maps DN to member id.
      * @param subgroups all the subgroups identified.
      * @param context the XWiki context.
@@ -408,6 +408,29 @@ public class XWikiLDAPUtils
         return groupMembers;
     }
 
+    public boolean isMemberOfGroup(String memberDN, String groupDN, XWikiContext context) throws XWikiException
+    {
+        for (String memberDNEntry : getGroupMembers(groupDN, context).keySet()) {
+            if (memberDNEntry.equals(memberDN.toLowerCase())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isMemberOfGroups(String memberDN, Collection<String> groupDNList, XWikiContext context)
+        throws XWikiException
+    {
+        for (String groupDN : groupDNList) {
+            if (isMemberOfGroup(memberDN, groupDN, context)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @param context the XWiki context used to get cache configuration.
      * @return the configuration for the LDAP groups cache.
@@ -455,10 +478,10 @@ public class XWikiLDAPUtils
      * @param userName the user name.
      * @param groupDN the LDAP group DN.
      * @param context the XWiki context.
-     * @return user's DB if the user is in the LDAP group, null otherwise.
+     * @return LDAP user's DN if the user is in the LDAP group, null otherwise.
      * @throws XWikiException error when getting the group cache.
      */
-    public String isUserInGroup(String userName, String groupDN, XWikiContext context) throws XWikiException
+    public String isUidInGroup(String userName, String groupDN, XWikiContext context) throws XWikiException
     {
         String userDN = null;
 

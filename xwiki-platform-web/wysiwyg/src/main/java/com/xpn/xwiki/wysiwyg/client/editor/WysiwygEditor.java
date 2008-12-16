@@ -116,7 +116,7 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
      * The list of plug-ins that can be loaded by default. Can be overwritten from the configuration.
      */
     private static final String DEFAULT_PLUGINS =
-        "separator sync text valign justify list indent undo format font color symbol link";
+        "separator sync text valign justify list indent undo format font color symbol link image table";
 
     /**
      * The list of features that can be placed on the tool bar by default. Can be overwritten from the configuration.
@@ -124,7 +124,9 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
     private static final String DEFAULT_TOOLBAR =
         "bold italic underline strikethrough teletype | subscript superscript"
             + " | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent"
-            + " | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | sync | link unlink";
+            + " | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | link unlink | image"
+            + " | inserttable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol"
+            + " | sync";
 
     /**
      * The list of default menu entries. Can be overwritten from the configuration.

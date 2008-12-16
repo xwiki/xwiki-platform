@@ -68,7 +68,7 @@ public final class ImageHTMLGenerator
         String imageReference = getImageReference(imageConfig, currentWiki, currentSpace, currentPage);
         String styleAttribute = imageConfig.getAlignment() != null ? getAlignmentStyle(imageConfig.getAlignment()) : "";
         return "<!--startimage:" + imageReference + "--><img src=\"" + imageConfig.getImageURL() + "\" alt=\""
-            + ((imageConfig.getTooltip() != null) ? imageConfig.getTooltip() : imageConfig.getImageFileName()) + "\" "
+            + ((imageConfig.getAltText() != null) ? imageConfig.getAltText() : imageConfig.getImageFileName()) + "\" "
             + ((styleAttribute.length() > 0) ? "style=\"" + styleAttribute + "\" " : "")
             + ((imageConfig.getWidth() != null) ? "width=\"" + imageConfig.getWidth() + "\" " : "")
             + ((imageConfig.getHeight() != null) ? "height=\"" + imageConfig.getHeight() + "\" " : "")
@@ -123,13 +123,13 @@ public final class ImageHTMLGenerator
                 styleAttribute = "margin-right: auto; margin-left: auto; display: block;";
                 break;
             case TOP:
-                styleAttribute = "vertical-alignment: top;";
+                styleAttribute = "vertical-align: top;";
                 break;
             case MIDDLE:
-                styleAttribute = "vertical-alignment: middle;";
+                styleAttribute = "vertical-align: middle;";
                 break;
             case BOTTOM:
-                styleAttribute = "vertical-alignment: bottom;";
+                styleAttribute = "vertical-align: bottom;";
                 break;
             default:
                 break;

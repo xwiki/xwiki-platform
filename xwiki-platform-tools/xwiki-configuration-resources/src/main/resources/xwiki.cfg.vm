@@ -118,6 +118,11 @@ xwiki.store.migration=1
 #-# live afterwards.
 # xwiki.store.migration.exitAfterEnd=0
 
+#-# Indicate the list of databases to migrate.
+#-# to upgrade all wikis database set xwiki.store.migration.databases=all
+#-# to upgrade just some wikis databases set xwiki.store.migration.databases=xwiki,wiki1,wiki2
+#-# Note: the main wiki is always migrated whatever the configuration.
+# xwiki.store.migration.databases=
 
 #---------------------------------------
 # Internationalization

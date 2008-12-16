@@ -134,7 +134,7 @@ public class ImageDialog extends CompositeDialogBox implements ClickListener, Fo
     {
         ImageConfig selectedImage = imageSelector.getSelectedImage();
         selectedImage.setAlignment(imageParameters.getSelectedAlignment());
-        selectedImage.setTooltip(imageParameters.getAltText());
+        selectedImage.setAltText(imageParameters.getAltText());
         selectedImage.setWidth(imageParameters.getWidth());
         selectedImage.setHeight(imageParameters.getHeight());
         imageHTMLBlock =

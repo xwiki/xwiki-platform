@@ -67,9 +67,9 @@ public class ImageConfig implements IsSerializable
     private String page;
 
     /**
-     * The tooltip (alt string) of this image.
+     * The altText (alt string) of this image.
      */
-    private String tooltip;
+    private String altText;
 
     /**
      * The width of this image, as a string. It can contain measure unit (pixels, pts) or not.
@@ -184,19 +184,19 @@ public class ImageConfig implements IsSerializable
     }
 
     /**
-     * @return the tooltip
+     * @return the altText
      */
-    public String getTooltip()
+    public String getAltText()
     {
-        return tooltip;
+        return altText;
     }
 
     /**
-     * @param tooltip the tooltip to set
+     * @param altText the altText to set
      */
-    public void setTooltip(String tooltip)
+    public void setAltText(String altText)
     {
-        this.tooltip = tooltip;
+        this.altText = altText;
     }
 
     /**

@@ -69,7 +69,8 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                 subView.init(this, nextToken.toUpperCase(), "/" + nextToken.toUpperCase());
                 stack.push(subView);
                 subView.decode(stack, tokens, next + 1);
-            } else if (getContext().isCreateCollectionRequest() || getContext().exists(nextToken)) {
+            } else if (getContext().isCreateCollectionRequest()
+                || getContext().exists(this.name + "." + nextToken)) {
                 DavPage page = new DavPage();
                 page.init(this, this.name + "." + nextToken, "/" + nextToken);
                 stack.push(page);

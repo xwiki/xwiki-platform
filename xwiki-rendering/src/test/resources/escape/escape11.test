@@ -1,0 +1,45 @@
+.#---------------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.#---------------------------------------------------------------------------------------------------------
+~First letter is escaped
+~ A space just after a tilda
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [First]
+onSpace
+onWord [letter]
+onSpace
+onWord [is]
+onSpace
+onWord [escaped]
+onLineBreak
+onSpace
+onWord [A]
+onSpace
+onWord [space]
+onSpace
+onWord [just]
+onSpace
+onWord [after]
+onSpace
+onWord [a]
+onSpace
+onWord [tilda]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p>First letter is escaped<br/>&nbsp;A space just after a tilda</p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+First letter is escaped
+ A space just after a tilda
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+<html><p>single ~ tilde<br/>not newline \\</p></html>

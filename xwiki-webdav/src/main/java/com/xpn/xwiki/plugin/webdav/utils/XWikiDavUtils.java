@@ -47,45 +47,44 @@ public final class XWikiDavUtils
     /**
      * Signature used to identify a webdav url.
      */
-    public static final String XWIKI_WEBDAV_SIGNATURE = "/xwiki/webdav/pages/";
+    public static final String XWIKI_WEBDAV_SIGNATURE = "/xwiki/webdav/spaces/";
 
     /**
-     * Resource hint for root view.
+     * An interface for collecting all resource hints used.
      */
-    public static final String ROOT_VIEW = "root";
+    public interface ResourceHints
+    {
+        /**
+         * Resource hint for root view.
+         */
+        public static final String ROOT = "root";
 
-    /**
-     * Resource hint for 'pages' base view.
-     */
-    public static final String PAGES_BASEVIEW = "pages";
+        /**
+         * Resource hint for 'pages' base view.
+         */
+        public static final String PAGES = "pages";
 
-    /**
-     * Resource hint for 'attachments' base view.
-     */
-    public static final String ATTACHMENTS_BASEVIEW = "attachments";
+        /**
+         * Resource hint for 'attachments' base view.
+         */
+        public static final String ATTACHMENTS = "attachments";
 
-    /**
-     * Resource hint for 'home' base view.
-     */
-    public static final String HOME_BASEVIEW = "home";
+        /**
+         * Resource hint for 'home' base view.
+         */
+        public static final String HOME = "home";
 
-    /**
-     * Resource hint for 'orphans' base view.
-     */
-    public static final String ORPHANS_BASEVIEW = "orphans";
+        /**
+         * Resource hint for 'orphans' base view.
+         */
+        public static final String ORPHANS = "orphans";
 
-    /**
-     * Resource hint for 'whatsnew' base view.
-     */
-    public static final String WHATSNEW_BASEVIEW = "whatsnew";
-
-    /**
-     * Array of all base view identifiers.
-     */
-    public static final String[] BASE_VIEWS =
-        new String[] {PAGES_BASEVIEW, ATTACHMENTS_BASEVIEW, HOME_BASEVIEW, ORPHANS_BASEVIEW,
-        WHATSNEW_BASEVIEW};
-
+        /**
+         * Resource hint for 'whatsnew' base view.
+         */
+        public static final String WHATSNEW = "whatsnew";
+    }    
+    
     /**
      * Forbidden constructor.
      */

@@ -20,7 +20,9 @@
 package com.xpn.xwiki.plugin.webdav.resources.views;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavException;
@@ -39,7 +41,7 @@ import org.xwiki.component.phase.Composable;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
-import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils.ResourceHints;
 
 /**
  * The root of all views (entry point).
@@ -57,6 +59,23 @@ public class RootView extends AbstractDavView implements Composable
      * Plexus component manager.
      */
     private ComponentManager componentManager;
+    
+    /**
+     * A mapping from view names to corresponding plexus component hints.
+     */
+    private static final Map<String, String> viewHints;
+
+    /**
+     * Static initializer for viewHints.
+     */
+    static {
+        viewHints = new HashMap<String, String>();
+        viewHints.put("spaces", ResourceHints.PAGES);
+        viewHints.put("attachments", ResourceHints.ATTACHMENTS);
+        viewHints.put("home", ResourceHints.HOME);
+        viewHints.put("orphans", ResourceHints.ORPHANS);
+        viewHints.put("whatsnew", ResourceHints.WHATSNEW);
+    }
 
     /**
      * {@inheritDoc}
@@ -98,10 +117,11 @@ public class RootView extends AbstractDavView implements Composable
             String nextToken = tokens[next];
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
-            } else if (isBaseView(nextToken)) {
+            } else if (null != viewHints.get(nextToken)) {
                 XWikiDavResource resource = null;
                 try {
-                    resource = (XWikiDavResource) componentManager.lookup(ROLE, nextToken);
+                    String viewHint = viewHints.get(nextToken);
+                    resource = (XWikiDavResource) componentManager.lookup(ROLE, viewHint);
                     resource.init(this, nextToken, "/" + nextToken);
                     stack.push(resource);
                     resource.decode(stack, tokens, next + 1);
@@ -115,22 +135,6 @@ public class RootView extends AbstractDavView implements Composable
     }
 
     /**
-     * Utility method to check if there is a view component registered with the given hint (id).
-     * 
-     * @param id Expected resource hint.
-     * @return True if the given id corresponds to a view. False otherwise.
-     */
-    private boolean isBaseView(String id)
-    {
-        for (String baseViewID : XWikiDavUtils.BASE_VIEWS) {
-            if (id.equals(baseViewID)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public DavResourceIterator getMembers()
@@ -138,24 +142,23 @@ public class RootView extends AbstractDavView implements Composable
         List<DavResource> children = new ArrayList<DavResource>();
         try {
             XWikiDavResource homeView =
-                (XWikiDavResource) componentManager.lookup(ROLE, XWikiDavUtils.HOME_BASEVIEW);
+                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.HOME);
             homeView.init(this, "home", "/home");
             children.add(homeView);
             XWikiDavResource pagesView =
-                (XWikiDavResource) componentManager.lookup(ROLE, XWikiDavUtils.PAGES_BASEVIEW);
-            pagesView.init(this, "pages", "/pages");
+                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.PAGES);
+            pagesView.init(this, "spaces", "/spaces");
             children.add(pagesView);
             XWikiDavResource attachmentsView =
-                (XWikiDavResource) componentManager.lookup(ROLE,
-                    XWikiDavUtils.ATTACHMENTS_BASEVIEW);
+                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.ATTACHMENTS);
             attachmentsView.init(this, "attachments", "/attachments");
             children.add(attachmentsView);
             XWikiDavResource orphansView =
-                (XWikiDavResource) componentManager.lookup(ROLE, XWikiDavUtils.ORPHANS_BASEVIEW);
+                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.ORPHANS);
             orphansView.init(this, "orphans", "/orphans");
             children.add(orphansView);
             XWikiDavResource whatsnewView =
-                (XWikiDavResource) componentManager.lookup(ROLE, XWikiDavUtils.WHATSNEW_BASEVIEW);
+                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.WHATSNEW);
             whatsnewView.init(this, "whatsnew", "/whatsnew");
             children.add(whatsnewView);
         } catch (ComponentLookupException e) {
@@ -188,7 +191,7 @@ public class RootView extends AbstractDavView implements Composable
     public void removeMember(DavResource member) throws DavException
     {
         if (member instanceof DavTempFile) {
-            removeTempResource((DavTempFile)member);
+            removeTempResource((DavTempFile) member);
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }

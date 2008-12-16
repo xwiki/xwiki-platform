@@ -5,12 +5,10 @@ import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
-import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
-import org.apache.jackrabbit.webdav.DavSession;
-import org.apache.jackrabbit.webdav.lock.LockManager;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
 
-import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavContext;
 
 /**
  * The super interface for all xwiki related dav resources. Adds extra xwiki specific methods for
@@ -23,13 +21,13 @@ public interface XWikiDavResource extends DavResource
     /**
      * This component's role, used when code needs to look it up.
      */
-    String ROLE = XWikiDavResource.class.getName(); 
-    
+    String ROLE = XWikiDavResource.class.getName();
+
     /**
      * This URI segment is used as the base workspace name.
      */
     public static final String BASE_URI = "/webdav";
-    
+
     /**
      * Initializes this resource with common attributes inherited from the parent.
      * 
@@ -38,22 +36,17 @@ public interface XWikiDavResource extends DavResource
      * @param relativePath Path relative to the parent resource.
      * @throws DavException If the initialization fails.
      */
-    void init(XWikiDavResource parent, String name, String relativePath)
-        throws DavException;
+    void init(XWikiDavResource parent, String name, String relativePath) throws DavException;
 
     /**
-     * Initializes this resource with the given attributes.
+     * Initializes this resource with the given parameters.
      * 
      * @param name Name of this resource.
-     * @param locator Resource Locator.
-     * @param factory Resource Factory.
-     * @param session Dav Session.
-     * @param lockManager Lock Manager.
-     * @param xwikiContext XWiki Context.
+     * @param locator Dav resource locator.
+     * @param context XWiki dav context.
      * @throws DavException If the initialization fails.
      */
-    void init(String name, DavResourceLocator locator, DavResourceFactory factory,
-        DavSession session, LockManager lockManager, XWikiContext xwikiContext)
+    void init(String name, DavResourceLocator locator, XWikiDavContext context)
         throws DavException;
 
     /**
@@ -70,19 +63,19 @@ public interface XWikiDavResource extends DavResource
      * @throws DavException If it's not possible to decode the url.
      */
     void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException;
-    
-    /**
-     * @return The set of virtual resources (some clients need such resources).
-     */
-    List<XWikiDavResource> getSessionResources();
 
     /**
-     * @return The {@link XWikiContext} associated with this resource.
+     * @return List of virtual members for this resource.
      */
-    XWikiContext getXwikiContext();
+    List<XWikiDavResource> getVirtualMembers();
     
     /**
-     * @return The {@link LockManager} associated with this request (global).
+     * @return Set of virtual properties for this resource.
      */
-    LockManager getLockManager();
+    DavPropertySet getVirtualProperties();
+
+    /**
+     * @return The {@link XWikiDavContext} for this resource.
+     */
+    XWikiDavContext getContext();
 }

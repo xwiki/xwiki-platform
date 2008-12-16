@@ -21,36 +21,68 @@ package com.xpn.xwiki.plugin.webdav.resources.domain;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Stack;
 
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
+import org.apache.jackrabbit.webdav.DavResourceIterator;
+import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.MultiStatusResponse;
+import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
-import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
-import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavFile;
+import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavResource;
 
 /**
- * Resource used to represent temporary files demanded by various dav cleints.
+ * Resource used to represent temporary resources demanded by various dav clients.
  * 
  * @version $Id$
  */
-public class DavTempFile extends AbstractDavFile
-{    
+public class DavTempFile extends AbstractDavResource
+{
+    /**
+     * Flag indicating whether this resource is a collection.
+     */
+    private boolean isCollection;
+
     /**
      * Content of this resource (file).
      */
     private byte[] data;
+
+    /**
+     * Indicates if this resource has been created or not. Here creation means if the resource has
+     * been actually PUT / MKCOL by the client as opposed to being initialized. This flag will be
+     * set to true once setModified() has been invoked for the first time.
+     */
+    private boolean created;
+
+    /**
+     * Created on.
+     */
+    private Date timeOfCreation;
+
+    /**
+     * Last modified.
+     */
+    private Date timeOfLastModification;
+
+    /**
+     * Default constructor.
+     */
+    public DavTempFile()
+    {
+        timeOfCreation = new Date(IOUtil.UNDEFINED_TIME);
+        timeOfLastModification = (Date) timeOfCreation.clone();
+    }
 
     /**
      * {@inheritDoc}
@@ -59,29 +91,31 @@ public class DavTempFile extends AbstractDavFile
         throws DavException
     {
         super.init(parent, name, relativePath);
-        if (!name.startsWith(".")) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-        Date currentDate = new Date();
-        String timeStamp = DavConstants.creationDateFormat.format(currentDate);
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, timeStamp));
-        timeStamp = DavConstants.modificationDateFormat.format(currentDate);
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, timeStamp));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETETAG, timeStamp));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, "en"));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE,
-            "application/octet-stream"));
-        int contentLength = exists() ? data.length : 0;
-        davPropertySet
-            .add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, contentLength));
+        String strTimeOfCreation = DavConstants.creationDateFormat.format(timeOfCreation);
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.CREATIONDATE, strTimeOfCreation));
+        String strTimeOfModification =
+            DavConstants.modificationDateFormat.format(timeOfLastModification);
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, strTimeOfModification));
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETETAG, strTimeOfModification));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, "en"));
+        String contentType = isCollection() ? "text/directory" : "application/octet-stream";
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, contentType));
+        int contentLength = (data != null) ? data.length : 0;
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, contentLength));
     }
 
     /**
-     * @param data Data to be set as the content of this temporary file.
+     * {@inheritDoc}
      */
-    public void setdData(byte[] data)
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
-        this.data = data;
+        // Simply invoke the default decode method.
+        super.decode(stack, tokens, next);
     }
 
     /**
@@ -89,7 +123,7 @@ public class DavTempFile extends AbstractDavFile
      */
     public boolean exists()
     {
-        return data != null;
+        return parentResource.getVirtualMembers().contains(this);
     }
 
     /**
@@ -97,7 +131,13 @@ public class DavTempFile extends AbstractDavFile
      */
     public void spool(OutputContext outputContext) throws IOException
     {
-        if (exists()) {
+        outputContext.setContentLanguage("en");
+        outputContext.setContentLength(data != null ? data.length : 0);
+        outputContext.setContentType(isCollection() ? "text/directory"
+            : "application/octet-stream");
+        outputContext.setETag(DavConstants.modificationDateFormat.format(getModificationTime()));
+        outputContext.setModificationTime(getModificationTime());
+        if (exists() && !isCollection()) {
             OutputStream out = outputContext.getOutputStream();
             if (out != null) {
                 out.write(this.data);
@@ -109,51 +149,109 @@ public class DavTempFile extends AbstractDavFile
     /**
      * {@inheritDoc}
      */
+    public DavResourceIterator getMembers()
+    {
+        List<DavResource> children = new ArrayList<DavResource>();
+        // In-memory resources.
+        for (DavResource sessionResource : getVirtualMembers()) {
+            children.add(sessionResource);
+        }
+        return new DavResourceIteratorImpl(children);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addMember(DavResource resource, InputContext inputContext) throws DavException
+    {
+        if (resource instanceof DavTempFile) {
+            addTempResource((DavTempFile) resource, inputContext);
+        } else {
+            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeMember(DavResource resource) throws DavException
+    {
+        if (resource instanceof DavTempFile) {
+            removeTempResource((DavTempFile) resource);
+        } else {
+            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void move(DavResource destination) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
+        if (destination instanceof DavTempFile
+            && destination.getCollection().equals(getCollection()) && !destination.isCollection()
+            && !isCollection()) {
+            // A file rename operation
+            DavTempFile destTempFile = (DavTempFile) destination;
+            parentResource.getVirtualMembers().remove(this);
+            parentResource.getVirtualMembers().add(destTempFile);
+            destTempFile.update(this.data.clone(), this.timeOfLastModification);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
+    }
+
+    /**
+     * @param data Data to be set as the content of this temporary file.
+     * @param modificationTime Time of modification.
+     */
+    public void update(byte[] data, Date modificationTime)
+    {
+        this.data = data.clone();
+        setModified(modificationTime);
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, (data != null) ? data.length
+                : 0));
+    }
+
+    /**
+     * Changes the time of modification of this resource.
+     * 
+     * @param modificationTime Time of modification.
+     */
+    public void setModified(Date modificationTime)
+    {
+        if (!created) {
+            timeOfCreation = (Date) modificationTime.clone();
+            String strTimeOfCreation = DavConstants.creationDateFormat.format(timeOfCreation);
+            getProperties().add(
+                new DefaultDavProperty(DavPropertyName.CREATIONDATE, strTimeOfCreation));
+            created = true;
+        }
+        timeOfLastModification = (Date) modificationTime.clone();
+        String strTimeOfModification =
+            DavConstants.modificationDateFormat.format(timeOfLastModification);
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, strTimeOfModification));
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETETAG, String
+                .valueOf(timeOfLastModification)));
+    }
+
+    /**
+     * Sets the isCollection flag to true.
+     */
+    public void setCollection()
+    {
+        this.isCollection = true;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void copy(DavResource destination, boolean shallow) throws DavException
+    public boolean isCollection()
     {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public MultiStatusResponse alterProperties(List changeList) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public MultiStatusResponse alterProperties(DavPropertySet setProperties,
-        DavPropertyNameSet removePropertyNames) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeProperty(DavPropertyName propertyName) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setProperty(DavProperty property) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
+        return isCollection;
     }
 
     /**
@@ -161,14 +259,6 @@ public class DavTempFile extends AbstractDavFile
      */
     public long getModificationTime()
     {
-        return IOUtil.UNDEFINED_TIME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, PROPFIND, LOCK, UNLOCK";
+        return timeOfLastModification.getTime();
     }
 }

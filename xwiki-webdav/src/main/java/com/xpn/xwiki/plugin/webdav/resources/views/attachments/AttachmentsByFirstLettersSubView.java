@@ -32,9 +32,9 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
@@ -49,7 +49,7 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
     /**
      * Logger instance.
      */
-    private static final Logger LOG =
+    private static final Logger logger =
         LoggerFactory.getLogger(AttachmentsByFirstLettersSubView.class);
 
     /**
@@ -74,11 +74,15 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
     {
         String spaceName = getCollection().getDisplayName();
         if (next < tokens.length) {
-            String pageName = tokens[next];
-            DavPage page = new DavPage();
-            page.init(this, spaceName + "." + pageName, "/" + pageName);
-            stack.push(page);
-            page.decode(stack, tokens, next + 1);
+            String nextToken = tokens[next];
+            if (isTempResource(nextToken)) {
+                super.decode(stack, tokens, next);
+            } else {
+                DavPage page = new DavPage();
+                page.init(this, spaceName + "." + nextToken, "/" + nextToken);
+                stack.push(page);
+                page.decode(stack, tokens, next + 1);
+            }
         }
     }
 
@@ -96,10 +100,9 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
             String sql =
                 ", XWikiAttachment as attach where doc.id = attach.docId and doc.web = '"
                     + spaceName + "'";
-            List<String> docNames =
-                xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 0, 0, xwikiContext);
+            List<String> docNames = getContext().searchDocumentsNames(sql);
             for (String docName : docNames) {
-                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
+                if (getContext().hasAccess("view", docName)) {
                     int dot = docName.lastIndexOf('.');
                     String pageName = docName.substring(dot + 1);
                     if (pageName.toUpperCase().startsWith(filter)) {
@@ -109,10 +112,12 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
                     }
                 }
             }
-        } catch (XWikiException e) {
-            LOG.error("Unexpected Error : ", e);
         } catch (DavException e) {
-            LOG.error("Unexpected Error : ", e);
+            logger.error("Unexpected Error : ", e);
+        }
+        // In-memory resources.
+        for (DavResource sessionResource : getVirtualMembers()) {
+            children.add(sessionResource);
         }
         return new DavResourceIteratorImpl(children);
     }
@@ -122,7 +127,11 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+        if (resource instanceof DavTempFile) {
+            addTempResource((DavTempFile) resource, inputContext);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 
     /**
@@ -130,22 +139,10 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return name.toUpperCase();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, PROPFIND, LOCK, UNLOCK";
+        if (member instanceof DavTempFile) {
+            removeTempResource((DavTempFile) member);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 }

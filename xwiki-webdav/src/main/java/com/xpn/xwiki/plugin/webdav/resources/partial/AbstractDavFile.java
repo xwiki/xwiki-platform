@@ -37,13 +37,12 @@ import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
  */
 public abstract class AbstractDavFile extends AbstractDavResource
 {
-
     /**
      * {@inheritDoc}
      */
     public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
+        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     /**
@@ -60,22 +59,6 @@ public abstract class AbstractDavFile extends AbstractDavResource
     public void removeMember(DavResource member) throws DavException
     {
         throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getHref()
-    {
-        return locator.getHref(false);
     }
 
     /**

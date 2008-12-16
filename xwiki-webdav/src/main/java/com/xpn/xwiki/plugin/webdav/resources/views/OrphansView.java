@@ -32,11 +32,10 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
-import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * This view allows to view the other entry points in the wiki that are not linked to
@@ -59,10 +58,12 @@ public class OrphansView extends AbstractDavView
         throws DavException
     {
         if (next < tokens.length) {
-            String docName = tokens[next];
-            if (docName.indexOf('.') != -1) {
+            String nextToken = tokens[next];
+            if (isTempResource(nextToken)) {
+                super.decode(stack, tokens, next);
+            } else if (nextToken.lastIndexOf('.') != -1) {
                 DavPage page = new DavPage();
-                page.init(this, docName, "/" + docName);
+                page.init(this, nextToken, "/" + nextToken);
                 stack.push(page);
                 page.decode(stack, tokens, next + 1);
             } else {
@@ -79,19 +80,20 @@ public class OrphansView extends AbstractDavView
         List<DavResource> children = new ArrayList<DavResource>();
         String sql = "where doc.parent not in (select doc2.fullName from XWikiDocument as doc2)";
         try {
-            List<String> docNames =
-                xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 0, 0, xwikiContext);
+            List<String> docNames = getContext().searchDocumentsNames(sql);
             for (String docName : docNames) {
-                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
+                if (getContext().hasAccess("view", docName)) {
                     DavPage page = new DavPage();
                     page.init(this, docName, "/" + docName);
                     children.add(page);
                 }
             }
-        } catch (XWikiException e) {
-            LOG.error("Unexpected Error : ", e);
         } catch (DavException e) {
             LOG.error("Unexpected Error : ", e);
+        }
+        // In-memory resources.
+        for (DavResource sessionResource : getVirtualMembers()) {
+            children.add(sessionResource);
         }
         return new DavResourceIteratorImpl(children);
     }
@@ -101,7 +103,11 @@ public class OrphansView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+        if (resource instanceof DavTempFile) {
+            addTempResource((DavTempFile) resource, inputContext);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 
     /**
@@ -109,22 +115,10 @@ public class OrphansView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, PROPFIND, LOCK, UNLOCK";
+        if (member instanceof DavTempFile) {
+            removeTempResource((DavTempFile) member);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 }

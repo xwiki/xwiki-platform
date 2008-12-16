@@ -32,9 +32,9 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
@@ -48,7 +48,8 @@ public class PagesByFirstLettersSubView extends AbstractDavView
     /**
      * Logger instance.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(PagesByFirstLettersSubView.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(PagesByFirstLettersSubView.class);
 
     /**
      * {@inheritDoc}
@@ -72,11 +73,15 @@ public class PagesByFirstLettersSubView extends AbstractDavView
     {
         String spaceName = getCollection().getDisplayName();
         if (next < tokens.length) {
-            String docName = tokens[next];
-            DavPage page = new DavPage();
-            page.init(this, spaceName + "." + docName, "/" + docName);
-            stack.push(page);
-            page.decode(stack, tokens, next + 1);
+            String nextToken = tokens[next];
+            if (isTempResource(nextToken)) {
+                super.decode(stack, tokens, next);
+            } else {
+                DavPage page = new DavPage();
+                page.init(this, spaceName + "." + nextToken, "/" + nextToken);
+                stack.push(page);
+                page.decode(stack, tokens, next + 1);
+            }
         }
     }
 
@@ -91,11 +96,10 @@ public class PagesByFirstLettersSubView extends AbstractDavView
             getDisplayName().substring(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX.length(),
                 getDisplayName().length() - XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX.length());
         try {
-            List<String> docNames =
-                xwikiContext.getWiki().getStore().searchDocumentsNames(
-                    "where doc.web='" + spaceName + "'", 0, 0, xwikiContext);
-            for (String docName : docNames) {                
-                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
+            String sql = "where doc.web='" + spaceName + "'";
+            List<String> docNames = getContext().searchDocumentsNames(sql);
+            for (String docName : docNames) {
+                if (getContext().hasAccess("view", docName)) {
                     int dot = docName.lastIndexOf('.');
                     String pageName = docName.substring(dot + 1);
                     if (pageName.toUpperCase().startsWith(filter)) {
@@ -105,10 +109,12 @@ public class PagesByFirstLettersSubView extends AbstractDavView
                     }
                 }
             }
-        } catch (XWikiException e) {
-            LOG.error("Unexpected Error : ", e);
         } catch (DavException e) {
-            LOG.error("Unexpected Error : ", e);
+            logger.error("Unexpected Error : ", e);
+        }
+        // In-memory resources.
+        for (DavResource sessionResource : getVirtualMembers()) {
+            children.add(sessionResource);
         }
         return new DavResourceIteratorImpl(children);
     }
@@ -118,8 +124,12 @@ public class PagesByFirstLettersSubView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        // This is only a virtual grouping of pages. Delegate the request to the parent.
-        getCollection().addMember(resource, inputContext);
+        if (resource instanceof DavTempFile) {
+            addTempResource((DavTempFile) resource, inputContext);
+        } else {
+            // This is only a virtual grouping of pages. Delegate the request to the parent.
+            getCollection().addMember(resource, inputContext);
+        }
     }
 
     /**
@@ -127,23 +137,11 @@ public class PagesByFirstLettersSubView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        // This is only a virtual grouping of pages. Delegate the request to the parent.
-        getCollection().removeMember(member);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, PROPFIND, LOCK, UNLOCK";
+        if (member instanceof DavTempFile) {
+            removeTempResource((DavTempFile) member);
+        } else {
+            // This is only a virtual grouping of pages. Delegate the request to the parent.
+            getCollection().removeMember(member);
+        }
     }
 }

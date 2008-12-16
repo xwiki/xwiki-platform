@@ -34,35 +34,35 @@
 
     <component>
       <role>com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource</role>
-      <role-hint>home-baseview</role-hint>
+      <role-hint>home</role-hint>
       <implementation>com.xpn.xwiki.plugin.webdav.resources.views.HomeView</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
 
     <component>
       <role>com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource</role>
-      <role-hint>orphans-baseview</role-hint>
+      <role-hint>orphans</role-hint>
       <implementation>com.xpn.xwiki.plugin.webdav.resources.views.OrphansView</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
 
     <component>
       <role>com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource</role>
-      <role-hint>whatsnew-baseview</role-hint>
+      <role-hint>whatsnew</role-hint>
       <implementation>com.xpn.xwiki.plugin.webdav.resources.views.WhatsnewView</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
 
     <component>
       <role>com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource</role>
-      <role-hint>attachments-baseview</role-hint>
+      <role-hint>attachments</role-hint>
       <implementation>com.xpn.xwiki.plugin.webdav.resources.views.attachments.AttachmentsView</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
 
     <component>
       <role>com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource</role>
-      <role-hint>pages-baseview</role-hint>
+      <role-hint>pages</role-hint>
       <implementation>com.xpn.xwiki.plugin.webdav.resources.views.pages.PagesView</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>	

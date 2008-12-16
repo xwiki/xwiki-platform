@@ -21,28 +21,19 @@ package com.xpn.xwiki.plugin.webdav.resources.domain;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.OutputContext;
-import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavFile;
-import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * The dav resource used to represent the wiki content of an {@link XWikiDocument}.
@@ -51,11 +42,6 @@ import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
  */
 public class DavWikiFile extends AbstractDavFile
 {
-    /**
-     * Logger instance.
-     */
-    private static final Logger LOG = LoggerFactory.getLogger(DavWikiFile.class);
-
     /**
      * Identifier for wiki text file.
      */
@@ -83,25 +69,19 @@ public class DavWikiFile extends AbstractDavFile
         }
         this.parentDoc = ((DavPage) parent).getDocument();
         String timeStamp = DavConstants.creationDateFormat.format(parentDoc.getCreationDate());
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, timeStamp));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, timeStamp));
         timeStamp = DavConstants.modificationDateFormat.format(parentDoc.getContentUpdateDate());
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, timeStamp));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETETAG, timeStamp));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, parentDoc
-            .getLanguage()));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, timeStamp));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETETAG, timeStamp));
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, parentDoc.getLanguage()));
         String contentType = this.name.equals(WIKI_TXT) ? "text/plain" : "text/xml";
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, contentType));
-        int contentLength = 0;
-        try {
-            contentLength =
-                this.name.equals(WIKI_TXT) ? parentDoc.getContent().length() : parentDoc.toXML(
-                    xwikiContext).length();
-        } catch (XWikiException e) {
-            LOG.error("Unexpected Error : ", e);
-        } finally {
-            davPropertySet.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH,
-                contentLength));
-        }
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, contentType));
+        int contentLength =
+            this.name.equals(WIKI_TXT) ? parentDoc.getContent().length() : getContext().toXML(
+                parentDoc).length();
+        getProperties().add(
+            new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, contentLength));
     }
 
     /**
@@ -117,33 +97,37 @@ public class DavWikiFile extends AbstractDavFile
      */
     public void spool(OutputContext outputContext) throws IOException
     {
+        // Protect against direct url referencing.
+        if (!getContext().hasAccess("view", parentDoc.getFullName())) {
+            throw new IOException("Access rights violation.");
+        }
+        outputContext.setContentLanguage(parentDoc.getLanguage());
+        int contentLength = 0;
+        try {
+            contentLength =
+                this.name.equals(WIKI_TXT) ? parentDoc.getContent().length() : getContext()
+                    .toXML(parentDoc).length();
+        } catch (DavException ex) {
+            throw new IOException(ex.getMessage());
+        }
+        outputContext.setContentLength(contentLength);
+        outputContext.setContentType(this.name.equals(WIKI_TXT) ? "text/plain" : "text/xml");
+        outputContext.setETag(DavConstants.modificationDateFormat.format(getModificationTime()));
+        outputContext.setModificationTime(getModificationTime());
         if (exists()) {
-            // Protect against direct url referencing.
-            if (!XWikiDavUtils.hasAccess("view", parentDoc.getFullName(), xwikiContext)) {
-                throw new IOException("Access rights violation.");
-            } else {
-                OutputStream out = outputContext.getOutputStream();
-                if (out != null) {
-                    try {
-                        String content =
-                            this.name.equals(WIKI_TXT) ? parentDoc.getContent() : parentDoc
-                                .toXML(xwikiContext);
-                        out.write(content.getBytes());
-                        out.flush();
-                    } catch (XWikiException ex) {
-                        throw new IOException(ex.getFullMessage());
-                    }
+            OutputStream out = outputContext.getOutputStream();
+            if (out != null) {
+                try {
+                    String content =
+                        this.name.equals(WIKI_TXT) ? parentDoc.getContent() : getContext().toXML(
+                            parentDoc);
+                    out.write(content.getBytes());
+                    out.flush();
+                } catch (DavException ex) {
+                    throw new IOException(ex.getMessage());
                 }
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void copy(DavResource destination, boolean shallow) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
     }
 
     /**
@@ -157,53 +141,11 @@ public class DavWikiFile extends AbstractDavFile
     /**
      * {@inheritDoc}
      */
-    public MultiStatusResponse alterProperties(DavPropertySet setProperties,
-        DavPropertyNameSet removePropertyNames) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public MultiStatusResponse alterProperties(List changeList) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeProperty(DavPropertyName propertyName) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setProperty(DavProperty property) throws DavException
-    {
-        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public long getModificationTime()
     {
         if (exists()) {
             return parentDoc.getContentUpdateDate().getTime();
         }
         return IOUtil.UNDEFINED_TIME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, PROPFIND, PROPPATCH, COPY, LOCK, UNLOCK";
     }
 }

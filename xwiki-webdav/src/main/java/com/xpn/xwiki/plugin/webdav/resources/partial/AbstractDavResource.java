@@ -22,16 +22,19 @@ package com.xpn.xwiki.plugin.webdav.resources.partial;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.servlet.http.HttpSession;
+import java.util.Map;
+import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
+import org.apache.jackrabbit.webdav.MultiStatusResponse;
+import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.lock.ActiveLock;
 import org.apache.jackrabbit.webdav.lock.LockDiscovery;
 import org.apache.jackrabbit.webdav.lock.LockInfo;
@@ -41,12 +44,15 @@ import org.apache.jackrabbit.webdav.lock.SupportedLock;
 import org.apache.jackrabbit.webdav.lock.Type;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
+import org.apache.jackrabbit.webdav.property.DavPropertyNameIterator;
+import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavContext;
 
 /**
  * The superclass for all XWiki WebDAV resources.
@@ -56,34 +62,14 @@ import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 public abstract class AbstractDavResource implements XWikiDavResource
 {
     /**
+     * Name of this resource.
+     */
+    protected String name;
+
+    /**
      * Resource locator for this resource. {@link DavResourceLocator}.
      */
     protected DavResourceLocator locator;
-
-    /**
-     * Resource factory which created this resource. {@link DavResourceFactory}
-     */
-    protected DavResourceFactory factory;
-
-    /**
-     * Current session associated with this resource. {@link DavSession}
-     */
-    protected DavSession session;
-
-    /**
-     * Set of properties of this resource. {@link DavPropertySet}
-     */
-    protected DavPropertySet davPropertySet;
-
-    /**
-     * XWiki Context. {@link XWikiContext}
-     */
-    protected XWikiContext xwikiContext;
-
-    /**
-     * Lock manager (this is shared).
-     */
-    protected LockManager lockManager;
 
     /**
      * Parent resource (collection).
@@ -91,17 +77,9 @@ public abstract class AbstractDavResource implements XWikiDavResource
     protected XWikiDavResource parentResource;
 
     /**
-     * Name of this resource.
+     * XWiki WebDAV Context. {@link XWikiDavContext}
      */
-    protected String name;
-
-    /**
-     * Default constructor.
-     */
-    public AbstractDavResource()
-    {
-        this.davPropertySet = new DavPropertySet();
-    }
+    private XWikiDavContext context;
 
     /**
      * {@inheritDoc}
@@ -109,105 +87,84 @@ public abstract class AbstractDavResource implements XWikiDavResource
     public void init(XWikiDavResource parent, String name, String relativePath)
         throws DavException
     {
-        this.locator =
+        DavResourceLocator locator =
             parent.getLocator().getFactory().createResourceLocator(
                 parent.getLocator().getPrefix(), parent.getLocator().getWorkspacePath(),
                 parent.getLocator().getResourcePath() + relativePath);
-        this.factory = parent.getFactory();
-        this.session = parent.getSession();
-        this.lockManager = parent.getLockManager();
-        this.xwikiContext = parent.getXwikiContext();
+        init(name, locator, parent.getContext());
         this.parentResource = parent;
-        this.name = name;
-        initProperties();
+
     }
 
     /**
      * {@inheritDoc}
      */
-    public void init(String name, DavResourceLocator locator, DavResourceFactory factory,
-        DavSession session, LockManager lockManager, XWikiContext xwikiContext) throws DavException
+    public void init(String name, DavResourceLocator locator, XWikiDavContext context)
+        throws DavException
     {
-        this.locator = locator;
-        this.factory = factory;
-        this.session = session;
-        this.lockManager = lockManager;
-        this.xwikiContext = xwikiContext;
         this.name = name;
-        initProperties();
-    }
-
-    /**
-     * Initializes the default properties.
-     */
-    public void initProperties()
-    {
+        this.locator = locator;
+        this.context = context;
         // set fundamental properties (Will be overridden as necessary)
-        String timeStamp = DavConstants.creationDateFormat.format(new Date());
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, timeStamp));
-        davPropertySet.add(new DefaultDavProperty(DavPropertyName.SOURCE, locator.getPrefix()
-            + getResourcePath()));
-        if (getDisplayName() != null) {
-            davPropertySet.add(new DefaultDavProperty(DavPropertyName.DISPLAYNAME,
-                getDisplayName()));
+        // Some properties are cached and should not be overwritten.
+        DavPropertySet propertySet = getVirtualProperties();
+        if (propertySet.get(DavPropertyName.CREATIONDATE) == null) {
+            String timeStamp = DavConstants.creationDateFormat.format(new Date());
+            propertySet.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, timeStamp));
         }
+        propertySet.add(new DefaultDavProperty(DavPropertyName.DISPLAYNAME, getDisplayName()));
         if (isCollection()) {
-            davPropertySet.add(new ResourceType(ResourceType.COLLECTION));
+            propertySet.add(new ResourceType(ResourceType.COLLECTION));
             // Windows XP support
-            davPropertySet.add(new DefaultDavProperty(DavPropertyName.ISCOLLECTION, "1"));
+            propertySet.add(new DefaultDavProperty(DavPropertyName.ISCOLLECTION, "1"));
         } else {
-            davPropertySet.add(new ResourceType(ResourceType.DEFAULT_RESOURCE));
+            propertySet.add(new ResourceType(ResourceType.DEFAULT_RESOURCE));
             // Windows XP support
-            davPropertySet.add(new DefaultDavProperty(DavPropertyName.ISCOLLECTION, "0"));
+            propertySet.add(new DefaultDavProperty(DavPropertyName.ISCOLLECTION, "0"));
         }
         /*
          * set current lock information. If no lock is set to this resource, an empty lockdiscovery
          * will be returned in the response.
          */
-        davPropertySet.add(new LockDiscovery(getLock(Type.WRITE, Scope.EXCLUSIVE)));
+        propertySet.add(new LockDiscovery(getLock(Type.WRITE, Scope.EXCLUSIVE)));
         /*
          * lock support information: all locks are lockable.
          */
         SupportedLock supportedLock = new SupportedLock();
         supportedLock.addEntry(Type.WRITE, Scope.EXCLUSIVE);
-        davPropertySet.add(supportedLock);
+        propertySet.add(supportedLock);
     }
 
     /**
-     * @return The set of virtual resources (some clients need such resources).
+     * <p>
+     * The default decode implementation assumes the next resource in chain to be a temporary
+     * resource. Sub classes should override this method to provide their own implementation.
+     * </p>
      */
-    @SuppressWarnings("unchecked")
-    public List<XWikiDavResource> getSessionResources()
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
-        HttpSession httpSession = xwikiContext.getRequest().getSession();
-        if (httpSession.getAttribute(getResourcePath()) == null) {
-            httpSession.setAttribute(getResourcePath(), new ArrayList<XWikiDavResource>());
+        if (next < tokens.length) {
+            String nextToken = tokens[next];
+            DavTempFile resource = new DavTempFile();
+            String method = getContext().getMethod();
+            if (method != null && DavMethods.getMethodCode(method) == DavMethods.DAV_MKCOL) {
+                resource.setCollection();
+            }
+            resource.init(this, nextToken, "/" + nextToken);
+            // Search inside session resources to see if we already have this resource stored.
+            int index = getVirtualMembers().indexOf(resource);
+            if (index != -1) {
+                // Use the old resource instead.
+                resource = (DavTempFile) getVirtualMembers().get(index);
+                // Re-init the old resource.
+                resource.init(this, nextToken, "/" + nextToken);
+            }
+            stack.push(resource);
+            if (resource.isCollection()) {
+                resource.decode(stack, tokens, next + 1);
+            }
         }
-        return (List<XWikiDavResource>) httpSession.getAttribute(getResourcePath());
-    }
-
-    /**
-     * @return The set of properties associated with this resource.
-     */
-    public DavPropertySet getProperties()
-    {
-        return this.davPropertySet;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public DavProperty getProperty(DavPropertyName name)
-    {
-        return getProperties().get(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public DavPropertyName[] getPropertyNames()
-    {
-        return getProperties().getPropertyNames();
     }
 
     /**
@@ -223,7 +180,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
      */
     public ActiveLock getLock(Type type, Scope scope)
     {
-        return lockManager.getLock(type, scope, this);
+        return getContext().getLock(type, scope, this);
     }
 
     /**
@@ -250,7 +207,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
     {
         ActiveLock lock = null;
         if (isLockable(reqLockInfo.getType(), reqLockInfo.getScope())) {
-            lock = lockManager.createLock(reqLockInfo, this);
+            lock = getContext().createLock(reqLockInfo, this);
         } else {
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED);
         }
@@ -269,7 +226,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
         if (lock == null) {
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED);
         }
-        return lockManager.refreshLock(reqLockInfo, lockToken, this);
+        return getContext().refreshLock(reqLockInfo, lockToken, this);
     }
 
     /**
@@ -278,13 +235,103 @@ public abstract class AbstractDavResource implements XWikiDavResource
     public void unlock(String lockToken) throws DavException
     {
         ActiveLock lock = getLock(Type.WRITE, Scope.EXCLUSIVE);
-        if (lock == null) {
-            throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED);
-        } else if (lock.isLockedByToken(lockToken)) {
-            lockManager.releaseLock(lockToken, this);
-        } else {
-            throw new DavException(DavServletResponse.SC_LOCKED);
+        if (lock != null && lock.isLockedByToken(lockToken)) {
+            getContext().releaseLock(lockToken, this);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void copy(DavResource destination, boolean shallow) throws DavException
+    {
+        throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
+    }
+
+    /**
+     * Default implementation simply returns all the cached properties.
+     * 
+     * @return The set of properties associated with this resource.
+     */
+    public DavPropertySet getProperties()
+    {
+        return getVirtualProperties();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public DavProperty getProperty(DavPropertyName name)
+    {
+        return getProperties().get(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public DavPropertyName[] getPropertyNames()
+    {
+        return getProperties().getPropertyNames();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public MultiStatusResponse alterProperties(DavPropertySet setProperties,
+        DavPropertyNameSet removePropertyNames) throws DavException
+    {
+        getProperties().addAll(setProperties);
+        DavPropertyNameIterator it = removePropertyNames.iterator();
+        while (it.hasNext()) {
+            removeProperty(it.nextPropertyName());
+        }
+        return createPropStat();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    public MultiStatusResponse alterProperties(List changeList) throws DavException
+    {
+        for (Object next : changeList) {
+            if (next instanceof DavProperty) {
+                DavProperty property = (DavProperty) next;
+                setProperty(property);
+            } else {
+                DavPropertyName propertyName = (DavPropertyName) next;
+                removeProperty(propertyName);
+            }
+        }
+        return createPropStat();
+    }
+
+    /**
+     * @return A {@link MultiStatusResponse} with all property statuses.
+     */
+    private MultiStatusResponse createPropStat()
+    {
+        DavPropertyNameSet propertyNameSet = new DavPropertyNameSet();
+        for (DavPropertyName propertyName : getPropertyNames()) {
+            propertyNameSet.add(propertyName);
+        }
+        return new MultiStatusResponse(this, propertyNameSet);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeProperty(DavPropertyName propertyName) throws DavException
+    {
+        getProperties().remove(propertyName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setProperty(DavProperty property) throws DavException
+    {
+        getProperties().add(property);
     }
 
     /**
@@ -292,7 +339,15 @@ public abstract class AbstractDavResource implements XWikiDavResource
      */
     public void addLockManager(LockManager lockmgr)
     {
-        this.lockManager = lockmgr;
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getDisplayName()
+    {
+        return this.name;
     }
 
     /**
@@ -300,7 +355,15 @@ public abstract class AbstractDavResource implements XWikiDavResource
      */
     public String getComplianceClass()
     {
-        return DavResource.COMPLIANCE_CLASS;
+        return COMPLIANCE_CLASS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getSupportedMethods()
+    {
+        return METHODS;
     }
 
     /**
@@ -308,7 +371,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
      */
     public DavResourceFactory getFactory()
     {
-        return this.factory;
+        return getContext().getResourceFactory();
     }
 
     /**
@@ -330,9 +393,17 @@ public abstract class AbstractDavResource implements XWikiDavResource
     /**
      * {@inheritDoc}
      */
+    public String getHref()
+    {
+        return this.locator.getHref(isCollection());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public DavSession getSession()
     {
-        return this.session;
+        return getContext().getDavSession();
     }
 
     /**
@@ -344,21 +415,89 @@ public abstract class AbstractDavResource implements XWikiDavResource
     }
 
     /**
-     * @return the xwikiContext
+     * {@inheritDoc}
      */
-    public XWikiContext getXwikiContext()
+    public XWikiDavContext getContext()
     {
-        return xwikiContext;
+        return context;
     }
 
     /**
-     * @return the lockManager
+     * {@inheritDoc}
      */
-    public LockManager getLockManager()
+    public List<XWikiDavResource> getVirtualMembers()
     {
-        return lockManager;
+        Map<String, List<XWikiDavResource>> vResourcesMap =
+            getContext().getUserStorage().getResourcesMap();
+        if (vResourcesMap.get(getResourcePath()) == null) {
+            vResourcesMap.put(getResourcePath(), new ArrayList<XWikiDavResource>());
+        }
+        return vResourcesMap.get(getResourcePath());
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    public DavPropertySet getVirtualProperties()
+    {
+        Map<String, DavPropertySet> vPropertiesMap =
+            getContext().getUserStorage().getPropertiesMap();
+        if (vPropertiesMap.get(getResourcePath()) == null) {
+            vPropertiesMap.put(getResourcePath(), new DavPropertySet());
+        }
+        return vPropertiesMap.get(getResourcePath());
+    }
+
+    /**
+     * Utility method for adding temporary resources to current user's cache.
+     * 
+     * @param tempResource {@link DavTempFile} instance.
+     * @param inputContext {@link InputContext}
+     */
+    public void addTempResource(DavTempFile tempResource, InputContext inputContext)
+        throws DavException
+    {
+        boolean isFile = (inputContext.getInputStream() != null);
+        long modificationTime = inputContext.getModificationTime();
+        if (isFile) {
+            byte[] data = null;
+            data = getContext().getFileContentAsBytes(inputContext.getInputStream());
+            tempResource.update(data, new Date(modificationTime));
+        } else {
+            tempResource.setModified(new Date(modificationTime));
+        }
+        // It's possible that we are updating an existing resource.
+        if (!getVirtualMembers().contains(tempResource)) {
+            getVirtualMembers().add(tempResource);
+        }
+    }
+
+    /**
+     * Utility method for removing a temporary resource from session resources.
+     * 
+     * @param tempResource {@link DavTempFile} to be removed.
+     */
+    public void removeTempResource(DavTempFile tempResource) throws DavException
+    {
+        if (getVirtualMembers().contains(tempResource)) {
+            getVirtualMembers().remove(tempResource);
+        } else {
+            throw new DavException(DavServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    /**
+     * Checks if the given resource name corresponds to a temporary resource.
+     * 
+     * @param resourceName Name of the resource.
+     * @return True if the resourceName corresponds to a temporary file / directory. False
+     *         otherwise.
+     */
+    public boolean isTempResource(String resourceName)
+    {
+        return resourceName.startsWith(".") || resourceName.endsWith("~");
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -369,13 +508,5 @@ public abstract class AbstractDavResource implements XWikiDavResource
             return getResourcePath().equals(other.getResourcePath());
         }
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int hashCode()
-    {
-        return super.hashCode();
     }
 }

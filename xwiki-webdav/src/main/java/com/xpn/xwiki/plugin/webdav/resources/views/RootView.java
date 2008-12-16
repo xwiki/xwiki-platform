@@ -37,8 +37,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
-import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils.ResourceHint;
+import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * The root of all views (entry point).
@@ -50,7 +51,7 @@ public class RootView extends AbstractDavView implements Composable
     /**
      * Logger instance.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(RootView.class);
+    private static final Logger logger = LoggerFactory.getLogger(RootView.class);
 
     /**
      * Plexus component manager.
@@ -90,21 +91,43 @@ public class RootView extends AbstractDavView implements Composable
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
         if (next < tokens.length) {
             String nextToken = tokens[next];
-            XWikiDavResource resource = null;
-            try {
-                resource =
-                    (XWikiDavResource) componentManager.lookup(ROLE, nextToken + "-baseview");
-                resource.init(this, nextToken, "/" + nextToken);
-                stack.push(resource);
-                resource.decode(stack, tokens, next + 1);
-            } catch (ComponentLookupException e) {
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+            if (isTempResource(nextToken)) {
+                super.decode(stack, tokens, next);
+            } else if (isBaseView(nextToken)) {
+                XWikiDavResource resource = null;
+                try {
+                    resource = (XWikiDavResource) componentManager.lookup(ROLE, nextToken);
+                    resource.init(this, nextToken, "/" + nextToken);
+                    stack.push(resource);
+                    resource.decode(stack, tokens, next + 1);
+                } catch (ComponentLookupException e) {
+                    throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+                }
+            } else {
+                throw new DavException(DavServletResponse.SC_BAD_REQUEST);
             }
         }
+    }
+
+    /**
+     * Utility method to check if there is a view component registered with the given hint (id).
+     * 
+     * @param id Expected resource hint.
+     * @return True if the given id corresponds to a view. False otherwise.
+     */
+    private boolean isBaseView(String id)
+    {
+        for (String baseViewID : XWikiDavUtils.BASE_VIEWS) {
+            if (id.equals(baseViewID)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -115,29 +138,34 @@ public class RootView extends AbstractDavView implements Composable
         List<DavResource> children = new ArrayList<DavResource>();
         try {
             XWikiDavResource homeView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHint.HOME);
+                (XWikiDavResource) componentManager.lookup(ROLE, XWikiDavUtils.HOME_BASEVIEW);
             homeView.init(this, "home", "/home");
             children.add(homeView);
             XWikiDavResource pagesView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHint.PAGES);
+                (XWikiDavResource) componentManager.lookup(ROLE, XWikiDavUtils.PAGES_BASEVIEW);
             pagesView.init(this, "pages", "/pages");
             children.add(pagesView);
             XWikiDavResource attachmentsView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHint.ATTACHMENTS);
+                (XWikiDavResource) componentManager.lookup(ROLE,
+                    XWikiDavUtils.ATTACHMENTS_BASEVIEW);
             attachmentsView.init(this, "attachments", "/attachments");
             children.add(attachmentsView);
             XWikiDavResource orphansView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHint.ORPHANS);
+                (XWikiDavResource) componentManager.lookup(ROLE, XWikiDavUtils.ORPHANS_BASEVIEW);
             orphansView.init(this, "orphans", "/orphans");
             children.add(orphansView);
             XWikiDavResource whatsnewView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHint.WHATSNEW);
+                (XWikiDavResource) componentManager.lookup(ROLE, XWikiDavUtils.WHATSNEW_BASEVIEW);
             whatsnewView.init(this, "whatsnew", "/whatsnew");
             children.add(whatsnewView);
         } catch (ComponentLookupException e) {
-            LOG.error("Unexpected Error : ", e);
+            logger.error("Unexpected Error : ", e);
         } catch (DavException e) {
-            LOG.error("Unexpected Error : ", e);
+            logger.error("Unexpected Error : ", e);
+        }
+        // In-memory resources.
+        for (DavResource sessionResource : getVirtualMembers()) {
+            children.add(sessionResource);
         }
         return new DavResourceIteratorImpl(children);
     }
@@ -147,7 +175,11 @@ public class RootView extends AbstractDavView implements Composable
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+        if (resource instanceof DavTempFile) {
+            addTempResource((DavTempFile) resource, inputContext);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 
     /**
@@ -155,22 +187,10 @@ public class RootView extends AbstractDavView implements Composable
      */
     public void removeMember(DavResource member) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, PROPFIND, LOCK, UNLOCK";
+        if (member instanceof DavTempFile) {
+            removeTempResource((DavTempFile)member);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 }

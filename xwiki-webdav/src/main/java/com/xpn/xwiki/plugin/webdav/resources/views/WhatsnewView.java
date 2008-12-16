@@ -32,11 +32,10 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
-import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
  * This view would list the last 20 modified pages.
@@ -48,7 +47,7 @@ public class WhatsnewView extends AbstractDavView
     /**
      * Logger instance.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(WhatsnewView.class);
+    private static final Logger logger = LoggerFactory.getLogger(WhatsnewView.class);
 
     /**
      * {@inheritDoc}
@@ -57,10 +56,12 @@ public class WhatsnewView extends AbstractDavView
         throws DavException
     {
         if (next < tokens.length) {
-            String docName = tokens[next];
-            if (docName.indexOf('.') != -1) {
+            String nextToken = tokens[next];
+            if (isTempResource(nextToken)) {
+                super.decode(stack, tokens, next);
+            } else if (nextToken.indexOf('.') != -1) {
                 DavPage page = new DavPage();
-                page.init(this, docName, "/" + docName);
+                page.init(this, nextToken, "/" + nextToken);
                 stack.push(page);
                 page.decode(stack, tokens, next + 1);
             } else {
@@ -77,19 +78,20 @@ public class WhatsnewView extends AbstractDavView
         List<DavResource> children = new ArrayList<DavResource>();
         String sql = "where 1=1 order by doc.date desc";
         try {
-            List<String> docNames =
-                xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 20, 0, xwikiContext);
+            List<String> docNames = getContext().searchDocumentsNames(sql, 20, 0);
             for (String docName : docNames) {
-                if (XWikiDavUtils.hasAccess("view", docName, xwikiContext)) {
+                if (getContext().hasAccess("view", docName)) {
                     DavPage page = new DavPage();
                     page.init(this, docName, "/" + docName);
                     children.add(page);
                 }
             }
-        } catch (XWikiException e) {
-            LOG.error("Unexpected Error : ", e);
         } catch (DavException e) {
-            LOG.error("Unexpected Error : ", e);
+            logger.error("Unexpected Error : ", e);
+        }
+        // In-memory resources.
+        for (DavResource sessionResource : getVirtualMembers()) {
+            children.add(sessionResource);
         }
         return new DavResourceIteratorImpl(children);
     }
@@ -99,7 +101,11 @@ public class WhatsnewView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+        if (resource instanceof DavTempFile) {
+            addTempResource((DavTempFile) resource, inputContext);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 
     /**
@@ -107,22 +113,10 @@ public class WhatsnewView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getSupportedMethods()
-    {
-        return "OPTIONS, GET, HEAD, PROPFIND, LOCK, UNLOCK";
+        if (member instanceof DavTempFile) {
+            removeTempResource((DavTempFile) member);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 }

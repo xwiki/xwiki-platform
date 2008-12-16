@@ -50,7 +50,7 @@
   <!-- Filter used to 'steal' webdav requests made to the application root -->
   <filter>
     <filter-name>DavFilter</filter-name>
-    <filter-class>com.xpn.xwiki.plugin.webdav.DavFilter</filter-class>
+    <filter-class>com.xpn.xwiki.plugin.webdav.XWikiDavFilter</filter-class>
   </filter>
 
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the request data. -->
@@ -157,7 +157,7 @@
   <!-- WebDAV servlet -->
   <servlet>
    <servlet-name>webdav</servlet-name>
-   <servlet-class>com.xpn.xwiki.plugin.webdav.DavServlet</servlet-class>
+   <servlet-class>com.xpn.xwiki.plugin.webdav.XWikiDavServlet</servlet-class>
   </servlet>
 
   <!-- Unused mapping for now. In the future the correct mapping will be /* when the action servlet

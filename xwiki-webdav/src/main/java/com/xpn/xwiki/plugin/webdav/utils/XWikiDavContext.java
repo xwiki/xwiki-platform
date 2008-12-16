@@ -167,7 +167,10 @@ public class XWikiDavContext implements LockManager
     {
         boolean hasAccess = false;
         try {
-            if (xwikiContext.getWiki().getRightService().hasAccessLevel(right,
+            if (right.equals("overwrite")) {
+                String overwriteAccess = exists(fullDocName) ? "delete" : "edit";
+                hasAccess = hasAccess(overwriteAccess, fullDocName);
+            } else if (xwikiContext.getWiki().getRightService().hasAccessLevel(right,
                 xwikiContext.getUser(), fullDocName, xwikiContext)) {
                 hasAccess = true;
             }
@@ -188,13 +191,8 @@ public class XWikiDavContext implements LockManager
      */
     public void checkAccess(String right, String fullDocName) throws DavException
     {
-        try {
-            if (!xwikiContext.getWiki().getRightService().hasAccessLevel(right,
-                xwikiContext.getUser(), fullDocName, xwikiContext)) {
-                throw new DavException(DavServletResponse.SC_FORBIDDEN);
-            }
-        } catch (XWikiException ex) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+        if (!hasAccess(right, fullDocName)) {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }
     }
 

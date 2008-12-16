@@ -197,9 +197,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                     for (String docName : docNames) {
                         String newDocName = dSpace.getDisplayName() + "." + docName;
                         getContext().checkAccess("edit", docName);
-                        if (getContext().exists(newDocName)) {
-                            getContext().checkAccess("delete", newDocName);
-                        }
+                        getContext().checkAccess("overwrite", newDocName);
                     }
                     for (String docName : docNames) {
                         XWikiDocument doc = getContext().getDocument(docName);

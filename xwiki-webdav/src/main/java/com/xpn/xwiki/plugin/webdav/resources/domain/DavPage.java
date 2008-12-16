@@ -304,9 +304,7 @@ public class DavPage extends AbstractDavResource
             String sql = "where doc.parent='" + this.name + "'";
             List<String> childDocNames = getContext().searchDocumentsNames(sql);
             // Validate access rights for the destination page.
-            if (getContext().exists(newDocName)) {
-                getContext().checkAccess("delete", newDocName);
-            }
+            getContext().checkAccess("overwrite", newDocName);
             // Validate access rights for all the child pages.
             for (String childDocName : childDocNames) {
                 getContext().checkAccess("edit", childDocName);

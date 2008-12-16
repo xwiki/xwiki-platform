@@ -408,6 +408,15 @@ public class XWikiLDAPUtils
         return groupMembers;
     }
 
+    /**
+     * Check if provided DN is in provided LDAP group.
+     * 
+     * @param memberDN the DN to find in the provided group.
+     * @param groupDN the DN of the group where to search.
+     * @param context the XWiki context.
+     * @return true if provided members in the provided group.
+     * @throws XWikiException error when searching for group members.
+     */
     public boolean isMemberOfGroup(String memberDN, String groupDN, XWikiContext context) throws XWikiException
     {
         for (String memberDNEntry : getGroupMembers(groupDN, context).keySet()) {
@@ -419,6 +428,15 @@ public class XWikiLDAPUtils
         return false;
     }
 
+    /**
+     * Check if provided DN is in one of the provided LDAP groups.
+     * 
+     * @param memberDN the DN to find in the provided groups.
+     * @param groupDNList the list of DN of the groups where to search.
+     * @param context the XWiki context.
+     * @return true if provided members in one of the provided groups.
+     * @throws XWikiException error when searching for group members.
+     */
     public boolean isMemberOfGroups(String memberDN, Collection<String> groupDNList, XWikiContext context)
         throws XWikiException
     {

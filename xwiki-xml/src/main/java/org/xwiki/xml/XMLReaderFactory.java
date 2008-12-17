@@ -17,37 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.xhtml;
+package org.xwiki.xml;
 
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro} Macro.
- * 
+ * Factory to create optimised {@link XMLReader}. This gives us a level of indirection versus
+ * using directly {@link javax.xml.parsers.SAXParserFactory}. We use that for example to
+ * verify if we're using Xerces and if so we configure it to cache parsed DTD grammars for
+ * better performance.
+ *  
  * @version $Id$
- * @since 1.6M1
+ * @since 1.7.1
  */
-public class XHTMLMacroParameters
+public interface XMLReaderFactory
 {
     /**
-     * Indicate if the user has asked to interpret wiki syntax or not.
+     * This component's role, used when code needs to look it up.
      */
-    private boolean wiki = true;
+    String ROLE = XMLReaderFactory.class.getName();
 
     /**
-     * @param interpretWikiSyntax indicate if the user has asked to interpret wiki syntax or not
+     * @return the optimised XML Reader instance
+     * @throws SAXException in case of an error in the creation of the XML Reader instance
+     * @throws ParserConfigurationException in case of an error in the creation of the XML Reader instance
      */
-    @ParameterDescription("indicate if the wiki syntax in the macro will be interpreted or not")
-    public void setWiki(boolean interpretWikiSyntax)
-    {
-        this.wiki = interpretWikiSyntax;
-    }
-
-    /**
-     * @return if the user has asked to interpret wiki syntax or not
-     */
-    public boolean getWiki()
-    {
-        return this.wiki;
-    }
+    XMLReader createXMLReader() throws SAXException, ParserConfigurationException;
 }

@@ -32,6 +32,13 @@
   <artifactId>xwiki-core-macro-include</artifactId>
   <name>XWiki Platform - Core - Macro - Include</name>
   <description>XWiki Platform - Core - Macro - Include</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-context</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

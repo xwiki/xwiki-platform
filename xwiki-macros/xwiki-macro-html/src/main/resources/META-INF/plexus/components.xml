@@ -40,6 +40,9 @@
         <requirement>
           <role>org.xml.sax.EntityResolver</role>
         </requirement>
+        <requirement>
+          <role>org.xwiki.xml.XMLReaderFactory</role>
+        </requirement>
       </requirements>
       <configuration>
         <priority>1000</priority>

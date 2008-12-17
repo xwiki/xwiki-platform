@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.CleanerTransformations;
+import org.htmlcleaner.ContentToken;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.JDomSerializer;
 import org.htmlcleaner.TagNode;
@@ -77,7 +78,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         // no thread contention at that time).
         // Note: This email thread seems to say it's thread safe but that's not what we see here:
         //   http://osdir.com/ml/text.xml.xforms.chiba.devel/2006-09/msg00025.html
-        clean(new StringReader("<p>dummy</p>"));
+        clean(new StringReader(""));
     }
 
     /**
@@ -117,6 +118,9 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             throw new RuntimeException("Unhandled error when cleaning HTML", e);
         }
 
+        // Fix cleaned node bug
+        fixCleanedNodeBug(cleanedNode);
+        
         Document document = new JDomSerializer(cleanerProperties, false).createJDom(cleanedNode);
 
         // Perform other cleaning operation this time using the W3C Document interface.
@@ -167,5 +171,26 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         transformations.addTransformation(tt);
 
         return transformations;
+    }
+
+    /**
+     * There's a known limitation (bug?) in HTML Cleaner where if there's a XML declaration specified
+     * it'll be copied as the first element of the body. Thus remove it if it's there.
+     * See https://sourceforge.net/forum/message.php?msg_id=4657800
+     * 
+     * @param cleanedNode the cleaned node (ie after the HTML cleaning)
+     */
+    private void fixCleanedNodeBug(TagNode cleanedNode)
+    {
+        TagNode body = cleanedNode.getElementsByName("body", false)[0];
+        if (body.getChildren().size() > 0) {
+            Object firstBodyChild = body.getChildren().get(0);
+            if (firstBodyChild != null && ContentToken.class.isAssignableFrom(firstBodyChild.getClass())) {
+                ContentToken token = (ContentToken) firstBodyChild;
+                if (token.getContent().startsWith("<?xml")) {
+                    body.removeChild(token);
+                }
+            }
+        }
     }
 }

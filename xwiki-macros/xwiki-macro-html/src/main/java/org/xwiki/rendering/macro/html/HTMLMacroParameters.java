@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,28 +16,38 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.rendering.macro.html;
 
-<component-set>
-  <components>
-    <component>
-      <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>xhtml</role-hint>
-      <implementation>org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.rendering.parser.Parser</role>
-          <role-hint>xwiki/2.0</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.xml.sax.EntityResolver</role>
-        </requirement>
-      </requirements>
-      <configuration>
-        <priority>1000</priority>
-      </configuration>
-    </component>
-  </components>
-</component-set>
+import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+
+/**
+ * Parameters for the {@link org.xwiki.rendering.internal.macro.html.HTMLMacro} Macro.
+ * 
+ * @version $Id$
+ * @since 1.6M1
+ */
+public class HTMLMacroParameters
+{
+    /**
+     * Indicate if the user has asked to interpret wiki syntax or not.
+     */
+    private boolean wiki = true;
+
+    /**
+     * @param interpretWikiSyntax indicate if the user has asked to interpret wiki syntax or not
+     */
+    @ParameterDescription("indicate if the wiki syntax in the macro will be interpreted or not")
+    public void setWiki(boolean interpretWikiSyntax)
+    {
+        this.wiki = interpretWikiSyntax;
+    }
+
+    /**
+     * @return if the user has asked to interpret wiki syntax or not
+     */
+    public boolean getWiki()
+    {
+        return this.wiki;
+    }
+}

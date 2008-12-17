@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{xhtml}}
+{{html}}
 <table>
 <tr>
 <td>
@@ -9,12 +9,12 @@
 </td>
 </tr>
 </table>
-{{/xhtml}}
+{{/html}}
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [xhtml] [] [
+beginMacroMarker [html] [] [
 <table>
 <tr>
 <td>
@@ -24,6 +24,7 @@ beginMacroMarker [xhtml] [] [
 </table>
 ]
 beginXMLNode [table]
+beginXMLNode [tbody]
 beginXMLNode [tr]
 beginXMLNode [td]
 beginList [BULLETED]
@@ -33,8 +34,9 @@ endListItem
 endList [BULLETED]
 endXMLNode [td]
 endXMLNode [tr]
+endXMLNode [tbody]
 endXMLNode [table]
-endMacroMarker [xhtml] [] [
+endMacroMarker [html] [] [
 <table>
 <tr>
 <td>

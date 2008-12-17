@@ -32,13 +32,6 @@
   <artifactId>xwiki-core-macro-html</artifactId>
   <name>XWiki Platform - Core - Macro - Html</name>
   <description>XWiki Platform - Core - Macro - Html</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-xhtml</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>

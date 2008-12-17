@@ -36,5 +36,11 @@
       <implementation>org.xwiki.xml.internal.html.DefaultHTMLCleaner</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
+    <component>
+      <role>org.xwiki.xml.XMLReaderFactory</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.xml.internal.DefaultXMLReaderFactory</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
   </components>
 </component-set>

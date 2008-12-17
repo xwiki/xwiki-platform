@@ -57,13 +57,16 @@ public class PagesView extends AbstractDavView
     {
         if (next < tokens.length) {
             String nextToken = tokens[next];
+            boolean last = (next == tokens.length - 1);
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
-            } else {
+            } else if (!(last && getContext().isCreateFileRequest())) {
                 PagesBySpaceNameSubView subView = new PagesBySpaceNameSubView();
                 subView.init(this, nextToken, "/" + nextToken);
                 stack.push(subView);
                 subView.decode(stack, tokens, next + 1);
+            } else {
+                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             }
         }
     }

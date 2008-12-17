@@ -59,15 +59,17 @@ public class OrphansView extends AbstractDavView
     {
         if (next < tokens.length) {
             String nextToken = tokens[next];
+            boolean last = (next == tokens.length - 1);
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
-            } else if (nextToken.lastIndexOf('.') != -1) {
+            } else if (getContext().exists(nextToken)
+                && !(last && getContext().isCreateOrMoveRequest())) {
                 DavPage page = new DavPage();
                 page.init(this, nextToken, "/" + nextToken);
                 stack.push(page);
                 page.decode(stack, tokens, next + 1);
             } else {
-                throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             }
         }
     }

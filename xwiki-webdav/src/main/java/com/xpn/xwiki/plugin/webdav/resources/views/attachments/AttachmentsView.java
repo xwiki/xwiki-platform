@@ -58,13 +58,17 @@ public class AttachmentsView extends AbstractDavView
     {
         if (next < tokens.length) {
             String nextToken = tokens[next];
+            boolean last = (next == tokens.length - 1);
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
-            } else {
+            } else if (getContext().getSpaces().contains(nextToken)
+                && !(last && getContext().isCreateOrMoveRequest())) {
                 AttachmentsBySpaceNameSubView subView = new AttachmentsBySpaceNameSubView();
                 subView.init(this, nextToken, "/" + nextToken);
                 stack.push(subView);
                 subView.decode(stack, tokens, next + 1);
+            } else {
+                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             }
         }
     }

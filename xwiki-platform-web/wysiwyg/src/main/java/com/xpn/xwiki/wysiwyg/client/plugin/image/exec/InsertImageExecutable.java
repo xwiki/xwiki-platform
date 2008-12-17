@@ -43,9 +43,10 @@ public class InsertImageExecutable extends InsertHTMLExecutable
         Node startContainer = currentRange.getStartContainer();
         Node endContainer = currentRange.getEndContainer();
 
-        if (startContainer == endContainer && (currentRange.getEndOffset() - currentRange.getStartOffset() == 1)) {
+        if (startContainer == endContainer && startContainer.getNodeType() == Node.ELEMENT_NODE
+            && (currentRange.getEndOffset() - currentRange.getStartOffset() == 1)) {
             // Check that the node inside is an image
-            Node nodeInside = startContainer.getChildNodes().getItem(currentRange.getEndOffset() - 1);
+            Node nodeInside = startContainer.getChildNodes().getItem(currentRange.getStartOffset());
             if (nodeInside.getNodeName().equalsIgnoreCase("img")) {
                 return true;
             }

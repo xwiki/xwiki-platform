@@ -88,6 +88,9 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
             // do the initial extracting on the loaded document
             extractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
             getTextArea().getDocument().addInnerHTMLListener(new ImageMetaDataExtractor());
+            
+            // Create an image behavior adjuster for this text area
+            new ImageBehaviorAdjuster(getTextArea());
         }
     }
 

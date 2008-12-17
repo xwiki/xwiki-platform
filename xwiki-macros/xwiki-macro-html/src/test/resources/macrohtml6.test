@@ -1,20 +1,20 @@
 .#-------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that XHTML entities are supported and can be parsed.
+.# Verify that HTML entities are supported and can be parsed.
 .# Note that (((xxx))) is a special notation to display non ascii printable chars 
 .#-------------------------------------------------------------------------------
-{{xhtml}}
+{{html}}
 &nbsp;
-{{/xhtml}}
+{{/html}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [xhtml] [] [
+beginMacroMarker [html] [] [
 &nbsp;
 ]
 onWord [(((160)))]
-endMacroMarker [xhtml] [] [
+endMacroMarker [html] [] [
 &nbsp;
 ]
 endDocument

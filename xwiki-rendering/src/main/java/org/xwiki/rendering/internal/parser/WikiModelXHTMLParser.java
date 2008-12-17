@@ -19,11 +19,10 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.wikimodel.wem.IWikiParser;
 import org.wikimodel.wem.xhtml.XhtmlParser;
@@ -43,6 +42,9 @@ import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiHeaderTagHandler
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiImageTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiReferenceTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiSpanTagHandler;
+import org.xwiki.xml.XMLReaderFactory;
+import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLCleaner;
 
 /**
  * Parses XHTML and generate a {@link XDOM} object.
@@ -55,6 +57,18 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XHTML, "1.0");
 
     private PrintRendererFactory printRendererFactory;
+
+    /**
+     * Used to clean the HTML into valid XHTML. Injected by the Component Manager.
+     */
+    private HTMLCleaner htmlCleaner;
+
+    /**
+     * Used to create an optimized SAX XML Reader. In general SAX parsers don't cache DTD grammars and
+     * as a consequence parsing a document with a grammar such as the XHTML DTD takes a lot more time
+     * than required. Injected by the Component Manager. 
+     */
+    private XMLReaderFactory xmlReaderFactory;
     
     /**
      * {@inheritDoc}
@@ -66,6 +80,17 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
         return SYNTAX;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WikiModelXHTMLParser#parse(Reader)
+     */
+    @Override
+    public XDOM parse(Reader source) throws ParseException
+    {
+        return super.parse(new StringReader(XMLUtils.toString(this.htmlCleaner.clean(source))));
+    }
+    
     /**
      * {@inheritDoc}
      * 
@@ -109,11 +134,12 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
         XMLReader xmlReader;
 
         try {
-            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-            SAXParser parser = parserFactory.newSAXParser();
-    
+
+            // Use a performant XML Reader (which does DTD caching for Xerces)
+            xmlReader = this.xmlReaderFactory.createXMLReader();
+            
             // Ignore SAX callbacks when the parser parses the DTD
-            DTDXMLFilter dtdFilter = new DTDXMLFilter(parser.getXMLReader());
+            DTDXMLFilter dtdFilter = new DTDXMLFilter(xmlReader);
             
             // Add a XML Filter to accumulate onCharacters() calls since SAX
             // parser may call it several times.

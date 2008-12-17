@@ -45,18 +45,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-context</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-
-    <!-- Required for the XHTML macro -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-xml</artifactId>
       <version>${pom.version}</version>
     </dependency>
@@ -96,13 +84,17 @@
       <version>1.6.1</version>
     </dependency>
     
-    <!-- Testing dependencies -->
+    <!-- We need the Xerces dependency at runtime since we have an optimization for the Xerces
+         parser (to tell it to cache DTD grammars). If it's not there then there's no DTD
+         caching. -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-plexus</artifactId>
-      <version>${pom.version}</version>
-      <scope>test</scope>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.9.1</version>
+      <scope>runtime</scope>
     </dependency>
+      
+    <!-- Testing dependencies -->
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>

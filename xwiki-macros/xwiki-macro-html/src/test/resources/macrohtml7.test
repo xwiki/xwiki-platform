@@ -1,21 +1,21 @@
 .#----------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that the XHTML Macro knows how to handle CDATA and that they are not lost.
+.# Verify that the HTML Macro knows how to handle CDATA and that they are not lost.
 .# Also verify that characters are not escaped when inside the CDATA section.
 .#----------------------------------------------------------------------------------
-{{xhtml wiki="false"}}
+{{html wiki="false"}}
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)
              alert("Hello, World")
    // ]]>
 </script>
-{{/xhtml}}
+{{/html}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [xhtml] [wiki=false] [
+beginMacroMarker [html] [wiki=false] [
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)
@@ -32,7 +32,7 @@ onWord [
    // ]
 endXMLNode [CDATA]
 endXMLNode [script] [type=text/javascript]
-endMacroMarker [xhtml] [wiki=false] [
+endMacroMarker [html] [wiki=false] [
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)
@@ -44,7 +44,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:xhtml|-|wiki="false"|-|
+<!--startmacro:html|-|wiki="false"|-|
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)

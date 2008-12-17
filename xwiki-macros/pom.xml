@@ -66,7 +66,6 @@
     <module>xwiki-macro-id</module>
     <module>xwiki-macro-include</module>
     <module>xwiki-macro-toc</module>
-    <module>xwiki-macro-xhtml</module>
     <module>xwiki-macro-html</module>
     <module>xwiki-macro-script</module>
     <module>xwiki-macro-velocity</module>

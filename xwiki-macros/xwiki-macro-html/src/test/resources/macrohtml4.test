@@ -1,62 +1,68 @@
-.#------------------------------------------------------------------------------------------------------------
+.#----------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify trimming of whitespaces/new lines when in non-wiki mode (wiki syntax NOT allowed in element content)
-.#------------------------------------------------------------------------------------------------------------
-{{xhtml wiki="false"}}
+.# Verify trimming of whitespaces/new lines when in wiki mode (wiki syntax allowed in element content)
+.# Note: whitespaces in PRE and CDATA element are preserved (except for leading and trailing ones)
+.#----------------------------------------------------------------------------------------------------
+{{html}}
 <pre>
   newline
   newline
 </pre>
 <p> Some  <span>  text 
-</span> 
+</span>
 <!--comment-->  another  <![CDATA[
 hello  world
    ]]>
 </p>
-{{/xhtml}}
+{{/html}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [xhtml] [wiki=false] [
+beginMacroMarker [html] [] [
 <pre>
   newline
   newline
 </pre>
 <p> Some  <span>  text 
-</span> 
+</span>
 <!--comment-->  another  <![CDATA[
 hello  world
    ]]>
 </p>
 ]
 beginXMLNode [pre]
-onWord [
-  newline
-  newline
-]
+onWord [newline]
+onLineBreak
+onSpace
+onSpace
+onWord [newline]
 endXMLNode [pre]
 beginXMLNode [p]
-onWord [Some ]
+onWord [Some]
+onSpace
 beginXMLNode [span]
 onWord [text]
 endXMLNode [span]
 beginXMLNode [comment]
 endXMLNode [comment]
-onWord [ another ]
+onSpace
+onWord [another]
+onSpace
 beginXMLNode [CDATA]
-onWord [
-hello  world
-   ]
+onWord [hello]
+onSpace
+onSpace
+onWord [world]
 endXMLNode [CDATA]
 endXMLNode [p]
-endMacroMarker [xhtml] [wiki=false] [
+endMacroMarker [html] [] [
 <pre>
   newline
   newline
 </pre>
 <p> Some  <span>  text 
-</span> 
+</span>
 <!--comment-->  another  <![CDATA[
 hello  world
    ]]>

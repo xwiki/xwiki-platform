@@ -26,6 +26,7 @@ import java.util.Map;
 
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
+import com.xpn.xwiki.wysiwyg.client.syntax.rule.ImageSelectionBehaviourRule;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -92,6 +93,8 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("insertrowafter", new Command("insertrowafter")));
         addValidationRule(new DefaultValidationRule("insertrowbefore", new Command("insertrowbefore")));
         addValidationRule(new DefaultValidationRule("inserttable", new Command("inserttable")));
+        // Add the validation rule for the image selection behaviour
+        addValidationRule(new ImageSelectionBehaviourRule());
     }
 
     /**

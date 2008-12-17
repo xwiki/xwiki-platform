@@ -89,7 +89,7 @@ public class DavWikiFile extends AbstractDavFile
      */
     public boolean exists()
     {
-        return !parentDoc.isNew();
+        return !parentDoc.isNew() && parentResource.getVirtualMembers().contains(this);
     }
 
     /**

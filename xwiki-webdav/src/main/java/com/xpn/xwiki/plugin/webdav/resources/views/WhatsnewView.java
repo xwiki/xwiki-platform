@@ -89,10 +89,7 @@ public class WhatsnewView extends AbstractDavView
         } catch (DavException e) {
             logger.error("Unexpected Error : ", e);
         }
-        // In-memory resources.
-        for (DavResource sessionResource : getVirtualMembers()) {
-            children.add(sessionResource);
-        }
+        children.addAll(getVirtualMembers());
         return new DavResourceIteratorImpl(children);
     }
 
@@ -102,7 +99,7 @@ public class WhatsnewView extends AbstractDavView
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavTempFile) {
-            addTempResource((DavTempFile) resource, inputContext);
+            addVirtualMember(resource, inputContext);
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }
@@ -114,7 +111,7 @@ public class WhatsnewView extends AbstractDavView
     public void removeMember(DavResource member) throws DavException
     {
         if (member instanceof DavTempFile) {
-            removeTempResource((DavTempFile) member);
+            removeVirtualMember(member);
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }

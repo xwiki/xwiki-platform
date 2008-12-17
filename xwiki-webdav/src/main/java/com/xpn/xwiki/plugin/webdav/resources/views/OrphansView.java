@@ -49,7 +49,7 @@ public class OrphansView extends AbstractDavView
     /**
      * Logger instance.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(OrphansView.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrphansView.class);
 
     /**
      * {@inheritDoc}
@@ -89,12 +89,9 @@ public class OrphansView extends AbstractDavView
                 }
             }
         } catch (DavException e) {
-            LOG.error("Unexpected Error : ", e);
+            logger.error("Unexpected Error : ", e);
         }
-        // In-memory resources.
-        for (DavResource sessionResource : getVirtualMembers()) {
-            children.add(sessionResource);
-        }
+        children.addAll(getVirtualMembers());
         return new DavResourceIteratorImpl(children);
     }
 
@@ -104,7 +101,7 @@ public class OrphansView extends AbstractDavView
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavTempFile) {
-            addTempResource((DavTempFile) resource, inputContext);
+            addVirtualMember(resource, inputContext);
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }
@@ -116,7 +113,7 @@ public class OrphansView extends AbstractDavView
     public void removeMember(DavResource member) throws DavException
     {
         if (member instanceof DavTempFile) {
-            removeTempResource((DavTempFile) member);
+            removeVirtualMember(member);
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }

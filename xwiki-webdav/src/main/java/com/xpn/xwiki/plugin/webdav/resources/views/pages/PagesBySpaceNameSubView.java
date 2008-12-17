@@ -51,7 +51,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     /**
      * Logger instance.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(PagesBySpaceNameSubView.class);
+    private static final Logger logger = LoggerFactory.getLogger(PagesBySpaceNameSubView.class);
 
     /**
      * {@inheritDoc}
@@ -92,7 +92,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                 return true;
             }
         } catch (DavException ex) {
-            LOG.error("Unexpected Error : ", ex);
+            logger.error("Unexpected Error : ", ex);
         }
         return false;
     }
@@ -129,16 +129,13 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                     subView.init(this, modName, "/" + modName);
                     children.add(subView);
                 } catch (DavException e) {
-                    LOG.error("Unexpected Error : ", e);
+                    logger.error("Unexpected Error : ", e);
                 }
             }
         } catch (DavException ex) {
-            LOG.error("Unexpected Error : ", ex);
+            logger.error("Unexpected Error : ", ex);
         }
-        // In-memory resources.
-        for (DavResource sessionResource : getVirtualMembers()) {
-            children.add(sessionResource);
-        }
+        children.addAll(getVirtualMembers());
         return new DavResourceIteratorImpl(children);
     }
 
@@ -148,9 +145,9 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavTempFile) {
-            addTempResource((DavTempFile) resource, inputContext);
+            addVirtualMember(resource, inputContext);
         } else if (resource instanceof DavPage) {
-            String pName = ((DavPage) resource).getDisplayName();
+            String pName = resource.getDisplayName();
             if (getContext().hasAccess("edit", pName)) {
                 XWikiDocument childDoc = getContext().getDocument(pName);
                 childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
@@ -166,10 +163,11 @@ public class PagesBySpaceNameSubView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        if (member instanceof DavTempFile) {
-            removeTempResource((DavTempFile) member);
-        } else if (member instanceof DavPage) {
-            String pName = ((DavPage) member).getDisplayName();
+        XWikiDavResource davResource = (XWikiDavResource) member;
+        if (davResource instanceof DavTempFile) {
+            removeVirtualMember(davResource);
+        } else if (davResource instanceof DavPage) {
+            String pName = davResource.getDisplayName();
             getContext().checkAccess("delete", pName);
             XWikiDocument childDoc = getContext().getDocument(pName);
             if (!childDoc.isNew()) {
@@ -178,6 +176,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
+        davResource.clearCache();
     }
 
     /**
@@ -217,5 +216,6 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
+        clearCache();
     }
 }

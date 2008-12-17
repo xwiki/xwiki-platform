@@ -75,6 +75,16 @@ public interface XWikiDavResource extends DavResource
     DavPropertySet getVirtualProperties();
 
     /**
+     * @return List of members that is added to the initial virtual member list.
+     */
+    List<XWikiDavResource> getInitMembers();
+    
+    /**
+     * Removes everything belonging to this resource from the cache.
+     */
+    void clearCache();
+    
+    /**
      * @return The {@link XWikiDavContext} for this resource.
      */
     XWikiDavContext getContext();

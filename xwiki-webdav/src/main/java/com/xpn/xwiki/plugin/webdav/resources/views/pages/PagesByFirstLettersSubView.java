@@ -112,10 +112,7 @@ public class PagesByFirstLettersSubView extends AbstractDavView
         } catch (DavException e) {
             logger.error("Unexpected Error : ", e);
         }
-        // In-memory resources.
-        for (DavResource sessionResource : getVirtualMembers()) {
-            children.add(sessionResource);
-        }
+        children.addAll(getVirtualMembers());
         return new DavResourceIteratorImpl(children);
     }
 
@@ -125,7 +122,7 @@ public class PagesByFirstLettersSubView extends AbstractDavView
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavTempFile) {
-            addTempResource((DavTempFile) resource, inputContext);
+            addVirtualMember(resource, inputContext);
         } else {
             // This is only a virtual grouping of pages. Delegate the request to the parent.
             getCollection().addMember(resource, inputContext);
@@ -138,7 +135,7 @@ public class PagesByFirstLettersSubView extends AbstractDavView
     public void removeMember(DavResource member) throws DavException
     {
         if (member instanceof DavTempFile) {
-            removeTempResource((DavTempFile) member);
+            removeVirtualMember(member);
         } else {
             // This is only a virtual grouping of pages. Delegate the request to the parent.
             getCollection().removeMember(member);

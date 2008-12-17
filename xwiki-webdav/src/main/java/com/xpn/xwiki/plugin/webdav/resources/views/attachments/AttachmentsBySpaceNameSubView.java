@@ -115,20 +115,17 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
         } catch (DavException ex) {
             logger.error("Unexpected Error : ", ex);
         }
-        // In-memory resources.
-        for (DavResource sessionResource : getVirtualMembers()) {
-            children.add(sessionResource);
-        }
+        children.addAll(getVirtualMembers());
         return new DavResourceIteratorImpl(children);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void addMember(DavResource member, InputContext inputContext) throws DavException
+    public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        if (member instanceof DavTempFile) {
-            addTempResource((DavTempFile) member, inputContext);
+        if (resource instanceof DavTempFile) {
+            addVirtualMember(resource, inputContext);
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }
@@ -140,7 +137,7 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
     public void removeMember(DavResource member) throws DavException
     {
         if (member instanceof DavTempFile) {
-            removeTempResource((DavTempFile) member);
+            removeVirtualMember(member);
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }

@@ -152,10 +152,7 @@ public class DavTempFile extends AbstractDavResource
     public DavResourceIterator getMembers()
     {
         List<DavResource> children = new ArrayList<DavResource>();
-        // In-memory resources.
-        for (DavResource sessionResource : getVirtualMembers()) {
-            children.add(sessionResource);
-        }
+        children.addAll(getVirtualMembers());
         return new DavResourceIteratorImpl(children);
     }
 
@@ -165,7 +162,7 @@ public class DavTempFile extends AbstractDavResource
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavTempFile) {
-            addTempResource((DavTempFile) resource, inputContext);
+            addVirtualMember(resource, inputContext);
         } else {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
@@ -177,7 +174,7 @@ public class DavTempFile extends AbstractDavResource
     public void removeMember(DavResource resource) throws DavException
     {
         if (resource instanceof DavTempFile) {
-            removeTempResource((DavTempFile) resource);
+            removeVirtualMember(resource);
         } else {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
@@ -199,6 +196,7 @@ public class DavTempFile extends AbstractDavResource
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }
+        clearCache();
     }
 
     /**

@@ -134,6 +134,7 @@ public class DavAttachment extends AbstractDavFile
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
+        clearCache();
     }
 
     /**

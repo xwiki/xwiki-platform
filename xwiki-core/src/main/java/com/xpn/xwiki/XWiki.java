@@ -1531,22 +1531,22 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * String[list.size()]; for (int i=0;i<list.size();i++) array[i] = (String)list.get(i); return array; }
      */
 
-    public List search(String sql, XWikiContext context) throws XWikiException
+    public <T> List<T> search(String sql, XWikiContext context) throws XWikiException
     {
         return getStore().search(sql, 0, 0, context);
     }
 
-    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException
+    public <T> List<T> search(String sql, int nb, int start, XWikiContext context) throws XWikiException
     {
         return getStore().search(sql, nb, start, context);
     }
 
-    public List search(String sql, Object[][] whereParams, XWikiContext context) throws XWikiException
+    public <T> List<T> search(String sql, Object[][] whereParams, XWikiContext context) throws XWikiException
     {
         return getStore().search(sql, 0, 0, whereParams, context);
     }
 
-    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
+    public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
         throws XWikiException
     {
         return getStore().search(sql, nb, start, whereParams, context);
@@ -6064,7 +6064,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return bclass.displaySearchOrder(className + "_" + prefix, query, context);
     }
 
-    public List search(XWikiQuery query, XWikiContext context) throws XWikiException
+    public <T> List<T> search(XWikiQuery query, XWikiContext context) throws XWikiException
     {
         QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
         if (qp == null) {

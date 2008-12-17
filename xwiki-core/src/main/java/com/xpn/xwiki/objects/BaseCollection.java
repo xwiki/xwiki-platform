@@ -31,11 +31,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -55,7 +55,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     protected String className;
 
-    protected Map fields = ListOrderedMap.decorate(new HashMap());
+    protected Map<String, Object> fields = new LinkedHashMap<String, Object>();
 
     protected List fieldsToRemove = new ArrayList();
 
@@ -397,7 +397,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     // These functions should not be used
     // but instead our own implementation
-    private Map getFields()
+    private Map<String, Object> getFields()
     {
         return this.fields;
     }
@@ -431,7 +431,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return this.fields.values();
     }
 
-    public Set getPropertyList()
+    public Set<String> getPropertyList()
     {
         return this.fields.keySet();
     }
@@ -442,9 +442,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return array;
     }
 
-    public Object[] getPropertyNames()
+    public String[] getPropertyNames()
     {
-        Object[] array = getFields().keySet().toArray();
+        String[] array = getFields().keySet().toArray(new String[0]);
         return array;
     }
 
@@ -497,7 +497,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             return false;
         }
 
-        for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) getFields().entrySet()) {
+        for (Map.Entry<String, Object> entry : getFields().entrySet()) {
             Object prop = entry.getValue();
             Object prop2 = collection.getFields().get(entry.getKey());
             if (!prop.equals(prop2)) {

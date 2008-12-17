@@ -28,6 +28,7 @@ import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
@@ -93,7 +94,7 @@ public interface XWikiStoreInterface
      * @return a list of document names
      * @throws XWikiException in case of error while performing the query
      */
-    List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List parameterValues,
+    List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
     /**
@@ -101,7 +102,7 @@ public interface XWikiStoreInterface
      * 
      * @see #searchDocumentsNames(String, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
      */
-    List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues, XWikiContext context)
+    List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -115,7 +116,7 @@ public interface XWikiStoreInterface
      * @param context The current request context.
      * @throws XWikiException if there was a problem executing the query.
      */
-    int countDocuments(String parametrizedSqlClause, List parameterValues, XWikiContext context) throws XWikiException;
+    int countDocuments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * Search documents in the storing system.
@@ -191,7 +192,7 @@ public interface XWikiStoreInterface
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
-        List parameterValues, XWikiContext context) throws XWikiException;
+        List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * Search documents in the storing system.
@@ -255,7 +256,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List<XWikiDocument> searchDocuments(String wheresql, List parameterValues, XWikiContext context)
+    List<XWikiDocument> searchDocuments(String wheresql, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -280,7 +281,7 @@ public interface XWikiStoreInterface
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping, int nb,
-        int start, List parameterValues, XWikiContext context) throws XWikiException;
+        int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * Search documents in the storing system.
@@ -300,7 +301,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List parameterValues, XWikiContext context)
+    List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -326,7 +327,7 @@ public interface XWikiStoreInterface
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        boolean checkRight, int nb, int start, List parameterValues, XWikiContext context) throws XWikiException;
+        boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
 
@@ -334,9 +335,9 @@ public interface XWikiStoreInterface
 
     void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;
 
-    List loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
+    List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
 
-    List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException;
+    List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;
 
@@ -353,7 +354,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
+    <T> List<T> search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
 
     /**
      * Execute a reading request with parameters and return result.
@@ -372,7 +373,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List search(String sql, int nb, int start, List parameterValues, XWikiContext context) throws XWikiException;
+    <T> List<T> search(String sql, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * Execute a reading request and return result.
@@ -386,7 +387,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException;
+    <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException;
 
     /**
      * Execute a reading request with parameters and return result.
@@ -407,7 +408,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List search(String sql, int nb, int start, Object[][] whereParams, List parameterValues, XWikiContext context)
+    <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
     void cleanUp(XWikiContext context);
@@ -454,7 +455,7 @@ public interface XWikiStoreInterface
 
     void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException;
 
-    List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException;
+    List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     /**
      * @return QueryManager used for creating queries to store. Use QueryManager instead of #search* methods because it

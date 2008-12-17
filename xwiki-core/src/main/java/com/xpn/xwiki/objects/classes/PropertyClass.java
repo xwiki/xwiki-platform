@@ -493,7 +493,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return new BaseProperty();
     }
 
-    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList)
+    public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
     }
 

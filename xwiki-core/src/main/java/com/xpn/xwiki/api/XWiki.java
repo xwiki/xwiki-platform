@@ -315,7 +315,7 @@ public class XWiki extends Api
      * @return A list of rows (Object[])
      * @throws XWikiException
      */
-    public List search(String wheresql) throws XWikiException
+    public <T> List<T> search(String wheresql) throws XWikiException
     {
         if (hasProgrammingRights()) {
             return this.xwiki.search(wheresql, getXWikiContext());
@@ -334,7 +334,7 @@ public class XWiki extends Api
      * @return A list of rows (Object[])
      * @throws XWikiException
      */
-    public List search(String wheresql, int nb, int start) throws XWikiException
+    public <T> List<T> search(String wheresql, int nb, int start) throws XWikiException
     {
         if (hasProgrammingRights()) {
             return this.xwiki.search(wheresql, nb, start, getXWikiContext());
@@ -2399,7 +2399,7 @@ public class XWiki extends Api
      * @return A list of document names matching the query
      * @throws XWikiException exception is a failure occured
      */
-    public List search(XWikiQuery query) throws XWikiException
+    public <T> List<T> search(XWikiQuery query) throws XWikiException
     {
         return this.xwiki.search(query, getXWikiContext());
     }

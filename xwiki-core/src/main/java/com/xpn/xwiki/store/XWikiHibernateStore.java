@@ -1777,9 +1777,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return links;
     }
 
-    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
+    public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
     {
-        List backlinks = new ArrayList();
+        List<String> backlinks = new ArrayList<String>();
         try {
             if (bTransaction) {
                 checkHibernate(context);

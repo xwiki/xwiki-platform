@@ -164,7 +164,7 @@ public class NumberClass extends PropertyClass
         buffer.append(input2.toString());
     }
 
-    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList)
+    public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         Number value = (Number) map.get(prefix);
         if ((value != null) && (!value.equals(""))) {

@@ -142,7 +142,7 @@ public class StringClass extends PropertyClass
         buffer.append(input.toString());
     }
 
-    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList)
+    public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         String value = (String) map.get(prefix);
         if ((value != null) && (!value.equals(""))) {

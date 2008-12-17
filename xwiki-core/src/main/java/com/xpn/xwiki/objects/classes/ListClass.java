@@ -679,7 +679,7 @@ public abstract class ListClass extends PropertyClass
         return select.toString();
     }
 
-    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList)
+    public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         Object values = map.get(prefix);
         if ((values == null) || (values.equals(""))) {

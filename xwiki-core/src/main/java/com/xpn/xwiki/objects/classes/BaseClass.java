@@ -834,10 +834,10 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public String makeQuery(XWikiCriteria query)
     {
-        List criteriaList = new ArrayList();
+        List<String> criteriaList = new ArrayList<String>();
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
-            Map map = query.getParameters(getName() + "_" + name);
+            Map<String, Object> map = query.getParameters(getName() + "_" + name);
             if (map.size() > 0) {
                 property.makeQuery(map, "", query, criteriaList);
             }
@@ -853,18 +853,18 @@ public class BaseClass extends BaseCollection implements ClassInterface
         select.setName(prefix + "searchcolumns");
         select.setID(prefix + "searchcolumns");
 
-        List list = Arrays.asList(getPropertyNames());
-        Map prettynamesmap = new HashMap();
+        List<String> list = Arrays.asList(getPropertyNames());
+        Map<String, String> prettynamesmap = new HashMap<String, String>();
         for (int i = 0; i < list.size(); i++) {
             String propname = (String) list.get(i);
             list.set(i, prefix + propname);
             prettynamesmap.put(prefix + propname, ((PropertyClass) get(propname)).getPrettyName());
         }
 
-        List selectlist = query.getDisplayProperties();
+        List<String> selectlist = query.getDisplayProperties();
 
         // Add options from Set
-        for (Iterator it = list.iterator(); it.hasNext();) {
+        for (Iterator<String> it = list.iterator(); it.hasNext();) {
             String value = it.next().toString();
             String displayValue = (String) prettynamesmap.get(value);
             option option = new option(displayValue, displayValue);
@@ -886,8 +886,8 @@ public class BaseClass extends BaseCollection implements ClassInterface
         select.setName(prefix + "searchorder");
         select.setID(prefix + "searchorder");
 
-        List list = Arrays.asList(getPropertyNames());
-        Map prettynamesmap = new HashMap();
+        List<String> list = Arrays.asList(getPropertyNames());
+        Map<String, String> prettynamesmap = new HashMap<String, String>();
         for (int i = 0; i < list.size(); i++) {
             String propname = (String) list.get(i);
             list.set(i, prefix + propname);
@@ -900,7 +900,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
         }
 
         // Add options from Set
-        for (Iterator it = list.iterator(); it.hasNext();) {
+        for (Iterator<String> it = list.iterator(); it.hasNext();) {
             String value = it.next().toString();
             String displayValue = (String) prettynamesmap.get(value);
             option option = new option(displayValue, displayValue);

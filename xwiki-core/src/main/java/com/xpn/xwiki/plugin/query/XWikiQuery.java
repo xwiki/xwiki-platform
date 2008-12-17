@@ -59,8 +59,8 @@ public class XWikiQuery extends XWikiCriteria
         String[] order = request.getParameterValues(className + "_" + "searchorder");
         setOrderProperties(order);
         BaseClass bclass = context.getWiki().getDocument(className, context).getxWikiClass();
-        Set properties = bclass.getPropertyList();
-        Iterator propid = properties.iterator();
+        Set<String> properties = bclass.getPropertyList();
+        Iterator<String> propid = properties.iterator();
         while (propid.hasNext()) {
             String propname = (String) propid.next();
             Map<String, String[]> map = Util.getObject(request, className + "_" + propname);

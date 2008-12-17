@@ -430,7 +430,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
         Map<String, List<XWikiDavResource>> vResourcesMap =
             getContext().getUserStorage().getResourcesMap();
         if (vResourcesMap.get(getResourcePath()) == null) {
-            vResourcesMap.put(getResourcePath(), new ArrayList<XWikiDavResource>());
+            vResourcesMap.put(getResourcePath(), getInitMembers());
         }
         return vResourcesMap.get(getResourcePath());
     }
@@ -449,38 +449,65 @@ public abstract class AbstractDavResource implements XWikiDavResource
     }
 
     /**
-     * Utility method for adding temporary resources to current user's cache.
+     * {@inheritDoc}
+     */
+    public List<XWikiDavResource> getInitMembers()
+    {
+        return new ArrayList<XWikiDavResource>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void clearCache()
+    {
+        Map<String, List<XWikiDavResource>> vResourcesMap =
+            getContext().getUserStorage().getResourcesMap();
+        Map<String, DavPropertySet> vPropertiesMap =
+            getContext().getUserStorage().getPropertiesMap();
+        vResourcesMap.remove(getResourcePath());
+        vPropertiesMap.remove(getResourcePath());
+    }
+
+    /**
+     * Utility method for adding virtual members.
      * 
-     * @param tempResource {@link DavTempFile} instance.
+     * @param resource {@link XWikiDavResource} instance.
      * @param inputContext {@link InputContext}
      */
-    public void addTempResource(DavTempFile tempResource, InputContext inputContext)
+    public void addVirtualMember(DavResource resource, InputContext inputContext)
         throws DavException
     {
+        XWikiDavResource davResource = (XWikiDavResource) resource;
         boolean isFile = (inputContext.getInputStream() != null);
         long modificationTime = inputContext.getModificationTime();
-        if (isFile) {
-            byte[] data = null;
-            data = getContext().getFileContentAsBytes(inputContext.getInputStream());
-            tempResource.update(data, new Date(modificationTime));
-        } else {
-            tempResource.setModified(new Date(modificationTime));
+        if (davResource instanceof DavTempFile) {
+            DavTempFile tempFile = (DavTempFile) davResource;
+            if (isFile) {
+                byte[] data = null;
+                data = getContext().getFileContentAsBytes(inputContext.getInputStream());
+                tempFile.update(data, new Date(modificationTime));
+            } else {
+                tempFile.setModified(new Date(modificationTime));
+            }
         }
         // It's possible that we are updating an existing resource.
-        if (!getVirtualMembers().contains(tempResource)) {
-            getVirtualMembers().add(tempResource);
+        if (!getVirtualMembers().contains(davResource)) {
+            getVirtualMembers().add(davResource);
         }
     }
 
     /**
-     * Utility method for removing a temporary resource from session resources.
+     * Utility method for removing virtual members.
      * 
-     * @param tempResource {@link DavTempFile} to be removed.
+     * @param member {@link XWikiDavResource} to be removed.
      */
-    public void removeTempResource(DavTempFile tempResource) throws DavException
+    public void removeVirtualMember(DavResource member) throws DavException
     {
-        if (getVirtualMembers().contains(tempResource)) {
-            getVirtualMembers().remove(tempResource);
+        XWikiDavResource davResource = (XWikiDavResource) member;
+        if (getVirtualMembers().contains(davResource)) {
+            getVirtualMembers().remove(davResource);
+            davResource.clearCache();
         } else {
             throw new DavException(DavServletResponse.SC_NOT_FOUND);
         }

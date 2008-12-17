@@ -53,6 +53,8 @@ public class XWikiDavContext implements LockManager
      */
     private static final Logger logger = LoggerFactory.getLogger(XWikiDavContext.class);
 
+    private DavServletRequest request;
+
     private XWikiContext xwikiContext;
 
     private DavResourceFactory resourceFactory;
@@ -70,6 +72,7 @@ public class XWikiDavContext implements LockManager
         ServletContext servletContext, DavResourceFactory resourceFactory, DavSession davSession,
         LockManager lockManager) throws DavException
     {
+        this.request = request;
         this.resourceFactory = resourceFactory;
         this.davSession = davSession;
         this.lockManager = lockManager;
@@ -392,8 +395,25 @@ public class XWikiDavContext implements LockManager
 
     public boolean isCreateCollectionRequest()
     {
-        return DavMethods.isCreateCollectionRequest((DavServletRequest) xwikiContext.getRequest()
-            .getHttpServletRequest());
+        return DavMethods.isCreateCollectionRequest(request);
+    }
+
+    public boolean isCreateFileRequest()
+    {
+        int methodCode = DavMethods.getMethodCode(getMethod());
+        return methodCode == DavMethods.DAV_PUT || methodCode == DavMethods.DAV_POST;
+    }
+
+    public boolean isMoveAttachmentRequest(XWikiDocument doc)
+    {
+        int methodCode = DavMethods.getMethodCode(getMethod());
+        if (methodCode == DavMethods.DAV_MOVE) {
+            String rPath = request.getRequestLocator().getResourcePath();
+            rPath = (rPath.endsWith("/")) ? rPath.substring(0, rPath.length() - 1) : rPath;
+            String resourceName = rPath.substring(rPath.lastIndexOf("/") + 1);
+            return doc.getAttachment(resourceName) != null;
+        }
+        return false;
     }
 
     public ActiveLock getLock(Type type, Scope scope, DavResource resource)
@@ -424,7 +444,7 @@ public class XWikiDavContext implements LockManager
 
     public String getMethod()
     {
-        return xwikiContext.getRequest().getMethod();
+        return request.getMethod();
     }
 
     public String getUser()

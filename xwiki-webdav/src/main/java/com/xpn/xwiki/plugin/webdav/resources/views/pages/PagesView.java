@@ -84,10 +84,7 @@ public class PagesView extends AbstractDavView
         } catch (DavException e) {
             logger.error("Unexpected Error : ", e);
         }
-        // In-memory resources.
-        for (DavResource sessionResource : getVirtualMembers()) {
-            children.add(sessionResource);
-        }
+        children.addAll(getVirtualMembers());
         return new DavResourceIteratorImpl(children);
     }
 
@@ -97,12 +94,11 @@ public class PagesView extends AbstractDavView
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavTempFile) {
-            addTempResource((DavTempFile) resource, inputContext);
+            addVirtualMember(resource, inputContext);
         } else if (resource instanceof PagesBySpaceNameSubView) {
-            PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) resource;
-            String homePage = space.getDisplayName() + ".WebHome";
+            String homePage = resource.getDisplayName() + ".WebHome";
             getContext().checkAccess("edit", homePage);
-            XWikiDocument doc = getContext().getDocument(space.getDisplayName() + ".WebHome");
+            XWikiDocument doc = getContext().getDocument(resource.getDisplayName() + ".WebHome");
             doc.setContent("This page was created thorugh xwiki-webdav interface.");
             getContext().saveDocument(doc);
         } else {
@@ -115,10 +111,11 @@ public class PagesView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        if (member instanceof DavTempFile) {
-            removeTempResource((DavTempFile) member);
-        } else if (member instanceof PagesBySpaceNameSubView) {
-            PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) member;
+        XWikiDavResource davResource = (XWikiDavResource) member;
+        if (davResource instanceof DavTempFile) {
+            removeVirtualMember(davResource);
+        } else if (davResource instanceof PagesBySpaceNameSubView) {
+            PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) davResource;
             String sql = "where doc.web='" + space.getDisplayName() + "'";
             List<String> docNames = getContext().searchDocumentsNames(sql);
             // Check if the user has delete rights on all child pages.
@@ -132,5 +129,6 @@ public class PagesView extends AbstractDavView
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);
         }
+        davResource.clearCache();
     }
 }

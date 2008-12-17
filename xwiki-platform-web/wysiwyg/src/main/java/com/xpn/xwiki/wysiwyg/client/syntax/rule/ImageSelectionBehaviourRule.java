@@ -19,10 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.rule;
 
-import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Validation rule used to define the behavior when the selection is on an image. This will disable features that refer
@@ -40,19 +39,7 @@ public class ImageSelectionBehaviourRule implements ValidationRule
      */
     public boolean areValid(RichTextArea textArea)
     {
-        // Check the current text area selection, if it is an image selection
-        Range range = textArea.getDocument().getSelection().getRangeAt(0);
-        if (range.getStartContainer() == range.getEndContainer()
-            && range.getStartContainer().getNodeType() == Node.ELEMENT_NODE
-            && (range.getEndOffset() - range.getStartOffset()) == 1) {
-            // The selection is exactly one element large, check the content of the selection
-            Node selectedNode = range.getStartContainer().getChildNodes().getItem(range.getStartOffset());
-            if (selectedNode.getNodeType() == Node.ELEMENT_NODE && selectedNode.getNodeName().equalsIgnoreCase("img")) {
-                // The current selection is an image selection, the features must be disabled
-                return false;
-            }
-        }
-        return true;
+        return !textArea.getCommandManager().isExecuted(Command.INSERT_IMAGE);
     }
 
     /**

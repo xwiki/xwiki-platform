@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.image;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
@@ -33,6 +36,13 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class ImageBehaviorAdjuster implements KeyboardListener
 {
     /**
+     * The list of allowed keys on image selection.
+     */
+    private static final List<Integer> ALLOWED_KEYS =
+        Arrays.asList(KEY_DELETE, KEY_BACKSPACE, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, KEY_HOME, KEY_END, KEY_PAGEUP,
+            KEY_PAGEDOWN);
+
+    /**
      * The rich text area for which this behavior adjuster operates.
      */
     private RichTextArea textArea;
@@ -44,8 +54,8 @@ public class ImageBehaviorAdjuster implements KeyboardListener
      */
     public ImageBehaviorAdjuster(RichTextArea textArea)
     {
-        super();
-        this.setTextArea(textArea);
+        this.textArea = textArea;
+        this.textArea.addKeyboardListener(this);
     }
 
     /**
@@ -55,15 +65,7 @@ public class ImageBehaviorAdjuster implements KeyboardListener
      */
     public void onKeyDown(Widget sender, char keyCode, int modifiers)
     {
-        if (sender != textArea) {
-            return;
-        }
-
-        // Disable all other keys besides delete and backspace when an image is selected
-        if (textArea.getCommandManager().isExecuted(Command.INSERT_IMAGE) && keyCode != KEY_BACKSPACE
-            && keyCode != KEY_DELETE) {
-            textArea.getCurrentEvent().preventDefault();
-        }
+        // nothing
     }
 
     /**
@@ -73,7 +75,20 @@ public class ImageBehaviorAdjuster implements KeyboardListener
      */
     public void onKeyPress(Widget sender, char keyCode, int modifiers)
     {
-        // nothing
+        // Make sure the sender is the listened text area and an image is selected
+        if (!(sender == textArea && textArea.getCommandManager().isExecuted(Command.INSERT_IMAGE))) {
+            return;
+        }
+        // If it's a modified key (ctrl or alt), let it execute
+        if (textArea.getCurrentEvent().getCtrlKey() || textArea.getCurrentEvent().getAltKey()) {
+            return;
+        }
+        // If it's in the defined list of allowed keys, let it execute
+        if (ALLOWED_KEYS.contains((int) keyCode)) {
+            return;
+        }
+        // block everything else
+        textArea.getCurrentEvent().preventDefault();
     }
 
     /**
@@ -84,16 +99,5 @@ public class ImageBehaviorAdjuster implements KeyboardListener
     public void onKeyUp(Widget sender, char keyCode, int modifiers)
     {
         // nothing
-    }
-
-    /**
-     * @param textArea the textArea to set
-     */
-    public void setTextArea(RichTextArea textArea)
-    {
-        this.textArea = textArea;
-        if (this.textArea != null) {
-            this.textArea.addKeyboardListener(this);
-        }
     }
 }

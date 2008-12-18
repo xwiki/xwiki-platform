@@ -329,10 +329,14 @@ public class XWikiDavContext implements LockManager
     public void renameDocument(XWikiDocument document, String newDocumentName)
         throws DavException
     {
-        try {
-            document.rename(newDocumentName, xwikiContext);
-        } catch (XWikiException ex) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+        if (document.isCurrentUserPage(xwikiContext)) {
+            throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+        } else {
+            try {
+                document.rename(newDocumentName, xwikiContext);
+            } catch (XWikiException ex) {
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            }
         }
     }
 
@@ -377,10 +381,14 @@ public class XWikiDavContext implements LockManager
 
     public void deleteDocument(XWikiDocument document) throws DavException
     {
-        try {
-            xwikiContext.getWiki().deleteDocument(document, xwikiContext);
-        } catch (XWikiException ex) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+        if (document.isCurrentUserPage(xwikiContext)) {
+            throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+        } else {
+            try {
+                xwikiContext.getWiki().deleteDocument(document, xwikiContext);
+            } catch (XWikiException ex) {
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            }
         }
     }
 
@@ -403,20 +411,20 @@ public class XWikiDavContext implements LockManager
         int methodCode = DavMethods.getMethodCode(getMethod());
         return methodCode == DavMethods.DAV_PUT || methodCode == DavMethods.DAV_POST;
     }
-    
+
     public boolean isCreateResourceRequest()
-    {        
+    {
         return isCreateCollectionRequest() || isCreateFileRequest();
     }
-    
+
     public boolean isMoveResourceRequest()
-    {        
+    {
         int methodCode = DavMethods.getMethodCode(getMethod());
         return methodCode == DavMethods.DAV_MOVE;
     }
-    
+
     public boolean isCreateOrMoveRequest()
-    {                
+    {
         return isMoveResourceRequest() || isCreateResourceRequest();
     }
 
@@ -431,9 +439,9 @@ public class XWikiDavContext implements LockManager
         }
         return false;
     }
-    
+
     public boolean isDeleteResourceRequest()
-    {                
+    {
         int methodCode = DavMethods.getMethodCode(getMethod());
         return methodCode == DavMethods.DAV_DELETE;
     }

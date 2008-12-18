@@ -146,7 +146,7 @@ public class DavPage extends AbstractDavResource
             String sql = "where doc.parent='" + this.name + "'";
             List<String> docNames = getContext().searchDocumentsNames(sql);
             for (String docName : docNames) {
-                if (getContext().hasAccess("view", docName)) {
+                if (!createsCycle(docName) && getContext().hasAccess("view", docName)) {
                     XWikiDocument childDoc = getContext().getDocument(docName);
                     DavPage page = new DavPage();
                     if (childDoc.getSpace().equals(this.spaceName)) {
@@ -236,7 +236,10 @@ public class DavPage extends AbstractDavResource
         getContext().checkAccess("edit", this.name);
         XWikiDavResource dResource = (XWikiDavResource) member;
         String mName = dResource.getDisplayName();
-        if (dResource instanceof DavTempFile || dResource instanceof DavWikiFile) {
+        if (dResource instanceof DavTempFile) {
+            removeVirtualMember(dResource);
+        } else if (dResource instanceof DavWikiFile) {
+            getContext().checkAccess("delete", this.name);
             removeVirtualMember(dResource);
         } else if (dResource instanceof DavAttachment) {
             getContext().deleteAttachment(doc.getAttachment(mName));
@@ -339,5 +342,23 @@ public class DavPage extends AbstractDavResource
     public XWikiDocument getDocument()
     {
         return this.doc;
+    }
+
+    /**
+     * Utility method to verify that a member of this resource doesn't give rise to a cycle.
+     * 
+     * @param childDocName Name of the want-to-be-member resource.
+     * @return True if the childPageName has occured before, false otherwise.
+     */
+    public boolean createsCycle(String childDocName)
+    {
+        DavResource ancestor = this;
+        while (ancestor instanceof DavPage && ancestor != null) {
+            if (ancestor.getDisplayName().equals(childDocName)) {
+                return true;
+            }
+            ancestor = ancestor.getCollection();
+        }
+        return false;
     }
 }

@@ -61,10 +61,12 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     {
         if (next < tokens.length) {
             String nextToken = tokens[next];
+            boolean last = (next == tokens.length - 1);
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
-            } else if (nextToken.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX)
-                && nextToken.endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX)) {
+            } else if ((nextToken.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX) && nextToken
+                .endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX))
+                && !(last && getContext().isCreateOrMoveRequest())) {
                 PagesByFirstLettersSubView subView = new PagesByFirstLettersSubView();
                 subView.init(this, nextToken.toUpperCase(), "/" + nextToken.toUpperCase());
                 stack.push(subView);
@@ -76,7 +78,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                 stack.push(page);
                 page.decode(stack, tokens, next + 1);
             } else {
-                throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             }
         }
     }

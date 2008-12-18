@@ -72,16 +72,20 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
     public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
         throws DavException
     {
-        String spaceName = getCollection().getDisplayName();
         if (next < tokens.length) {
             String nextToken = tokens[next];
+            String pageName = getCollection().getDisplayName() + "." + nextToken;
+            boolean last = (next == tokens.length - 1);
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
-            } else {
+            } else if (getContext().exists(pageName)
+                && !(last && getContext().isCreateOrMoveRequest())) {
                 DavPage page = new DavPage();
-                page.init(this, spaceName + "." + nextToken, "/" + nextToken);
+                page.init(this, pageName, "/" + nextToken);
                 stack.push(page);
                 page.decode(stack, tokens, next + 1);
+            } else {
+                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             }
         }
     }

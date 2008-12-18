@@ -73,14 +73,17 @@ public class PagesByFirstLettersSubView extends AbstractDavView
     {
         String spaceName = getCollection().getDisplayName();
         if (next < tokens.length) {
+            boolean last = (next == tokens.length - 1);
             String nextToken = tokens[next];
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
-            } else {
+            } else if (!(last && getContext().isCreateFileRequest())) {
                 DavPage page = new DavPage();
                 page.init(this, spaceName + "." + nextToken, "/" + nextToken);
                 stack.push(page);
                 page.decode(stack, tokens, next + 1);
+            } else {
+                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             }
         }
     }

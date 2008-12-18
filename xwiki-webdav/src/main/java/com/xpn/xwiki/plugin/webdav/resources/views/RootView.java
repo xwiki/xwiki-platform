@@ -59,7 +59,7 @@ public class RootView extends AbstractDavView implements Composable
      * Plexus component manager.
      */
     private ComponentManager componentManager;
-    
+
     /**
      * A mapping from view names to corresponding plexus component hints.
      */
@@ -115,9 +115,11 @@ public class RootView extends AbstractDavView implements Composable
     {
         if (next < tokens.length) {
             String nextToken = tokens[next];
+            boolean last = (next == tokens.length - 1);
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
-            } else if (null != viewHints.get(nextToken)) {
+            } else if (null != viewHints.get(nextToken)
+                && !(last && getContext().isCreateOrMoveRequest())) {
                 XWikiDavResource resource = null;
                 try {
                     String viewHint = viewHints.get(nextToken);
@@ -129,7 +131,7 @@ public class RootView extends AbstractDavView implements Composable
                     throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
                 }
             } else {
-                throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             }
         }
     }

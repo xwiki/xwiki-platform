@@ -403,6 +403,22 @@ public class XWikiDavContext implements LockManager
         int methodCode = DavMethods.getMethodCode(getMethod());
         return methodCode == DavMethods.DAV_PUT || methodCode == DavMethods.DAV_POST;
     }
+    
+    public boolean isCreateResourceRequest()
+    {        
+        return isCreateCollectionRequest() || isCreateFileRequest();
+    }
+    
+    public boolean isMoveResourceRequest()
+    {        
+        int methodCode = DavMethods.getMethodCode(getMethod());
+        return methodCode == DavMethods.DAV_MOVE;
+    }
+    
+    public boolean isCreateOrMoveRequest()
+    {                
+        return isMoveResourceRequest() || isCreateResourceRequest();
+    }
 
     public boolean isMoveAttachmentRequest(XWikiDocument doc)
     {
@@ -414,6 +430,12 @@ public class XWikiDavContext implements LockManager
             return doc.getAttachment(resourceName) != null;
         }
         return false;
+    }
+    
+    public boolean isDeleteResourceRequest()
+    {                
+        int methodCode = DavMethods.getMethodCode(getMethod());
+        return methodCode == DavMethods.DAV_DELETE;
     }
 
     public ActiveLock getLock(Type type, Scope scope, DavResource resource)

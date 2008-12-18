@@ -60,16 +60,18 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
     {
         if (next < tokens.length) {
             String nextToken = tokens[next];
+            boolean last = (next == tokens.length - 1);
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
-            } else if (nextToken.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX)
-                && nextToken.endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX)) {
+            } else if ((nextToken.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX) && nextToken
+                .endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX))
+                && !(last && getContext().isCreateOrMoveRequest())) {
                 AttachmentsByFirstLettersSubView subView = new AttachmentsByFirstLettersSubView();
                 subView.init(this, nextToken.toUpperCase(), "/" + nextToken.toUpperCase());
                 stack.push(subView);
                 subView.decode(stack, tokens, next + 1);
             } else {
-                throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             }
         }
     }

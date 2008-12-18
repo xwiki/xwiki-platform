@@ -175,6 +175,29 @@ public class PagesBySpaceNameSubView extends AbstractDavView
             if (!childDoc.isNew()) {
                 getContext().deleteDocument(childDoc);
             }
+        } else if (member instanceof PagesByFirstLettersSubView) {
+            // We are going to force a recursive delete.
+            String filter =
+                member.getDisplayName().substring(
+                    XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX.length(),
+                    member.getDisplayName().length()
+                        - XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX.length());
+            String sql = "where doc.web='" + this.name + "'";
+            List<String> docNames = getContext().searchDocumentsNames(sql);
+            List<String> filteredDocNames = new ArrayList<String>();
+            for (String docName : docNames) {
+                if (docName.toUpperCase().startsWith(filter)) {
+                    filteredDocNames.add(docName);
+                }
+            }
+            // Verify delete rights on all the documents to be removed.
+            for (String docName : filteredDocNames) {
+                getContext().checkAccess("delete", docName);
+            }
+            // Delete the documents.
+            for (String docName : filteredDocNames) {
+                getContext().deleteDocument(getContext().getDocument(docName));
+            }
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }

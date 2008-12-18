@@ -24,11 +24,14 @@ import java.util.Stack;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
+import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
+import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 
 /**
@@ -58,17 +61,27 @@ public class HomeView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+        throws DavException
     {
-        mPage.decode(stack, tokens, next);
+        if (next < tokens.length) {
+            String nextToken = tokens[next];
+            if (mPage.exists()) {
+                mPage.decode(stack, tokens, next);
+            } else if (isTempResource(nextToken)) {
+                super.decode(stack, tokens, next);
+            } else {
+                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+            }
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public long getModificationTime()
-    {        
-        return mPage.getModificationTime();
+    {
+        return mPage.exists() ? mPage.getModificationTime() : super.getModificationTime();
     }
 
     /**
@@ -76,7 +89,7 @@ public class HomeView extends AbstractDavView
      */
     public DavPropertySet getProperties()
     {
-        return mPage.getProperties();
+        return mPage.exists() ? mPage.getProperties() : super.getProperties();
     }
 
     /**
@@ -84,7 +97,8 @@ public class HomeView extends AbstractDavView
      */
     public DavResourceIterator getMembers()
     {
-        return mPage.getMembers();
+        return mPage.exists() ? mPage.getMembers()
+            : new DavResourceIteratorImpl(getVirtualMembers());
     }
 
     /**
@@ -92,7 +106,13 @@ public class HomeView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        mPage.addMember(resource, inputContext);
+        if (mPage.exists()) {
+            mPage.addMember(resource, inputContext);
+        } else if (resource instanceof DavTempFile) {
+            addVirtualMember(resource, inputContext);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 
     /**
@@ -100,14 +120,12 @@ public class HomeView extends AbstractDavView
      */
     public void removeMember(DavResource member) throws DavException
     {
-        mPage.removeMember(member);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean exists()
-    {
-        return mPage.exists();
+        if (mPage.exists()) {
+            mPage.removeMember(member);
+        } else if (member instanceof DavTempFile) {
+            removeVirtualMember(member);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 }

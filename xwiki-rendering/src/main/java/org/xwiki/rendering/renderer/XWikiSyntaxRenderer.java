@@ -68,6 +68,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     private boolean isBeginQuotationLineFound = false;
 
     private boolean isEndQuotationLineFound = false;
+    
+    private boolean escapeIfSpace = false;
 
     private int listDepth = 0;
 
@@ -156,11 +158,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginFormat(Format format, Map<String, String> parameters)
     {
-        super.beginFormat(format, parameters);
-        
         switch (format) {
             case BOLD:
-                print("**");
+                getPrinter().printBeginBold();
                 break;
             case ITALIC:
                 getPrinter().printBeginItalic();
@@ -191,6 +191,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         } else {
             this.previousFormatParameters = null;
         }
+
+        super.beginFormat(format, parameters);
     }
 
     /**

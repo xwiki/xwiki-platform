@@ -26,39 +26,46 @@ import org.xwiki.rendering.renderer.RendererState;
 
 /**
  * Escape characters that would be confused for XWiki wiki syntax if they were not escaped.
- *
+ * 
  * @version $Id$
  * @since 1.7
  */
 public class XWikiSyntaxEscapeHandler
 {
-    private static final Pattern LIST_PATTERN = Pattern.compile("\\p{Blank}*((\\*+[:;]*)|([1*]+\\.[:;]*)|([:;]+))\\p{Blank}+");
+    public static final Pattern SPACE_PATTERN = Pattern.compile("([ \t])");
+
+    private static final Pattern LIST_PATTERN =
+        Pattern.compile("\\p{Blank}*((\\*+[:;]*)|([1*]+\\.[:;]*)|([:;]+))\\p{Blank}+");
 
     private static final Pattern SECTION_PATTERN = Pattern.compile("\\p{Blank}*(=+)");
 
     private static final Pattern DOUBLE_CHARS_PATTERN = Pattern.compile("\\/\\/|\\*\\*|__|--|\\^\\^|,,|##|\\\\\\\\");
 
     private static final String ESCAPE_CHAR = "~";
-    
-    public void escape(StringBuffer accumulatedBuffer, RendererState state, boolean escapeLastChar)
+
+    public void escape(StringBuffer accumulatedBuffer, RendererState state, boolean escapeLastChar,
+        Pattern escapeFirstIfMatching)
     {
         // Escape tilde symbol (i.e. the escape character).
         // Note: This needs to be the first replacement since other replacements below also use the tilde symbol
         replaceAll(accumulatedBuffer, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
-        
+
         // When in a paragraph we need to escape symbols that are at beginning of lines and that could be confused
         // with list items or sections.
         if (state.isInParagraph() && state.isTextOnNewLine()) {
-            
+
             // Look for list pattern at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(LIST_PATTERN, accumulatedBuffer);
 
             // Look for section pattern at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(SECTION_PATTERN, accumulatedBuffer);
-
         }
         
-        // When in a section we need to escape "=" symbols since otherwise they would be confused for end of section 
+        if (escapeFirstIfMatching != null) {
+            escapeFirstMatchedCharacter(escapeFirstIfMatching, accumulatedBuffer);
+        }
+
+        // When in a section we need to escape "=" symbols since otherwise they would be confused for end of section
         // characters.
         if (state.isInSection()) {
             replaceAll(accumulatedBuffer, "=", ESCAPE_CHAR + "=");
@@ -71,16 +78,15 @@ public class XWikiSyntaxEscapeHandler
 
         // Escape verbatim "{{{"
         replaceAll(accumulatedBuffer, "{{{", ESCAPE_CHAR + "{" + ESCAPE_CHAR + "{" + ESCAPE_CHAR + "{");
-        
+
         // Escape "{{"
         replaceAll(accumulatedBuffer, "{{", ESCAPE_CHAR + "{" + ESCAPE_CHAR + "{");
-        
+
         // Escape reserved keywords
         Matcher matcher = DOUBLE_CHARS_PATTERN.matcher(accumulatedBuffer.toString());
-        for (int i = 0; matcher.find(); i = i + 2)
-        {
-            accumulatedBuffer.replace(matcher.start() + i, matcher.end() + i, 
-                ESCAPE_CHAR + matcher.group().charAt(0) + ESCAPE_CHAR + matcher.group().charAt(1));
+        for (int i = 0; matcher.find(); i = i + 2) {
+            accumulatedBuffer.replace(matcher.start() + i, matcher.end() + i, ESCAPE_CHAR + matcher.group().charAt(0)
+                + ESCAPE_CHAR + matcher.group().charAt(1));
         }
 
         // Escape ":" in "image:something", "attach:something" and "mailto:something"
@@ -95,39 +101,36 @@ public class XWikiSyntaxEscapeHandler
         // - onWord("hello:") followed by onFormat(ITALIC) which would lead to "hello://" if the ":" wasn't escaped
         // - onWord("{") followed by onMacro() which would lead to "{{{" if the "{" wasn't escaped
         if (escapeLastChar) {
-            accumulatedBuffer.replace(accumulatedBuffer.length() - 1, accumulatedBuffer.length(), 
-                ESCAPE_CHAR + accumulatedBuffer.charAt(accumulatedBuffer.length() - 1));
+            accumulatedBuffer.replace(accumulatedBuffer.length() - 1, accumulatedBuffer.length(), ESCAPE_CHAR
+                + accumulatedBuffer.charAt(accumulatedBuffer.length() - 1));
         }
     }
-    
+
     private void escapeURI(StringBuffer accumulatedBuffer, String match)
     {
         int pos = accumulatedBuffer.indexOf(match);
-        if (pos > -1 && accumulatedBuffer.length() > pos + match.length() 
-            && accumulatedBuffer.charAt(pos + match.length()) > 32)
-        {
+        if (pos > -1 && accumulatedBuffer.length() > pos + match.length()
+            && accumulatedBuffer.charAt(pos + match.length()) > 32) {
             // Escape the ":" symbol
             accumulatedBuffer.replace(pos + match.length() - 1, pos + match.length(), "~:");
         }
     }
-    
+
     private void replaceAll(StringBuffer accumulatedBuffer, String match, String replacement)
     {
-        int pos = - replacement.length();
-        while ((pos + replacement.length() < accumulatedBuffer.length()) 
-            && ((pos = accumulatedBuffer.indexOf(match, pos + replacement.length())) != -1))
-        {
+        int pos = -replacement.length();
+        while ((pos + replacement.length() < accumulatedBuffer.length())
+            && ((pos = accumulatedBuffer.indexOf(match, pos + replacement.length())) != -1)) {
             accumulatedBuffer.replace(pos, pos + match.length(), replacement);
         }
     }
-    
+
     private void escapeFirstMatchedCharacter(Pattern pattern, StringBuffer accumulatedBuffer)
     {
         Matcher matcher = pattern.matcher(accumulatedBuffer);
         if (matcher.lookingAt()) {
             // Escape the first character
-            accumulatedBuffer.replace(matcher.start(1), matcher.start(1) + 1, 
-                ESCAPE_CHAR + matcher.group(1).charAt(0));
+            accumulatedBuffer.replace(matcher.start(1), matcher.start(1) + 1, ESCAPE_CHAR + matcher.group(1).charAt(0));
         }
     }
 }

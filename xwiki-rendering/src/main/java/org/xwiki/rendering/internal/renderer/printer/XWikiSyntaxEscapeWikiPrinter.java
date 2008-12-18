@@ -19,30 +19,45 @@
  */
 package org.xwiki.rendering.internal.renderer.printer;
 
+import java.util.regex.Pattern;
+
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxEscapeHandler;
 import org.xwiki.rendering.renderer.RendererState;
 import org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
- * A Wiki printer that knows how to escape characters that would otherwise mean something different in 
- * XWiki wiki syntax. For example if we have "**" as special symbols (and not as a Bold Format block)
- * we need to escape them to "~*~*" as otherwise they'd be considered bold after being rendered.
- *  
+ * A Wiki printer that knows how to escape characters that would otherwise mean something different in XWiki wiki
+ * syntax. For example if we have "**" as special symbols (and not as a Bold Format block) we need to escape them to
+ * "~*~*" as otherwise they'd be considered bold after being rendered.
+ * 
  * @version $Id$
  * @since 1.7
  */
 public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
 {
     private XWikiSyntaxEscapeHandler escapeHandler;
-    
+
     private boolean escapeLastChar;
-    
+
+    private Pattern escapeFirstIfMatching;
+
     private RendererState state;
 
     public XWikiSyntaxEscapeWikiPrinter(WikiPrinter printer)
     {
         this(printer, null);
+    }
+
+    public void printBeginBold()
+    {
+        boolean isOnNewLine = getRendererState().isTextOnNewLine() && getBuffer().length() == 0;
+
+        super.print("**");
+
+        if (isOnNewLine) {
+            this.escapeFirstIfMatching = XWikiSyntaxEscapeHandler.SPACE_PATTERN;
+        }
     }
 
     public void printBeginItalic()
@@ -52,7 +67,7 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         if (getBuffer().length() > 0 && getBuffer().charAt(getBuffer().length() - 1) == ':') {
             this.escapeLastChar = true;
         }
-        
+
         super.print("//");
     }
 
@@ -60,7 +75,7 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
     {
         super.print("//");
     }
-    
+
     public void printInlineMacro(String xwikiSyntaxText)
     {
         // If the lookahead buffer is not empty and the last character is "{" then we need to escape it
@@ -83,17 +98,18 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
     {
         this.state = state;
     }
-    
+
     public RendererState getRendererState()
     {
         return this.state;
     }
-    
+
     @Override
     public void flush()
     {
-        this.escapeHandler.escape(getBuffer(), getRendererState(), this.escapeLastChar);
+        this.escapeHandler.escape(getBuffer(), getRendererState(), this.escapeLastChar, this.escapeFirstIfMatching);
         this.escapeLastChar = false;
+        this.escapeFirstIfMatching = null;
         super.flush();
     }
 }

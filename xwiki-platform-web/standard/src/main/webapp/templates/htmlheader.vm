@@ -27,10 +27,15 @@
       ## Universal edit button http://universaleditbutton.org
       <link rel="alternate" type="application/x-wiki" title="Edit" href="$doc.getURL("edit")" />
     #end
-    ## Store the page name so that we can access if from Javascript code needing it.
+    ## Store the space, name and full page name so that we can access if from Javascript code needing it.
     ## For example to pass it to the server side using an Ajax query.
     ## Usage example: var name = $$("meta[name='page']")[0].content;
     <meta name="page" content="$doc.fullName"/>
+    <meta name="space" content="$doc.space"/>
+    <meta name="document" content="$doc.name"/>
+    #if($xwiki.isVirtualMode())
+      <meta name="wiki" content="$doc.wiki"/>
+    #end
     $xwiki.parseContent($!xwiki.getWebPreference("meta"))
     #template("stylesheets.vm")
     #template("analytics.vm")

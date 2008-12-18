@@ -37,6 +37,7 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
 
+        /*
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);
         suite.addTestsFromResource("bold/bold2", false);
@@ -138,6 +139,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("escape/escape9", false);
         suite.addTestsFromResource("escape/escape10", false);
         suite.addTestsFromResource("escape/escape11", false);
+        suite.addTestsFromResource("escape/escape12", false);
         suite.addTestsFromResource("horizontalline/horizontalline1", false);
         suite.addTestsFromResource("horizontalline/horizontalline2", false);
         suite.addTestsFromResource("horizontalline/horizontalline3", false);
@@ -162,6 +164,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image1", false);
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
+        */
+        
+        suite.addTestsFromResource("escape/escape12", false);
         
         return new RenderingPlexusTestSetup(suite);
     }

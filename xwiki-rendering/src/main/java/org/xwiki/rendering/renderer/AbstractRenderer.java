@@ -259,10 +259,12 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
 
     public void onSpace()
     {
+        
     }
 
     public void onSpecialSymbol(char symbol)
     {
+        
     }
 
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
@@ -282,5 +284,6 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
 
     public void onWord(String word)
     {
+        
     }
 }

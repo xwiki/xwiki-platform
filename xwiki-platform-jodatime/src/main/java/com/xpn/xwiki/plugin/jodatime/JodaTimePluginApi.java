@@ -44,7 +44,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
      */
     public DateTime getDateTime()
     {
-        return getInternalPlugin().getDateTime();
+        return getProtectedPlugin().getDateTime();
     }
 
     /**
@@ -54,7 +54,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
     public DateTime getDateTime(int year, int monthOfYear, int dayOfMonth, int hourOfDay, int minuteOfHour,
         int secondOfMinute, int millisOfSecond)
     {
-        return getInternalPlugin().getDateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, secondOfMinute,
+        return getProtectedPlugin().getDateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, secondOfMinute,
             millisOfSecond);
     }
 
@@ -64,7 +64,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
      */
     public DateTime getDateTime(long instant)
     {
-        return getInternalPlugin().getDateTime(instant);
+        return getProtectedPlugin().getDateTime(instant);
     }
 
     /**
@@ -73,7 +73,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
      */
     public MutableDateTime getMutableDateTime()
     {
-        return getInternalPlugin().getMutableDateTime();
+        return getProtectedPlugin().getMutableDateTime();
     }
 
     /**
@@ -83,7 +83,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
     public MutableDateTime getMutableDateTime(int year, int monthOfYear, int dayOfMonth, int hourOfDay,
         int minuteOfHour, int secondOfMinute, int millisOfSecond)
     {
-        return getInternalPlugin().getMutableDateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour,
+        return getProtectedPlugin().getMutableDateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour,
             secondOfMinute, millisOfSecond);
     }
 
@@ -93,7 +93,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
      */
     public MutableDateTime getMutableDateTime(long instant)
     {
-        return getInternalPlugin().getMutableDateTime(instant);
+        return getProtectedPlugin().getMutableDateTime(instant);
     }
 
     /**
@@ -102,7 +102,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
      */
     public DateTimeFormatter getDateTimeFormatterForPattern(String pattern)
     {
-        return getInternalPlugin().getDateTimeFormatterForPattern(pattern, getXWikiContext());
+        return getProtectedPlugin().getDateTimeFormatterForPattern(pattern, getXWikiContext());
     }
 
     /**
@@ -111,7 +111,25 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
      */
     public DateTimeFormatter getDateTimeFormatterForStyle(String style)
     {
-        return getInternalPlugin().getDateTimeFormatterForStyle(style, getXWikiContext());
+        return getProtectedPlugin().getDateTimeFormatterForStyle(style, getXWikiContext());
+    }
+
+    /**
+     * @see org.joda.time.DateTimeZone#getDefault()
+     * @see JodaTimePlugin#getServerTimezone()
+     */
+    public DateTimeZone getServerTimezone()
+    {
+        return getProtectedPlugin().getServerTimezone();
+    }
+
+    /**
+     * @see org.joda.time.DateTimeZone#UTC
+     * @see JodaTimePlugin#getUTCTimezone()
+     */
+    public DateTimeZone getUTCTimezone()
+    {
+        return getProtectedPlugin().getUTCTimezone();
     }
 
     /**
@@ -120,7 +138,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
      */
     public DateTimeZone getTimezone(String locationOrOffset)
     {
-        return getInternalPlugin().getTimezone(locationOrOffset);
+        return getProtectedPlugin().getTimezone(locationOrOffset);
     }
 
     /**
@@ -129,7 +147,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
      */
     public DateTimeZone getTimezone(int offsetHours)
     {
-        return getInternalPlugin().getTimezone(offsetHours);
+        return getProtectedPlugin().getTimezone(offsetHours);
     }
 
     /**
@@ -138,6 +156,6 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
      */
     public DateTimeZone getTimezone(int offsetHours, int offsetMinutes)
     {
-        return getInternalPlugin().getTimezone(offsetHours, offsetMinutes);
+        return getProtectedPlugin().getTimezone(offsetHours, offsetMinutes);
     }
 }

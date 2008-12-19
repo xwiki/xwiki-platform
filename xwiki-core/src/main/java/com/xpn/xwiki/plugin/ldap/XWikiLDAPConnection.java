@@ -205,7 +205,7 @@ public class XWikiLDAPConnection
     private void bind(String loginDN, String password) throws UnsupportedEncodingException, LDAPException
     {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Binding to LDAP server with credentials login=[" + loginDN + "] password=[" + password + "]");
+            LOG.debug("Binding to LDAP server with credentials login=[" + loginDN + "]");
         }
 
         // authenticate to the server

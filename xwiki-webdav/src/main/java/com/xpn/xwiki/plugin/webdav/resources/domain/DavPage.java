@@ -99,6 +99,7 @@ public class DavPage extends AbstractDavResource
     {
         if (next < tokens.length) {
             String nextToken = tokens[next];
+            boolean last = (next == tokens.length - 1);
             String relativePath = "/" + nextToken;
             if (isTempResource(nextToken)) {
                 super.decode(stack, tokens, next);
@@ -107,8 +108,9 @@ public class DavPage extends AbstractDavResource
                 DavWikiFile wikiFile = new DavWikiFile();
                 wikiFile.init(this, nextToken, relativePath);
                 stack.push(wikiFile);
-            } else if (doc.getAttachment(nextToken) != null || getContext().isCreateFileRequest()
-                || getContext().isMoveAttachmentRequest(doc)) {
+            } else if (doc.getAttachment(nextToken) != null
+                || (last && getContext().isCreateFileRequest())
+                || (last && getContext().isMoveAttachmentRequest(doc))) {
                 DavAttachment attachment = new DavAttachment();
                 attachment.init(this, nextToken, relativePath);
                 stack.push(attachment);

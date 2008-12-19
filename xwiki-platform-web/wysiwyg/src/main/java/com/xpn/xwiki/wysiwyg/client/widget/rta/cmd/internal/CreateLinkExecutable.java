@@ -60,6 +60,7 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
         if (!DOMUtils.getInstance().isInline(commonAncestor)) {
             // The selection may contain a block element, check if it actually does
             Node leaf = DOMUtils.getInstance().getFirstLeaf(range);
+            Node lastLeaf = DOMUtils.getInstance().getLastLeaf(range);
             while (true) {
                 if (leaf != null) {
                     // Check if it has any non-inline parents up to the commonAncestor
@@ -73,7 +74,7 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
                     }
                 }
                 // Go to next leaf, if any are left
-                if (leaf == DOMUtils.getInstance().getLastLeaf(range)) {
+                if (leaf == lastLeaf) {
                     break;
                 } else {
                     leaf = DOMUtils.getInstance().getNextLeaf(leaf);

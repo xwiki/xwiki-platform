@@ -187,11 +187,7 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
      */
     public void onUnlink()
     {
-        // Save selection before unlinking
-        selectionPreserver.saveSelection();
         getTextArea().getCommandManager().execute(Command.UNLINK);
-        // Restore the selection
-        selectionPreserver.restoreSelection();
     }
 
     /**

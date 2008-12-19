@@ -1,6 +1,6 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Verify that spaces before lists are allowed
+.# Verify that first space of the list content are meaningful
 .#-----------------------------------------------------
 *   some   content
 .#-----------------------------------------------------

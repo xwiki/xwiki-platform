@@ -241,7 +241,12 @@ public abstract class DOMUtils
             case Node.TEXT_NODE:
                 return Style.Display.INLINE;
             case Node.ELEMENT_NODE:
-                return getComputedStyleProperty((Element) node, Style.DISPLAY);
+                // An image is always an inline element, even if it is displayed as a block
+                if ("img".equalsIgnoreCase(node.getNodeName())) {
+                    return Style.Display.INLINE;
+                } else {
+                    return getComputedStyleProperty((Element) node, Style.DISPLAY);
+                }
             default:
                 return null;
         }

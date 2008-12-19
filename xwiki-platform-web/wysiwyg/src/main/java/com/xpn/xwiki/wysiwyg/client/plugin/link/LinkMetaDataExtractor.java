@@ -62,11 +62,10 @@ public class LinkMetaDataExtractor implements InnerHTMLListener
         // search for parent span and surrounding comments
         Element parentNode = anchor.getParentElement().cast();
         boolean foundWikiLink = parentNode != null && parentNode.getNodeName().equalsIgnoreCase("span");
-        String classAttrName = "class";
+        String spanClass = parentNode.getClassName();
         foundWikiLink &=
-            parentNode.getAttribute(classAttrName).contains("wikilink")
-                || parentNode.getAttribute(classAttrName).contains("wikicreatelink")
-                || parentNode.getAttribute(classAttrName).contains("wikiexternallink");
+            spanClass.contains("wikilink") || spanClass.contains("wikicreatelink")
+                || spanClass.contains("wikiexternallink");
         Node previousSibling = null;
         Node nextSibling = null;
         if (foundWikiLink) {

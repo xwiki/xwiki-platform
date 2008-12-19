@@ -506,7 +506,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
         if (param == null || "".equals(param)) {
             try {
-                param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "auth_", "."));
+                param = context.getWiki().Param("xwiki.authentication" + StringUtils.replace(name, "auth_", "."));
             } catch (Exception e) {
             }
         }

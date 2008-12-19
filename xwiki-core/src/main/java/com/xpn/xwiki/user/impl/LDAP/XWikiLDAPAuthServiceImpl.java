@@ -154,7 +154,11 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("LDAP authentication succeed with principal [" + principal.getName() + "]");
+            if (principal != null) {
+                LOG.debug("LDAP authentication succeed with principal [" + principal.getName() + "]");
+            } else {
+                LOG.debug("LDAP authentication failed for user [" + login + "]");
+            }
         }
 
         return principal;

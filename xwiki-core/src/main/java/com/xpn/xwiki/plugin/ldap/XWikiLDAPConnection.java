@@ -167,7 +167,7 @@ public class XWikiLDAPConnection
 
             bind(loginDN, password);
 
-            succeed = this.connection.isConnected() && this.connection.isConnectionAlive() && this.connection.isBound();
+            succeed = true;
         } catch (UnsupportedEncodingException e) {
             throw new XWikiLDAPException("LDAP bind failed with UnsupportedEncodingException.", e);
         } catch (LDAPException e) {

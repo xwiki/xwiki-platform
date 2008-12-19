@@ -152,6 +152,22 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @see org.joda.time.DateTimeZone#getDefault()
+     */
+    public DateTimeZone getServerTimezone()
+    {
+        return DateTimeZone.getDefault();
+    }
+
+    /**
+     * @see org.joda.time.DateTimeZone#UTC
+     */
+    public DateTimeZone getUTCTimezone()
+    {
+        return DateTimeZone.UTC;
+    }
+
+    /**
      * @see org.joda.time.DateTimeZone#forID(String)
      */
     public DateTimeZone getTimezone(String locationOrOffset)

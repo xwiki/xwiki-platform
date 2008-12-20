@@ -152,7 +152,7 @@ public class XWikiDavServlet extends AbstractWebdavServlet
     protected boolean execute(WebdavRequest request, WebdavResponse response, int method,
         DavResource resource) throws ServletException, IOException, DavException
     {
-        logger.warn("Resource : [" + resource.getDisplayName() + "] Method : [" + request.getMethod()
+        logger.debug("Resource : [" + resource.getDisplayName() + "] Method : [" + request.getMethod()
             + "]");
         return super.execute(request, response, method, resource);
     }

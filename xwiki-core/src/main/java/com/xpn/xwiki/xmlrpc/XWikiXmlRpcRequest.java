@@ -20,10 +20,13 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.web.XWikiServletRequest;
-
 import javax.servlet.http.HttpServletRequest;
 
+import com.xpn.xwiki.web.XWikiServletRequest;
+
+/**
+ * @version $Id$
+ */
 public class XWikiXmlRpcRequest extends XWikiServletRequest
 {
     public XWikiXmlRpcRequest(HttpServletRequest request)

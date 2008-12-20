@@ -21,7 +21,9 @@
 package com.xpn.xwiki.xmlrpc;
 
 /**
- * This is an helper class for storing XMLRPC user information.
+ * This is an helper class for storing XML RPC user information.
+ * 
+ * @version $Id$
  */
 public class XWikiXmlRpcUser
 {

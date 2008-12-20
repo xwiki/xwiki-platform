@@ -20,13 +20,17 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.web.XWikiServletResponse;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
+import com.xpn.xwiki.web.XWikiServletResponse;
+
+/**
+ * @version $Id$
+ */
 public class XWikiXmlRpcResponse extends XWikiServletResponse
 {
     public XWikiXmlRpcResponse(HttpServletResponse response)

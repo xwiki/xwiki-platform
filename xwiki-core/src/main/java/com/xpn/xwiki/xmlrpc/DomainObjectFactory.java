@@ -30,6 +30,7 @@ import org.codehaus.swizzle.confluence.Comment;
 import org.codehaus.swizzle.confluence.SearchResult;
 import org.codehaus.swizzle.confluence.Space;
 import org.codehaus.swizzle.confluence.SpaceSummary;
+import org.xwiki.query.QueryException;
 import org.xwiki.xmlrpc.model.XWikiClass;
 import org.xwiki.xmlrpc.model.XWikiClassSummary;
 import org.xwiki.xmlrpc.model.XWikiExtendedId;
@@ -38,13 +39,19 @@ import org.xwiki.xmlrpc.model.XWikiObjectSummary;
 import org.xwiki.xmlrpc.model.XWikiPage;
 import org.xwiki.xmlrpc.model.XWikiPageHistorySummary;
 import org.xwiki.xmlrpc.model.XWikiPageSummary;
+
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Property;
 import com.xpn.xwiki.api.PropertyClass;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
  * This class contains utility methods for building xmlrpc domain objects.
+ * 
+ * @version $Id$
  */
 public class DomainObjectFactory
 {
@@ -153,7 +160,7 @@ public class DomainObjectFactory
      * @return An XWikiPage object representing the page.
      * @throws XWikiException If there is a problem getting page translations.
      */
-    public static XWikiPage createXWikiPage(Document document, boolean useExtendedPageId) throws XWikiException
+    public static XWikiPage createXWikiPage(Document document, boolean useExtendedPageId) throws Exception
     {
         XWikiPage result = new XWikiPage();
 
@@ -364,18 +371,30 @@ public class DomainObjectFactory
      * Create an XWikiObject containing all the information and attributed of a given xwiki object.
      * 
      * @return An XWikiObject containing all the information.
+     * @throws QueryException
+     * @throws XWikiException
      */
-    public static XWikiObject createXWikiObject(Document document, com.xpn.xwiki.api.Object object)
+    public static XWikiObject createXWikiObject(com.xpn.xwiki.XWiki xwiki, XWikiContext xwikiContext,
+        Document document, com.xpn.xwiki.api.Object object) throws QueryException, XWikiException
     {
-        Map<String, Object> propertyToValueMap = new HashMap<String, Object>();
+        XWikiObject result = new XWikiObject();
         for (Object o : object.getProperties()) {
             Property property = (Property) o;
-            String name = property.getName();
+
+            String propertyName = property.getName();
+            Object propertyType = getPropertyType(xwiki, xwikiContext, object, propertyName);
+            result.setPropertyType(propertyName, propertyType.getClass().getName());
+
+            if (propertyType instanceof ListClass) {
+                ListClass listClass = (ListClass) propertyType;
+                result.setPropertyAllowedValues(propertyName, listClass.getList(xwikiContext));
+
+            }
 
             /* Send only non-null values */
             Object value = property.getValue();
             if (value != null) {
-                propertyToValueMap.put(name, XWikiUtils.xmlRpcConvert(value));
+                result.setProperty(propertyName, XWikiUtils.xmlRpcConvert(value));
             }
         }
 
@@ -384,19 +403,33 @@ public class DomainObjectFactory
             prettyName = String.format("%s[%d]", object.getxWikiClass().getName(), object.getNumber());
         }
 
-        XWikiObject result = new XWikiObject();
         result.setPageId(document.getFullName());
         result.setPageVersion(document.getRCSVersion().at(0));
         result.setPageMinorVersion(document.getRCSVersion().at(1));
         result.setClassName(object.getxWikiClass().getName());
         result.setId(object.getNumber());
         result.setPrettyName(prettyName);
-        result.setPropertyToValueMap(propertyToValueMap);
 
         return result;
     }
-    
-    public static XWikiObject createEmptyXWikiObject() {
+
+    private static com.xpn.xwiki.objects.classes.PropertyClass getPropertyType(com.xpn.xwiki.XWiki xwiki,
+        XWikiContext xwikiContext, com.xpn.xwiki.api.Object object, String propertyName) throws XWikiException
+    {
+        BaseClass c = xwiki.getClass(object.getxWikiClass().getName(), xwikiContext);
+
+        for (Object o : c.getProperties()) {
+            com.xpn.xwiki.objects.classes.PropertyClass propertyClass = (com.xpn.xwiki.objects.classes.PropertyClass) o;
+            if (propertyClass.getName().equals(propertyName)) {
+                return propertyClass;
+            }
+        }
+
+        return null;
+    }
+
+    public static XWikiObject createEmptyXWikiObject()
+    {
         XWikiObject result = new XWikiObject();
         result.setPageId("");
         result.setPageVersion(0);
@@ -404,8 +437,7 @@ public class DomainObjectFactory
         result.setClassName("");
         result.setId(0);
         result.setPrettyName("");
-        result.setPropertyToValueMap(new HashMap());
-        
+
         return result;
     }
 

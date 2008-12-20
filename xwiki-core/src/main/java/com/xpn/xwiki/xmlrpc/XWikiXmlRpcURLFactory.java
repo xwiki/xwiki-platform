@@ -20,11 +20,14 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.net.URL;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
-import java.net.URL;
-
+/**
+ * @version $Id$
+ */
 public class XWikiXmlRpcURLFactory extends XWikiServletURLFactory
 {
     public XWikiXmlRpcURLFactory()

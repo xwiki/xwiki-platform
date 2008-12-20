@@ -20,45 +20,26 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.xmlrpc.XmlRpcException;
+import org.xwiki.xmlrpc.model.XWikiExtendedId;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Document;
 
 /**
  * This is an helper class containing some utility method for handling and setting up the XWiki and XMLRPC data objects
  * needed to serve XMLRPC requests.
+ * 
+ * @version $Id$
  */
 public class XWikiUtils
 {
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
-
-    public static Object mock(Class someClass)
-    {
-        ClassLoader loader = someClass.getClassLoader();
-
-        InvocationHandler handler = new InvocationHandler()
-        {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-            {
-                return null;
-            }
-        };
-        Class[] interfaces = new Class[] {someClass};
-
-        return Proxy.newProxyInstance(loader, interfaces, handler);
-    }
-
     public static Map getTokens(XWikiContext context)
     {
         Map tokens = (Map) context.getEngineContext().getAttribute("xmlrpc_tokens");
@@ -70,27 +51,100 @@ public class XWikiUtils
         return tokens;
     }
 
-    public static XWikiXmlRpcUser checkToken(String token, XWikiContext context) throws XmlRpcException
+    public static XWikiXmlRpcUser checkToken(String token, XWikiContext context) throws Exception
     {
         XWikiXmlRpcUser user = null;
         String ip = context.getRequest().getRemoteAddr();
 
         if (token != null) {
             if (token.equals("")) {
-                user = new XWikiXmlRpcUser("XWiki.Guest", ip);
+                user = new XWikiXmlRpcUser("XWiki.XWikiGuest", ip);
             } else {
                 user = (XWikiXmlRpcUser) getTokens(context).get(token);
             }
         }
 
         if ((user == null) || (!user.getRemoteIp().equals(ip))) {
-            throw new XmlRpcException(String.format("[Access Denied: authentication token '%s' for IP %s is invalid]",
+            throw new Exception(String.format("[Access Denied: authentication token '%s' for IP '%s' is invalid]",
                 token, ip));
         }
 
         context.setUser(user.getName());
 
         return user;
+    }
+
+    /**
+     * <p>
+     * Gets a document. This method can be used to retrieve a specific translation or a version of a page by using
+     * extended ids in the form of Space.Page[?language=l&version=v&minorVersion=mv] where all parameters are optional.
+     * </p>
+     * <p>
+     * For example:
+     * <ul>
+     * <li><code>Main.WebHome</code>: retrieves Main.WebHome at its latest version in the default language</li>
+     * <li><code>Main.WebHome?language=fr</code>: retrieves Main.WebHome in its french translation</li>
+     * <li><code>Main.WebHome?version=3</code>: retrieves Main.WebHome at version 3.1 in the default language</li>
+     * <li><code>Main.WebHome?language=fr&version=2</code>: retrieves the version 2.1 of the french translation</li>
+     * </ul>
+     * </p>
+     * 
+     * @param xwikiApi The api object for accessing XWiki functionalities.
+     * @param extendedPageId The extended page id
+     * @param failIfDoesntExist True is an exception has to be raised if the page doesn't exist.
+     * @return Always returns a document if success. Otherwise an exception is raised. Never returns null.
+     * @throws Exception
+     * @throws XmlRpcException An exception is thrown if the requested document doesn't exist or cannot be accessed or
+     *             if there has been a problem with the underlying XWiki infrastructure.
+     * @throws Exception
+     */
+    public static Document getDocument(com.xpn.xwiki.api.XWiki xwikiApi, String extendedPageId,
+        boolean failIfDoesntExist) throws Exception
+    {
+        XWikiExtendedId id = new XWikiExtendedId(extendedPageId);
+
+        String pageId = id.getBasePageId();
+
+        String language = id.getParameter(XWikiExtendedId.LANGUAGE_PARAMETER);
+
+        String versionString = id.getParameter(XWikiExtendedId.VERSION_PARAMETER);
+        int version = versionString != null ? Integer.parseInt(versionString) : 0;
+
+        String minorVersionString = id.getParameter(XWikiExtendedId.MINOR_VERSION_PARAMETER);
+        int minorVersion = minorVersionString != null ? Integer.parseInt(minorVersionString) : 1;
+
+        if (failIfDoesntExist) {
+            /* Check if the page exists */
+            if (!xwikiApi.exists(pageId)) {
+                throw new Exception(String.format("[Page '%s' doesn't exist]", pageId));
+            }
+        }
+
+        /* Get the base doc */
+        Document doc = xwikiApi.getDocument(pageId);
+        if (doc == null) {
+            throw new Exception(String.format("[Page '%s' cannot be accessed]", pageId));
+        }
+
+        /* In case the language is specified, get the translated document */
+        if (language != null && !language.equals("") && doc.getTranslationList().contains(language)) {
+            doc = doc.getTranslatedDocument(language);
+            if (doc == null) {
+                throw new Exception(String.format("[Page '%s' at translation '%s' cannot be accessed]", pageId,
+                    language));
+            }
+        }
+
+        /* Get the specific version of the document */
+        if (version != 0) {
+            doc = doc.getDocumentRevision(String.format("%d.%d", version, minorVersion));
+            if (doc == null) {
+                throw new Exception(String.format("[Page '%s' at version '%d.%d' cannot be accessed (language '%s')]",
+                    pageId, version, minorVersion, language != null ? language : "default"));
+            }
+        }
+
+        return doc;
     }
 
     public static Object xmlRpcConvert(Object object)

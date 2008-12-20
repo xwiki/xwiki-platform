@@ -21,96 +21,63 @@
 package com.xpn.xwiki.xmlrpc;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.URL;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.XmlRpcHandler;
 import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;
-import org.apache.xmlrpc.server.RequestProcessorFactoryFactory.RequestProcessorFactory;
+import org.apache.xmlrpc.server.RequestProcessorFactoryFactory.RequestSpecificProcessorFactoryFactory;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 import org.apache.xmlrpc.webserver.XmlRpcServletServer;
+import org.xwiki.xmlrpc.XWikiXmlRpcApi;
 
 /**
  * This is the XMLRPC Servlet that is used as a gateway for serving XMLRPC requests.
+ * 
+ * @version $Id$
  */
 public class XWikiXmlRpcServlet extends XmlRpcServlet
 {
     private static final long serialVersionUID = 3745689092652029366L;
 
-    @Override
-    protected PropertyHandlerMapping newPropertyHandlerMapping(URL url) throws IOException,
-        XmlRpcException
+	@Override
+    protected PropertyHandlerMapping newPropertyHandlerMapping(URL url) throws IOException, XmlRpcException
     {
-
-        PropertyHandlerMapping mapping = new PropertyHandlerMapping()
+        PropertyHandlerMapping mapping = new PropertyHandlerMapping();
+        RequestProcessorFactoryFactory factory = new RequestSpecificProcessorFactoryFactory()
         {
-            /**
-             * This is almost a 1-to-1 copy of the implementation of
-             * org.apache.xmlrpc.server.PropertyHandlerMapping.newXmlRpcHandler() defined in its
-             * superclass AbstractReflectiveHandlerMapping. We had to do this because in the
-             * original implementation of the method newXmlRpcHandler in
-             * AbstractReflectiveHandlerMapping, the classes RelfectiveXmlRpcHandler and
-             * ReflectiveXmlRpcMetaDataHandler are hard-coded.
-             */
+
             @Override
-            protected XmlRpcHandler newXmlRpcHandler(Class pClass, Method[] pMethods)
-                throws XmlRpcException
+            protected Object getRequestProcessor(Class class1, XmlRpcRequest request) throws XmlRpcException
             {
+                XWikiXmlRpcHttpRequestConfig config = (XWikiXmlRpcHttpRequestConfig) request.getConfig();
 
-                String[][] sig = getSignature(pMethods);
-                String help = getMethodHelp(pClass, pMethods);
-                RequestProcessorFactory factory =
-                    getRequestProcessorFactoryFactory().getRequestProcessorFactory(pClass);
-                if (sig == null || help == null) {
-                    return new XWikiReflectiveXmlRpcHandler(this,
-                        getTypeConverterFactory(),
-                        pClass,
-                        factory,
-                        pMethods);
+                /*
+                 * Here we check that the requested class is the interface XWikiXmlRpcApi. In this case we return a
+                 * proxy object that provides an implementation of this interface. If the requested class is of another
+                 * type, we call the superclass method. This allows other handlers to be specified and used.
+                 */
+                if (XWikiXmlRpcApi.class.equals(class1)) {
+                    XWikiXmlRpcApi proxy =
+                        (XWikiXmlRpcApi) Proxy.newProxyInstance(XWikiXmlRpcApi.class.getClassLoader(),
+                            new Class[] {XWikiXmlRpcApi.class}, new XWikiXmlRpcApiInvocationHandler(config
+                                .getServletContext(), config.getRequest()));
+
+                    return proxy;
                 }
-                return new XWikiReflectiveXmlRpcMetaDataHandler(this,
-                    getTypeConverterFactory(),
-                    pClass,
-                    factory,
-                    pMethods,
-                    sig,
-                    help);
+
+                return super.getRequestProcessor(class1, request);
             }
-
         };
-
-        mapping.setTypeConverterFactory(getXmlRpcServletServer().getTypeConverterFactory());
-
-        RequestProcessorFactoryFactory factory =
-            new RequestProcessorFactoryFactory.RequestSpecificProcessorFactoryFactory()
-            {
-                protected Object getRequestProcessor(Class pClass, XmlRpcRequest pRequest)
-                    throws XmlRpcException
-                {
-                    Object proc = super.getRequestProcessor(pClass, pRequest);
-
-                    if (proc instanceof XWikiXmlRpcHandler) {
-                        XWikiXmlRpcHandler handler = (XWikiXmlRpcHandler) proc;
-                        HttpServletRequest request =
-                            ((XWikiXmlRpcHttpRequestConfig) pRequest.getConfig()).getRequest();
-
-                        handler.init((XWikiXmlRpcHttpRequestConfig) pRequest.getConfig());
-                    }
-
-                    return proc;
-                }
-            };
 
         mapping.setRequestProcessorFactoryFactory(factory);
         mapping.load(Thread.currentThread().getContextClassLoader(), url);
-
         return mapping;
     }
 
@@ -123,8 +90,9 @@ public class XWikiXmlRpcServlet extends XmlRpcServlet
             @Override
             protected XmlRpcHttpRequestConfigImpl newConfig(HttpServletRequest request)
             {
-                return new XWikiXmlRpcHttpRequestConfig(XWikiXmlRpcServlet.this, request);
+                return new XWikiXmlRpcHttpRequestConfig(XWikiXmlRpcServlet.this.getServletContext(), request);
             }
+
         };
 
         return server;

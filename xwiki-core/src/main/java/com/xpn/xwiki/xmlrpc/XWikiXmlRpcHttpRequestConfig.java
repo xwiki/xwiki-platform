@@ -20,47 +20,37 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
-import javax.servlet.http.HttpServlet;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
 
 /**
- * This is an helper class for storing the current HTTP request coming from an XMLRPC client
- * interacting with the XMLRPC endpoint servlet
+ * This is an helper class for storing the current HTTP request coming from an XMLRPC client interacting with the XMLRPC
+ * endpoint servlet.
+ * 
+ * @version $Id$
  */
 public class XWikiXmlRpcHttpRequestConfig extends XmlRpcHttpRequestConfigImpl
 {
+    private ServletContext servletContext;
+
     private HttpServletRequest request;
 
-    private HttpServlet servlet;
-
-    private XWikiXmlRpcContext xmlRpcContext;
-
-    public XWikiXmlRpcHttpRequestConfig(HttpServlet servlet, HttpServletRequest request)
+    public XWikiXmlRpcHttpRequestConfig(ServletContext servletContext, HttpServletRequest request)
     {
-        this.servlet = servlet;
+        this.servletContext = servletContext;
         this.request = request;
+    }
+
+    public ServletContext getServletContext()
+    {
+        return servletContext;
     }
 
     public HttpServletRequest getRequest()
     {
         return request;
-    }
-
-    public HttpServlet getServlet()
-    {
-        return servlet;
-    }
-
-    public void setXmlRpcContext(XWikiXmlRpcContext xmlRpcContext)
-    {
-        this.xmlRpcContext = xmlRpcContext;
-    }
-
-    public XWikiXmlRpcContext getXmlRpcContext()
-    {
-        return xmlRpcContext;
     }
 
 }

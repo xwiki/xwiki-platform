@@ -27,9 +27,9 @@ import org.codehaus.swizzle.confluence.Page;
 
 /**
  * Extends Page with information about minor version, translations and language.
+ * 
+ * @version $Id$
  *  
- * @author fmancinelli
- *
  */
 public class XWikiPage extends Page
 {

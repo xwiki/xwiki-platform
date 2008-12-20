@@ -25,8 +25,33 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * <p>
+ * An extended id is a string in the form of Space.Page[?param=value&...] that is used to request some kind of objects.
+ * Typically an extended id is used for requesting a given page in a particular translation or version.
+ * </p>
+ * <p>
+ * Examples:
+ * <ul>
+ * <li>Main.WebHome</li>
+ * <li>Main.WebHome?language=fr</li>
+ * <li>Main.WebHome?version=3</li>
+ * <li>Main.WebHome?language=it&version=2</li>
+ * </ul>
+ * </p>
+ * 
+ * @version $Id$
+ */
 public class XWikiExtendedId
 {
+    public final static String VERSION_PARAMETER = "version";
+
+    public final static String MINOR_VERSION_PARAMETER = "minorVersion";
+
+    public final static String LANGUAGE_PARAMETER = "language";
+
+    public final static String COMMENT_ID_PARAMETER = "commentId";
+
     private String basePageId;
 
     private Map<String, String> parametersMap;
@@ -34,8 +59,8 @@ public class XWikiExtendedId
     public XWikiExtendedId(String string)
     {
         if (string.indexOf(".") == -1) {
-            throw new IllegalArgumentException(
-                "An XWiki id must be in the form Space.Page[?param=value&param=value&...]");
+            throw new IllegalArgumentException(String.format(
+                "An XWiki id must be in the form Space.Page[?param=value&param=value&...]. Got '%s'", string));
         }
 
         parametersMap = new HashMap<String, String>();

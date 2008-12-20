@@ -25,10 +25,9 @@ import java.util.Map;
 import org.codehaus.swizzle.confluence.PageHistorySummary;
 
 /**
- * Extends PageHistorySummary with information about minor version and actual page id, since the
- * main page ids are in the form Space.Page::Version.
+ * Extends PageHistorySummary with information about minor version and actual page id.
  * 
- * @author fmancinelli
+ * @version $Id$
  */
 public class XWikiPageHistorySummary extends PageHistorySummary
 {

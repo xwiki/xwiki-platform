@@ -22,18 +22,29 @@ package org.xwiki.xmlrpc.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * A class representing XWiki objects. An XWiki object contains the association between the
- * properties defined in the object's XWikiClass and their corresponding values.
+ * A class representing XWiki objects. An XWiki object contains the association between the properties defined in the
+ * object's XWikiClass and their corresponding values.
  * 
- * @author fmancinelli
+ * @version $Id$
  */
-
 public class XWikiObject extends XWikiObjectSummary
 {
+    /*
+     * These are special suffixes for attaching to properties additional metadata. They are put in the same map as other
+     * object's properties but they should not be returned directly to the client requesting the property list of the
+     * object. If you add additional metadata properties be sure to modify the getProperties method to exclude them and
+     * to add specific methods for accessing this kind of metadata
+     */
+    public static final String PROPERTY_ALLOWED_VALUES_SUFFIX = "##allowed_values";
+
+    public static final String PROPERTY_TYPE_SUFFIX = "##type";
+
     public XWikiObject()
     {
         super();
@@ -48,16 +59,11 @@ public class XWikiObject extends XWikiObjectSummary
         }
     }
 
-    public void setPropertyToValueMap(Map propertyToValueMap)
-    {
-        setMap("propertyToValueMap", propertyToValueMap);
-    }
-
     public Object getProperty(String propertyName)
     {
         Map propertyToValueMap = getMap("propertyToValueMap");
         Object value = propertyToValueMap.get(propertyName);
-        
+
         if (value != null) {
             /* Convert arrays to list for easier management */
             if (value.getClass().isArray()) {
@@ -69,8 +75,8 @@ public class XWikiObject extends XWikiObjectSummary
                 propertyToValueMap.put(propertyName, value);
             }
         }
-        
-        return value; 
+
+        return value;
     }
 
     public void setProperty(String propertyName, Object value)
@@ -81,7 +87,39 @@ public class XWikiObject extends XWikiObjectSummary
 
     public Set<String> getProperties()
     {
-        Map propertToValueMap = getMap("propertyToValueMap");
-        return propertToValueMap.keySet();
+        Set<String> result = new HashSet<String>();
+
+        Map<String, Object> propertyToValueMap = getMap("propertyToValueMap");
+        /*
+         * Don't put in the property list the pseudo-properties containing metadata such as the property type and the
+         * property allowed values. They are accessed through special methods.
+         */
+        for (String property : propertyToValueMap.keySet()) {
+            if (!property.endsWith(PROPERTY_ALLOWED_VALUES_SUFFIX) && !property.endsWith(PROPERTY_TYPE_SUFFIX)) {
+                result.add(property);
+            }
+        }
+
+        return result;
+    }
+
+    public void setPropertyAllowedValues(String propertyName, List values)
+    {
+        setProperty(String.format("%s%s", propertyName, PROPERTY_ALLOWED_VALUES_SUFFIX), values);
+    }
+
+    public List getPropertyAllowedValues(String propertyName)
+    {
+        return (List) getProperty(String.format("%s%s", propertyName, PROPERTY_ALLOWED_VALUES_SUFFIX));
+    }
+
+    public void setPropertyType(String propertyName, String type)
+    {
+        setProperty(String.format("%s%s", propertyName, PROPERTY_TYPE_SUFFIX), type);
+    }
+
+    public String getPropertyType(String propertyName)
+    {
+        return (String) getProperty(String.format("%s%s", propertyName, PROPERTY_TYPE_SUFFIX));
     }
 }

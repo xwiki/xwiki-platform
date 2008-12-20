@@ -20,23 +20,14 @@
  */
 package org.xwiki.xmlrpc.model;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 /**
  * Utility methods.
  * 
- * @author fmancinelli
+ * @version $Id$
  */
 public class Utils
 {
- 
+
     /**
      * Truncate a string to the first '\n' character.
      * 

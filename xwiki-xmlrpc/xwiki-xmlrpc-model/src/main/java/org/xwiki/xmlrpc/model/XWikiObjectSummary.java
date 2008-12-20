@@ -27,8 +27,7 @@ import org.codehaus.swizzle.confluence.MapObject;
 /**
  * XWiki specific class to describe an object.
  * 
- * @author fmancinelli
- *
+ * @version $Id$
  */
 public class XWikiObjectSummary extends MapObject
 {
@@ -41,52 +40,64 @@ public class XWikiObjectSummary extends MapObject
     {
         super(map);
     }
-    
-    public String getPageId() {
-        return getString("pageId");        
+
+    public String getPageId()
+    {
+        return getString("pageId");
     }
-    
-    public void setPageId(String pageId) {
+
+    public void setPageId(String pageId)
+    {
         setString("pageId", pageId);
     }
-    
-    public int getPageVersion() {
-        return getInt("pageVersion");        
+
+    public int getPageVersion()
+    {
+        return getInt("pageVersion");
     }
-    
-    public void setPageVersion(int version) {
+
+    public void setPageVersion(int version)
+    {
         setInt("pageVersion", version);
     }
-    
-    public int getPageMinorVersion() {
+
+    public int getPageMinorVersion()
+    {
         return getInt("pageMinorVersion");
     }
-    
-    public void setPageMinorVersion(int minorVersion) {
+
+    public void setPageMinorVersion(int minorVersion)
+    {
         setInt("pageMinorVersion", minorVersion);
     }
-    
-    public int getId() {
-        return getInt("id");        
+
+    public int getId()
+    {
+        return getInt("id");
     }
-    
-    public void setId(int id) {
+
+    public void setId(int id)
+    {
         setInt("id", id);
     }
-    
-    public String getClassName() {
+
+    public String getClassName()
+    {
         return getString("className");
     }
-    
-    public void setClassName(String className) {
+
+    public void setClassName(String className)
+    {
         setString("className", className);
     }
-    
-    public String getPrettyName() {
+
+    public String getPrettyName()
+    {
         return getString("prettyName");
     }
-    
-    public void setPrettyName(String prettyName) {
+
+    public void setPrettyName(String prettyName)
+    {
         setString("prettyName", prettyName);
-    }            
+    }
 }

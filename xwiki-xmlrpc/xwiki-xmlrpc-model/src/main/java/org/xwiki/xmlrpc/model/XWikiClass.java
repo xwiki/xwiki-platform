@@ -24,16 +24,16 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A class representing XWiki classes. An XWikiClass is basically a set of properties where each
- * property can have different attributes. For example the standard XWiki.TagClass has one property
- * 'tags', and this property has several attributes such as 'prettyName', 'tooltip', etc.
+ * A class representing XWiki classes. An XWikiClass is basically a set of properties where each property can have
+ * different attributes. For example the standard XWiki.TagClass has one property 'tags', and this property has several
+ * attributes such as 'prettyName', 'tooltip', etc.
  * 
- * @author fmancinelli
+ * @version $Id$
  */
 public class XWikiClass extends XWikiClassSummary
 {
     public static final String XWIKICLASS_ATTRIBUTE = "xwikiclass";
-    
+
     public XWikiClass()
     {
         super();
@@ -43,10 +43,12 @@ public class XWikiClass extends XWikiClassSummary
     {
         super(map);
     }
-    
-    public void setPropertyToAttributesMap(Map<String, Map<String, Object>> map) {
+
+    public void setPropertyToAttributesMap(Map<String, Map<String, Object>> map)
+    {
         setMap("propertyToAttributesMap", map);
     }
+
     public Set<String> getPropertyAttributes(String propertyName)
     {
         Map<String, Map<String, Object>> propertyToAttributesMap = getMap("propertyToAttributesMap");

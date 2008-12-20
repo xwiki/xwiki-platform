@@ -28,25 +28,27 @@ import org.codehaus.swizzle.confluence.PageSummary;
 /**
  * Extends PageSummary with information about available translations.
  * 
- * @author fmancinelli
- *
+ * @version $Id$
  */
 public class XWikiPageSummary extends PageSummary
 {
     public XWikiPageSummary()
     {
-     super();
+        super();
     }
-    
-    public XWikiPageSummary(Map data) {
+
+    public XWikiPageSummary(Map data)
+    {
         super(data);
     }
-    
-    public void setTranslations(List<String> translations) {
+
+    public void setTranslations(List<String> translations)
+    {
         setList("translations", translations);
     }
-    
-    public List<String> getTranslations() {
+
+    public List<String> getTranslations()
+    {
         return getList("translations");
     }
 }

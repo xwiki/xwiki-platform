@@ -27,24 +27,28 @@ import org.codehaus.swizzle.confluence.MapObject;
 /**
  * A class representing XWiki class summaries.
  * 
- * @author fmancinelli
+ * @version $Id$
  */
 
 public class XWikiClassSummary extends MapObject
-{    
-    public XWikiClassSummary() {
+{
+    public XWikiClassSummary()
+    {
         super();
     }
-    
-    public XWikiClassSummary(Map map) {
+
+    public XWikiClassSummary(Map map)
+    {
         super(map);
     }
-    
-    public void setId(String id) {
+
+    public void setId(String id)
+    {
         setString("id", id);
     }
-    
-    public String getId() {
+
+    public String getId()
+    {
         return getString("id");
     }
 }

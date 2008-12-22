@@ -208,7 +208,8 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument())) == null;
+        return super.isEnabled(rta)
+            && TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument())) == null;
     }
 
     /**

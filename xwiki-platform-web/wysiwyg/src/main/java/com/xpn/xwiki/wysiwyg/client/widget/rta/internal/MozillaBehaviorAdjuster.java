@@ -19,12 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.NodeList;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 
 /**
  * Adjusts the behavior of the rich text area in Mozilla based browsers, like Firefox.
@@ -33,106 +33,6 @@ import com.xpn.xwiki.wysiwyg.client.dom.Selection;
  */
 public class MozillaBehaviorAdjuster extends BehaviorAdjuster
 {
-    public void onEnter()
-    {
-        if (getTextArea().getCurrentEvent().getShiftKey()) {
-            // Keep the default behavior for soft return.
-            return;
-        }
-
-        Selection selection = getTextArea().getDocument().getSelection();
-        // We only take care of the first range.
-        // The other ranges will be removed from the selection but their text will remain untouched.
-        Range range = selection.getRangeAt(0);
-
-        Node ancestor = range.getStartContainer();
-        while (ancestor != null && DOMUtils.getInstance().isInline(ancestor)) {
-            ancestor = ancestor.getParentNode();
-        }
-        if (ancestor == null) {
-            // This shouln't happen!
-            return;
-        }
-
-        String display = DOMUtils.getInstance().getDisplay(ancestor);
-        if ("list-item".equalsIgnoreCase(display)) {
-            // ignore
-        } else if ("block".equalsIgnoreCase(display) && !"body".equalsIgnoreCase(ancestor.getNodeName())) {
-            if ("p".equalsIgnoreCase(ancestor.getNodeName())) {
-                Element paragraph = Element.as(ancestor);
-                if (paragraph.getInnerText().length() == 0) {
-                    // We are inside an empty paragraph. We'll behave as if the use pressed Shift+Return.
-                    getTextArea().getCurrentEvent().preventDefault();
-
-                    // Delete the text from the first range and leave the text of the other ranges untouched.
-                    range.deleteContents();
-
-                    // Create the line break and insert it before the current range.
-                    Element br = getTextArea().getDocument().xCreateBRElement();
-                    Node refNode = range.getStartContainer();
-                    if (refNode.hasChildNodes()) {
-                        refNode = refNode.getChildNodes().getItem(range.getStartOffset());
-                    }
-                    refNode.getParentNode().insertBefore(br, refNode);
-
-                    // Update the current range
-                    selection.removeAllRanges();
-                    range = getTextArea().getDocument().createRange();
-                    range.setStartBefore(refNode);
-                    range.setEndBefore(refNode);
-                    selection.addRange(range);
-                } else {
-                    // The selection starts inside a non-empty paragraph so we leave the default behavior.
-                }
-            }
-        } else {
-            // We are not inside a paragraph so we change the default behavior.
-            getTextArea().getCurrentEvent().preventDefault();
-
-            // Save the start container and offset to know later where to split the text.
-            Node startContainer = range.getStartContainer();
-            int startOffset = range.getStartOffset();
-
-            // Delete the text from the first range and leave the text of the other ranges untouched.
-            range.deleteContents();
-            // Reset the selection. We're going to move the cursor inside the new paragraph.
-            selection.removeAllRanges();
-
-            // Split the DOM subtree that has the previously found ancestor as root.
-            DOMUtils.getInstance().splitNode(ancestor, startContainer, startOffset);
-
-            // Wrap left in-line siblings in a paragraph.
-            Element leftParagraph = getTextArea().getDocument().xCreatePElement();
-            Node splitRightNode = DOMUtils.getInstance().getChild(ancestor, startContainer).getNextSibling();
-            Node leftSibling = splitRightNode.getPreviousSibling();
-            if (leftSibling != null && DOMUtils.getInstance().isInline(leftSibling)) {
-                leftParagraph.appendChild(leftSibling);
-                leftSibling = splitRightNode.getPreviousSibling();
-                while (leftSibling != null && DOMUtils.getInstance().isInline(leftSibling)) {
-                    leftParagraph.insertBefore(leftSibling, leftParagraph.getFirstChild());
-                    leftSibling = splitRightNode.getPreviousSibling();
-                }
-                ancestor.insertBefore(leftParagraph, splitRightNode);
-            }
-
-            // Wrap right in-line siblings in a paragraph.
-            Element rightParagraph = getTextArea().getDocument().xCreatePElement();
-            ancestor.replaceChild(rightParagraph, splitRightNode);
-            rightParagraph.appendChild(splitRightNode);
-            Node rightSibling = rightParagraph.getNextSibling();
-            while (rightSibling != null && DOMUtils.getInstance().isInline(rightSibling)) {
-                rightParagraph.appendChild(rightSibling);
-                rightSibling = rightParagraph.getNextSibling();
-            }
-
-            // Create the new range and move the cursor inside the new paragraph.
-            range = getTextArea().getDocument().createRange();
-            range.selectNodeContents(DOMUtils.getInstance().getFirstLeaf(rightParagraph));
-            range.collapse(true);
-            selection.addRange(range);
-        }
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -145,4 +45,113 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
             event.stopPropagation();
         }, true);
     }-*/;
+
+    /**
+     * {@inheritDoc}<br/>
+     * We overwrite in order to fix a Mozilla bug which causes the caret to be rendered on the same line after you press
+     * Enter, if the new line doesn't have any visible contents. Once you start typing the caret moves below, but it
+     * looks strange before you type. We fixed the bug by adding a BR at the end of the new line.
+     * 
+     * @see BehaviorAdjuster#onEnterParagraphOnce(Node, Range)
+     */
+    protected void onEnterParagraphOnce(Node container, Range range)
+    {
+        super.onEnterParagraphOnce(container, range);
+
+        // Start container should be a text node.
+        Node lastLeaf;
+        Node leaf = range.getStartContainer();
+        // Look if there is any visible element on the new line, taking care to remain in the current block container.
+        do {
+            if (needsSpace(leaf)) {
+                return;
+            }
+            lastLeaf = leaf;
+            leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+        } while (leaf != null && container == DOMUtils.getInstance().getNearestBlockContainer(leaf));
+        // It seems there's no visible element on the new line. We should add one.
+        DOMUtils.getInstance().insertAfter(getTextArea().getDocument().xCreateBRElement(), lastLeaf);
+    }
+
+    /**
+     * @param leaf A DOM node which has not children.
+     * @return true if the given leaf needs space on the screen in order to be rendered.
+     */
+    private boolean needsSpace(Node leaf)
+    {
+        switch (leaf.getNodeType()) {
+            case Node.TEXT_NODE:
+                return leaf.getNodeValue().length() > 0;
+            case Node.ELEMENT_NODE:
+                Element element = Element.as(leaf);
+                return BR.equalsIgnoreCase(element.getTagName()) || element.getOffsetHeight() > 0
+                    || element.getOffsetWidth() > 0;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * {@inheritDoc}<br/>
+     * We overwrite in order to fix a Mozilla bug which makes empty paragraphs invisible. We add a BR to the created
+     * paragraph if it's empty.
+     * 
+     * @see BehaviorAdjuster#onEnterParagraphTwice(Node, Range)
+     */
+    protected void onEnterParagraphTwice(Node container, Range range)
+    {
+        super.onEnterParagraphTwice(container, range);
+
+        // The start point of the range should have been placed inside the new paragraph.
+        Node paragraph = DOMUtils.getInstance().getNearestBlockContainer(range.getStartContainer());
+        // Look if there is any visible element on the new line, taking care to remain in the current block container.
+        Node leaf = DOMUtils.getInstance().getFirstLeaf(paragraph);
+        do {
+            if (needsSpace(leaf)) {
+                return;
+            }
+            leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+        } while (leaf != null && paragraph == DOMUtils.getInstance().getNearestBlockContainer(leaf));
+        // It seems there's no visible element inside the newly created paragraph. We should add one.
+        paragraph.appendChild(getTextArea().getDocument().xCreateBRElement());
+    }
+
+    /**
+     * {@inheritDoc}<br/>
+     * We overwrite in order to fix a Mozilla bug which makes empty paragraphs invisible. We add a BR to the newly
+     * created paragraph.
+     * 
+     * @see BehaviorAdjuster#onEnterParagraphThrice(Node, Range)
+     */
+    protected void onEnterParagraphThrice(Node container, Range range)
+    {
+        super.onEnterParagraphThrice(container, range);
+
+        Node paragraph;
+        if (DOMUtils.getInstance().isFlowContainer(container)) {
+            paragraph = container.getFirstChild();
+        } else {
+            paragraph = container.getPreviousSibling();
+        }
+        paragraph.appendChild(getTextArea().getDocument().xCreateBRElement());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see BehaviorAdjuster#replaceEmptyDivsWithParagraphs()
+     */
+    protected void replaceEmptyDivsWithParagraphs()
+    {
+        super.replaceEmptyDivsWithParagraphs();
+
+        Document document = getTextArea().getDocument();
+        NodeList<com.google.gwt.dom.client.Element> paragraphs = document.getBody().getElementsByTagName("p");
+        for (int i = 0; i < paragraphs.getLength(); i++) {
+            Node paragraph = paragraphs.getItem(i);
+            if (!paragraph.hasChildNodes()) {
+                paragraph.appendChild(document.xCreateBRElement());
+            }
+        }
+    }
 }

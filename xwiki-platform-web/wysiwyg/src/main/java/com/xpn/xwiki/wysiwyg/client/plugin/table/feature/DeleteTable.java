@@ -74,6 +74,7 @@ public class DeleteTable extends AbstractTableFeature
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
+        return super.isEnabled(rta)
+            && TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
     }
 }

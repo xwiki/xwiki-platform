@@ -94,6 +94,7 @@ public class DeleteCol extends AbstractTableFeature
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
+        return super.isEnabled(rta)
+            && TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
     }
 }

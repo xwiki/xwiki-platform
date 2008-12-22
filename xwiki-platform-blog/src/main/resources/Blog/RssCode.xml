@@ -79,7 +79,7 @@
  *###
 #macro(setBlogRssCacheSettings)
   ## Internally cache the rendered RSS for 30 minutes, for better performance
-  ## $!context.setCacheDuration(1800)
+  $!context.setCacheDuration(1800)
   ## Instruct the client to cache the response for 1 hour
   #set($expires = $xwiki.jodatime.getMutableDateTime())##
   $!expires.addHours(1)##

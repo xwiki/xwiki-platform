@@ -25,29 +25,36 @@
 <hidden>true</hidden>
 <content>#includeMacros("Blog.BlogCode")
 $xwiki.jsx.use($blogScriptsDocumentName)
+##
+##
+##
 #set($name = "$!request.entryTitle")
-#if($name != '')
-  #set($space = "$!request.entrySpace")
-  #if($space == '')
-    #set($space = 'Main')
-  #end
-  #set($postDocName = "${space}.${name.replaceAll('[.]', '')}")
-  #getBlogDocument($space $blogDoc)
-  #set($parent = $blogDoc.fullName)
-  #set($title = $util.encodeURI($name))
-  $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "parent=${parent}&amp;title=${title}&amp;template=${blogPostTemplate}&amp;${blogPostClassname}_0_title=${title}"))
-#else
+#if($name == '')
+  ## First step, display the create form
   #set($space = "$!request.entrySpace")
   #if($space == '')
     #set($space = $doc.space)
   #end
-1.1 Create a new post
+  1.1 Create a new post
   &lt;form action="${xwiki.getURL('Blog.CreatePost')}" id="newBlogPost" method="post"&gt;
   &lt;div&gt;
-  &lt;input type="hidden" name="entrySpace" value="$space"/&gt;
-  &lt;input type="text" name="entryTitle" value="Post title"/&gt;
-  &lt;input type="submit" value="Create"/&gt;
+    &lt;input type="hidden" name="entrySpace" value="$space"/&gt;
+    &lt;input type="text" name="entryTitle" value="Post title"/&gt;
+    &lt;input type="submit" value="Create"/&gt;
   &lt;/div&gt;
   &lt;/form&gt;
+#else
+  ## Second step, form submitted, create the document
+  #set($space = "$!request.entrySpace")
+  #if($space == '')
+    #set($space = 'Main')
+  #end
+  ## Remove . and : from the document name, as they have a special meaning in XWiki document names
+  #set($postDocName = "${space}.${name.replaceAll('[.:]', '')}")
+  ## Get the target blog document, to set it as the parent
+  #getBlogDocument($space $blogDoc)
+  #set($parent = $blogDoc.fullName)
+  #set($title = $util.encodeURI($name))
+  $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}"))
 #end</content>
 </xwikidoc>

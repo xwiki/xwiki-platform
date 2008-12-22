@@ -23,12 +23,10 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogCode")
-#includeMacros("Blog.CategoriesCode")
+<content>#includeMacros("Blog.CategoriesCode")
 1 $doc.display("name")
 #info("$doc.display('description')")
 
-#getArticlesForCategory($doc.fullName $start $perPage $articles $total)
 #if($context.action != "inline")
 1.1.1 Subcategories
 &lt;div style="float: right; width: 60%"&gt;
@@ -40,16 +38,13 @@
 &lt;/fieldset&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-#getCategoriesHierarchy($tree)
-#displayCategoriesHierarchy($tree $doc.fullName 1)
+#getCategoriesHierarchy($doc.space $tree)
+#displayCategoriesHierarchyRecursive($tree $doc.fullName 1 'simple')
 &lt;div class="clearfloats"&gt;&lt;/div&gt;
+
 1.1.1 Articles from this category
-#set($start = $util.parseInt("$!{request.start}"))
-#set($perPage = $util.parseInt("$!{request.items}"))
-#if($perPage == 0)
-  #set($perPage = 10)
-#end
-#displayBlog($articles)
-#displayNavigationLinks($start $perPage $total)
+#getEntriesForCategory($doc.fullName $entries $total)
+#displayBlog($entries true)
+#displayNavigationLinks()
 #end</content>
 </xwikidoc>

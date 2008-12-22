@@ -102,7 +102,7 @@
 ## workaround is to wrap it in a comment, which will be discarded when minimizing the output.
 /* #includeMacros("Blog.BlogParameters") */
 
-if(!XWiki) {
+if(typeof(XWiki) == 'undefined') {
   XWiki = new Object();
 }
 XWiki.Blog = {

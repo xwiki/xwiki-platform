@@ -11,7 +11,6 @@ Helpers
     digit = ['0'..'9'];
     anychar = [0..0xffff];
     idtail = letter | digit | '_' | '.';
-    colon = ':';
     squote = ''';
     dquote = '"';
     sstring = squote [anychar - squote]* squote;
@@ -117,8 +116,8 @@ Tokens
     integer_literal = digit+;
     float_literal = digit+ '.' digit* ('e' ('+' | '-')? digit+)?;
     string_literal = sstring | dstring;
-    
-    input_parameter = colon idtail+;
+
+    input_parameter = (':' idtail+) | ('?' digit+);
 
     aggregate_func = avg | max | min | sum;
     orderby_spec = asc | desc;
@@ -389,7 +388,8 @@ numeric_literal =
     {float} float_literal;
 
 pattern_value =
-    string_literal;
+    {str} string_literal |
+    {param} input_parameter;
 
 escape_character =
     string_literal;

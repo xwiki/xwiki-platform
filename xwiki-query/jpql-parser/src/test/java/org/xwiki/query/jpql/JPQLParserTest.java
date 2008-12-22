@@ -27,37 +27,37 @@ public class JPQLParserTest extends TestCase
 
     public void testStartSpeed() throws Exception
     {
-        // heat up parser engine for more accuracy test timing  
+        // heat up parser engine for more accuracy test timing
+        // this is needed because of much static data in the parser
         parser.parse("select a from A as a");
     }
 
-    public void testQuote() throws Exception
+    public void testJPQL() throws Exception
     {
+        // quotes
         parser.parse("select a from A as a where a.f='str'");
         parser.parse("select a from A as a where a.f=\"str\"");
-    }
 
-    public void testObjectsInFrom() throws Exception
-    {
-        parser.parse("select doc from Document as doc, doc.object('XWiki.Test') as test where test.some=1");
-        parser.parse("select doc from Document as doc, doc.object(XWiki.Test) as test where test.some=1");
-    }
-
-    public void testObjectInWhere() throws Exception
-    {
-        parser.parse("select doc from Document as doc where doc.object('XWiki.Test').prop=1");
-        parser.parse("select doc from Document as doc where doc.object(XWiki.Test).prop=1");
-    }
-
-    public void testOrderBy() throws Exception
-    {
+        // order by
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number");
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number desc");
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number asc");
+
+        // member of
+        parser.parse("select a from A as a where :param member of a.prop");
+
+        // input parameters
+        parser.parse("select a from A as a where a.p = ?1 or :name = a.p or ?2 member of a.p or a.p like :qwe");
     }
 
-    public void testMemberOf() throws Exception
+    public void testXWQLExtensions() throws Exception
     {
-        parser.parse("select a from A as a where :param member of a.prop");
+        // object() in from clause
+        parser.parse("select doc from Document as doc, doc.object('XWiki.Test') as test where test.some=1");
+        parser.parse("select doc from Document as doc, doc.object(XWiki.Test) as test where test.some=1");
+
+        // object() in where clause
+        parser.parse("select doc from Document as doc where doc.object('XWiki.Test').prop=1");
+        parser.parse("select doc from Document as doc where doc.object(XWiki.Test).prop=1");
     }
 }

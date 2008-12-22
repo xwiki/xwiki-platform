@@ -54,4 +54,8 @@
 <title>Wiki blog</title>
 </property>
 </object>
-<content>#includeForm("Blog.BlogSheet")</content></xwikidoc>
+<content>#includeMacros("Blog.BlogCode")
+#getGlobalBlogEntries($entries)
+#displayBlog($entries true)
+#displayNavigationLinks()
+#includeInContext("Blog.CreatePost")</content></xwikidoc>

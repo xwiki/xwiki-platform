@@ -28,14 +28,14 @@
 ##
 ##
 ## Import the blog skin and javascripts.
-$xwiki.ssx.use($blogStyleDocumentName)
-$xwiki.jsx.use($blogScriptsDocumentName)
+$!xwiki.ssx.use($blogStyleDocumentName)##
+$!xwiki.jsx.use($blogScriptsDocumentName)##
 ##
 ##
 ##
 #**
  * Shows blog information. Currently, only the blog title is displayed.
- *#
+ *###
 #macro(showBlogInfo)
   #getBlogDocument($doc.space $blogDoc)
   #getBlogTitle($blogDoc $title)
@@ -52,9 +52,9 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * target space that contains one is returned. Finally, if no document in the current space contains a blog object, then
  * Blog.WebHome is returned as the default blog.
  * 
- * @param space The space where to search.
+ * @param space A &lt;tt&gt;String&lt;/tt&gt;, the name of the space where to search.
  * @param blogDoc The resulting XDocument.
- *#
+ *###
 #macro(getBlogDocument $space $blogDoc)
   ## First, try the Space.WebHome, for a whole-space blog
   #set($blogDoc = $xwiki.getDocument("${space}.WebHome"))
@@ -64,7 +64,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
     #if(!$blogDoc.getObject($blogClassname))
       ## Third, try searching for a blog document in the current space
       #set($blogDocs = $xwiki.searchDocuments(", BaseObject obj where doc.space = '${space}' and obj.name = doc.fullName and obj.className = '$blogClassname' order by doc.name"))
-      #if($blogDocs.size() > 0)
+      #if($blogDocs.size() &gt; 0)
         #set($blogDoc = $xwiki.getDocument($blogDocs.get(0)))
       #else
         ## Last, fallback to Blog.WebHome, the default blog
@@ -81,7 +81,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param blogDoc The blog document. It should contain a Blog.BlogClass object with the title property set.
  * @param title The resulting title.
- *#
+ *###
 #macro(getBlogTitle $blogDoc $title)
   #set($title = "$!{blogDoc.getObject(${blogClassname}).getProperty('title').value}")
 #end
@@ -89,26 +89,56 @@ $xwiki.jsx.use($blogScriptsDocumentName)
 ##
 ##
 #**
- * Retrieves a list of entries to be displayed. The entries are part of the current space
+ * Retrieves a list of entries to be displayed. The entries are either part of the blog's space, or have the blog
+ * document set as a parent.
  * 
+ * @param blogDoc The blog document. It should contain a Blog.BlogClass object with the title property set.
  * @param entries The resulting list of entries to display, a list of XDocument names.
- *#
-#macro(getBlogEntries $entries)
-  #set ($query = ", BaseObject obj, IntegerProperty isPublished, IntegerProperty hidden, DateProperty publishDate 
-    where doc.space = '${doc.space}' and
-      obj.name = doc.fullName and obj.className = 'Blog.BlogPostClass' and
-      publishDate.id.id = obj.id and publishDate.id.name = 'publishDate' and
-      isPublished.id.id = obj.id and isPublished.id.name = 'published' and
-      hidden.id.id = obj.id and hidden.id.name = 'hidden' and
-      (doc.creator = '$context.user' or (isPublished.value = 1 and hidden.value = 0))")
+ *###
+#macro(getBlogEntries $blogDoc $entries)
+  #getBlogEntriesBaseQuery($query)
+  #set($query = "${query} and (doc.space = '${blogDoc.space}' or doc.parent = '${blogDoc.fullName}')")
   #set($totalEntries = $xwiki.countDocuments(${query}))
   ## TODO: Replace this with a blogPreferences
   #set($defaultItemsPerPage = 10)
   ## This macro is defined in the default macros.vm library. It also sets $itemsPerPage and $startAt.
   #preparePagedViewParams($totalEntries $defaultItemsPerPage)
   #set($entries = $xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt))
-  ##
-  ##
+#end
+##
+##
+##
+#**
+ * Retrieves a list of entries to be displayed. The entries are taken from all the wiki, and not from a specific blog.
+ * 
+ * @param entries The resulting list of entries to display, a list of XDocument names.
+ *###
+#macro(getGlobalBlogEntries $entries)
+  #getBlogEntriesBaseQuery($query)
+  #set($totalEntries = $xwiki.countDocuments(${query}))
+  ## TODO: Replace this with a blogPreferences
+  #set($defaultItemsPerPage = 10)
+  ## This macro is defined in the default macros.vm library. It also sets $itemsPerPage and $startAt.
+  #preparePagedViewParams($totalEntries $defaultItemsPerPage)
+  #set($entries = $xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt))
+#end
+##
+##
+##
+#**
+ * Return the base query for selecting blog entries. It filters only visible entries, but does not bind to a specific
+ * blog, nor specify a range or an ordering criteria.
+ * 
+ * @param query The basic query for selecting blog entries.
+ *###
+#macro(getBlogEntriesBaseQuery $query)
+  #set ($query = ", BaseObject obj, IntegerProperty isPublished, IntegerProperty hidden, DateProperty publishDate 
+    where doc.fullName &lt;&gt; 'Blog.BlogPostTemplate' and
+      obj.name = doc.fullName and obj.className = '${blogPostClassname}' and
+      publishDate.id.id = obj.id and publishDate.id.name = 'publishDate' and
+      isPublished.id.id = obj.id and isPublished.id.name = 'published' and
+      hidden.id.id = obj.id and hidden.id.name = 'hidden' and
+      (doc.creator = '$context.user' or (isPublished.value = 1 and hidden.value = 0))")
 #end
 ##
 ##
@@ -118,7 +148,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param entries The entries to display, a list of XDocument names.
  * @param onlyExtract If &lt;tt&gt;true&lt;/tt&gt;, only display the extract of articles where available, otherwise display the full content.
- *#
+ *###
 #macro(displayBlog $entries $onlyExtract)
   #set($blogDay = "")
   &lt;div class="hfeed"&gt;
@@ -157,7 +187,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The resulting xobject of the blog post.
- *#
+ *###
 #macro(getEntryObject $entryDoc $entryObj)
   #set($entryObj = '')
   #set($entryObj = $entryDoc.getObject("${blogPostClassname}"))
@@ -175,7 +205,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
  * @param result The resulting date, a class extending &lt;tt&gt;java.util.Date&lt;/tt&gt;.
- *#
+ *###
 #macro(getEntryDate $entryDoc $entryObj $result)
   ## The blog should be sorted by publication date, but unpublished entries don't have such a date.
   #if("$!entryObj.getProperty('published').value" == "1")
@@ -192,16 +222,16 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * Displays a date, nicely formatted as a calendar page.
  * 
  * @param date The date to display, a class extending &lt;tt&gt;java.util.Date&lt;/tt&gt;.
- *#
+ *###
 #macro(displayBlogDate $date)
   #set($year = $xwiki.formatDate($date, "yyyy"))
   #set($month = $xwiki.formatDate($date, "MMMM"))
   #set($day = $xwiki.formatDate($date, "dd"))
-  &lt;h3 class="blogdate"&gt;## title="#formatdateISO($date)"&gt;
+  &lt;h2 class="blogdate"&gt;## title="#formatdateISO($date)"&gt;
     &lt;span class="month"&gt;$month&lt;/span&gt;
     &lt;span class="day"&gt;$day&lt;/span&gt;
     &lt;span class="year"&gt;$year&lt;/span&gt;
-  &lt;/h3&gt;
+  &lt;/h2&gt;
 #end
 ##
 ##
@@ -210,7 +240,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * Displays a blog article: management tools, header, content, footer.
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
- *#
+ *###
 #macro(displayEntry $entryDoc $entryObj $onlyExtract)
   ##
   ## Only articles with an explicit hidden setting or an explicit unpublished setting are hidden
@@ -243,7 +273,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
  * @param isPublished The resulting boolean, true if the entry is considered published.
- *#
+ *###
 #macro(isPublished $entryObj $isPublished)
   ## This should work for both old articles, which don't have the 'published' property at all, and
   ## are considered published by default, and new entries, that should have 1 if published.
@@ -257,7 +287,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
  * @param isHiddel The resulting boolean, true if the entry is considered hidden.
- *#
+ *###
 #macro(isHidden $entryObj $isHidden)
   ## This should work for both old articles, which don't have the 'hidden' property at all, and
   ## are considered visible by default, and new entries, that should have 1 if hidden.
@@ -271,7 +301,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
- *#
+ *###
 #macro(displayEntryTools $entryDoc $entryObj)
   #if($context.action != 'preview')
     &lt;div class="blog-entry-toolbox"&gt;
@@ -291,7 +321,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
  * @todo AJAX calls.
- *#
+ *###
 #macro(displayHideShowButton $entryDoc $entryObj)
   #isPublished($entryObj $isPublished)
   #isHidden($entryObj $isHidden)
@@ -310,7 +340,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
  * @todo AJAX calls.
- *#
+ *###
 #macro(displayPublishButton $entryDoc $entryObj)
   #isPublished($entryObj $isPublished)
   #if(!$isPublished &amp;&amp; $entryDoc.creator == $context.user &amp;&amp; $xwiki.hasAccessLevel("edit", $context.user, $entryDoc.fullName))
@@ -325,7 +355,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
- *#
+ *###
 #macro(displayEditButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel("edit", $context.user, $entryDoc.fullName))
     &lt;a href="$entryDoc.getURL('inline')" title="Edit this blog post"&gt;#toolImage('edit.png' 'edit ')&lt;/a&gt;##
@@ -340,7 +370,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
  * @todo AJAX calls.
- *#
+ *###
 #macro(displayDeleteButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel("delete", $context.user, $entryDoc.fullName))
     &lt;a href="$entryDoc.getURL('delete')" title="Delete this blog post"&gt;#toolImage('delete.png' 'delete ')&lt;/a&gt;##
@@ -354,12 +384,12 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
- *#
+ *###
 #macro(displayEntryTitle $entryDoc $entryObj)
   #if($doc.fullName == $entryDoc.fullName)
     &lt;h1 class="entry-title"&gt;$entryDoc.display('title', 'view', $entryObj)&lt;/h1&gt;
   #else
-    &lt;h4 class="entry-title"&gt;&lt;a href="$entryDoc.getURL()"&gt;$entryDoc.display('title', 'view', $entryObj)&lt;/a&gt;&lt;/h4&gt;
+    &lt;h3 class="entry-title"&gt;&lt;a href="$entryDoc.getURL()"&gt;$entryDoc.display('title', 'view', $entryObj)&lt;/a&gt;&lt;/h3&gt;
   #end
 #end
 ##
@@ -370,31 +400,46 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
- *#
+ * @param onlyExtract If &lt;tt&gt;true&lt;/tt&gt;, try to display only a summary of the entry.
+ *###
 #macro(displayEntryContent $entryDoc $entryObj $onlyExtract)
   &lt;div class="#if($onlyExtract)entry-summary#{else}entry-content#end"&gt;
-  #if($onlyExtract)
-    #set($content = $entryDoc.display('extract', 'view', $entryObj))
+  #getEntryContent($entryDoc $entryObj $onlyExtract $entryContent)
+  ## $doc.display does not render non-1.0 syntaxes.
+  #if($!entryDoc.syntaxId == 'xwiki/1.0')
+    $entryContent
+  #else
+    $entryDoc.getRenderedContent($entryContent, $entryDoc.getSyntaxId())
   #end
-  #if("$!content" == '')
-    #set($content = $entryDoc.display('content', 'view', $entryObj))
+  &lt;/div&gt; ## entry-content
+#end
+##
+##
+##
+#**
+ * Extracts the body of the entry that should be displayed. If .
+ * 
+ * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
+ * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
+ * @param onlyExtract If &lt;tt&gt;true&lt;/tt&gt;, try to display only a summary of the entry.
+ * @param entryContent The resulting content.
+ *###
+#macro(getEntryContent $entryDoc $entryObj $onlyExtract $entryContent)
+  #if($onlyExtract)
+    #set($entryContent = $entryDoc.display('extract', 'view', $entryObj))
+  #end
+  #if("$!entryContent" == '')
+    #set($entryContent = $entryDoc.display('content', 'view', $entryObj))
 #* Disabled until the content can be cleanly cut.
 *    #if($onlyExtract &amp;&amp; $content.length()&gt;$maxchars)
 *      #set($i = $content.lastIndexOf(" ", $maxchars))
 *      #set($i = $i + 1)
 *      #set($content = "${content.substring(0,$i)} *[...&gt;${entryDoc.fullName}]*")
 *    #end
-## *#
+## *###
   #else
-    #set($content = "${content} *[...&gt;${entryDoc.fullName}]*")
+    #set($entryContent = "${entryContent} &lt;a href='${entryDoc.getURL()}' title='Read the full entry'&gt;...&lt;/a&gt;")
   #end
-  ## $doc.display does not render non-1.0 syntaxes.
-  #if($!entryDoc.syntaxId == 'xwiki/1.0')
-    $content
-  #else
-    $entryDoc.getRenderedContent($content, $entryDoc.getSyntaxId())
-  #end
-  &lt;/div&gt; ## entry-content
 #end
 ##
 ##
@@ -404,7 +449,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * 
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
- *#
+ *###
 #macro(displayEntryFooter $entryDoc $entryObj)
   &lt;div class="entry-footer"&gt;
   #isPublished($entryObj $isPublished)
@@ -433,7 +478,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
 #**
  * 
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
- *#
+ *###
 #macro(listCategories $entryObj)
   #listNewCategories($entryObj)
   #listOldCategories($entryObj)
@@ -444,7 +489,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
 #**
  * 
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
- *#
+ *###
 #macro(listNewCategories $entryObj)
   #if($entryObj.getxWikiClass().getName() == $blogPostClassname)
     #set($categories = $entryObj.getProperty('category').value)
@@ -470,7 +515,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
 #**
  * 
  * @param entryObj The xobject of the blog post, an instance of the Blog.BlogPostClass xclass.
- *#
+ *###
 #macro(listOldCategories $entryObj)
   #if($entryObj.getxWikiClass().getName() == $oldArticleClassname)
     #set($categories = $entryObj.getProperty('category').value)
@@ -490,7 +535,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * @param start The first item currently displayed.
  * @param perPage The number of blog entries displayed.
  * @param total The total number of entries.
- *#
+ *###
 #macro(displayNavigationLinks)
   &lt;div class="clearfloats"&gt;&lt;/div&gt;
   #if(($totalPages &gt; 1))
@@ -527,7 +572,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * Displays a message box with "publish" icon.
  * 
  * @param message A text message concerning blog article publishing
- *#
+ *###
 #macro(publishMessageBox $message)
 &lt;div class="plainmessage publish-message"&gt;$message&lt;/div&gt;
 #end
@@ -535,7 +580,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)
  * Displays a message box with "show/hide" icon.
  * 
  * @param message A text message concerning blog article hiding
- *#
+ *###
 #macro(hideMessageBox $message)
 &lt;div class="plainmessage hide-message"&gt;$message&lt;/div&gt;
 #end</content>

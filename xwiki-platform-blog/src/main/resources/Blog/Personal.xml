@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 
 <xwikidoc>
 <web>Blog</web>
-<name>Categories</name>
+<name>Personal</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent>Blog.WebHome</parent>
+<parent>Blog.Categories</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1107115183000</creationDate>
-<date>1226261191000</date>
-<contentUpdateDate>1226261191000</contentUpdateDate>
+<creationDate>1229921569000</creationDate>
+<date>1229921733000</date>
+<contentUpdateDate>1229921733000</contentUpdateDate>
 <version>1.1</version>
-<title>Blog categories</title>
-<template></template>
+<title>Personal</title>
+<template>Blog.CategoryTemplate</template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
@@ -63,15 +63,15 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 </class>
-<name>Blog.Categories</name>
+<name>Blog.Personal</name>
 <number>0</number>
 <className>Blog.CategoryClass</className>
 <property>
-<description>Pseudo-category.</description>
+<description>Personal blog posts.</description>
 </property>
 <property>
-<name>Root</name>
+<name>Personal</name>
 </property>
 </object>
-<content>#includeForm("Blog.CategorySheet")</content>
+<content>#includeForm("CategorySheet")</content>
 </xwikidoc>

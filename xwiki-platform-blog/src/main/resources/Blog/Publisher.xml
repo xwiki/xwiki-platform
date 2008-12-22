@@ -37,7 +37,8 @@
       #if("$!{entryObj.getProperty('published').value}" == '0')
         #set($discard = $entryObj.set('hidden', 0))
         #set($discard = $entryObj.set('published', 1))
-        #set($discard = $entryObj.set('publishDate', $util.date))
+        ## Uncomment if you want to always set the publication date to the date when the post was actually published.
+        ## #set($discard = $entryObj.set('publishDate', $util.date))
         $entryDoc.save('Published article')
       #end
     #end

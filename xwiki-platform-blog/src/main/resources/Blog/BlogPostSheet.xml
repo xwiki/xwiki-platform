@@ -54,12 +54,16 @@
   #isPublished($entryObj $isPublished)
   #if($isPublished)
     #if($doc.creator == $context.user)
-      #publishMessageBox("This article was published on ${doc.display('publishDate', 'edit', $entryObj)}")
+      #publishMessageBox("This article was published on ${doc.display('publishDate', 'view', $entryObj)}")
       #hideMessageBox("Hide article $doc.display('hidden', 'edit', $entryObj)")
     #end
   #else
-    #publishMessageBox("This article is not published yet. *Publish ${doc.display('published', 'edit', $entryObj)}*")
-    &lt;input type="hidden" name="${entryObj.getxWikiClass().getName()}_${entryObj.number}_publishDate" value="$xwiki.formatDate($util.date, 'dd/MM/yyyy HH:mm:ss')"/&gt;
+    #set($defaultDate = $xwiki.getDocument($blogPostTemplate).getObject($blogPostClassname).getProperty('publishDate').value.time)
+    #if($entryObj.getProperty('publishDate').value.time == $defaultDate)
+      ## The publish date was not set, force it to be the creation date
+      $entryObj.set('publishDate', $doc.creationDate)
+    #end
+    #publishMessageBox("This article is not published yet. &lt;label&gt;*Publish ${doc.display('published', 'edit', $entryObj)}*&lt;/label&gt;\\&lt;label&gt;Set the publication date to: ${doc.display('publishDate', 'edit', $entryObj)}&lt;/label&gt;")
   #end
   #set($newtitle = $request.title)
   #if($newtitle)

@@ -23,20 +23,26 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>true</hidden>
-<content>#set($blogClassname = 'Blog.BlogClass')
+<content>## Blog
+#set($blogClassname = 'Blog.BlogClass')
 #set($blogTemplate = 'Blog.BlogTemplate')
+## Blog entries
 #set($blogPostClassname = 'Blog.BlogPostClass')
 #set($blogPostTemplate = 'Blog.BlogPostTemplate')
 #set($oldArticleClassname = 'XWiki.ArticleClass')
+## Categories
 #set($blogCategoryClassname = 'Blog.CategoryClass')
 #set($blogCategoryTemplate = 'Blog.CategoryTemplate')
 #set($oldBlogCategoryClassname = 'Blog.Categories')
 #set($defaultCategoryParent = 'Blog.Categories')
-#set($thisURL = $doc.getURL($context.action, $request.queryString))
+## Style
 #set($blogStyleDocumentName = 'Blog.BlogStyle')
 #set($blogStyleDocument = $xwiki.getDocument($blogStyleDocumentName))
+## Clientside scripts
 #set($blogScriptsDocumentName = 'Blog.BlogScripts')
 #set($blogPublisher = $xwiki.getDocument('Blog.Publisher'))
+## Misc
+#set($thisURL = $doc.getURL($context.action, $request.queryString))
 ##
 ##
 ##

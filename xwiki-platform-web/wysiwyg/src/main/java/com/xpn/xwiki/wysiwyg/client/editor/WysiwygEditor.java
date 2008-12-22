@@ -125,8 +125,8 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
         "bold italic underline strikethrough teletype | subscript superscript"
             + " | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent"
             + " | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | link unlink | image"
-            + " | inserttable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol"
-            + " | sync";
+            + " | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter"
+            + " deletecol | sync";
 
     /**
      * The list of default menu entries. Can be overwritten from the configuration.

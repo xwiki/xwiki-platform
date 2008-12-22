@@ -88,7 +88,7 @@ public class ImageBehaviorAdjuster implements KeyboardListener
             return;
         }
         // block everything else
-        textArea.getCurrentEvent().preventDefault();
+        textArea.getCurrentEvent().xPreventDefault();
     }
 
     /**

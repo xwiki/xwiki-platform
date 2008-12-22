@@ -808,4 +808,18 @@ public abstract class DOMUtils
      * @param range The DOM range to be normalized.
      */
     public abstract void normalize(Range range);
+
+    /**
+     * @param node A DOM node
+     * @return The nearest block level ancestor of the given node.
+     */
+    public Node getNearestBlockContainer(Node node)
+    {
+        Node ancestor = DOMUtils.getInstance().getFarthestInlineAncestor(node);
+        if (ancestor == null) {
+            return node;
+        } else {
+            return ancestor.getParentNode();
+        }
+    }
 }

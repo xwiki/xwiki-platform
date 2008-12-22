@@ -77,8 +77,11 @@ public class InsertRowBefore extends AbstractTableFeature
      */
     public boolean isEnabled(RichTextArea rta)
     {
+        if (!super.isEnabled(rta)) {
+            return false;
+        }
         Node node = TableUtils.getInstance().getCaretNode(rta.getDocument());
-        TableRowElement row = TableUtils.getInstance().getRow(node); 
-        return  row != null && !TableUtils.getInstance().isHeaderRow(row);
+        TableRowElement row = TableUtils.getInstance().getRow(node);
+        return row != null && !TableUtils.getInstance().isHeaderRow(row);
     }
 }

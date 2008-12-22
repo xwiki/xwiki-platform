@@ -24,12 +24,12 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.IFrameElement;
-import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ChangeListenerCollection;
 import com.google.gwt.user.client.ui.HasName;
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Event;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyFactory;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
@@ -59,6 +59,13 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      * The history of this rich text area.
      */
     private final History history;
+
+    /**
+     * Overwrites the default behavior of the rich text area when DOM events are triggered by user actions and that
+     * default behavior is either incomplete, unnatural, browser specific or buggy. This custom behavior can still be
+     * prevented from a listener by calling {@link Event#preventDefault()} on the {@link #getCurrentEvent()}.
+     */
+    private final BehaviorAdjuster adjuster = (BehaviorAdjuster) GWT.create(BehaviorAdjuster.class);
 
     /**
      * The list of listeners that are notified when the content of the rich text area changes. Change events are
@@ -92,7 +99,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     {
         cm = new DefaultCommandManager(this);
         history = new DefaultHistory(this, 10);
-        BehaviorAdjuster adjuster = (BehaviorAdjuster) GWT.create(BehaviorAdjuster.class);
         adjuster.setTextArea(this);
     }
 
@@ -107,6 +113,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     {
         this.cm = cm;
         this.history = history;
+        adjuster.setTextArea(this);
     }
 
     /**
@@ -241,22 +248,23 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /**
      * {@inheritDoc}
      * 
-     * @see com.google.gwt.user.client.ui.RichTextArea#onBrowserEvent(Event)
+     * @see com.google.gwt.user.client.ui.RichTextArea#onBrowserEvent(com.google.gwt.user.client.Event)
      */
-    public void onBrowserEvent(Event event)
+    public void onBrowserEvent(com.google.gwt.user.client.Event event)
     {
         // We need to preview the event due to a GWT bug.
         // @see http://code.google.com/p/google-web-toolkit/issues/detail?id=729
         if (!previewEvent(event)) {
             return;
         }
-        currentEvent = event;
-        if (event.getTypeInt() == Event.ONKEYDOWN) {
-            if (shortcutKeys.contains(ShortcutKeyFactory.createShortcutKey(event))) {
-                event.preventDefault();
+        currentEvent = event.cast();
+        if (currentEvent.getTypeInt() == Event.ONKEYDOWN) {
+            if (shortcutKeys.contains(ShortcutKeyFactory.createShortcutKey(currentEvent))) {
+                currentEvent.xPreventDefault();
             }
         }
         super.onBrowserEvent(event);
+        adjuster.onBrowserEvent();
         currentEvent = null;
     }
 
@@ -268,7 +276,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      * @return <code>false</code> to cancel the event.
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=729
      */
-    private native boolean previewEvent(Event event)
+    private native boolean previewEvent(com.google.gwt.user.client.Event event)
     /*-{
         return @com.google.gwt.user.client.DOM::previewEvent(Lcom/google/gwt/user/client/Event;)(event);
     }-*/;

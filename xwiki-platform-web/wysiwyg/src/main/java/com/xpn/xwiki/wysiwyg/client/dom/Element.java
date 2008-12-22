@@ -202,4 +202,18 @@ public class Element extends com.google.gwt.dom.client.Element
         }
         return false;
     }
+
+    /**
+     * Clones this element along with its meta data.
+     * 
+     * @param deep if true then all the descendants of this element will be cloned too.
+     * @return the clone.
+     * @see #cloneNode(boolean)
+     */
+    public final Node xCloneNode(boolean deep)
+    {
+        Element clone = cloneNode(deep).cast();
+        clone.setMetaData(getMetaData());
+        return clone;
+    }
 }

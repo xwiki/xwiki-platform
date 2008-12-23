@@ -19,7 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
+import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
@@ -74,19 +76,27 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
         String linkInnerHTML =
             "<!--startwikilink:Space.ExistingPage--><span class=\"wikilink\">"
                 + "<a href=\"/xwiki/bin/view/Space/ExistingPage\">label</a></span><!--stopwikilink-->";
-        container.setInnerHTML(linkInnerHTML);
+        container.xSetInnerHTML(linkInnerHTML);
         extractor.onInnerHTMLChange(container);
         Element anchorElement = (Element) container.getFirstChild();
-        // test the inner html left in the container
-        String expected = "<a href=\"/xwiki/bin/view/Space/ExistingPage\">label</a>";
-        assertEquals(expected, container.getInnerHTML());
-        String expectedMeta =
-            "<!--startwikilink:Space.ExistingPage--><span class=\"wikilink\">" + Element.INNER_HTML_PLACEHOLDER
-                + "</span><!--stopwikilink-->";
+        // test the elements left in the container
+        assertEquals(1, container.getChildNodes().getLength());
+        assertEquals("a", container.getChildNodes().getItem(0).getNodeName().toLowerCase());
         // Get Meta data fragment
         DocumentFragment metaFragment = anchorElement.getMetaData();
         assertNotNull(metaFragment);
-        assertEquals(expectedMeta, metaFragment.getInnerHTML());
+        assertEquals(3, metaFragment.getChildNodes().getLength());
+        // Check the three nodes in the meta fragment and the content
+        assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(0).getNodeType());
+        assertEquals("startwikilink:Space.ExistingPage", metaFragment.getChildNodes().getItem(0).getNodeValue());
+        assertEquals(Node.ELEMENT_NODE, metaFragment.getChildNodes().getItem(1).getNodeType());
+        assertEquals("span", metaFragment.getChildNodes().getItem(1).getNodeName().toLowerCase());
+        assertEquals(1, metaFragment.getChildNodes().getItem(1).getChildNodes().getLength());
+        assertEquals(Node.TEXT_NODE, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0).getNodeType());
+        assertEquals(Element.INNER_HTML_PLACEHOLDER, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0)
+            .getNodeValue());
+        assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(2).getNodeType());
+        assertEquals("stopwikilink", metaFragment.getChildNodes().getItem(2).getNodeValue());
     }
 
     /**
@@ -97,19 +107,26 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
         String linkInnerHTML =
             "<!--startwikilink:http://xwiki.org--><span class=\"wikiexternallink\">"
                 + "<a href=\"http://xwiki.org\">label</a></span><!--stopwikilink-->";
-        container.setInnerHTML(linkInnerHTML);
+        container.xSetInnerHTML(linkInnerHTML);
         extractor.onInnerHTMLChange(container);
         Element anchorElement = (Element) container.getFirstChild();
-        // test the inner html left in the container
-        String expected = "<a href=\"http://xwiki.org\">label</a>";
-        assertEquals(expected, container.getInnerHTML());
-        String expectedMeta =
-            "<!--startwikilink:http://xwiki.org--><span class=\"wikiexternallink\">" + Element.INNER_HTML_PLACEHOLDER
-                + "</span><!--stopwikilink-->";
+        // test the elements left in the container
+        assertEquals(1, container.getChildNodes().getLength());
+        assertEquals("a", container.getChildNodes().getItem(0).getNodeName().toLowerCase());
         // Get Meta data fragment
         DocumentFragment metaFragment = anchorElement.getMetaData();
         assertNotNull(metaFragment);
-        assertEquals(expectedMeta, metaFragment.getInnerHTML());
+        // test the meta data fragment
+        assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(0).getNodeType());
+        assertEquals("startwikilink:http://xwiki.org", metaFragment.getChildNodes().getItem(0).getNodeValue());
+        assertEquals(Node.ELEMENT_NODE, metaFragment.getChildNodes().getItem(1).getNodeType());
+        assertEquals("span", metaFragment.getChildNodes().getItem(1).getNodeName().toLowerCase());
+        assertEquals(1, metaFragment.getChildNodes().getItem(1).getChildNodes().getLength());
+        assertEquals(Node.TEXT_NODE, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0).getNodeType());
+        assertEquals(Element.INNER_HTML_PLACEHOLDER, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0)
+            .getNodeValue());
+        assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(2).getNodeType());
+        assertEquals("stopwikilink", metaFragment.getChildNodes().getItem(2).getNodeValue());
     }
 
     /**
@@ -120,18 +137,25 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
         String linkInnerHTML =
             "<!--startwikilink:Space.Page--><span class=\"wikicreatelink\">"
                 + "<a href=\"/xwiki/bin/view/Space/Page\">label</a></span><!--stopwikilink-->";
-        container.setInnerHTML(linkInnerHTML);
+        container.xSetInnerHTML(linkInnerHTML);
         extractor.onInnerHTMLChange(container);
         Element anchorElement = (Element) container.getFirstChild();
-        // test the inner html left in the container
-        String expected = "<a href=\"/xwiki/bin/view/Space/Page\">label</a>";
-        assertEquals(expected, container.getInnerHTML());
-        String expectedMeta =
-            "<!--startwikilink:Space.Page--><span class=\"wikicreatelink\">" + Element.INNER_HTML_PLACEHOLDER
-                + "</span><!--stopwikilink-->";
+        // test the elements left in the container
+        assertEquals(1, container.getChildNodes().getLength());
+        assertEquals("a", container.getChildNodes().getItem(0).getNodeName().toLowerCase());
         // Get Meta data fragment
         DocumentFragment metaFragment = anchorElement.getMetaData();
         assertNotNull(metaFragment);
-        assertEquals(expectedMeta, metaFragment.getInnerHTML());
+        // test the meta data fragment
+        assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(0).getNodeType());
+        assertEquals("startwikilink:Space.Page", metaFragment.getChildNodes().getItem(0).getNodeValue());
+        assertEquals(Node.ELEMENT_NODE, metaFragment.getChildNodes().getItem(1).getNodeType());
+        assertEquals("span", metaFragment.getChildNodes().getItem(1).getNodeName().toLowerCase());
+        assertEquals(1, metaFragment.getChildNodes().getItem(1).getChildNodes().getLength());
+        assertEquals(Node.TEXT_NODE, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0).getNodeType());
+        assertEquals(Element.INNER_HTML_PLACEHOLDER, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0)
+            .getNodeValue());
+        assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(2).getNodeType());
+        assertEquals("stopwikilink", metaFragment.getChildNodes().getItem(2).getNodeValue());
     }
 }

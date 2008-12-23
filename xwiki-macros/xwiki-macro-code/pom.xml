@@ -34,6 +34,10 @@
   <description>XWiki Platform - Core - Macro - Code</description>
   <dependencies>
     <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-macro-box</artifactId>
       <version>${pom.version}</version>

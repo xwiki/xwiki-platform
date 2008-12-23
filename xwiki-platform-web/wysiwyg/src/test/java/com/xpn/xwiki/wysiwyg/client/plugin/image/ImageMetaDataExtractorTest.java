@@ -19,7 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.image;
 
+import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
@@ -71,18 +73,26 @@ public class ImageMetaDataExtractorTest extends AbstractWysiwygClientTest
      */
     public void testOnInnerHTMLChange()
     {
-        String imageInnerHTML = "<!--startimage:Space.Page@my.png--><img src=\"\" /><!--stopimage-->";
-        container.setInnerHTML(imageInnerHTML);
+        String imageInnerHTML =
+            "<!--startimage:Space.Page@my.png--><img src=\"/xwiki/bin/download/Space/Page/my.png\" /><!--stopimage-->";
+        container.xSetInnerHTML(imageInnerHTML);
         extractor.onInnerHTMLChange(container);
         Element imgElement = (Element) container.getFirstChild();
-        // test the inner html left in the container
-        String expected = "<img src=\"\">";
-        assertEquals(expected, container.getInnerHTML());
-        String expectedMeta =
-            "<!--startimage:Space.Page@my.png-->" + Element.INNER_HTML_PLACEHOLDER + "<!--stopimage-->";
+        // test the elements left in the container.
+        // We test the elements and not the inner html because the IE returns modified html (resolved links, non quoted
+        // attributes and the string test would fail)
+        assertEquals(1, container.getChildNodes().getLength());
+        assertEquals("img", container.getChildNodes().getItem(0).getNodeName().toLowerCase());
         // Get Meta data fragment
         DocumentFragment metaFragment = imgElement.getMetaData();
         assertNotNull(metaFragment);
-        assertEquals(expectedMeta, metaFragment.getInnerHTML());
+        // test the elements in the metaFragment
+        assertEquals(3, metaFragment.getChildNodes().getLength());
+        assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(0).getNodeType());
+        assertEquals("startimage:Space.Page@my.png", metaFragment.getChildNodes().getItem(0).getNodeValue());
+        assertEquals(Node.TEXT_NODE, metaFragment.getChildNodes().getItem(1).getNodeType());
+        assertEquals(Element.INNER_HTML_PLACEHOLDER, metaFragment.getChildNodes().getItem(1).getNodeValue());
+        assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(2).getNodeType());
+        assertEquals("stopimage", metaFragment.getChildNodes().getItem(2).getNodeValue());
     }
 }

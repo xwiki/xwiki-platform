@@ -50,7 +50,6 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
 public abstract class ListClass extends PropertyClass
 {
 
-
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
         super(name, prettyname, wclass);
@@ -72,7 +71,8 @@ public abstract class ListClass extends PropertyClass
         this(null);
     }
 
-    public String getSeparators() {
+    public String getSeparators()
+    {
         String separators = getStringValue("separators");
         if (separators == null || separators.equals("")) {
             separators = "|,";
@@ -80,7 +80,8 @@ public abstract class ListClass extends PropertyClass
         return separators;
     }
 
-    public void setSeparators(String separators) {
+    public void setSeparators(String separators)
+    {
         setStringValue("separators", separators);
     }
 
@@ -221,6 +222,7 @@ public abstract class ListClass extends PropertyClass
         return map;
     }
 
+    @Override
     public BaseProperty newProperty()
     {
         BaseProperty lprop;
@@ -240,6 +242,7 @@ public abstract class ListClass extends PropertyClass
         return lprop;
     }
 
+    @Override
     public BaseProperty fromString(String value)
     {
         BaseProperty prop = newProperty();
@@ -251,6 +254,7 @@ public abstract class ListClass extends PropertyClass
         return prop;
     }
 
+    @Override
     public BaseProperty fromStringArray(String[] strings)
     {
         if (!isMultiSelect()) {
@@ -283,6 +287,7 @@ public abstract class ListClass extends PropertyClass
         return prop;
     }
 
+    @Override
     public BaseProperty newPropertyfromXML(Element ppcel)
     {
         if ((!isRelationalStorage()) && (!isMultiSelect())) {
@@ -310,8 +315,8 @@ public abstract class ListClass extends PropertyClass
     /**
      * Search for an internationalizable display text for the current value. The search process is:
      * <ol>
-     * <li>let V = the internal value of the option, used as the "value" attribute of the <option>
-     * element, and D = the displayed value</li>
+     * <li>let V = the internal value of the option, used as the "value" attribute of the <option> element, and D = the
+     * displayed value</li>
      * <li>if a message with the key <fieldFullName>_<V> exists, return it as D</li>
      * <li>else, if a message with the key <fieldName>_<V> exists, return it as D</li>
      * <li>else, if a message with the key option_<V> exists, return it as D</li>
@@ -323,8 +328,7 @@ public abstract class ListClass extends PropertyClass
      * @param name The name of the ListProperty.
      * @param map The value=name mapping specified in the "values" parameter of the property.
      * @param context The request context.
-     * @return The text that should be displayed, representing a human-understandable name for the
-     *         internal value.
+     * @return The text that should be displayed, representing a human-understandable name for the internal value.
      */
     protected String getDisplayValue(String value, String name, Map map, XWikiContext context)
     {
@@ -355,16 +359,15 @@ public abstract class ListClass extends PropertyClass
     }
 
     /**
-     * Search for an internationalizable display text for the current value. The value can be either
-     * a simple string, or a value=name pair selected from the database.
+     * Search for an internationalizable display text for the current value. The value can be either a simple string, or
+     * a value=name pair selected from the database.
      * 
      * @see #getDisplayValue(String, String, Map, XWikiContext)
      * @param rawvalue The internal value, or a value=name pair.
      * @param name The name of the ListProperty.
      * @param map The value=name mapping specified in the "values" parameter of the property.
      * @param context The request context.
-     * @return The text that should be displayed, representing a human-understandable name for the
-     *         internal value.
+     * @return The text that should be displayed, representing a human-understandable name for the internal value.
      */
     protected String getDisplayValue(Object rawvalue, String name, Map map, XWikiContext context)
     {
@@ -378,8 +381,8 @@ public abstract class ListClass extends PropertyClass
     }
 
     /**
-     * If the list is populated with value=name pairs selected from the database, then return only
-     * the value. Otherwise, it is a simple value.
+     * If the list is populated with value=name pairs selected from the database, then return only the value. Otherwise,
+     * it is a simple value.
      * 
      * @param rawvalue
      * @return The list value
@@ -392,11 +395,12 @@ public abstract class ListClass extends PropertyClass
         if (rawvalue instanceof Object[]) {
             return ((Object[]) rawvalue)[0].toString();
         }
-        return (rawvalue==null) ? "" : rawvalue.toString();
+        return (rawvalue == null) ? "" : rawvalue.toString();
     }
 
-    public void displayHidden(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         input input = new input();
         BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -410,8 +414,8 @@ public abstract class ListClass extends PropertyClass
         buffer.append(input.toString());
     }
 
-    public void displayView(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         List selectlist;
         String separator = getSeparator();
@@ -429,8 +433,8 @@ public abstract class ListClass extends PropertyClass
         }
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         if (getDisplayType().equals("input")) {
             input input = new input();
@@ -455,8 +459,8 @@ public abstract class ListClass extends PropertyClass
         }
     }
 
-    protected void displayRadioEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    protected void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         List list = getList(context);
         Map map = getMap(context);
@@ -486,8 +490,8 @@ public abstract class ListClass extends PropertyClass
             Object rawvalue = it.next();
             String value = getElementValue(rawvalue);
             input radio =
-                new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio
-                    : input.checkbox, prefix + name, value);
+                new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
+                    + name, value);
 
             if (selectlist.contains(value)) {
                 radio.setChecked(true);
@@ -514,8 +518,8 @@ public abstract class ListClass extends PropertyClass
 
         public int compare(Object o1, Object o2)
         {
-            ListItem s1 = (ListItem) map.get(o1);
-            ListItem s2 = (ListItem) map.get(o2);
+            ListItem s1 = (ListItem) this.map.get(o1);
+            ListItem s2 = (ListItem) this.map.get(o2);
 
             if ((s1 == null) && (s2 == null)) {
                 return 0;
@@ -533,8 +537,8 @@ public abstract class ListClass extends PropertyClass
         }
     }
 
-    protected void displaySelectEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    protected void displaySelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         select select = new select(prefix + name, 1);
         select.setMultiple(isMultiSelect());
@@ -595,8 +599,8 @@ public abstract class ListClass extends PropertyClass
 
     public abstract Map getMap(XWikiContext context);
 
-    public String displaySearch(String name, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
+    @Override
+    public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         if (getDisplayType().equals("input")) {
             return super.displaySearch(name, prefix, criteria, context);
@@ -607,18 +611,16 @@ public abstract class ListClass extends PropertyClass
         }
     }
 
-    protected String displayRadioSearch(String name, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
+    protected String displayRadioSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
         List list = getList(context);
         List selectlist = new ArrayList();
 
         /*
-         * BaseProperty prop = (BaseProperty)object.safeget(name); if (prop==null) { selectlist =
-         * new ArrayList(); } else if ((prop instanceof ListProperty)||(prop instanceof
-         * DBStringListProperty)) { selectlist = (List) prop.getValue(); } else { selectlist = new
-         * ArrayList(); selectlist.add(prop.getValue()); }
+         * BaseProperty prop = (BaseProperty)object.safeget(name); if (prop==null) { selectlist = new ArrayList(); }
+         * else if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) { selectlist = (List)
+         * prop.getValue(); } else { selectlist = new ArrayList(); selectlist.add(prop.getValue()); }
          */
 
         // Add options from Set
@@ -627,8 +629,7 @@ public abstract class ListClass extends PropertyClass
             String value = getElementValue(rawvalue);
             String display = getDisplayValue(rawvalue, name, getMap(context), context);
             input radio =
-                new input(getDisplayType().equals("radio") ? input.radio : input.checkbox, prefix
-                    + name, value);
+                new input(getDisplayType().equals("radio") ? input.radio : input.checkbox, prefix + name, value);
 
             if (selectlist.contains(value)) {
                 radio.setChecked(true);
@@ -642,8 +643,7 @@ public abstract class ListClass extends PropertyClass
         return buffer.toString();
     }
 
-    protected String displaySelectSearch(String name, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
+    protected String displaySelectSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         select select = new select(prefix + name, 1);
         select.setMultiple(true);
@@ -657,10 +657,9 @@ public abstract class ListClass extends PropertyClass
         List selectlist = (selectArray != null) ? Arrays.asList(selectArray) : new ArrayList();
 
         /*
-         * BaseProperty prop = (BaseProperty)object.safeget(name); if (prop==null) { selectlist =
-         * new ArrayList(); } else if ((prop instanceof ListProperty)||(prop instanceof
-         * DBStringListProperty)) { selectlist = (List) prop.getValue(); } else { selectlist = new
-         * ArrayList(); selectlist.add(prop.getValue()); }
+         * BaseProperty prop = (BaseProperty)object.safeget(name); if (prop==null) { selectlist = new ArrayList(); }
+         * else if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) { selectlist = (List)
+         * prop.getValue(); } else { selectlist = new ArrayList(); selectlist.add(prop.getValue()); }
          */
 
         // Add options from Set
@@ -679,6 +678,7 @@ public abstract class ListClass extends PropertyClass
         return select.toString();
     }
 
+    @Override
     public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         Object values = map.get(prefix);

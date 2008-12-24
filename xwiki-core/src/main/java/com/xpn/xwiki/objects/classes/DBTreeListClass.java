@@ -88,8 +88,7 @@ public class DBTreeListClass extends DBListClass
     }
 
     /**
-     * Gets an ordered list of items in the tree. This is necessary to make sure childs are coming
-     * after their parents
+     * Gets an ordered list of items in the tree. This is necessary to make sure childs are coming after their parents
      * 
      * @param treemap
      * @return list of ListItems
@@ -107,7 +106,8 @@ public class DBTreeListClass extends DBListClass
         if (list != null) {
             for (int i = 0; i < list.size(); i++) {
                 ListItem item = (ListItem) list.get(i);
-                ListItem item2 = new ListItem(item.getId(),getDisplayValue(item.getId(), "", map, context), item.getParent());
+                ListItem item2 =
+                    new ListItem(item.getId(), getDisplayValue(item.getId(), "", map, context), item.getParent());
                 treelist.add(item2);
                 addToTreeList(treelist, treemap, map, item.getId(), context);
             }
@@ -124,8 +124,8 @@ public class DBTreeListClass extends DBListClass
         list.add(item);
     }
 
-    public void displayView(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         List selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -145,8 +145,8 @@ public class DBTreeListClass extends DBListClass
         }
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         List selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -161,9 +161,9 @@ public class DBTreeListClass extends DBListClass
 
         if (isPicker()) {
             String result = displayTree(name, prefix, selectlist, "edit", context);
-            if (result.equals(""))
+            if (result.equals("")) {
                 displayTreeSelectEdit(buffer, name, prefix, object, context);
-            else {
+            } else {
                 displayHidden(buffer, name, prefix, object, context);
                 buffer.append(result);
             }
@@ -251,8 +251,7 @@ public class DBTreeListClass extends DBListClass
         return null;
     }
 
-    private String displayTree(String name, String prefix, List selectlist, String mode,
-        XWikiContext context)
+    private String displayTree(String name, String prefix, List selectlist, String mode, XWikiContext context)
     {
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         Map map = getMap(context);
@@ -265,8 +264,8 @@ public class DBTreeListClass extends DBListClass
         return context.getWiki().parseTemplate("treeview.vm", context);
     }
 
-    protected void addToSelect(select select, List selectlist, Map map, Map treemap,
-        String parent, String level, XWikiContext context)
+    protected void addToSelect(select select, List selectlist, Map map, Map treemap, String parent, String level,
+        XWikiContext context)
     {
         List list = (List) treemap.get(parent);
         if (list != null) {
@@ -279,14 +278,13 @@ public class DBTreeListClass extends DBListClass
                     option.setSelected(true);
                 }
                 select.addElement(option);
-                addToSelect(select, selectlist, map, treemap, item.getId(), level + "&nbsp;",
-                    context);
+                addToSelect(select, selectlist, map, treemap, item.getId(), level + "&nbsp;", context);
             }
         }
     }
 
-    protected void displayTreeSelectEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    protected void displayTreeSelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         select select = new select(prefix + name, 1);
         select.setMultiple(isMultiSelect());
@@ -315,31 +313,31 @@ public class DBTreeListClass extends DBListClass
 
     /**
      * <p>
-     * Computes the query corresponding to the current XProperty. The query is either manually
-     * specified by the XClass creator in the <tt>sql</tt> field, or, if the query field is blank,
-     * constructed using the <tt>classname</tt>, <tt>idField</tt>, <tt>valueField</tt> and
-     * <tt>parentField</tt> properties. The query is constructed according to the following rules:
+     * Computes the query corresponding to the current XProperty. The query is either manually specified by the XClass
+     * creator in the <tt>sql</tt> field, or, if the query field is blank, constructed using the <tt>classname</tt>,
+     * <tt>idField</tt>, <tt>valueField</tt> and <tt>parentField</tt> properties. The query is constructed according to
+     * the following rules:
      * </p>
      * <ul>
-     * <li>If no classname, id and value fields are selected, return a query that return no rows,
-     * as the parent is not enough to make a query.</li>
+     * <li>If no classname, id and value fields are selected, return a query that return no rows, as the parent is not
+     * enough to make a query.</li>
      * <li>If no parent field is provided, use the document "parent" medatada.</li>
-     * <li>If only the classname is provided, select all document names which have an object of
-     * that type, preserving the hierarchy defined by the parent field.</li>
+     * <li>If only the classname is provided, select all document names which have an object of that type, preserving
+     * the hierarchy defined by the parent field.</li>
      * <li>If only one of id and value is provided, use it for both columns.</li>
      * <li>If no classname is provided, assume the fields are document properties.</li>
      * <li>If the document is not used at all, don't put it in the query.</li>
      * <li>If the object is not used at all, don't put it in the query.</li>
      * </ul>
      * <p>
-     * The generated query always selects 3 columns, the first one is used as the stored value, the
-     * second one as the displayed value, and the third one defines the "parent" of the current
-     * value.
+     * The generated query always selects 3 columns, the first one is used as the stored value, the second one as the
+     * displayed value, and the third one defines the "parent" of the current value.
      * </p>
      * 
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
      */
+    @Override
     public String getQuery(XWikiContext context)
     {
         // First, get the hql query entered by the user.
@@ -370,8 +368,7 @@ public class DBTreeListClass extends DBListClass
                             "select distinct doc.fullName, doc.fullName, "
                                 + (hasParentField ? parentField : "doc.parent")
                                 + " from XWikiDocument as doc, BaseObject as obj"
-                                + " where doc.fullName=obj.name and obj.className='" + classname
-                                + "'";
+                                + " where doc.fullName=obj.name and obj.className='" + classname + "'";
                     } else {
                         // If none of the first 3 properties is specified, return a query that
                         // always returns no rows (only with the parent field no query can be made)
@@ -402,10 +399,8 @@ public class DBTreeListClass extends DBListClass
                 // if there is no classname specified and at least one of the selected columns is
                 // not an object property.
                 boolean usesDoc =
-                    idField.startsWith("doc.") || valueField.startsWith("doc.")
-                        || parentField.startsWith("doc.");
-                if ((!idField.startsWith("obj.") || !valueField.startsWith("obj.") || !parentField
-                    .startsWith("obj."))
+                    idField.startsWith("doc.") || valueField.startsWith("doc.") || parentField.startsWith("doc.");
+                if ((!idField.startsWith("obj.") || !valueField.startsWith("obj.") || !parentField.startsWith("obj."))
                     && !hasClassname) {
                     usesDoc = true;
                 }
@@ -439,8 +434,7 @@ public class DBTreeListClass extends DBListClass
                 } else {
                     select.append("idprop.value");
                     fromStatements.add("StringProperty as idprop");
-                    whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField
-                        + "'");
+                    whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
                 }
 
                 // Add the second column to the query.
@@ -454,8 +448,7 @@ public class DBTreeListClass extends DBListClass
                     } else {
                         select.append(", valueprop.value");
                         fromStatements.add("StringProperty as valueprop");
-                        whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='"
-                            + valueField + "'");
+                        whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
                     }
                 }
 
@@ -472,8 +465,7 @@ public class DBTreeListClass extends DBListClass
                     } else {
                         select.append(", parentprop.value");
                         fromStatements.add("StringProperty as parentprop");
-                        whereStatements.add("obj.id=parentprop.id.id and parentprop.id.name='"
-                            + parentField + "'");
+                        whereStatements.add("obj.id=parentprop.id.id and parentprop.id.name='" + parentField + "'");
                     }
                 }
                 // Let's create the complete query
@@ -494,8 +486,8 @@ public class DBTreeListClass extends DBListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOG.warn("Failed to parse SQL script [" + sql + "]. Internal error ["
-                + e.getMessage() + "]. Continuing with non-rendered script.");
+            LOG.warn("Failed to parse SQL script [" + sql + "]. Internal error [" + e.getMessage()
+                + "]. Continuing with non-rendered script.");
         }
         return sql;
     }

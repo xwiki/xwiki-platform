@@ -45,8 +45,7 @@ import com.xpn.xwiki.plugin.query.QueryPlugin;
 
 public class DBListClass extends ListClass
 {
-    protected static final String DEFAULT_QUERY =
-        "select doc.name from XWikiDocument doc where 1 = 0";
+    protected static final String DEFAULT_QUERY = "select doc.name from XWikiDocument doc where 1 = 0";
 
     private static final Log LOG = LogFactory.getLog(DBListClass.class);
 
@@ -87,8 +86,7 @@ public class DBListClass extends ListClass
                     } else if (res.length == 2) {
                         list2.add(new ListItem(res[0].toString(), res[1].toString()));
                     } else {
-                        list2.add(new ListItem(res[0].toString(), res[1].toString(), res[2]
-                            .toString()));
+                        list2.add(new ListItem(res[0].toString(), res[1].toString(), res[2].toString()));
                     }
                 }
             }
@@ -110,9 +108,7 @@ public class DBListClass extends ListClass
                     if ((xwiki.getHibernateStore() != null) && (!query.startsWith("/"))) {
                         list = makeList(xwiki.search(query, context));
                     } else {
-                        list =
-                            makeList(((QueryPlugin) xwiki.getPlugin("query", context)).xpath(
-                                query).list());
+                        list = makeList(((QueryPlugin) xwiki.getPlugin("query", context)).xpath(query).list());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -124,6 +120,7 @@ public class DBListClass extends ListClass
         return list;
     }
 
+    @Override
     public List getList(XWikiContext context)
     {
         List dblist = getDBList(context);
@@ -134,6 +131,7 @@ public class DBListClass extends ListClass
         return list;
     }
 
+    @Override
     public Map getMap(XWikiContext context)
     {
         List list = getDBList(context);
@@ -155,15 +153,13 @@ public class DBListClass extends ListClass
 
     /**
      * <p>
-     * Computes the query corresponding to the current XProperty. The query is either manually
-     * specified by the XClass creator in the <tt>sql</tt> field, or, if the query field is blank,
-     * constructed using the <tt>classname</tt>, <tt>idField</tt> and <tt>valueField</tt>
-     * properties. The query is constructed according to the following rules:
+     * Computes the query corresponding to the current XProperty. The query is either manually specified by the XClass
+     * creator in the <tt>sql</tt> field, or, if the query field is blank, constructed using the <tt>classname</tt>,
+     * <tt>idField</tt> and <tt>valueField</tt> properties. The query is constructed according to the following rules:
      * </p>
      * <ul>
      * <li>If no classname, id or value fields are selected, return a query that return no rows.</li>
-     * <li>If only the classname is provided, select all document names which have an object of
-     * that type.</li>
+     * <li>If only the classname is provided, select all document names which have an object of that type.</li>
      * <li>If only one of id and value is provided, select just one column.</li>
      * <li>If id = value, select just one column.</li>
      * <li>If no classname is provided, assume the fields are document properties.</li>
@@ -171,8 +167,8 @@ public class DBListClass extends ListClass
      * <li>If the object is not used at all, don't put it in the query.</li>
      * </ul>
      * <p>
-     * If there are two columns selected, use the first one as the stored value and the second one
-     * as the displayed value.
+     * If there are two columns selected, use the first one as the stored value and the second one as the displayed
+     * value.
      * </p>
      * 
      * @param context The current {@link XWikiContext context}.
@@ -202,8 +198,7 @@ public class DBListClass extends ListClass
                     if (hasClassname) {
                         sql =
                             "select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj"
-                                + " where doc.fullName=obj.name and obj.className='" + classname
-                                + "'";
+                                + " where doc.fullName=obj.name and obj.className='" + classname + "'";
                     } else {
                         // If none of the 3 properties is specified, return a query that always
                         // returns no rows.
@@ -225,15 +220,12 @@ public class DBListClass extends ListClass
                 // Check if the document and object are needed or not.
                 // The object is needed if there is a classname, or if at least one of the selected
                 // columns is an object property.
-                boolean usesObj =
-                    hasClassname || idField.startsWith("obj.") || valueField.startsWith("obj.");
+                boolean usesObj = hasClassname || idField.startsWith("obj.") || valueField.startsWith("obj.");
                 // The document is needed if one of the selected columns is a document property, or
                 // if there is no classname specified and at least one of the selected columns is
                 // not an object property.
                 boolean usesDoc = idField.startsWith("doc.") || valueField.startsWith("doc.");
-                if ((!idField.startsWith("obj.") || (hasValueField && !valueField
-                    .startsWith("obj.")))
-                    && !hasClassname) {
+                if ((!idField.startsWith("obj.") || (hasValueField && !valueField.startsWith("obj."))) && !hasClassname) {
                     usesDoc = true;
                 }
 
@@ -266,8 +258,7 @@ public class DBListClass extends ListClass
                 } else {
                     select.append("idprop.value");
                     fromStatements.add("StringProperty as idprop");
-                    whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField
-                        + "'");
+                    whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
                 }
 
                 // If specified, add the second column to the query.
@@ -279,8 +270,7 @@ public class DBListClass extends ListClass
                     } else {
                         select.append(", valueprop.value");
                         fromStatements.add("StringProperty as valueprop");
-                        whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='"
-                            + valueField + "'");
+                        whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
                     }
                 }
                 // Let's create the complete query
@@ -301,8 +291,8 @@ public class DBListClass extends ListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOG.warn("Failed to parse SQL script [" + sql + "]. Internal error ["
-                + e.getMessage() + "]. Continuing with non-rendered script.");
+            LOG.warn("Failed to parse SQL script [" + sql + "]. Internal error [" + e.getMessage()
+                + "]. Continuing with non-rendered script.");
         }
         return sql;
     }
@@ -350,7 +340,7 @@ public class DBListClass extends ListClass
     public List getCachedDBList(XWikiContext context)
     {
         if (isCache()) {
-            return cachedDBList;
+            return this.cachedDBList;
         } else {
             return (List) context.get(context.getDatabase() + ":" + getFieldFullName());
         }
@@ -365,6 +355,7 @@ public class DBListClass extends ListClass
         }
     }
 
+    @Override
     public void flushCache()
     {
         this.cachedDBList = null;
@@ -388,8 +379,9 @@ public class DBListClass extends ListClass
                 StringTokenizer st = new StringTokenizer(firstPart, " ,()", true);
                 ArrayList words = new ArrayList();
 
-                while (st.hasMoreTokens())
+                while (st.hasMoreTokens()) {
                     words.add(st.nextToken().toLowerCase());
+                }
 
                 int comma = words.indexOf(",") - 1;
                 while (words.get(comma).toString().compareTo(" ") == 0) {
@@ -464,8 +456,8 @@ public class DBListClass extends ListClass
     }
 
     // override the method from parent ListClass
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         // input display
         if (getDisplayType().equals("input")) {
@@ -477,8 +469,9 @@ public class DBListClass extends ListClass
 
             BaseProperty prop = (BaseProperty) object.safeget(name);
             String val = "";
-            if (prop != null)
+            if (prop != null) {
                 val = prop.toFormString();
+            }
 
             if (isPicker()) {
                 input.addAttribute("autocomplete", "off");
@@ -504,8 +497,9 @@ public class DBListClass extends ListClass
                         hidden.setID(prefix + name);
                         hidden.setName(prefix + name);
                         hidden.setType("hidden");
-                        if (val != null && !val.equals(""))
+                        if (val != null && !val.equals("")) {
                             hidden.setValue(val);
+                        }
                         buffer.append(hidden.toString());
 
                         input.setValue(getValue(val, hibquery, context));
@@ -514,17 +508,15 @@ public class DBListClass extends ListClass
                 }
 
                 String script =
-                    "\"" + path + "?xpage=suggest&amp;classname=" + classname + "&amp;fieldname="
-                        + fieldname + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol
-                        + "&amp;\"";
+                    "\"" + path + "?xpage=suggest&amp;classname=" + classname + "&amp;fieldname=" + fieldname
+                        + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
                 String varname = "\"input\"";
                 String seps = "\"" + this.getSeparators() + "\"";
                 if (isMultiSelect()) {
-                    input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:"
-                        + varname + ", seps:" + seps + "} )");
+                    input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:" + varname + ", seps:"
+                        + seps + "} )");
                 } else {
-                    input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:"
-                        + varname + "} )");
+                    input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:" + varname + "} )");
                 }
             }
 
@@ -552,8 +544,8 @@ public class DBListClass extends ListClass
         }
     }
 
-    public void displayView(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         if (isPicker() && getSql().compareTo("") != 0) {
             BaseProperty prop = (BaseProperty) object.safeget(name);

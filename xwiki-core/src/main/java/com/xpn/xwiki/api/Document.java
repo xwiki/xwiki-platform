@@ -1486,6 +1486,11 @@ public class Document extends Api
         getDoc().setContent(content);
     }
 
+    public void setSyntaxId(String syntaxId)
+    {
+        getDoc().setSyntaxId(syntaxId);
+    }
+
     public void setDefaultTemplate(String dtemplate)
     {
         getDoc().setDefaultTemplate(dtemplate);
@@ -1901,8 +1906,13 @@ public class Document extends Api
      * @param targetSyntaxId the syntax to convert to (eg "xwiki/2.0", "xhtml/1.0", etc)
      * @throws XWikiException if an exception occurred during the conversion process
      */
-    public void convertSyntax(String targetSyntaxId) throws XWikiException
+    public boolean convertSyntax(String targetSyntaxId) throws XWikiException
     {
-        this.doc.convertSyntax(targetSyntaxId);
+        try {
+            this.doc.convertSyntax(targetSyntaxId);
+        } catch (Exception ex) {
+            return false;
+        }
+        return true;
     }
 }

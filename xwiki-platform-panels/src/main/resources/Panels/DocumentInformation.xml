@@ -225,7 +225,7 @@ $xwiki.jsx.use($paneldoc.fullName)
 <number>0</number>
 <className>XWiki.JavaScriptExtension</className>
 <property>
-<cache>forbid</cache>
+<cache>long</cache>
 </property>
 <property>
 <code>// Make sure the XWiki "namespace" is valid.

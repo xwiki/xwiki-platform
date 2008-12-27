@@ -108,7 +108,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("link/links12", false);
         suite.addTestsFromResource("link/links13", false);
         suite.addTestsFromResource("link/links14", false);
-        
+        suite.addTestsFromResource("link/links15", false);
+        suite.addTestsFromResource("link/links16", false);
+
         // Lists
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("list/list2", false);
@@ -126,7 +128,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("list/definitionlist4", false);
         suite.addTestsFromResource("list/definitionlist5", false);
         suite.addTestsFromResource("list/definitionlist6", false);
-        
+
         // Other
         suite.addTestsFromResource("escape/escape1", false);
         suite.addTestsFromResource("escape/escape2", false);
@@ -164,7 +166,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image1", false);
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
-        
+
         return new RenderingPlexusTestSetup(suite);
     }
 }

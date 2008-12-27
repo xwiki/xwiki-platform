@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.rendering.listener.DefaultAttachement;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.SectionLevel;
@@ -41,10 +42,12 @@ public class BlockTest extends TestCase
 {
     public void testGetBlocksByType()
     {
-        ParagraphBlock pb1 = new ParagraphBlock(Arrays.<Block>asList(new SectionBlock(Arrays.asList(new Block[] {
-            new WordBlock("title1")}), SectionLevel.LEVEL1)));
-        ParagraphBlock pb2 = new ParagraphBlock(Arrays.<Block>asList(new SectionBlock(Arrays.asList(new Block[] {
-            new WordBlock("title2")}), SectionLevel.LEVEL2)));
+        ParagraphBlock pb1 =
+            new ParagraphBlock(Arrays.<Block> asList(new SectionBlock(Arrays
+                .asList(new Block[] {new WordBlock("title1")}), SectionLevel.LEVEL1)));
+        ParagraphBlock pb2 =
+            new ParagraphBlock(Arrays.<Block> asList(new SectionBlock(Arrays
+                .asList(new Block[] {new WordBlock("title2")}), SectionLevel.LEVEL2)));
         ParagraphBlock pb3 = new ParagraphBlock(Arrays.asList(new Block[] {pb1, pb2}));
 
         List<SectionBlock> results = pb1.getChildrenByType(SectionBlock.class, true);
@@ -58,60 +61,60 @@ public class BlockTest extends TestCase
     {
         Block wb1 = new WordBlock("block1");
         Block wb2 = new WordBlock("block2");
-        
+
         List<Block> children = new ArrayList<Block>();
         children.add(wb1);
         children.add(wb2);
-        
+
         ParagraphBlock pb = new ParagraphBlock(children);
-        
+
         Block wb = new WordBlock("block");
-        
+
         pb.insertChildAfter(wb, wb1);
         assertSame(wb, pb.getChildren().get(1));
-        
+
         pb.insertChildAfter(wb, wb2);
         assertSame(wb, pb.getChildren().get(3));
     }
-    
+
     public void testInsertChildBefore()
     {
         Block wb1 = new WordBlock("block1");
         Block wb2 = new WordBlock("block2");
-        
+
         List<Block> children = new ArrayList<Block>();
         children.add(wb1);
         children.add(wb2);
-        
+
         ParagraphBlock pb = new ParagraphBlock(children);
-        
+
         Block wb = new WordBlock("block");
-        
+
         pb.insertChildBefore(wb, wb1);
         assertSame(wb, pb.getChildren().get(0));
-        
+
         pb.insertChildBefore(wb, wb2);
         assertSame(wb, pb.getChildren().get(2));
     }
-    
+
     public void testReplaceBlock()
     {
         Block wb = new WordBlock("block");
         Block parentBlock = new ParagraphBlock(Arrays.asList(wb));
-        
+
         Block newBlock1 = new WordBlock("block1");
         Block newBlock2 = new WordBlock("block2");
         wb.replace(Arrays.asList(newBlock1, newBlock2));
-        
+
         assertEquals(2, parentBlock.getChildren().size());
         assertSame(newBlock1, parentBlock.getChildren().get(0));
         assertSame(newBlock2, parentBlock.getChildren().get(1));
     }
-    
+
     public void testClone()
     {
         WordBlock wb = new WordBlock("block");
-        ImageBlock ib = new ImageBlock(new DocumentImage("document", "attachment"), true);
+        ImageBlock ib = new ImageBlock(new DocumentImage(new DefaultAttachement("document", "attachment")), true);
         Link link = new Link();
         link.setReference("reference");
         LinkBlock lb = new LinkBlock(Arrays.asList((Block) new WordBlock("label")), link, false);
@@ -119,7 +122,7 @@ public class BlockTest extends TestCase
         Block rootBlock = new ParagraphBlock(Arrays.asList((Block) wb, ib, lb, xb));
 
         Block newRootBlock = rootBlock.clone();
-        
+
         assertNotSame(rootBlock, newRootBlock);
         assertNotSame(wb, newRootBlock.getChildren().get(0));
         assertNotSame(ib, newRootBlock.getChildren().get(1));

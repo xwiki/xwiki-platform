@@ -25,8 +25,10 @@ import java.util.Map;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
+import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
@@ -41,16 +43,20 @@ public class XHTMLLinkRenderer
 
     private RenderingConfiguration configuration;
 
+    private AttachmentParser attachmentParser;
+
     private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
-    
-    public XHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, RenderingConfiguration configuration)
+
+    public XHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, RenderingConfiguration configuration,
+        AttachmentParser attachmentParser)
     {
         this.documentAccessBridge = documentAccessBridge;
         this.configuration = configuration;
+        this.attachmentParser = attachmentParser;
         this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
     }
 
-    public void beginRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, 
+    public void beginRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI,
         Map<String, String> parameters)
     {
         try {
@@ -69,20 +75,20 @@ public class XHTMLLinkRenderer
         }
     }
 
-    private void beginRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, 
+    private void beginRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI,
         Map<String, String> parameters) throws Exception
     {
-        // Add an XML comment as a placeholder so that the XHTML parser can find the document name. 
-        // Otherwise it would be too difficult to transform a URL into a document name especially since 
+        // Add an XML comment as a placeholder so that the XHTML parser can find the document name.
+        // Otherwise it would be too difficult to transform a URL into a document name especially since
         // a link can refer to an external URL.
         printer.printXMLComment("startwikilink:" + this.xwikiSyntaxLinkRenderer.renderLinkReference(link));
 
         Map<String, String> spanAttributes = new LinkedHashMap<String, String>();
         Map<String, String> aAttributes = new LinkedHashMap<String, String>();
-        
+
         // Add all parameters to the A attributes
         aAttributes.putAll(parameters);
-        
+
         if (link.isExternalLink()) {
             spanAttributes.put("class", "wikiexternallink");
             if (isFreeStandingURI) {
@@ -93,7 +99,15 @@ public class XHTMLLinkRenderer
             if (link.getType() == LinkType.INTERWIKI) {
                 // TODO: Resolve the Interwiki link
             } else {
-                aAttributes.put("href", link.getReference());
+                if (link.getReference().startsWith("attach:")) {
+                    // use the default attachment syntax parser to extract document name and attchment name
+                    Attachment attachment =
+                        this.attachmentParser.parse(link.getReference().substring("attach:".length()));
+                    aAttributes.put("href", this.documentAccessBridge.getAttachmentURL(attachment.getDocumentName(),
+                        attachment.getAttachmentName()));
+                } else {
+                    aAttributes.put("href", link.getReference());
+                }
             }
 
             printer.printXMLStartElement("span", spanAttributes);
@@ -116,10 +130,10 @@ public class XHTMLLinkRenderer
                 printer.printXMLStartElement("span", spanAttributes);
                 printer.printXMLStartElement("a", aAttributes);
             }
-        }        
+        }
     }
 
-    public void endRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, 
+    public void endRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI,
         boolean generateLinkContent) throws Exception
     {
         // If there was no link content then generate it based on the passed reference
@@ -128,10 +142,10 @@ public class XHTMLLinkRenderer
             printer.printXML(link.getReference());
             printer.printXMLEndElement("span");
         }
-        
+
         printer.printXMLEndElement("a");
         printer.printXMLEndElement("span");
-        
+
         // Add a XML comment to signify the end of the link.
         printer.printXMLComment("stopwikilink");
     }

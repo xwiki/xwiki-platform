@@ -4,7 +4,7 @@
 ~First letter is escaped
 ~ A space just after a tilda
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
@@ -31,11 +31,11 @@ onWord [tilda]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|xhtml
 .#-----------------------------------------------------
 <p>First letter is escaped<br/>&nbsp;A space just after a tilda</p>
 .#-----------------------------------------------------
-.expect|xwiki/2.0
+.expect|xwiki
 .#-----------------------------------------------------
 First letter is escaped
  A space just after a tilda

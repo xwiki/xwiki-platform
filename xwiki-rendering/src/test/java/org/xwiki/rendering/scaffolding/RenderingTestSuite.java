@@ -30,6 +30,7 @@ import junit.framework.TestSuite;
 
 import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
+import org.xwiki.rendering.internal.parser.DefaultAttachmentParser;
 import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererType;
@@ -56,6 +57,7 @@ public class RenderingTestSuite extends TestSuite
         this.rendererFactory = new DefaultPrintRendererFactory();
         this.rendererFactory.setDocumentAccessBridge(new MockDocumentAccessBridge());
         this.rendererFactory.setRenderingConfiguration(new DefaultRenderingConfiguration());
+        this.rendererFactory.setAttachmentParser(new DefaultAttachmentParser());
     }
 
     public void addTestsFromResource(String testResourceName, boolean runTransformations) throws Exception

@@ -24,6 +24,10 @@ import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
+import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Image;
@@ -35,14 +39,11 @@ import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.MonitoringWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
-import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
 
 /**
  * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
@@ -71,26 +72,26 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     private XHTMLWikiPrinter xhtmlWikiPrinter;
 
     private XWikiSyntaxImageRenderer imageRenderer;
-    
+
     /**
      * The temporary Printer used to redirect all outputs when computing the section title.
      * 
      * @see #originalPrinter
      */
     private WikiPrinter sectionTitlePrinter;
-    
+
     /**
      * @param printer the object to which to write the XHTML output to
      * @param documentAccessBridge see {@link #documentAccessBridge}
      * @param configuration the rendering configuration
      */
     public XHTMLRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
-        RenderingConfiguration configuration)
+        RenderingConfiguration configuration, AttachmentParser attachmentParser)
     {
         super(printer);
 
         this.documentAccessBridge = documentAccessBridge;
-        this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, configuration);
+        this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, configuration, attachmentParser);
         this.macroRenderer = new XHTMLMacroRenderer();
         this.configuration = configuration;
         this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
@@ -761,27 +762,28 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         String imageURL;
         if (image.getType() == ImageType.DOCUMENT) {
             DocumentImage documentImage = (DocumentImage) image;
-             try {
-                 imageURL = this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), 
-                     documentImage.getAttachmentName());
-             } catch (Exception e) {
-                 // TODO: Handle exceptions in a better manner
-                 throw new RuntimeException("Failed to get attachment URL for [" + image + "]", e);
-             }
+            try {
+                imageURL =
+                    this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), documentImage
+                        .getAttachmentName());
+            } catch (Exception e) {
+                // TODO: Handle exceptions in a better manner
+                throw new RuntimeException("Failed to get attachment URL for [" + image + "]", e);
+            }
         } else {
             URLImage urlImage = (URLImage) image;
             imageURL = urlImage.getURL();
         }
-        
+
         // Then add it as an attribute of the IMG element.
         Map<String, String> attributes = new LinkedHashMap<String, String>();
         attributes.put("src", imageURL);
-        
+
         // Add the class if we're on a freestanding uri
         if (isFreeStandingURI) {
             attributes.put("class", "wikimodel-freestanding");
         }
-        
+
         // Add the other parameters as attributes
         attributes.putAll(parameters);
 
@@ -789,14 +791,14 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         if (!parameters.containsKey("alt")) {
             attributes.put("alt", image.getName());
         }
-        
+
         // And generate the XHTML IMG element. We need to save the image location in XML comment so that
         // it can be reconstructed later on when moving from XHTML to wiki syntax.
         getXHTMLWikiPrinter().printXMLComment("startimage:" + this.imageRenderer.renderImage(image));
         getXHTMLWikiPrinter().printXMLElement("img", attributes);
         getXHTMLWikiPrinter().printXMLComment("stopimage");
     }
-    
+
     /**
      * {@inheritDoc}
      * 

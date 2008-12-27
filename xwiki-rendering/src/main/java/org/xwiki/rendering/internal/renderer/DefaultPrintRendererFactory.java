@@ -19,20 +19,21 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
-import org.xwiki.rendering.renderer.XHTMLRenderer;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.PrintRendererType;
-import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
-import org.xwiki.rendering.renderer.EventsRenderer;
-import org.xwiki.rendering.renderer.TexRenderer;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.parser.AttachmentParser;
+import org.xwiki.rendering.renderer.EventsRenderer;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.PrintRendererType;
+import org.xwiki.rendering.renderer.TexRenderer;
+import org.xwiki.rendering.renderer.XHTMLRenderer;
+import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
- * Easily create Print renderers instances.
- *
+ * Easily create Print Renderers instances.
+ * 
  * @version $Id: $
  * @since 1.6M2
  * @see PrintRendererFactory
@@ -43,13 +44,17 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
 
     private RenderingConfiguration renderingConfiguration;
 
+    private AttachmentParser attachmentParser;
+
     public PrintRenderer createRenderer(PrintRendererType type, WikiPrinter printer)
     {
         PrintRenderer result;
 
         switch (type) {
             case XHTML:
-                result = new XHTMLRenderer(printer, this.documentAccessBridge, this.renderingConfiguration);
+                result =
+                    new XHTMLRenderer(printer, this.documentAccessBridge, this.renderingConfiguration,
+                        this.attachmentParser);
                 break;
             case XWIKISYNTAX:
                 result = new XWikiSyntaxRenderer(printer);
@@ -75,5 +80,13 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
     public void setRenderingConfiguration(RenderingConfiguration renderingConfiguration)
     {
         this.renderingConfiguration = renderingConfiguration;
+    }
+
+    /**
+     * @since 1.7.1
+     */
+    public void setAttachmentParser(AttachmentParser attachmentParser)
+    {
+        this.attachmentParser = attachmentParser;
     }
 }

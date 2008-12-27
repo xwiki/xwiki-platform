@@ -22,12 +22,13 @@ package org.xwiki.rendering.internal.parser;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.parser.ImageParser;
 
 /**
  * Parses XWiki image definitions, using either a URL (pointing to an imagep or the following format:
- * <code>[wiki:Space.Page]^imageName</code> where <code>imageName</code> is the name of the image attachment
- * (for example "my.png").
+ * <code>[wiki:Space.Page]^imageName</code> where <code>imageName</code> is the name of the image attachment (for
+ * example "my.png").
  * 
  * @version $Id$
  * @since 1.7M3
@@ -35,7 +36,13 @@ import org.xwiki.rendering.parser.ImageParser;
 public class XWikiImageParser implements ImageParser
 {
     /**
+     * Used to parse the attachment syntax to extract document name and attachment name.
+     */
+    private AttachmentParser attachmentParser;
+
+    /**
      * {@inheritDoc}
+     * 
      * @see ImageParser#parse(String)
      */
     public Image parse(String imageLocation)
@@ -47,18 +54,9 @@ public class XWikiImageParser implements ImageParser
         if (imageLocation.startsWith("http://")) {
             result = new URLImage(imageLocation);
         } else {
-            String documentName = null;
-            String attachmentName;
-            int attachmentSeparatorPosition = imageLocation.indexOf("@");
-            if (attachmentSeparatorPosition > -1) {
-                documentName = imageLocation.substring(0, attachmentSeparatorPosition);
-                attachmentName = imageLocation.substring(attachmentSeparatorPosition + 1);
-            } else {
-                attachmentName = imageLocation;
-            }
-            result = new DocumentImage(documentName, attachmentName); 
+            result = new DocumentImage(this.attachmentParser.parse(imageLocation));
         }
-        
-        return result; 
+
+        return result;
     }
 }

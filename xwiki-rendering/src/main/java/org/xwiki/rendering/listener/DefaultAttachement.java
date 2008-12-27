@@ -20,21 +20,31 @@
 package org.xwiki.rendering.listener;
 
 /**
- * Image located in a wiki Document.
+ * Default implementation of {@link Attachment}.
  * 
  * @version $Id$
- * @since 1.7RC1
+ * @since 1.7.1
  */
-public class DocumentImage extends AbstractImage implements Attachment
+public class DefaultAttachement implements Attachment
 {
-    private Attachment attachment;
+    /**
+     * The name of the document containing the attachment.
+     */
+    private String documentName;
 
     /**
-     * @since 1.7.1
+     * The name of the attachment.
      */
-    public DocumentImage(Attachment attachment)
+    private String attachmentName;
+
+    /**
+     * @param documentName the name of the document containing the attachment.
+     * @param attachmentName the name of the attachment.
+     */
+    public DefaultAttachement(String documentName, String attachmentName)
     {
-        this.attachment = attachment;
+        this.documentName = documentName;
+        this.attachmentName = attachmentName;
     }
 
     /**
@@ -44,7 +54,7 @@ public class DocumentImage extends AbstractImage implements Attachment
      */
     public String getDocumentName()
     {
-        return this.attachment.getDocumentName();
+        return this.documentName;
     }
 
     /**
@@ -54,37 +64,6 @@ public class DocumentImage extends AbstractImage implements Attachment
      */
     public String getAttachmentName()
     {
-        return this.attachment.getAttachmentName();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractImage#getType()
-     */
-    public ImageType getType()
-    {
-        return ImageType.DOCUMENT;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractImage#getName()
-     */
-    public String getName()
-    {
-        return getAttachmentName();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return "document = [" + getDocumentName() + "], attachment = [" + getAttachmentName() + "]";
+        return this.attachmentName;
     }
 }

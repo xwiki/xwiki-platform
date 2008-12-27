@@ -25,6 +25,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
+import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 
 /**
  * Cache proxy for {@link WysiwygServiceAsync}. This proxy is used to store on the client a set of values from the
@@ -86,8 +87,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * @see WysiwygServiceAsync#syncEditorContent(Revision, String, int, AsyncCallback)
      */
     public void syncEditorContent(Revision syncedRevision, String pageName, int version, 
-        AsyncCallback<SyncResult> async)
-    {
+        AsyncCallback<SyncResult> async) throws XWikiGWTException {
         service.syncEditorContent(syncedRevision, pageName, version, async);
     }
 

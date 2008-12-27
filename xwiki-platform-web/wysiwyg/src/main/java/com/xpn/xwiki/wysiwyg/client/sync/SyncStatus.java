@@ -30,11 +30,17 @@ public class SyncStatus
 
     protected String pageName;
 
-    public SyncStatus(String pageName, String content)
+    private String lastXWikiVersion;
+
+    private String lastXWikiContent;
+
+    public SyncStatus(String pageName, String version, String content)
     {
         this.pageName = pageName;
         versions.add("");
         addVersion(content);
+        this.lastXWikiVersion = version;
+        this.lastXWikiContent = content;
     }
 
     public List<String> getVersions()
@@ -62,4 +68,18 @@ public class SyncStatus
     {
         return getVersion(getCurrentVersionNumber());
     }
+
+    public String getLastXWikiVersion() {
+        return lastXWikiVersion;
+    }
+
+    public String getLastXWikiContent() {
+        return lastXWikiContent;
+    }
+    
+    public void setLastXWikiContent(String version, String content) {
+        this.lastXWikiVersion = version;
+        this.lastXWikiContent = content;
+    }
+
 }

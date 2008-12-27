@@ -49,6 +49,17 @@
       <role-hint>xwiki/2.0</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.XWikiImageParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.AttachmentParser</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.parser.AttachmentParser</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.DefaultAttachmentParser</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
@@ -232,6 +243,9 @@
         </requirement>
         <requirement>
           <role>org.xwiki.rendering.configuration.RenderingConfiguration</role>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.rendering.parser.AttachmentParser</role>
         </requirement>
       </requirements>
     </component>

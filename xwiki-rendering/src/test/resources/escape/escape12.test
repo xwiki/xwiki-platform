@@ -1,5 +1,5 @@
 .#---------------------------------------------------------------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .# Verify that the XHTML parser is able to automatically escape characters having a meaning in wiki syntax.
 .# Perform check for ensuring a bold at beginning of a line will have its following charater escaped if 
 .# it's a space to prevent confusing it for a list.

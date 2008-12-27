@@ -30,6 +30,7 @@ import junit.framework.TestSuite;
 
 import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
+import org.xwiki.rendering.internal.parser.DefaultAttachmentParser;
 import org.xwiki.rendering.internal.parser.DefaultSyntaxFactory;
 import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
 import org.xwiki.rendering.parser.Syntax;
@@ -46,7 +47,7 @@ public class RenderingTestSuite extends TestSuite
     private DefaultPrintRendererFactory rendererFactory;
 
     private SyntaxFactory syntaxFactory;
-    
+
     private class Data
     {
         public Map<String, String> inputs = new HashMap<String, String>();
@@ -60,6 +61,7 @@ public class RenderingTestSuite extends TestSuite
         this.rendererFactory = new DefaultPrintRendererFactory();
         this.rendererFactory.setDocumentAccessBridge(new MockDocumentAccessBridge());
         this.rendererFactory.setRenderingConfiguration(new DefaultRenderingConfiguration());
+        this.rendererFactory.setAttachmentParser(new DefaultAttachmentParser());
         this.syntaxFactory = new DefaultSyntaxFactory();
     }
 

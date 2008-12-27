@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import org.xwiki.rendering.listener.DefaultAttachement;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
@@ -28,7 +29,7 @@ import org.xwiki.rendering.parser.ImageParser;
  * Since we need to have wiki syntax-specific image parsers, this generic parser allows at least to the reference
  * displayed when using syntaxes other than XWiki (which has its specific image parser, see {@link XWikiImageParser}),
  * while waiting for specialized image parsers to be written.
- *
+ * 
  * @version $Id$
  * @since 1.7M3
  */
@@ -36,6 +37,7 @@ public class GenericImageParser implements ImageParser
 {
     /**
      * {@inheritDoc}
+     * 
      * @see ImageParser#parse(String)
      */
     public Image parse(String imageLocation)
@@ -44,8 +46,9 @@ public class GenericImageParser implements ImageParser
         if (imageLocation.startsWith("http://")) {
             result = new URLImage(imageLocation);
         } else {
-            result = new DocumentImage(null, imageLocation);
+            result = new DocumentImage(new DefaultAttachement(null, imageLocation));
         }
+
         return result;
     }
 }

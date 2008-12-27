@@ -27,7 +27,7 @@ import org.xwiki.rendering.parser.ImageParser;
 
 /**
  * Parses XWiki image definitions, using either a URL (pointing to an imagep or the following format:
- * <code>[wiki:Space.Page]^imageName</code> where <code>imageName</code> is the name of the image attachment (for
+ * <code>wiki:Space.Page@attachmentName</code> where <code>imageName</code> is the name of the image attachment (for
  * example "my.png").
  * 
  * @version $Id$

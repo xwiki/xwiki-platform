@@ -14,13 +14,15 @@
 <creationDate>1154086661000</creationDate>
 <date>1212586489000</date>
 <contentUpdateDate>1212586489000</contentUpdateDate>
-<version>6.1</version>
-<title></title>
+<version>1.1</version>
+<title>Document Information</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -104,19 +106,24 @@
 #if(($tdoc.language=="")&amp;&amp;($xwiki.isMultiLingual()))
 &lt;dt&gt;&lt;label for="xwikidoclanguageinput2"&gt;$msg.get("panels.documentInformation.defaultLanguage")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;&lt;/dd&gt;
 #end
-#if ($xwiki.getConfiguredSyntaxes().size() &gt; 1)
+##--------------------------------------------------------------------------
+## Display wiki syntax combo box if there's more than one configured syntax.
+##--------------------------------------------------------------------------
+$xwiki.jsx.use($paneldoc.fullName)
+#if($xwiki.getConfiguredSyntaxes().size() &gt; 1)
 &lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;Page Syntax&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;
 &lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
 &lt;option value="xwiki/1.0"#if($tdoc.getSyntaxId().equalsIgnoreCase("xwiki/1.0")) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
 #foreach ($syntax in $syntaxFactory.getAvailableSyntaxes())
-  #if ($xwiki.getConfiguredSyntaxes().contains($syntax.toIdString()))
+  #if($xwiki.getConfiguredSyntaxes().contains($syntax.toIdString()))
     &lt;option value="$syntax.toIdString()"#if($tdoc.getSyntaxId().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
   #end  
 #end
 &lt;/select&gt;
 &lt;/dd&gt;
 #end
+##--------------------------------------------------------------------------
 #if($pages.size() != 0)
   #if($pages.size() == 1)
     &lt;dt&gt;$msg.get("panels.documentInformation.includesOne", [$pages.size()])&lt;/dt&gt;
@@ -149,7 +156,7 @@
 </object>
 <object>
 <class>
-<name>XWiki.TagClass</name>
+<name>XWiki.JavaScriptExtension</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -157,28 +164,247 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<tags>
+<cache>
 <cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>tags</name>
-<number>1</number>
-<prettyName>Tags</prettyName>
-<relationalStorage>1</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
 <separator> </separator>
 <separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
 <size>30</size>
 <unmodifiable>0</unmodifiable>
-<values></values>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>onDemand=On demand|always=Always</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
+</use>
 </class>
 <name>Panels.DocumentInformation</name>
 <number>0</number>
-<className>XWiki.TagClass</className>
+<className>XWiki.JavaScriptExtension</className>
 <property>
-<tags/>
+<cache>forbid</cache>
+</property>
+<property>
+<code>// Make sure the XWiki "namespace" is valid.
+if (typeof(XWiki) == 'undefined') {
+  XWiki = new Object();
+}
+
+/**
+ * When the user switches to a different syntax, this component offers the ability to also convert the document content
+ * to the new syntax, if a valid converter is available on the server.
+ */
+XWiki.SyntaxConverter = Class.create({
+  /**
+   * Valid syntaxes as the initial content syntax. If the originally selected syntax is not among these, then a
+   * conversion is not proposed.
+   */
+  validSourceSyntaxes : ["xwiki/2.0", "confluence/1.0", "jspwiki/1.0", "creole/1.0", "mediawiki/1.0", "twiki/1.0", "xhtml/1.0", "html/4.01"],
+
+  /**
+   * Valid syntaxes as the target content syntax. If the newly selected syntax is not among these, then a conversion is
+   * not proposed.
+   */
+  validTargetSyntaxes : ["xwiki/2.0", "xhtml/1.0"],
+
+  /**
+   * Constructor. If the syntax field is present in the HTML (and it should, as the extension is pulled iff the syntax
+   * field is displayed), then adds the custom behavior to that field.
+   */
+  initialize : function() {
+    if ($("xwikidocsyntaxinput2")) {
+      this.gatherMembers();
+      this.addSyntaxChangeListener();
+    }
+  },
+
+  /**
+   * Gather/create the data needed for this component to work.
+   */
+  gatherMembers : function() {
+    this.contentField = $('content');
+    this.syntaxField = $('xwikidocsyntaxinput2');
+    this.storeNewSyntax();
+    var name = $$("meta[name='document']");
+    if (name.length &gt; 0) {
+      // The meta element holding the document name is present. Use it.
+      this.name = name[0].content;
+    } else {
+      // The metadata is missing, probably an old or custom skin. Try to obtain the document name from the URL.
+      if (document.location.pathname.indexOf('/edit/') &gt;= 0) {
+        this.name = document.location.pathname.substring(document.location.pathname.indexOf('/edit/') + 6).replace("/", ".");
+      } else {
+        // Use the default name, as this is not a critical part.
+        this.name = "Main.WebHome";
+      }
+    }
+    this.loading = new Element("div").setStyle({backgroundColor: '#000', backgroundImage: 'url($xwiki.getSkinFile('icons/ajax-loader.gif'))', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', opacity: 0.6}).absolutize().clonePosition(this.contentField).hide();
+    document.body.appendChild(this.loading);
+  },
+
+  /** Add the event listener that triggers the custom behavior when the syntax choice is changed. */
+  addSyntaxChangeListener : function() {
+    Event.observe(this.syntaxField, 'change', this.syntaxChanged.bind(this));
+  },
+
+  /**
+   * Callback function triggered when the user selects a new syntax. If the combination of the previously and newly
+   * selected syntaxes are a valid combination for converting the content, then send an AJAX request to the server to
+   * obtain the converted content from the editor. This data might be newer than what is stored on the server (the user
+   * could have made changes), so always convert the current content of the editing area.
+   */
+  syntaxChanged : function() {
+    var syntaxIndex = this.syntaxField.selectedIndex;
+    var syntax = this.syntaxField.options.item(syntaxIndex).value;
+    if (this.validSourceSyntaxes.indexOf(this.originalSyntax) == -1 || this.validTargetSyntaxes.indexOf(syntax) == -1) {
+      // Server does not support this conversion. Simply accept the new syntax.
+    } else if (confirm("Do you want to also convert the document's content to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content.")) {
+      this.disableEditingArea();
+      var url = '$doc.getURL('view', 'action=convertSyntax&amp;xpage=plain&amp;documentName=')' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
+      new Ajax.Request(
+        url,
+        {
+          method: 'post',
+          parameters: {
+            content: $('content').value
+          },
+          onSuccess: this.successfulConversion.bindAsEventListener(this),
+          onFailure: this.failedConversion.bindAsEventListener(this),
+          onComplete: this.enableEditingArea.bind(this)
+        }
+      );
+      return;
+    }
+    this.storeNewSyntax();
+  },
+
+  /**
+   * Callback function triggered by a successful response from the server. The converted content should be in the
+   * response text. This method re-enables the editing area and sets the new content.
+   * 
+   * @param response The Ajax.Response object, wrapping the HTTP response received from the server.
+   * @todo How to set the content in the WYSIWYG editor?
+   */
+  successfulConversion : function(response) {
+    this.storeNewSyntax();
+    this.contentField.value = response.responseText.substring(3);
+  },
+
+  /**
+   * Callback function triggered by a failed response from the server. This method informs the user of the error and
+   * re-enables the editing area with the old content and syntax.
+   * 
+   * @param response The Ajax.Response object, wrapping the HTTP response received from the server.
+   * @todo The cause of the error should be placed in the context and sent in this response, so that the user can know
+   *     what exactly prevented the conversion.
+   */
+  failedConversion : function(response) {
+    alert('Failed to convert to the selected syntax. If you want to use this syntax anyway, you can select it again and choose not to perform the conversion.');
+    this.syntaxField.selectedIndex = this.originalSyntaxIndex;
+  },
+
+  /**
+   * Disable the editing area and the syntax chooser. Also cover the editing area with a busy loading image.
+   * 
+   * @todo How to disable the WYSIWYG editor?
+   */
+  disableEditingArea : function() {
+    this.syntaxField.disabled = true;
+    this.contentField.disabled = true;
+    this.loading.show();
+  },
+
+  /**
+   * Re-enable the editing area and the syntax chooser.
+   * 
+   * @todo How to enable the WYSIWYG editor?
+   */
+  enableEditingArea : function() {
+    this.syntaxField.disabled = false;
+    this.loading.hide();
+    this.contentField.disabled = false;
+  },
+
+  /**
+   * Store the new syntax as the source syntax. This allows to change the syntax more than once in the same editing
+   * session, and to perform the proper chained conversions.
+   */
+  storeNewSyntax : function() {
+    this.originalSyntaxIndex = this.syntaxField.selectedIndex;
+    this.originalSyntax = this.syntaxField.options.item(this.originalSyntaxIndex).value;
+  }
+});
+
+// Create the component when the HTML tree is fully loaded.
+document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</code>
+</property>
+<property>
+<name>SyntaxConverter</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
-</xwikidoc>
+<content>#if("$!{request.action}" == "convertSyntax")
+  #set($theDoc = $xwiki.getDocument($request.documentName))
+  ## Use the syntax and content received from the client, as the user might have made some changes that are not on saved yet.
+  $theDoc.setSyntaxId($request.oldSyntaxId)##
+  $theDoc.setContent($request.content)##
+  #if($theDoc.convertSyntax($request.newSyntaxId))
+    ## Conversion successful. The "ok:" prefix is needed, since otherwise an empty content will result in a "This template does not exist" exception.
+    ok:{pre}$theDoc.content{/pre}
+  #else
+    $response.setStatus(501)
+    ## TODO: Find a way to put the exception in the context and send it to the client.
+    failed
+  #end
+#else
+  #includeForm("Panels.PanelSheet")
+#end
+</content></xwikidoc>

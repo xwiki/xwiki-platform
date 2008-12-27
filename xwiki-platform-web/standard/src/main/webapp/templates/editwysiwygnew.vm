@@ -24,6 +24,9 @@
 #if($xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
 ## We should find a better way of including the JavaScript code of the editor!
 <script type="text/javascript" src="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
+#if($request.sync=="1")
+$xwiki.getTextArea("")
+#else
 ## The editor will replace the following text area with its own widget.
 ## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
 $xwiki.getTextArea($tdoc.content)
@@ -37,11 +40,16 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #end
 #set($wysiwygInputKey = $util.generateRandomString(4))
 #set($ok = $wysiwygInput.put($wysiwygInputKey, $tdoc.content))
+#end
 <script type="text/javascript">
 //<![CDATA[
     var Wysiwyg0 = {
       hookId: 'content',
+#if($request.sync=="1")
+      syncPage: '$doc.fullName',
+#else
       inputURL: "${tdoc.getExternalURL("view", "xpage=wysiwyginput&key=$wysiwygInputKey")}",
+#end 
       syntax: "$doc.syntaxId",
       plugins: 'separator text valign list indent undo format symbol link image table',
       toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | image | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol',

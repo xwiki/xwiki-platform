@@ -27,6 +27,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
+import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 
 /**
  * The service interface used on the server.
@@ -97,7 +98,7 @@ public interface WysiwygService extends RemoteService
      * @param version The version affected by syncedRevision.
      * @return The result of synchronizing this editor with others editing the same page.
      */
-    SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version);
+    SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version) throws XWikiGWTException;
 
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).

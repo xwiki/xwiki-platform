@@ -49,7 +49,7 @@ public class SyncTest extends MockObjectTestCase
         DifferentiationFailedException
     {
         String currentContent = "";
-        SyncStatus syncStatus = new SyncStatus("Test.Test", "A\n");
+        SyncStatus syncStatus = new SyncStatus("Test.Test", "1.1", "A\n");
         syncEngine.setSyncStatus("Test.Test", syncStatus);
         SyncResult sync = syncEngine.sync(syncStatus, null, 0);
 
@@ -73,7 +73,7 @@ public class SyncTest extends MockObjectTestCase
         DifferentiationFailedException
     {
         String currentContent = "";
-        SyncStatus syncStatus = new SyncStatus("Test.Test", "A\n");
+        SyncStatus syncStatus = new SyncStatus("Test.Test", "1.1", "A\n");
         syncEngine.setSyncStatus("Test.Test", syncStatus);
         SyncResult sync = syncEngine.sync(syncStatus, null, 0);
 
@@ -101,7 +101,7 @@ public class SyncTest extends MockObjectTestCase
         int currentVersionUser1 = 0;
         int currentVersionUser2 = 0;
 
-        SyncStatus syncStatus = new SyncStatus("Test.Test", original);
+        SyncStatus syncStatus = new SyncStatus("Test.Test", "1.1", original);
         syncEngine.setSyncStatus("Test.Test", syncStatus);
         assertEquals("Current version should be 1", 1, syncStatus.getCurrentVersionNumber());
 

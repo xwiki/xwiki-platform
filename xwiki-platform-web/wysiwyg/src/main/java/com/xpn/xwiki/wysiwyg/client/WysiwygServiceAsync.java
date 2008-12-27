@@ -25,6 +25,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
+import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 
 /**
  * Service interface used on the client. It should have all the methods from {@link WysiwygService} with an additional
@@ -68,7 +69,7 @@ public interface WysiwygServiceAsync
      * @param version The version affected by syncedRevision.
      * @param async The callback to be used for notifying the caller after receiving the response from the server.
      */
-    void syncEditorContent(Revision syncedRevision, String pageName, int version, AsyncCallback<SyncResult> async);
+    void syncEditorContent(Revision syncedRevision, String pageName, int version, AsyncCallback<SyncResult> async) throws XWikiGWTException;
 
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).

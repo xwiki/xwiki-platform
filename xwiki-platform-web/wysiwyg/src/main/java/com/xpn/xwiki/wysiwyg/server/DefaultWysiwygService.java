@@ -26,15 +26,24 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.context.Execution;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletContainerException;
+import org.xwiki.container.servlet.ServletContainerInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.gwt.api.server.XWikiServiceImpl;
+import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -44,6 +53,9 @@ import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.server.sync.DefaultSyncEngine;
 import com.xpn.xwiki.wysiwyg.server.sync.SyncEngine;
+import com.xpn.xwiki.wysiwyg.server.sync.SyncException;
+
+import javax.servlet.ServletException;
 
 /**
  * The default implementation for {@link WysiwygService}.
@@ -129,23 +141,77 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         return XMLUtils.toString(getHTMLCleaner().clean(new StringReader(dirtyHTML)));
     }
 
+    /* private void initializeContainerComponent(XWikiContext context)
+           throws ServletException
+       {
+           // Initialize the Container fields (request, response, session).
+           // Note that this is a bridge between the old core and the component architecture.
+           // In the new component architecture we use ThreadLocal to transport the request,
+           // response and session to components which require them.
+           ServletContainerInitializer containerInitializer =
+               (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE);
+           try {
+               containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
+                   context);
+               containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
+               containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
+           } catch (ServletContainerException e) {
+               throw new ServletException("Failed to initialize request/response or session", e);
+           }
+       }
+
+       private void cleanupContainerComponent(XWikiContext context)
+       {
+           Container container = (Container) Utils.getComponent(Container.ROLE);
+           Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+
+           // We must ensure we clean the ThreadLocal variables located in the Container and Execution
+           // components as otherwise we will have a potential memory leak.
+           container.removeRequest();
+           container.removeResponse();
+           container.removeSession();
+           execution.removeContext();
+       }
+    */
+
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see WysiwygService#syncEditorContent(Revision, String, int)
      */
-    public synchronized SyncResult syncEditorContent(Revision revision, String pageName, int version)
-    {
+    public synchronized SyncResult syncEditorContent(Revision revision, String pageName, int version) throws XWikiGWTException {
         try {
+            XWikiContext context = getXWikiContext();
             SyncStatus syncStatus = syncEngine.getSyncStatus(pageName);
+            XWikiDocument doc = context.getWiki().getDocument(pageName, context);
+            String docVersion = doc.getVersion();
             if (syncStatus == null) {
-                String content = getDocumentAccessBridge().getDocumentContent(pageName);
-                syncStatus = new SyncStatus(pageName, toHTML(content, "xwiki/2.0"));
+                VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+                if (vcontext==null) {
+                    vcontext = new VelocityContext();
+                    vcontext.put("context", new Context(context));
+                    vcontext.put("xwiki", new XWiki(context.getWiki(), context));
+                    context.put("vcontext", vcontext);
+                }
+                Document doc2 = doc.newDocument(context);
+                vcontext.put("tdoc", doc2);
+                vcontext.put("doc", doc2);
+
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Initial content wiki syntax: " + doc.getContent());
+                String html = context.getWiki().parseTemplate("wysiwyginput.vm", context);
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Initial content html: " + html);
+                syncStatus = new SyncStatus(pageName, docVersion, html);
                 syncEngine.setSyncStatus(pageName, syncStatus);
+            } else {
+                // we need to check the version versus the one that was initially loaded
+                // if the version is different then we should handle this
+
             }
             return syncEngine.sync(syncStatus, revision, version);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
@@ -242,7 +308,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#createPageURL(String, String, String, String)
+     * @see WysiwygService#createPageURL(String, String, String, String, String)
      */
     public String createPageURL(String wikiName, String spaceName, String pageName, String revision, String anchor)
     {

@@ -198,6 +198,9 @@ public class SelectionPreserver
      */
     public void restoreSelection(boolean reset)
     {
+        if (placeHolders.isEmpty()) {
+            return;
+        }
         Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();
         for (int i = 0; i < placeHolders.size(); i++) {

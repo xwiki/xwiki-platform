@@ -23,6 +23,8 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
@@ -155,15 +157,24 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
                 // We restore the selection in the target document before executing the command, without resetting the
                 // state of the preserver.
                 selectionPreserver.restoreSelection(false);
-                getTextArea().getCommandManager().execute(Command.INSERT_HTML, character);
+                if (getTextArea().getCommandManager().execute(Command.INSERT_HTML, character)) {
+                    // We restore the selection (once again) to have the inserted symbol selected.
+                    selectionPreserver.restoreSelection();
+                    // We place the caret after the inserted symbol to allow the user to insert new symbols.
+                    Selection selection = getTextArea().getDocument().getSelection();
+                    Range range = selection.getRangeAt(0);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
             } else {
                 // We get here if the symbol picker has been closed by clicking the close button.
                 // In this case we return the focus to the text area.
                 getTextArea().setFocus(true);
+                // We restore the selection to have the initial selection back in place, resetting the state of the
+                // preserver.
+                selectionPreserver.restoreSelection();
             }
-            // We restore the selection (once again) to have the inserted symbol selected or to have the initial
-            // selection back in place, resetting the state of the preserver.
-            selectionPreserver.restoreSelection();
         }
     }
 

@@ -19,7 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
+import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.user.client.ui.KeyboardListener;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
+import com.xpn.xwiki.wysiwyg.client.dom.Event;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
 
 /**
  * Adjusts the behavior of the rich text area in Internet Explorer browsers.
@@ -45,4 +52,72 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
             event.returnValue = false;
         });
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see BehaviorAdjuster#onKeyDown()
+     */
+    protected void onKeyDown()
+    {
+        Event event = getTextArea().getCurrentEvent();
+        if (event.getKeyCode() == KeyboardListener.KEY_TAB) {
+            // IE moves the focus when Tab key is down and thus the key press event doesn't get fired. If we block the
+            // key down event then IE doesn't fire key press. We are forced to apply out custom behavior for tab key
+            // now, on key down, and not later, on key press.
+            onTab();
+        }
+    }
+
+    /**
+     * {@inheritDoc}<br/>
+     * We overwrite in order to fix a IE bug which makes empty paragraphs invisible. Setting the inner HTML to the empty
+     * string seems to do the trick.
+     * 
+     * @see BehaviorAdjuster#onEnterParagraphThrice(Node, Range)
+     */
+    protected void onEnterParagraphThrice(Node container, Range range)
+    {
+        super.onEnterParagraphThrice(container, range);
+
+        Node paragraph;
+        if (DOMUtils.getInstance().isFlowContainer(container)) {
+            paragraph = container.getFirstChild();
+        } else {
+            paragraph = container.getPreviousSibling();
+
+            if (!container.hasChildNodes()) {
+                // If the caret is inside an empty block level container and we insert a new paragraph before then the
+                // caret doesn't remain in its place. We have to reset the caret.
+                container.appendChild(container.getOwnerDocument().createTextNode(""));
+                range.selectNodeContents(container.getFirstChild());
+            }
+        }
+        // Empty paragraphs are not displayed in IE. Strangely, setting the inner HTML to the empty string
+        // forces IE to render the empty paragraphs. Appending an empty text node doesn't help.
+        Element.as(paragraph).setInnerHTML("");
+    }
+
+    /**
+     * {@inheritDoc}<br/>
+     * We overwrite in order to fix a IE bug which makes empty paragraphs invisible. Setting the inner HTML to the empty
+     * string seems to do the trick.
+     * 
+     * @see BehaviorAdjuster#replaceEmptyDivsWithParagraphs()
+     */
+    protected void replaceEmptyDivsWithParagraphs()
+    {
+        super.replaceEmptyDivsWithParagraphs();
+
+        Document document = getTextArea().getDocument();
+        NodeList<com.google.gwt.dom.client.Element> paragraphs = document.getBody().getElementsByTagName("p");
+        for (int i = 0; i < paragraphs.getLength(); i++) {
+            Element paragraph = paragraphs.getItem(i).cast();
+            if (!paragraph.hasChildNodes()) {
+                // Empty paragraphs are not displayed in IE. Strangely, setting the inner HTML to the empty string
+                // forces IE to render the empty paragraphs. Appending an empty text node doesn't help.
+                paragraph.setInnerHTML("");
+            }
+        }
+    }
 }

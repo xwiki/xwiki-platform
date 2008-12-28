@@ -19,36 +19,23 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
-import com.xpn.xwiki.wysiwyg.client.dom.SelectionManager;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
 
 /**
- * The default {@link SelectionManager} implementation. Retrieves the selection object using Mozilla's API.
+ * Extends {@link DefaultRangeFactory} for Firefox prior to version 3.0.
  * 
  * @version $Id$
  */
-public class DefaultSelectionManager implements SelectionManager
+public class MozillaRangeFactory extends DefaultRangeFactory
 {
     /**
      * {@inheritDoc}
      * 
-     * @see SelectionManager#getSelection(Document)
+     * @see DefaultRangeFactory#createRange(Document)
      */
-    public Selection getSelection(Document doc)
+    public Range createRange(Document doc)
     {
-        return new DefaultSelection(getJSSelection(doc));
+        return new MozillaRange(createJSRange(doc));
     }
-
-    /**
-     * Retrieves the native selection object using Mozilla's API.
-     * 
-     * @param doc The DOM document for which to retrieve the native selection.
-     * @return The selection JavaScript object associated with the specified document.
-     */
-    protected native JavaScriptObject getJSSelection(Document doc)
-    /*-{
-        return doc.defaultView.getSelection();
-    }-*/;
 }

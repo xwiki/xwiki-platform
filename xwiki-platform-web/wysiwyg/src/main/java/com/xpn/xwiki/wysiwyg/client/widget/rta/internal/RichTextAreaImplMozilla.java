@@ -87,7 +87,10 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         var enterDesignMode = function() {
             iframe.contentWindow.onfocus = null;
             iframe.contentWindow.onblur = null;
-            iframe.contentWindow.document.designMode = 'On';
+            iframe.contentWindow.document.designMode = 'on';
+            // It seems that the following line of code fixes the Midas bug which prevents the user 
+            // to delete any HTML inserted through DOM API before any printable key has been pressed.
+            iframe.contentWindow.document.execCommand('undo', false, null);
         };
 
         iframe.onload = function() {

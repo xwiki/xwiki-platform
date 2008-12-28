@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.util;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Node;
 
 /**
  * Interface to the browser's console. Useful for logging and profiling. This class provides an empty implementation.
@@ -87,6 +88,157 @@ public class Console
      * @param title The message printed in addition to the number of the count.
      */
     public void count(String title)
+    {
+    }
+
+    /**
+     * Writes a message to the console. You may pass as many arguments as you'd like, and they will be joined together
+     * in a space-delimited line.<br/>
+     * The first argument to log may be a string containing printf-like string substitution patterns. For example:<br/>
+     * <code>console.log("The %s jumped over %d tall buildings", animal, count);</code><br/>
+     * The example above can be re-written without string substitution to achieve the same result:<br/>
+     * <code>console.log("The", animal, "jumped over", count, "tall buildings");</code><br/>
+     * These two techniques can be combined. If you use string substitution but provide more arguments than there are
+     * substitution patterns, the remaining arguments will be appended in a space-delimited line, like so:<br/>
+     * <code>console.log("I am %s and I have:", myName, thing1, thing2, thing3);</code><br/>
+     * If objects are logged, they will be written not as static text, but as interactive hyperlinks that can be clicked
+     * to inspect the object in Firebug's HTML, CSS, Script, or DOM tabs. You may also use the %o pattern to substitute
+     * a hyperlink in a string.<br/>
+     * Here is the complete set of patterns that you may use for string substitution:<br/>
+     * <table>
+     * <thead>
+     * <tr>
+     * <td>String</td>
+     * <td>Substitution Patterns</td>
+     * </tr>
+     * </thead> <tbody>
+     * <tr>
+     * <td>%s</td>
+     * <td>String</td>
+     * </tr>
+     * <tr>
+     * <td>%d, %i</td>
+     * <td>Integer (numeric formatting is not yet supported)</td>
+     * </tr>
+     * <tr>
+     * <td>%f</td>
+     * <td>Floating point number (numeric formatting is not yet supported)</td>
+     * </tr>
+     * <tr>
+     * <td>%o</td>
+     * <td>Object hyperlink</td>
+     * </tr>
+     * </tbody>
+     * </table>
+     * 
+     * @param object First parameter is required. It can be either a formatting string or any ordinary object.
+     * @param objects Optional parameters.
+     */
+    public void log(Object object, Object... objects)
+    {
+    }
+
+    /**
+     * Writes a message to the console, including a hyperlink to the line where it was called.
+     * 
+     * @param object First parameter is required. It can be either a formatting string or any ordinary object.
+     * @param objects Optional parameters.
+     * @see #log(Object, Object...)
+     */
+    public void debug(Object object, Object... objects)
+    {
+    }
+
+    /**
+     * Writes a message to the console with the visual "info" icon and color coding and a hyperlink to the line where it
+     * was called.
+     * 
+     * @param object First parameter is required. It can be either a formatting string or any ordinary object.
+     * @param objects Optional parameters.
+     * @see #log(Object, Object...)
+     */
+    public void info(Object object, Object... objects)
+    {
+    }
+
+    /**
+     * Writes a message to the console with the visual "warning" icon and color coding and a hyperlink to the line where
+     * it was called.
+     * 
+     * @param object First parameter is required. It can be either a formatting string or any ordinary object.
+     * @param objects Optional parameters.
+     * @see #log(Object, Object...)
+     */
+    public void warn(Object object, Object... objects)
+    {
+    }
+
+    /**
+     * Writes a message to the console with the visual "error" icon and color coding and a hyperlink to the line where
+     * it was called.
+     * 
+     * @param object First parameter is required. It can be either a formatting string or any ordinary object.
+     * @param objects Optional parameters.
+     * @see #log(Object, Object...)
+     */
+    public void error(Object object, Object... objects)
+    {
+    }
+
+    /**
+     * Tests that an expression is true. If not, it will write a message to the console and throw an exception.
+     * 
+     * @param expression The expression to be evaluated.
+     * @param objects Optional parameters.
+     * @see #log(Object, Object...)
+     */
+    public void assertTrue(boolean expression, Object... objects)
+    {
+    }
+
+    /**
+     * Prints an interactive listing of all properties of the given object.
+     * 
+     * @param object The object whose properties will be displayed.
+     */
+    public void dir(Object object)
+    {
+    }
+
+    /**
+     * Prints the XML source tree of an HTML or XML element. You can click on any node to inspect it.
+     * 
+     * @param node Any DOM node.
+     */
+    public void dirxml(Node node)
+    {
+    }
+
+    /**
+     * Prints an interactive stack trace of JavaScript execution at the point where it is called.<br/>
+     * The stack trace details the functions on the stack, as well as the values that were passed as arguments to each
+     * function. You can click each function to take you to its source, and click each argument value to inspect it.
+     */
+    public void trace()
+    {
+    }
+
+    /**
+     * Writes a message to the console and opens a nested block to indent all future messages sent to the console. Call
+     * {@link #groupEnd()} to close the block.
+     * 
+     * @param object First parameter is required. It can be either a formatting string or any ordinary object.
+     * @param objects Optional parameters.
+     * @see #log(Object, Object...)
+     */
+    public void group(Object object, Object... objects)
+    {
+    }
+
+    /**
+     * Closes the most recently opened block created by a call to {@link #group(Object, Object...)}.
+     */
+    public void groupEnd()
     {
     }
 }

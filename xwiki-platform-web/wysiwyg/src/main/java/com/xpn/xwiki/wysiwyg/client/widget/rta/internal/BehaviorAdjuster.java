@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.dom.client.Node;
@@ -34,7 +35,10 @@ import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Event;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
+import com.xpn.xwiki.wysiwyg.client.dom.TableCellElement;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Adjusts the behavior of the rich text area to meet the cross browser specification.<br/>
@@ -49,6 +53,21 @@ public class BehaviorAdjuster implements LoadListener
      * The name of the <code>&lt;br/&gt;</code> tag.
      */
     public static final String BR = "br";
+
+    /**
+     * The name of the <code>&lt;li&gt;</code> tag.
+     */
+    public static final String LI = "li";
+
+    /**
+     * The name of the <code>&lt;td&gt;</code> tag.
+     */
+    public static final String TD = "td";
+
+    /**
+     * The name of the <code>&lt;th&gt;</code> tag.
+     */
+    public static final String TH = "th";
 
     /**
      * The rich text area whose behavior is being adjusted.
@@ -99,6 +118,12 @@ public class BehaviorAdjuster implements LoadListener
             case Event.ONKEYDOWN:
                 onKeyDown();
                 break;
+            case Event.ONKEYPRESS:
+                onKeyPress();
+                break;
+            case Event.ONBLUR:
+                onBlur();
+                break;
             default:
                 break;
         }
@@ -109,10 +134,21 @@ public class BehaviorAdjuster implements LoadListener
      */
     protected void onKeyDown()
     {
+        // Nothing here by default. May be overridden by browser specific implementations.
+    }
+
+    /**
+     * Called when a KeyPress event is triggered inside the rich text area.
+     */
+    protected void onKeyPress()
+    {
         Event event = getTextArea().getCurrentEvent();
         switch (event.getKeyCode()) {
             case KeyboardListener.KEY_ENTER:
                 onEnter();
+                break;
+            case KeyboardListener.KEY_TAB:
+                onTab();
                 break;
             default:
                 break;
@@ -131,9 +167,9 @@ public class BehaviorAdjuster implements LoadListener
         Range range = selection.getRangeAt(0);
         Node ancestor = DOMUtils.getInstance().getNearestBlockContainer((range.getStartContainer()));
         String tagName = ancestor.getNodeName().toLowerCase();
-        if ("li".equals(tagName)) {
+        if (LI.equals(tagName)) {
             // Leave the default behavior for now.
-        } else if ("td".equals(tagName) || "th".equals(tagName)) {
+        } else if (TD.equals(tagName) || TH.equals(tagName)) {
             onEnterTableCell(ancestor);
         } else {
             onEnterParagraph(ancestor);
@@ -382,13 +418,129 @@ public class BehaviorAdjuster implements LoadListener
     }
 
     /**
+     * Overwrites the default rich text area behavior when the Tab key is being pressed.
+     */
+    protected void onTab()
+    {
+        Selection selection = getTextArea().getDocument().getSelection();
+        if (selection.getRangeCount() == 0) {
+            return;
+        }
+
+        // Prevent the default browser behavior.
+        getTextArea().getCurrentEvent().xPreventDefault();
+
+        // See in which context the tab key has been pressed.
+        Range range = selection.getRangeAt(0);
+        List<String> specialTags = Arrays.asList(new String[] {LI, TD, TH});
+        Node ancestor = range.getStartContainer();
+        int index = specialTags.indexOf(ancestor.getNodeName().toLowerCase());
+        while (ancestor != null && index < 0) {
+            ancestor = ancestor.getParentNode();
+            if (ancestor != null) {
+                index = specialTags.indexOf(ancestor.getNodeName().toLowerCase());
+            }
+        }
+
+        // Handle the tab key depending on the context.
+        switch (index) {
+            case 0:
+                onTabInListItem(ancestor);
+                break;
+            case 1:
+            case 2:
+                onTabInTableCell((TableCellElement) ancestor);
+                break;
+            default:
+                onTabDefault();
+                break;
+        }
+    }
+
+    /**
+     * Tab key has been pressed in an ordinary context. If the Shift key was not pressed then the current selection will
+     * be replaced by 4 spaces. Otherwise no action will be taken.
+     */
+    protected void onTabDefault()
+    {
+        if (getTextArea().getCurrentEvent().getShiftKey()) {
+            // Do nothing.
+        } else {
+            if (getTextArea().getCommandManager().isEnabled(Command.INSERT_HTML)) {
+                // Save the selection.
+                SelectionPreserver preserver = new SelectionPreserver(getTextArea());
+                preserver.saveSelection();
+                // Replace the selection.
+                getTextArea().getCommandManager().execute(Command.INSERT_HTML, "&nbsp;&nbsp;&nbsp;&nbsp;");
+                // Restore the selection and collapse it to the end in order to have the caret after the inserted
+                // spaces.
+                preserver.restoreSelection();
+                getTextArea().getDocument().getSelection().collapseToEnd();
+            }
+        }
+    }
+
+    /**
+     * Tab key has been pressed inside a list item. If the selection is collapsed at the beginning of a list item then
+     * indent or outdent that list item depending on the Shift key. Otherwise use the default behavior for Tab key.
+     * 
+     * @param item The list item in which the tab key has been pressed.
+     */
+    protected void onTabInListItem(Node item)
+    {
+        Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
+        if (!range.isCollapsed() || !isAtStart(item, range)) {
+            onTabDefault();
+        } else {
+            Command command = getTextArea().getCurrentEvent().getShiftKey() ? Command.OUTDENT : Command.INDENT;
+            if (getTextArea().getCommandManager().isEnabled(command)) {
+                getTextArea().getCommandManager().execute(command);
+            }
+        }
+    }
+
+    /**
+     * Tab key has been pressed inside a table cell.
+     * 
+     * @param cell The table cell in which the tab key has been pressed.
+     */
+    protected void onTabInTableCell(TableCellElement cell)
+    {
+        Node nextCell = getTextArea().getCurrentEvent().getShiftKey() ? cell.getPreviousCell() : cell.getNextCell();
+        if (nextCell != null) {
+            Selection selection = getTextArea().getDocument().getSelection();
+            Range range = selection.getRangeAt(0);
+
+            // Place the caret at the beginning of the next cell.
+            Node leaf = DOMUtils.getInstance().getFirstLeaf(nextCell);
+            if (leaf == nextCell || leaf.getNodeType() == Node.TEXT_NODE) {
+                range.setStart(leaf, 0);
+            } else {
+                range.setStartBefore(leaf);
+            }
+
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
+
+    /**
+     * Called when the underlying rich text area looses focus.
+     */
+    protected void onBlur()
+    {
+        // Nothing here by default. May be overridden by browser specific implementations.
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see LoadListener#onError(Widget)
      */
     public void onError(Widget sender)
     {
-        // Nothing to do upon load error
+        // Nothing to do upon load error.
     }
 
     /**
@@ -409,7 +561,7 @@ public class BehaviorAdjuster implements LoadListener
      */
     protected void adjustDragDrop(Document document)
     {
-        // nothing here by default
+        // Nothing here by default. May be overridden by browser specific implementations.
     }
 
     /**

@@ -129,7 +129,7 @@ public class Element extends com.google.gwt.dom.client.Element
         String outerHTML;
         if (hasChildNodes()) {
             Element clone = Element.as(cloneNode(false));
-            clone.setInnerHTML(INNER_HTML_PLACEHOLDER);
+            clone.appendChild(getOwnerDocument().createTextNode(INNER_HTML_PLACEHOLDER));
             outerHTML = clone.getString();
             outerHTML = outerHTML.replace(INNER_HTML_PLACEHOLDER, xGetInnerHTML());
         } else {

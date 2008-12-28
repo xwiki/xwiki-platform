@@ -137,7 +137,9 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc}<br/>
+     * We overwrite in order to fix a Mozilla bug which makes empty paragraphs invisible. We add a BR to the newly
+     * created paragraph.
      * 
      * @see BehaviorAdjuster#replaceEmptyDivsWithParagraphs()
      */
@@ -150,7 +152,50 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
         for (int i = 0; i < paragraphs.getLength(); i++) {
             Node paragraph = paragraphs.getItem(i);
             if (!paragraph.hasChildNodes()) {
+                // The user cannot place the caret inside an empty paragraph in Firefox. The workaround to make an empty
+                // paragraph editable is to append a BR.
                 paragraph.appendChild(document.xCreateBRElement());
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see BehaviorAdjuster#onBlur()
+     */
+    protected void onBlur()
+    {
+        super.onBlur();
+        markUnwantedBRs();
+    }
+
+    /**
+     * Marks the BRs that generate empty lines. These BRs were added to overcome a Mozilla bug that prevents us from
+     * typing inside an empty block level element.
+     */
+    protected void markUnwantedBRs()
+    {
+        Document document = getTextArea().getDocument();
+        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
+        for (int i = 0; i < brs.getLength(); i++) {
+            Element br = brs.getItem(i).cast();
+            Node container = DOMUtils.getInstance().getNearestBlockContainer(br);
+            Node leaf = DOMUtils.getInstance().getNextLeaf(br);
+            boolean emptyLine = true;
+            // Look if there is any visible element on the new line, taking care to remain in the current block
+            // container.
+            while (leaf != null && container == DOMUtils.getInstance().getNearestBlockContainer(leaf)) {
+                if (needsSpace(leaf)) {
+                    emptyLine = false;
+                    break;
+                }
+                leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+            }
+            if (emptyLine) {
+                br.setClassName("emptyLine");
+            } else {
+                br.removeAttribute("class");
             }
         }
     }

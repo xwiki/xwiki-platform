@@ -20,35 +20,32 @@
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
-import com.xpn.xwiki.wysiwyg.client.dom.SelectionManager;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
 
 /**
- * The default {@link SelectionManager} implementation. Retrieves the selection object using Mozilla's API.
+ * Fixes selection problems found in Firefox versions prior to 3.0.
  * 
  * @version $Id$
  */
-public class DefaultSelectionManager implements SelectionManager
+public class MozillaSelection extends DefaultSelection
 {
     /**
-     * {@inheritDoc}
+     * Creates a new instance that wraps the given native selection object.
      * 
-     * @see SelectionManager#getSelection(Document)
+     * @param jsSelection The native selection object to be wrapped.
      */
-    public Selection getSelection(Document doc)
+    MozillaSelection(JavaScriptObject jsSelection)
     {
-        return new DefaultSelection(getJSSelection(doc));
+        super(jsSelection);
     }
 
     /**
-     * Retrieves the native selection object using Mozilla's API.
+     * {@inheritDoc}
      * 
-     * @param doc The DOM document for which to retrieve the native selection.
-     * @return The selection JavaScript object associated with the specified document.
+     * @see DefaultSelection#getRangeAt(int)
      */
-    protected native JavaScriptObject getJSSelection(Document doc)
-    /*-{
-        return doc.defaultView.getSelection();
-    }-*/;
+    public Range getRangeAt(int index)
+    {
+        return new MozillaRange(getJSRangeAt(index));
+    }
 }

@@ -29,7 +29,7 @@ import com.xpn.xwiki.wysiwyg.client.dom.Range;
  * 
  * @version $Id$
  */
-public final class DefaultSelection extends AbstractSelection<JavaScriptObject, JavaScriptObject>
+public class DefaultSelection extends AbstractSelection<JavaScriptObject, JavaScriptObject>
 {
     /**
      * Creates a new instance that wraps the given native selection object. All the calls will be forwarded to this
@@ -169,7 +169,7 @@ public final class DefaultSelection extends AbstractSelection<JavaScriptObject, 
      * @param index The index of the range to retrieve. Usually the selection contains just one range.
      * @return The JavaScript range at the specified index in the JavaScript selection object wrapped by this object.
      */
-    private native JavaScriptObject getJSRangeAt(int index)
+    protected native JavaScriptObject getJSRangeAt(int index)
     /*-{
         var range = this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()();
         return range.getRangeAt(index);

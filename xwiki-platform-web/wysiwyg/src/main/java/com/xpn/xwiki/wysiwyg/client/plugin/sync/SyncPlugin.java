@@ -271,7 +271,7 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
                     Node node = childs.getItem(i);
                     if (i==0)
                         firstNode = node;
-                    else if (i==nb-1)
+                    if (i==nb-1)
                         lastNode = node;
                     // we want to insert the node in it's parent before the cursor Node
                     cursorNode.removeChild(node);

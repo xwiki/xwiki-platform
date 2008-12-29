@@ -84,11 +84,11 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#syncEditorContent(Revision, String, int, AsyncCallback)
+     * @see WysiwygServiceAsync#syncEditorContent(Revision, String, int, boolean, AsyncCallback)
      */
-    public void syncEditorContent(Revision syncedRevision, String pageName, int version, 
-        AsyncCallback<SyncResult> async) throws XWikiGWTException {
-        service.syncEditorContent(syncedRevision, pageName, version, async);
+    public void syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset, 
+        AsyncCallback<SyncResult> async) {
+        service.syncEditorContent(syncedRevision, pageName, version, syncReset, async);
     }
 
     /**

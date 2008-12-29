@@ -30,10 +30,6 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
-import org.xwiki.context.Execution;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletContainerException;
-import org.xwiki.container.servlet.ServletContainerInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -53,7 +49,6 @@ import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.server.sync.DefaultSyncEngine;
 import com.xpn.xwiki.wysiwyg.server.sync.SyncEngine;
-import com.xpn.xwiki.wysiwyg.server.sync.SyncException;
 
 import javax.servlet.ServletException;
 
@@ -179,17 +174,20 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      *
      * @see WysiwygService#syncEditorContent(Revision, String, int)
      */
-    public synchronized SyncResult syncEditorContent(Revision revision, String pageName, int version) throws XWikiGWTException {
+    public synchronized SyncResult syncEditorContent(Revision revision, String pageName, int version, boolean syncReset) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             SyncStatus syncStatus = syncEngine.getSyncStatus(pageName);
             XWikiDocument doc = context.getWiki().getDocument(pageName, context);
             String docVersion = doc.getVersion();
-            if (syncStatus == null) {
+            if ((syncStatus == null)||syncReset) {
                 VelocityContext vcontext = (VelocityContext) context.get("vcontext");
                 if (vcontext==null) {
                     vcontext = new VelocityContext();
                     vcontext.put("context", new Context(context));
+                    vcontext.put("request", context.getRequest());
+                    vcontext.put("response", context.getResponse());
+                    vcontext.put("util", context.getUtil());
                     vcontext.put("xwiki", new XWiki(context.getWiki(), context));
                     context.put("vcontext", vcontext);
                 }

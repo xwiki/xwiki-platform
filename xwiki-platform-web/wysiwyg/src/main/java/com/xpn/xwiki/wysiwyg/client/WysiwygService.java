@@ -98,7 +98,7 @@ public interface WysiwygService extends RemoteService
      * @param version The version affected by syncedRevision.
      * @return The result of synchronizing this editor with others editing the same page.
      */
-    SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version) throws XWikiGWTException;
+    SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset) throws XWikiGWTException;
 
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).

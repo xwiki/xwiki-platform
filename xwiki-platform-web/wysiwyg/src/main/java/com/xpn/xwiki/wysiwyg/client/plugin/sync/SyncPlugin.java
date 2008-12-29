@@ -189,11 +189,9 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
         }
 
         // Commit our revision and, at the same time, checkout the latest revision
-        try {
-            WysiwygService.Singleton.getInstance().syncEditorContent(syncedRevision, pageName, version, this);
-        } catch (XWikiGWTException e) {
-            showError(e, null);
-        }
+        // If we send -1 then we ask the server to reset it's content to the page content
+        boolean syncReset = ((version==0)&&(getConfig().getParameter("syncReset", "0").equals("1")));
+        WysiwygService.Singleton.getInstance().syncEditorContent(syncedRevision, pageName, version, syncReset, this);
     }
 
     private void insertCursor(Document doc) {
@@ -373,7 +371,8 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
                 initialContent = futureInitialContent;
 
                 // TODO improve by working on an cloned Document that is updated in one call in the textarea
-                getTextArea().setHTML(newHTMLContent);
+                setHTML(newHTMLContent);
+
                 // we should have retrieved the cursor so we need to remove it
                 if ((maintainCursor||sendCursor)&& (version!=0))
                  removeCursor(getTextArea().getDocument());
@@ -395,6 +394,10 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
             }
            });
         }
+    }
+
+    private void setHTML(String newHTMLContent) {
+        getTextArea().setHTML(newHTMLContent);
     }
 
 

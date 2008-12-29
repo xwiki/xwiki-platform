@@ -47,11 +47,16 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
       hookId: 'content',
 #if($request.sync=="1")
       syncPage: '$doc.fullName',
+      plugins: 'separator text valign list indent undo format symbol link image table sync',
+      inputURL: "${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/empty.html",
+ #if($request.reset=="1")
+      syncReset: 1,
+ #end
 #else
       inputURL: "${tdoc.getExternalURL("view", "xpage=wysiwyginput&key=$wysiwygInputKey")}",
+      plugins: 'separator text valign list indent undo format symbol link image table',
 #end 
       syntax: "$doc.syntaxId",
-      plugins: 'separator text valign list indent undo format symbol link image table',
       toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | image | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol',
       space: '${doc.space}',
       page: '${doc.name}',

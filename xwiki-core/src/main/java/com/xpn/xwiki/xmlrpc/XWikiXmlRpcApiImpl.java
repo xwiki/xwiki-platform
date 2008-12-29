@@ -446,6 +446,12 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         /* Build the extended id from the page id */
         XWikiExtendedId extendedId = new XWikiExtendedId(page.getId());
 
+        /* If the space is null then set it to the space encoded in the page id. */
+        if (page.getSpace() == null) {
+            String[] components = extendedId.getBasePageId().split("\\.");
+            page.setSpace(components[0]);            
+        }
+
         /*
          * Even though the extended id could contain parameters such as language and version, here we ignore them and
          * just consider the base page id. The language to be stored will be taken from the result of

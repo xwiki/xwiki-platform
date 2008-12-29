@@ -67,9 +67,11 @@ public interface WysiwygServiceAsync
      * @param syncedRevision The changes to this editor's content, since the last update.
      * @param pageName The page being edited.
      * @param version The version affected by syncedRevision.
+     * @param syncReset resets the sync server for this page.
      * @param async The callback to be used for notifying the caller after receiving the response from the server.
      */
-    void syncEditorContent(Revision syncedRevision, String pageName, int version, AsyncCallback<SyncResult> async) throws XWikiGWTException;
+    void syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset,
+                           AsyncCallback<SyncResult> async);
 
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).

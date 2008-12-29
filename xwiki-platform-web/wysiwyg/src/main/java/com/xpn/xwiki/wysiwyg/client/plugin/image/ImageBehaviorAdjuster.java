@@ -43,6 +43,11 @@ public class ImageBehaviorAdjuster implements KeyboardListener
             KEY_PAGEDOWN);
 
     /**
+     * Flag to handle if the current key needs to be blocked or not. Will be set in onKeyDown() for all incoming keys.
+     */
+    private boolean blocking;
+
+    /**
      * The rich text area for which this behavior adjuster operates.
      */
     private RichTextArea textArea;
@@ -65,7 +70,39 @@ public class ImageBehaviorAdjuster implements KeyboardListener
      */
     public void onKeyDown(Widget sender, char keyCode, int modifiers)
     {
-        // nothing
+        // Test the current input and set the blocking flag.
+        this.blocking = needsBlocking(sender, keyCode, modifiers);
+        // If we're blocking this key, prevent the default behavior for this key
+        if (this.blocking) {
+            textArea.getCurrentEvent().xPreventDefault();
+        }
+    }
+
+    /**
+     * Tests if the passed key needs to be blocked or not. This test is done depending on the current selection in the
+     * text area, the key pressed and its modifiers.
+     * 
+     * @param sender the sender of this key event
+     * @param keyCode the code of the key that was pressed
+     * @param modifiers modifier keys that are pressed when this key is pressed
+     * @return true if the key needs to be blocked by this adjuster, false otherwise.
+     */
+    private boolean needsBlocking(Widget sender, char keyCode, int modifiers)
+    {
+        // Make sure the sender is the listened text area and an image is selected
+        if (!(sender == textArea && textArea.getCommandManager().isExecuted(Command.INSERT_IMAGE))) {
+            return false;
+        }
+        // If it's a modified key (ctrl or alt), let it execute
+        if (textArea.getCurrentEvent().getCtrlKey() || textArea.getCurrentEvent().getAltKey()) {
+            return false;
+        }
+        // If it's in the defined list of allowed keys, let it execute
+        if (ALLOWED_KEYS.contains((int) keyCode)) {
+            return false;
+        }
+        // block everything else
+        return true;
     }
 
     /**
@@ -75,20 +112,10 @@ public class ImageBehaviorAdjuster implements KeyboardListener
      */
     public void onKeyPress(Widget sender, char keyCode, int modifiers)
     {
-        // Make sure the sender is the listened text area and an image is selected
-        if (!(sender == textArea && textArea.getCommandManager().isExecuted(Command.INSERT_IMAGE))) {
-            return;
+        // If we're blocking this key, prevent the default behavior for this key
+        if (this.blocking) {
+            textArea.getCurrentEvent().xPreventDefault();
         }
-        // If it's a modified key (ctrl or alt), let it execute
-        if (textArea.getCurrentEvent().getCtrlKey() || textArea.getCurrentEvent().getAltKey()) {
-            return;
-        }
-        // If it's in the defined list of allowed keys, let it execute
-        if (ALLOWED_KEYS.contains((int) keyCode)) {
-            return;
-        }
-        // block everything else
-        textArea.getCurrentEvent().xPreventDefault();
     }
 
     /**
@@ -98,6 +125,9 @@ public class ImageBehaviorAdjuster implements KeyboardListener
      */
     public void onKeyUp(Widget sender, char keyCode, int modifiers)
     {
-        // nothing
+        // If we're blocking this key, prevent the default behavior for this key
+        if (this.blocking) {
+            textArea.getCurrentEvent().xPreventDefault();
+        }
     }
 }

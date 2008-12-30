@@ -62,7 +62,6 @@ beginMacroMarker [code] [language=javascript] [
 })();
 ]
 beginXMLNode [div] [class=code]
-beginParagraph
 beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
 onWord [//]
 onSpace
@@ -487,7 +486,6 @@ onWord [}]
 onLineBreak
 onWord [})();]
 onLineBreak
-endParagraph
 endXMLNode [div] [class=code]
 endMacroMarker [code] [language=javascript] [
 // getJSON function by Juriy Zaytsev 

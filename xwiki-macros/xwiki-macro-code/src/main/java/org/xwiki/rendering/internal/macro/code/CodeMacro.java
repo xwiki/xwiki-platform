@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.VerbatimInlineBlock;
 import org.xwiki.rendering.block.VerbatimStandaloneBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -87,11 +86,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
                     result = Collections.<Block> singletonList(new VerbatimStandaloneBlock(content));
                 }
             } else {
-                if (context.isInlined()) {
-                    result = highlight(parameters, content);
-                } else {
-                    result = Collections.<Block> singletonList(new ParagraphBlock(highlight(parameters, content)));
-                }
+                result = highlight(parameters, content);
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to highlight content", e);

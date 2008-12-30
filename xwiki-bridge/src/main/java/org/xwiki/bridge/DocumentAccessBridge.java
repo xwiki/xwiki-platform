@@ -165,10 +165,11 @@ public interface DocumentAccessBridge
      * both will be created newly.
      * 
      * @param documentName Target document name.
-     * @param AttachmentName Name of the attachment.
+     * @param attachmentName Name of the attachment.
      * @param attachmentData Attachment content.
+     * @throws Exception If the storage cannot be accessed.
      */
-    void setAttachmentContent(String documentName, String AttachmentName, byte[] attachmentData)
+    void setAttachmentContent(String documentName, String attachmentName, byte[] attachmentData)
         throws Exception;
 
     /**

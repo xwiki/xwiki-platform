@@ -116,8 +116,30 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         throw new RuntimeException("Not implemented");
     }
+        
+    public void setAttachmentContent(String documentName, String AttachmentName,
+        byte[] attachmentData) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void setDocumentContent(String documentName, String content, String editComment,
+        boolean isMinorEdit) throws Exception
+    {
+        throw new RuntimeException("Not implemented");        
+    }
+    
+    public void setDocumentSyntaxId(String documentName, String syntaxId) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
 
     public boolean isDocumentViewable(String documentName)
+    {
+        return true;
+    }
+    
+    public boolean isDocumentEditable(String documentName)
     {
         return true;
     }
@@ -126,4 +148,14 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         return true;
     }
+
+    public String getCurrentUser()
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public String getDefaultEncoding()
+    {
+        throw new RuntimeException("Not implemented");
+    }        
 }

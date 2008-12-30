@@ -20,8 +20,8 @@
 package org.xwiki.bridge;
 
 /**
- * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
- * services.
+ * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes
+ * and the Document services.
  * 
  * @version $Id$
  * @since 1.6M1
@@ -43,6 +43,19 @@ public interface DocumentAccessBridge
     boolean exists(String documentName) throws Exception;
 
     /**
+     * Updates the target document with the new content provided. If the target document does not
+     * exists, a new one will be created.
+     * 
+     * @param documentName Name of the target document.
+     * @param content Content to be set.
+     * @param editComment Comment describing this particular change.
+     * @param isMinorEdit Flag indicating if this change is a minor one.
+     * @throws Exception If the storage cannot be accessed.
+     */
+    void setDocumentContent(String documentName, String content, String editComment,
+        boolean isMinorEdit) throws Exception;
+
+    /**
      * Retrieves the textual content of the document, in the current language.
      * 
      * @param documentName The name of the document to access.
@@ -52,10 +65,20 @@ public interface DocumentAccessBridge
     String getDocumentContent(String documentName) throws Exception;
 
     /**
+     * Changes the syntax Id of the target document to the given syntaxId. If the target document
+     * does not exists, a new one will be created.
+     * 
+     * @param documentName Name of the target document.
+     * @param syntaxId New syntax Id.
+     * @throws Exception If the storage cannot be accessed.
+     */
+    void setDocumentSyntaxId(String documentName, String syntaxId) throws Exception;
+
+    /**
      * Retrieves the textual content of the document, in the document's default language.
      * <p>
-     * Note: you should always use {@link #getDocumentContent(String)} unless you really need specifically the
-     * document's content for default language of the document.
+     * Note: you should always use {@link #getDocumentContent(String)} unless you really need
+     * specifically the document's content for default language of the document.
      * 
      * @param documentName The name of the document to access.
      * @return The document's content.
@@ -83,7 +106,8 @@ public interface DocumentAccessBridge
      * @return A <code>string</code> representation of the property value.
      * @throws Exception If the document cannot be accessed.
      */
-    String getProperty(String documentName, String className, int objectNumber, String propertyName) throws Exception;
+    String getProperty(String documentName, String className, int objectNumber,
+        String propertyName) throws Exception;
 
     /**
      * Retrieves the value for an object property, from the first object of the given class.
@@ -94,11 +118,12 @@ public interface DocumentAccessBridge
      * @return A <code>string</code> representation of the property value.
      * @throws Exception If the document cannot be accessed.
      */
-    String getProperty(String documentName, String className, String propertyName) throws Exception;
+    String getProperty(String documentName, String className, String propertyName)
+        throws Exception;
 
     /**
-     * Retrieves the value for an object property, from the first object of any class that has a property with that
-     * name.
+     * Retrieves the value for an object property, from the first object of any class that has a
+     * property with that name.
      * 
      * @param documentName The name of the document to access.
      * @param propertyName The name of the property to retrieve.
@@ -110,8 +135,8 @@ public interface DocumentAccessBridge
     /**
      * @param className The name of the class.
      * @param propertyName The name of the property.
-     * @return class name of the property object or null if property is not found. For example StringProperty,
-     *         IntegerProperty.
+     * @return class name of the property object or null if property is not found. For example
+     *         StringProperty, IntegerProperty.
      * @throws Exception if class cannot be accessed
      */
     String getPropertyType(String className, String propertyName) throws Exception;
@@ -129,31 +154,47 @@ public interface DocumentAccessBridge
      * 
      * @param documentName The name of the document to access.
      * @param attachmentName The filename of the attachment to access.
-     * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
-     *         not exist.
+     * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if
+     *         the attachment does not exist.
      * @throws Exception If the document cannot be accessed.
      */
     byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception;
 
     /**
-     * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.
+     * Sets the content of a document attachment. If the document or the attachment does not exist,
+     * both will be created newly.
+     * 
+     * @param documentName Target document name.
+     * @param AttachmentName Name of the attachment.
+     * @param attachmentData Attachment content.
+     */
+    void setAttachmentContent(String documentName, String AttachmentName, byte[] attachmentData)
+        throws Exception;
+
+    /**
+     * Retrieves the internal (without the hostname) URL that can be used to access a document,
+     * using a specific action.
      * 
      * @param documentName The name of the document to access.
-     * @param action The "mode" in which the document is accessed, for example <code>view</code> to view the document,
-     *            <code>edit</code> to open the document for modifications, etc.
-     * @param queryString An optional query string to append to the URL, use <code>null</code> or an empty string to
-     *            skip.
-     * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an empty string to skip.
-     * @return A <code>String</code> representation of the URL, starting with the path segment of the URL (without
-     *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
+     * @param action The "mode" in which the document is accessed, for example <code>view</code> to
+     *            view the document, <code>edit</code> to open the document for modifications, etc.
+     * @param queryString An optional query string to append to the URL, use <code>null</code> or an
+     *            empty string to skip.
+     * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an
+     *            empty string to skip.
+     * @return A <code>String</code> representation of the URL, starting with the path segment of
+     *         the URL (without protocol, host and port), for example
+     *         <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
      * @throws Exception If the document cannot be accessed.
      */
-    String getURL(String documentName, String action, String queryString, String anchor) throws Exception;
+    String getURL(String documentName, String action, String queryString, String anchor)
+        throws Exception;
 
     /**
      * Retrieves the internal (without the hostname) URL that can be used to access an attachment.
      * 
-     * @param documentName the full name of the document containing the attachment (eg "wiki:Space.Page")
+     * @param documentName the full name of the document containing the attachment (eg
+     *            "wiki:Space.Page")
      * @param attachmentName the attachment name (eg "my.png")
      * @return the attachment URL
      * @throws Exception If the document or the attachment cannot be accessed
@@ -167,7 +208,25 @@ public interface DocumentAccessBridge
     boolean isDocumentViewable(String documentName);
 
     /**
+     * @param documentName The name of the document to be edited.
+     * @return True if current user has 'edit' access on the target document.
+     */
+    boolean isDocumentEditable(String documentName);
+
+    /**
      * @return true if the current document's author has programming rights.
      */
     boolean hasProgrammingRights();
+
+    /**
+     * Utility method to retrieve the current user. 
+     * 
+     * @return The current user.
+     */
+    String getCurrentUser();
+
+    /**
+     * @return The default encoding for the current wiki.
+     */
+    String getDefaultEncoding();
 }

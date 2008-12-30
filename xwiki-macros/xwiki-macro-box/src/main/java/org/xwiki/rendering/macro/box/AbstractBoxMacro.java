@@ -120,8 +120,30 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
 
             boxBlock = spanBlock;
         } else {
-            int beginIndex = 0;
-            int endIndex = content.length();
+            // We remove the first leading and trailing new line in non inline mode to have a better readability
+            // {{box}}
+            // some content
+            // {{box}}
+            // is the same than
+            // {{box}}some content{{box}}
+            List<Block> result = parseContent(parameters, stripSingleNewLine(content), context);
+            boxBlock = new XMLBlock(result, new XMLElement("div", classParameter));
+        }
+
+        return Collections.singletonList(boxBlock);
+    }
+
+    /**
+     * Remove the first and last new line of provided content.
+     * 
+     * @param content the content to trim.
+     * @return the trimed content.
+     */
+    private String stripSingleNewLine(String content)
+    {
+        int beginIndex = 0;
+        int endIndex = content.length();
+        if (endIndex > 0) {
             if (content.charAt(0) == NEWLINE_N) {
                 beginIndex = 1;
             } else if (content.startsWith(NEWLINE_RN)) {
@@ -130,19 +152,18 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
                 beginIndex = 1;
             }
 
-            if (content.charAt(endIndex - 1) == NEWLINE_R) {
-                endIndex -= 1;
-            } else if (content.endsWith(NEWLINE_RN)) {
-                endIndex -= 2;
-            } else if (content.charAt(endIndex - 1) == NEWLINE_N) {
-                endIndex -= 1;
+            if (endIndex - beginIndex > 0) {
+                if (content.charAt(endIndex - 1) == NEWLINE_R) {
+                    endIndex -= 1;
+                } else if (content.endsWith(NEWLINE_RN)) {
+                    endIndex -= 2;
+                } else if (content.charAt(endIndex - 1) == NEWLINE_N) {
+                    endIndex -= 1;
+                }
             }
-
-            List<Block> result = parseContent(parameters, content.substring(beginIndex, endIndex), context);
-            boxBlock = new XMLBlock(result, new XMLElement("div", classParameter));
         }
 
-        return Collections.singletonList(boxBlock);
+        return content.substring(beginIndex, endIndex);
     }
 
     /**

@@ -1,0 +1,15 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify empty box works
+.#-----------------------------------------------------
+{{testbox}}{{/testbox}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker [testbox] [] []
+beginXMLNode [div] [class=box]
+onVerbatimStandalone []
+endXMLNode [div] [class=box]
+endMacroMarker [testbox] [] []
+endDocument

@@ -1,0 +1,21 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify AbstractBoxMacro remove first and last newline when in non inline mode
+.#-----------------------------------------------------
+{{testbox}}
+content
+{{/testbox}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker [testbox] [] [
+content
+]
+beginXMLNode [div] [class=box]
+onVerbatimStandalone [content]
+endXMLNode [div] [class=box]
+endMacroMarker [testbox] [] [
+content
+]
+endDocument\ No newline at end of file

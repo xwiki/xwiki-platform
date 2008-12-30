@@ -1,4 +1,7 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,31 +19,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.rendering;
+ *
+-->
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-
-/**
- * All Rendering integration tests defined in text files using a special format.
- * 
- * @version $Id$
- * @since 1.7M3
- */
-public class RenderingTests extends TestCase
-{
-    public static Test suite() throws Exception
-    {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Box Macro");
-
-        suite.addTestsFromResource("macrobox1", true);
-        suite.addTestsFromResource("macrobox2", true);
-        suite.addTestsFromResource("macrobox3", true);
-
-        return new RenderingPlexusTestSetup(suite);
-    }
-}
+<component-set>
+  <components>
+    <!-- Components used for testing -->
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>testbox</role-hint>
+      <implementation>org.xwiki.rendering.macro.box.TestBoxMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+  </components>
+</component-set>

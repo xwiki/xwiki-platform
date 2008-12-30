@@ -45,6 +45,21 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends AbstractMacro<P> implements Composable
 {
     /**
+     * A new line based on <code>\n</code>.
+     */
+    private static final char NEWLINE_N = '\n';
+
+    /**
+     * A new line based on <code>\r\n</code>.
+     */
+    private static final char NEWLINE_R = '\r';
+
+    /**
+     * A new line based on <code>\r\n</code>.
+     */
+    private static final String NEWLINE_RN = "\r\n";
+
+    /**
      * Used to get the current syntax parser.
      */
     private ComponentManager componentManager;
@@ -95,17 +110,35 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     public List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        List<Block> result = parseContent(parameters, content, context);
-
         Map<String, String> classParameter = Collections.singletonMap("class", getClassProperty());
 
         Block boxBlock;
         if (context.isInlined()) {
+            List<Block> result = parseContent(parameters, content, context);
             FormatBlock spanBlock = new FormatBlock(result, Format.NONE);
             spanBlock.setParameters(classParameter);
 
             boxBlock = spanBlock;
         } else {
+            int beginIndex = 0;
+            int endIndex = content.length();
+            if (content.charAt(0) == NEWLINE_N) {
+                beginIndex = 1;
+            } else if (content.startsWith(NEWLINE_RN)) {
+                endIndex = 2;
+            } else if (content.charAt(0) == NEWLINE_R) {
+                beginIndex = 1;
+            }
+
+            if (content.charAt(endIndex - 1) == NEWLINE_R) {
+                endIndex -= 1;
+            } else if (content.endsWith(NEWLINE_RN)) {
+                endIndex -= 2;
+            } else if (content.charAt(endIndex - 1) == NEWLINE_N) {
+                endIndex -= 1;
+            }
+
+            List<Block> result = parseContent(parameters, content.substring(beginIndex, endIndex), context);
             boxBlock = new XMLBlock(result, new XMLElement("div", classParameter));
         }
 

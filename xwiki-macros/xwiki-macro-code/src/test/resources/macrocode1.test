@@ -16,7 +16,6 @@ beginMacroMarker [code] [] [
 <i>italic</i>
 ]
 beginXMLNode [div] [class=code]
-beginParagraph
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [<b>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
@@ -32,7 +31,6 @@ onWord [italic]
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [</i>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-endParagraph
 endXMLNode [div] [class=code]
 endMacroMarker [code] [] [
 <b>bold</b>

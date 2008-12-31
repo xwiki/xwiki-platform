@@ -90,7 +90,7 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
         containerPanel.addStyleName("xImagesContainerPanel");
         imagesPanel = new FlowPanel();
         containerPanel.add(imagesPanel);
-        updateImagesPanel(currentWiki, currentSpace, currentPage);
+        updateImagesPanel(currentWiki, currentSpace, currentPage, null);
         imageChooserPanel.add(containerPanel);
 
         initWidget(imageChooserPanel);
@@ -108,9 +108,7 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
         FlowPanel selectorsPanel = new FlowPanel();
         wikiSelector = new WikiSelector();
         spaceSelector = new SpaceSelector(currentWiki);
-        spaceSelector.refreshList(currentSpace);
         pageSelector = new PageSelector(currentWiki, currentSpace);
-        pageSelector.refreshList(currentPage);
         wikiSelector.setVisible(false);
         WysiwygService.Singleton.getInstance().isMultiWiki(new AsyncCallback<Boolean>()
         {
@@ -122,9 +120,6 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
             public void onSuccess(Boolean result)
             {
                 wikiSelector.setVisible(result);
-                if (result) {
-                    wikiSelector.refreshList(currentWiki);
-                }
             }
         });
 
@@ -137,7 +132,7 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
             public void onClick(Widget sender)
             {
                 updateImagesPanel(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(), pageSelector
-                    .getSelectedPage());
+                    .getSelectedPage(), selectedImage != null ? selectedImage.getImage().getImageFileName() : null);
             }
         });
 
@@ -155,46 +150,103 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
      * @param wiki the wiki to set the selection to
      * @param space the space to set the selection on
      * @param page the page to set the selection on
+     * @param fileName the filename of the image to set as currently selected image
+     * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
      */
-    public void setSelection(String wiki, final String space, final String page)
+    public void setSelection(String wiki, final String space, final String page, final String fileName,
+        final boolean forceRefresh)
     {
         boolean isMultiWiki = wikiSelector.isVisible();
-        if (isMultiWiki && !wikiSelector.getSelectedWiki().equals(wiki)) {
-            wikiSelector.setSelectedWiki(wiki);
+        if (isMultiWiki) {
+            if (forceRefresh) {
+                wikiSelector.refreshList(wiki, new AsyncCallback<List<String>>()
+                {
+                    public void onSuccess(List<String> result)
+                    {
+                        setSpaceSelection(space, page, fileName, true);
+                    }
+
+                    public void onFailure(Throwable caught)
+                    {
+                    }
+                });
+            } else {
+                // just set the selection
+                if (!wikiSelector.getSelectedWiki().equals(wiki)) {
+                    wikiSelector.setSelectedWiki(wiki);
+                    setSpaceSelection(space, page, fileName, true);
+                }
+            }
+        } else {
+            setSpaceSelection(space, page, fileName, forceRefresh);
+        }
+    }
+
+    /**
+     * Sets the selection on the specified space triggering the page selector update accordingly.
+     * 
+     * @param selectedSpace the space to be set as selected
+     * @param selectedPage the page to be set as selected
+     * @param selectedFile the file to set as selected in the images list
+     * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
+     */
+    private void setSpaceSelection(String selectedSpace, final String selectedPage, final String selectedFile,
+        final boolean forceRefresh)
+    {
+        if (forceRefresh) {
+            // refresh the spaces list
             spaceSelector.setWiki(wikiSelector.getSelectedWiki());
-            spaceSelector.refreshList(space, new AsyncCallback<List<String>>()
+            spaceSelector.refreshList(selectedSpace, new AsyncCallback<List<String>>()
             {
+                public void onSuccess(List<String> result)
+                {
+                    setPageSelection(selectedPage, selectedFile, true);
+                }
+
                 public void onFailure(Throwable caught)
                 {
                 }
+            });
+        } else {
+            if (!selectedSpace.equals(spaceSelector.getSelectedSpace())) {
+                spaceSelector.setSelectedSpace(selectedSpace);
+                setPageSelection(selectedPage, selectedFile, true);
+            } else {
+                setPageSelection(selectedPage, selectedFile, forceRefresh);
+            }
+        }
+    }
 
+    /**
+     * Sets the selection on the specified page, triggering the images panel update accordingly.
+     * 
+     * @param selectedPage the page to be set as selected
+     * @param selectedFile the file to set as selected in the images list
+     * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
+     */
+    private void setPageSelection(String selectedPage, final String selectedFile, boolean forceRefresh)
+    {
+        if (forceRefresh) {
+            pageSelector.setWiki(wikiSelector.getSelectedWiki());
+            pageSelector.setSpace(spaceSelector.getSelectedSpace());
+            pageSelector.refreshList(selectedPage, new AsyncCallback<List<String>>()
+            {
                 public void onSuccess(List<String> result)
                 {
-                    pageSelector.setWiki(wikiSelector.getSelectedWiki());
-                    pageSelector.setSpace(spaceSelector.getSelectedSpace());
-                    if (!spaceSelector.getSelectedSpace().equals(space)) {
-                        pageSelector.refreshList(page);
-                    } else {
-                        // just set page selector selection
-                        pageSelector.setSelectedPage(page);
-                    }
                     updateImagesPanel(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(), pageSelector
-                        .getSelectedPage());
+                        .getSelectedPage(), selectedFile);
+                }
+
+                public void onFailure(Throwable caught)
+                {
                 }
             });
         } else {
-            // just set selection on space
-            if (!spaceSelector.getSelectedSpace().equals(space)) {
-                // just set the space selection
-                spaceSelector.setSelectedSpace(space);
-                pageSelector.setSpace(space);
-                pageSelector.refreshList(page);
-            } else {
-                // just set selection on page
-                pageSelector.setSelectedPage(page);
+            if (!selectedPage.equals(pageSelector.getSelectedPage())) {
+                pageSelector.setSelectedPage(selectedPage);
             }
             updateImagesPanel(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(), pageSelector
-                .getSelectedPage());
+                .getSelectedPage(), selectedFile);
         }
     }
 
@@ -235,13 +287,19 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
      * Populates the images panel with the images in the passed map.
      * 
      * @param images the list of images given by their URL and corresponding file names.
+     * @param selectedImage the currently selected image to set in the built image panel. If no image is to be selected,
+     *            this argument should be null.
      */
-    public void populateImagesPanel(List<ImageConfig> images)
+    public void populateImagesPanel(List<ImageConfig> images, String selectedImage)
     {
         for (ImageConfig imageData : images) {
             final ImagePreviewWidget imageWidget = new ImagePreviewWidget(imageData);
             imageWidget.addClickListener(this);
             imagesPanel.add(imageWidget);
+            if (imageData.getImageFileName().equals(selectedImage)) {
+                imageWidget.setSelected(true);
+                this.selectedImage = imageWidget;
+            }
         }
         // Add a div for float clear
         Panel clearPanel = new FlowPanel();
@@ -255,8 +313,11 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
      * @param selectedWiki the currently selected wiki
      * @param selectedSpace the currently selected space
      * @param selectedPage the currently selected page
+     * @param selectedImage the currently selected image, passed by its filename. If no image is to be selected, this
+     *            value should be null.
      */
-    public void updateImagesPanel(String selectedWiki, String selectedSpace, String selectedPage)
+    public void updateImagesPanel(String selectedWiki, String selectedSpace, String selectedPage,
+        final String selectedImage)
     {
         imagesPanel.clear();
         // reset selection
@@ -271,7 +332,7 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
 
                 public void onSuccess(List<ImageConfig> result)
                 {
-                    populateImagesPanel(result);
+                    populateImagesPanel(result, selectedImage);
                 }
             });
     }

@@ -57,4 +57,15 @@ public class JavaScriptObject extends com.google.gwt.core.client.JavaScriptObjec
     /*-{ 
          return eval('(' + input + ')') 
     }-*/;
+
+    /**
+     * Returns the value stored in this javascript object for the passed key.
+     * 
+     * @param key the key whose value to return
+     * @return the value of the specified key.
+     */
+    public final native String get(String key)
+    /*-{
+        return this[key];
+    }-*/;
 }

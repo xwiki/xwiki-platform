@@ -178,18 +178,6 @@ public class ImageParametersPanel extends Composite
     }
 
     /**
-     * Sets the default alternative text for this image settings.
-     * 
-     * @param altText the string to be used as the default alternative text for the edited image.
-     */
-    public void setDefaultAltText(String altText)
-    {
-        if (altTextBox != null) {
-            altTextBox.setText(altText);
-        }
-    }
-
-    /**
      * @return the selected image alignment
      */
     public ImageConfig.ImageAlignment getSelectedAlignment()
@@ -200,6 +188,23 @@ public class ImageParametersPanel extends Composite
             }
         }
         return null;
+    }
+
+    /**
+     * Sets the passed alignment in the image alignment radio set.
+     * 
+     * @param alignment the alignment to set
+     */
+    protected void setImageAlignment(ImageConfig.ImageAlignment alignment)
+    {
+        String alignValue = alignment != null ? alignment.toString() : ""; 
+        for (RadioButton rb : alignmentOptions) {
+            if (rb.getValue().equals(alignValue)) {
+                rb.setChecked(true);
+            } else {
+                rb.setChecked(false);
+            }
+        }
     }
 
     /**
@@ -246,5 +251,33 @@ public class ImageParametersPanel extends Composite
     public void onShow()
     {
         widthBox.setFocus(true);
+    }
+
+    /**
+     * Reads and sets the parameters from the passed {@link ImageConfig}.
+     * 
+     * @param config the {@link ImageConfig} to get parameters from.
+     */
+    public void setParameters(ImageConfig config)
+    {
+        boolean isEditing = config.getImageFileName() != null;
+        if (config.getAltText() != null && !config.getAltText().equals(config.getImageFileName())) {
+            altTextBox.setText(config.getAltText());
+        } else if (isEditing) {
+            altTextBox.setText("");
+        }
+        if (config.getWidth() != null) {
+            widthBox.setText(config.getWidth());
+        } else if (isEditing) {
+            widthBox.setText("");
+        }
+        if (config.getHeight() != null) {
+            heightBox.setText(config.getHeight());
+        } else if (isEditing) {
+            heightBox.setText("");
+        }
+        if (config.getAlignment() != null || isEditing) {
+            setImageAlignment(config.getAlignment());
+        }
     }
 }

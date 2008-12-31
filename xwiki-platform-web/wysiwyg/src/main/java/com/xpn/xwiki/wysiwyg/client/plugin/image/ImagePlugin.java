@@ -139,9 +139,16 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
         if (show) {
             // store current selection, we'll need it after to add the image in the right place
             selectionPreserver.saveSelection();
-            // get selection, textify and set as the default alternative text
-            getImageDialog()
-                .setDefaultImageAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+            ImageConfig config = new ImageConfig();
+            String imageParam = 
+                getTextArea().getCommandManager().getExecutable(Command.INSERT_IMAGE).getParameter(getTextArea());
+            if (imageParam != null) {
+                config.fromJSON(imageParam);
+            } else {
+                // get selection, textify and set as the default alternative text                
+                config.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+            }
+            getImageDialog().setImageConfig(config);
             getImageDialog().center();
         } else {
             String imageHTML = getImageDialog().getImageHTMLBlock();

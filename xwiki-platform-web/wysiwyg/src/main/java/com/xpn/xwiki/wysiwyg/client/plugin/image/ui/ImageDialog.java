@@ -69,6 +69,11 @@ public class ImageDialog extends CompositeDialogBox implements ClickListener, Fo
      * The page name of the document we are currently editing.
      */
     private String currentPage;
+    
+    /**
+     * Flag to store of the dialog has been loaded or not.
+     */
+    private boolean isLoaded;
 
     /**
      * Creates an image insertion dialog, for the referred page, and the default file upload url.
@@ -167,18 +172,6 @@ public class ImageDialog extends CompositeDialogBox implements ClickListener, Fo
     }
 
     /**
-     * Sets the edited image default alternative. It will be editable in this dialog.
-     * 
-     * @param defaultAltText the default image alternative text
-     */
-    public void setDefaultImageAltText(String defaultAltText)
-    {
-        if (imageParameters != null) {
-            imageParameters.setDefaultAltText(defaultAltText);
-        }
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see FormHandler#onSubmit(FormSubmitEvent)
@@ -195,7 +188,7 @@ public class ImageDialog extends CompositeDialogBox implements ClickListener, Fo
      */
     public void onSubmitComplete(FormSubmitCompleteEvent event)
     {
-        imageSelector.setSelection(currentWiki, currentSpace, currentPage);
+        imageSelector.setSelection(currentWiki, currentSpace, currentPage, null, false);
     }
 
     /**
@@ -236,5 +229,24 @@ public class ImageDialog extends CompositeDialogBox implements ClickListener, Fo
         }
         // all other parameters are optional, return true
         return true;
+    }
+
+    /**
+     * Sets the image that is edited by this dialog.
+     * 
+     * @param config the {@link ImageConfig} corresponding to the edited image.
+     */
+    public void setImageConfig(ImageConfig config)
+    {
+        if (config.getImageFileName() != null || !isLoaded) {
+            // Change the selectors only if we're editing an image
+            imageSelector.setSelection(config.getWiki() != null ? config.getWiki() : currentWiki,
+                config.getSpace() != null ? config.getSpace() : currentSpace, config.getPage() != null ? config
+                    .getPage() : currentPage, config.getImageFileName(), !isLoaded);
+            if (!isLoaded) {
+                isLoaded = true;
+            }
+        } 
+        imageParameters.setParameters(config);
     }
 }

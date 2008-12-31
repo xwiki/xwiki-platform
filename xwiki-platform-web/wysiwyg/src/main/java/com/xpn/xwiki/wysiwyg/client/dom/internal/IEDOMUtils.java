@@ -137,4 +137,14 @@ public class IEDOMUtils extends DOMUtils
             }
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#getAttribute(Element, String)
+     */
+    public String getAttribute(Element element, String name)
+    {
+        return element.getAttribute(name) + "";
+    }
 }

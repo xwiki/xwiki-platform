@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.image;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import com.xpn.xwiki.wysiwyg.client.dom.JavaScriptObject;
 
 /**
  * Stores the data about an image: information about the image file (filename, url, etc.) and also about its
@@ -245,5 +246,52 @@ public class ImageConfig implements IsSerializable
     public void setAlignment(ImageAlignment alignment)
     {
         this.alignment = alignment;
+    }
+
+    /**
+     * @return the JSON representation of this ImageConfig
+     */
+    public String toJSON()
+    {
+        String commaString = "', ";
+        String jsonString =
+            "{ " + (getWiki() != null ? "wiki: '" + getWiki() + commaString : "")
+                + (getSpace() != null ? "space: '" + getSpace() + commaString : "")
+                + (getPage() != null ? "page: '" + getPage() + commaString : "")
+                + (getImageFileName() != null ? "filename: '" + getImageFileName() + commaString : "")
+                + (getImageURL() != null ? "url: '" + getImageURL() + commaString : "")
+                + (getWidth() != null ? "width: '" + getWidth() + commaString : "")
+                + (getHeight() != null ? "height: '" + getHeight() + commaString : "")
+                + (getAltText() != null ? "alttext: '" + getAltText() + commaString : "")
+                + (getAlignment() != null ? "alignment: '" + getAlignment() + commaString : "");
+        // Remove last comma
+        if (jsonString.length() > 4) {
+            jsonString = jsonString.substring(0, jsonString.length() - 2);
+        }
+        // close it and return it
+        jsonString = jsonString + " }";
+        return jsonString;
+    }
+
+    /**
+     * Fills this object with data from the passed JSON representation.
+     * 
+     * @param json the JSON representation of this image config object.
+     */
+    public void fromJSON(String json)
+    {
+        JavaScriptObject jsObj = JavaScriptObject.fromJson(json);
+        setWiki(jsObj.get("wiki"));
+        setSpace(jsObj.get("space"));
+        setPage(jsObj.get("page"));
+        setImageFileName(jsObj.get("filename"));
+        setImageURL(jsObj.get("url"));
+        setWidth(jsObj.get("width"));
+        setHeight(jsObj.get("height"));
+        setAltText(jsObj.get("alttext"));
+        String foundAlignment = jsObj.get("alignment");
+        if (foundAlignment != null) {
+            setAlignment(ImageAlignment.valueOf(foundAlignment));
+        }
     }
 }

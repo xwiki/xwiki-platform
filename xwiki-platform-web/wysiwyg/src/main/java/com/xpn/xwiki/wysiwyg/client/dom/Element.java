@@ -216,4 +216,16 @@ public class Element extends com.google.gwt.dom.client.Element
         clone.setMetaData(getMetaData());
         return clone;
     }
+
+    /**
+     * Get the value for the specified attribute in cross browser manner.
+     * 
+     * @param name the name of the attribute
+     * @return the value of the attribute
+     * @see DOMUtils#getAttribute(Element, String)
+     */
+    public final String xGetAttribute(String name)
+    {
+        return DOMUtils.getInstance().getAttribute(this, name);
+    }
 }

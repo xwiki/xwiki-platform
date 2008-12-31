@@ -822,4 +822,17 @@ public abstract class DOMUtils
             return ancestor.getParentNode();
         }
     }
+
+    /**
+     * Returns the value of the named attribute of the specified element. This method will be overwritten for
+     * internet explorer browsers to handle bug http://code.google.com/p/google-web-toolkit/issues/detail?id=3238 .
+     * 
+     * @param element the element to get the attribute for
+     * @param name the name of the attribute to return
+     * @return the value of the attribute
+     */
+    public String getAttribute(Element element, String name)
+    {
+        return element.getAttribute(name);
+    }
 }

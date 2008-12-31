@@ -87,7 +87,7 @@
 	#set($targetDocument="${targetSpace}.${targetPage}")
 	* Source Document: $fileName
 	* Target Document: $targetDocument
-	$xwiki.officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options)
+	$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options)
 	Conversion succeeded. You can view the *[result&gt;$targetSpace.$targetPage]*, or you can [go back&gt;Import.WebHome] to convert another document.
 #end</content>
 </xwikidoc>

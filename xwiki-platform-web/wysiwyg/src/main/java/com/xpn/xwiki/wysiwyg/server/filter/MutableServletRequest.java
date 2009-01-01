@@ -19,7 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.server.filter;
 
+import java.io.IOException;
+
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 /**
  * A servlet request that can be modified. It is very useful, for instance, when you need to change the values of some
@@ -48,4 +51,39 @@ public interface MutableServletRequest extends ServletRequest
      *         its values.
      */
     String[] setParameterValues(String name, String[] values);
+
+    /**
+     * Redirects this request to the specified URL. We had to add this method since there's no generic way to redirect a
+     * {@link ServletRequest}.
+     * 
+     * @param response The response object used to redirect.
+     * @param url The location where to redirect.
+     * @throws IOException if the redirect fails.
+     */
+    void sendRedirect(ServletResponse response, String url) throws IOException;
+
+    /**
+     * @return The URL of the requester.
+     */
+    String getReferer();
+
+    /**
+     * @param attrName The name of the session attribute whose value should be retrieved.
+     * @return The value of the specified session attribute.
+     */
+    Object getSessionAttribute(String attrName);
+
+    /**
+     * Sets the value of a session attribute.
+     * 
+     * @param attrName The name of the session attribute.
+     * @param attrValue The value to be set.
+     * @return The previous value of the specified session attribute.
+     */
+    Object setSessionAttribute(String attrName, Object attrValue);
+
+    /**
+     * @return The request object wrapped by this object.
+     */
+    ServletRequest getRequest();
 }

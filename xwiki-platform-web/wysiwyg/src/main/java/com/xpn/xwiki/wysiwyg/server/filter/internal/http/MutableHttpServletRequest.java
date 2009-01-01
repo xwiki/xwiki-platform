@@ -19,13 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.server.filter.internal.http;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 
 import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequest;
 
@@ -114,5 +117,47 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
     public String[] getParameterValues(String name)
     {
         return params.get(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MutableHttpServletRequest#sendRedirect(ServletResponse, String)
+     */
+    public void sendRedirect(ServletResponse res, String url) throws IOException
+    {
+        ((HttpServletResponse) res).sendRedirect(url);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MutableServletRequest#getReferer()
+     */
+    public String getReferer()
+    {
+        return getHeader("Referer");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MutableServletRequest#setSessionAttribute(String, Object)
+     */
+    public Object getSessionAttribute(String attrName)
+    {
+        return getSession().getAttribute(attrName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MutableServletRequest#setSessionAttribute(String, Object)
+     */
+    public Object setSessionAttribute(String attrName, Object attrValue)
+    {
+        Object oldValue = getSession().getAttribute(attrName);
+        getSession().setAttribute(attrName, attrValue);
+        return oldValue;
     }
 }

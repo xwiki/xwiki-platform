@@ -9,7 +9,7 @@
       <br /><br />
       $msg.get("choosefiletoupload"):
       <input type="file" name="filepath" value="" size="40"  /> <br /><br />
-      <input type="submit" id="attachment" name="attachment" value="$msg.get("attachthisfile")" />
+      <input type="submit" id="displayers" name="displayers" value="$msg.get("attachthisfile")" />
     </p>
   </form>
   #set($counter=0)

@@ -31,7 +31,7 @@ ${Msz}Mb
       <div id="_attachments">
 #if($attachments.size()>0)
 #foreach ($attach in $attachments)
-        <div class="attachment #if($velocityCount % 2 == 0) even #else odd #end">
+        <div class="displayers #if($velocityCount % 2 == 0) even #else odd #end">
           <span class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</span>
           <div class="information">
           <span class="name"><a href="$doc.getAttachmentURL("${attach.filename}", "download")" title="$msg.get("downloadthisattachment")">#packName($attach.filename)</a></span>

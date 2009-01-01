@@ -22,38 +22,83 @@
 <div id="xwikitext">
 <div id="xwikieditcontent">
 #if($xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
+##
 ## We should find a better way of including the JavaScript code of the editor!
+##
 <script type="text/javascript" src="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
-#if($request.sync=="1")
-$xwiki.getTextArea("")
-#else
-## The editor will replace the following text area with its own widget.
-## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
-$xwiki.getTextArea($tdoc.content)
-## We put the $tdoc.content on the session to be available from wysiwyginput.vm 
-## because by using directly $tdoc.content in wysiwyginput.vm we can miss the content 
-## updates from this request, like when we switch from wiki editor to wysiwyg.
+##
+## Get the WYSIWYG input map in order to add the the data for this request.
+## This map is needed to keep user changes while switching editors and after server-side exceptions.
+##
 #set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
 #if(!$wysiwygInput)
 #set($wysiwygInput = $util.getHashMap())
 $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #end
-#set($wysiwygInputKey = $util.generateRandomString(4))
-#set($ok = $wysiwygInput.put($wysiwygInputKey, $tdoc.content))
+##
+## Determine the key into the WYSIWYG input and error map.
+## We pass this key to the WYSIWYG editor in the query string of the input URL.
+## This key will be used in wysiwyginput.vm to get the content of the editor from the WYSIWYG input map.
+##
+#set($reuseKey = $request.keys && $wysiwygInput.containsKey($request.keys))
+#if(!$request.sync && $reuseKey)
+## If this template is called after a conversion exception then the content is already 
+## stored in the input map. We have to use the key provided by the ConversionFilter.
+#set($wysiwygKey = $request.keys)
+#else
+#set($wysiwygKey = $util.generateRandomString(4))
 #end
+##
+## Determine the query string of the input URL.
+## We pass the following arguments to the wysiwyginput.vm template:
+## * key: the key in the WYSIWYG input map.
+## * render: flag indicating if the content associated with the given key should be rendered or not.
+##
+#set($inputURLQueryString = "xpage=wysiwyginput&key=${wysiwygKey}")
+#if(!($request.sync || $reuseKey))
+#set($inputURLQueryString = $inputURLQueryString + "&render")
+#end
+##
+## Determine the initial content of the editor.
+## We can't use $tdoc.content when the user switches editors or when we encounter 
+## a conversion exception because we would loose unsaved changes.
+##
+#if($request.sync)
+#set($ok = $wysiwygInput.put($wysiwygKey, ""))
+#elseif(!$reuseKey)
+#set($ok = $wysiwygInput.put($wysiwygKey, $tdoc.content))
+#end
+##
+## Get the WYSIWYG error map in order to display the conversion exceptions.
+##
+#set($wysiwygError = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.error"))
+#if($wysiwygError)
+#set($error = $wysiwygError.get($wysiwygKey))
+#if($error)
+#error($error.message)
+#set($ok = $wysiwygError.remove($wysiwygKey))
+#end
+#end
+##
+## The editor will replace the following text area with its own widget.
+## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
+##
+$xwiki.getTextArea($tdoc.content)
+##
+## Configure the WYSIWYG editor.
+##
 <script type="text/javascript">
 //<![CDATA[
     var Wysiwyg0 = {
       hookId: 'content',
-#if($request.sync=="1")
+      inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",
+#if($request.sync)
       syncPage: '$doc.fullName',
       plugins: 'separator text valign list indent undo format symbol link image table sync',
-      inputURL: "${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/empty.html",
  #if($request.reset=="1")
       syncReset: 1,
  #end
 #else
-      inputURL: "${tdoc.getExternalURL("view", "xpage=wysiwyginput&key=$wysiwygInputKey")}",
       plugins: 'separator text valign list indent undo format symbol link image table',
 #end 
       syntax: "$doc.syntaxId",

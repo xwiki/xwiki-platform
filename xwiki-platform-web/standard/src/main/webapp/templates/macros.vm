@@ -1154,3 +1154,113 @@ $html
     #end
   </div>
 #end
+
+#**
+ * Displays a public google calendar with all buttons and displays
+ * The size of the display is 800x600
+ * 
+ * This macro displays the public part of the calendar specified. However if the visiting user is logged in in Google Calendar and has rights to the private part of the calendar then the information will be displayed. 
+ *
+ * @param id ID of the google account to display the calendar for
+ *#
+#macro(googlecal $id)
+{pre}
+<iframe src="http://www.google.com/calendar/embed?height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=${id.replaceAll("@","%40")}&amp;color=%232952A3" style=" border-width:0 " width="800" height="600" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end
+
+#**
+ * Displays a public google calendar with all buttons and displays and a custom size
+ * 
+ * @param id ID of the google account to display the calendar for
+ * @param width Width of the calendar
+ * @param height Height of the calendar
+ *#
+#macro(googlecalsize $id $width $height)
+#if($width=="")
+#set($width = "800")
+#end
+#if($height=="")
+#set($height = "600")
+#end
+{pre}
+<iframe src="http://www.google.com/calendar/embed?height=${height}&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=${id.replaceAll("@","%40")}&amp;color=%232952A3" style=" border-width:0 " width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end
+
+#**
+ * Displays a private google calendar with all buttons
+ * 
+ * @param id ID of the google account to display the calendar for
+ * @param token Private token giving access to the Calendar. This token is 32 chars long and can be retrieved in the "Agenda Details" when accessing your "Private URL" of your calendar. You should use this parameter with care as it will display all your calendar events to anybody that can access the page in which you use this macro
+ *#
+#macro(googlecalprivate $id $token)
+{pre}
+<iframe src="http://www.google.com/calendar/embed?pvttk=${token}&amp;height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=${id.replaceAll("@","%40")}&amp;color=%232952A3" style=" border-width:0 " width="800" height="600" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end
+
+#**
+ * Displays a private google calendar with all buttons
+ * 
+ * @param id ID of the google account to display the calendar for
+ * @param token Private token giving access to the Calendar. This token is 32 chars long and can be retrieved in the "Agenda Details" when accessing your "Private URL" of your calendar. You should use this parameter with care as it will display all your calendar events to anybody that can access the page in which you use this macro
+ * @param width Width of the calendar
+ * @param height Height of the calendar
+ *#
+#macro(googlecalprivatesize $id $token $width $height)
+#if($width=="")
+#set($width = "800")
+#end
+#if($height=="")
+#set($height = "600")
+#end
+{pre}
+<iframe src="http://www.google.com/calendar/embed?pvttk=${token}&amp;height=${height}&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=${id.replaceAll("@","%40")}&amp;color=%232952A3" style=" border-width:0 " width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end
+
+#**
+ * Displays a public or private google calendar with a wide range of settings
+ * You can check the effect of these settings using the Google Calendar Embed Helper
+ * http://www.google.com/calendar/embedhelper
+ * 
+ * @param id ID of the google account to display the calendar for
+ * @param token Private token giving access to the Calendar. This token is 32 chars long and can be retrieved in the "Agenda Details" when accessing your "Private URL" of your calendar. You should use this parameter with care as it will display all your calendar events to anybody that can access the page in which you use this macro
+ * @param width Width of the calendar
+ * @param height Height of the calendar
+ * @param showTitle 0 to not show the title
+ * @param showNav 0 to not show the navigation buttons allowing to switch to previous/next week or month
+ * @param showDate 0 to not show the current period displayed
+ * @param showPrint 0 to not show the print button
+ * @param showTabs 0 to not show the tabs allowing to switch between MONTH,WEEK,AGENDA mode
+ * @param showCalendars 0 to not show the calendars list drop down button
+ * @param showTz Show a message saying the timezone of the dates/hours
+ * @param mode Default mode to display (empty is Month display, WEEK is Week dispaly, AGENDA is the event display)
+ * @param language Language to display in (en,fr,de,..)
+ * @param bgcolor Background color of the calendar in the form #255455
+ * @param color Color of the events in the form #234567
+ * @param ctz Timezone in which to display the calendar. Leave empty for default calendar Timezone
+ * @param border Border in pixels (1,2,3)
+ *#
+#macro(googlecalcustom $id $token $width $height $showTitle $showNav $showDate $showPrint $showTabs $showCalendars $showTz $mode $language $bgcolor $color $ctz $border)
+#if($width=="")
+#set($width = "800")
+#end
+#if($height=="")
+#set($height = "600")
+#end
+#if($color!="")
+#set($color = $color.replaceAll("#","%23"))
+#else
+#set($color = "%232952A3")
+#end
+#if($bgcolor!="")
+#set($bgcolor = $color.replaceAll("#","%23"))
+#else
+#set($bgcolor = "%232952A3")
+#end
+{pre}
+<iframe src="//www.google.com/calendar/embed?title=Test&amp;showTitle=${showTitle}&amp;showNav=${showNav}&amp;showDate=${showDate}&amp;showPrint=${showPrint}&amp;showTabs=${showTabs}&amp;showCalendars=${showCalendars}&amp;showTz=${showTz}&amp;mode=${mode}&amp;height=${height}&amp;wkst=2&amp;hl=${language}&amp;bgcolor=${bgcolor}&amp;src=${id.replaceAll("@","%40")}&amp;color=${color}&amp;ctz=${ctz}" style=" border:solid ${border}px #777 " width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end

@@ -1,20 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <link type="text/css" rel="stylesheet" href="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/RichTextArea.css"/>
-##TODO: The style sheet configuration is commented out for now because it affects the behavior of the new WYSIWYG editor in a very bad way. 
-##This is temporary. See http://jira.xwiki.org/jira/browse/XWIKI-2721
+## TODO: The style sheet configuration is commented out for now because it affects the behavior of the new WYSIWYG editor in a very bad way. 
+## This is temporary. See http://jira.xwiki.org/jira/browse/XWIKI-2721
 ##<link type="text/css" rel="stylesheet" href="${request.getRequestURL().substring(0, $request.getRequestURL().indexOf("/", 9))}${xwiki.getSkinFile("style.css")}"/>
 </head>
-## We don't use directly $tdoc.content because we could miss the content updates 
-## when we switch from wiki editor to wysiwyg.
+## We don't use directly $tdoc.content because we could loose changes made by the 
+## user before switching from wiki editor to wysiwyg or before saving when a 
+## conversion exception is thrown.
 #set($content = $tdoc.content)
 #if($request.key)
 #set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
-#if($wysiwygInput.containsKey($request.key))
+#if($wysiwygInput && $wysiwygInput.containsKey($request.key))
 #set($content = $wysiwygInput.get($request.key))
 #set($ok = $wysiwygInput.remove($request.key))
 #end
 #end
-<body id="body" class="main">$tdoc.getRenderedContent($content, $tdoc.getSyntaxId())</body>
+## We don't always have to render the content:
+## * If this template is called after a conversion exception then the content is HTML.
+## * If the WYSIWYG is in real time mode then the content must be empty.
+#if($request.render)
+#set($content = $tdoc.getRenderedContent($content, $tdoc.getSyntaxId()))
+#end
+<body id="body" class="main">$content</body>
 </html>

@@ -27,87 +27,62 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * Skin Extension plugin to use javascript files from JAR resources.
+ * Skin Extension plugin that allows pulling javascript files from JAR resources.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.3
  */
-public class JsResourceSkinExtensionPlugin extends SkinExtensionPlugin
+public class JsResourceSkinExtensionPlugin extends AbstractSkinExtensionPlugin
 {
-
+    /**
+     * XWiki plugin constructor.
+     * 
+     * @param name The name of the plugin, which can be used for retrieving the plugin API from velocity. Unused.
+     * @param className The canonical classname of the plugin. Unused.
+     * @param context The current request context.
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
+     */
     public JsResourceSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
-        super(name, className, context);
+        super("jsrx", className, context);
         init(context);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
-     */
-    @Override
-    public String getName()
-    {
-        return "jsrx";
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SkinExtensionPlugin#getLink(String, XWikiContext)
+     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
      */
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
-        String url = "";
+        String result = "";
+        // If the current user has access to Main.WebHome, we will use this document in the URL
+        // to serve the js resource. This way, the resource can be efficiently cached, since it has a
+        // common URL for any page.
         try {
-            // If the current user has access to Main.WebHome, we will use this document in the URL
-            // to serve the js resource. This way, the resource can be efficiently cached, since it has a
-            // common URL for any page.
-            if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), "Main.WebHome", context)) {
-                url = context.getWiki().getURL("Main.WebHome", "jsx", "resource=" + documentName, context);
+            String page = context.getWiki().getDefaultWeb(context) + "." + context.getWiki().getDefaultPage(context);
+            if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), page, context)) {
+                page = context.getDoc().getFullName();
             }
+            String url =
+                context.getWiki().getURL(page, "jsx",
+                    "resource=" + documentName + parametersAsQueryString(documentName, context), context);
+            result = "<script type=\"text/javascript\" src=\"" + url + "\"></script>";
         } catch (XWikiException e) {
-            // do nothing here, we'll fold back just after.
+            // Do nothing here; we can't access the wiki, so don't link to this resource at all.
         }
-        if (url.equals("")) {
-            // If we could not have an URL with Main.WebHome, we use the context document.
-            url = context.getDoc().getURL("jsx", "resource=" + documentName, context);
-        }
-        return "<script type=\"text/javascript\" src=\"" + url + "\"></script>";
-    }
-
-    @Override
-    public void beginParsing(XWikiContext context)
-    {
-        super.beginParsing(context);
-    }
-
-    @Override
-    public String endParsing(String content, XWikiContext context)
-    {
-        return super.endParsing(content, context);
+        return result;
     }
 
     /**
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
+     * {@inheritDoc}
+     * <p>
+     * There is no support for always used resource-based extensions yet.
+     * </p>
+     * 
+     * @see AbstractSkinExtensionPlugin#getAlwaysUsedExtensions(XWikiContext)
      */
-    @Override
-    public void init(XWikiContext context)
-    {
-        super.init(context);
-    }
-
-    /**
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#virtualInit(com.xpn.xwiki.XWikiContext)
-     */
-    @Override
-    public void virtualInit(XWikiContext context)
-    {
-        super.virtualInit(context);
-    }
-
     @Override
     public Set<String> getAlwaysUsedExtensions(XWikiContext context)
     {
@@ -118,4 +93,18 @@ public class JsResourceSkinExtensionPlugin extends SkinExtensionPlugin
         return Collections.emptySet();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * We must override this method since the plugin manager only calls it for classes that provide their own
+     * implementation, and not an inherited one.
+     * </p>
+     * 
+     * @see AbstractSkinExtensionPlugin#endParsing(String, XWikiContext)
+     */
+    @Override
+    public String endParsing(String content, XWikiContext context)
+    {
+        return super.endParsing(content, context);
+    }
 }

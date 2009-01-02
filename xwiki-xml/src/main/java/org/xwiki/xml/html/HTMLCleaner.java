@@ -20,12 +20,13 @@
 package org.xwiki.xml.html;
 
 import java.io.Reader;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 
 /**
  * Transforms any HTML content into valid XHTML that can be feed to the XHTML Parser for example.
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
@@ -43,4 +44,14 @@ public interface HTMLCleaner
      * @return the cleaned HTML as a w3c DOM (this allows further transformations if needed)
      */
     Document clean(Reader originalHtmlContent);
+
+    /**
+     * Transforms any HTML content into valid XHTML. Additional parameters may be passed in to fine tune the cleaning
+     * process.
+     * 
+     * @param originalHtmlContent The original html content to be cleaned.
+     * @param params Additional parameters (implementation dependent) for cleaning.
+     * @return The cleaned HTML as a w3c DOM
+     */
+    Document clean(Reader originalHtmlContent, Map<String, String> params);
 }

@@ -38,6 +38,7 @@
       <meta name="wiki" content="$doc.wiki"/>
     #end
     $xwiki.parseContent($!xwiki.getWebPreference("meta"))
+    <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
     #template("stylesheets.vm")
     #template("analytics.vm")
     #template("javascript.vm")

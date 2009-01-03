@@ -66,19 +66,17 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         this.filters.add(new ListCleaningFilter());
         this.filters.add(new DocTypeCleaningFilter());
 
-        // The clean method below is thread safe. However it seems that DOMOutputter.output() is not
-        // fully thread safe since it causes the following exception on the first time it's called
-        // from different threads:
-        // Caused by: org.jdom.JDOMException: Reflection failed while creating new JAXP document:
-        // duplicate class definition: org/apache/xerces/jaxp/DocumentBuilderFactoryImpl
-        // at org.jdom.adapters.JAXPDOMAdapter.createDocument(JAXPDOMAdapter.java:191)
-        // at org.jdom.adapters.AbstractDOMAdapter.createDocument(AbstractDOMAdapter.java:133)
-        // at org.jdom.output.DOMOutputter.createDOMDocument(DOMOutputter.java:208)
-        // at org.jdom.output.DOMOutputter.output(DOMOutputter.java:127)
-        // Since this only happens once, we call it first here at initialization time (since there's
-        // no thread contention at that time).
-        // Note: This email thread seems to say it's thread safe but that's not what we see here:
-        // http://osdir.com/ml/text.xml.xforms.chiba.devel/2006-09/msg00025.html
+        // The clean method below is thread safe. However it seems that DOMOutputter.output() is not fully thread safe
+        // since it causes the following exception on the first time it's called from different threads:
+        //  Caused by: org.jdom.JDOMException: Reflection failed while creating new JAXP document:
+        //  duplicate class definition: org/apache/xerces/jaxp/DocumentBuilderFactoryImpl
+        //  at org.jdom.adapters.JAXPDOMAdapter.createDocument(JAXPDOMAdapter.java:191)
+        //  at org.jdom.adapters.AbstractDOMAdapter.createDocument(AbstractDOMAdapter.java:133)
+        //  at org.jdom.output.DOMOutputter.createDOMDocument(DOMOutputter.java:208)
+        //  at org.jdom.output.DOMOutputter.output(DOMOutputter.java:127)
+        // Since this only happens once, we call it first here at initialization time (since there's no thread
+        // contention at that time). Note: This email thread seems to say it's thread safe but that's not what we see
+        // here: http:osdir.com/ml/text.xml.xforms.chiba.devel/2006-09/msg00025.html
         clean(new StringReader(""));
     }
 
@@ -91,27 +89,21 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     {
         org.w3c.dom.Document result;
 
-        // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since
-        // otherwise
-        // we would need to synchronize this clean() method which would slow down the whole system
-        // by
-        // queuing up cleaning requests.
-        // See
-        // http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=
-        // 903699
+        // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise we would need
+        // to synchronize this clean() method which would slow down the whole system by queuing up cleaning requests.
+        // See http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=903699
         HtmlCleaner cleaner = new HtmlCleaner();
         cleaner.setTransformations(getCleaningTransformations());
         CleanerProperties cleanerProperties = cleaner.getProperties();
         cleanerProperties.setOmitUnknownTags(true);
 
-        // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if
-        // we use
-        // the best practice of using CDATA inside a script. For example:
-        // <script type="text/javascript">
-        // //<![CDATA[
-        // ...
-        // // ]]>
-        // </script>
+        // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if we use the best
+        // practice of using CDATA inside a script. For example:
+        //  <script type="text/javascript">
+        //  <![CDATA[
+        //  ...
+        //  ]]>
+        //  </script>
         // Thus we need to turn off this feature.
         cleanerProperties.setUseCdataForScriptAndStyle(false);
 
@@ -119,8 +111,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         try {
             cleanedNode = cleaner.clean(originalHtmlContent);
         } catch (Exception e) {
-            // This shouldn't happen since we're not doing any IO... I consider this a flaw in the
-            // design of HTML Cleaner.
+            // This shouldn't happen since we're not doing any IO... I consider this a flaw in the design of HTML
+            // Cleaner.
             throw new RuntimeException("Unhandled error when cleaning HTML", e);
         }
 
@@ -150,7 +142,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      * {@link DefaultHTMLCleaner} does not allow fine-tuning of html cleaning via parameters.
      * </p>
      */
-    public org.w3c.dom.Document clean(Reader originalHtmlContent, Map<String, String> params)
+    public org.w3c.dom.Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters)
     {
         return clean(originalHtmlContent);
     }

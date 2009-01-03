@@ -433,6 +433,11 @@ public class DBListClass extends ListClass
     // the result of the second query, to retrieve the value
     public String getValue(String val, String sql, XWikiContext context)
     {
+        // Make sure the query does not contain ORDER BY, as it will fail in certain databases.
+        int orderByPos = sql.toLowerCase().lastIndexOf("order by");
+        if (orderByPos >= 0) {
+            sql = sql.substring(0, orderByPos);
+        }
         String firstCol = returnCol(sql, true);
         String secondCol = returnCol(sql, false);
 

@@ -58,6 +58,15 @@
     </component>
 
     <component>
+      <role>com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner</role>
+      <role-hint>default</role-hint>
+      <implementation>
+        com.xpn.xwiki.wysiwyg.server.cleaner.internal.DefaultHTMLCleaner
+      </implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+
+    <component>
       <role>com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequestFactory</role>
       <role-hint>HTTP/1.1</role-hint>
       <implementation>

@@ -258,6 +258,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
             return;
         }
         currentEvent = event.cast();
+        adjuster.onBeforeBrowserEvent();
         if (currentEvent.getTypeInt() == Event.ONKEYDOWN) {
             if (shortcutKeys.contains(ShortcutKeyFactory.createShortcutKey(currentEvent))) {
                 currentEvent.xPreventDefault();

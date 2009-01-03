@@ -98,21 +98,16 @@ public class Element extends com.google.gwt.dom.client.Element
         if (getFirstChildElement() == null) {
             return getInnerHTML();
         } else {
+            Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
             StringBuffer innerHTML = new StringBuffer();
             Node child = getFirstChild();
             do {
-                switch (child.getNodeType()) {
-                    case Node.TEXT_NODE:
-                        innerHTML.append(child.getNodeValue());
-                        break;
-                    case Node.ELEMENT_NODE:
-                        innerHTML.append(Element.as(child).xGetString());
-                        break;
-                    default:
-                        Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
-                        container.appendChild(child.cloneNode(true));
-                        innerHTML.append(container.getInnerHTML());
-                        break;
+                if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    innerHTML.append(Element.as(child).xGetString());
+                } else {
+                    container.appendChild(child.cloneNode(true));
+                    innerHTML.append(container.getInnerHTML());
+                    container.removeChild(container.getLastChild());
                 }
                 child = child.getNextSibling();
             } while (child != null);

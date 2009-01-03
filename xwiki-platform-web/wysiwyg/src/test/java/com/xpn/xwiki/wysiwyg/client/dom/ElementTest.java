@@ -58,4 +58,15 @@ public class ElementTest extends AbstractWysiwygClientTest
         assertEquals("<div k=\"l\">x<!--p--><span i=\"j\"><a href=\"about:blank\">y</a></span><!--q-->z</div>",
             container.xGetString().toLowerCase().trim());
     }
+
+    /**
+     * Unit test for {@link Element#xGetInnerHTML()} when the inner text nodes contain HTML special characters.
+     */
+    public void testXGetInnerHTMLWithHTMLSpecialChars()
+    {
+        Element element = Document.get().createDivElement().cast();
+        element.appendChild(Document.get().createTextNode("<\"'>&"));
+        element.appendChild(Document.get().createBRElement());
+        assertEquals("&lt;\"'&gt;&amp;<br>", element.xGetInnerHTML().toLowerCase());
+    }
 }

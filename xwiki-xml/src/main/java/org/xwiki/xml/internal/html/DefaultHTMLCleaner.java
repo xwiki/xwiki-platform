@@ -139,7 +139,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     /**
      * {@inheritDoc}
      * <p>
-     * {@link DefaultHTMLCleaner} does not allow fine-tuning of html cleaning via parameters.
+     * {@link DefaultHTMLCleaner} doesn't support any HTML cleaning parameters and thus any parameters passed will be
+     * ignored.
      * </p>
      */
     public org.w3c.dom.Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters)

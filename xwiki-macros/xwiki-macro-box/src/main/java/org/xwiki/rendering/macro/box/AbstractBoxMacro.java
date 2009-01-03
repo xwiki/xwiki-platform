@@ -50,7 +50,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     private static final char NEWLINE_N = '\n';
 
     /**
-     * A new line based on <code>\r\n</code>.
+     * A new line based on <code>\r</code>.
      */
     private static final char NEWLINE_R = '\r';
 

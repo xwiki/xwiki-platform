@@ -50,7 +50,7 @@ public interface HTMLCleaner
      * process.
      * 
      * @param originalHtmlContent The original html content to be cleaned.
-     * @param cleaning Additional parameters (implementation dependent) for cleaning.
+     * @param cleaningParameters Additional parameters (implementation dependent) for cleaning.
      * @return the cleaned HTML as a w3c DOM
      */
     Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters);

@@ -945,8 +945,8 @@ b.ts1{border-width: 0 2px}</code>
     ##-------------------------------------
     ## determine the displayed sections
     ##-------------------------------------
-    $xwiki.jsx.use("XWiki.AdminSheet")
-    $xwiki.ssx.use("XWiki.AdminSheet")
+    $xwiki.jsx.use("XWiki.AdminSheet")##
+    $xwiki.ssx.use("XWiki.AdminSheet")##
     #if($editor == "globaladmin")
       #set($currentDoc = "XWiki.XWikiPreferences")
       #set($sections = ["General", "Presentation", "Registration", "Programming", "Rights", "Users", "Groups", "Import", "Export"])

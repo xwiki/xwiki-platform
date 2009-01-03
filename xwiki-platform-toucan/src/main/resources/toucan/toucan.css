@@ -292,10 +292,6 @@ span.edit_section {
 	border: 1px dotted #555555;
 }
 
-#xwikimaincontainerinner .code p {
-	font-family: courier, courier new, monospace;
-}
-
 .java-keyword {
     font-weight: bold;
     color: #0000aa;

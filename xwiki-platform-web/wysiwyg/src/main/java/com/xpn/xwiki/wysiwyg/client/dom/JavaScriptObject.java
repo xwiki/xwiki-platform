@@ -66,6 +66,7 @@ public class JavaScriptObject extends com.google.gwt.core.client.JavaScriptObjec
      */
     public final native String get(String key)
     /*-{
-        return this[key];
+        var value = this[key];
+        return value == null ? null : '' + value;
     }-*/;
 }

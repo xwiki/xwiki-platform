@@ -36,6 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 
 /**
@@ -104,8 +105,9 @@ public class ConversionFilter implements Filter
                 }
                 String syntax = req.getParameter(wysiwygName + "_syntax");
                 try {
+                    HTMLCleaner cleaner = (HTMLCleaner) Utils.getComponent(HTMLCleaner.ROLE);
                     HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax);
-                    mreq.setParameter(wysiwygName, converter.fromHTML(req.getParameter(wysiwygName)));
+                    mreq.setParameter(wysiwygName, converter.fromHTML(cleaner.clean(req.getParameter(wysiwygName))));
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
                     sendBack = true;

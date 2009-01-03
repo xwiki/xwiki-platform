@@ -162,11 +162,11 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
     /**
      * {@inheritDoc}
      * 
-     * @see BehaviorAdjuster#onBlur()
+     * @see BehaviorAdjuster#onBeforeBlur()
      */
-    protected void onBlur()
+    protected void onBeforeBlur()
     {
-        super.onBlur();
+        super.onBeforeBlur();
         markUnwantedBRs();
     }
 

@@ -102,7 +102,27 @@ public class BehaviorAdjuster implements LoadListener
     }
 
     /**
-     * Called by the underlying rich text are when user actions trigger browser events.
+     * Called by the underlying rich text are when user actions trigger browser events, before any registered listener
+     * is notified.
+     * 
+     * @see RichTextArea#onBrowserEvent(com.google.gwt.user.client.Event)
+     * @see RichTextArea#getCurrentEvent()
+     */
+    public void onBeforeBrowserEvent()
+    {
+        Event event = getTextArea().getCurrentEvent();
+        switch (event.getTypeInt()) {
+            case Event.ONBLUR:
+                onBeforeBlur();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Called by the underlying rich text are when user actions trigger browser events, after all the registered
+     * listeners have been notified.
      * 
      * @see RichTextArea#onBrowserEvent(com.google.gwt.user.client.Event)
      * @see RichTextArea#getCurrentEvent()
@@ -120,9 +140,6 @@ public class BehaviorAdjuster implements LoadListener
                 break;
             case Event.ONKEYPRESS:
                 onKeyPress();
-                break;
-            case Event.ONBLUR:
-                onBlur();
                 break;
             default:
                 break;
@@ -526,9 +543,9 @@ public class BehaviorAdjuster implements LoadListener
     }
 
     /**
-     * Called when the underlying rich text area looses focus.
+     * Called before the underlying rich text area looses focus.
      */
-    protected void onBlur()
+    protected void onBeforeBlur()
     {
         // Nothing here by default. May be overridden by browser specific implementations.
     }

@@ -53,6 +53,14 @@
     <filter-class>com.xpn.xwiki.plugin.webdav.XWikiDavFilter</filter-class>
   </filter>
 
+  <!-- A filter that dispatches requests to the right action depending on the button pressed in the editing form. This
+       is needed when javascript is disabled, since the browser cannot send the form data to different URLs depending on
+       the button pressed. -->
+  <filter>
+    <filter-name>ActionDispatcher</filter-name>
+    <filter-class>com.xpn.xwiki.web.ActionFilter</filter-class>
+  </filter>
+
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the request data. -->
   <filter-mapping>
     <filter-name>Set Character Encoding</filter-name>
@@ -71,6 +79,11 @@
 
   <filter-mapping>
     <filter-name>DavFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>ActionDispatcher</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 

@@ -211,11 +211,9 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
     {
         StringBuilder result = new StringBuilder();
         // First, we add to the import string the extensions that should always be used.
-        if (context.getAction().equals("view") || context.getAction().equals("admin")) {
-            // TODO use a list of actions set by the extension instead.
-            for (String docName : getAlwaysUsedExtensions(context)) {
-                result.append(getLink(docName, context));
-            }
+        // TODO Global extensions should be able to select a set of actions for which they are enabled.
+        for (String docName : getAlwaysUsedExtensions(context)) {
+            result.append(getLink(docName, context));
         }
         // Then, we add On-Demand extensions for this request, from which we remove the
         // extensions that were already in the "always use".

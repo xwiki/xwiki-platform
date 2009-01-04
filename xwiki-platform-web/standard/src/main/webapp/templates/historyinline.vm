@@ -84,7 +84,14 @@
 ##
       </table>
 ## Print the page navigation links, if needed.
-  #printPagedViewLinks($itemsPerPage $totalPages $currentPageNumber "viewer=history&amp;showminor=${minorVersions}" false)
+## Since the history can be viewed both in edit and view mode, and these modes use a different parameter name, detect
+## and set the right parameter here.
+#if($context.action == 'view')
+  #set($viewer = 'viewer=history')
+#else
+  #set($viewer = 'editor=history')
+#end
+  #printPagedViewLinks($itemsPerPage $totalPages $currentPageNumber "${viewer}&amp;showminor=${minorVersions}" false)
       <div class="buttons">
         #if ($totalVersions > 1)
           <div class="buttonwrapper"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div>

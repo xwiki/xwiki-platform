@@ -49,8 +49,8 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     /**
      * Feature name.
      */
-    private static final String NAME = "inserttable"; 
-    
+    private static final String NAME = "inserttable";
+
     /**
      * Table dialog.
      */
@@ -69,8 +69,8 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public InsertTable(TablePlugin plugin)
     {
-        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.insertTable().createImage(),
-            plugin), Strings.INSTANCE.insertTable(), plugin);
+        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.insertTable().createImage(), plugin),
+            Strings.INSTANCE.insertTable(), plugin);
         selectionPreserver = new SelectionPreserver(plugin.getTextArea());
     }
 
@@ -103,42 +103,53 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
             getDialog().center();
         }
     }
-    
+
     /**
      * Create a table from TableConfig configuration.
-     *
+     * <p>
+     * We create the table using innerHTML instead of creating each DOM node in order to improve the speed. In most of
+     * the browsers setting the innerHTML is faster than creating the DOM nodes and appending them.
+     * 
      * @param doc currently edited document.
      * @param config table configuration (row number, etc).
      * @return the newly created table.
      */
-    public Element createTable(Document doc, TableConfig config) 
+    public Element createTable(Document doc, TableConfig config)
     {
-        Element table = doc.xCreateElement(TableUtils.TABLE_NODENAME);       
-        Element tbody = doc.xCreateElement(TableUtils.TBODY_NODENAME);
-        Element row;
-        Element cell;
-                        
-        table.appendChild(tbody);        
+        StringBuffer table = new StringBuffer("<table>");
 
-        // Set table border
-        // table.setBorder(config.getBorderSize());
-        
-        // Create a table with rows and columns according to the configuration
-        for (int i = 0; i < config.getRowNumber(); i++) {
-            row = doc.xCreateElement(TableUtils.ROW_NODENAME);            
-            tbody.appendChild(row);                 
-            for (int j = 0; j < config.getColNumber(); j++) {
-                if (i == 0 && config.hasHeader()) {
-                    cell = doc.xCreateElement(TableUtils.COL_HNODENAME);
-                } else {
-                    cell = doc.xCreateElement(TableUtils.COL_NODENAME);                    
-                }                
-                cell.setInnerHTML(TableUtils.CELL_DEFAULTHTML);            
-                row.appendChild(cell);                
-            }
+        StringBuffer row = new StringBuffer("<tr>");
+        for (int i = 0; i < config.getColNumber(); i++) {
+            row.append("<td>");
+            // The default cell content depends on the browser. In Firefox the best option is to use a BR. Firefox
+            // itself uses BRs in order to allow the user to place the caret inside empty block elements. In Internet
+            // Explorer the best option is to set the inner HTML of each cell to the empty string, after creation. For
+            // now lets keep the non-breaking space. At some point we should have browser specific implementations for
+            // FF and IE. Each will overwrite this method and add specific initialization.
+            row.append(TableUtils.CELL_DEFAULTHTML);
+            row.append("</td>");
         }
-        
-        return table;
+        row.append("</tr>");
+
+        if (config.hasHeader()) {
+            table.append("<thead>");
+            if (config.getRowNumber() > 0) {
+                table.append(row.toString().replace("td", "th"));
+            }
+            table.append("</thead>");
+        }
+
+        table.append("<tbody>");
+        for (int i = config.hasHeader() ? 1 : 0; i < config.getRowNumber(); i++) {
+            table.append(row.toString());
+        }
+        table.append("</tbody></table>");
+
+        Element container = doc.xCreateDivElement().cast();
+        container.setInnerHTML(table.toString());
+        Element tableElement = (Element) container.getFirstChild();
+        container.removeChild(tableElement);
+        return tableElement;
     }
 
     /**
@@ -149,38 +160,35 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public void insertTable(RichTextArea rta, TableConfig config)
     {
-        Range range = TableUtils.getInstance().getRange(rta.getDocument());
         Selection selection = rta.getDocument().getSelection();
-        Node start = range.getStartContainer();
-        int offset = range.getStartOffset();
-        Node flowContainer = DOMUtils.getInstance().getNearestFlowContainer(start);
-        Element table = createTable(rta.getDocument(), config);
-        Node nodeToSelect;
+        Range range = selection.getRangeAt(0);
 
         // Leave the rest of the ranges intact.
         selection.removeAllRanges();
 
-        // Delete the contents of the first range. The table will be inserted in place of the deleted text.
+        // Delete the contents of the first range. The horizontal rule will be inserted in place of the deleted text.
         range.deleteContents();
 
-        // Insert the table in the DOM.
+        // Split the DOM tree up to the nearest flow container and insert the table.
+        Node start = range.getStartContainer();
+        int offset = range.getStartOffset();
+        Node flowContainer = DOMUtils.getInstance().getNearestFlowContainer(start);
+        if (flowContainer == null) {
+            return;
+        }
+        Element table = createTable(rta.getDocument(), config);
         if (flowContainer == start) {
             DOMUtils.getInstance().insertAt(flowContainer, table, offset);
         } else {
             DOMUtils.getInstance().splitNode(flowContainer, start, offset);
             DOMUtils.getInstance().insertAfter(table, DOMUtils.getInstance().getChild(flowContainer, start));
         }
-        
-        // Find the first table cell to put the caret within.
-        if (config.hasHeader()) {            
-            nodeToSelect = DOMUtils.getInstance().getFirstDescendant(table, TableUtils.COL_HNODENAME);
-        } else {
-            nodeToSelect = DOMUtils.getInstance().getFirstDescendant(table, TableUtils.COL_NODENAME);
-        }
-        
-        range.selectNodeContents(nodeToSelect);
+
+        // Place the caret at the beginning of the first cell.
+        range.selectNodeContents(DOMUtils.getInstance().getFirstDescendant(table,
+            config.hasHeader() ? TableUtils.COL_HNODENAME : TableUtils.COL_NODENAME));
         range.collapse(false);
-        selection.addRange(range);                
+        selection.addRange(range);
     }
 
     /**
@@ -223,11 +231,10 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
         selectionPreserver.restoreSelection();
         if (!autoClosed && !getDialog().isCanceled()) {
             // Call the command again, passing the insertion configuration as a JSON object.
-            getPlugin().getTextArea().getCommandManager().execute(getCommand(),
-                "{ rows:" + getDialog().getRowNumber()
-                + ", cols: " + getDialog().getColNumber()
-                + ", header: " + getDialog().hasHeader()
-                + " }");
+            getPlugin().getTextArea().getCommandManager().execute(
+                getCommand(),
+                "{ rows:" + getDialog().getRowNumber() + ", cols: " + getDialog().getColNumber() + ", header: "
+                    + getDialog().hasHeader() + " }");
         } else {
             // We get here if the dialog has been closed by clicking the close button.
             // In this case we return the focus to the text area.

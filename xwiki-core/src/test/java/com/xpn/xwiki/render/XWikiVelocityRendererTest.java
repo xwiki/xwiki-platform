@@ -81,6 +81,7 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
 
     public void testRenderWithSimpleText()
     {
+        this.mockXWiki.stubs().method("Param").will(returnValue(""));
         this.mockXWiki.stubs().method("getIncludedMacros").will(
             returnValue(Collections.EMPTY_LIST));
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));
@@ -94,6 +95,7 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
 
     public void testRenderWithVelocityContent()
     {
+        this.mockXWiki.stubs().method("Param").will(returnValue(""));
         this.mockXWiki.stubs().method("getIncludedMacros").will(
             returnValue(Collections.EMPTY_LIST));
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));

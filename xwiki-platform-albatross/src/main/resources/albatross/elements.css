@@ -47,6 +47,13 @@ strong {}
 dfn {}
 code {
   font-family: "Bitstream Vera Sans Mono", "Courier New", Monaco, Courier, monospace;  /* [3] */
+  overflow: auto;
+  background-color: #EEE;
+  border: 1px solid #DDD;
+  padding: 4px;
+}
+code pre {
+  font-family: "Bitstream Vera Sans Mono", "Courier New", Monaco, Courier, monospace;  /* [3] */
 }
 samp {}
 kbd {}
@@ -60,13 +67,6 @@ sub {}
 sup {}
 /* End of 9.2 */
 p {}
-pre {
-  font-family: "Bitstream Vera Sans Mono", "Courier New", Monaco, Courier, monospace;  /* [3] */
-  overflow: auto;
-  background-color: #EEE;
-  border: 1px solid #DDD;
-  padding: 4px;
-}
 ins {}
 del {}
 

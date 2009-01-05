@@ -96,7 +96,7 @@ public class Element extends com.google.gwt.dom.client.Element
     public final String xGetInnerHTML()
     {
         if (getFirstChildElement() == null) {
-            return getInnerHTML();
+            return unformat(getInnerHTML());
         } else {
             Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
             StringBuffer innerHTML = new StringBuffer();
@@ -111,7 +111,7 @@ public class Element extends com.google.gwt.dom.client.Element
                 }
                 child = child.getNextSibling();
             } while (child != null);
-            return innerHTML.toString();
+            return unformat(innerHTML.toString());
         }
     }
 
@@ -132,10 +132,26 @@ public class Element extends com.google.gwt.dom.client.Element
         }
         DocumentFragment metaData = getMetaData();
         if (metaData != null) {
-            return metaData.getInnerHTML().replace(INNER_HTML_PLACEHOLDER, outerHTML);
-        } else {
-            return outerHTML;
+            outerHTML = metaData.getInnerHTML().replace(INNER_HTML_PLACEHOLDER, outerHTML);
         }
+        return unformat(outerHTML);
+    }
+
+    /**
+     * Removes the formatting added by some browsers, including IE, to the HTML returned by innerHTML and outerHTML
+     * properties. Some browsers, like iE, format the HTML fragment returned by innerHTML and outerHTML properties using
+     * new lines.
+     * <p>
+     * We have to remove this formatting because when we reset the innerHTML or outerHTML properties the new lines can
+     * generate additional text nodes which can, for instance, mess up the History mechanism.
+     * 
+     * @param html The HTML fragment whose formatting should be removed.
+     * @return The given HTML without the new lines or tabs.
+     * @see XWIKI-3047 Undo fails in IE when called inside a paragraph
+     */
+    private static String unformat(String html)
+    {
+        return html.replaceAll("[\r\n\t]+", "");
     }
 
     /**

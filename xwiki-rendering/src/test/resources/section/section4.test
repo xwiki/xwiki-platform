@@ -9,7 +9,7 @@ end header =
 
 not header =
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 beginSection [1]
@@ -31,11 +31,11 @@ onSpecialSymbol [=]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|xhtml
 .#-----------------------------------------------------
 <h1 id="Hheaderbrendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p>
 .#-----------------------------------------------------
-.expect|xwiki/2.0
+.expect|xwiki
 .#-----------------------------------------------------
 = header
 end header =

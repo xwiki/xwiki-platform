@@ -35,7 +35,7 @@ import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.PrintRendererType;
-import org.xwiki.rendering.renderer.XHTMLRenderer;
+import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
@@ -103,8 +103,21 @@ public class XWikiCommentHandler extends CommentHandler
     private void handleLinkCommentStop(String content, TagStack stack)
     {
         DefaultWikiPrinter printer = new DefaultWikiPrinter();            
-        XHTMLRenderer renderer = 
-            (XHTMLRenderer) this.printRendererFactory.createRenderer(PrintRendererType.XHTML, printer);
+        // Since wikimodel does not support wiki syntax in link labels we need to pass the link label "as is" (as it
+        // originally appears in the parsed source) and handle it specially in the
+        // XDOMGeneratorListener.createLinkBlock(), with the parser passed as the first parameter in the
+        // XDOMGeneratorListener constructor.
+        // Since we cannot get this label as it originally appeared in the HTML source ( we are doing a SAX-like
+        // parsing), we should render the XDOM as HTML to get an HTML label. 
+        // Since any syntax would do it, as long as this renderer matches the corresponding XDOMGeneratorListener
+        // parser, we use an xwiki 2.0 renderer for it is less complex (no context needed to render xwiki 2.0, no url
+        // resolution needed, no reference validity tests).
+        // see XDOMGeneratorListener#XDOMGeneratorListener(Parser, LinkParser, ImageParser)
+        // see WikiModelXHTMLParser#getLinkLabelParser()
+        // see http://code.google.com/p/wikimodel/issues/detail?id=87
+        // TODO: remove this workaround when wiki syntax in link labels will be supported by wikimodel
+        XWikiSyntaxRenderer renderer =
+            (XWikiSyntaxRenderer) this.printRendererFactory.createRenderer(PrintRendererType.XWIKISYNTAX, printer);
         XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.getStackParameter("xdomGeneratorListener");
         listener.getXDOM().traverse(renderer);
 

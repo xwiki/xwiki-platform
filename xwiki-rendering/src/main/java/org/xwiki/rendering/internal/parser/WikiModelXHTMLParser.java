@@ -32,6 +32,7 @@ import org.wikimodel.wem.xhtml.filter.XHTMLWhitespaceXMLFilter;
 import org.wikimodel.wem.xhtml.handler.TagHandler;
 import org.xml.sax.XMLReader;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -71,6 +72,14 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     private XMLReaderFactory xmlReaderFactory;
     
     /**
+     * The parser used for the link label parsing. For (x)html parsing, this will be an xwiki 2.0 parser, since it's 
+     * more convenient to pass link labels in xwiki syntax. See referred resource for more details.
+     * 
+     * @see XWikiCommentHandler#handleLinkCommentStop(String, TagStack)
+     */
+    private Parser xwikiParser;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.parser.Parser#getSyntax()
@@ -90,6 +99,18 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     {
         return super.parse(new StringReader(XMLUtils.toString(this.htmlCleaner.clean(source))));
     }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractWikiModelParser#getLinkLabelParser()
+     */
+    @Override
+    public Parser getLinkLabelParser()
+    {
+        return this.xwikiParser;
+    }
+    
     
     /**
      * {@inheritDoc}

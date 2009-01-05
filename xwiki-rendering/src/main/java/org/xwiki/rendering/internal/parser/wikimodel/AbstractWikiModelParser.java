@@ -42,12 +42,26 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
     
     public abstract IWikiParser createWikiModelParser() throws ParseException;
 
+    /**
+     * @return the parser to use for the link labels, since wikimodel does not support wiki syntax in links and they
+     *         need to be handled in the XDOMGeneratorListener. By default, the link label parser is the same one as the
+     *         source parser (this), but you should overwrite this method if you need to use a special parser.
+     * @see XDOMGeneratorListener#XDOMGeneratorListener(Parser, LinkParser, ImageParser)
+     * @see http://code.google.com/p/wikimodel/issues/detail?id=87 
+     * TODO: Remove this method when the parser will not need to be passed to the XDOMGeneratorListener anymore.
+     */
+    public Parser getLinkLabelParser() 
+    {
+        return this;
+    }
+
     public XDOM parse(Reader source) throws ParseException
     {
         IWikiParser parser = createWikiModelParser();
 
         // We pass the LinkParser corresponding to the syntax.
-        XDOMGeneratorListener listener = new XDOMGeneratorListener(this, this.linkParser, this.imageParser);
+        XDOMGeneratorListener listener =
+            new XDOMGeneratorListener(this.getLinkLabelParser(), this.linkParser, this.imageParser);
 
         try {
             parser.parse(source, listener);

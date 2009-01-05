@@ -1,36 +1,49 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Test multilines sections
 .#-----------------------------------------------------
-= Title level 1
-Some paragraph
+= header
+end header =
+
+= header
+
+not header =
 .#-----------------------------------------------------
-.expect|event
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginSection [1]
-onWord [Title]
+onWord [header]
+onLineBreak
+onWord [end]
 onSpace
-onWord [level]
-onSpace
-onWord [1]
+onWord [header]
+endSection [1]
+beginSection [1]
+onWord [header]
 endSection [1]
 beginParagraph
-onWord [Some]
+onWord [not]
 onSpace
-onWord [paragraph]
+onWord [header]
+onSpace
+onSpecialSymbol [=]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml
+.expect|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="HTitlelevel1"><span>Title level 1</span></h1><p>Some paragraph</p>
+<h1 id="Hheaderbrendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p>
 .#-----------------------------------------------------
-.expect|xwiki
+.expect|xwiki/2.0
 .#-----------------------------------------------------
-= Title level 1 =
+= header
+end header =
 
-Some paragraph
+= header =
+
+not header =
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><h1 id="HTitlelevel1"><span>Title level 1</span></h1><p>Some paragraph</p></html>
+<h1 id="Hheaderbrendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p>

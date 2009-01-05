@@ -153,7 +153,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("section/section4", false);
         suite.addTestsFromResource("section/section5", false);
         suite.addTestsFromResource("section/section6", false);
-        suite.addTestsFromResource("section/section7", false);
         suite.addTestsFromResource("quote/quote1", false);
         suite.addTestsFromResource("quote/quote2", false);
         suite.addTestsFromResource("quote/quote3", false);

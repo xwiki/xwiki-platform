@@ -125,17 +125,6 @@ a img {
     border: none;
 }
 
-pre {
-    background-color: #F1F7FF;
-    border: 1px dotted #555555;
-    float: left;
-    white-space: pre;
-    padding: 10px;
-    margin: 0;
-    overflow: auto;
-    position: relative; /*word-wrap:break-word;*/
-}
-
 /* Used to signify a rendering error in the rendered page. Valid only with new rendering */
 .xwikirenderingerror {
     background-color: #FF5555;
@@ -290,6 +279,10 @@ span.edit_section {
 	overflow: auto;
 	background-color: #F1F7FF;
 	border: 1px dotted #555555;
+}
+
+#xwikimaincontainerinner .code pre {
+    font-family: courier, courier new, monospace;
 }
 
 .java-keyword {

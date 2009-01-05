@@ -113,4 +113,42 @@ public class HistoryTest extends AbstractRichTextAreaTest
         assertTrue(rta.getCommandManager().execute(Command.REDO));
         assertEquals(selectedText, rta.getDocument().getSelection().getRangeAt(0).toString());
     }
+
+    /**
+     * @see XWIKI-3047: Undo fails in IE when called inside a paragraph
+     */
+    public void testUndoInsideParagraph()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestUndoInsideParagraph();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see XWIKI-3047: Undo fails in IE when called inside a paragraph
+     */
+    public void doTestUndoInsideParagraph()
+    {
+        String html = "<p>xyz</p>";
+        rta.setHTML(html);
+
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
+        range.setEnd(getBody().getFirstChild().getFirstChild(), 2);
+        range.setStart(getBody().getFirstChild().getFirstChild(), 1);
+        select(range);
+
+        String selectedText = "y";
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+        rta.getCommandManager().execute(Command.BOLD);
+        rta.getCommandManager().execute(Command.UNDO);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+        assertEquals(html, clean(rta.getHTML()));
+    }
 }

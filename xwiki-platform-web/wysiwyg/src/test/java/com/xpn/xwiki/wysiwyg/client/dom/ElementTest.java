@@ -37,7 +37,7 @@ public class ElementTest extends AbstractWysiwygClientTest
         element.setInnerHTML("a<!--x--><em r=\"s\"><br/><!--y-->b<del>c</del></em>");
         element.setAttribute("q", "p");
         assertEquals("<div q=\"p\">a<!--x--><em r=\"s\"><br><!--y-->b<del>c</del></em></div>", element.xGetString()
-            .toLowerCase().trim());
+            .toLowerCase());
     }
 
     /**
@@ -56,7 +56,7 @@ public class ElementTest extends AbstractWysiwygClientTest
         anchor.setMetaData(metaData);
 
         assertEquals("<div k=\"l\">x<!--p--><span i=\"j\"><a href=\"about:blank\">y</a></span><!--q-->z</div>",
-            container.xGetString().toLowerCase().trim());
+            container.xGetString().toLowerCase());
     }
 
     /**

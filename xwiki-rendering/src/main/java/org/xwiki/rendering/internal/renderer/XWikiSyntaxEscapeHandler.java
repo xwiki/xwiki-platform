@@ -61,6 +61,10 @@ public class XWikiSyntaxEscapeHandler
             escapeFirstMatchedCharacter(SECTION_PATTERN, accumulatedBuffer);
         }
         
+        if (state.isInTable()) {
+            replaceAll(accumulatedBuffer, "|", "~|");
+        }
+
         if (escapeFirstIfMatching != null) {
             escapeFirstMatchedCharacter(escapeFirstIfMatching, accumulatedBuffer);
         }

@@ -347,6 +347,9 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
      */
     private void initTextArea()
     {
+        // Focus the rich text area to be sure it has reached desing mode.
+        getUI().getTextArea().setFocus(true);
+
         // Make sure the editor uses formatting tags instead of CSS.
         // This is a requirement for HTML to wiki conversion.
         StyleWithCssExecutable styleWithCss = new StyleWithCssExecutable();

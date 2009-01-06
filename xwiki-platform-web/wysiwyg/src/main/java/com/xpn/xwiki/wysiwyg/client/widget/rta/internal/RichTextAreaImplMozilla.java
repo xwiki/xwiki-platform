@@ -98,14 +98,16 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
             // designMode, so let's avoid doing it more than once.
             iframe.onload = null;
 
-            // Send notification that the iframe has finished loading.
-            _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
-            
             if (focused) {
                 enterDesignMode();
             } else {
                 loaded = true;
             }
+
+            // Send notification that the iframe has finished loading.
+            // NOTE: The iframe didn't reached design mode unless it was focused.
+            // If your code relies on design mode you have to focus the iframe before.
+            _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
         };
 
         // Don't set designMode until the RTA actually gets focused. This is

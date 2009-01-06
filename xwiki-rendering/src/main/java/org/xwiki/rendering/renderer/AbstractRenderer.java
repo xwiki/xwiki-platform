@@ -121,6 +121,7 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
 
     public void beginTable(Map<String, String> parameters)
     {
+        this.state.setInTable(true);
         this.state.setTextOnNewLine(false);
     }
 
@@ -205,6 +206,7 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
 
     public void endTable(Map<String, String> parameters)
     {
+        this.state.setInTable(false);
     }
 
     public void endTableCell(Map<String, String> parameters)

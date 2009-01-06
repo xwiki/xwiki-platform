@@ -21,36 +21,37 @@ package org.xwiki.rendering.renderer;
 
 /**
  * Saves a renderer's state (ie for example if the renderer is in a link, in a section, etc).
- *  
+ * 
  * @version $Id$
  * @since 1.7
  */
 public class RendererState
 {
     /**
-     * True if the text being written starts a new line. By text we mean Space, Special Symbol and Words. 
-     * This is useful for some renderers which need to have this information. For example the XWiki Syntax 
-     * renderer uses it to decide whether to escape "*" characters starting new lines since otherwise they
-     * would be confused for list items. 
+     * True if the text being written starts a new line. By text we mean Space, Special Symbol and Words. This is useful
+     * for some renderers which need to have this information. For example the XWiki Syntax renderer uses it to decide
+     * whether to escape "*" characters starting new lines since otherwise they would be confused for list items.
      */
     private boolean isTextOnNewLine;
-    
+
     private boolean isInParagraph;
 
     private boolean isInSection;
-    
+
     private boolean isInLink;
-    
+
+    private boolean isInTable;
+
     public boolean isInParagraph()
     {
         return this.isInParagraph;
     }
-    
+
     public void setInParagraph(boolean isInParagraph)
     {
         this.isInParagraph = isInParagraph;
     }
-    
+
     public boolean isInSection()
     {
         return this.isInSection;
@@ -60,7 +61,7 @@ public class RendererState
     {
         this.isInSection = isInSection;
     }
-    
+
     public boolean isInLink()
     {
         return this.isInLink;
@@ -75,9 +76,19 @@ public class RendererState
     {
         return this.isTextOnNewLine;
     }
-    
+
     public void setTextOnNewLine(boolean isTextOnNewLine)
     {
         this.isTextOnNewLine = isTextOnNewLine;
+    }
+
+    public void setInTable(boolean isInTable)
+    {
+        this.isInTable = isInTable;
+    }
+
+    public boolean isInTable()
+    {
+        return this.isInTable;
     }
 }

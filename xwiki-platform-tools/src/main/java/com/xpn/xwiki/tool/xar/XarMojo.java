@@ -337,8 +337,14 @@ public class XarMojo extends AbstractXarMojo
                 if (documentNames.contains(documentName)) {
 
                     // building the path the current file will have within the archive
+                    /*
+                     * DO NOT USE String.split since it requires a regexp. Under Windows XP, the FileSeparator is '\'
+                     * when not escaped is a special character of the regexp String archivedFilePath =
+                     * currentFile.getAbsolutePath().split(sourceDir.getAbsolutePath() + File.separator)[1];
+                     */
                     String archivedFilePath =
-                        currentFile.getAbsolutePath().split(sourceDir.getAbsolutePath() + File.separator)[1];
+                        currentFile.getAbsolutePath()
+                            .substring((sourceDir.getAbsolutePath() + File.separator).length());
                     archivedFilePath.replace(File.separatorChar, '/');
 
                     archiver.addFile(currentFile, archivedFilePath);

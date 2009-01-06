@@ -31,3 +31,11 @@ table th {
   text-align: left;
   background-color: #F0F0EE;
 }
+
+/*
+  Overwrite no matter what list-style-position to outside position to avoid the Firefox issues with editing lists
+  with inside list style. 
+*/
+.main ul, .main ol {
+  list-style-position: outside !important;
+}

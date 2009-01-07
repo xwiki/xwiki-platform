@@ -643,6 +643,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-officeimporter</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-query-xwql</artifactId>
       <version>${pom.version}</version>
       <scope>runtime</scope>
@@ -659,6 +664,13 @@
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>
       <version>${platform.tool.test.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Required by jodconverter; see http://www.slf4j.org/faq.html#maven2 -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.4.3</version>
       <scope>test</scope>
     </dependency>
 

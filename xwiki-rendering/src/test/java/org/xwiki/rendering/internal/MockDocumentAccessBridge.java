@@ -48,26 +48,51 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
         return componentDescriptor;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDocumentContent(String)
+     */
     public String getDocumentContent(String documentName) throws Exception
     {
         return "Some content";
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDocumentContent(String, String)
+     */
     public String getDocumentContent(String documentName, String language) throws Exception
     {
         return "Some translated content";
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDocumentContentForDefaultLanguage(String)
+     */
     public String getDocumentContentForDefaultLanguage(String documentName) throws Exception
     {
         return "Some content";
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#exists(String)
+     */
     public boolean exists(String documentName) throws Exception
     {
         return documentName.equals("Space.ExistingPage");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getURL(String, String, String, String)
+     */
     public String getURL(String documentName, String action, String queryString, String anchor) throws Exception
     {
         String result = "/xwiki/bin/view/" + (documentName == null ? "currentdoc" : documentName.replace(".", "/"));
@@ -80,80 +105,155 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getAttachmentURL(String, String)
+     */
     public String getAttachmentURL(String documentName, String attachmentName) throws Exception
     {
         return "/xwiki/bin/download/" + (documentName == null ? "currentdoc" : documentName.replace(".", "/")) + "/"
             + attachmentName;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getProperty(String, String, int, String)
+     */
     public String getProperty(String documentName, String className, int objectNumber, String propertyName)
         throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getProperty(String, String, String)
+     */
     public String getProperty(String documentName, String className, String propertyName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getProperty(String, String)
+     */
     public String getProperty(String documentName, String propertyName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getPropertyType(String, String)
+     */
     public String getPropertyType(String className, String propertyName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#isPropertyCustomMapped(String, String)
+     */
     public boolean isPropertyCustomMapped(String className, String propertyName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getAttachmentContent(String, String)
+     */
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
-        
+       
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#setAttachmentContent(String, String, byte[])
+     */
     public void setAttachmentContent(String documentName, String AttachmentName,
         byte[] attachmentData) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#setDocumentContent(String, String, String, boolean)
+     */
     public void setDocumentContent(String documentName, String content, String editComment,
         boolean isMinorEdit) throws Exception
     {
         throw new RuntimeException("Not implemented");        
     }
     
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#setDocumentSyntaxId(String, String)
+     */
     public void setDocumentSyntaxId(String documentName, String syntaxId) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#isDocumentViewable(String)
+     */
     public boolean isDocumentViewable(String documentName)
     {
         return true;
     }
     
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#isDocumentEditable(String)
+     */
     public boolean isDocumentEditable(String documentName)
     {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#hasProgrammingRights()
+     */
     public boolean hasProgrammingRights()
     {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getCurrentUser()
+     */
     public String getCurrentUser()
     {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDefaultEncoding()
+     */
     public String getDefaultEncoding()
     {
         throw new RuntimeException("Not implemented");

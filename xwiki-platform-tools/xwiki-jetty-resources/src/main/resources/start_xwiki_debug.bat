@@ -21,7 +21,7 @@ REM $3 must the path where Yourkit can find the agent.
 REM For example: "C:\PROGRA~1\YOURKI~1.11\bin\win32"
 REM No spaces are allowed in this path, 8.3 DOS path format should be used.
 REM Use the "dir /X" command (in command prompt) within a directory to get 8.3 DOS path
-if %2==profiler (
+if "%2"=="profiler" (
   set OLD_PATH=%PATH%
   set PATH=%3;%PATH%
   set JAVA_TOOL_OPTIONS=-agentlib:yjpagent

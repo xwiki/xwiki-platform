@@ -116,8 +116,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
+        String oldSyntaxId = doc.getSyntaxId();
         doc.setSyntaxId(syntaxId);
-        xcontext.getWiki().saveDocument(doc, xcontext);
+        xcontext.getWiki().saveDocument(doc,
+            String.format("Changed document syntax from [%s] to [%s].", oldSyntaxId, syntaxId), xcontext);
     }
 
     /**
@@ -241,8 +243,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         attachment.setAuthor(xcontext.getUser());
         attachment.setDoc(doc);
         doc.saveAttachmentContent(attachment, xcontext);
-        xcontext.getWiki().saveDocument(doc,
-            String.format("Added attachment [%s].", AttachmentName), xcontext);
     }
 
     /**
@@ -326,6 +326,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
+     * Utility method for checking access rights of the current user on a target document. 
+     * 
      * @param documentName The name of the document.
      * @param right Access right requested.
      * @return True if the current user has the given access right, false otherwise.

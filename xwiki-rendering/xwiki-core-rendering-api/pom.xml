@@ -68,16 +68,6 @@
       <version>2.0.7-20090105</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.doxia</groupId>
-      <artifactId>doxia-module-confluence</artifactId>
-      <version>1.0-alpha-11</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.doxia</groupId>
-      <artifactId>doxia-module-twiki</artifactId>
-      <version>1.0-alpha-11</version>
-    </dependency>
-    <dependency>
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
       <version>1.6.1</version>

@@ -25,13 +25,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform</groupId>
-    <artifactId>xwiki-core-parent</artifactId>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-core-rendering-parent</artifactId>
     <version>1.8-SNAPSHOT</version>
   </parent>
-  <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-macros-parent</artifactId>
-  <name>XWiki Platform - Core - Macros - Parent POM</name>
+  <artifactId>xwiki-core-rendering-macros-parent</artifactId>
+  <name>XWiki Platform - Rendering - Core - Macros - Parent POM</name>
   <packaging>pom</packaging>
   <description>Macros implementations supported by XWiki Platform</description>
   <dependencies>
@@ -63,15 +62,15 @@
     </dependency>
   </dependencies>
   <modules>
-    <module>xwiki-macro-id</module>
-    <module>xwiki-macro-include</module>
-    <module>xwiki-macro-toc</module>
-    <module>xwiki-macro-html</module>
-    <module>xwiki-macro-script</module>
-    <module>xwiki-macro-velocity</module>
-    <module>xwiki-macro-groovy</module>
-    <module>xwiki-macro-box</module>
-    <module>xwiki-macro-code</module>
+    <module>xwiki-core-rendering-macro-id</module>
+    <module>xwiki-core-rendering-macro-include</module>
+    <module>xwiki-core-rendering-macro-toc</module>
+    <module>xwiki-core-rendering-macro-html</module>
+    <module>xwiki-core-rendering-macro-script</module>
+    <module>xwiki-core-rendering-macro-velocity</module>
+    <module>xwiki-core-rendering-macro-groovy</module>
+    <module>xwiki-core-rendering-macro-box</module>
+    <module>xwiki-core-rendering-macro-code</module>
   </modules>
 </project>
        

@@ -29,13 +29,13 @@ import org.xwiki.rendering.scaffolding.RenderingTestSuite;
  * All Rendering integration tests defined in text files using a special format.
  * 
  * @version $Id$
- * @since 1.7.1
+ * @since 1.8M1
  */
 public class RenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test XWiki1.0 -> XWiki2.0 convertion");
+        RenderingTestSuite suite = new RenderingTestSuite("Test XWiki1.0 -> XWiki2.0 conversion");
 
         // Velocity comments
         suite.addTestsFromResource("velocity/comments1", false);

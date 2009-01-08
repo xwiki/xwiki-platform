@@ -36,5 +36,6 @@
   <description>XWiki Platform - Core - Rendering - Parent POM</description>
   <modules>
     <module>xwiki-core-rendering-api</module>
+    <module>xwiki-core-rendering-macros</module>
   </modules>
 </project>

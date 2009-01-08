@@ -20,10 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.dom;
 
 /**
- * Extends GWT JavaScriptObject to add a fromJson method. 
- * 
- * Usage :
- * <code>
+ * Extends GWT JavaScriptObject to add a fromJson method. Usage : <code>
  * public class MyCar extends JavaScriptObject {   
  *     protected MyCar() {}
  *     public final native int getWheelNumber() / *-{ return this.wheelnb; }-* /;
@@ -59,14 +56,27 @@ public class JavaScriptObject extends com.google.gwt.core.client.JavaScriptObjec
     }-*/;
 
     /**
-     * Returns the value stored in this javascript object for the passed key.
+     * Returns the reference stored in this JavaScript object for the given key.
      * 
      * @param key the key whose value to return
-     * @return the value of the specified key.
+     * @return the value of the specified key
      */
-    public final native String get(String key)
+    public final native Object get(String key)
     /*-{
-        var value = this[key];
-        return value == null ? null : '' + value;
+        return this[key];
+    }-*/;
+
+    /**
+     * Saves the given reference in this JavaScript object using the specified key.
+     * 
+     * @param key the string used for storing and retrieving the reference
+     * @param ref the object whose reference will be stored
+     * @return the previous reference associated with the given key
+     */
+    public final native Object set(String key, Object ref)
+    /*-{
+        var oldRef = this[key];
+        this[key] = ref;
+        return oldRef;
     }-*/;
 }

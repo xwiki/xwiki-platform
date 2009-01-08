@@ -281,15 +281,15 @@ public class ImageConfig implements IsSerializable
     public void fromJSON(String json)
     {
         JavaScriptObject jsObj = JavaScriptObject.fromJson(json);
-        setWiki(jsObj.get("wiki"));
-        setSpace(jsObj.get("space"));
-        setPage(jsObj.get("page"));
-        setImageFileName(jsObj.get("filename"));
-        setImageURL(jsObj.get("url"));
-        setWidth(jsObj.get("width"));
-        setHeight(jsObj.get("height"));
-        setAltText(jsObj.get("alttext"));
-        String foundAlignment = jsObj.get("alignment");
+        setWiki((String) jsObj.get("wiki"));
+        setSpace((String) jsObj.get("space"));
+        setPage((String) jsObj.get("page"));
+        setImageFileName((String) jsObj.get("filename"));
+        setImageURL((String) jsObj.get("url"));
+        setWidth((String) jsObj.get("width"));
+        setHeight((String) jsObj.get("height"));
+        setAltText((String) jsObj.get("alttext"));
+        String foundAlignment = (String) jsObj.get("alignment");
         if (foundAlignment != null) {
             setAlignment(ImageAlignment.valueOf(foundAlignment));
         }

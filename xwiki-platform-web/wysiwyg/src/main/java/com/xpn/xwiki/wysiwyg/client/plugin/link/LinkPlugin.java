@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkDialog;
@@ -160,8 +161,19 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
             selectionPreserver.saveSelection();
             // setup the dialog data
             // use only the first range in the user selection
-            getLinkDialog().setLabel(getTextArea().getDocument().getSelection().getRangeAt(0).toHTML(),
-                getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+            // Check the special case when the selection is an image and add a link on an image
+            String imageParam =
+                (getTextArea().getCommandManager().getExecutable(Command.INSERT_IMAGE)).getParameter(getTextArea());
+            if (imageParam != null) {
+                // it's an image selection, set the label readonly and put the image filename in the label text
+                ImageConfig imgConfig = new ImageConfig();
+                imgConfig.fromJSON(imageParam);
+                getLinkDialog().setLabel(getTextArea().getDocument().getSelection().getRangeAt(0).toHTML(),
+                    imgConfig.getImageFileName(), true);
+            } else {
+                getLinkDialog().setLabel(getTextArea().getDocument().getSelection().getRangeAt(0).toHTML(),
+                    getTextArea().getDocument().getSelection().getRangeAt(0).toString(), false);
+            }
             // show the dialog
             getLinkDialog().center();
         } else {

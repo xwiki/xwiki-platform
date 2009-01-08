@@ -99,7 +99,7 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
         initWidget(tabs);
 
         // set the initial label HTML to void string, as if no selection was made.
-        setLabel("", "");
+        setLabel("", "", false);
     }
 
     /**
@@ -109,14 +109,15 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
      * 
      * @param labelHTML the HTML of the label for the created link.
      * @param labelText the text of the label for the created link (stripped of HTML tags)
+     * @param readOnly specifies if the link label will be exposed as readonly to the user
      */
-    public void setLabel(String labelHTML, String labelText)
+    public void setLabel(String labelHTML, String labelText, boolean readOnly)
     {
         // pass the label to all the tabs in this dialog's tab panel
         for (int i = 0; i < tabs.getWidgetCount(); i++) {
             Widget tab = tabs.getWidget(i);
             if (tab instanceof HasLink) {
-                ((HasLink) tab).setLabel(labelHTML, labelText);
+                ((HasLink) tab).setLabel(labelHTML, labelText, readOnly);
             }
         }
     }

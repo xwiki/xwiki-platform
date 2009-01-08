@@ -339,6 +339,7 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
             loadPlugins();
             fillMenu();
             fillToolBar();
+            onUpdate();
         }
     }
 
@@ -354,7 +355,9 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
         // This is a requirement for HTML to wiki conversion.
         StyleWithCssExecutable styleWithCss = new StyleWithCssExecutable();
         if (styleWithCss.isSupported(getUI().getTextArea())) {
-            styleWithCss.execute(getUI().getTextArea(), String.valueOf(false));
+            // If we disable styleWithCss then the indent command will generate blockquote elements even when the caret
+            // is inside a list item. Let's keep it enabled until we overwrite the default list support.
+            styleWithCss.execute(getUI().getTextArea(), String.valueOf(true));
         }
 
         // Make sure pressing return generates a new paragraph.

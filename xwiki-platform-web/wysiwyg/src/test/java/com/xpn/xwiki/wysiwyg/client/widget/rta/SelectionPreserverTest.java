@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
@@ -121,13 +123,15 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         Range range = rta.getDocument().createRange();
         range.setStart(getBody().getFirstChild(), 0);
         range.setEnd(getBody().getFirstChild(), 2);
+        String selectedText = "to";
 
         Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
-        assertEquals("to", selection.toString());
+        assertEquals(selectedText, selection.toString());
 
         preserver.saveSelection();
+        assertEquals(selectedText, selection.getRangeAt(0).toHTML());
         assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "<ins>the</ins> <em>To</em>"));
 
         preserver.restoreSelection();
@@ -244,7 +248,9 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         assertEquals("", rta.getDocument().getSelection().toString());
         preserver.saveSelection();
         preserver.restoreSelection();
-        assertEquals("", rta.getDocument().getSelection().toString());
+        // We need to trim the selected text because the IE range implementation adds and selects a single-space text
+        // when we try to place the caret inside an empty DOM element.
+        assertEquals("", rta.getDocument().getSelection().toString().trim());
     }
 
     /**
@@ -277,5 +283,153 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, symbol));
         preserver.restoreSelection();
         assertEquals(symbol, rta.getDocument().getSelection().toString());
+    }
+
+    /**
+     * Tests the preserver when an image is selected.
+     */
+    public void testPreserveImageSelection()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestPreserveImageSelection();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests the preserver when an image is selected.
+     */
+    private void doTestPreserveImageSelection()
+    {
+        String imageHTML = "<img src=\"clear.cache.gif\" height=\"10\" width=\"10\"/>";
+        rta.setHTML("pq" + imageHTML + "r");
+
+        Range range = rta.getDocument().createRange();
+        range.selectNode(getBody().getChildNodes().getItem(1));
+        select(range);
+
+        preserver.saveSelection();
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, imageHTML.replace("10", "15")));
+        preserver.restoreSelection();
+        assertEquals(15, ((ImageElement) getBody().getChildNodes().getItem(1)).getWidth());
+
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertEquals(getBody(), range.getStartContainer());
+        assertEquals(1, range.getStartOffset());
+        assertEquals(getBody(), range.getEndContainer());
+        assertEquals(2, range.getEndOffset());
+    }
+
+    /**
+     * Test the preserver when we select a text node and we replace it with the empty string.
+     */
+    public void testSelectTextNodeAndReplaceItWithEmptyString()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestSelectTextNodeAndReplaceItWithEmptyString();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Test the preserver when we select a text node and we replace it with the empty string.
+     */
+    private void doTestSelectTextNodeAndReplaceItWithEmptyString()
+    {
+        rta.setHTML("<p>123</p>");
+
+        Range range = rta.getDocument().createRange();
+        range.selectNodeContents(getBody().getFirstChild().getFirstChild());
+        select(range);
+
+        preserver.saveSelection();
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, ""));
+        preserver.restoreSelection();
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "%"));
+        assertEquals("<p>%</p>", rta.getHTML().toLowerCase());
+    }
+
+    /**
+     * Test the preserver when we select a text node and then we delete it.
+     */
+    public void testSelectTextNodeAndDeleteIt()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestSelectTextNodeAndDeleteIt();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Test the preserver when we select a text node and then we delete it.
+     */
+    private void doTestSelectTextNodeAndDeleteIt()
+    {
+        rta.setHTML("<p>321</p>");
+        Node text = getBody().getFirstChild().getFirstChild();
+
+        Range range = rta.getDocument().createRange();
+        range.selectNodeContents(text);
+        select(range);
+
+        preserver.saveSelection();
+        text.getParentNode().removeChild(text);
+        preserver.restoreSelection();
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "+"));
+        assertEquals("<p>+</p>", rta.getHTML().toLowerCase());
+    }
+
+    /**
+     * Test the preserver when we select an image and then delete that image.
+     */
+    public void testSelectImageAndDeleteIt()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestSelectImageAndDeleteIt();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Test the preserver when we select an image and then delete that image.
+     */
+    private void doTestSelectImageAndDeleteIt()
+    {
+        rta.setHTML("<div><img src=\"clear.cache.gif\" height=\"10\" width=\"10\"/></div>");
+        Node image = getBody().getFirstChild().getFirstChild();
+
+        Range range = rta.getDocument().createRange();
+        range.selectNode(image);
+        select(range);
+
+        preserver.saveSelection();
+        image.getParentNode().removeChild(image);
+        preserver.restoreSelection();
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "@"));
+        assertEquals("<div>@</div>", rta.getHTML().toLowerCase());
     }
 }

@@ -242,7 +242,7 @@ XWiki.SyntaxConverter = Class.create({
    * Valid syntaxes as the initial content syntax. If the originally selected syntax is not among these, then a
    * conversion is not proposed.
    */
-  validSourceSyntaxes : ["xwiki/2.0", "confluence/1.0", "jspwiki/1.0", "creole/1.0", "mediawiki/1.0", "twiki/1.0", "xhtml/1.0", "html/4.01"],
+  validSourceSyntaxes : ["xwiki/2.0", "xwiki/1.0", "confluence/1.0", "jspwiki/1.0", "creole/1.0", "mediawiki/1.0", "twiki/1.0", "xhtml/1.0", "html/4.01"],
 
   /**
    * Valid syntaxes as the target content syntax. If the newly selected syntax is not among these, then a conversion is

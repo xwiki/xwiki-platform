@@ -26,12 +26,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-macros-parent</artifactId>
+    <artifactId>xwiki-core-rendering-macros-parent</artifactId>
     <version>1.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-macro-velocity</artifactId>
-  <name>XWiki Platform - Core - Macro - Velocity</name>
-  <description>XWiki Platform - Core - Macro - Velocity</description>
+  <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
+  <name>XWiki Platform - Core - Rendering - Macro - Velocity</name>
+  <description>XWiki Platform - Core - Rendering - Macro - Velocity</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

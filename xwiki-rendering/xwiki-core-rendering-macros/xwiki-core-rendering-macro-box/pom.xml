@@ -26,7 +26,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-macros-parent</artifactId>
+    <artifactId>xwiki-core-rendering-macros-parent</artifactId>
     <version>1.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-macro-box</artifactId>

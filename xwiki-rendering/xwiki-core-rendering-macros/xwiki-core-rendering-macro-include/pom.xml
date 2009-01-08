@@ -26,12 +26,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-macros-parent</artifactId>
+    <artifactId>xwiki-core-rendering-macros-parent</artifactId>
     <version>1.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-macro-include</artifactId>
-  <name>XWiki Platform - Core - Macro - Include</name>
-  <description>XWiki Platform - Core - Macro - Include</description>
+  <artifactId>xwiki-core-rendering-macro-include</artifactId>
+  <name>XWiki Platform - Core - Rendering - Macro - Include</name>
+  <description>XWiki Platform - Core - Rendering - Macro - Include</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

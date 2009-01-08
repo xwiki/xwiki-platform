@@ -62,6 +62,7 @@
     </dependency>
   </dependencies>
   <modules>
+    <module>xwiki-core-rendering-parser-doxia</module>
     <module>xwiki-core-rendering-parser-xwiki10</module>
   </modules>
 </project>

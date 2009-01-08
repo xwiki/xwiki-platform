@@ -573,47 +573,47 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-velocity</artifactId>
+      <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-groovy</artifactId>
+      <artifactId>xwiki-core-rendering-macro-groovy</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-box</artifactId>
+      <artifactId>xwiki-core-rendering-macro-box</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-code</artifactId>
+      <artifactId>xwiki-core-rendering-macro-code</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-id</artifactId>
+      <artifactId>xwiki-core-rendering-macro-id</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-toc</artifactId>
+      <artifactId>xwiki-core-rendering-macro-toc</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-include</artifactId>
+      <artifactId>xwiki-core-rendering-macro-include</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-xhtml</artifactId>
+      <artifactId>xwiki-core-rendering-macro-xhtml</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-html</artifactId>
+      <artifactId>xwiki-core-rendering-macro-html</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

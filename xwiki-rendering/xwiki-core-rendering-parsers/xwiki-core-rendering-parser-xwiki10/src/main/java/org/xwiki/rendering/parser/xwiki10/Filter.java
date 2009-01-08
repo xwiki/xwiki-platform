@@ -2,6 +2,11 @@ package org.xwiki.rendering.parser.xwiki10;
 
 import org.xwiki.rendering.parser.ParseException;
 
+/**
+ * Filter provided content into another content.
+ * 
+ * @version $Id$
+ */
 public interface Filter
 {
     /**

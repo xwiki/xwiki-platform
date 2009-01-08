@@ -3,6 +3,11 @@ package org.xwiki.rendering.parser.xwiki10.macro;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Base class for Radeox macros converters.
+ * 
+ * @version $Id$
+ */
 public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConverter
 {
     private String name;

@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -22,15 +21,26 @@ import org.xwiki.rendering.parser.xwiki10.Filter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
+/**
+ * Convert XWiki 1.0 content into 2.0 content and call XWiki 2.0 parser to generate the XDOM.
+ * 
+ * @version $Id$
+ */
 public class XWikiParser extends AbstractLogEnabled implements Parser, Initializable
 {
+    /**
+     * The syntax identifier of the parser.
+     */
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "1.0");
 
-    private static final Pattern XWIKI1020TOKEN_PATTERN =
-        Pattern.compile("\\{" + FilterContext.XWIKI1020TOKEN + "([\\d]+)\\}");
-
+    /**
+     * Use to create the XDOM from converted content.
+     */
     private Parser xwiki20Parser;
 
+    /**
+     * The filters use to convert 1.0 content to 2.0.
+     */
     private List<Filter> filters;
 
     /**
@@ -74,6 +84,13 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
         return this.xwiki20Parser.parse(new StringReader(content20));
     }
 
+    /**
+     * Convert XWiki 1.0 content to 2.0.
+     * 
+     * @param source the 1.0 source.
+     * @return the 2.0 converted content.
+     * @throws ParseException error when converting content.
+     */
     public String xwiki10To20(Reader source) throws ParseException
     {
         String content;
@@ -90,17 +107,24 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
         }
 
         content = filterProtectedStrings(content, filterContext);
-        
+
         content = CleanUtil.removeFirstNL(content);
         content = CleanUtil.removeLastNL(content);
 
         return content;
     }
 
+    /**
+     * Re-insert all protected/registered strings in to the global content.
+     * 
+     * @param content the global content.
+     * @param filterContext the conversion context.
+     * @return the complete content.
+     */
     private String filterProtectedStrings(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
-        Matcher matcher = XWIKI1020TOKEN_PATTERN.matcher(content);
+        Matcher matcher = FilterContext.XWIKI1020TOKEN_PATTERN.matcher(content);
         int current = 0;
         while (matcher.find()) {
             result.append(content.substring(current, matcher.start()));

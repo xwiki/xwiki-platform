@@ -2,6 +2,11 @@ package org.xwiki.rendering.parser.xwiki10.macro;
 
 import java.util.Map;
 
+/**
+ * Convert Velocity macro to XWiki 2.0 syntax or macro.
+ * 
+ * @version $Id$
+ */
 public interface RadeoxMacroConverter
 {
     /**

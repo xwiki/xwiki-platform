@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.internal;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -46,7 +48,7 @@ public class DefaultOfficeImporter implements OfficeImporter, Composable, Initia
     /**
      * File extensions corresponding to slide presentations.
      */
-    private static final String[] PRESENTATION_FORMAT_EXTENSIONS = new String[] {"ppt", "odp"};
+    private static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
 
     /**
      * The host address of the Open Office server.
@@ -69,17 +71,17 @@ public class DefaultOfficeImporter implements OfficeImporter, Composable, Initia
     private DocumentAccessBridge docBridge;
     
     /**
-     * Transformer responsible for converting office documents into (html + artifacts).
+     * Transformer responsible for converting office documents into (HTML + artifacts).
      */
     private DocumentTransformer officeToHtmlTransformer;
 
     /**
-     * Transforms a resulting (xhtml + artifacts) into an xwiki presentation (via ZipExplorer).
+     * Transforms a resulting (XHTML + artifacts) into an XWiki presentation (via ZipExplorer).
      */
     private DocumentTransformer htmlToXWikiPresentationTransformer;
 
     /**
-     * Transforms an Xhtml document into xwiki 2.0 syntax.
+     * Transforms an XHTML document into XWiki 2.0 syntax.
      */
     private DocumentTransformer htmlToXWikiTwoZeroTransformer;
     
@@ -103,6 +105,10 @@ public class DefaultOfficeImporter implements OfficeImporter, Composable, Initia
 
     /**
      * {@inheritDoc}
+     *  
+     * Supports converting the Office document to HTML or XWiki Syntax 2.0.
+     * 
+     * @see OfficeImporter#importDocument(byte[], String, String, Map)
      */
     public void importDocument(byte[] fileContent, String fileName, String targetDocument,
         Map<String, String> options) throws OfficeImporterException
@@ -122,8 +128,8 @@ public class DefaultOfficeImporter implements OfficeImporter, Composable, Initia
             htmlToXWikiTransformer.transform(importerContext);
             importerContext.finalizeDocument(isPresentation);
         } else {
-            // TODO Need to improve this.
-            throw new OfficeImporterException("Invalid Request.");
+            throw new OfficeImporterException("Failed to import document [" + fileName + "] into page [" 
+                + targetDocument + "]. Most probably the page already exists or you don't have edit rights on it.");
         }
     }
 
@@ -136,27 +142,22 @@ public class DefaultOfficeImporter implements OfficeImporter, Composable, Initia
      */
     private boolean isValidRequest(String targetDocument)
     {
-        boolean valid = false;
+        boolean isValid = false;
         try {
-            valid =
-                !docBridge.exists(targetDocument) && docBridge.isDocumentEditable(targetDocument);
+            isValid = !docBridge.exists(targetDocument) && docBridge.isDocumentEditable(targetDocument);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // Some unexpected error since "exists" and "isDocumentEditable" should not throw exceptions.
+            // Don't do anything but consider the request as invalid.
         }
-        return valid;
+        return isValid;
     }
 
     /**
-     * @param format Format of the document.
-     * @return True of the given format corresponds to a slide presentation.
+     * @param format the input document's format
+     * @return true if the given format corresponds to a slide presentation.
      */
     private boolean isPresentation(DocumentFormat format)
     {
-        for (String extension : PRESENTATION_FORMAT_EXTENSIONS) {
-            if (extension.equals(format.getFileExtension())) {
-                return true;
-            }
-        }
-        return false;
+        return PRESENTATION_FORMAT_EXTENSIONS.contains(format.getFileExtension().toLowerCase());
     }
 }

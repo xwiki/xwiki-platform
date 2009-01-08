@@ -25,7 +25,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Remove some tags from html, such as style, script. The tag and all the contents under the tag will be removed.
+ * Remove some tags from HTML, such as style, script. The tag and all the contents under the tag will be removed.
  * 
  * @version $Id$
  * @since 1.8M1

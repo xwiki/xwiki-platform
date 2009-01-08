@@ -26,7 +26,7 @@ import org.w3c.dom.NodeList;
 /**
  * This filter is used to remove those tags that doesn't play any role with the representation of
  * information. This type of tags can result from other filters (like the style filter) or
- * openoffice specific formatting choices (like newlines being represented by empty paragraphs). For
+ * Open Office specific formatting choices (like newlines being represented by empty paragraphs). For
  * an example, empty {@code <span>} or {@code <div>} tags will be ripped off within this filter.
  * 
  * @version $Id$
@@ -37,12 +37,12 @@ public class RedundancyFilter implements HTMLFilter
     /**
      * List of those tags which will be filtered if no attributes are present.
      */
-    private final String[] attributeWiseFilteredTags = new String[] {"span", "div"};
+    private static final String[] ATTRIBUTES_FILTERED_TAGS = new String[] {"span", "div"};
 
     /**
      * List of those tags which will be filtered if no textual content is present inside them.
      */
-    private final String[] contentWiseFilteredTags =
+    private static final String[] CONTENT_FILTERED_TAGS =
         new String[] {"em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr",
         "acronym", "address", "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
 
@@ -51,10 +51,10 @@ public class RedundancyFilter implements HTMLFilter
      */
     public void filter(Document document)
     {
-        for (String key : attributeWiseFilteredTags) {
+        for (String key : ATTRIBUTES_FILTERED_TAGS) {
             filterNodesWithZeroAttributes(document.getElementsByTagName(key));
         }
-        for (String key : contentWiseFilteredTags) {
+        for (String key : CONTENT_FILTERED_TAGS) {
             filterNodesWithEmptyTextContent(document.getElementsByTagName(key));
         }
     }

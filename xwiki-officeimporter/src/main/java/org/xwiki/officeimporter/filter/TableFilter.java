@@ -38,12 +38,12 @@ public class TableFilter implements HTMLFilter
     /**
      * Tags that need to be removed from cell items while preserving there children.
      */
-    private static final String[] filterTags = new String[] {"p"};
+    private static final String[] FILTER_TAGS = new String[] {"p"};
 
     /**
      * Tags that need to be completely removed from cell items.
      */
-    private static final String[] removeTags = new String[] {"br"};
+    private static final String[] REMOVE_TAGS = new String[] {"br"};
 
     /**
      * {@inheritDoc}
@@ -88,7 +88,7 @@ public class TableFilter implements HTMLFilter
             } else {
                 node.setTextContent(trimmedContent);
             }
-        } else if (Arrays.binarySearch(filterTags, node.getNodeName()) >= 0) {
+        } else if (Arrays.binarySearch(FILTER_TAGS, node.getNodeName()) >= 0) {
             while (children.getLength() > 0) {
                 Node child = children.item(0);
                 parent.insertBefore(children.item(0), node);
@@ -96,7 +96,7 @@ public class TableFilter implements HTMLFilter
             }
             parent.removeChild(node);
             removed = true;
-        } else if (Arrays.binarySearch(removeTags, node.getNodeName()) >= 0) {
+        } else if (Arrays.binarySearch(REMOVE_TAGS, node.getNodeName()) >= 0) {
             parent.removeChild(node);
             removed = true;
         } else {

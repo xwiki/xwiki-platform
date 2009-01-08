@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This particular filter searches html tags containing style attributes and removes such attributes if present.
+ * This particular filter searches HTML tags containing style attributes and removes such attributes if present.
  * 
  * @version $Id$
  * @since 1.8M1
@@ -41,17 +41,17 @@ public class StyleFilter implements HTMLFilter
      * unnecessary attributes. The mapped object is a '|' separated string of all allowed attributes. If a particular
      * tag name is not present in this map, all of it's attributes will be filtered.
      */
-    Map<String, String> attributeMappingsModerate;
+    private Map<String, String> attributeMappingsModerate;
 
     /**
      * The html_tag_name->allowed_attribute_names mappings for moderate filtering mode. This is used to filter out all
      * unnecessary attributes. The mapped object is a '|' separated string of all allowed attributes. If a particular
      * tag name is not present in this map, all of it's attributes will be filtered.
      */
-    Map<String, String> attributeMappingsStrict;
+    private Map<String, String> attributeMappingsStrict;
 
     /**
-     * Mode of filtering (strict, moderate, etc).
+     * Filtering mode (strict, moderate, etc). Controls how much is filtered.
      */
     private String mode;
 

@@ -21,10 +21,8 @@ package org.xwiki.officeimporter;
 
 import java.util.Map;
 
-
-
 /**
- * The interface for the office importer component.
+ * Entry point to import Office documents into wiki pages.
  * 
  * @version $Id$
  * @since 1.8M1
@@ -37,14 +35,15 @@ public interface OfficeImporter
     String ROLE = OfficeImporter.class.getName();
 
     /**
-     * Imports the document in byte[] to html or the xwiki syntax 2.0 code.
+     * Imports the passed Office document in wiki pages.
      * 
-     * @param fileContent Binary content of the input document.
-     * @param fileName Name of the source document name (should have a valid extension).
-     * @param targetDocument Name of the resulting wiki page.
-     * @param options Additional parameters for the conversion.
-     * @throws OfficeImporterException Idicates office importer specific errors.
+     * @param fileContent the binary content of the input document
+     * @param fileName the name of the source document name (should have a valid extension since the extension is 
+     *        used to find out the office document's format)
+     * @param targetDocument the name of the resulting wiki page
+     * @param options the optional parameters for the conversion
+     * @throws OfficeImporterException if an error occurred during the import
      */
-    public void importDocument(byte[] fileContent, String fileName, String targetDocument,
+    void importDocument(byte[] fileContent, String fileName, String targetDocument,
         Map<String, String> options) throws OfficeImporterException;
 }

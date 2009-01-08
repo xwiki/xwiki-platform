@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.filter;
 import org.w3c.dom.Document;
 
 /**
- * Defines an interface for filters that will filter xhtml documents as necessary.
+ * Defines an interface for filters that will filter XHTML documents as necessary.
  * 
  * @version $Id$
  * @since 1.8M1

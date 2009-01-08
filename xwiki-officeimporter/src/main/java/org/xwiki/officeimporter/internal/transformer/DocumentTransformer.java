@@ -23,7 +23,7 @@ import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.internal.OfficeImporterContext;
 
 /**
- * A Document Transformer is responsible for transforming a document (Office, Html etc.) into some
+ * A Document Transformer is responsible for transforming a document (Office, HTML, etc) into some
  * other format.
  * 
  * @version $Id$
@@ -36,8 +36,7 @@ public interface DocumentTransformer
      * implementing class. If there are any artifacts collected while performing the transformation
      * (like images), they should be stored into the {@link OfficeImporterContext}.
      * 
-     * @param importerContext The {@link OfficeImporterContext} holding all the information about the input
-     *            document.
+     * @param importerContext The {@link OfficeImporterContext} holding all the information about the input document.
      */
     void transform(OfficeImporterContext importerContext) throws OfficeImporterException;
 }

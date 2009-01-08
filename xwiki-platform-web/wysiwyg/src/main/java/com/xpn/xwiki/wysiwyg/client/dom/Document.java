@@ -25,6 +25,7 @@ import com.google.gwt.dom.client.BRElement;
 import com.google.gwt.dom.client.BaseElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HRElement;
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.ParagraphElement;
@@ -150,6 +151,16 @@ public class Document extends com.google.gwt.dom.client.Document
     public final HRElement xCreateHRElement()
     {
         return xCreateElement("hr").cast();
+    }
+
+    /**
+     * Creates a &lt;img&gt; element.
+     * 
+     * @return the newly create element.
+     */
+    public final ImageElement xCreateImageElement()
+    {
+        return xCreateElement("img").cast();
     }
 
     /**

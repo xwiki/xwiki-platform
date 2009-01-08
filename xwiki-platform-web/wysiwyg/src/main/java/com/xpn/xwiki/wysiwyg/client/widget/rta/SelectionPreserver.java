@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
@@ -75,26 +76,28 @@ public class SelectionPreserver
          */
         public RangePlaceHolder(Range range)
         {
-            DOMUtils.getInstance().normalize(range);
+            DOMUtils domUtils = DOMUtils.getInstance();
+            domUtils.normalize(range);
             Node startContainer = range.getStartContainer();
-            start = ((Document) startContainer.getOwnerDocument()).xCreateSpanElement();
+            Node endContainer = range.getEndContainer();
+            int rightOffset = domUtils.getLength(endContainer) - range.getEndOffset();
+
+            start = createMarker((Document) startContainer.getOwnerDocument());
             if (startContainer.getNodeType() == Node.ELEMENT_NODE) {
-                DOMUtils.getInstance().insertAt(startContainer, start, range.getStartOffset());
-                range.setStartAfter(start);
+                domUtils.insertAt(startContainer, start, range.getStartOffset());
                 startOffset = -1;
             } else {
                 startContainer.getParentNode().insertBefore(start, startContainer);
                 startOffset = range.getStartOffset();
             }
-            Node endContainer = range.getEndContainer();
+
             end = start.cloneNode(true);
             if (endContainer.getNodeType() == Node.ELEMENT_NODE) {
-                DOMUtils.getInstance().insertAt(endContainer, end, range.getEndOffset());
-                range.setEndBefore(end);
+                domUtils.insertAt(endContainer, end, endContainer.getChildNodes().getLength() - rightOffset);
                 endOffset = -1;
             } else {
-                DOMUtils.getInstance().insertAfter(end, endContainer);
-                endOffset = DOMUtils.getInstance().getLength(endContainer) - range.getEndOffset();
+                domUtils.insertAfter(end, endContainer);
+                endOffset = rightOffset;
             }
         }
 
@@ -128,6 +131,22 @@ public class SelectionPreserver
         public int getEndOffset()
         {
             return endOffset;
+        }
+
+        /**
+         * @param document the document which includes the range.
+         * @return a new DOM node to be used as a marker for a DOM Range boundary.
+         */
+        private static Node createMarker(Document document)
+        {
+            // We're using a source-less image node as a range boundary marker for two reasons:
+            // * an image node cannot have child nodes so a range boundary cannot fall inside an image node.
+            // * most web browsers (including FF and IE) allow a range boundary to be placed before and after an image
+            // node.
+            ImageElement img = document.xCreateImageElement();
+            img.setWidth(0);
+            img.setHeight(0);
+            return img;
         }
     }
 
@@ -176,6 +195,9 @@ public class SelectionPreserver
         for (int i = 0; i < selection.getRangeCount(); i++) {
             placeHolders.add(new RangePlaceHolder(selection.getRangeAt(i)));
         }
+        // We need to restore the selection because it might have been affected by the range boundary markers we have
+        // inserted. Of course, we don't reset the state of the preserver.
+        restoreSelection(false);
     }
 
     /**
@@ -203,24 +225,39 @@ public class SelectionPreserver
         }
         Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();
+        int delta = reset ? 0 : 1;
         for (int i = 0; i < placeHolders.size(); i++) {
             RangePlaceHolder placeHolder = placeHolders.get(i);
+
+            Node startContainer = placeHolder.getStart().getNextSibling();
+            int startOffset = placeHolder.getStartOffset();
+            if (startOffset <= 0) {
+                startContainer = placeHolder.getStart().getParentNode();
+                startOffset = DOMUtils.getInstance().getNodeIndex(placeHolder.getStart()) + delta;
+            }
+            if (reset) {
+                DOMUtils.getInstance().detach(placeHolder.getStart());
+            }
+
+            Node endContainer = placeHolder.getEnd().getPreviousSibling();
+            int endOffset;
+            if (placeHolder.getEndOffset() > 0) {
+                endOffset = DOMUtils.getInstance().getLength(endContainer) - placeHolder.getEndOffset();
+            } else {
+                endContainer = placeHolder.getEnd().getParentNode();
+                endOffset = DOMUtils.getInstance().getNodeIndex(placeHolder.getEnd());
+            }
+            if (reset) {
+                DOMUtils.getInstance().detach(placeHolder.getEnd());
+            }
+
             Range range = rta.getDocument().createRange();
-            if (placeHolder.getStartOffset() >= 0) {
-                range.setStart(placeHolder.getStart().getNextSibling(), placeHolder.getStartOffset());
-            } else {
-                range.setStartAfter(placeHolder.getStart());
-            }
-            if (placeHolder.getEndOffset() >= 0) {
-                Node prevSibling = placeHolder.getEnd().getPreviousSibling();
-                range.setEnd(prevSibling, DOMUtils.getInstance().getLength(prevSibling) - placeHolder.getEndOffset());
-            } else {
-                range.setEndBefore(placeHolder.getEnd());
-            }
+            range.setStart(startContainer, startOffset);
+            range.setEnd(endContainer, endOffset);
             selection.addRange(range);
         }
         if (reset) {
-            clearPlaceHolders();
+            placeHolders.clear();
         }
     }
 }

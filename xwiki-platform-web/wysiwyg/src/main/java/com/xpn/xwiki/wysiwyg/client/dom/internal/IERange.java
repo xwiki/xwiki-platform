@@ -365,22 +365,6 @@ public final class IERange extends AbstractRange<NativeRange>
     /**
      * {@inheritDoc}
      * 
-     * @see Range#selectNode(Node)
-     */
-    public void selectNode(Node refNode)
-    {
-        if (getJSRange().isTextRange()) {
-            // TODO
-            throw new UnsupportedOperationException();
-        } else {
-            // TODO
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see Range#selectNodeContents(Node)
      */
     public void selectNodeContents(Node refNode)

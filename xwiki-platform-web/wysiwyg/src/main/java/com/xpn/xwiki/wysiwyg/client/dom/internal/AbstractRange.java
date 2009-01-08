@@ -184,6 +184,19 @@ public abstract class AbstractRange<R extends JavaScriptObject> implements Range
     /**
      * {@inheritDoc}
      * 
+     * @see Range#selectNode(Node)
+     */
+    public void selectNode(Node refNode)
+    {
+        Node parent = refNode.getParentNode();
+        int index = DOMUtils.getInstance().getNodeIndex(refNode);
+        setStart(parent, index);
+        setEnd(parent, index + 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see Range#toHTML()
      */
     public String toHTML()

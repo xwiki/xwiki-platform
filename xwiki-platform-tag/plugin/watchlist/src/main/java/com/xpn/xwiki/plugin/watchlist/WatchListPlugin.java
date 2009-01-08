@@ -101,7 +101,6 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         super.virtualInit(context);
         try {
             initWatchListClass(context);
-            sanitizeWatchlists(context);
         } catch (XWikiException e) {
             log.error("virtualInit", e);
             e.printStackTrace();

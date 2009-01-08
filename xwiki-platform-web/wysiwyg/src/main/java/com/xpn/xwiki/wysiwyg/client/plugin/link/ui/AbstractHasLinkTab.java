@@ -131,15 +131,15 @@ public abstract class AbstractHasLinkTab extends Composite implements HasLink
     }
 
     /**
-     * Sets the label for which this {@link HasLink} will generate the link HTML.
+     * {@inheritDoc}
      * 
-     * @param labelHTML the label's HTML value
-     * @param labelText the label's text value
+     * @see HasLink#setLabel(String, String, boolean)
      */
-    public void setLabel(String labelHTML, String labelText)
+    public void setLabel(String labelHTML, String labelText, boolean readOnly)
     {
         setLabelHTML(labelHTML);
         setLabelText(labelText);
+        this.labelTextBox.setReadOnly(readOnly);
     }
 
     /**

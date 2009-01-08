@@ -49,10 +49,9 @@ public class ImageSelectionBehaviourRule implements ValidationRule
      */
     public String[] getFeatures()
     {
-        // TODO: remove the link from this list when issue XWIKI-3003 will be implemented.
         return new String[] {"bold", "italic", "underline", "strikethrough", "subscript", "superscript",
             "unorderedlist", "orderedlist", "outdent", "indent", "format", "hr", "symbol", "inserttable", 
-            "deletetable", "link"};
+            "deletetable"};
     }
 
 }

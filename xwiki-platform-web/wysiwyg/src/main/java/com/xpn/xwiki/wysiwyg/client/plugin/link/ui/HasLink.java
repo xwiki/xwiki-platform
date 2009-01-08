@@ -40,8 +40,9 @@ public interface HasLink extends SourcesClickEvents
      * 
      * @param labelHTML the label's HTML value
      * @param labelText the label's text value
+     * @param readOnly specifies if the user will be allowed to edit the link's label or not.
      */
-    void setLabel(String labelHTML, String labelText);
+    void setLabel(String labelHTML, String labelText, boolean readOnly);
 
     /**
      * Some setup need for the moment when the widget will be display.

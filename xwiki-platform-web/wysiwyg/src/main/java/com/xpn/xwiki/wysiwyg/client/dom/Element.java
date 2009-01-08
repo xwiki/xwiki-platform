@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.dom;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
  * Extends the element implementation provided by GWT to add useful methods. All of them should be removed as soon as
@@ -34,6 +35,12 @@ public class Element extends com.google.gwt.dom.client.Element
      * The text used in an element's meta data as a place holder for that element's outer HTML.
      */
     public static final String INNER_HTML_PLACEHOLDER = "com.xpn.xwiki.wysiwyg.client.dom.Element#placeholder";
+
+    /**
+     * Both the name of the JavaScript property storing the reference to the meta data and the name of the DOM attribute
+     * storing the HTML of the meta data.
+     */
+    public static final String META_DATA = "metaData";
 
     /**
      * Default constructor. Needs to be protected because all instances are created from JavaScript.
@@ -122,6 +129,12 @@ public class Element extends com.google.gwt.dom.client.Element
     public final String xGetString()
     {
         String outerHTML;
+        // We need to remove the meta data attribute on serialization
+        String metaDataHTML = xGetAttribute(META_DATA);
+        if (!StringUtils.isEmpty(metaDataHTML)) {
+            // Remove the attribute from this element
+            removeAttribute(META_DATA);
+        }
         if (hasChildNodes()) {
             Element clone = Element.as(cloneNode(false));
             clone.appendChild(getOwnerDocument().createTextNode(INNER_HTML_PLACEHOLDER));
@@ -130,9 +143,10 @@ public class Element extends com.google.gwt.dom.client.Element
         } else {
             outerHTML = getString();
         }
-        DocumentFragment metaData = getMetaData();
-        if (metaData != null) {
-            outerHTML = metaData.getInnerHTML().replace(INNER_HTML_PLACEHOLDER, outerHTML);
+        if (!StringUtils.isEmpty(metaDataHTML)) {
+            // Put the meta data attribute back
+            setAttribute(META_DATA, metaDataHTML);
+            outerHTML = metaDataHTML.replace(INNER_HTML_PLACEHOLDER, outerHTML);
         }
         return unformat(outerHTML);
     }
@@ -186,20 +200,43 @@ public class Element extends com.google.gwt.dom.client.Element
     /**
      * @return the meta data associated with this element.
      */
-    public final native DocumentFragment getMetaData()
-    /*-{
-        return this.metaData;
-    }-*/;
+    public final DocumentFragment getMetaData()
+    {
+        DocumentFragment metaData = (DocumentFragment) ((JavaScriptObject) cast()).get(META_DATA);
+        if (metaData == null) {
+            // There's no saved reference to the meta data.
+            // Test if this element has stored meta data.
+            String html = xGetAttribute(META_DATA);
+            if (!StringUtils.isEmpty(html)) {
+                // This element could be the result of node cloning or copy&paste.
+                // Let's update the cached meta data reference.
+                Element container = (Element) getOwnerDocument().createDivElement().cast();
+                container.xSetInnerHTML(html);
+                metaData = container.extractContents();
+                ((JavaScriptObject) cast()).set(META_DATA, metaData);
+            }
+        }
+        return metaData;
+    };
 
     /**
      * Sets the meta data of this element.
      * 
      * @param metaData a document fragment with additional information regarding this element.
      */
-    public final native void setMetaData(DocumentFragment metaData)
-    /*-{
-        this.metaData = metaData;
-    }-*/;
+    public final void setMetaData(DocumentFragment metaData)
+    {
+        // Save a reference to the meta data for fast retrieval.
+        ((JavaScriptObject) cast()).set(META_DATA, metaData);
+        if (metaData != null) {
+            // We have to serialize the meta data and store it using a custom attribute to avoid loosing the meta data
+            // over node cloning or copy&paste. The custom attribute used for storing the meta data should be filtered
+            // when getting the outer HTML.
+            setAttribute(META_DATA, metaData.getInnerHTML());
+        } else {
+            removeAttribute(META_DATA);
+        }
+    };
 
     /**
      * @return true if HTML Strict DTD specifies that this element must be empty.
@@ -212,20 +249,6 @@ public class Element extends com.google.gwt.dom.client.Element
             }
         }
         return false;
-    }
-
-    /**
-     * Clones this element along with its meta data.
-     * 
-     * @param deep if true then all the descendants of this element will be cloned too.
-     * @return the clone.
-     * @see #cloneNode(boolean)
-     */
-    public final Node xCloneNode(boolean deep)
-    {
-        Element clone = cloneNode(deep).cast();
-        clone.setMetaData(getMetaData());
-        return clone;
     }
 
     /**

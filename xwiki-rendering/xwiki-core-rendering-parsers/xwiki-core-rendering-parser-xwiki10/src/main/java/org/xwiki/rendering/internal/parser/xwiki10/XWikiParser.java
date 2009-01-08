@@ -1,0 +1,124 @@
+package org.xwiki.rendering.internal.parser.xwiki10;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.IOUtils;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.parser.xwiki10.Filter;
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
+import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
+
+public class XWikiParser extends AbstractLogEnabled implements Parser, Initializable
+{
+    private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "1.0");
+
+    private static final Pattern XWIKI1020TOKEN_PATTERN =
+        Pattern.compile("\\{" + FilterContext.XWIKI1020TOKEN + "([\\d]+)\\}");
+
+    private Parser xwiki20Parser;
+
+    private List<Filter> filters;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.phase.Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        // order filters
+        Collections.sort(this.filters, new Comparator<Filter>()
+        {
+            public int compare(Filter filter1, Filter filter2)
+            {
+                return filter1.getPriority() - filter2.getPriority();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.Parser#getSyntax()
+     */
+    public Syntax getSyntax()
+    {
+        return SYNTAX;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.Parser#parse(java.io.Reader)
+     */
+    public XDOM parse(Reader source) throws ParseException
+    {
+        // Convert from 1.0 syntax to 2.0 syntax
+        String content20 = xwiki10To20(source);
+
+        // Generate the XDOM using 2.0 syntax parser
+        return this.xwiki20Parser.parse(new StringReader(content20));
+    }
+
+    public String xwiki10To20(Reader source) throws ParseException
+    {
+        String content;
+        try {
+            content = IOUtils.toString(source);
+        } catch (IOException e) {
+            throw new ParseException("Failed to reade source");
+        }
+
+        FilterContext filterContext = new FilterContext();
+
+        for (Filter filter : this.filters) {
+            content = filter.filter(content, filterContext);
+        }
+
+        content = filterProtectedStrings(content, filterContext);
+        
+        content = CleanUtil.removeFirstNL(content);
+        content = CleanUtil.removeLastNL(content);
+
+        return content;
+    }
+
+    private String filterProtectedStrings(String content, FilterContext filterContext)
+    {
+        StringBuffer result = new StringBuffer();
+        Matcher matcher = XWIKI1020TOKEN_PATTERN.matcher(content);
+        int current = 0;
+        while (matcher.find()) {
+            result.append(content.substring(current, matcher.start()));
+            current = matcher.end();
+
+            int index = Integer.valueOf(matcher.group(1));
+
+            String storedContent = filterContext.getProtectedContent(index);
+
+            result.append(storedContent);
+        }
+
+        if (current == 0) {
+            return content;
+        }
+
+        result.append(content.substring(current));
+
+        return result.toString();
+    }
+}

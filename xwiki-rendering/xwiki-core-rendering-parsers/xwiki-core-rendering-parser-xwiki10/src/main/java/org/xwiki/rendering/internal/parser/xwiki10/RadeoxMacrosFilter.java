@@ -1,0 +1,145 @@
+package org.xwiki.rendering.internal.parser.xwiki10;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Composable;
+import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroConverter;
+import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
+
+/**
+ * Convert 1.0 radeox macros to 2.0 macro. A conversion can be added by implementing RadeoxMacroConverter.
+ * 
+ * @version $Id$
+ */
+public class RadeoxMacrosFilter extends AbstractFilter implements Composable
+{
+    /**
+     * Regex pattern for matching macros that are written on single line.
+     */
+    public static final Pattern SINGLE_LINE_MACRO_PATTERN = Pattern.compile("\\{(\\w+)(:(.+))?\\}");
+
+    /**
+     * Regex pattern for matching macros that span several lines (i.e. macros that have a body block). Note that we're
+     * using the {@link Pattern#DOTALL} flag to tell the compiler that "." should match any characters, including new
+     * lines.
+     */
+    public static final Pattern MULTI_LINE_MACRO_PATTERN =
+        Pattern.compile("\\{(\\w+)(:(.+?))?\\}(.+?)\\{\\1\\}", Pattern.DOTALL);
+
+    private ComponentManager componentManager;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
+     */
+    public void compose(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
+    }
+
+    public String filter(String content, FilterContext filterContext)
+    {
+        content = filterMacros(content, SINGLE_LINE_MACRO_PATTERN, false, filterContext);
+        content = filterMacros(content, MULTI_LINE_MACRO_PATTERN, true, filterContext);
+
+        return content;
+    }
+
+    private String filterMacros(String content, Pattern pattern, boolean supportContent, FilterContext filterContext)
+    {
+        StringBuffer result = new StringBuffer();
+        Matcher matcher = pattern.matcher(content);
+
+        int currentIndex = 0;
+        RadeoxMacroConverter currentMacro = null;
+        for (; matcher.find(); currentIndex = matcher.end()) {
+            String before = content.substring(currentIndex, matcher.start());
+
+            if (currentMacro != null && !currentMacro.isInline()) {
+                before = CleanUtil.setFirstNL(before, 2);
+            }
+
+            String allcontent = matcher.group(0);
+
+            String macroName = matcher.group(1);
+            String params = matcher.group(3);
+            String macroContent = matcher.groupCount() >= 4 ? matcher.group(4) : null;
+
+            try {
+                currentMacro =
+                    (RadeoxMacroConverter) this.componentManager.lookup(RadeoxMacroConverter.ROLE, macroName);
+
+                if (currentMacro.supportContent() == supportContent) {
+                    // a standalone new line is not interpreted by XWiki 1.0 rendering
+                    before = CleanUtil.removeLastStandaloneNewLine(before);
+
+                    if (!currentMacro.isInline()) {
+                        before = CleanUtil.setLastNL(before, 2);
+                    }
+
+                    allcontent = currentMacro.convert(macroName, getMacroParameters(params), macroContent);
+                    if (currentMacro.protectResult()) {
+                        allcontent = filterContext.addProtectedContent(allcontent);
+                    }
+                } else {
+                    currentMacro = null;
+                }
+            } catch (ComponentLookupException e) {
+                if (getLogger().isDebugEnabled()) {
+                    getLogger().debug("Can't find macro converter [" + macroName + "]", e);
+                }
+                
+                currentMacro = null;
+            }
+
+            result.append(before);
+            result.append(allcontent);
+        }
+
+        if (currentIndex == 0) {
+            return content;
+        }
+
+        if (currentMacro != null && !currentMacro.isInline()) {
+            result.append(CleanUtil.setFirstNL(content.substring(currentIndex), 2));
+        } else {
+            result.append(content.substring(currentIndex));
+        }
+
+        return result.toString();
+    }
+
+    public static Map<String, String> getMacroParameters(String parameters)
+    {
+        Map<String, String> parameterMap = new LinkedHashMap<String, String>();
+
+        if (parameters != null) {
+            String[] parameterTable = parameters.split("\\|");
+
+            for (String parameter : parameterTable) {
+                int index = parameter.indexOf('=');
+
+                String parameterName = "";
+                String parameterValue;
+                if (index >= 0) {
+                    parameterName = parameter.substring(0, index);
+                    parameterValue = parameter.substring(index + 1);
+                } else {
+                    parameterValue = parameter;
+                }
+
+                parameterMap.put(parameterName, parameterValue);
+            }
+        }
+
+        return parameterMap;
+    }
+}

@@ -1,0 +1,14 @@
+.#-----------------------------------------------------
+.input|xwiki/1.0
+.#-----------------------------------------------------
+{attach:file.txt}
+{attach:file.txt|document=Space.Page}
+{attach:ile.txt|param1=value1}
+
+{attach:file.txt}
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+attach:file.txt attach:Space.Page@file.txt [[attach:ile.txt||param1="value1"]]
+
+attach:file.txt

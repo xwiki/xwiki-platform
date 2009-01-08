@@ -1,0 +1,51 @@
+.#-----------------------------------------------------
+.input|xwiki/1.0
+.#-----------------------------------------------------
+## commented
+
+### commented
+
+\\## commented ## commented
+
+#* commented *#
+
+#*commented*#
+
+#*commented
+
+
+
+*# not commented
+
+
+#*commented
+
+
+
+\\\*#
+.#-----------------------------------------------------
+.expect|xwiki/2.0|skip
+.# Converter does not fully support Velocity yet
+.#-----------------------------------------------------
+## commented
+
+### commented
+
+\\## commented ## commented
+
+#* commented *#
+
+#*commented*#
+
+#*commented
+
+
+
+*# not commented
+
+
+#*commented
+
+
+
+\\\*#

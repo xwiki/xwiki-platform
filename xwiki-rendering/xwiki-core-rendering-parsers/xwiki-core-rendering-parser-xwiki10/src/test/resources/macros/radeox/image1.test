@@ -1,0 +1,14 @@
+.#-----------------------------------------------------
+.input|xwiki/1.0
+.#-----------------------------------------------------
+{image:gamesigns.jpg}
+{image:gamesigns.jpg|document=Space.Page}
+{image:gamesigns.jpg|height=128|width=128}
+
+{image:gamesigns.jpg}
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+image:gamesigns.jpg image:Space.Page@gamesigns.jpg [[image:gamesigns.jpg||height="128" width="128"]]
+
+image:gamesigns.jpg

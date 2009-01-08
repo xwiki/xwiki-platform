@@ -86,8 +86,8 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
         addFeature(rta, new DeleteCol(this));
         addFeature(rta, new DeleteTable(this));
         
-        // Disable the standard table editing features of Firefox.
-        // See XWIKI-3068 for more info.
+        // Disable the standard table editing features of Firefox since they don't take
+        // table headings (th) into account.
         rta.getDocument().execCommand("enableInlineTableEditing", "false");          
 
         getUIExtensionList().add(toolBarExtension);

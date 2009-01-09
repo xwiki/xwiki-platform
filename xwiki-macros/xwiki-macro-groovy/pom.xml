@@ -49,7 +49,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-macro-script</artifactId>
       <version>${pom.version}</version>
-      <classifier>tests</classifier>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

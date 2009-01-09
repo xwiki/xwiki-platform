@@ -177,34 +177,6 @@
         </requirement>        
       </requirements>
     </component>
-    <component>
-      <role>org.xwiki.rendering.parser.Parser</role>
-      <role-hint>confluence/1.0</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.DoxiaConfluenceParser</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.rendering.parser.LinkParser</role>
-        </requirement>
-        <requirement>
-          <role>org.xwiki.rendering.parser.ImageParser</role>
-        </requirement>
-      </requirements>
-    </component>
-    <component>
-      <role>org.xwiki.rendering.parser.Parser</role>
-      <role-hint>twiki/1.0</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.DoxiaTWikiParser</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.rendering.parser.LinkParser</role>
-        </requirement>
-        <requirement>
-          <role>org.xwiki.rendering.parser.ImageParser</role>
-        </requirement>
-      </requirements>
-    </component>
 
     <!-- Others -->
     <component>

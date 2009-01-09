@@ -30,7 +30,7 @@
     <version>1.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-rendering-macros-parent</artifactId>
-  <name>XWiki Platform - Rendering - Core - Macros - Parent POM</name>
+  <name>XWiki Platform - Core - Rendering - Macros - Parent POM</name>
   <packaging>pom</packaging>
   <description>Macros implementations supported by XWiki Platform</description>
   <dependencies>
@@ -43,21 +43,8 @@
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering</artifactId>
+      <artifactId>xwiki-core-rendering-tests</artifactId>
       <version>${pom.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-plexus</artifactId>
-      <version>${pom.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform.tools</groupId>
-      <artifactId>xwiki-shared-tests</artifactId>
-      <version>${platform.tool.test.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

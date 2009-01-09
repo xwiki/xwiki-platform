@@ -39,27 +39,6 @@
       <artifactId>xwiki-core-rendering-api</artifactId>
       <version>${pom.version}</version>
     </dependency>
-    
-    <!-- Testing dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-api</artifactId>
-      <version>${pom.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-plexus</artifactId>
-      <version>${pom.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform.tools</groupId>
-      <artifactId>xwiki-shared-tests</artifactId>
-      <version>${platform.tool.test.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <modules>
     <module>xwiki-rendering-parser-doxia</module>

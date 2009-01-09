@@ -26,24 +26,56 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-rendering-parsers-parent</artifactId>
+    <artifactId>xwiki-core-rendering-parent</artifactId>
     <version>1.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-parser-xwiki10</artifactId>
-  <name>XWiki Platform - Core - Rendering - Parser - XWiki 1.0</name>
-  <description>XWiki Platform - Core - Rendering - Parser - XWiki 1.0</description>
+  <artifactId>xwiki-core-rendering-tests</artifactId>
+  <name>XWiki Platform - Core - Rendering - Tests</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Core - Rendering - Tests</description>
   <dependencies>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component</artifactId>
+      <version>${pom.version}</version>
     </dependency>
-
-    <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-tests</artifactId>
+      <artifactId>xwiki-core-bridge</artifactId>
       <version>${pom.version}</version>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-api</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-api</artifactId>
+      <version>${pom.version}</version>
+      <type>test-jar</type>
+      <!-- <classifier>tests</classifier> -->
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-parser-doxia</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.2</version>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock-cglib</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.tools</groupId>
+      <artifactId>xwiki-shared-tests</artifactId>
+      <version>${platform.tool.test.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -53,8 +85,13 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <includes>
+            <include>**/*TestSuite.java</include>
+            <include>**/*Test.java</include>
             <include>**/RenderingTests.java</include>
           </includes>
+          <excludes>
+            <exclude>**/scaffolding/**.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

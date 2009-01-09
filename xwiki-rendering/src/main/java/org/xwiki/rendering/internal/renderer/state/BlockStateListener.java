@@ -53,6 +53,8 @@ public class BlockStateListener implements Listener
     
     private boolean isInQuotation;
     
+    private boolean isInQuotationLine;
+    
     public boolean isInParagraph()
     {
         return this.isInParagraph;
@@ -91,6 +93,11 @@ public class BlockStateListener implements Listener
     public boolean isInQuotation()
     {
         return this.isInQuotation;
+    }
+    
+    public boolean isInQuotationLine()
+    {
+        return this.isInQuotationLine;
     }
     
     public void beginDefinitionDescription()
@@ -155,7 +162,7 @@ public class BlockStateListener implements Listener
 
     public void beginQuotationLine()
     {
-        // Nothing to do
+        this.isInQuotationLine = true;
     }
 
     public void beginSection(SectionLevel level, Map<String, String> parameters)
@@ -251,7 +258,7 @@ public class BlockStateListener implements Listener
 
     public void endQuotationLine()
     {
-        // Nothing to do
+        this.isInQuotationLine = false;
     }
 
     public void endSection(SectionLevel level, Map<String, String> parameters)

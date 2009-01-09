@@ -6,7 +6,7 @@
 content
 {{/testbox}}
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [testbox] [] [
@@ -18,4 +18,4 @@ endXMLNode [div] [class=box]
 endMacroMarker [testbox] [] [
 content
 ]
-endDocument\ No newline at end of file
+endDocument

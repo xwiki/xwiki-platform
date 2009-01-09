@@ -8,7 +8,7 @@
 <html><head /><body>test</body></html>
 {{/html}}
 .#-----------------------------------------------------
-.expect|xwiki/2.0
+.expect|xwiki
 .#-----------------------------------------------------
 {{html}}
 <?xml version="1.0" encoding="UTF-8"?>
@@ -16,7 +16,7 @@
 <html><head /><body>test</body></html>
 {{/html}}
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|xhtml
 .#-----------------------------------------------------
 <!--startmacro:html|-||-|
 <?xml version="1.0" encoding="UTF-8"?>

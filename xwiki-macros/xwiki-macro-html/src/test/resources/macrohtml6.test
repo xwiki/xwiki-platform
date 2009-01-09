@@ -7,7 +7,7 @@
 &nbsp;
 {{/html}}
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [html] [] [

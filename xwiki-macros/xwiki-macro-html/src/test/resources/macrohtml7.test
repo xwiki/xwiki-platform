@@ -12,7 +12,7 @@
 </script>
 {{/html}}
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [html] [wiki=false] [
@@ -42,7 +42,7 @@ endMacroMarker [html] [wiki=false] [
 ]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|xhtml
 .#-----------------------------------------------------
 <!--startmacro:html|-|wiki="false"|-|
 <script type="text/javascript">

@@ -34,7 +34,7 @@ onSpecialSymbol ["]
 onWord [two]
 onSpecialSymbol ["]
 onSpecialSymbol []]
-onLineBreak
+onNewLine
 onWord [list]
 onSpecialSymbol [.]
 onWord [each]
@@ -45,7 +45,7 @@ onWord [item]
 onSpace
 onSpecialSymbol [-]
 onSpecialSymbol [>]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onWord [println]
@@ -58,7 +58,7 @@ onSpecialSymbol [{]
 onWord [item]
 onSpecialSymbol [}]
 onSpecialSymbol ["]
-onLineBreak
+onNewLine
 onSpecialSymbol [}]
 endParagraph
 endMacroMarker [script] [] [

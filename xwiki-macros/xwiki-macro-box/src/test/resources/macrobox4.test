@@ -4,7 +4,7 @@
 .#-----------------------------------------------------
 {{testbox}}{{/testbox}}
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [testbox] [] []
@@ -12,4 +12,4 @@ beginXMLNode [div] [class=box]
 onVerbatimStandalone []
 endXMLNode [div] [class=box]
 endMacroMarker [testbox] [] []
-endDocument\ No newline at end of file
+endDocument

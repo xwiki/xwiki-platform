@@ -6,7 +6,7 @@ Google : {{map location="Romania" service="google" size="small" zoom="country"/}
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
 {{/code}}
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [code] [] [
@@ -23,7 +23,7 @@ Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="s
 ]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|xhtml
 .#-----------------------------------------------------
 <!--startmacro:code|-||-|
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
@@ -31,7 +31,7 @@ Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="s
 --><div class="code"><tt class="wikimodel-verbatim">Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}</tt></div><!--stopmacro-->
 .#-----------------------------------------------------
-.expect|xwiki/2.0
+.expect|xwiki
 .#-----------------------------------------------------
 {{code}}
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 

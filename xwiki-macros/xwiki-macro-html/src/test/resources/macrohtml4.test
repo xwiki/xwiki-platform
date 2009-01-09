@@ -16,7 +16,7 @@ hello  world
 </p>
 {{/html}}
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [html] [] [
@@ -33,7 +33,7 @@ hello  world
 ]
 beginXMLNode [pre]
 onWord [newline]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onWord [newline]

@@ -6,7 +6,7 @@
 **some escaped text**
 {{/html}}
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarker [html] [wiki=false] [

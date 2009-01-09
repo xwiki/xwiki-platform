@@ -22,8 +22,8 @@ package org.xwiki.rendering.renderer;
 import org.wikimodel.wem.tex.TexSerializer;
 import org.xwiki.rendering.listener.ListenerDelegate;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.internal.parser.wikimodel.WikiModelGeneratorListener;
-import org.xwiki.rendering.internal.parser.wikimodel.WikiModelPrinterAdapter;
+import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelGeneratorListener;
+import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelPrinterAdapter;
 
 public class TexRenderer extends ListenerDelegate implements PrintRenderer
 {

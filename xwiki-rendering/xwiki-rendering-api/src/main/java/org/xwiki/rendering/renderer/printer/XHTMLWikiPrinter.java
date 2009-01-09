@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultComment;

@@ -67,7 +67,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-xhtml</artifactId>
+      <artifactId>xwiki-core-macro-html</artifactId>
       <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>

@@ -37,10 +37,17 @@ public class Element extends com.google.gwt.dom.client.Element
     public static final String INNER_HTML_PLACEHOLDER = "com.xpn.xwiki.wysiwyg.client.dom.Element#placeholder";
 
     /**
-     * Both the name of the JavaScript property storing the reference to the meta data and the name of the DOM attribute
-     * storing the HTML of the meta data.
+     * The name of the JavaScript property storing the reference to the meta data.<br/>
+     * NOTE: We can't use the same name as for {@link #META_DATA_ATTR} because IE stores attribute values as JavaScript
+     * properties of DOM element objects.
      */
-    public static final String META_DATA = "metaData";
+    public static final String META_DATA_REF = "metaDataRef";
+
+    /**
+     * The name of the DOM attribute storing the HTML of the meta data. This HTML is used to recreate the meta data when
+     * an element is cloned or copy&pasted.
+     */
+    public static final String META_DATA_ATTR = "metadata";
 
     /**
      * Default constructor. Needs to be protected because all instances are created from JavaScript.
@@ -130,10 +137,10 @@ public class Element extends com.google.gwt.dom.client.Element
     {
         String outerHTML;
         // We need to remove the meta data attribute on serialization
-        String metaDataHTML = xGetAttribute(META_DATA);
+        String metaDataHTML = xGetAttribute(META_DATA_ATTR);
         if (!StringUtils.isEmpty(metaDataHTML)) {
             // Remove the attribute from this element
-            removeAttribute(META_DATA);
+            removeAttribute(META_DATA_ATTR);
         }
         if (hasChildNodes()) {
             Element clone = Element.as(cloneNode(false));
@@ -145,7 +152,7 @@ public class Element extends com.google.gwt.dom.client.Element
         }
         if (!StringUtils.isEmpty(metaDataHTML)) {
             // Put the meta data attribute back
-            setAttribute(META_DATA, metaDataHTML);
+            setAttribute(META_DATA_ATTR, metaDataHTML);
             outerHTML = metaDataHTML.replace(INNER_HTML_PLACEHOLDER, outerHTML);
         }
         return unformat(outerHTML);
@@ -202,18 +209,18 @@ public class Element extends com.google.gwt.dom.client.Element
      */
     public final DocumentFragment getMetaData()
     {
-        DocumentFragment metaData = (DocumentFragment) ((JavaScriptObject) cast()).get(META_DATA);
+        DocumentFragment metaData = (DocumentFragment) ((JavaScriptObject) cast()).get(META_DATA_REF);
         if (metaData == null) {
             // There's no saved reference to the meta data.
             // Test if this element has stored meta data.
-            String html = xGetAttribute(META_DATA);
+            String html = xGetAttribute(META_DATA_ATTR);
             if (!StringUtils.isEmpty(html)) {
                 // This element could be the result of node cloning or copy&paste.
                 // Let's update the cached meta data reference.
                 Element container = (Element) getOwnerDocument().createDivElement().cast();
                 container.xSetInnerHTML(html);
                 metaData = container.extractContents();
-                ((JavaScriptObject) cast()).set(META_DATA, metaData);
+                ((JavaScriptObject) cast()).set(META_DATA_REF, metaData);
             }
         }
         return metaData;
@@ -227,14 +234,14 @@ public class Element extends com.google.gwt.dom.client.Element
     public final void setMetaData(DocumentFragment metaData)
     {
         // Save a reference to the meta data for fast retrieval.
-        ((JavaScriptObject) cast()).set(META_DATA, metaData);
+        ((JavaScriptObject) cast()).set(META_DATA_REF, metaData);
         if (metaData != null) {
             // We have to serialize the meta data and store it using a custom attribute to avoid loosing the meta data
             // over node cloning or copy&paste. The custom attribute used for storing the meta data should be filtered
             // when getting the outer HTML.
-            setAttribute(META_DATA, metaData.getInnerHTML());
+            setAttribute(META_DATA_ATTR, metaData.getInnerHTML());
         } else {
-            removeAttribute(META_DATA);
+            removeAttribute(META_DATA_ATTR);
         }
     };
 

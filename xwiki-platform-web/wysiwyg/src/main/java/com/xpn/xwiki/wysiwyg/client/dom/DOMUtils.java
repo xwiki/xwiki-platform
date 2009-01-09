@@ -802,14 +802,6 @@ public abstract class DOMUtils
     }
 
     /**
-     * Prepares the given range to be selected. Due to cross-browser inconsistencies in Range implementation we might
-     * have to adapt a range object before applying it to the current selection.
-     * 
-     * @param range The DOM range to be normalized.
-     */
-    public abstract void normalize(Range range);
-
-    /**
      * @param node A DOM node
      * @return The nearest block level ancestor of the given node.
      */

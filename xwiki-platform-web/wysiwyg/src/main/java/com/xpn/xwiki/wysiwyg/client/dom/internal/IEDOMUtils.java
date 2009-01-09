@@ -24,7 +24,6 @@ import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Style;
 
 /**
@@ -108,34 +107,6 @@ public class IEDOMUtils extends DOMUtils
     {
         element.setInnerHTML("<span>iesucks</span>" + html);
         element.removeChild(element.getFirstChild());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#normalize(Range)
-     */
-    public void normalize(Range range)
-    {
-        if (range.isCollapsed()) {
-            Node start = range.getStartContainer();
-            switch (start.getNodeType()) {
-                case Node.ELEMENT_NODE:
-                    Node text = start.getOwnerDocument().createTextNode(" ");
-                    insertAt(start, text, range.getStartOffset());
-                    range.selectNodeContents(text);
-                    break;
-                case Node.TEXT_NODE:
-                    if ("".equals(start.getNodeValue())) {
-                        start.setNodeValue(" ");
-                        range.selectNodeContents(start);
-                    }
-                    break;
-                default:
-                    // Leave the range as it is.
-                    break;
-            }
-        }
     }
 
     /**

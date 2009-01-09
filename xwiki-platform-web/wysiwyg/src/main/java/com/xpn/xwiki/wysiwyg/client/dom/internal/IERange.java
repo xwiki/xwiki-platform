@@ -365,6 +365,29 @@ public final class IERange extends AbstractRange<NativeRange>
     /**
      * {@inheritDoc}
      * 
+     * @see AbstractRange#selectNode(Node)
+     */
+    public void selectNode(Node refNode)
+    {
+        if ("img".equalsIgnoreCase(refNode.getNodeName())) {
+            // Images support control selection.
+            ControlRange controlRange;
+            if (getJSRange().isTextRange()) {
+                controlRange = ControlRange.newInstance(getJSRange().getOwnerDocument());
+            } else {
+                controlRange = (ControlRange) getJSRange();
+            }
+            controlRange.clear();
+            controlRange.add((Element) refNode);
+            setJSRange(controlRange);
+        } else {
+            super.selectNode(refNode);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see Range#selectNodeContents(Node)
      */
     public void selectNodeContents(Node refNode)

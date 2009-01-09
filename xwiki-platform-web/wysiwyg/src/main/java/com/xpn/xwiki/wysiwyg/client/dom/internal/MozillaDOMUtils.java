@@ -24,7 +24,6 @@ import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
 
 /**
  * Contains methods from {@link DOMUtils} that require a different implementation in Mozilla.
@@ -76,15 +75,5 @@ public class MozillaDOMUtils extends DOMUtils
     public void setInnerHTML(Element element, String html)
     {
         element.setInnerHTML(html);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#normalize(Range)
-     */
-    public void normalize(Range range)
-    {
-        // Leave the range as it is, since Mozilla follows W3C Range specifications.
     }
 }

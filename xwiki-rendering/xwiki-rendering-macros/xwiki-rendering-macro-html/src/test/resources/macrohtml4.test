@@ -33,7 +33,7 @@ hello  world
 ]
 beginXMLNode [pre]
 onWord [newline]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onWord [newline]

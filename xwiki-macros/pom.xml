@@ -46,7 +46,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering</artifactId>
       <version>${pom.version}</version>
-      <classifier>tests</classifier>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>

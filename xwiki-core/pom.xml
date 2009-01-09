@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-core-parent</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.7.1</version>
   </parent>
   <artifactId>xwiki-core</artifactId>
   <name>XWiki Platform - Core - Core</name>
@@ -604,11 +604,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-macro-include</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-xhtml</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

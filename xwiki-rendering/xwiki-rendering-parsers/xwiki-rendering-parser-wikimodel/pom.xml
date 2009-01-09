@@ -24,25 +24,14 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <description>Parsers based on Doxia</description>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-rendering-parent</artifactId>
+    <artifactId>xwiki-core-rendering-parsers-parent</artifactId>
     <version>1.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-parsers-parent</artifactId>
-  <name>XWiki Platform - Core - Rendering - Parsers - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Parsers implementations supported by XWiki Platform</description>
+  <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
+  <name>XWiki Platform - Core - Rendering - Parser - Wiki Model</name>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-api</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
   </dependencies>
-  <modules>
-    <module>xwiki-rendering-parser-doxia</module>
-    <module>xwiki-rendering-parser-wikimodel</module>
-    <module>xwiki-rendering-parser-xwiki10</module>
-  </modules>
 </project>

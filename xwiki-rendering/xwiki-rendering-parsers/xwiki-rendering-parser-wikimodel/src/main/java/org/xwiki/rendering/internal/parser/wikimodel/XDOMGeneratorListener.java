@@ -47,7 +47,6 @@ import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Transforms WikiModel events into XWiki Rendering events.
@@ -631,7 +630,7 @@ public class XDOMGeneratorListener implements IWemListener
             if ((label != null) && (label.length() > 0)) {
                 try {
                     // TODO: Use an inline parser. See http://jira.xwiki.org/jira/browse/XWIKI-2748
-                    ParserUtils parserUtils = new ParserUtils();
+                    WikiModelParserUtils parserUtils = new WikiModelParserUtils();
                     linkedBlocks = parserUtils.parseInline(this.parser, label);
                 } catch (ParseException e) {
                     // TODO: Handle errors

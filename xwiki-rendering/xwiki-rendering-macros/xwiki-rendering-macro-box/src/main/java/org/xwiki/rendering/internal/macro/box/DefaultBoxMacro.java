@@ -98,12 +98,13 @@ public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMa
         Parser parser = getSyntaxParser(context);
 
         try {
+            List<Block> blocks = parser.parse(new StringReader(content)).getChildren();
             if (context.isInlined()) {
                 ParserUtils parseUtils = new ParserUtils();
-                return parseUtils.parseInline(parser, content);
-            } else {
-                return parser.parse(new StringReader(content)).getChildren();
+                parseUtils.removeTopLevelParagraph(blocks);
             }
+
+            return blocks;
         } catch (ParseException e) {
             throw new MacroExecutionException("Failed to parse content [" + content + "] with Syntax parser ["
                 + parser.getSyntax() + "]", e);

@@ -29,9 +29,9 @@
     <artifactId>xwiki-core-rendering-macros-parent</artifactId>
     <version>1.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-macro-box</artifactId>
-  <name>XWiki Platform - Core - Macro - Box</name>
-  <description>XWiki Platform - Core - Macro - Box</description>
+  <artifactId>xwiki-core-rendering-macro-box</artifactId>
+  <name>XWiki Platform - Core - Rendering - Macro - Box</name>
+  <description>XWiki Platform - Core - Rendering - Macro - Box</description>
   <build>
     <plugins>
       <plugin>

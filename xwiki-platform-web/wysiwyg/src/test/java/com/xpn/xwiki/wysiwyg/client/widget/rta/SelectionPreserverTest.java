@@ -432,4 +432,46 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "@"));
         assertEquals("<div>@</div>", rta.getHTML().toLowerCase());
     }
+
+    /**
+     * Test if the selection wraps an image after it was inserted. This is needed in order to have control selection
+     * over the image after it was inserted.
+     */
+    public void testSelectionAfterImageInsertion()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestSelectionAfterImageInsertion();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Test if the selection wraps an image after it was inserted. This is needed in order to have control selection
+     * over the image after it was inserted.
+     */
+    private void doTestSelectionAfterImageInsertion()
+    {
+        rta.setHTML("albatross");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild(), 2);
+        range.setEnd(getBody().getFirstChild(), 4);
+        select(range);
+
+        preserver.saveSelection();
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "<img src=\"clear.cache.gif\"/>"));
+
+        preserver.restoreSelection();
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertEquals(getBody(), range.getStartContainer());
+        assertEquals(1, range.getStartOffset());
+        assertEquals(getBody(), range.getEndContainer());
+        assertEquals(2, range.getEndOffset());
+    }
 }

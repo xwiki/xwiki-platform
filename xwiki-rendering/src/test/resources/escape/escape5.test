@@ -16,13 +16,13 @@ beginParagraph
 onSpecialSymbol [*]
 onSpace
 onWord [notlist]
-onLineBreak
+onNewLine
 onWord [11]
 onSpecialSymbol [*]
 onSpecialSymbol [.]
 onSpace
 onWord [notlist]
-onLineBreak
+onNewLine
 beginFormat: [ITALIC]
 onWord [something]
 endFormat: [ITALIC]

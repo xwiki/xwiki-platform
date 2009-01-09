@@ -22,8 +22,8 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Listener;
 
 /**
- * Represents an implicit new line triggered when the new line character is found ("\n"). Note
- * that this is different from a line break which is explicitely specified in wiki syntax.
+ * Represents a new line or line break (it's up to the Renderers to decide if it should be outputted as a new
+ * line or as a line break in the given syntax).
  *
  * @version $Id$
  * @since 1.5M2
@@ -51,6 +51,6 @@ public final class NewLineBlock extends AbstractBlock
      */
     public void traverse(Listener listener)
     {
-        listener.onLineBreak();
+        listener.onNewLine();
     }
 }

@@ -10,7 +10,7 @@ beginDocument
 beginParagraph
 beginLink [Reference = [attach:my.png]] [false] [[param1]=[value1][param2]=[value2]]
 endLink [Reference = [attach:my.png]] [false] [[param1]=[value1][param2]=[value2]]
-onLineBreak
+onNewLine
 beginLink [Reference = [attach:Space.ExistingPage@my.png]] [false]
 endLink [Reference = [attach:Space.ExistingPage@my.png]] [false]
 endParagraph

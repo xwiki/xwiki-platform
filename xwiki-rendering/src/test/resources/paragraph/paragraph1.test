@@ -18,7 +18,7 @@ fourth paragraph
 beginDocument
 beginParagraph
 onWord [first]
-onLineBreak
+onNewLine
 onWord [paragraph]
 endParagraph
 beginParagraph

@@ -1,38 +1,40 @@
-.#-----------------------------------------------------
+.#--------------------------------------------------------------------------------
 .input|xwiki/2.0
-.#-----------------------------------------------------
-* Item
-This is not a paragraph
+.# Verify we can force a list to have empty new lines using the special \\ symbol.
+.#--------------------------------------------------------------------------------
+* item
+\\still in the same item
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginList [BULLETED]
 beginListItem
-onWord [Item]
+onWord [item]
 onNewLine
-onWord [This]
+onNewLine
+onWord [still]
 onSpace
-onWord [is]
+onWord [in]
 onSpace
-onWord [not]
+onWord [the]
 onSpace
-onWord [a]
+onWord [same]
 onSpace
-onWord [paragraph]
+onWord [item]
 endListItem
 endList [BULLETED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<ul><li>Item<br/>This is not a paragraph</li></ul>
+<ul><li>item<br/><br/>still in the same item</li></ul>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-* Item
-This is not a paragraph
+* item
+\\still in the same item
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><ul><li>Item<br/>This is not a paragraph</li></ul></html>
+<html><ul><li>item<br/><br/>still in the same item</li></ul></html>

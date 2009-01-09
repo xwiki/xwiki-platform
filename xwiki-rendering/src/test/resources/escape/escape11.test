@@ -15,7 +15,7 @@ onSpace
 onWord [is]
 onSpace
 onWord [escaped]
-onLineBreak
+onNewLine
 onSpace
 onWord [A]
 onSpace
@@ -39,7 +39,3 @@ endDocument
 .#-----------------------------------------------------
 First letter is escaped
  A space just after a tilda
-.#-----------------------------------------------------
-.input|xhtml/1.0|skip
-.#-----------------------------------------------------
-<html><p>single ~ tilde<br/>not newline \\</p></html>

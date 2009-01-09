@@ -22,7 +22,8 @@ package org.xwiki.rendering.internal.renderer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.xwiki.rendering.renderer.RendererState;
+import org.xwiki.rendering.internal.renderer.state.BlockStateListener;
+import org.xwiki.rendering.internal.renderer.state.TextOnNewLineStateListener;
 
 /**
  * Escape characters that would be confused for XWiki wiki syntax if they were not escaped.
@@ -43,8 +44,8 @@ public class XWikiSyntaxEscapeHandler
 
     private static final String ESCAPE_CHAR = "~";
 
-    public void escape(StringBuffer accumulatedBuffer, RendererState state, boolean escapeLastChar,
-        Pattern escapeFirstIfMatching)
+    public void escape(StringBuffer accumulatedBuffer, BlockStateListener blockListener, 
+        TextOnNewLineStateListener textListener, boolean escapeLastChar, Pattern escapeFirstIfMatching)
     {
         // Escape tilde symbol (i.e. the escape character).
         // Note: This needs to be the first replacement since other replacements below also use the tilde symbol
@@ -52,7 +53,7 @@ public class XWikiSyntaxEscapeHandler
 
         // When in a paragraph we need to escape symbols that are at beginning of lines and that could be confused
         // with list items or sections.
-        if (state.isInParagraph() && state.isTextOnNewLine()) {
+        if (blockListener.isInParagraph() && textListener.isTextOnNewLine()) {
 
             // Look for list pattern at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(LIST_PATTERN, accumulatedBuffer);
@@ -61,7 +62,7 @@ public class XWikiSyntaxEscapeHandler
             escapeFirstMatchedCharacter(SECTION_PATTERN, accumulatedBuffer);
         }
         
-        if (state.isInTable()) {
+        if (blockListener.isInTable()) {
             replaceAll(accumulatedBuffer, "|", "~|");
         }
 
@@ -71,12 +72,12 @@ public class XWikiSyntaxEscapeHandler
 
         // When in a section we need to escape "=" symbols since otherwise they would be confused for end of section
         // characters.
-        if (state.isInSection()) {
+        if (blockListener.isInSection()) {
             replaceAll(accumulatedBuffer, "=", ESCAPE_CHAR + "=");
         }
 
         // Escape "[[" if not in a link.
-        if (!state.isInLink()) {
+        if (!blockListener.isInLink()) {
             replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
         }
 

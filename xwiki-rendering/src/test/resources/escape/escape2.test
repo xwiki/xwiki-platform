@@ -21,43 +21,43 @@ onSpecialSymbol [*]
 onWord [notbold]
 onSpecialSymbol [*]
 onSpecialSymbol [*]
-onLineBreak
+onNewLine
 onSpecialSymbol [#]
 onSpecialSymbol [#]
 onWord [nomono]
 onSpecialSymbol [#]
 onSpecialSymbol [#]
-onLineBreak
+onNewLine
 onSpecialSymbol [/]
 onSpecialSymbol [/]
 onWord [noitalic]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
-onLineBreak
+onNewLine
 onSpecialSymbol [-]
 onSpecialSymbol [-]
 onWord [notrike]
 onSpecialSymbol [-]
 onSpecialSymbol [-]
-onLineBreak
+onNewLine
 onSpecialSymbol [_]
 onSpecialSymbol [_]
 onWord [nounderscore]
 onSpecialSymbol [_]
 onSpecialSymbol [_]
-onLineBreak
+onNewLine
 onSpecialSymbol [^]
 onSpecialSymbol [^]
 onWord [nosuper]
 onSpecialSymbol [^]
 onSpecialSymbol [^]
-onLineBreak
+onNewLine
 onSpecialSymbol [,]
 onSpecialSymbol [,]
 onWord [nosub]
 onSpecialSymbol [,]
 onSpecialSymbol [,]
-onLineBreak
+onNewLine
 onSpecialSymbol [{]
 onSpecialSymbol [{]
 onSpecialSymbol [{]

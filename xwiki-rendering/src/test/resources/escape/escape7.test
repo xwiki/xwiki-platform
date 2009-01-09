@@ -16,12 +16,12 @@ onSpecialSymbol [[]
 onWord [nolink]
 onSpecialSymbol []]
 onSpecialSymbol []]
-onLineBreak
+onNewLine
 beginLink [Reference = [reference]] [false]
 onSpecialSymbol [[]
 onSpecialSymbol [[]
 endLink [Reference = [reference]] [false]
-onLineBreak
+onNewLine
 onSpecialSymbol [[]
 onSpecialSymbol [[]
 onWord [whatever]

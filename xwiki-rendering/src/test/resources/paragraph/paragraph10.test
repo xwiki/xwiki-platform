@@ -1,0 +1,45 @@
+.#-----------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify we can force a paragraph to have empty new lines using the special \\ symbol.
+.# Also verify that \\Êare converted to new lines when they're used where they don't need to be.
+.#-----------------------------------------------------------------------------------------------------
+paragraph
+\\same paragraph
+
+paragraph\\same paragraph
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [paragraph]
+onNewLine
+onNewLine
+onWord [same]
+onSpace
+onWord [paragraph]
+endParagraph
+beginParagraph
+onWord [paragraph]
+onNewLine
+onWord [same]
+onSpace
+onWord [paragraph]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>paragraph<br/><br/>same paragraph</p><p>paragraph<br/>same paragraph</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+paragraph
+\\same paragraph
+
+paragraph
+same paragraph
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>paragraph<br/><br/>same paragraph</p><p>paragraph<br/>same paragraph</p></html>

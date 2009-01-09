@@ -194,11 +194,6 @@ public class WikiModelGeneratorListener implements Listener
         // TODO: Find what to do... For now don't render XML elements
     }
 
-    public void onLineBreak()
-    {
-        this.wikimodelListener.onLineBreak();
-    }
-
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // TODO wait for WikiModel to support wiki syntax in links
@@ -225,6 +220,7 @@ public class WikiModelGeneratorListener implements Listener
 
     public void onNewLine()
     {
+        // TODO: Decide when to generate a line break and when to generate a new line
         this.wikimodelListener.onNewLine();
     }
 

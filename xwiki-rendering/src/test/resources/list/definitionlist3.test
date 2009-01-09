@@ -23,7 +23,7 @@ onWord [title]
 endDefinitionTerm
 beginDefinitionDescription
 onWord [definition1]
-onLineBreak
+onNewLine
 onWord [definition2]
 endDefinitionDescription
 endDefinitionList

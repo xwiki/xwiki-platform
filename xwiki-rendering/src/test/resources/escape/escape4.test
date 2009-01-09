@@ -19,25 +19,25 @@ onSpecialSymbol [:]
 beginFormat: [ITALIC]
 onWord [whatever]
 endFormat: [ITALIC]
-onLineBreak
+onNewLine
 onWord [hello]
 onSpecialSymbol [:]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
 onWord [world]
-onLineBreak
+onNewLine
 onWord [image]
 onSpecialSymbol [:]
 onWord [something]
-onLineBreak
+onNewLine
 onWord [attach]
 onSpecialSymbol [:]
 onWord [something]
-onLineBreak
+onNewLine
 onWord [mailto]
 onSpecialSymbol [:]
 onWord [something]
-onLineBreak
+onNewLine
 onWord [dummy]
 onSpecialSymbol [:]
 onWord [something]

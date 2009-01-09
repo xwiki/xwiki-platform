@@ -27,6 +27,9 @@ import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
+import org.xwiki.rendering.internal.renderer.state.ConsecutiveNewLineStateListener;
+import org.xwiki.rendering.internal.renderer.state.BlockStateListener;
+import org.xwiki.rendering.internal.renderer.state.TextOnNewLineStateListener;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
@@ -85,10 +88,22 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     private Map<String, String> previousFormatParameters;
 
+    private BlockStateListener blockListener = new BlockStateListener();
+    
+    private TextOnNewLineStateListener textListener = new TextOnNewLineStateListener();
+    
+    private ConsecutiveNewLineStateListener newLineListener = new ConsecutiveNewLineStateListener();
+    
     public XWikiSyntaxRenderer(WikiPrinter printer)
     {
         super(new XWikiSyntaxEscapeWikiPrinter(printer));
-        getPrinter().setRendererState(getState());
+        
+        getPrinter().setBlockListener(this.blockListener);
+        getPrinter().setTextListener(this.textListener);
+
+        registerStateListener(this.blockListener);
+        registerStateListener(this.textListener);
+        registerStateListener(this.newLineListener);
 
         this.macroPrinter = new XWikiMacroPrinter();
         this.linkRenderer = new XWikiSyntaxLinkRenderer();
@@ -130,7 +145,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         this.linkRenderer.beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
         
         // Defer printing the link content since we need to gather all nested elements
-        this.linkBlocksPrinter = new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), getState());
+        this.linkBlocksPrinter = new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), this.blockListener, this.textListener);
         pushPrinter(this.linkBlocksPrinter);
     }
 
@@ -254,18 +269,11 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     {
         this.previousFormatParameters = null;
         
-        super.endParagraph(parameters);
-    }
+        // Ensure that any not printed characters are flushed.
+        // TODO: Fix this better by introducing a state listener to handle escapes
+        getPrinter().flush();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.PrintRenderer#onLineBreak()
-     */
-    public void onLineBreak()
-    {
-        super.onLineBreak();
-        print("\n");
+        super.endParagraph(parameters);
     }
 
     /**
@@ -276,7 +284,18 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void onNewLine()
     {
         super.onNewLine();
-        print("\\");
+
+        // If we're inside a table cell, a paragraph, a list or a section header then if we have already outputted
+        // a new line before then this new line should be a line break in order not to break the table cell, 
+        // paragraph, list or section header.
+        if (this.newLineListener.getNewLineCount() > 1 && (this.blockListener.isInParagraph()
+            || this.blockListener.isInList() || this.blockListener.isInDefinitionList()
+            || this.blockListener.isInSection() || this.blockListener.isInTableCell()))
+        {
+            print("\\\\");
+        } else {
+            print("\n");
+        }
     }
 
     /**
@@ -475,7 +494,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         
         // When we encounter a macro marker we ignore all other blocks inside since we're going to use the macro
         // definition wrapped by the macro marker to construct the xwiki syntax.
-        pushPrinter(new XWikiSyntaxEscapeWikiPrinter(VoidWikiPrinter.VOIDWIKIPRINTER, getState()));
+        pushPrinter(new XWikiSyntaxEscapeWikiPrinter(VoidWikiPrinter.VOIDWIKIPRINTER, this.blockListener, 
+            this.textListener));
     }
 
     /**

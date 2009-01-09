@@ -1,0 +1,32 @@
+.#---------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify we can force a quote to have empty new lines using the special \\ symbol.
+.#---------------------------------------------------------------------------------
+>line1
+\\line1bis
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginQuotation
+beginQuotationLine
+onWord [line1]
+onNewLine
+onNewLine
+onWord [line1bis]
+endQuotationLine
+endQuotation
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<blockquote>line1<br/><br/>line1bis</blockquote>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+>line1
+\\line1bis
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><blockquote>line1<br/><br/>line1bis</blockquote></html>

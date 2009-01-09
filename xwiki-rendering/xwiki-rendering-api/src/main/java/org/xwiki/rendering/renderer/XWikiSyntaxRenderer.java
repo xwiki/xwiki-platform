@@ -290,7 +290,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         // paragraph, list or section header.
         if (this.newLineListener.getNewLineCount() > 1 && (this.blockListener.isInParagraph()
             || this.blockListener.isInList() || this.blockListener.isInDefinitionList()
-            || this.blockListener.isInSection() || this.blockListener.isInTableCell()))
+            || this.blockListener.isInSection() || this.blockListener.isInTableCell()
+            || this.blockListener.isInQuotationLine()))
         {
             print("\\\\");
         } else {

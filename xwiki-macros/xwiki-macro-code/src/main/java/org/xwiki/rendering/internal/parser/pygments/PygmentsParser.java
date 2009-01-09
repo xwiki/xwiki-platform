@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -168,17 +169,12 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         PythonInterpreter interpreter = getPythonInterpreter();
         BlocksGeneratorPygmentsListener listener = new BlocksGeneratorPygmentsListener();
 
-        StringBuffer sb = new StringBuffer();
-
+        String code;
         try {
-            for (char[] buffer = new char[4096]; source.read(buffer, 0, 4096) > 0;) {
-                sb.append(buffer);
-            }
+            code = IOUtils.toString(source);
         } catch (IOException e) {
             throw new ParseException("Failed to read source", e);
         }
-
-        String code = sb.toString();
 
         interpreter.set(PY_LISTENER_VARNAME, listener);
         interpreter.set(PY_CODE_VARNAME, new PyUnicode(code));

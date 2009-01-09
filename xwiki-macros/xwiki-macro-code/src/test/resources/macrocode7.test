@@ -44,4 +44,4 @@ Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="s
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
 --><div class="code"><p><tt class="wikimodel-verbatim">Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
-Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}</tt></p></div><!--stopmacro--></html>\ No newline at end of file
+Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}</tt></p></div><!--stopmacro--></html>

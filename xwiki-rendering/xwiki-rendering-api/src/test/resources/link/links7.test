@@ -14,13 +14,13 @@ beginFormat: [BOLD]
 onWord [hello]
 endFormat: [BOLD]
 endLink [Reference = [Page]] [false]
-onLineBreak
+onNewLine
 beginLink [Reference = [Page]] [false]
 onSpecialSymbol [=]
 onSpace
 onWord [notheader]
 endLink [Reference = [Page]] [false]
-onLineBreak
+onNewLine
 beginLink [Reference = [Page]] [false]
 onMacroInline [testsimplemacro] [] [label]
 endLink [Reference = [Page]] [false]

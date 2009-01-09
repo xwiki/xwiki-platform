@@ -14,13 +14,13 @@ beginDocument
 beginParagraph
 beginLink [Reference = [{{macro}}]] [false]
 endLink [Reference = [{{macro}}]] [false]
-onLineBreak
+onNewLine
 beginLink [Reference = [Label>Reference]] [false]
 endLink [Reference = [Label>Reference]] [false]
-onLineBreak
+onNewLine
 beginLink [Reference = [Reference|Param=Value]] [false]
 endLink [Reference = [Reference|Param=Value]] [false]
-onLineBreak
+onNewLine
 beginLink [Reference = [[[no link]] [false]
 endLink [Reference = [[[no link]] [false]
 onSpecialSymbol [>]
@@ -28,13 +28,13 @@ onSpecialSymbol [>]
 onWord [Reference]
 onSpecialSymbol []]
 onSpecialSymbol []]
-onLineBreak
+onNewLine
 beginLink [Reference = [Reference]] [false]
 onSpecialSymbol [[]
 onSpecialSymbol [[]
 onImage: [whatever] [true]
 endLink [Reference = [Reference]] [false]
-onLineBreak
+onNewLine
 onWord [not]
 onSpecialSymbol [:]
 onWord [link]

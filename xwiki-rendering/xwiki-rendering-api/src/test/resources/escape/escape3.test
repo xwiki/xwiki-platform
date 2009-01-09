@@ -13,7 +13,7 @@ onSpace
 onSpecialSymbol [~]
 onSpace
 onWord [tilde]
-onLineBreak
+onNewLine
 onWord [not]
 onSpace
 onWord [newline]

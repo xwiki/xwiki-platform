@@ -15,7 +15,7 @@ onSpace
 onWord [a]
 onSpace
 onWord [list]
-onLineBreak
+onNewLine
 onWord [1]
 onSpecialSymbol [.]
 onWord [Not]

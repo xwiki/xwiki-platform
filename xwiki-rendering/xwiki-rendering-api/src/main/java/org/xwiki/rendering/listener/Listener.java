@@ -327,15 +327,8 @@ public interface Listener
     void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters);
 
     /**
-     * An explicit line break specified in the wiki syntax. For example for XWiki this would be "\\". Note that this is
-     * different from a new line which is triggered when the new line character is found ("\n") and which generates an
-     * {@link #onNewLine()} event.
-     */
-    void onLineBreak();
-
-    /**
-     * An implicit new line triggered when the new line character is found ("\n"). Note that this is different from a
-     * line break which is explicitely specified in wiki syntax, and which generates a {@link #onLineBreak()} event.
+     * A new line or line break (it's up to the renderers to decide if it should be outputted as a new
+     * line or as a line break in the given syntax).
      */
     void onNewLine();
 

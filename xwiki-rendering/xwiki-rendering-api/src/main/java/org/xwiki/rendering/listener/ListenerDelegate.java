@@ -118,11 +118,6 @@ public class ListenerDelegate implements Listener
         this.listener.endXMLNode(node);
     }
 
-    public void onLineBreak()
-    {
-        this.listener.onLineBreak();
-    }
-    
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.listener.beginLink(link, isFreeStandingURI, parameters);

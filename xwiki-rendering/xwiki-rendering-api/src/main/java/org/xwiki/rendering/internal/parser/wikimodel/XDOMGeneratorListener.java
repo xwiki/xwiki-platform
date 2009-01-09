@@ -374,11 +374,15 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * Explicit line breaks. For example in XWiki syntax that would be "\\".
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#onLineBreak()
      */
     public void onLineBreak()
     {
-        this.stack.push(LineBreakBlock.LINE_BREAK_BLOCK);
+        // Note that in XWiki we don't differentiate new lines and line breaks since it's the Renderers that decide
+        // to generate new lines or line breaks depending on the context and the target syntax.
+        this.stack.push(NewLineBlock.NEW_LINE_BLOCK);
     }
 
     /**
@@ -406,10 +410,14 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * "\n" character.
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#onLineBreak()
      */
     public void onNewLine()
     {
+        // Note that in XWiki we don't differentiate new lines and line breaks since it's the Renderers that decide
+        // to generate new lines or line breaks depending on the context and the target syntax.
         this.stack.push(NewLineBlock.NEW_LINE_BLOCK);
     }
 

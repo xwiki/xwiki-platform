@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.LineBreakBlock;
+import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.WordBlock;
@@ -106,22 +106,22 @@ public class ParserUtils
     /**
      * Parse a simple inline non wiki string to be able to insert it in the XDOM.
      * 
-     * @param value the value to parse.
-     * @return the list of {@link Block} ({@link WordBlock}, {@link SpaceBlock}, {@link LineBreakBlock}).
+     * @param text the text to parse (pure text)
+     * @return the list of {@link Block} ({@link WordBlock}, {@link SpaceBlock}, {@link NewLineBlock}).
      * @since 1.7
      */
-    public List<Block> parseInlineNonWiki(String value)
+    public List<Block> parseInlineNonWiki(String text)
     {
         List<Block> blockList = new ArrayList<Block>();
         StringBuffer word = new StringBuffer();
-        for (int i = 0; i < value.length(); ++i) {
-            char c = value.charAt(i);
+        for (int i = 0; i < text.length(); ++i) {
+            char c = text.charAt(i);
 
             if (c == '\n') {
                 if (word.length() > 0) {
                     blockList.add(new WordBlock(word.toString()));
                 }
-                blockList.add(LineBreakBlock.LINE_BREAK_BLOCK);
+                blockList.add(NewLineBlock.NEW_LINE_BLOCK);
 
                 word = new StringBuffer();
             } else if (c == '\r') {

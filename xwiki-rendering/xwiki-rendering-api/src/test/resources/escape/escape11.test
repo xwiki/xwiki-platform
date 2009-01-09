@@ -15,7 +15,7 @@ onSpace
 onWord [is]
 onSpace
 onWord [escaped]
-onLineBreak
+onNewLine
 onSpace
 onWord [A]
 onSpace

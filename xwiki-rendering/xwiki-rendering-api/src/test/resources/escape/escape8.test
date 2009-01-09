@@ -15,7 +15,7 @@ onSpecialSymbol [{]
 onWord [nomacro]
 onSpecialSymbol [}]
 onSpecialSymbol [}]
-onLineBreak
+onNewLine
 onSpecialSymbol [{]
 onSpecialSymbol [{]
 onWord [whatever]

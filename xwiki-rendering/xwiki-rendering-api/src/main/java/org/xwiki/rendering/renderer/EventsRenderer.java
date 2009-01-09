@@ -89,11 +89,6 @@ public class EventsRenderer extends AbstractPrintRenderer
         getPrinter().println("endParagraph" + serializeParameters(parameters));
     }
 
-    public void onLineBreak()
-    {
-        getPrinter().println("onLineBreak");
-    }
-
     public void onNewLine()
     {
         getPrinter().println("onNewLine");

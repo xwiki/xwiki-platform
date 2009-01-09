@@ -211,11 +211,6 @@ public class DoxiaGeneratorListener implements Listener
         // TODO: Find out what to do...
     }
 
-    public void onLineBreak()
-    {
-        this.sink.lineBreak();
-    }
-
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
     {
         // Don't do anything since macros have already been transformed so this method
@@ -230,6 +225,8 @@ public class DoxiaGeneratorListener implements Listener
 
     public void onNewLine()
     {
+        // TODO: Decide when to generate a line break and when to generate a new line
+
         // Since there's no On NewLine event in Doxia we simply generate text
         this.sink.rawText("\n");
     }

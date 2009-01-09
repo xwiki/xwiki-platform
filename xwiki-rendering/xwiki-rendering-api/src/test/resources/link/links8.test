@@ -10,7 +10,7 @@ beginDocument
 beginParagraph
 beginLink [Reference = [Space.ExistingPage]] [false] [[param1]=[value1][param2]=[value2]]
 endLink [Reference = [Space.ExistingPage]] [false] [[param1]=[value1][param2]=[value2]]
-onLineBreak
+onNewLine
 beginLink [Reference = [Space.UnknownPage]] [false] [[param]=[value]]
 onWord [label]
 endLink [Reference = [Space.UnknownPage]] [false] [[param]=[value]]

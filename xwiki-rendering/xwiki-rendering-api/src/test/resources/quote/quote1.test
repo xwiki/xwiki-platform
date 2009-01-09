@@ -19,7 +19,7 @@ endParagraph
 beginQuotation
 beginQuotationLine
 onWord [line1]
-onLineBreak
+onNewLine
 onWord [line1bis]
 beginQuotation
 beginQuotationLine

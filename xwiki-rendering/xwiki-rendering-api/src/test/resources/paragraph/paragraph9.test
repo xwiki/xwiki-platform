@@ -30,12 +30,12 @@ onWord [before]
 onSpace
 onWord [another]
 onSpace
-onLineBreak
+onNewLine
 onWord [hello]
 onSpace
 onSpace
 onWord [world]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace

@@ -16,8 +16,8 @@ onSpace
 onWord [two]
 onSpace
 onWord [three]
-onLineBreak
-onLineBreak
+onNewLine
+onNewLine
 onWord [hello]
 endParagraph
 endDocument

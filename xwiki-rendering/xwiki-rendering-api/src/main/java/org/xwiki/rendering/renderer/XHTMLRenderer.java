@@ -248,21 +248,11 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#onLineBreak()
-     */
-    public void onLineBreak()
-    {
-        getXHTMLWikiPrinter().printXMLElement("br");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see Renderer#onNewLine()
      */
     public void onNewLine()
     {
-        // Voluntarily do nothing since we want the same behavior as HTML.
+        getXHTMLWikiPrinter().printXMLElement("br");
     }
 
     /**

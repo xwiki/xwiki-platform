@@ -1,13 +1,9 @@
-.#-----------------------------------------------------
+.#-----------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Test multilines sections
-.#-----------------------------------------------------
+.# Verify we can force a section to have empty new lines using the special \\ symbol.
+.#-----------------------------------------------------------------------------------
 = header
-end header =
-
-= header
-
-not header =
+\\still in header
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -15,35 +11,24 @@ beginDocument
 beginSection [1]
 onWord [header]
 onNewLine
-onWord [end]
+onNewLine
+onWord [still]
+onSpace
+onWord [in]
 onSpace
 onWord [header]
 endSection [1]
-beginSection [1]
-onWord [header]
-endSection [1]
-beginParagraph
-onWord [not]
-onSpace
-onWord [header]
-onSpace
-onSpecialSymbol [=]
-endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="Hheaderbrendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p>
+<h1 id="Hheaderbrbrstillinheader"><span>header<br/><br/>still in header</span></h1>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 = header
-end header =
-
-= header =
-
-not header =
+\\still in header =
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="Hheaderbrendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p>
+<html><h1 id="Hheaderbrbrstillinheader"><span>header<br/><br/>still in header</span></h1></html>

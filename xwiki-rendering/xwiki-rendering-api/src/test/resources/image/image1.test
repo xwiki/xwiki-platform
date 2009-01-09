@@ -9,7 +9,7 @@
 beginDocument
 beginParagraph
 onImage: [my.png] [false] [[param1]=[value1][param2]=[value2]]
-onLineBreak
+onNewLine
 onImage: [Space.ExistingPage] [my.png] [false]
 endParagraph
 endDocument

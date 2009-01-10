@@ -8,7 +8,7 @@
   <artifactId>xwiki-web-wysiwyg</artifactId>
   <name>XWiki Platform - Web - WYSIWYG</name>
   <packaging>war</packaging>
-  <description>XWiki's What You See Is What You Get editor</description>
+  <description>XWiki's GWT WYSIWYG editor</description>
   <dependencies>
     <dependency>
       <groupId>com.google.gwt</groupId>
@@ -27,21 +27,8 @@
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwtVersion}</version>
-      <classifier>${platform}-libs</classifier>
-      <type>zip</type>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-dev</artifactId>
-      <version>${gwtVersion}</version>
       <classifier>${platform}</classifier>
       <scope>provided</scope>
-      <!-- We load this library this way because GWT looks for SWT libraries in the same folder -->
-      <!--
-        <scope>system</scope>
-        <systemPath>${settings.localRepository}/com/google/gwt/gwt-dev/${gwtVersion}/gwt-dev-${platform}.jar</systemPath>
-      -->
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
@@ -116,33 +103,6 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Download and unpack the GWT libs -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unzip-gwt-libs</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>com.google.gwt</groupId>
-                  <artifactId>gwt-dev</artifactId>
-                  <version>${gwtVersion}</version>
-                  <classifier>${platform}-libs</classifier>
-                  <type>zip</type>
-                  <overWrite>false</overWrite>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${settings.localRepository}/com/google/gwt/gwt-dev/${gwtVersion}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -287,12 +247,6 @@
       </properties>
     </profile>
   </profiles>
-  <repositories>
-    <repository>
-      <id>ibiblio</id>
-      <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
-    </repository>
-  </repositories>
   <pluginRepositories>
     <pluginRepository>
       <id>gwt-maven</id>

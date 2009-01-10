@@ -42,8 +42,11 @@ import org.dom4j.io.SAXReader;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.classes.UsersClass;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ObjectDiff;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.query.OrderClause;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
@@ -128,7 +131,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
         return fromMap(map, object);
     }
 
-    public BaseCollection fromMap(Map map, BaseCollection object)
+    public BaseCollection fromMap(Map<String, ? extends Object> map, BaseCollection object)
     {
         object.setClassName(getName());
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
@@ -687,11 +690,11 @@ public class BaseClass extends BaseCollection implements ClassInterface
             return "internal";
         }
 
-        if (customMapping == null) {
+        if (this.customMapping == null) {
             return "";
         }
 
-        return customMapping;
+        return this.customMapping;
     }
 
     public boolean hasCustomMapping()
@@ -710,7 +713,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public boolean hasInternalCustomMapping()
     {
-        return "internal".equals(customMapping);
+        return "internal".equals(this.customMapping);
     }
 
     public boolean isCustomMappingValid(XWikiContext context) throws XWikiException
@@ -744,11 +747,11 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public String getCustomClass()
     {
-        if (customClass == null) {
+        if (this.customClass == null) {
             return "";
         }
 
-        return customClass;
+        return this.customClass;
     }
 
     public BaseObject newCustomClassInstance(XWikiContext context) throws XWikiException
@@ -778,11 +781,11 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public String getDefaultWeb()
     {
-        if (defaultWeb == null) {
+        if (this.defaultWeb == null) {
             return "";
         }
 
-        return defaultWeb;
+        return this.defaultWeb;
     }
 
     public void setDefaultWeb(String defaultWeb)
@@ -792,11 +795,11 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public String getDefaultViewSheet()
     {
-        if (defaultViewSheet == null) {
+        if (this.defaultViewSheet == null) {
             return "";
         }
 
-        return defaultViewSheet;
+        return this.defaultViewSheet;
     }
 
     public void setDefaultViewSheet(String defaultViewSheet)
@@ -806,11 +809,11 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public String getDefaultEditSheet()
     {
-        if (defaultEditSheet == null) {
+        if (this.defaultEditSheet == null) {
             return "";
         }
 
-        return defaultEditSheet;
+        return this.defaultEditSheet;
     }
 
     public void setDefaultEditSheet(String defaultEditSheet)
@@ -820,11 +823,11 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public String getNameField()
     {
-        if (nameField == null) {
+        if (this.nameField == null) {
             return "";
         }
 
-        return nameField;
+        return this.nameField;
     }
 
     public void setNameField(String nameField)
@@ -856,7 +859,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
         List<String> list = Arrays.asList(getPropertyNames());
         Map<String, String> prettynamesmap = new HashMap<String, String>();
         for (int i = 0; i < list.size(); i++) {
-            String propname = (String) list.get(i);
+            String propname = list.get(i);
             list.set(i, prefix + propname);
             prettynamesmap.put(prefix + propname, ((PropertyClass) get(propname)).getPrettyName());
         }
@@ -866,7 +869,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
         // Add options from Set
         for (Iterator<String> it = list.iterator(); it.hasNext();) {
             String value = it.next().toString();
-            String displayValue = (String) prettynamesmap.get(value);
+            String displayValue = prettynamesmap.get(value);
             option option = new option(displayValue, displayValue);
             option.addElement(displayValue);
             option.setValue(value);
@@ -889,20 +892,20 @@ public class BaseClass extends BaseCollection implements ClassInterface
         List<String> list = Arrays.asList(getPropertyNames());
         Map<String, String> prettynamesmap = new HashMap<String, String>();
         for (int i = 0; i < list.size(); i++) {
-            String propname = (String) list.get(i);
+            String propname = list.get(i);
             list.set(i, prefix + propname);
             prettynamesmap.put(prefix + propname, ((PropertyClass) get(propname)).getPrettyName());
         }
 
         OrderClause order = null;
         if ((query != null) && (query.getOrderProperties() != null) && (query.getOrderProperties().size() > 0)) {
-            order = (OrderClause) query.getOrderProperties().get(0);
+            order = query.getOrderProperties().get(0);
         }
 
         // Add options from Set
         for (Iterator<String> it = list.iterator(); it.hasNext();) {
             String value = it.next().toString();
-            String displayValue = (String) prettynamesmap.get(value);
+            String displayValue = prettynamesmap.get(value);
             option option = new option(displayValue, displayValue);
             option.addElement(displayValue);
             option.setValue(value);
@@ -922,10 +925,10 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public String getValidationScript()
     {
-        if (validationScript == null) {
+        if (this.validationScript == null) {
             return "";
         } else {
-            return validationScript;
+            return this.validationScript;
         }
     }
 

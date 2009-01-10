@@ -46,6 +46,6 @@ public class OfficeImporterVelocityContextInitializer implements VelocityContext
      */
     public void initialize(VelocityContext context)
     {
-        context.put(VELOCITY_CONTEXT_KEY, this.officeImporter);
+        context.put(VELOCITY_CONTEXT_KEY, new OfficeImporterVelocityBridge(this.officeImporter));
     }
 }

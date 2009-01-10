@@ -17,22 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter;
+package org.xwiki.officeimporter.internal;
 
 import java.util.Map;
 
+import org.xwiki.officeimporter.OfficeImporter;
+import org.xwiki.officeimporter.OfficeImporterException;
+
 /**
- * Entry point to import Office documents into wiki pages.
+ * A bridge between velocity and office importer.
  * 
  * @version $Id$
  * @since 1.8M1
  */
-public interface OfficeImporter
+public class OfficeImporterVelocityBridge
 {
     /**
-     * This component's role, used when code needs to look it up.
+     * Internal {@link OfficeImporter} instance.
      */
-    String ROLE = OfficeImporter.class.getName();
+    private OfficeImporter importer;
+
+    /**
+     * Holds any error messages thrown during the import operation.
+     */
+    private String message;
+    
+    /**
+     * Default constructor.
+     * 
+     * @param importer internal {@link OfficeImporter} component.
+     */
+    public OfficeImporterVelocityBridge(OfficeImporter importer)
+    {
+        this.importer = importer;
+    }
 
     /**
      * Imports the passed Office document into the target wiki page.
@@ -42,8 +60,25 @@ public interface OfficeImporter
      *        used to find out the office document's format)
      * @param targetDocument the name of the resulting wiki page
      * @param options the optional parameters for the conversion
-     * @throws OfficeImporterException if an error occurred during the import
+     * @return true if the operation was a success.
      */
-    void importDocument(byte[] fileContent, String fileName, String targetDocument,
-        Map<String, String> options) throws OfficeImporterException;
+    public boolean importDocument(byte[] fileContent, String fileName, String targetDocument,
+        Map<String, String> options)
+    {
+        boolean success = false;
+        try {
+            importer.importDocument(fileContent, fileName, targetDocument, options);
+            success = true;
+        } catch(OfficeImporterException ex) {
+            this.message = ex.getMessage();
+        }
+        return success;
+    }
+    
+    /**
+     * @return any error messages thrown while importing or null.
+     */
+    public String getMessage() {
+        return this.message;
+    }
 }

@@ -21,12 +21,12 @@
 
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.XWikiContext;
-
 import java.io.Serializable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.xpn.xwiki.XWikiContext;
 
 public abstract class BaseElement implements ElementInterface, Serializable
 {

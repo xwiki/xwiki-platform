@@ -57,12 +57,12 @@ public class DefaultOfficeImporter implements OfficeImporter
     /**
      * Transforms a resulting (XHTML + artifacts) into an XWiki presentation (via ZipExplorer).
      */
-    private DocumentTransformer htmlToXWikiPresentationTransformer;
+    private DocumentTransformer htmlToPresentationTransformer;
 
     /**
      * Transforms an XHTML document into XWiki 2.0 syntax.
      */
-    private DocumentTransformer htmlToXWikiTwoZeroTransformer;
+    private DocumentTransformer htmlToXWikiTransformer;
 
     /**
      * {@inheritDoc}
@@ -79,14 +79,14 @@ public class DefaultOfficeImporter implements OfficeImporter
             OfficeImporterContext importerContext =
                 new OfficeImporterContext(fileContent, fileName, targetDocument, options, docBridge);
             officeToHtmlTransformer.transform(importerContext);
-            DocumentTransformer htmlToXWikiTransformer = null;
+            DocumentTransformer htmlTransformer = null;
             boolean isPresentation = isPresentation(importerContext.getSourceFormat());
             if (isPresentation) {
-                htmlToXWikiTransformer = htmlToXWikiPresentationTransformer;
+                htmlTransformer = htmlToPresentationTransformer;
             } else {
-                htmlToXWikiTransformer = htmlToXWikiTwoZeroTransformer;
+                htmlTransformer = htmlToXWikiTransformer;
             }
-            htmlToXWikiTransformer.transform(importerContext);
+            htmlTransformer.transform(importerContext);
             importerContext.finalizeDocument(isPresentation);
         } else {
             throw new OfficeImporterException("Failed to import document [" + fileName + "] into page [" 

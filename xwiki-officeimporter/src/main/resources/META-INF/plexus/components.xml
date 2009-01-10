@@ -54,7 +54,7 @@
     <component>
       <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
       <role-hint>htmltoxwiki</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToXWikiTwoZeroTransformer
+      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToXWikiTransformer
       </implementation>
       <requirements>
         <requirement>
@@ -67,7 +67,7 @@
     <component>
       <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
       <role-hint>htmltopresentation</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.transformer.OfficeToHtmlTransformer
+      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToPresentationTransformer
       </implementation>          
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
@@ -89,12 +89,12 @@
         <requirement>
           <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
           <role-hint>htmltoxwiki</role-hint>
-          <field-name>htmlToXWikiTwoZeroTransformer</field-name>
+          <field-name>htmlToXWikiTransformer</field-name>
         </requirement>
         <requirement>
           <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
           <role-hint>htmltopresentation</role-hint>
-          <field-name>htmlToXWikiPresentationTransformer</field-name>
+          <field-name>htmlToPresentationTransformer</field-name>
         </requirement>
       </requirements>      
     </component>

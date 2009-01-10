@@ -28,6 +28,7 @@ import java.util.zip.ZipOutputStream;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.officeimporter.transformer.DocumentTransformer;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
@@ -37,7 +38,7 @@ import org.xwiki.rendering.parser.SyntaxType;
  * @version $Id$
  * @since 1.8M1
  */
-public class HtmlToXWikiPresentationTransformer extends AbstractLogEnabled
+public class HtmlToPresentationTransformer extends AbstractLogEnabled implements DocumentTransformer
 {
     /**
      * {@inheritDoc}

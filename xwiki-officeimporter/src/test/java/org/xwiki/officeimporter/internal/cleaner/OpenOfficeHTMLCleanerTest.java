@@ -54,12 +54,12 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
      * Ending of the test html document..
      */
     private String footer = "</body></html>";
-    
+
     /**
      * Open office html cleaner.
      */
     private HTMLCleaner cleaner;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -67,8 +67,7 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
     {
         getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();
-        cleaner =
-            (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "openoffice");
+        cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "openoffice");
     }
 
     /**
@@ -90,9 +89,7 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
         Document doc = cleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("style");
         assertEquals(0, nodes.getLength());
-        html =
-            header + "<script type=\"text/javascript\">document.write(\"Hello World!\")</script>"
-                + footer;
+        html = header + "<script type=\"text/javascript\">document.write(\"Hello World!\")</script>" + footer;
         doc = cleaner.clean(new StringReader(html));
         nodes = doc.getElementsByTagName("script");
         assertEquals(0, nodes.getLength());
@@ -103,8 +100,8 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
      */
     public void testRedundantTagFiltering()
     {
-     // <span> & <div> tags without attributes should be stripped off.
-        String htmlTemplate = header + "<p>Test%sRedundant%sFiltering<p>" + footer;
+        // <span> & <div> tags without attributes should be stripped off.
+        String htmlTemplate = header + "<p>Test%sRedundant%sFiltering</p>" + footer;
         String[] attributeWiseFilteredTags = new String[] {"span", "div"};
         for (String tag : attributeWiseFilteredTags) {
             String startTag = "<" + tag + ">";
@@ -116,11 +113,11 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
         }
         // Tags that usually contain textual information like <strong>, <code>, <em> etc. etc.
         // should be filtered if they do not contain any textual content.
-        htmlTemplate = header + "<p>Test%sRedundant%s%s%sFiltering<p>" + footer;
+        htmlTemplate = header + "<p>Test%sRedundant%s%s%sFiltering</p>" + footer;
         String[] contentWiseFilteredTags =
-            new String[] {"em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr",
-            "acronym", "address", "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
-        for(String tag: contentWiseFilteredTags) {
+            new String[] {"em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr", "acronym", "address",
+            "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
+        for (String tag : contentWiseFilteredTags) {
             String startTag = "<" + tag + ">";
             String endTag = "</" + tag + ">";
             String html = String.format(htmlTemplate, startTag, endTag, startTag, endTag);
@@ -128,6 +125,18 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
             NodeList nodes = doc.getElementsByTagName(tag);
             assertEquals(1, nodes.getLength());
         }
+    }
+    
+    /**
+     * Test filtering of {@code<p><br/></p>} elements.
+     */
+    public void testEmptyParagraphFiltering() {
+        String html = header + "<p><br/></p><p><br/></p><p><br/></p><p><br/></p>" + footer;
+        Document doc = cleaner.clean(new StringReader(html));
+        NodeList paras = doc.getElementsByTagName("p");
+        assertEquals(0, paras.getLength());
+        NodeList breaks = doc.getElementsByTagName("br");
+        assertEquals(3, breaks.getLength());
     }
 
     /**
@@ -211,16 +220,17 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
         assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
         assertEquals("-", cellContent.getNodeValue());
     }
-    
+
     /**
      * Test filtering of html image links.
      */
-    public void testImageFiltering() {
+    public void testImageFiltering()
+    {
         String html = header + "<img src=\"foo.png\"/>" + footer;
-        Document doc = cleaner.clean(new StringReader(html),Collections.singletonMap("targetDocument", "Import.Test"));
+        Document doc = cleaner.clean(new StringReader(html), Collections.singletonMap("targetDocument", "Import.Test"));
         NodeList nodes = doc.getElementsByTagName("img");
         assertEquals(1, nodes.getLength());
-        Element image = (Element)nodes.item(0);
+        Element image = (Element) nodes.item(0);
         Node startComment = image.getPreviousSibling();
         Node stopComment = image.getNextSibling();
         assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
@@ -229,16 +239,17 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
         assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
         assertTrue(stopComment.getNodeValue().equals("stopimage"));
     }
- 
+
     /**
      * Test handling of image links.
      */
-    public void testImageLinks() {
+    public void testImageLinks()
+    {
         String html = header + "<a href=\"http://www.xwiki.org\"><img src=\"foo.png\"/></a>" + footer;
-        Document doc = cleaner.clean(new StringReader(html),Collections.singletonMap("targetDocument", "Import.Test"));
+        Document doc = cleaner.clean(new StringReader(html), Collections.singletonMap("targetDocument", "Import.Test"));
         NodeList nodes = doc.getElementsByTagName("img");
         assertEquals(1, nodes.getLength());
-        Element image = (Element)nodes.item(0);
+        Element image = (Element) nodes.item(0);
         Node startImageComment = image.getPreviousSibling();
         Node stopImageComment = image.getNextSibling();
         assertEquals(Node.COMMENT_NODE, startImageComment.getNodeType());

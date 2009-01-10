@@ -16,11 +16,14 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */package org.xwiki.officeimporter.filter;
+ */
+package org.xwiki.officeimporter.filter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -40,23 +43,111 @@ public class ParagraphFilter implements HTMLFilter
      */
     public void filter(Document document)
     {
-        // This is only a partial workaround, need to implement the correct scheme (mentioned in the class comment)
-        // soon.
-        NodeList paragraphs = document.getElementsByTagName("p");
-        for (int i = 0; i < paragraphs.getLength(); i++) {
-            Element paragraph = (Element) paragraphs.item(i);
-            if (paragraph.getTextContent().trim().equals("")) {
-                // We suspect this is an empty paragraph but it is possible that it contains other
-                // non-textual tags like images. For the moment we'll only search for internal image
-                // tags, we might have to refine this criterion later.
-                NodeList internalImages = paragraph.getElementsByTagName("img");
-                if (internalImages.getLength() == 0) {
-                    NamedNodeMap attributes = paragraph.getAttributes();
-                    while (attributes.getLength() > 0) {
-                        attributes.removeNamedItem(attributes.item(0).getNodeName());
-                    }
+        for (Node p : findEmptyParagraphSequences(document)) {
+            Node next = p.getNextSibling();
+            // Remove the first empty paragraph.
+            p.getParentNode().removeChild(p);
+            // Replace the following ones with a <br> element.
+            while (isEmptyLine(next)) {
+                Node following = next.getNextSibling();
+                next.getParentNode().insertBefore(document.createElement("br"), next);
+                next.getParentNode().removeChild(next);
+                next = following;
+            }
+        }
+    }
+
+    /**
+     * Finds all the empty paragraph sequences in the document.
+     * 
+     * @param document the {@link Document}
+     * @return a list of nodes containing leading paragraph elements of each sequence found.
+     */
+    private List<Node> findEmptyParagraphSequences(Document document)
+    {
+        NodeList paragraphElements = document.getElementsByTagName("p");
+        List<Node> sequences = new ArrayList<Node>();
+        for (int i = 0; i < paragraphElements.getLength(); i++) {
+            Node p = paragraphElements.item(i);
+            if (isEmptyLine(p)) {
+                Node prev = p.getPreviousSibling();
+                // Skip garbage.
+                while (isEmptyTextNode(prev) || isCommentNode(prev)) {
+                    Node oneBefore = prev.getPreviousSibling();
+                    prev.getParentNode().removeChild(prev);
+                    prev = oneBefore;
+                }
+                if (!isEmptyLine(prev)) {
+                    sequences.add(p);
                 }
             }
         }
+        return sequences;
+    }
+
+    /**
+     * Checks if a node represents a paragraph element.
+     * 
+     * @param node the {@link Node}.
+     * @return True if the node represents a {@code <p/>} element.
+     */
+    private boolean isParagraph(Node node)
+    {
+        return null != node && node.getNodeName().equals("p");
+    }
+
+    /**
+     * Checks if a node represents a {@code<p><br/></p>} element used by open office to represent an empty line.
+     * 
+     * @param node the {@link Node}
+     * @return true if the node represents an empty line.
+     */
+    private boolean isEmptyLine(Node node)
+    {
+        boolean isEmptyLine = false;
+        if (isParagraph(node)) {
+            isEmptyLine = true;
+            NodeList children = node.getChildNodes();
+            for (int i = 0; i < children.getLength(); i++) {
+                Node child = children.item(i);
+                if (!(isEmptyTextNode(child) || isCommentNode(child) || isLineBreak(child))) {
+                    isEmptyLine = false;
+                }
+            }
+        }
+        return isEmptyLine;
+    }
+
+    /**
+     * Checks if a node represents empty text content (white space).
+     * 
+     * @param node the {@link Node}.
+     * @return true if the node represents white space.
+     */
+    private boolean isEmptyTextNode(Node node)
+    {
+        return null != node && node.getNodeType() == Node.TEXT_NODE && node.getTextContent().trim().equals("");
+    }
+
+    /**
+     * Checks if a node represents an html comment.
+     * 
+     * @param node the {@link Node}.
+     * @return true if the node is a comment node.
+     */
+    private boolean isCommentNode(Node node)
+    {
+        return null != node && node.getNodeType() == Node.COMMENT_NODE;
+    }
+
+    /**
+     * Checks if a node represents an html line break.
+     * 
+     * @param node the {@link Node}
+     * @return true of the node represents a line break.
+     */
+    private boolean isLineBreak(Node node)
+    {
+        return null != node && node.getNodeName().equals("br");
     }
 }

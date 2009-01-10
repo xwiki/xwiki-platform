@@ -28,8 +28,11 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 
-public class CommentAddAction extends XWikiAction {
-    public boolean action(XWikiContext context) throws XWikiException {
+public class CommentAddAction extends XWikiAction
+{
+    @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
@@ -38,8 +41,9 @@ public class CommentAddAction extends XWikiAction {
         Boolean isResponseCorrect = Boolean.TRUE;
         if (xwiki.hasCaptcha(context)) {
             CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-            if (captchaPluginApi != null)
+            if (captchaPluginApi != null) {
                 isResponseCorrect = captchaPluginApi.verifyCaptcha("comment");
+            }
         }
 
         // Make sure this class exists
@@ -49,15 +53,14 @@ public class CommentAddAction extends XWikiAction {
                 return true;
             } else {
                 String className = baseclass.getName(); // XWiki.XWikiComments
-                int nb = doc.createNewObject(className, context);
-                BaseObject oldobject = doc.getObject(className, nb);
-                BaseObject newobject = (BaseObject) baseclass.fromMap(oform.getObject(className), oldobject);
-                newobject.setNumber(oldobject.getNumber());
-                newobject.setName(doc.getFullName());
-                doc.setObject(className, nb, newobject);
+                BaseObject object = doc.newObject(className, context);
+                // TODO The map should be pre-filled with empty strings for all class properties, just like in
+                // ObjectAddAction, so that properties missing from the request are still added to the database.
+                baseclass.fromMap(oform.getObject(className), object);
                 doc.setAuthor(context.getUser());
-                doc.setContentDirty(false); // Consider comments not being content
-                // if we consider that it is no contentDirty so it NEED be metaDataDirty for increment version and change history.
+                // Consider comments not being content.
+                doc.setContentDirty(false);
+                // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.
                 doc.setMetaDataDirty(true);
                 xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
             }
@@ -65,7 +68,7 @@ public class CommentAddAction extends XWikiAction {
             String redirect = Utils.getRedirect("edit", context);
             sendRedirect(response, redirect);
         } else {
-                String url = context.getDoc().getURL("view", "xpage=comments&confirm=false",context);
+            String url = context.getDoc().getURL("view", "xpage=comments&confirm=false", context);
             try {
                 response.sendRedirect(url);
             } catch (Exception e) {
@@ -75,7 +78,9 @@ public class CommentAddAction extends XWikiAction {
         return false;
     }
 
-    public String render(XWikiContext context) throws XWikiException {
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
         context.put("message", "nocommentwithnewdoc");
         return "exception";
     }

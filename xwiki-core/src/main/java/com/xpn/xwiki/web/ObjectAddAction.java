@@ -33,6 +33,10 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class ObjectAddAction extends XWikiAction
 {
+    private static final String[] EMPTY_PROPERTY = new String[] {""};
+
+    @SuppressWarnings("unchecked")
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -42,31 +46,29 @@ public class ObjectAddAction extends XWikiAction
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
 
         String className = oform.getClassName();
-        int nb = doc.createNewObject(className, context);
+        BaseObject object = doc.newObject(className, context);
 
-        BaseObject oldobject = doc.getObject(className, nb);
-        BaseClass baseclass = oldobject.getxWikiClass(context);
-        Map objmap = oform.getObject(className);
-        // We need to have a string in the map for each field
-        // for the object to be correctly created.
-        Iterator itfields = baseclass.getFieldList().iterator();
+        // We need to have a string in the map for each field for the object to be correctly created.
+        // Otherwise, queries using the missing properties will fail to return this object.
+        BaseClass baseclass = object.getxWikiClass(context);
+        Map<String, String[]> objmap = oform.getObject(className);
+        Iterator<PropertyClass> itfields = baseclass.getFieldList().iterator();
         while (itfields.hasNext()) {
-            PropertyClass property = (PropertyClass) itfields.next();
+            PropertyClass property = itfields.next();
             String name = property.getName();
-            if (objmap.get(name) == null)
-                objmap.put(name, "");
+            if (objmap.get(name) == null) {
+                objmap.put(name, EMPTY_PROPERTY);
+            }
         }
-        BaseObject newobject = (BaseObject) baseclass.fromMap(objmap, oldobject);
-        newobject.setNumber(oldobject.getNumber());
-        newobject.setName(doc.getFullName());
-        doc.setObject(className, nb, newobject);
+
+        // Load the object properties that are defined in the request.
+        baseclass.fromMap(objmap, object);
 
         doc.setAuthor(username);
         if (doc.isNew()) {
             doc.setCreator(username);
         }
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), true,
-            context);
+        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), true, context);
 
         // forward to edit
         String redirect = Utils.getRedirect("edit", context);

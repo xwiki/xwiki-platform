@@ -21,28 +21,32 @@
 
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.util.Util;
-
 import java.util.Map;
 
+import com.xpn.xwiki.util.Util;
 
-public class ObjectAddForm extends XWikiForm {
-
+public class ObjectAddForm extends XWikiForm
+{
     private String className;
 
-    public String getClassName() {
-        return className;
+    public String getClassName()
+    {
+        return this.className;
     }
 
-    public void setClassName(String className) {
+    public void setClassName(String className)
+    {
         this.className = className;
     }
 
-    public void readRequest() {
+    @Override
+    public void readRequest()
+    {
         setClassName(getRequest().getParameter("classname"));
     }
 
-    public Map getObject(String prefix) {
+    public Map<String, String[]> getObject(String prefix)
+    {
         return Util.getObject(getRequest(), prefix);
     }
 }

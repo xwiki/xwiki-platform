@@ -32,6 +32,13 @@
   <artifactId>xwiki-core-rendering-macro-html</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Html</name>
   <description>XWiki Platform - Core - Rendering - Macro - Html</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-xml</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

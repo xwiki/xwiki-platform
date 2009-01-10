@@ -87,7 +87,11 @@
 	#set($targetDocument="${targetSpace}.${targetPage}")
 	* Source Document: $fileName
 	* Target Document: $targetDocument
-	$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options)
-	Conversion succeeded. You can view the *[result&gt;$targetSpace.$targetPage]*, or you can [go back&gt;Import.WebHome] to convert another document.
+	#set($result=$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options))
+    #if($result)
+        Conversion succeeded. You can view the *[result&gt;$targetSpace.$targetPage]*, or you can [go back&gt;Import.WebHome] to convert another document.
+    #else
+        #error($officeimporter.getMessage())
+    #end
 #end</content>
 </xwikidoc>

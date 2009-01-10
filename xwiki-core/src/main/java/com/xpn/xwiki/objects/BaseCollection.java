@@ -426,7 +426,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
     }
 
-    public Collection getFieldList()
+    public Collection<Object> getFieldList()
     {
         return this.fields.values();
     }
@@ -663,7 +663,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public Map<String, Object> getCustomMappingMap() throws XWikiException
     {
         Map<String, Object> map = new HashMap<String, Object>();
-        for (String name : (Set<String>) this.fields.keySet()) {
+        for (String name : this.fields.keySet()) {
             BaseProperty property = (BaseProperty) get(name);
             map.put(name, property.getCustomMappingValue());
         }

@@ -40,7 +40,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering</artifactId>
+      <artifactId>xwiki-core-rendering-api</artifactId>
       <version>${pom.version}</version>
       <type>test-jar</type>
     </dependency>

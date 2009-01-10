@@ -26,8 +26,11 @@ import java.io.IOException;
 import java.net.ConnectException;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
-import org.xwiki.officeimporter.internal.OfficeImporterContext;
+import org.xwiki.officeimporter.transformer.DocumentTransformer;
 
 import com.artofsolving.jodconverter.DefaultDocumentFormatRegistry;
 import com.artofsolving.jodconverter.DocumentConverter;
@@ -43,7 +46,7 @@ import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConv
  * @version $Id$
  * @since 1.8M1
  */
-public class OfficeToHtmlTransformer extends AbstractLogEnabled implements DocumentTransformer
+public class OfficeToHtmlTransformer extends AbstractLogEnabled implements DocumentTransformer, Initializable
 {
     /**
      * The host address of the Open Office server.
@@ -88,15 +91,13 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
     /**
      * Output file (html).
      */
-    private File outputFile = null;
+    private File outputFile = null;    
 
     /**
-     * Default constructor.
+     * {@inheritDoc}
      */
-    public OfficeToHtmlTransformer(String serverIp, int port)
+    public void initialize() throws InitializationException
     {
-        this.openOfficeServerIp = serverIp;
-        this.openOfficeServerPort = port;
         openOfficeServerConnection = new SocketOpenOfficeConnection(openOfficeServerIp, openOfficeServerPort);
         DocumentFormatRegistry formatRegistry = new DefaultDocumentFormatRegistry();
         htmlFormat = formatRegistry.getFormatByFileExtension("html");

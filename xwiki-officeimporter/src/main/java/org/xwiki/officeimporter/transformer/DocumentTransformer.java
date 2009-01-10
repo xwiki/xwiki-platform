@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.transformer;
+package org.xwiki.officeimporter.transformer;
 
+import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
-import org.xwiki.officeimporter.internal.OfficeImporterContext;
 
 /**
  * A Document Transformer is responsible for transforming a document (Office, HTML, etc) into some

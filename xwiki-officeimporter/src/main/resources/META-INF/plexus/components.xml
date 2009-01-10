@@ -11,6 +11,7 @@
   -->
 <component-set>
   <components>
+  <!-- HTML Cleaners -->
     <component>
       <role>org.xwiki.xml.html.HTMLCleaner</role>
       <role-hint>openoffice</role-hint>
@@ -38,6 +39,39 @@
       </requirements>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
+    <!-- Document Transformers -->
+    <component>
+      <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
+      <role-hint>officetohtml</role-hint>
+      <implementation>org.xwiki.officeimporter.internal.transformer.OfficeToHtmlTransformer
+      </implementation>
+      <configuration>
+        <openOfficeServerIp>127.0.0.1</openOfficeServerIp>
+        <openOfficeServerPort>8100</openOfficeServerPort>
+      </configuration>      
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
+      <role-hint>htmltoxwiki</role-hint>
+      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToXWikiTwoZeroTransformer
+      </implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.xml.html.HTMLCleaner</role>
+          <role-hint>openoffice</role-hint>
+        </requirement>
+      </requirements>  
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
+      <role-hint>htmltopresentation</role-hint>
+      <implementation>org.xwiki.officeimporter.internal.transformer.OfficeToHtmlTransformer
+      </implementation>          
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <!-- Office Importer -->
     <component>
       <role>org.xwiki.officeimporter.OfficeImporter</role>
       <role-hint>default</role-hint>
@@ -47,12 +81,24 @@
         <requirement>
           <role>org.xwiki.bridge.DocumentAccessBridge</role>
         </requirement>
-      </requirements>
-      <configuration>
-        <openOfficeServerIp>127.0.0.1</openOfficeServerIp>
-        <openOfficeServerPort>8100</openOfficeServerPort>
-      </configuration>
+        <requirement>
+          <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
+          <role-hint>officetohtml</role-hint>
+          <field-name>officeToHtmlTransformer</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
+          <role-hint>htmltoxwiki</role-hint>
+          <field-name>htmlToXWikiTwoZeroTransformer</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
+          <role-hint>htmltopresentation</role-hint>
+          <field-name>htmlToXWikiPresentationTransformer</field-name>
+        </requirement>
+      </requirements>      
     </component>
+    <!-- Velocity -->
     <component>
       <role>org.xwiki.velocity.VelocityContextInitializer</role>
       <role-hint>officeimporter</role-hint>

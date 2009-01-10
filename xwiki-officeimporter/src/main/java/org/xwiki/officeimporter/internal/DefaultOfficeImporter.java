@@ -24,16 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporter;
-import org.xwiki.officeimporter.internal.transformer.DocumentTransformer;
-import org.xwiki.officeimporter.internal.transformer.HtmlToXWikiPresentationTransformer;
-import org.xwiki.officeimporter.internal.transformer.HtmlToXWikiTwoZeroTransformer;
-import org.xwiki.officeimporter.internal.transformer.OfficeToHtmlTransformer;
+import org.xwiki.officeimporter.OfficeImporterContext;
+import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.officeimporter.transformer.DocumentTransformer;
 
 import com.artofsolving.jodconverter.DocumentFormat;
 
@@ -43,27 +37,12 @@ import com.artofsolving.jodconverter.DocumentFormat;
  * @version $Id$
  * @since 1.8M1
  */
-public class DefaultOfficeImporter implements OfficeImporter, Composable, Initializable
+public class DefaultOfficeImporter implements OfficeImporter
 {
     /**
      * File extensions corresponding to slide presentations.
      */
     private static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
-
-    /**
-     * The host address of the Open Office server.
-     */
-    private String openOfficeServerIp;
-
-    /**
-     * The port number of the the Open Office service
-     */
-    private int openOfficeServerPort;
-    
-    /**
-     * Component manager used to lookup for other components.
-     */
-    private ComponentManager componentManager;
     
     /**
      * Document access bridge used to access wiki documents.
@@ -84,24 +63,6 @@ public class DefaultOfficeImporter implements OfficeImporter, Composable, Initia
      * Transforms an XHTML document into XWiki 2.0 syntax.
      */
     private DocumentTransformer htmlToXWikiTwoZeroTransformer;
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void initialize() throws InitializationException
-    {
-        officeToHtmlTransformer = new OfficeToHtmlTransformer(openOfficeServerIp, openOfficeServerPort);
-        htmlToXWikiTwoZeroTransformer = new HtmlToXWikiTwoZeroTransformer(componentManager);
-        htmlToXWikiPresentationTransformer = new HtmlToXWikiPresentationTransformer(componentManager);
-    }
 
     /**
      * {@inheritDoc}

@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.xwiki.component.manager.ComponentManager;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
-import org.xwiki.officeimporter.internal.OfficeImporterContext;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
@@ -37,17 +37,8 @@ import org.xwiki.rendering.parser.SyntaxType;
  * @version $Id$
  * @since 1.8M1
  */
-public class HtmlToXWikiPresentationTransformer extends AbstractHtmlToXWikiTransformer
+public class HtmlToXWikiPresentationTransformer extends AbstractLogEnabled
 {
-    /**
-     * Default constructor.
-     * 
-     * @param componentManager {@link ComponentManager} used to lookup for components.
-     */
-    public HtmlToXWikiPresentationTransformer(ComponentManager componentManager) {
-        super(componentManager);
-    }
-    
     /**
      * {@inheritDoc}
      */

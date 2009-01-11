@@ -71,14 +71,14 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()
     {
         return false;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -121,12 +121,16 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
 
         List<SectionBlock> sections = root.getChildrenByType(SectionBlock.class, true);
 
-        // Construct table of content from sections list
-        Block rootBlock =
-            generateTree(sections, parameters.getStart(), parameters.getDepth(), parameters.isNumbered(),
-                rootSectionBlock);
+        if (!sections.isEmpty()) {
+            // Construct table of content from sections list
+            Block rootBlock =
+                generateTree(sections, parameters.getStart(), parameters.getDepth(), parameters.isNumbered(),
+                    rootSectionBlock);
 
-        return Arrays.asList(rootBlock);
+            return Arrays.asList(rootBlock);
+        }
+
+        return Collections.emptyList();
     }
 
     /**
@@ -162,8 +166,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
                 if (rootSectionBlock == sectionBlock) {
                     rootSectionFound = true;
                     continue;
-                } else if (rootSectionBlock.getParent() == sectionBlock.getParent()
-                    && sectionLevel <= rootSectionLevel) {
+                } else if (rootSectionBlock.getParent() == sectionBlock.getParent() && sectionLevel <= rootSectionLevel) {
                     break;
                 }
             } else {

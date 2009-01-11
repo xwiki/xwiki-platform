@@ -70,12 +70,12 @@ public class CalendarData
      */
     public CalendarData(String user, XWikiContext context) throws XWikiException
     {
-        addCalendarData(context.getDoc(), user);
+        addCalendarData(context.getDoc(), user, context);
     }
 
     public CalendarData(XWikiDocument doc, String user, XWikiContext context) throws XWikiException
     {
-        addCalendarData(doc, user);
+        addCalendarData(doc, user, context);
     }
 
     public CalendarData(String hql, String user, XWikiContext context) throws XWikiException
@@ -85,7 +85,7 @@ public class CalendarData
         for (int i = 0; i < list.size(); i++) {
             String docname = (String) list.get(i);
             XWikiDocument doc = xwiki.getDocument(docname, context);
-            addCalendarData(doc, user);
+            addCalendarData(doc, user, context);
         }
     }
 
@@ -100,7 +100,7 @@ public class CalendarData
             Date date = doc.getDate();
             Calendar cdate = Calendar.getInstance();
             cdate.setTime(date);
-            this.cdata.put(df.format(date), new CalendarEvent(cdate, cdate, "", "[" + doc.getName() + ">"
+            this.cdata.put(df.format(date), new CalendarEvent(cdate, cdate, "", "[" + doc.getDisplayTitle(context) + ">"
                 + doc.getFullName() + "] by " + context.getWiki().getLocalUserName(doc.getAuthor(), context)));
         }
     }
@@ -138,7 +138,7 @@ public class CalendarData
      * @param defaultUser The username to be used ig objects do not have a User field.
      * @throws XWikiException
      */
-    public void addCalendarData(XWikiDocument doc, String defaultUser) throws XWikiException
+    public void addCalendarData(XWikiDocument doc, String defaultUser, XWikiContext context) throws XWikiException
     {
         if (doc == null) {
             return;
@@ -153,7 +153,9 @@ public class CalendarData
         }
 
         String defaultDescription = "";
-        defaultDescription = "[" + doc.getFullName() + "]";
+        String defaultURL = "";
+        defaultDescription = "[" + doc.getDisplayTitle(context) + ">" + doc.getFullName() + "]";
+        defaultURL = doc.getURL("view", context);
 
         Vector bobjs = doc.getObjects("XWiki.CalendarEvent");
         if (bobjs != null) {
@@ -231,6 +233,10 @@ public class CalendarData
 
                     if ((description == null) || description.equals("")) {
                         description = defaultDescription;
+                    }
+
+                    if ((url == null) || url.equals("")) {
+                        url = defaultURL;
                     }
 
                     Calendar cdateStart = Calendar.getInstance();

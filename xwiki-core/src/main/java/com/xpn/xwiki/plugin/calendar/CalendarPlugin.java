@@ -236,17 +236,15 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
                 ((cal.get(Calendar.DAY_OF_MONTH) == todayCal.get(Calendar.DAY_OF_MONTH))
                     && (cal.get(Calendar.MONTH) == todayCal.get(Calendar.MONTH))
                     && (cal.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR))) {
-                    printDay(output, cal, null, content, true, cal.get(Calendar.MONTH) == dayCal
+                    printDay(output, cal, content, true, cal.get(Calendar.MONTH) == dayCal
                         .get(Calendar.MONTH));
                 } else if // day is in calendar month
                 ((cal.get(Calendar.MONTH) == dayCal.get(Calendar.MONTH))
                     && (cal.get(Calendar.YEAR) == dayCal.get(Calendar.YEAR))) {
-                    // printDayInThisMonth(output, cal, null, content);
-                    printDay(output, cal, null, content, false, true);
+                    printDay(output, cal, content, false, true);
                 } else // apply day-not-in-month style ;-)
                 {
-                    // printDayNotInMonth(output, cal);
-                    printDay(output, cal, null, content, false, false);
+                    printDay(output, cal, content, false, false);
                 }
 
                 // increment calendar by one day
@@ -266,7 +264,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return output.toString();
     }
 
-    private void printDay(StringBuffer output, Calendar cal, String url, String content,
+    private void printDay(StringBuffer output, Calendar cal, String content,
         boolean today, boolean inThisMonth)
     {
         if (inThisMonth) {
@@ -282,24 +280,16 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
                 output.append("<td class=\"wiki-calendar-daynotinmonth\">");
             }
         }
-        if (url != null) {
-            output.append("<div class=\"wiki-calendar-daytitle\">");
-            if (content != null && content.length() > 0)
-                output.append("<div class=\"wiki-calendar-daytitle-hasevent\">");
-            output.append("<a href=\"" + url + "\">");
-            output.append(cal.get(Calendar.DAY_OF_MONTH));
-            if (content != null && content.length() > 0) {
-                output.append(content);
-                output.append("</div>");
-            }
-            output.append("</a></div>");
-        } else {
-            output.append("<div class=\"wiki-calendar-daytitle\">");
-            output.append(cal.get(Calendar.DAY_OF_MONTH));
-            output.append("</div>");
-            if (content != null && content.length() > 0) {
-                output.append(content);
-            }
+       
+        String classname = "wiki-calendar-daytitle"; 
+        if (content != null && content.length() > 0) {
+            classname += " wiki-calendar-daytitle-hasevent";
+        }
+        output.append("<div class=\"" + classname + "\">");
+        output.append(cal.get(Calendar.DAY_OF_MONTH));
+        output.append("</div>");
+        if (content != null && content.length() > 0) {
+            output.append(content);
         }
         output.append("</td>");
     }
@@ -380,26 +370,4 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         }
     }
 
-    /*
-     * private void printDayNotInMonth(StringBuffer output, Calendar cal) { output.append("<td class=\"wiki-calendar-daynotinmonth\">");
-     * output.append(cal.get(Calendar.DAY_OF_MONTH)); output.append("&nbsp;"); output.append("</td>"); }
-     * private void printDayInThisMonth(StringBuffer output, Calendar cal, String url, String
-     * content, boolean today) { if (today) output.append("<td class=\"wiki-calendar-today\">");
-     * else output.append("<td class=\"wiki-calendar-dayinmonth\">"); if (url != null) {
-     * output.append("<div class=\"wiki-calendar-daytitle\">"); if (content != null &&
-     * content.length() > 0) output.append("<div class=\"wiki-calendar-daytitle-hasevent\">");
-     * output.append("<a href=\"" + url + "\">"); output.append(cal.get(Calendar.DAY_OF_MONTH)); if
-     * (content != null && content.length() > 0) { output.append("<br />");
-     * output.append(content); output.append("</div>"); } output.append("</a></div>"); } else {
-     * output.append("<div class=\"wiki-calendar-daytitle\">"); if (content != null &&
-     * content.length() > 0) output.append("<div class=\"wiki-calendar-daytitle-hasevent\">");
-     * output.append(cal.get(Calendar.DAY_OF_MONTH)); if (content != null && content.length() > 0) {
-     * output.append("<br />"); output.append(content); output.append("</div>"); }
-     * output.append("</div>"); } output.append("</td>"); } private void
-     * printDayInThisMonth(StringBuffer output, Calendar cal, String url, String content) {
-     * //printDayInThisMonth(output, cal, url, content, false); printDay(output, cal, url, content,
-     * false, true); } private void printToday(StringBuffer output, Calendar cal, String url, String
-     * content) { //printDayInThisMonth(output, cal, url, content, true); printDay(output, cal, url,
-     * content, true, true); }
-     */
 }

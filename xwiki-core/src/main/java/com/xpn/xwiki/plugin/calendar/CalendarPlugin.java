@@ -287,10 +287,10 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         }
         output.append("<div class=\"" + classname + "\">");
         output.append(cal.get(Calendar.DAY_OF_MONTH));
-        output.append("</div>");
         if (content != null && content.length() > 0) {
             output.append(content);
         }
+        output.append("</div>");
         output.append("</td>");
     }
 

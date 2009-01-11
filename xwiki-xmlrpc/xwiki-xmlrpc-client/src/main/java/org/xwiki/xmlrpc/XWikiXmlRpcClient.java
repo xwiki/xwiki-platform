@@ -82,12 +82,12 @@ public class XWikiXmlRpcClient
         XmlRpcClientConfigImpl clientConfig = new XmlRpcClientConfigImpl();
         clientConfig.setServerURL(new URL(endpoint));
 
-        xmlRpcClient = new XmlRpcClient();
-        xmlRpcClient.setConfig(clientConfig);
+        this.xmlRpcClient = new XmlRpcClient();
+        this.xmlRpcClient.setConfig(clientConfig);
 
         this.rpcHandler = rpcHandler;
 
-        token = "";
+        this.token = "";
     }
 
     /**
@@ -99,7 +99,7 @@ public class XWikiXmlRpcClient
      */
     public void login(String username, String password) throws XmlRpcException
     {
-        token = (String) invokeRpc("login", username, password);
+        this.token = (String) invokeRpc("login", username, password);
     }
 
     /**
@@ -110,8 +110,8 @@ public class XWikiXmlRpcClient
      */
     public boolean logout() throws XmlRpcException
     {
-        Boolean value = (Boolean) invokeRpc("logout", token);
-        token = "";
+        Boolean value = (Boolean) invokeRpc("logout", this.token);
+        this.token = "";
 
         return value.booleanValue();
     }
@@ -124,7 +124,7 @@ public class XWikiXmlRpcClient
      */
     public ServerInfo getServerInfo() throws XmlRpcException
     {
-        Object object = invokeRpc("getServerInfo", token);
+        Object object = invokeRpc("getServerInfo", this.token);
         return new ServerInfo((Map) object);
     }
 
@@ -133,11 +133,10 @@ public class XWikiXmlRpcClient
      * 
      * @return A list of SpaceSummaries for each space defined in the remote XWiki.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public List<SpaceSummary> getSpaces() throws XmlRpcException
     {
-        Object[] objects = (Object[]) invokeRpc("getSpaces", token);
+        Object[] objects = (Object[]) invokeRpc("getSpaces", this.token);
         List<SpaceSummary> result = new ArrayList<SpaceSummary>();
         for (Object object : objects) {
             Map<String, Object> spaceSummaryMap = (Map) object;
@@ -154,11 +153,10 @@ public class XWikiXmlRpcClient
      * @param spaceName
      * @return A Space object containing extended space information.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public Space getSpace(String spaceName) throws XmlRpcException
     {
-        Object object = invokeRpc("getSpace", token, spaceName);
+        Object object = invokeRpc("getSpace", this.token, spaceName);
         return new Space((Map) object);
     }
 
@@ -178,11 +176,10 @@ public class XWikiXmlRpcClient
      * @param space The Space object containing information about the new space.
      * @return A Space object with up-to-date information about the newly created space.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public Space addSpace(Space space) throws XmlRpcException
     {
-        Object object = invokeRpc("addSpace", token, space.toMap());
+        Object object = invokeRpc("addSpace", this.token, space.toMap());
         return new Space((Map) object);
     }
 
@@ -192,11 +189,10 @@ public class XWikiXmlRpcClient
      * @param spaceKey
      * @return True if the space was successfully deleted.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public Boolean removeSpace(String spaceKey) throws XmlRpcException
     {
-        return (Boolean) invokeRpc("removeSpace", token, spaceKey);
+        return (Boolean) invokeRpc("removeSpace", this.token, spaceKey);
     }
 
     /**
@@ -215,11 +211,10 @@ public class XWikiXmlRpcClient
      * @param spaceName
      * @return A list of SpaceSummaries for each page in the given space.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public List<XWikiPageSummary> getPages(String spaceName) throws XmlRpcException
     {
-        Object[] objects = (Object[]) invokeRpc("getPages", token, spaceName);
+        Object[] objects = (Object[]) invokeRpc("getPages", this.token, spaceName);
         List<XWikiPageSummary> result = new ArrayList<XWikiPageSummary>();
         for (Object object : objects) {
             Map pageSummaryMap = (Map) object;
@@ -246,11 +241,10 @@ public class XWikiXmlRpcClient
      * @param pageId
      * @return A Page object containing all the information.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public XWikiPage getPage(String pageId) throws XmlRpcException
     {
-        Object object = invokeRpc("getPage", token, pageId);
+        Object object = invokeRpc("getPage", this.token, pageId);
         return new XWikiPage((Map) object);
     }
 
@@ -277,7 +271,8 @@ public class XWikiXmlRpcClient
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         extendedId.setParameter("language", language);
 
-        Object object = invokeRpc("getPage", token, extendedId.toString()); // , language);
+        Object object = invokeRpc("getPage", this.token, extendedId.toString()); // ,
+        // language);
         return new XWikiPage((Map) object);
     }
 
@@ -304,7 +299,8 @@ public class XWikiXmlRpcClient
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         extendedId.setParameter("version", version.toString());
 
-        Object object = invokeRpc("getPage", token, extendedId.toString()); // pageId, version);
+        Object object = invokeRpc("getPage", this.token, extendedId.toString()); // pageId,
+        // version);
         return new XWikiPage((Map) object);
     }
 
@@ -331,7 +327,8 @@ public class XWikiXmlRpcClient
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         extendedId.setParameter("version", version.toString());
         extendedId.setParameter("minorVersion", minorVersion.toString());
-        Object object = invokeRpc("getPage", token, extendedId.toString());// pageId, version,
+        Object object = invokeRpc("getPage", this.token, extendedId.toString());// pageId,
+        // version,
         // minorVersion);
         return new XWikiPage((Map) object);
     }
@@ -353,11 +350,10 @@ public class XWikiXmlRpcClient
      * @param pageId
      * @return A list of PageHistorySummary for each revision of the page.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public List<XWikiPageHistorySummary> getPageHistory(String pageId) throws XmlRpcException
     {
-        Object[] objects = (Object[]) invokeRpc("getPageHistory", token, pageId);
+        Object[] objects = (Object[]) invokeRpc("getPageHistory", this.token, pageId);
         List<XWikiPageHistorySummary> result = new ArrayList<XWikiPageHistorySummary>();
         for (Object object : objects) {
             Map<String, Object> pageHistorySummaryMap = (Map) object;
@@ -384,11 +380,10 @@ public class XWikiXmlRpcClient
      * @param page
      * @return The Page object with the up-to-date information about the newly stored page.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public XWikiPage storePage(Page page) throws XmlRpcException
     {
-        Object object = invokeRpc("storePage", token, page.toMap());
+        Object object = invokeRpc("storePage", this.token, page.toMap());
         return new XWikiPage((Map) object);
     }
 
@@ -398,11 +393,10 @@ public class XWikiXmlRpcClient
      * @param pageId
      * @return True if the page has been successfully removed.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public Boolean removePage(String pageId) throws XmlRpcException
     {
-        Object object = invokeRpc("removePage", token, pageId);
+        Object object = invokeRpc("removePage", this.token, pageId);
         return (Boolean) object;
     }
 
@@ -424,11 +418,10 @@ public class XWikiXmlRpcClient
      * @param content The content to be rendered. If content == "" then the page content is rendered.
      * @return The rendered content.
      * @throws XmlRpcException XmlRpcException If the page does not exist or the user has not the right to access it.
-     * @category ConfluenceAPI
      */
     public String renderContent(String space, String pageId, String content) throws XmlRpcException
     {
-        return (String) invokeRpc("renderContent", token, space, pageId, content);
+        return (String) invokeRpc("renderContent", this.token, space, pageId, content);
     }
 
     /**
@@ -437,11 +430,10 @@ public class XWikiXmlRpcClient
      * @param pageId
      * @return A list of Comment objects for each comment associated to the page.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public List<Comment> getComments(String pageId) throws XmlRpcException
     {
-        Object[] objects = (Object[]) invokeRpc("getComments", token, pageId);
+        Object[] objects = (Object[]) invokeRpc("getComments", this.token, pageId);
         List<Comment> result = new ArrayList<Comment>();
         for (Object object : objects) {
             Map<String, Object> commentMap = (Map) object;
@@ -464,7 +456,7 @@ public class XWikiXmlRpcClient
 
     public Comment getComment(String commentId) throws XmlRpcException
     {
-        Object object = invokeRpc("removePage", token, commentId);
+        Object object = invokeRpc("removePage", this.token, commentId);
         return new Comment((Map) object);
     }
 
@@ -474,11 +466,10 @@ public class XWikiXmlRpcClient
      * @param comment A Comment object containing the comment to be added.
      * @return A Comment object containing the information about the newly created comment.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public Comment addComment(Comment comment) throws XmlRpcException
     {
-        Object object = invokeRpc("addComment", token, comment.toMap());
+        Object object = invokeRpc("addComment", this.token, comment.toMap());
         return new Comment((Map) object);
     }
 
@@ -488,11 +479,10 @@ public class XWikiXmlRpcClient
      * @param commentId
      * @return True if the comment has been successfully removed.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public Boolean removeComment(String commentId) throws XmlRpcException
     {
-        Object object = invokeRpc("removeComment", token, commentId);
+        Object object = invokeRpc("removeComment", this.token, commentId);
         return (Boolean) object;
     }
 
@@ -502,11 +492,10 @@ public class XWikiXmlRpcClient
      * @param pageId
      * @return A list of Attachment objects describing the attachments associated to the page.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public List<Attachment> getAttachments(String pageId) throws XmlRpcException
     {
-        Object[] objects = (Object[]) invokeRpc("getAttachments", token, pageId);
+        Object[] objects = (Object[]) invokeRpc("getAttachments", this.token, pageId);
         List<Attachment> result = new ArrayList<Attachment>();
         for (Object object : objects) {
             Map<String, Object> attachmentMap = (Map) object;
@@ -535,11 +524,10 @@ public class XWikiXmlRpcClient
      * @param versionNumber Ignored.
      * @return The actual attachment data.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public byte[] getAttachmentData(String pageId, String fileName, String versionNumber) throws XmlRpcException
     {
-        return (byte[]) invokeRpc("getAttachmentData", token, pageId, fileName, versionNumber);
+        return (byte[]) invokeRpc("getAttachmentData", this.token, pageId, fileName, versionNumber);
     }
 
     /**
@@ -560,13 +548,12 @@ public class XWikiXmlRpcClient
      * @param attachmentData The actual attachment data.
      * @return An Attachment object describing the newly added attachment.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public Attachment addAttachment(Integer contentId, Attachment attachment, byte[] attachmentData)
         throws XmlRpcException
     {
-        Object object = invokeRpc("addAttachment", token, contentId, attachment.toMap(), attachmentData);
-        return (Attachment) new Attachment((Map<String, Object>) object);
+        Object object = invokeRpc("addAttachment", this.token, contentId, attachment.toMap(), attachmentData);
+        return new Attachment((Map<String, Object>) object);
     }
 
     /**
@@ -576,11 +563,10 @@ public class XWikiXmlRpcClient
      * @param fileName
      * @return True if the attachment has been successfully removed.
      * @throws XmlRpcException
-     * @category ConfluenceAPI
      */
     public Boolean removeAttachment(String pageId, String fileName) throws XmlRpcException
     {
-        return (Boolean) invokeRpc("removeAttachment", token, pageId, fileName);
+        return (Boolean) invokeRpc("removeAttachment", this.token, pageId, fileName);
     }
 
     /**
@@ -601,7 +587,7 @@ public class XWikiXmlRpcClient
      */
     public List<XWikiClassSummary> getClasses() throws XmlRpcException
     {
-        Object[] objects = (Object[]) invokeRpc("getClasses", token);
+        Object[] objects = (Object[]) invokeRpc("getClasses", this.token);
         List<XWikiClassSummary> result = new ArrayList<XWikiClassSummary>();
         for (Object object : objects) {
             Map<String, Object> xwikiClassSummaryMap = (Map<String, Object>) object;
@@ -621,7 +607,7 @@ public class XWikiXmlRpcClient
      */
     public XWikiClass getClass(String className) throws XmlRpcException
     {
-        Object object = invokeRpc("getClass", token, className);
+        Object object = invokeRpc("getClass", this.token, className);
         return new XWikiClass((Map<String, Object>) object);
     }
 
@@ -644,7 +630,7 @@ public class XWikiXmlRpcClient
      */
     public List<XWikiObjectSummary> getObjects(String pageId) throws XmlRpcException
     {
-        Object[] objects = (Object[]) invokeRpc("getObjects", token, pageId);
+        Object[] objects = (Object[]) invokeRpc("getObjects", this.token, pageId);
         List<XWikiObjectSummary> result = new ArrayList<XWikiObjectSummary>();
         for (Object object : objects) {
             Map<String, Object> xwikiObjectSummaryMap = (Map<String, Object>) object;
@@ -654,7 +640,7 @@ public class XWikiXmlRpcClient
 
         return result;
     }
-    
+
     /**
      * Get XWiki objects associated with a page at a given version.
      * 
@@ -667,8 +653,8 @@ public class XWikiXmlRpcClient
     {
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         extendedId.setParameter("version", version.toString());
-        
-        Object[] objects = (Object[]) invokeRpc("getObjects", token, extendedId.toString());
+
+        Object[] objects = (Object[]) invokeRpc("getObjects", this.token, extendedId.toString());
         List<XWikiObjectSummary> result = new ArrayList<XWikiObjectSummary>();
         for (Object object : objects) {
             Map<String, Object> xwikiObjectSummaryMap = (Map<String, Object>) object;
@@ -678,7 +664,7 @@ public class XWikiXmlRpcClient
 
         return result;
     }
-    
+
     /**
      * Get XWiki objects associated with a page at a given version.
      * 
@@ -688,13 +674,14 @@ public class XWikiXmlRpcClient
      * @return A list containing an XWikiObject summary for every object found in the page.
      * @throws XmlRpcException
      */
-    public List<XWikiObjectSummary> getObjects(String pageId, Integer version, Integer minorVersion) throws XmlRpcException
+    public List<XWikiObjectSummary> getObjects(String pageId, Integer version, Integer minorVersion)
+        throws XmlRpcException
     {
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         extendedId.setParameter("version", version.toString());
         extendedId.setParameter("minorVersion", minorVersion.toString());
-        
-        Object[] objects = (Object[]) invokeRpc("getObjects", token, extendedId.toString());
+
+        Object[] objects = (Object[]) invokeRpc("getObjects", this.token, extendedId.toString());
         List<XWikiObjectSummary> result = new ArrayList<XWikiObjectSummary>();
         for (Object object : objects) {
             Map<String, Object> xwikiObjectSummaryMap = (Map<String, Object>) object;
@@ -726,10 +713,10 @@ public class XWikiXmlRpcClient
      */
     public XWikiObject getObject(String pageId, String className, Integer id) throws XmlRpcException
     {
-        Object object = invokeRpc("getObject", token, pageId, className, id);
+        Object object = invokeRpc("getObject", this.token, pageId, className, id);
         return new XWikiObject((Map<String, Object>) object);
     }
-    
+
     /**
      * Get the XWiki object associated with a page at a given version.
      * 
@@ -744,11 +731,11 @@ public class XWikiXmlRpcClient
     {
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         extendedId.setParameter("version", version.toString());
-        
-        Object object = invokeRpc("getObject", token, extendedId.toString(), className, id);
+
+        Object object = invokeRpc("getObject", this.token, extendedId.toString(), className, id);
         return new XWikiObject((Map<String, Object>) object);
     }
-    
+
     /**
      * Get XWiki objects associated with a page at a given version.
      * 
@@ -760,13 +747,14 @@ public class XWikiXmlRpcClient
      * @return An XWiki object with all the association property -> values.
      * @throws XmlRpcException
      */
-    public XWikiObject getObject(String pageId, String className, Integer id, Integer version, Integer minorVersion) throws XmlRpcException
+    public XWikiObject getObject(String pageId, String className, Integer id, Integer version, Integer minorVersion)
+        throws XmlRpcException
     {
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         extendedId.setParameter("version", version.toString());
         extendedId.setParameter("minorVersion", minorVersion.toString());
-        
-        Object object = invokeRpc("getObject", token, extendedId.toString(), className, id);
+
+        Object object = invokeRpc("getObject", this.token, extendedId.toString(), className, id);
         return new XWikiObject((Map<String, Object>) object);
     }
 
@@ -789,7 +777,7 @@ public class XWikiXmlRpcClient
      */
     public XWikiObject storeObject(XWikiObject xwikiObject) throws XmlRpcException
     {
-        Object object = invokeRpc("storeObject", token, xwikiObject.toRawMap());
+        Object object = invokeRpc("storeObject", this.token, xwikiObject.toRawMap());
         return new XWikiObject((Map<String, Object>) object);
     }
 
@@ -804,7 +792,7 @@ public class XWikiXmlRpcClient
      */
     public Boolean removeObject(String pageId, String className, Integer id) throws XmlRpcException
     {
-        Object object = invokeRpc("removeObject", token, pageId, className, id);
+        Object object = invokeRpc("removeObject", this.token, pageId, className, id);
         return (Boolean) object;
     }
 
@@ -826,7 +814,7 @@ public class XWikiXmlRpcClient
      */
     public List<SearchResult> search(String query, Integer maxResults) throws XmlRpcException
     {
-        Object[] objects = (Object[]) invokeRpc("search", token, query, maxResults);
+        Object[] objects = (Object[]) invokeRpc("search", this.token, query, maxResults);
         List<SearchResult> result = new ArrayList<SearchResult>();
         for (Object object : objects) {
             Map<String, Object> searchResultMap = (Map<String, Object>) object;
@@ -843,7 +831,7 @@ public class XWikiXmlRpcClient
      */
     public List<SearchResult> searchAllPagesIds() throws XmlRpcException
     {
-        Object[] objects = (Object[]) invokeRpc("search", token, "__ALL_PAGES__", 0);
+        Object[] objects = (Object[]) invokeRpc("search", this.token, "__ALL_PAGES__", 0);
         List<SearchResult> result = new ArrayList<SearchResult>();
         for (Object object : objects) {
             Map<String, Object> searchResultMap = (Map<String, Object>) object;
@@ -870,7 +858,7 @@ public class XWikiXmlRpcClient
         Boolean fromLatest) throws XmlRpcException
     {
         Object[] objects =
-            (Object[]) invokeRpc("getModifiedPagesHistory", token, date, numberOfResults, start, fromLatest);
+            (Object[]) invokeRpc("getModifiedPagesHistory", this.token, date, numberOfResults, start, fromLatest);
         List<XWikiPageHistorySummary> result = new ArrayList<XWikiPageHistorySummary>();
         for (Object object : objects) {
             Map<String, Object> pageHistorySummaryMap = (Map) object;
@@ -911,7 +899,7 @@ public class XWikiXmlRpcClient
      */
     public XWikiPage storePage(Page page, Boolean checkVersion) throws XmlRpcException
     {
-        Object object = invokeRpc("storePage", token, page.toMap(), checkVersion);
+        Object object = invokeRpc("storePage", this.token, page.toMap(), checkVersion);
         return new XWikiPage((Map) object);
     }
 
@@ -925,7 +913,7 @@ public class XWikiXmlRpcClient
      */
     public XWikiObject storeObject(XWikiObject xwikiObject, Boolean checkVersion) throws XmlRpcException
     {
-        Object object = invokeRpc("storeObject", token, xwikiObject.toRawMap(), checkVersion);
+        Object object = invokeRpc("storeObject", this.token, xwikiObject.toRawMap(), checkVersion);
         return new XWikiObject((Map<String, Object>) object);
     }
 
@@ -939,6 +927,6 @@ public class XWikiXmlRpcClient
      */
     private synchronized Object invokeRpc(String methodName, Object... args) throws XmlRpcException
     {
-        return xmlRpcClient.execute(String.format("%s.%s", rpcHandler, methodName), args);
+        return this.xmlRpcClient.execute(String.format("%s.%s", this.rpcHandler, methodName), args);
     }
 }

@@ -47,10 +47,13 @@ public class ParagraphFilter implements HTMLFilter
             Node next = p.getNextSibling();
             // Remove the first empty paragraph.
             p.getParentNode().removeChild(p);
-            // Replace the following ones with a <br> element.
+            // Replace the following ones by their children elements.
             while (isEmptyLine(next)) {
                 Node following = next.getNextSibling();
-                next.getParentNode().insertBefore(document.createElement("br"), next);
+                while (null != next.getFirstChild()) {
+                    Node child = next.removeChild(next.getFirstChild());
+                    next.getParentNode().insertBefore(child, next);
+                }
                 next.getParentNode().removeChild(next);
                 next = following;
             }

@@ -43,9 +43,14 @@ public class CleanUtil
     private static final Pattern ENDING_NL_GROUP_PATTERN = Pattern.compile("\\n*$");
 
     /**
-     * Match the last unique last new line. Does not match if there is more that one new line.
+     * Match the last unique new line. Does not match if there is more that one new line.
      */
-    private static final Pattern ENDS_WITH_NL_PATTERN = Pattern.compile("[^\\n]\\n$|^\\n$");
+    private static final Pattern ENDS_WITH_NL_PATTERN = Pattern.compile("[^\\n]\\n$");
+    
+    /**
+     * Match the first unique new line. Does not match if there is more that one new line.
+     */
+    private static final Pattern START_WITH_NL_PATTERN = Pattern.compile("^\\n[^\\n]?");
 
     /**
      * Match space, tab or new line.
@@ -63,10 +68,25 @@ public class CleanUtil
      * @param content the content to convert.
      * @return the converted string.
      */
-    public static String removeLastStandaloneNewLine(String content)
+    public static String removeLastStandaloneNewLine(String content, boolean replaceWithSpace)
     {
-        if (ENDS_WITH_NL_PATTERN.matcher(content).matches()) {
-            return content.substring(0, content.length() - 1) + ' ';
+        if (ENDS_WITH_NL_PATTERN.matcher(content).find()) {
+            return content.substring(0, content.length() - 1) + (replaceWithSpace ? ' ' : "");
+        } else {
+            return content;
+        }
+    }
+
+    /**
+     * Remove first new line if there is only one new line.
+     * 
+     * @param content the content to convert.
+     * @return the converted string.
+     */
+    public static String removeFirstStandaloneNewLine(String content, boolean replaceWithSpace)
+    {
+        if (START_WITH_NL_PATTERN.matcher(content).find()) {
+            return (replaceWithSpace ? ' ' : "") + content.substring(1);
         } else {
             return content;
         }

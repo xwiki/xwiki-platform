@@ -69,25 +69,14 @@
       </requirements>
     </component>
 
-    <!-- Velocity comments -->
+    <!-- Protect velocity comments, convert velocity macro into 2.9 macros/syntax and add needed 2.0 velocity macros and convert -->
     <component>
       <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
-      <role-hint>velocitycomments</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.xwiki10.VelocityCommentsFilter</implementation>
+      <role-hint>velocity</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.VelocityFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>
         <priority>20</priority>
-      </configuration>
-    </component>
-
-    <!-- Velocity macros -->
-    <component>
-      <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
-      <role-hint>velocitymacros</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.xwiki10.VelocityMacrosFilter</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <configuration>
-        <priority>30</priority>
       </configuration>
     </component>
     <component>

@@ -8,7 +8,7 @@
 #includeForm("Space.PageName")
 .#-----------------------------------------------------
 .expect|xwiki/2.0|skip
-.# Need to fix XWiki 2.0 inline detection, see http://jira.xwiki.org/jira/browse/XWIKI-3082
+.# TODO: Need to fix XWiki 2.0 inline detection, see http://jira.xwiki.org/jira/browse/XWIKI-3082
 .#-----------------------------------------------------
 {{include document="Space.PageName"/}} {{include document="Space.PageName" context=new/}} {{include document="Space.PageName"/}}
 

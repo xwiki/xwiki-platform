@@ -1,6 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
+some text
 ## commented
 
 ### commented
@@ -23,10 +24,23 @@
 
 
 \\\*#
+
+
+
+
+
+
+
+
+
+
+
+## standalone comment
+
 .#-----------------------------------------------------
-.expect|xwiki/2.0|skip
-.# Converter does not fully support Velocity yet
+.expect|xwiki/2.0
 .#-----------------------------------------------------
+some text{{velocity}}
 ## commented
 
 ### commented
@@ -48,4 +62,16 @@
 
 
 
-\\\*#
+\\\*#{{/velocity}}
+
+
+
+
+
+
+
+
+
+
+{{velocity}}
+## standalone comment{{/velocity}}

@@ -33,7 +33,6 @@ jj. list2
 .#-----------------------------------------------------
 .expect|xwiki/2.0|skip
 .# Need to fix XWiki 2.0 list rendering, see http://jira.xwiki.org/jira/browse/XWIKI-3067
-.# Converter does not fully support Velocity yet
 .#-----------------------------------------------------
 (% style="list-style-type: square" %)
 * list1

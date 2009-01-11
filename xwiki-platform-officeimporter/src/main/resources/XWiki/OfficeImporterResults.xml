@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Import</web>
-<name>Importer</name>
+<web>XWiki</web>
+<name>OfficeImporterResults</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -48,7 +48,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </tags>
 </class>
-<name>Import.Importer</name>
+<name>XWiki.OfficeImporterResults</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
 <property>
@@ -59,14 +59,14 @@
 &lt;h1&gt;Office Importer&lt;/h1&gt;
 ## Check the space
 #if(!$request.targetSpace || $request.targetSpace=="")
-	#error("Missing target space name. Please [go back&gt;Import.WebHome] and correct it.")
+	#error("Missing target space name. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
 #else
 	#set($targetSpace=$request.targetSpace)
 #end
 
 ## Check the pagename
 #if(!$request.targetPage || $request.targetPage=="")
-	#error("Missing target page name. Please [go back&gt;Import.WebHome] and correct it.")
+	#error("Missing target page name. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
 #else
 	#set($targetPage=$request.targetPage)
 #end
@@ -75,19 +75,19 @@
 #set($fileUpload=$xwiki.fileupload)
 #set($fileName=$fileUpload.getFileName("filePath"))
 #if(!$fileName || $fileName=="")
-	#error("Missing input file. Please [go back&gt;Import.WebHome] and correct it.")
+	#error("Missing input file. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
 #end
 
 ## do convert
 #if(!$targetSpace || !$targetPage || !$fileName)
-	#error("Invalid input. Please [go back&gt;Import.WebHome] and correct it.")
+	#error("Invalid input. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
 #else
 	#set($fileContent=$fileUpload.getFileItemData("filePath"))
 	#set($options={"filterStyles":${request.filterStyles}})
 	#set($targetDocument="${targetSpace}.${targetPage}")
 	#set($result=$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options))
     #if($result)
-        #info("Conversion succeeded. You can view the *[result&gt;$targetSpace.$targetPage]*, or you can [go back&gt;Import.WebHome] to convert another document.")
+        #info("Conversion succeeded. You can view the *[result&gt;$targetSpace.$targetPage]*, or you can [go back&gt;XWiki.OfficeImporter] to convert another document.")
     #else
         #error($officeimporter.getMessage())
     #end

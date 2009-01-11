@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Import</web>
-<name>WebHome</name>
+<web>XWiki</web>
+<name>OfficeImporter</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -48,7 +48,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </tags>
 </class>
-<name>Import.WebHome</name>
+<name>XWiki.OfficeImporter</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
 <property>
@@ -57,7 +57,7 @@
 </object>
 <content> 
 &lt;h1&gt;Office Importer&lt;/h1&gt;
-&lt;form action='$xwiki.getURL("Import.Importer","view")' enctype="multipart/form-data" method="post"&gt;
+&lt;form action='$xwiki.getURL("XWiki.OfficeImporterResults","view")' enctype="multipart/form-data" method="post"&gt;
 {table}&lt;p&gt;Document|&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
 &lt;p&gt;Target Space|&lt;input name="targetSpace" type="textarea"/&gt;&lt;/p&gt;
 &lt;p&gt;Target Page|&lt;input name="targetPage" type="textarea"/&gt;&lt;/p&gt;

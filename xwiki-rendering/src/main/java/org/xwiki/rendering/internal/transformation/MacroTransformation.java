@@ -156,9 +156,9 @@ public class MacroTransformation extends AbstractTransformation
 
             newBlocks = ((Macro<Object>) macroHolder.macro).execute(
                 macroParameters, macroHolder.macroBlock.getContent(), context);
-        } catch (MacroExecutionException e) {
+        } catch (Exception e) {
             // The Macro failed to execute, log a warning and leave it to the renderers to decide how to 
-            // display the macro in error.
+            // display the macro in error. We catch any Exception because we want to never break the whole rendering.
             wrapInErrorBlock(macroHolder.macroBlock, "Failed to execute macro: " + macroHolder.macroBlock.getName(), 
                 e);
             getLogger().debug("Failed to execute macro [" + macroHolder.macroBlock.getName() + "]. Internal error ["

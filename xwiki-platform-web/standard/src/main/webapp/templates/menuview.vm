@@ -129,6 +129,7 @@
 #submenuitem($doc.getURL("delete", $languageparams) $msg.get("core.menu.delete") "tmActionDelete")
 #submenuitem($doc.getURL("view", "xpage=rename&amp;step=1") $msg.get("core.menu.rename") "tmActionRename")
 #submenuitem($doc.getURL("view", "xpage=copy") $msg.get("core.menu.copy") "tmActionCopy")
+#submenuitem($xwiki.getURL("XWiki.OfficeImporter", "view") $msg.get("core.menu.import") "tmActionImport")
 #xwikitopmenuentryend()
 #if($keyboardShortcutsEnabled)
 <script type="text/javascript">

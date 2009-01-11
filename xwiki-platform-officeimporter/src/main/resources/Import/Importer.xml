@@ -56,7 +56,7 @@
 </property>
 </object>
 <content>
-1 Office Importer
+&lt;h1&gt;Office Importer&lt;/h1&gt;
 ## Check the space
 #if(!$request.targetSpace || $request.targetSpace=="")
 	#error("Missing target space name. Please [go back&gt;Import.WebHome] and correct it.")

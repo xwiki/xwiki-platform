@@ -426,7 +426,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
     }
 
-    public Collection<Object> getFieldList()
+    public Collection getFieldList()
     {
         return this.fields.values();
     }

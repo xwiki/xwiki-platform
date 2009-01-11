@@ -228,18 +228,21 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#setAttachmentContent(String, String, byte[])
      */
-    public void setAttachmentContent(String documentName, String AttachmentName,
+    public void setAttachmentContent(String documentName, String attachmentName,
         byte[] attachmentData) throws Exception
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
-        XWikiAttachment attachment = doc.getAttachment(AttachmentName);
-        if (attachment == null) {
+        XWikiAttachment attachment = doc.getAttachment(attachmentName);
+        if (attachment == null) {            
             attachment = new XWikiAttachment();
             doc.getAttachmentList().add(attachment);
+            doc.setComment("Add new attachment " + attachmentName);
+        } else {
+            doc.setComment("Update attachment " + attachmentName);
         }
         attachment.setContent(attachmentData);
-        attachment.setFilename(AttachmentName);
+        attachment.setFilename(attachmentName);
         attachment.setAuthor(xcontext.getUser());
         attachment.setDoc(doc);
         doc.saveAttachmentContent(attachment, xcontext);

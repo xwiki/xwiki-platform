@@ -49,9 +49,9 @@ public class HtmlToPresentationTransformer extends AbstractLogEnabled implements
         // Build the xwiki presentation.
         try {
             byte[] archive = buildArchive(importerContext.getArtifacts());
-            String archiveName = "presentation.zip";
-            importerContext.addAttachment(archive, archiveName);
-            importerContext.setTargetDocumentContent(buildPresentationFrameCode(archiveName, "output.html"));
+            importerContext.addArtifact(OfficeImporterContext.PRESENTATION_ARCHIVE_NAME, archive);
+            importerContext.setTargetDocumentContent(buildPresentationFrameCode(
+                OfficeImporterContext.PRESENTATION_ARCHIVE_NAME, "output.html"));
             importerContext.finalizeDocument(true);
         } catch (IOException ex) {
             String message = "Error while building presentation archive.";

@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-web</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.7.1</version>
   </parent>
   <artifactId>xwiki-web-wysiwyg</artifactId>
   <name>XWiki Platform - Web - WYSIWYG</name>

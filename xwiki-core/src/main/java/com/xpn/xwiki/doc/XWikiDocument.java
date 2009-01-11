@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1369,6 +1370,7 @@ public class XWikiDocument implements DocumentModelBridge
             for (BaseObject otherObject : templatedoc.getxWikiObjects().get(name)) {
                 if (otherObject != null) {
                     BaseObject myObject = (BaseObject) otherObject.clone();
+                    myObject.setGuid(UUID.randomUUID().toString());
                     myObjects.add(myObject);
                     myObject.setNumber(myObjects.size() - 1);
                 }
@@ -1641,15 +1643,14 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         BaseClass bclass = firstobject.getxWikiClass(context);
-        Collection fields = bclass.getFieldList();
-        if (fields.size() == 0) {
+        if (bclass.getPropertyList().size() == 0) {
             return "";
         }
 
         StringBuffer result = new StringBuffer();
         VelocityContext vcontext = new VelocityContext();
-        for (Iterator it = fields.iterator(); it.hasNext();) {
-            PropertyClass pclass = (PropertyClass) it.next();
+        for (String propertyName : bclass.getPropertyList()) {
+            PropertyClass pclass = (PropertyClass) bclass.getField(propertyName);
             vcontext.put(pclass.getName(), pclass.getPrettyName());
         }
         result.append(XWikiVelocityRenderer.evaluate(header, context.getDoc().getFullName(), vcontext, context));
@@ -1662,8 +1663,7 @@ public class XWikiDocument implements DocumentModelBridge
             vcontext.put("id", new Integer(i + 1));
             BaseObject object = objects.get(i);
             if (object != null) {
-                for (Iterator it = bclass.getPropertyList().iterator(); it.hasNext();) {
-                    String name = (String) it.next();
+                for (String name : bclass.getPropertyList()) {
                     vcontext.put(name, display(name, object, context));
                 }
                 result
@@ -1694,21 +1694,20 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         BaseClass bclass = firstobject.getxWikiClass(context);
-        Collection fields = bclass.getFieldList();
-        if (fields.size() == 0) {
+        if (bclass.getPropertyList().size() == 0) {
             return "";
         }
 
         StringBuffer result = new StringBuffer();
         result.append("{table}\n");
         boolean first = true;
-        for (Iterator it = fields.iterator(); it.hasNext();) {
+        for (String propertyName : bclass.getPropertyList()) {
             if (first == true) {
                 first = false;
             } else {
                 result.append("|");
             }
-            PropertyClass pclass = (PropertyClass) it.next();
+            PropertyClass pclass = (PropertyClass) bclass.getField(propertyName);
             result.append(pclass.getPrettyName());
         }
         result.append("\n");
@@ -1716,13 +1715,13 @@ public class XWikiDocument implements DocumentModelBridge
             BaseObject object = objects.get(i);
             if (object != null) {
                 first = true;
-                for (Iterator it = bclass.getPropertyList().iterator(); it.hasNext();) {
+                for (String propertyName : bclass.getPropertyList()) {
                     if (first == true) {
                         first = false;
                     } else {
                         result.append("|");
                     }
-                    String data = display((String) it.next(), object, context);
+                    String data = display(propertyName, object, context);
                     data = data.trim();
                     data = data.replaceAll("\n", " ");
                     if (data.length() == 0) {
@@ -1817,13 +1816,13 @@ public class XWikiDocument implements DocumentModelBridge
         return null;
     }
 
-    public List getTagsList(XWikiContext context)
+    public List<String> getTagsList(XWikiContext context)
     {
-        List tagList = null;
+        List<String> tagList = null;
 
         BaseProperty prop = getTagProperty(context);
         if (prop != null) {
-            tagList = (List) prop.getValue();
+            tagList = (List<String>) prop.getValue();
         }
 
         return tagList;
@@ -2787,12 +2786,12 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
-    public List getBacklinks(XWikiContext context) throws XWikiException
+    public List<String> getBacklinks(XWikiContext context) throws XWikiException
     {
         return getStore(context).loadBacklinks(getFullName(), context, true);
     }
 
-    public List getLinks(XWikiContext context) throws XWikiException
+    public List<XWikiLink> getLinks(XWikiContext context) throws XWikiException
     {
         return getStore(context).loadLinks(getId(), context, true);
     }
@@ -2851,7 +2850,7 @@ public class XWikiDocument implements DocumentModelBridge
                 dom = parser.parse(new StringReader(getContent()));
             } catch (Exception e) {
                 log.error("Failed to find included pages for [" + getFullName() + "]", e);
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
 
             List<String> result = new ArrayList<String>();
@@ -3065,12 +3064,12 @@ public class XWikiDocument implements DocumentModelBridge
                 if (obj != null) {
                     BaseClass bclass = obj.getxWikiClass(context);
                     if (bclass != null) {
-                        Set set = bclass.getPropertyList();
+                        Set<String> set = bclass.getPropertyList();
                         if ((set != null) && set.contains(fieldname)) {
                             return obj;
                         }
                     }
-                    Set set = obj.getPropertyList();
+                    Set<String> set = obj.getPropertyList();
                     if ((set != null) && set.contains(fieldname)) {
                         return obj;
                     }
@@ -4117,7 +4116,7 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     // This functions adds an object from an new object creation form
-    public List updateObjectsFromRequest(String className, XWikiContext context) throws XWikiException
+    public List<BaseObject> updateObjectsFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return updateObjectsFromRequest(className, "", context);
     }
@@ -4650,7 +4649,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         return this.hidden;
     }
-    
+
     /**
      * Convert the current document content from its current syntax to the new syntax passed as parameter.
      * 
@@ -4671,12 +4670,13 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      */
-    private String performSyntaxConversion(String content, String currentSyntaxId, String targetSyntaxId) 
+    private String performSyntaxConversion(String content, String currentSyntaxId, String targetSyntaxId)
         throws XWikiException
     {
         WikiPrinter printer;
         try {
-            TransformationManager transformations = (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+            TransformationManager transformations =
+                (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, currentSyntaxId);
             XDOM dom = parser.parse(new StringReader(content));
             SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);

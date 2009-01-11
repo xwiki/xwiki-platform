@@ -23,6 +23,7 @@ package com.xpn.xwiki.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,18 +34,22 @@ import java.util.Vector;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
+import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
+import com.xpn.xwiki.doc.AttachmentDiff;
+import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.impl.DocumentStats;
@@ -315,15 +320,15 @@ public class Document extends Api
     }
 
     /**
-     * return the list of possible traduction for this document
+     * Return the list of existing translations for this document.
      */
-    public List getTranslationList() throws XWikiException
+    public List<String> getTranslationList() throws XWikiException
     {
         return this.doc.getTranslationList(getXWikiContext());
     }
 
     /**
-     * return the tranlated document's content if the wiki is multilingual, the language is first checked in the URL,
+     * return the translated document's content if the wiki is multilingual, the language is first checked in the URL,
      * the cookie, the user profile and finally the wiki configuration if not, the language is the one on the wiki
      * configuration
      */
@@ -1001,12 +1006,12 @@ public class Document extends Api
         return this.doc.getIncludedPages(getXWikiContext());
     }
 
-    public List getIncludedMacros()
+    public List<String> getIncludedMacros()
     {
         return this.doc.getIncludedMacros(getXWikiContext());
     }
 
-    public List getLinkedPages()
+    public List<String> getLinkedPages()
     {
         return this.doc.getLinkedPages(getXWikiContext());
     }
@@ -1021,11 +1026,12 @@ public class Document extends Api
         }
     }
 
-    public List getContentDiff(Document origdoc, Document newdoc) throws XWikiException, DifferentiationFailedException
+    public List<Delta> getContentDiff(Document origdoc, Document newdoc) throws XWikiException,
+        DifferentiationFailedException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
-                return new ArrayList();
+                return Collections.emptyList();
             }
             if (origdoc == null) {
                 return this.doc.getContentDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
@@ -1049,11 +1055,12 @@ public class Document extends Api
         }
     }
 
-    public List getXMLDiff(Document origdoc, Document newdoc) throws XWikiException, DifferentiationFailedException
+    public List<Delta> getXMLDiff(Document origdoc, Document newdoc) throws XWikiException,
+        DifferentiationFailedException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
-                return new ArrayList();
+                return Collections.emptyList();
             }
             if (origdoc == null) {
                 return this.doc.getXMLDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
@@ -1077,12 +1084,12 @@ public class Document extends Api
         }
     }
 
-    public List getRenderedContentDiff(Document origdoc, Document newdoc) throws XWikiException,
+    public List<Delta> getRenderedContentDiff(Document origdoc, Document newdoc) throws XWikiException,
         DifferentiationFailedException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
-                return new ArrayList();
+                return Collections.emptyList();
             }
             if (origdoc == null) {
                 return this.doc.getRenderedContentDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()),
@@ -1106,11 +1113,11 @@ public class Document extends Api
         }
     }
 
-    public List getMetaDataDiff(Document origdoc, Document newdoc) throws XWikiException
+    public List<MetaDataDiff> getMetaDataDiff(Document origdoc, Document newdoc) throws XWikiException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
-                return new ArrayList();
+                return Collections.emptyList();
             }
             if (origdoc == null) {
                 return this.doc.getMetaDataDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
@@ -1134,11 +1141,11 @@ public class Document extends Api
         }
     }
 
-    public List getObjectDiff(Document origdoc, Document newdoc) throws XWikiException
+    public List<List<ObjectDiff>> getObjectDiff(Document origdoc, Document newdoc) throws XWikiException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
-                return new ArrayList();
+                return Collections.emptyList();
             }
             if (origdoc == null) {
                 return this.doc.getObjectDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
@@ -1162,11 +1169,11 @@ public class Document extends Api
         }
     }
 
-    public List getClassDiff(Document origdoc, Document newdoc) throws XWikiException
+    public List<List<ObjectDiff>> getClassDiff(Document origdoc, Document newdoc) throws XWikiException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
-                return new ArrayList();
+                return Collections.emptyList();
             }
             if (origdoc == null) {
                 return this.doc.getClassDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
@@ -1190,11 +1197,11 @@ public class Document extends Api
         }
     }
 
-    public List getAttachmentDiff(Document origdoc, Document newdoc) throws XWikiException
+    public List<AttachmentDiff> getAttachmentDiff(Document origdoc, Document newdoc) throws XWikiException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
-                return new ArrayList();
+                return Collections.emptyList();
             }
             if (origdoc == null) {
                 return this.doc.getAttachmentDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
@@ -1220,7 +1227,7 @@ public class Document extends Api
         }
     }
 
-    public List getLastChanges() throws XWikiException, DifferentiationFailedException
+    public List<Delta> getLastChanges() throws XWikiException, DifferentiationFailedException
     {
         return this.doc.getLastChanges(getXWikiContext());
     }
@@ -1693,8 +1700,8 @@ public class Document extends Api
         }
         XWiki xwiki = getXWikiContext().getWiki();
         FileUploadPlugin fileupload = (FileUploadPlugin) xwiki.getPlugin("fileupload", getXWikiContext());
-        List fileuploadlist = fileupload.getFileItems(getXWikiContext());
-        List attachments = new ArrayList();
+        List<FileItem> fileuploadlist = fileupload.getFileItems(getXWikiContext());
+        List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>();
         // adding attachment list to context so we find the names
         this.context.put("addedAttachments", attachments);
         int nb = 0;
@@ -1703,9 +1710,7 @@ public class Document extends Api
             return 0;
         }
 
-        Iterator it = fileuploadlist.iterator();
-        while (it.hasNext()) {
-            FileItem item = (FileItem) it.next();
+        for (FileItem item : fileuploadlist) {
             String name = item.getFieldName();
             if (fieldName != null && !fieldName.equals(name)) {
                 continue;
@@ -1820,7 +1825,7 @@ public class Document extends Api
      * @deprecated use {@link #rename(String, java.util.List)} instead
      */
     @Deprecated
-    public void renameDocument(String newDocumentName, List backlinkDocumentNames) throws XWikiException
+    public void renameDocument(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
     {
         rename(newDocumentName, backlinkDocumentNames);
     }
@@ -1844,7 +1849,7 @@ public class Document extends Api
      *            new renamed document.
      * @throws XWikiException in case of an error
      */
-    public void rename(String newDocumentName, List backlinkDocumentNames) throws XWikiException
+    public void rename(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
     {
         this.doc.rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
     }
@@ -1899,7 +1904,7 @@ public class Document extends Api
     {
         return this.doc.getSyntaxId();
     }
-    
+
     /**
      * Convert the current document content from its current syntax to the new syntax passed as parameter.
      * 

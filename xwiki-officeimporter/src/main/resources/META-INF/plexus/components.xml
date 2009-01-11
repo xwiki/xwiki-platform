@@ -105,7 +105,7 @@
       <role-hint>officeimporter</role-hint>
       <implementation>org.xwiki.officeimporter.internal.OfficeImporterVelocityContextInitializer
       </implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
           <role>org.xwiki.officeimporter.OfficeImporter</role>

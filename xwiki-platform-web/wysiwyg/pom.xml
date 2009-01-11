@@ -27,8 +27,21 @@
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwtVersion}</version>
+      <classifier>${platform}-libs</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>${gwtVersion}</version>
       <classifier>${platform}</classifier>
       <scope>provided</scope>
+      <!-- We load this library this way because GWT looks for SWT libraries in the same folder -->
+      <!--
+        <scope>system</scope>
+        <systemPath>${settings.localRepository}/com/google/gwt/gwt-dev/${gwtVersion}/gwt-dev-${platform}.jar</systemPath>
+      -->
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
@@ -103,6 +116,33 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Download and unpack the GWT libs -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unzip-gwt-libs</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.google.gwt</groupId>
+                  <artifactId>gwt-dev</artifactId>
+                  <version>${gwtVersion}</version>
+                  <classifier>${platform}-libs</classifier>
+                  <type>zip</type>
+                  <overWrite>false</overWrite>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${settings.localRepository}/com/google/gwt/gwt-dev/${gwtVersion}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

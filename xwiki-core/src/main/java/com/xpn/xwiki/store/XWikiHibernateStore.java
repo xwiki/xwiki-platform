@@ -563,7 +563,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
                 // TODO: Delete all objects for which we don't have a name in the Map..
                 for (Vector<BaseObject> objects : doc.getxWikiObjects().values()) {
-                    for (BaseCollection obj : objects) {
+                    for (BaseObject obj : objects) {
                         if (obj != null) {
                             obj.setName(doc.getFullName());
                             saveXWikiCollection(obj, context, false);
@@ -1777,7 +1777,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return links;
     }
 
-    public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
+    public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
+        throws XWikiException
     {
         List<String> backlinks = new ArrayList<String>();
         try {
@@ -2423,7 +2424,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         if (idx >= 0) {
             // With 'WHERE'
             idx = idx + 6;
-            result = result.substring(0, idx) + "(doc.hidden <> true or doc.hidden is null) and " + result.substring(idx);
+            result =
+                result.substring(0, idx) + "(doc.hidden <> true or doc.hidden is null) and " + result.substring(idx);
         } else {
             // Without 'WHERE'
             int oidx = Math.min(result.toLowerCase().indexOf("order by "), Integer.MAX_VALUE);
@@ -2432,7 +2434,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (idx > 0 && idx < Integer.MAX_VALUE) {
                 // Without 'WHERE', but with 'ORDER BY' or 'GROUP BY'
                 result =
-                    result.substring(0, idx) + "where doc.hidden <> true or doc.hidden is null " + result.substring(idx);
+                    result.substring(0, idx) + "where doc.hidden <> true or doc.hidden is null "
+                        + result.substring(idx);
             } else {
                 // Without 'WHERE', 'ORDER BY' or 'GROUP BY'... This should not happen at all.
                 result = result + " where (doc.hidden <> true or doc.hidden is null)";

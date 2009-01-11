@@ -22,27 +22,34 @@ package org.xwiki.xml;
 
 import java.io.StringReader;
 
-import junit.framework.TestCase;
-import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
-import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
 import org.w3c.dom.Document;
+import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
+
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link org.xwiki.xml.XMLUtils}.
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
-public class XMLUtilsTest extends TestCase
+public class XMLUtilsTest extends AbstractXWikiComponentTestCase
 {
+    private HTMLCleaner cleaner;
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "default");
+    }
+
     public void testStripHTMLEnvelope() throws Exception
     {
-        DefaultHTMLCleaner cleaner = new DefaultHTMLCleaner();
-        cleaner.initialize();
-        Document document = 
+        Document document =
             cleaner.clean(new StringReader("<html><head/><body><p>test1</p><p>test2</p></body></html>"));
         XMLUtils.stripHTMLEnvelope(document);
-        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", 
-            XMLUtils.toString(document));
+        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", XMLUtils
+            .toString(document));
     }
 }

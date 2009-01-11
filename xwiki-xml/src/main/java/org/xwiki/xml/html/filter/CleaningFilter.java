@@ -17,27 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.xml.internal.html;
+package org.xwiki.xml.html.filter;
 
-import org.jdom.DocType;
 import org.jdom.Document;
 
 /**
- * Sets the Document DOCTYPE to XHTML 1.0 strict.
- *
- * @version $Id$
- * @since 1.6RC1
+ * Clean some XML node after HTML Cleaner has been executed. This is because HTML Cleaner has some gaps and does't
+ * convert HTML to XHTML so we need to perform extra cleaning.
+ * 
+ * @version $Id: $
+ * @since 1.6M1
  */
-public class DocTypeCleaningFilter implements CleaningFilter
+public interface CleaningFilter
 {
     /**
-     * {@inheritDoc}
-     * @see CleaningFilter#filter(org.jdom.Document)
+     * This component's role, used when code needs to look it up.
      */
-    public void filter(Document document)
-    {
-        DocType docType = new DocType("html", "-//W3C//DTD XHTML 1.0 Strict//EN", 
-            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
-        document.setDocType(docType);
-    }
+    String ROLE = CleaningFilter.class.getName();
+    
+    /**
+     * Filters the passed XML document to generate valid and clean XHTML.
+     *
+     * @param document the document to clean
+     */
+    void filter(Document document);
 }

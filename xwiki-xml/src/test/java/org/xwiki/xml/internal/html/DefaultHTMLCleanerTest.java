@@ -22,40 +22,40 @@ package org.xwiki.xml.internal.html;
 
 import java.io.StringReader;
 
-import junit.framework.TestCase;
-
 import org.xwiki.xml.XMLUtils;
-import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
+import org.xwiki.xml.html.HTMLCleaner;
+
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link org.xwiki.xml.internal.html.DefaultHTMLCleaner}.
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
-public class DefaultHTMLCleanerTest extends TestCase
+public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
 {
-    public static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-        + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-        + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
-    
+    public static final String HEADER =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
+            + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
+
     private static final String HEADER_FULL = HEADER + "<html><head /><body>";
 
     private static final String FOOTER = "</body></html>\n";
 
-    private DefaultHTMLCleaner cleaner;
+    private HTMLCleaner cleaner;
 
     protected void setUp() throws Exception
     {
-        this.cleaner = new DefaultHTMLCleaner();
-        this.cleaner.initialize();
+        super.setUp();
+        cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "default");
     }
-    
+
     public void testSpecialCharacters()
     {
         // TODO: We still have a problem I think in that if there are characters such as "&" or quote in the source
         // text they are not escaped. This is because we have use "false" in DefaultHTMLCleaner here:
-        //     Document document = new JDomSerializer(this.cleanerProperties, false).createJDom(cleanedNode);
+        // Document document = new JDomSerializer(this.cleanerProperties, false).createJDom(cleanedNode);
         // See the problem described here: http://sourceforge.net/forum/forum.php?thread_id=2243880&forum_id=637246
         assertHTML("<p>&quot;&amp;**notbold**&lt;notag&gt;</p>", "<p>&quot;&amp;**notbold**&lt;notag&gt;</p>");
     }
@@ -88,8 +88,19 @@ public class DefaultHTMLCleanerTest extends TestCase
         assertHTML("<ol><li>item1<ol><li>item2<ol><li>item3</li></ol></li></ol></li></ol>",
             "<ol><li>item1</li><ol><li>item2</li><ol><li>item3</li></ol></ol></ol>");
         assertHTML("<ol><li><ol><li>item</li></ol></li></ol>", "<ol><ol><li>item</li></ol></ol>");
-        assertHTML("<ul><li>item1<ul><li><ul><li>item2</li></ul></li><li>item3</li></ul></li></ul>", 
+        assertHTML("<ul><li>item1<ul><li><ul><li>item2</li></ul></li><li>item3</li></ul></li></ul>",
             "<ul><li>item1</li><ul><ul><li>item2</li></ul><li>item3</li></ul></ul>");
+    }
+
+    /**
+     * Verify that {@code <br/>} elements between block elements are replaced properly.
+     */
+    public void testCleanLineBreaks()
+    {
+        assertHTML("<p>para1</p><div class=\"wikimodel-emptyline\" /><p>para2</p>", "<p>para1</p><br/><p>para2</p>");
+        assertHTML(
+            "<p>para1</p><div class=\"wikimodel-emptyline\" /><div class=\"wikimodel-emptyline\" /><p>para2</p>",
+            "<p>para1</p><br/><br/><p>para2</p>");
     }
 
     /**
@@ -97,7 +108,7 @@ public class DefaultHTMLCleanerTest extends TestCase
      */
     public void testScript()
     {
-        String script = "<script type=\"text/javascript\">//<![CDATA[alert(\"Hello World\")// ]]></script>"; 
+        String script = "<script type=\"text/javascript\">//<![CDATA[alert(\"Hello World\")// ]]></script>";
         assertHTML(script, script);
     }
 

@@ -22,7 +22,6 @@ package org.xwiki.xml.internal.html;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +38,7 @@ import org.jdom.output.DOMOutputter;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.filter.CleaningFilter;
 
 /**
  * Default implementation for {@link org.xwiki.xml.html.HTMLCleaner} using the <a href="HTML Cleaner
@@ -62,10 +62,6 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      */
     public void initialize() throws InitializationException
     {
-        this.filters = new ArrayList<CleaningFilter>();
-        this.filters.add(new ListCleaningFilter());
-        this.filters.add(new DocTypeCleaningFilter());
-
         // The clean method below is thread safe. However it seems that DOMOutputter.output() is not fully thread safe
         // since it causes the following exception on the first time it's called from different threads:
         //  Caused by: org.jdom.JDOMException: Reflection failed while creating new JAXP document:

@@ -24,16 +24,43 @@
 
 <component-set>
   <components>
+    <!-- Cleaning Filters -->
     <component>
-      <role>org.xml.sax.EntityResolver</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.xml.LocalEntityResolver</implementation>
+      <role>org.xwiki.xml.html.filter.CleaningFilter</role>
+      <role-hint>doctype</role-hint>
+      <implementation>org.xwiki.xml.internal.html.filter.DocTypeCleaningFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.CleaningFilter</role>
+      <role-hint>linebreak</role-hint>
+      <implementation>org.xwiki.xml.internal.html.filter.LineBreakCleaningFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.CleaningFilter</role>
+      <role-hint>list</role-hint>
+      <implementation>org.xwiki.xml.internal.html.filter.ListCleaningFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <!-- Default HTML Cleaner -->    
     <component>
       <role>org.xwiki.xml.html.HTMLCleaner</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.xml.internal.html.DefaultHTMLCleaner</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <!-- Inject all the CleaningFilter components into the 'filters' list -->
+      <requirements>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.CleaningFilter</role>
+          <field-name>filters</field-name>
+        </requirement>
+      </requirements>      
+    </component>
+    <component>
+      <role>org.xml.sax.EntityResolver</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.xml.LocalEntityResolver</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>

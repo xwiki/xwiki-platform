@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.xml.internal.html;
+package org.xwiki.xml.internal.html.filter;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.Filter;
+import org.xwiki.xml.html.filter.CleaningFilter;
 
 import java.util.Iterator;
 import java.util.List;

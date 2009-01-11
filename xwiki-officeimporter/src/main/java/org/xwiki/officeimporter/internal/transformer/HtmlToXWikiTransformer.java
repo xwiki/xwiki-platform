@@ -91,12 +91,14 @@ public class HtmlToXWikiTransformer extends AbstractLogEnabled implements Docume
             xdom.traverse(listener);
             importerContext.setTargetDocumentContent(printer.toString());
             importerContext.finalizeDocument(false);
-        } catch (ComponentLookupException ex) {          
-            getLogger().error("Error while looking up for xhtml to xwiki 2.0 parser.", ex);
+        } catch (ComponentLookupException ex) {
+            String message = "Internal error while looking up for xhtml to xwiki 2.0 parser.";
+            getLogger().error(message, ex);
             throw new OfficeImporterException(ex);
         } catch (ParseException ex) {
-            getLogger().error("Error while parsing the xhtml document.", ex);
-            throw new OfficeImporterException(ex);
+            String message = "Internal error while parsing the xhtml document.";
+            getLogger().error(message, ex);
+            throw new OfficeImporterException(message, ex);
         }
     }
 }

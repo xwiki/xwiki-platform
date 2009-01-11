@@ -91,7 +91,7 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
     /**
      * Output file (html).
      */
-    private File outputFile = null;    
+    private File outputFile = null;
 
     /**
      * {@inheritDoc}
@@ -112,10 +112,10 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
         try {
             openOfficeServerConnection.connect();
         } catch (ConnectException ex) {
-            getLogger().error(
-                String.format("Could not connect to the open office server at [%s].", openOfficeServerIp + ":"
-                    + openOfficeServerPort), ex);
-            throw new OfficeImporterException(ex);
+            String message =
+                "Could not connect to OpenOffice server at " + openOfficeServerIp + ":" + openOfficeServerPort;
+            getLogger().error(message, ex);
+            throw new OfficeImporterException(message, ex);
         }
         // Create an instance of the converter.
         openOfficeDocumentConverter = new OpenOfficeDocumentConverter(openOfficeServerConnection);
@@ -127,9 +127,10 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
             fos.write(importerContext.getSourceData());
             fos.close();
         } catch (IOException ex) {
-            getLogger().error("Error while creating temporary files.", ex);
+            String message = "Internal error while creating temporary files.";
+            getLogger().error(message, ex);
             cleanTempStorage();
-            throw new OfficeImporterException(ex);
+            throw new OfficeImporterException(message, ex);
         }
         // Make the conversion.
         openOfficeDocumentConverter.convert(inputFile, importerContext.getSourceFormat(), outputFile, htmlFormat);
@@ -143,9 +144,10 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
             fis.close();
             importerContext.setTargetDocumentContent(new String(content));
         } catch (IOException ex) {
-            getLogger().error("Error while reading temporary files.", ex);
+            String message = "Internal error while reading temporary files.";
+            getLogger().error(message, ex);
             cleanTempStorage();
-            throw new OfficeImporterException(ex);
+            throw new OfficeImporterException(message, ex);
         }
         // Start collecting the artifacts.
         File[] artifacts = outputDir.listFiles();
@@ -156,7 +158,8 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
                 fis.read(data);
                 importerContext.addArtifact(artifact.getName(), data);
             } catch (IOException ex) {
-                getLogger().error(String.format("Error while reading artifact [%s].", artifact.getName()), ex);
+                String message = "Internal error while reading artifact : " + artifact.getName();
+                getLogger().error(message, ex);                
                 // Skip the artifact.
             }
         }

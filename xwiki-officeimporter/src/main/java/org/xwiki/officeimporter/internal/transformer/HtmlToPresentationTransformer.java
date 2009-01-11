@@ -45,19 +45,18 @@ public class HtmlToPresentationTransformer extends AbstractLogEnabled implements
      */
     public void transform(OfficeImporterContext importerContext) throws OfficeImporterException
     {
-        importerContext.setTargetDocumentSyntaxId(new Syntax(SyntaxType.XWIKI, "1.0")
-            .toIdString());
+        importerContext.setTargetDocumentSyntaxId(new Syntax(SyntaxType.XWIKI, "1.0").toIdString());
         // Build the xwiki presentation.
         try {
             byte[] archive = buildArchive(importerContext.getArtifacts());
             String archiveName = "presentation.zip";
             importerContext.addAttachment(archive, archiveName);
-            importerContext.setTargetDocumentContent(buildPresentationFrameCode(archiveName,
-                "output.html"));
+            importerContext.setTargetDocumentContent(buildPresentationFrameCode(archiveName, "output.html"));
             importerContext.finalizeDocument(true);
         } catch (IOException ex) {
-            getLogger().error("Error while building artifacts archive.", ex);
-            throw new OfficeImporterException(ex);
+            String message = "Error while building presentation archive.";
+            getLogger().error(message, ex);
+            throw new OfficeImporterException(message, ex);
         }
     }
 
@@ -83,8 +82,8 @@ public class HtmlToPresentationTransformer extends AbstractLogEnabled implements
     }
 
     /**
-     * Generates the code necessary to display a presentation within an iframe. For more information
-     * refer to : <a>http://code.xwiki.org/xwiki/bin/view/Snippets /ViewOfficeDocumentSnippet</a>.
+     * Generates the code necessary to display a presentation within an iframe. For more information refer to :
+     * <a>http://code.xwiki.org/xwiki/bin/view/Snippets /ViewOfficeDocumentSnippet</a>.
      * 
      * @param zipFilename Name of the zip archive containing the html form of the presentation.
      * @param index The html document from which the presentation starts from.
@@ -92,8 +91,7 @@ public class HtmlToPresentationTransformer extends AbstractLogEnabled implements
      */
     private String buildPresentationFrameCode(String zipFilename, String index)
     {
-        return "#set ($url = $xwiki.zipexplorer.getFileLink($doc, \"" + zipFilename + "\", \""
-            + index + "\"))\n"
+        return "#set ($url = $xwiki.zipexplorer.getFileLink($doc, \"" + zipFilename + "\", \"" + index + "\"))\n"
             + "<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>";
     }
 }

@@ -43,12 +43,12 @@ public class DefaultOfficeImporter implements OfficeImporter
      * File extensions corresponding to slide presentations.
      */
     private static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
-    
+
     /**
      * Document access bridge used to access wiki documents.
      */
     private DocumentAccessBridge docBridge;
-    
+
     /**
      * Transformer responsible for converting office documents into (HTML + artifacts).
      */
@@ -65,52 +65,49 @@ public class DefaultOfficeImporter implements OfficeImporter
     private DocumentTransformer htmlToXWikiTransformer;
 
     /**
-     * {@inheritDoc}
-     *  
-     * Supports converting the Office document to HTML or XWiki Syntax 2.0.
+     * {@inheritDoc} Supports converting the Office document to HTML or XWiki Syntax 2.0.
      * 
      * @see OfficeImporter#importDocument(byte[], String, String, Map)
      */
-    public void importDocument(byte[] fileContent, String fileName, String targetDocument,
-        Map<String, String> options) throws OfficeImporterException
+    public void importDocument(byte[] fileContent, String fileName, String targetDocument, Map<String, String> options)
+        throws OfficeImporterException
     {
-        if (isValidRequest(targetDocument)) {
-            options.put("targetDocument", targetDocument);
-            OfficeImporterContext importerContext =
-                new OfficeImporterContext(fileContent, fileName, targetDocument, options, docBridge);
-            officeToHtmlTransformer.transform(importerContext);
-            DocumentTransformer htmlTransformer = null;
-            boolean isPresentation = isPresentation(importerContext.getSourceFormat());
-            if (isPresentation) {
-                htmlTransformer = htmlToPresentationTransformer;
-            } else {
-                htmlTransformer = htmlToXWikiTransformer;
-            }
-            htmlTransformer.transform(importerContext);
-            importerContext.finalizeDocument(isPresentation);
+        validateRequest(targetDocument);
+        options.put("targetDocument", targetDocument);
+        OfficeImporterContext importerContext =
+            new OfficeImporterContext(fileContent, fileName, targetDocument, options, docBridge);
+        officeToHtmlTransformer.transform(importerContext);
+        DocumentTransformer htmlTransformer = null;
+        boolean isPresentation = isPresentation(importerContext.getSourceFormat());
+        if (isPresentation) {
+            htmlTransformer = htmlToPresentationTransformer;
         } else {
-            throw new OfficeImporterException("Failed to import document [" + fileName + "] into page [" 
-                + targetDocument + "]. Most probably the page already exists or you don't have edit rights on it.");
+            htmlTransformer = htmlToXWikiTransformer;
         }
+        htmlTransformer.transform(importerContext);
+        importerContext.finalizeDocument(isPresentation);
     }
 
     /**
-     * Checks if this request is valid. For a request to be valid, the requested target document
-     * should not exist and the user should have enough privileges to create & edit that particular
-     * page.
+     * Checks if this request is valid. For a request to be valid, the requested target document should not exist and
+     * the user should have enough privileges to create & edit that particular page.
      * 
-     * @param targetDocument The target document.
+     * @param targetDocument the target document.
+     * @throws OfficeImporterException if the request is invalid.
      */
-    private boolean isValidRequest(String targetDocument)
+    private void validateRequest(String targetDocument) throws OfficeImporterException
     {
-        boolean isValid = false;
+        boolean exists = true;
         try {
-            isValid = !docBridge.exists(targetDocument) && docBridge.isDocumentEditable(targetDocument);
+            exists = docBridge.exists(targetDocument);
         } catch (Exception ex) {
-            // Some unexpected error since "exists" and "isDocumentEditable" should not throw exceptions.
-            // Don't do anything but consider the request as invalid.
+            throw new OfficeImporterException("Internal error.", ex);
         }
-        return isValid;
+        if (exists) {
+            throw new OfficeImporterException("The target document " + targetDocument + " already exists.");
+        } else if (!docBridge.isDocumentEditable(targetDocument)) {
+            throw new OfficeImporterException("Inadequate privileges.");
+        }
     }
 
     /**

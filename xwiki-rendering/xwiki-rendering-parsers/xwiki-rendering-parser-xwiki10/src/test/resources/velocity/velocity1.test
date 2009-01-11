@@ -40,8 +40,7 @@ some text
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-some text{{velocity}}
-## commented
+some text{{velocity}}## commented
 
 ### commented
 
@@ -73,5 +72,4 @@ some text{{velocity}}
 
 
 
-{{velocity}}
-## standalone comment{{/velocity}}
+{{velocity}}## standalone comment{{/velocity}}

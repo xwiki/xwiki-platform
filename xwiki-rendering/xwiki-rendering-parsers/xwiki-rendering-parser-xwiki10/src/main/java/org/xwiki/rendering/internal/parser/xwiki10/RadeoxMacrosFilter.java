@@ -99,7 +99,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable
 
                 if (currentMacro.supportContent() == supportContent) {
                     // a standalone new line is not interpreted by XWiki 1.0 rendering
-                    before = CleanUtil.removeLastStandaloneNewLine(before, true);
+                    before = CleanUtil.removeLastNewLines(before, 1, true);
 
                     if (!currentMacro.isInline()) {
                         before = CleanUtil.setLastNL(before, 2);
@@ -116,7 +116,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug("Can't find macro converter [" + macroName + "]", e);
                 }
-                
+
                 currentMacro = null;
             }
 

@@ -35,7 +35,7 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 public class CodeMacroFilter extends AbstractFilter
 {
     private static final Pattern CODEMACRO_PATTERN =
-        Pattern.compile("\\{(code)(?::([^\\}]*))?\\}(.*?)\\{code\\}", Pattern.MULTILINE);
+        Pattern.compile("\\{(code)(?::([^\\}]*))?\\}(.*?)\\{code\\}", Pattern.DOTALL);
 
     private RadeoxMacroConverter codeMacroCoverter;
 
@@ -53,8 +53,8 @@ public class CodeMacroFilter extends AbstractFilter
             }
 
             String macroResult =
-                this.codeMacroCoverter.convert("code", RadeoxMacrosFilter.getMacroParameters(matcher.group(3)), matcher
-                    .group(4));
+                this.codeMacroCoverter.convert("code", RadeoxMacrosFilter.getMacroParameters(matcher.group(2)), matcher
+                    .group(3));
 
             result.append(before);
             result.append(filterContext.addProtectedContent(macroResult));

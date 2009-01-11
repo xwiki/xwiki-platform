@@ -43,16 +43,6 @@ public class CleanUtil
     private static final Pattern ENDING_NL_GROUP_PATTERN = Pattern.compile("\\n*$");
 
     /**
-     * Match the last unique new line. Does not match if there is more that one new line.
-     */
-    private static final Pattern ENDS_WITH_NL_PATTERN = Pattern.compile("[^\\n]\\n$");
-    
-    /**
-     * Match the first unique new line. Does not match if there is more that one new line.
-     */
-    private static final Pattern START_WITH_NL_PATTERN = Pattern.compile("^\\n[^\\n]?");
-
-    /**
      * Match space, tab or new line.
      */
     private static final Pattern HTMLSPACEORNEWLINE_PATTERN = Pattern.compile("[\\s\\n]");
@@ -63,36 +53,6 @@ public class CleanUtil
     private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\\\\\|([^\\\\])\\\\");
 
     /**
-     * Remove last new line if there is only one new line.
-     * 
-     * @param content the content to convert.
-     * @return the converted string.
-     */
-    public static String removeLastStandaloneNewLine(String content, boolean replaceWithSpace)
-    {
-        if (ENDS_WITH_NL_PATTERN.matcher(content).find()) {
-            return content.substring(0, content.length() - 1) + (replaceWithSpace ? ' ' : "");
-        } else {
-            return content;
-        }
-    }
-
-    /**
-     * Remove first new line if there is only one new line.
-     * 
-     * @param content the content to convert.
-     * @return the converted string.
-     */
-    public static String removeFirstStandaloneNewLine(String content, boolean replaceWithSpace)
-    {
-        if (START_WITH_NL_PATTERN.matcher(content).find()) {
-            return (replaceWithSpace ? ' ' : "") + content.substring(1);
-        } else {
-            return content;
-        }
-    }
-
-    /**
      * Replace all spaces/new line groupes by one space.
      * 
      * @param content the content to convert.
@@ -101,6 +61,54 @@ public class CleanUtil
     public static String cleanSpacesAndNewLines(String content)
     {
         return HTMLSPACEORNEWLINE_PATTERN.matcher(content).replaceAll(" ");
+    }
+
+    /**
+     * Remove first new line if there is only one new line.
+     * 
+     * @param content the content to convert.
+     * @return the converted string.
+     */
+    public static String removeFirstNewLines(String content, int nb, boolean replaceWithSpace)
+    {
+        String cleanedContent = content;
+
+        Matcher matcher = STARTING_NL_GROUP_PATTERN.matcher(content);
+
+        int foundNb = matcher.find() ? matcher.end() - matcher.start() : 0;
+
+        if (foundNb > 0 && foundNb <= nb) {
+            cleanedContent = content.substring(foundNb > nb ? nb : foundNb);
+            if (replaceWithSpace) {
+                cleanedContent = " " + cleanedContent;
+            }
+        }
+
+        return cleanedContent;
+    }
+
+    /**
+     * Remove last new line if there is only one new line.
+     * 
+     * @param content the content to convert.
+     * @return the converted string.
+     */
+    public static String removeLastNewLines(String content, int nb, boolean replaceWithSpace)
+    {
+        String cleanedContent = content;
+
+        Matcher matcher = ENDING_NL_GROUP_PATTERN.matcher(content);
+
+        int foundNb = matcher.find() ? matcher.end() - matcher.start() : 0;
+
+        if (foundNb > 0 && foundNb <= nb) {
+            cleanedContent = content.substring(0, content.length() - (foundNb > nb ? nb : foundNb));
+            if (replaceWithSpace) {
+                cleanedContent = cleanedContent + " ";
+            }
+        }
+
+        return cleanedContent;
     }
 
     /**

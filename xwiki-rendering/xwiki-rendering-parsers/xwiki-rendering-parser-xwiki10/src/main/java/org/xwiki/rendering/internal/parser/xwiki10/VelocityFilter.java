@@ -94,11 +94,11 @@ public class VelocityFilter extends AbstractFilter implements Composable
                     currentMacro =
                         (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.ROLE, macroName);
 
-                    // A standalone new line is not interpreted by XWiki 1.0 rendering
-                    nonVelocityContent = CleanUtil.removeLastStandaloneNewLine(nonVelocityContent, true);
-
                     if (!currentMacro.isInline()) {
                         nonVelocityContent = CleanUtil.setLastNL(nonVelocityContent, 2);
+                    } else {
+                        // A standalone new line is not interpreted by XWiki 1.0 rendering
+                        nonVelocityContent = CleanUtil.removeLastNewLines(nonVelocityContent, 1, true);
                     }
 
                     matchedContent = currentMacro.convert(macroName, getMacroParameters(params));
@@ -124,7 +124,7 @@ public class VelocityFilter extends AbstractFilter implements Composable
 
             if (!inVelocityMacro) {
                 result.append(filterContext.addProtectedContent("{{velocity}}"));
-                matchedContent = CleanUtil.removeFirstStandaloneNewLine(matchedContent, false);
+                matchedContent = CleanUtil.removeFirstNewLines(matchedContent, 1, false);
                 inVelocityMacro = true;
             }
 

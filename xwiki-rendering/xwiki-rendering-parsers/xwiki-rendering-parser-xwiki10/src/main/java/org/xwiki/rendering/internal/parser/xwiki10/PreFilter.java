@@ -27,7 +27,6 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
- * 
  * @version $Id$
  * @since 1.8M1
  */
@@ -47,7 +46,7 @@ public class PreFilter extends AbstractFilter
             current = matcher.end();
 
             // a standalone new line is not interpreted by XWiki 1.0 rendering
-            result.append(CleanUtil.removeLastStandaloneNewLine(before, true));
+            result.append(CleanUtil.removeLastNewLines(before, 1, true));
 
             result.append("{{{");
             result.append(filterContext.addProtectedContent(CleanUtil.cleanSpacesAndNewLines(matcher.group(1)).trim()));

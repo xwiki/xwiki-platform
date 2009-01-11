@@ -61,9 +61,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("section/section1", false);
         */
-
-        suite.addTestsFromResource("velocity/velocity2", false);
-
+        
+        suite.addTestsFromResource("macros/velocity/include1", false);
+        
         return new RenderingPlexusTestSetup(suite);
     }
 }

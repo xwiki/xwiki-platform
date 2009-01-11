@@ -51,17 +51,16 @@ public class Object extends Collection
         String docname = getCollection().getName();
         String wiki = getCollection().getWiki();
 
-        String database = context.getDatabase();
+        String database = this.context.getDatabase();
         try {
-            context.setDatabase(wiki);
+            this.context.setDatabase(wiki);
 
-            XWikiDocument doc =
-                getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
+            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
             return doc.display(name, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;
         } finally {
-            context.setDatabase(database);
+            this.context.setDatabase(database);
         }
     }
 
@@ -70,27 +69,27 @@ public class Object extends Collection
         String docname = getCollection().getName();
         String wiki = getCollection().getWiki();
 
-        String database = context.getDatabase();
+        String database = this.context.getDatabase();
         try {
-            context.setDatabase(wiki);
+            this.context.setDatabase(wiki);
 
-            XWikiDocument doc =
-                getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
+            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
             return doc.display(name, mode, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;
         } finally {
-            context.setDatabase(database);
+            this.context.setDatabase(database);
         }
     }
 
+    @Override
     public boolean equals(java.lang.Object arg0)
     {
         if (!(arg0 instanceof Object)) {
             return false;
         }
         Object o = (Object) arg0;
-        return o.getXWikiContext().equals(getXWikiContext()) && element.equals(o.element);
+        return o.getXWikiContext().equals(getXWikiContext()) && this.element.equals(o.element);
     }
 
     public void set(String fieldname, java.lang.Object value)

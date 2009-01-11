@@ -36,11 +36,11 @@ public class Element extends Api
 
     protected BaseElement getBaseElement()
     {
-        return element;
+        return this.element;
     }
 
     public String getName()
     {
-        return element.getName();
+        return this.element.getName();
     }
 }

@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -46,6 +45,7 @@ import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -1382,7 +1382,7 @@ public class Document extends Api
         return this.doc.getTags(getXWikiContext());
     }
 
-    public List getTagList()
+    public List<String> getTagList()
     {
         return this.doc.getTagsList(getXWikiContext());
     }
@@ -1409,12 +1409,12 @@ public class Document extends Api
         return d.getXWikiContext().equals(getXWikiContext()) && this.doc.equals(d.doc);
     }
 
-    public List getBacklinks() throws XWikiException
+    public List<String> getBacklinks() throws XWikiException
     {
         return this.doc.getBacklinks(getXWikiContext());
     }
 
-    public List getLinks() throws XWikiException
+    public List<XWikiLink> getLinks() throws XWikiException
     {
         return this.doc.getLinks(getXWikiContext());
     }
@@ -1578,7 +1578,7 @@ public class Document extends Api
             getXWikiContext());
     }
 
-    public List addObjectsFromRequest(String className) throws XWikiException
+    public List<Object> addObjectsFromRequest(String className) throws XWikiException
     {
         return addObjectsFromRequest(className, "");
     }
@@ -1589,13 +1589,12 @@ public class Document extends Api
             getXWikiContext());
     }
 
-    public List addObjectsFromRequest(String className, String prefix) throws XWikiException
+    public List<Object> addObjectsFromRequest(String className, String prefix) throws XWikiException
     {
-        List objs = getDoc().addObjectsFromRequest(className, prefix, getXWikiContext());
-        List wrapped = new ArrayList();
-        Iterator it = objs.iterator();
-        while (it.hasNext()) {
-            wrapped.add(new com.xpn.xwiki.api.Object((BaseObject) it.next(), getXWikiContext()));
+        List<BaseObject> objs = getDoc().addObjectsFromRequest(className, prefix, getXWikiContext());
+        List<Object> wrapped = new ArrayList<Object>();
+        for (BaseObject object : objs) {
+            wrapped.add(new com.xpn.xwiki.api.Object(object, getXWikiContext()));
         }
         return wrapped;
     }
@@ -1606,7 +1605,7 @@ public class Document extends Api
             getXWikiContext());
     }
 
-    public List updateObjectsFromRequest(String className) throws XWikiException
+    public List<Object> updateObjectsFromRequest(String className) throws XWikiException
     {
         return updateObjectsFromRequest(className, "");
     }
@@ -1617,13 +1616,12 @@ public class Document extends Api
             getXWikiContext());
     }
 
-    public List updateObjectsFromRequest(String className, String prefix) throws XWikiException
+    public List<Object> updateObjectsFromRequest(String className, String prefix) throws XWikiException
     {
-        List objs = getDoc().updateObjectsFromRequest(className, prefix, getXWikiContext());
-        List wrapped = new ArrayList();
-        Iterator it = objs.iterator();
-        while (it.hasNext()) {
-            wrapped.add(new com.xpn.xwiki.api.Object((BaseObject) it.next(), getXWikiContext()));
+        List<BaseObject> objs = getDoc().updateObjectsFromRequest(className, prefix, getXWikiContext());
+        List<Object> wrapped = new ArrayList<Object>();
+        for (BaseObject object : objs) {
+            wrapped.add(new com.xpn.xwiki.api.Object(object, getXWikiContext()));
         }
         return wrapped;
     }

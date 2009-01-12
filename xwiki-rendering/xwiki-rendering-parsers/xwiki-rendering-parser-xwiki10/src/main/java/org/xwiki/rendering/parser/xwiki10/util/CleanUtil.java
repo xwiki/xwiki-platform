@@ -161,7 +161,7 @@ public class CleanUtil
      * @param content the content to convert.
      * @return the converted string.
      */
-    public static String removeFirstNL(String content)
+    public static String removeFirstNewLines(String content)
     {
         return STARTING_NL_GROUP_PATTERN.matcher(content).replaceAll("");
     }

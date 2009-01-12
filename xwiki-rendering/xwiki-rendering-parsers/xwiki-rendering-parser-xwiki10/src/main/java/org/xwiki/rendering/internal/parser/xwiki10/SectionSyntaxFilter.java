@@ -47,7 +47,9 @@ public class SectionSyntaxFilter extends AbstractFilter
             String before = content.substring(currentIndex, matcher.start());
 
             if (currentIndex > 0) {
-                before = CleanUtil.setFirstNL(before, 2);
+                // Section consume all following new lines
+                before = CleanUtil.removeFirstNewLines(before);
+                before = "\n\n" + before;
             }
 
             result.append(before);

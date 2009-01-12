@@ -1240,6 +1240,11 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             extendedId.setParameter(XWikiExtendedId.LANGUAGE_PARAMETER, page.getLanguage());
             extendedId.setParameter(XWikiExtendedId.VERSION_PARAMETER, null);
             extendedId.setParameter(XWikiExtendedId.MINOR_VERSION_PARAMETER, null);
+            
+            /* If the page doesn't exist then use directly the standard storePage */
+            if(!this.xwikiApi.exists(extendedId.getBasePageId())) {
+                return storePage(token, pageMap);
+            }
 
             Document doc = XWikiUtils.getDocument(this.xwikiApi, extendedId.toString(), true);
 

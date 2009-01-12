@@ -93,6 +93,8 @@ public interface XWikiXmlRpcApi
 
     public Map/* XWikiObject */getObject(String token, String pageId, String className, Integer id) throws Exception;
 
+    public Map/* XWikiObject */getObject(String token, String pageId, String guid) throws Exception;
+
     public Map/* XWikiObject */storeObject(String token, Map objectMap) throws Exception;
 
     public Map/* XWikiObject */storeObject(String token, Map objectMap, boolean checkVersion) throws Exception;

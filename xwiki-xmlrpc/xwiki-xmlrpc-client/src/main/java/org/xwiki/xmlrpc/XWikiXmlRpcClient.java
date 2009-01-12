@@ -718,6 +718,20 @@ public class XWikiXmlRpcClient
     }
 
     /**
+     * Get an XWiki object identified by its GUID.
+     * 
+     * @param pageId the document holding the object.
+     * @param guid the object's GUID.
+     * @return An XWiki object with all the association property -> values.
+     * @throws XmlRpcException
+     */
+    public XWikiObject getObject(String pageId, String guid) throws XmlRpcException
+    {
+        Object object = invokeRpc("getObject", this.token, pageId, guid);
+        return new XWikiObject((Map<String, Object>) object);
+    }
+
+    /**
      * Get the XWiki object associated with a page at a given version.
      * 
      * @param pageId

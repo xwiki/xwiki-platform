@@ -81,6 +81,16 @@ public class XWikiObjectSummary extends MapObject
         setInt("id", id);
     }
 
+    public String getGuid()
+    {
+        return getString("guid");
+    }
+
+    public void setGuid(String guid)
+    {
+        setString("guid", guid);
+    }
+
     public String getClassName()
     {
         return getString("className");

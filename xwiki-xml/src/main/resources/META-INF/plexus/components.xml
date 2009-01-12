@@ -33,14 +33,14 @@
     </component>
     <component>
       <role>org.xwiki.xml.html.filter.CleaningFilter</role>
-      <role-hint>linebreak</role-hint>
-      <implementation>org.xwiki.xml.internal.html.filter.LineBreakCleaningFilter</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.xwiki.xml.html.filter.CleaningFilter</role>
       <role-hint>list</role-hint>
       <implementation>org.xwiki.xml.internal.html.filter.ListCleaningFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>    
+    <component>
+      <role>org.xwiki.xml.html.filter.CleaningFilter</role>
+      <role-hint>linebreak</role-hint>
+      <implementation>org.xwiki.xml.internal.html.filter.LineBreakCleaningFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <!-- Default HTML Cleaner -->    
@@ -49,12 +49,23 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.xml.internal.html.DefaultHTMLCleaner</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <!-- Inject all the CleaningFilter components into the 'filters' list -->
+      <!-- Inject the default CleaningFilter components into the 'filters' list -->
       <requirements>
         <requirement>
           <role>org.xwiki.xml.html.filter.CleaningFilter</role>
+          <role-hint>doctype</role-hint>
           <field-name>filters</field-name>
         </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.CleaningFilter</role>
+          <role-hint>list</role-hint>
+          <field-name>filters</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.CleaningFilter</role>
+          <role-hint>linebreak</role-hint>
+          <field-name>filters</field-name>
+        </requirement>                
       </requirements>      
     </component>
     <component>

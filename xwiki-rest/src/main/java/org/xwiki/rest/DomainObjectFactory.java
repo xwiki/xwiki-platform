@@ -250,7 +250,9 @@ public class DomainObjectFactory
             fullUri =
                 String.format("%s%s", request.getRootRef(), resourceClassRegistry
                     .getUriPatternForResourceClass(SpaceResource.class));
-            link = new Link(Utils.formatUriTemplate(fullUri, Constants.SPACE_NAME_PARAMETER, doc.getSpace()));
+            link =
+                new Link(Utils.formatUriTemplate(fullUri, Constants.WIKI_NAME_PARAMETER, doc.getWiki(),
+                    Constants.SPACE_NAME_PARAMETER, doc.getSpace()));
             link.setRel(Relations.SPACE);
             page.addLink(link);
 
@@ -263,8 +265,8 @@ public class DomainObjectFactory
                     String.format("%s%s", request.getRootRef(), resourceClassRegistry
                         .getUriPatternForResourceClass(PageResource.class));
                 link =
-                    new Link(Utils.formatUriTemplate(fullUri, Constants.SPACE_NAME_PARAMETER, components[0],
-                        Constants.PAGE_NAME_PARAMETER, components[1]));
+                    new Link(Utils.formatUriTemplate(fullUri, Constants.WIKI_NAME_PARAMETER, doc.getWiki(),
+                        Constants.SPACE_NAME_PARAMETER, components[0], Constants.PAGE_NAME_PARAMETER, components[1]));
                 link.setRel(Relations.PARENT);
                 page.addLink(link);
             }

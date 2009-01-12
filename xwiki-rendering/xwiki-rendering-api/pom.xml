@@ -102,6 +102,11 @@
             <goals>
               <goal>test-jar</goal>
             </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/*Test.class</exclude>
+              </excludes>
+            </configuration>
           </execution>
         </executions>
       </plugin>

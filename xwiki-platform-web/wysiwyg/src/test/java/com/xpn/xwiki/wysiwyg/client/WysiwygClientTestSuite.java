@@ -30,7 +30,7 @@ import com.xpn.xwiki.wysiwyg.client.dom.DocumentTest;
 import com.xpn.xwiki.wysiwyg.client.dom.ElementTest;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeTest;
 import com.xpn.xwiki.wysiwyg.client.dom.StyleTest;
-import com.xpn.xwiki.wysiwyg.client.dom.internal.IERangeTest;
+import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.IESelectionTest;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.TextRangeTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
@@ -75,7 +75,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(StyleTest.class);
         suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);
         suite.addTestSuite(TextRangeTest.class);
-        suite.addTestSuite(IERangeTest.class);
+        suite.addTestSuite(IESelectionTest.class);
 
         // plugin
         suite.addTestSuite(DefaultPluginFactoryManagerTest.class);

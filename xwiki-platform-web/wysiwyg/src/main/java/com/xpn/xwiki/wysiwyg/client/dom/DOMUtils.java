@@ -816,8 +816,8 @@ public abstract class DOMUtils
     }
 
     /**
-     * Returns the value of the named attribute of the specified element. This method will be overwritten for
-     * internet explorer browsers to handle bug http://code.google.com/p/google-web-toolkit/issues/detail?id=3238 .
+     * Returns the value of the named attribute of the specified element. This method will be overwritten for internet
+     * explorer browsers to handle bug http://code.google.com/p/google-web-toolkit/issues/detail?id=3238 .
      * 
      * @param element the element to get the attribute for
      * @param name the name of the attribute to return
@@ -826,5 +826,75 @@ public abstract class DOMUtils
     public String getAttribute(Element element, String name)
     {
         return element.getAttribute(name);
+    }
+
+    /**
+     * Compares two points in a {@link Document}. Each point is specified by a DOM node and an offset within that node.
+     * 
+     * @param alice first point's node
+     * @param aliceOffset first point's offset
+     * @param bob second point's node
+     * @param bobOffset second point's offset
+     * @return -1, 0 or 1 depending on whether the first point is respectively before, equal to, or after the second
+     *         point
+     */
+    public short comparePoints(Node alice, int aliceOffset, Node bob, int bobOffset)
+    {
+        if (alice == bob) {
+            return (short) (aliceOffset < bobOffset ? -1 : aliceOffset > bobOffset ? 1 : 0);
+        }
+
+        // Build the chain of parents.
+        List<Node> aliceAncestors = getAncestors(alice);
+        List<Node> bobAncestors = getAncestors(bob);
+
+        // Test is the input nodes are disconnected.
+        int aliceIndex = aliceAncestors.size() - 1;
+        int bobIndex = bobAncestors.size() - 1;
+        if (aliceAncestors.get(aliceIndex) != bobAncestors.get(bobIndex)) {
+            throw new IllegalArgumentException();
+        }
+
+        // Find where the parent chain differs.
+        for (int count = Math.min(aliceIndex, bobIndex); count > 0; --count) {
+            Node aliceAncestor = aliceAncestors.get(--aliceIndex);
+            Node bobAncestor = bobAncestors.get(--bobIndex);
+            if (aliceAncestor != bobAncestor) {
+                return (short) (getNodeIndex(aliceAncestor) < getNodeIndex(bobAncestor) ? -1 : 1);
+            }
+        }
+
+        // The parent chains never differed, so one of the nodes is an ancestor of the other.
+        if (aliceIndex == 0) {
+            Node bobAncestor = bobAncestors.get(--bobIndex);
+            return (short) (aliceOffset <= getNodeIndex(bobAncestor) ? -1 : 1);
+        }
+
+        Node aliceAncestor = aliceAncestors.get(--aliceIndex);
+        return (short) (getNodeIndex(aliceAncestor) < bobOffset ? -1 : 1);
+    }
+
+    /**
+     * We need our own implementation because the one provided by GWT includes commented text in the output.
+     * 
+     * @param element the element whose inner text to return
+     * @return the text between the start and end tags of the given element
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3275
+     */
+    public String getInnerText(Element element)
+    {
+        // To mimic IE's 'innerText' property in the W3C DOM, we need to recursively
+        // concatenate all child text nodes (depth first).
+        StringBuffer text = new StringBuffer();
+        Node child = element.getFirstChild();
+        while (child != null) {
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                text.append(getInnerText((Element) child));
+            } else if (child.getNodeType() == Node.TEXT_NODE) {
+                text.append(child.getNodeValue());
+            }
+            child = child.getNextSibling();
+        }
+        return text.toString();
     }
 }

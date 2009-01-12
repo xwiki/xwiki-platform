@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.dom.internal;
+package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
@@ -27,14 +27,13 @@ import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
 import com.xpn.xwiki.wysiwyg.client.dom.Text;
-import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.TextRange;
 
 /**
  * Unit tests for {@link IERange}.
  * 
  * @version $Id$
  */
-public class IERangeTest extends AbstractWysiwygClientTest
+public class IESelectionTest extends AbstractWysiwygClientTest
 {
     /**
      * Used to mark the start or end of a text range.
@@ -83,21 +82,24 @@ public class IERangeTest extends AbstractWysiwygClientTest
     {
         container.xSetInnerHTML(html);
 
-        TextRange range = TextRange.newInstance((Document) container.getOwnerDocument());
+        TextRange textRange = TextRange.newInstance((Document) container.getOwnerDocument());
 
-        TextRange refRange = range.duplicate();
+        TextRange refRange = textRange.duplicate();
         refRange.moveToElementText(container);
         if (refRange.findText(PIPE, 0, 0)) {
             refRange.setHTML("");
-            range.setEndPoint(RangeCompare.END_TO_START, refRange);
+            textRange.setEndPoint(RangeCompare.END_TO_START, refRange);
             refRange.findText(PIPE, html.length() - html.indexOf(PIPE), 0);
             refRange.setHTML("");
-            range.setEndPoint(RangeCompare.START_TO_END, refRange);
+            textRange.setEndPoint(RangeCompare.START_TO_END, refRange);
         } else {
-            range.moveToElementText(container);
+            textRange.moveToElementText(container);
         }
 
-        return IERangeFactory.createRange(range);
+        // We cannot select the textRange because IE doesn't support collapsed selection in view mode (which is somehow
+        // normal since you cannot have the caret in view mode). Instead we use a mock native selection which returns
+        // our textRange like it has been selected.
+        return (new IESelection(MockNativeSelection.newInstance(textRange))).getRangeAt(0);
     }
 
     /**
@@ -390,8 +392,7 @@ public class IERangeTest extends AbstractWysiwygClientTest
         container.xSetInnerHTML("a<div><!--x-->b<em>#</em></div>c");
         Range range = ((Document) container.getOwnerDocument()).createRange();
         range.selectNodeContents(container.getChildNodes().getItem(1));
-        assertEquals("IE fails because leading comments are not included in the range.", ((Element) container
-            .getChildNodes().getItem(1)).xGetInnerHTML(), range.toHTML());
+        assertEquals(((Element) container.getChildNodes().getItem(1)).xGetInnerHTML(), range.toHTML());
     }
 
     /**
@@ -401,13 +402,13 @@ public class IERangeTest extends AbstractWysiwygClientTest
     {
         container.xSetInnerHTML("<!--x-->a<em></em>");
         Range range = ((Document) container.getOwnerDocument()).createRange();
-        range.selectNodeContents(container.getChildNodes().getItem(2));
+        range.selectNodeContents(container.getLastChild());
         assertCollapsed(range);
         assertEquals(container.getChildNodes().getItem(2), range.getStartContainer());
         assertEquals("", range.toHTML());
 
         container.xSetInnerHTML("<!--x-->a<img/>");
-        range.selectNodeContents(container.getChildNodes().getItem(2));
+        range.selectNode(container.getLastChild());
         assertFalse(range.isCollapsed());
         assertEquals("<img>", range.toHTML().toLowerCase());
         assertEquals(container, range.getCommonAncestorContainer());

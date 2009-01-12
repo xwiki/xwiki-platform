@@ -19,23 +19,24 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
+import com.xpn.xwiki.wysiwyg.client.dom.JavaScriptObject;
 
 /**
- * Extends {@link DefaultSelectionManager} for Firefox prior to version 3.0.
+ * Interface to access the native range object wrapped by a specific range implementation.
  * 
  * @version $Id$
  */
-public class MozillaSelectionManager extends DefaultSelectionManager
+public interface NativeRangeWrapper
 {
     /**
-     * {@inheritDoc}
-     * 
-     * @see DefaultSelectionManager#getSelection(Document)
+     * @return the native range wrapped by this object.
      */
-    public Selection getSelection(Document doc)
-    {
-        return new MozillaSelection(getJSSelection(doc));
-    }
+    JavaScriptObject getNativeRange();
+
+    /**
+     * Sets the native range to be wrapped by this object.
+     * 
+     * @param nativeRange the native range to be wrapped by this object.
+     */
+    void setNativeRange(JavaScriptObject nativeRange);
 }

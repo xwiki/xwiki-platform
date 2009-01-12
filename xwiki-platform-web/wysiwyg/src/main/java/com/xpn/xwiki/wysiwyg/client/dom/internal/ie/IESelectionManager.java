@@ -17,25 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.dom.internal;
+package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.Selection;
+import com.xpn.xwiki.wysiwyg.client.dom.SelectionManager;
 
 /**
- * Extends {@link DefaultRangeFactory} for Firefox prior to version 3.0.
+ * {@link SelectionManager} implementation for Internet Explorer.
  * 
  * @version $Id$
  */
-public class MozillaRangeFactory extends DefaultRangeFactory
+public final class IESelectionManager implements SelectionManager
 {
     /**
      * {@inheritDoc}
      * 
-     * @see DefaultRangeFactory#createRange(Document)
+     * @see SelectionManager#getSelection(Document)
      */
-    public Range createRange(Document doc)
+    public Selection getSelection(Document doc)
     {
-        return new MozillaRange(createJSRange(doc));
+        return new IESelection(NativeSelection.getInstance(doc));
     }
 }

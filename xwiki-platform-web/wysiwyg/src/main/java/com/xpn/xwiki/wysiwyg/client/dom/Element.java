@@ -269,4 +269,16 @@ public class Element extends com.google.gwt.dom.client.Element
     {
         return DOMUtils.getInstance().getAttribute(this, name);
     }
+
+    /**
+     * We need this method because {@link #getInnerText()} includes commented text in the output.
+     * 
+     * @return the text between the start and end tags of this element
+     * @see #getInnerText()
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3275
+     */
+    public final String xGetInnerText()
+    {
+        return DOMUtils.getInstance().getInnerText(this);
+    }
 }

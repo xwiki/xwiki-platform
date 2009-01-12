@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.dom.internal;
+package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
@@ -118,4 +118,14 @@ public class IEDOMUtils extends DOMUtils
     {
         return element.getAttribute(name) + "";
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#getInnerText(Element)
+     */
+    public native String getInnerText(Element element)
+    /*-{
+        return element.innerText;
+    }-*/;
 }

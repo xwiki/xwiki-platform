@@ -80,7 +80,6 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         assertEquals(Node.TEXT_NODE, textRange.getStartContainer().getNodeType());
         assertEquals(Node.TEXT_NODE, textRange.getEndContainer().getNodeType());
 
-        // The following may fail in IE.
         assertEquals(0, textRange.getStartOffset());
         assertEquals(2, textRange.getEndOffset());
     }
@@ -457,8 +456,8 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
 
         range.setStart(container.getChildNodes().getItem(1), 1);
         range.setEnd(container.getChildNodes().getItem(3), 0);
-        assertEquals("IE fails because both end points of the range fall inside the nearest text nodes.", container
-            .getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance().getFirstLeaf(range));
+        assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance()
+            .getFirstLeaf(range));
         assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance()
             .getLastLeaf(range));
 

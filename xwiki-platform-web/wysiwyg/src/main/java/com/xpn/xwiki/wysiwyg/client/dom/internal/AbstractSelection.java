@@ -19,78 +19,24 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 
 /**
- * Abstract selection that implements the Mozilla range specification using the API offered by the browser. Concrete
- * extensions of these class have the role to adapt the specific selection API offered by each browser to the Mozilla
- * selection specification.
+ * Abstract {@link Selection} implementation.
+ * <p>
+ * NOTE: In the current implementation we often make the assumption that the selection contains at most one range. All
+ * the other ranges, if they exist, are sometimes ignored. Additionally, but somehow as a consequence, we consider the
+ * anchor node as being the start container of the first range and the focus node as the end container of the first
+ * range. This has to do with the fact that not all the browsers distinguish the direction in which the user makes the
+ * selection (from left to right or the opposite).
  * 
- * @param <S> Browser specific selection implementation.
- * @param <R> Browser specific range implementation.
  * @version $Id$
  */
-public abstract class AbstractSelection<S extends JavaScriptObject, R extends JavaScriptObject> implements Selection
+public abstract class AbstractSelection implements Selection
 {
-    /**
-     * Browser specific selection implementation.
-     */
-    private final S jsSelection;
-
-    /**
-     * Creates a new instance that has to adapt the given browser-specific selection to the Mozilla specification.
-     * 
-     * @param jsSelection The selection implementation to adapt.
-     */
-    AbstractSelection(S jsSelection)
-    {
-        this.jsSelection = jsSelection;
-    }
-
-    /**
-     * @return The underlying selection implementation used.
-     */
-    public final S getJSSelection()
-    {
-        return this.jsSelection;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#addRange(Range)
-     */
-    @SuppressWarnings("unchecked")
-    public void addRange(Range range)
-    {
-        addRange(((AbstractRange<R>) range).getJSRange());
-    }
-
-    /**
-     * @param range Adds this range to the current selection.
-     */
-    protected abstract void addRange(R range);
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#removeRange(Range)
-     */
-    @SuppressWarnings("unchecked")
-    public void removeRange(Range range)
-    {
-        removeRange(((AbstractRange<R>) range).getJSRange());
-    }
-
-    /**
-     * @param range Removes this range from the current selection.
-     */
-    protected abstract void removeRange(R range);
-
     /**
      * {@inheritDoc}
      * 
@@ -100,7 +46,7 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
     {
         Range range = ((Document) parentNode.getOwnerDocument()).createRange();
         range.setStart(parentNode, offset);
-        range.setEnd(parentNode, offset);
+        range.collapse(true);
         removeAllRanges();
         addRange(range);
     }
@@ -112,8 +58,6 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
      */
     public void collapseToEnd()
     {
-        // NOTE: We should collapse to the focus node, but since we don't know which is the focus node and which is the
-        // anchor node we collapse to the end point of the first range.
         collapse(false);
     }
 
@@ -124,15 +68,13 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
      */
     public void collapseToStart()
     {
-        // NOTE: We should collapse to the anchor node, but since we don't know which is the focus node and which is the
-        // anchor node we collapse to the start point of the first range.
         collapse(true);
     }
 
     /**
      * Collapses this selection to the specified end point.
      * 
-     * @param toStart Whether to collapse to the start or to the end point of the first range in this selection.
+     * @param toStart whether to collapse to the start or to the end point of the first range in this selection
      */
     private void collapse(boolean toStart)
     {
@@ -142,6 +84,17 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
             removeAllRanges();
             addRange(range);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#containsNode(Node, boolean)
+     */
+    public boolean containsNode(Node node, boolean partlyContained)
+    {
+        // TODO
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -162,12 +115,25 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
     /**
      * {@inheritDoc}
      * 
+     * @see Selection#extend(Node, int)
+     */
+    public void extend(Node parentNode, int offset)
+    {
+        if (getRangeCount() > 0) {
+            Range range = getRangeAt(0);
+            range.setEnd(parentNode, offset);
+            removeAllRanges();
+            addRange(range);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see Selection#getAnchorNode()
      */
     public Node getAnchorNode()
     {
-        // NOTE: We should return the anchor node, but since we don't know which is the focus node and which is the
-        // anchor node we return the start point of the first range.
         if (getRangeCount() > 0) {
             return getRangeAt(0).getStartContainer();
         } else {
@@ -182,8 +148,6 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
      */
     public int getAnchorOffset()
     {
-        // NOTE: We should return the anchor offset, but since we don't know which is the focus node and which is the
-        // anchor node we return the start offset of the first range.
         if (getRangeCount() > 0) {
             return getRangeAt(0).getStartOffset();
         } else {
@@ -198,8 +162,6 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
      */
     public Node getFocusNode()
     {
-        // NOTE: We should return the focus node, but since we don't know which is the focus node and which is the
-        // anchor node we return the end point of the first range.
         if (getRangeCount() > 0) {
             return getRangeAt(0).getEndContainer();
         } else {
@@ -214,8 +176,6 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
      */
     public int getFocusOffset()
     {
-        // NOTE: We should return the focus offset, but since we don't know which is the focus node and which is the
-        // anchor node we return the end offset of the first range.
         if (getRangeCount() > 0) {
             return getRangeAt(0).getEndOffset();
         } else {
@@ -236,6 +196,30 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
     /**
      * {@inheritDoc}
      * 
+     * @see Selection#selectAllChildren(Node)
+     */
+    public void selectAllChildren(Node parentNode)
+    {
+        Range range = ((Document) parentNode.getOwnerDocument()).createRange();
+        range.selectNodeContents(parentNode);
+        removeAllRanges();
+        addRange(range);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selection#selectionLanguageChange(boolean)
+     */
+    public void selectionLanguageChange(boolean langRTL)
+    {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see Selection#toString()
      */
     public String toString()
@@ -243,7 +227,7 @@ public abstract class AbstractSelection<S extends JavaScriptObject, R extends Ja
         if (getRangeCount() > 0) {
             return getRangeAt(0).toString();
         } else {
-            return null;
+            return "";
         }
     }
 }

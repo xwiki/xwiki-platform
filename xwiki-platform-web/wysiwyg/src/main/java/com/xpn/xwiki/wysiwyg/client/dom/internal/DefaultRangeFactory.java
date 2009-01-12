@@ -19,13 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeFactory;
 
 /**
- * The default {@link RangeFactory} implementation. It creates JavaScript range objects using Mozilla's API.
+ * The default {@link RangeFactory} implementation.
  * 
  * @version $Id$
  */
@@ -38,15 +37,10 @@ public class DefaultRangeFactory implements RangeFactory
      */
     public Range createRange(Document doc)
     {
-        return new DefaultRange(createJSRange(doc));
+        // We create a new native range wrapper without passing a reference to a native range. The selection
+        // implementation should initialize this reference when the new range will be added.
+        Range range = new DefaultNativeRangeWrapper();
+        range.selectNodeContents(doc.getBody());
+        return range;
     }
-
-    /**
-     * @param doc The DOM document for which to create the range.
-     * @return A new JavaScript range object for the specified document, created using Mozilla's API.
-     */
-    protected native JavaScriptObject createJSRange(Document doc)
-    /*-{
-        return doc.createRange();
-    }-*/;
 }

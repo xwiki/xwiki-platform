@@ -38,7 +38,7 @@ public final class DocumentFragment extends Node
     }
 
     /**
-     * @return The HTML serialization of this DOM fragment.
+     * @return the HTML serialization of this document fragment
      */
     public String getInnerHTML()
     {
@@ -49,5 +49,19 @@ public final class DocumentFragment extends Node
         // We restore the document fragment.
         appendChild(container.extractContents());
         return innerHTML;
+    }
+
+    /**
+     * @return the text, without mark-up, found within this document fragment
+     */
+    public String getInnerText()
+    {
+        Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
+        // We avoid attaching a clone to limit the memory used.
+        container.appendChild(this);
+        String innerText = container.xGetInnerText();
+        // We restore the document fragment.
+        appendChild(container.extractContents());
+        return innerText;
     }
 }

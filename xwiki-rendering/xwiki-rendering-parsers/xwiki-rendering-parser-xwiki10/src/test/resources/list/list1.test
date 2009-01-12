@@ -32,7 +32,7 @@ jj. list2
 11. list2
 .#-----------------------------------------------------
 .expect|xwiki/2.0|skip
-.# Need to fix XWiki 2.0 list rendering, see http://jira.xwiki.org/jira/browse/XWIKI-3067
+.# TODO: Need to fix XWiki 2.0 list rendering, see http://jira.xwiki.org/jira/browse/XWIKI-3067
 .#-----------------------------------------------------
 (% style="list-style-type: square" %)
 * list1

@@ -61,6 +61,12 @@
       <artifactId>xwiki-webdav</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- The REST module -->
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-rest</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
     <!-- needed for slf4j clients such as QueryPlugin and JCRStore 
          It is deployment time logging configuration, so it is here instead of xwiki-core. -->
     <dependency>

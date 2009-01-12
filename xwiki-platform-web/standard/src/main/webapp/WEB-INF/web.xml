@@ -8,6 +8,14 @@
 
   <display-name>xwiki</display-name>
   <description>XWiki Application</description>
+  
+  <!-- RESTful API application class name -->
+  <context-param>
+    <param-name>org.restlet.application</param-name>
+    <param-value>
+	  org.xwiki.rest.XWikiRestApplication  
+	</param-value>
+  </context-param>  
 
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specificy
        the encoding used for submitting the request, so by default containers fall back to the
@@ -172,7 +180,21 @@
    <servlet-name>webdav</servlet-name>
    <servlet-class>com.xpn.xwiki.plugin.webdav.XWikiDavServlet</servlet-class>
   </servlet>
+  
+  <!-- RESTful API Restlet servlet -->
+  <servlet>
+    <servlet-name>XWikiRestletServlet</servlet-name>
+    <servlet-class>
+      org.xwiki.rest.XWikiRestletServlet  
+    </servlet-class>
+  </servlet>
 
+  <!-- RESTful API mapping -->
+  <servlet-mapping>
+    <servlet-name>XWikiRestletServlet</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
+  
   <!-- Unused mapping for now. In the future the correct mapping will be /* when the action servlet
        will be decommissioned in favor of the XWiki Action component --> 
   <servlet-mapping>

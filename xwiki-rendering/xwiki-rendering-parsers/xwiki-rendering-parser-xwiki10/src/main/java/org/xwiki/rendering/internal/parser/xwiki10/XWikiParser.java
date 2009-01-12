@@ -128,7 +128,7 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
 
         content = filterProtectedStrings(content, filterContext);
 
-        content = CleanUtil.removeFirstNL(content);
+        content = CleanUtil.removeFirstNewLines(content);
         content = CleanUtil.removeLastNL(content);
 
         return content;

@@ -277,15 +277,6 @@ public class SelectionPreserver
             if (leaf == DOMUtils.getInstance().getPreviousLeaf(end)) {
                 selectedNode = leaf;
             }
-        } else if (start == end && start.getNodeType() == Node.ELEMENT_NODE && endOffset - startOffset == 1) {
-            // If the range wraps an element we need to handle it differently because that element might support control
-            // selection. Since IE range implementation uses a text range by default we have to select that element
-            // explicitly in order to activate the special controls. We should drop this code as soon the IE range
-            // implementation will be improved.
-            // NOTE: In order to implement this behavior in IE we have to detach the IE range implementation from its
-            // native range which should be used only when getting or adding the high level, abstract, IE range to the
-            // selection.
-            selectedNode = start.getChildNodes().getItem(startOffset);
         }
         if (selectedNode != null) {
             range.selectNode(selectedNode);

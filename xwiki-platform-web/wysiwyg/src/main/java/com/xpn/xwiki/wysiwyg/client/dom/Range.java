@@ -22,137 +22,88 @@ package com.xpn.xwiki.wysiwyg.client.dom;
 import com.google.gwt.dom.client.Node;
 
 /**
- * The {@link Range} object represents a fragment of a document that can contain nodes and parts of text nodes in a
- * given document.
+ * A contiguous fragment of a {@link Document} or {@link DocumentFragment} that can contain nodes and parts of text
+ * nodes.
  * 
  * @version $Id$
+ * @see http://www.w3.org/TR/DOM-Level-2-Traversal-Range/ranges.html
  */
 public interface Range
 {
     /**
-     * @return Node within which the Range begins.
-     */
-    Node getStartContainer();
-
-    /**
-     * @return Offset within the starting node of the Range.
-     */
-    int getStartOffset();
-
-    /**
-     * @return Node within which the Range ends.
-     */
-    Node getEndContainer();
-
-    /**
-     * @return Offset within the ending node of the Range.
-     */
-    int getEndOffset();
-
-    /**
-     * @return true if the Range is collapsed.
-     */
-    boolean isCollapsed();
-
-    /**
-     * @return The deepest common ancestor container of the Range's two boundary-points.
-     */
-    Node getCommonAncestorContainer();
-
-    /**
-     * Sets the attributes describing the start of the Range.
+     * Duplicates the contents of this range.
      * 
-     * @param refNode The refNode value. This parameter must be different from null.
-     * @param offset The startOffset value.
+     * @return a DocumentFragment that contains content equivalent to this range
      */
-    void setStart(Node refNode, int offset);
+    DocumentFragment cloneContents();
 
     /**
-     * Sets the attributes describing the end of a Range.
+     * Produces a new Range whose boundary-points are equal to the boundary-points of this range.
      * 
-     * @param refNode The refNode value. This parameter must be different from null.
-     * @param offset The endOffset value.
+     * @return the duplicated range
      */
-    void setEnd(Node refNode, int offset);
+    Range cloneRange();
 
     /**
-     * Sets the start position to be before a node.
+     * Collapse this range onto one of its boundary-points.
      * 
-     * @param refNode Range starts before refNode.
-     */
-    void setStartBefore(Node refNode);
-
-    /**
-     * Sets the start position to be after a node.
-     * 
-     * @param refNode Range starts after refNode.
-     */
-    void setStartAfter(Node refNode);
-
-    /**
-     * Sets the end position to be before a node.
-     * 
-     * @param refNode Range ends before refNode.
-     */
-    void setEndBefore(Node refNode);
-
-    /**
-     * Sets the end of a Range to be after a node.
-     * 
-     * @param refNode Range ends after refNode.
-     */
-    void setEndAfter(Node refNode);
-
-    /**
-     * Collapse a Range onto one of its boundary-points.
-     * 
-     * @param toStart If true, collapses the Range onto its start; if false, collapses it onto its end.
+     * @param toStart if true, collapses this range onto its start; if false, collapses it onto its end.
      */
     void collapse(boolean toStart);
 
     /**
-     * Select a node and its contents.
-     * 
-     * @param refNode The node to select.
-     */
-    void selectNode(Node refNode);
-
-    /**
-     * Select the contents within a node.
-     * 
-     * @param refNode Node to select from.
-     */
-    void selectNodeContents(Node refNode);
-
-    /**
      * Compare the boundary-points of two Ranges in a document.
      * 
-     * @param how The type of comparison.
-     * @param sourceRange The range to compared to.
+     * @param how the type of comparison
+     * @param sourceRange the range to compared to
      * @return -1, 0 or 1 depending on whether the corresponding boundary-point of this range is respectively before,
-     *         equal to, or after the corresponding boundary-point of sourceRange.
+     *         equal to, or after the corresponding boundary-point of sourceRange
      */
     short compareBoundaryPoints(RangeCompare how, Range sourceRange);
 
     /**
-     * Removes the contents of a Range from the containing document or document fragment without returning a reference
-     * to the removed content.
+     * Removes the contents of this range from the containing document or document fragment without returning a
+     * reference to the removed content.
      */
     void deleteContents();
 
     /**
-     * Moves the contents of a Range from the containing document or document fragment to a new DocumentFragment.
+     * Called to indicate that this range is no longer in use and that the implementation may relinquish any resources
+     * associated with this range.
+     */
+    void detach();
+
+    /**
+     * Moves the contents of this range from the containing document or document fragment to a new DocumentFragment.
      * 
-     * @return A DocumentFragment containing the extracted contents.
+     * @return a DocumentFragment containing the extracted contents
      */
     DocumentFragment extractContents();
 
     /**
-     * Duplicates the contents of a Range.
-     * 
-     * @return A DocumentFragment that contains content equivalent to this Range.
+     * @return the deepest common ancestor container of this range's two boundary-points
      */
-    DocumentFragment cloneContents();
+    Node getCommonAncestorContainer();
+
+    /**
+     * @return the node within which this range ends
+     */
+    Node getEndContainer();
+
+    /**
+     * @return the offset within the ending node of this range
+     */
+    int getEndOffset();
+
+    /**
+     * @return the node within which this range begins
+     */
+    Node getStartContainer();
+
+    /**
+     * @return the offset within the starting node of this range
+     */
+    int getStartOffset();
 
     /**
      * Inserts a node into the Document or DocumentFragment at the start of the Range. If the container is a Text node,
@@ -161,40 +112,90 @@ public interface Range
      * be automatically merged. If the node to be inserted is a DocumentFragment node, the children will be inserted
      * rather than the DocumentFragment node itself.
      * 
-     * @param newNode The node to insert at the start of the Range.
+     * @param newNode the node to insert at the start of this range.
      */
     void insertNode(Node newNode);
 
     /**
-     * Re-parents the contents of the Range to the given node and inserts the node at the position of the start of the
-     * Range.
+     * @return true if this range is collapsed
+     */
+    boolean isCollapsed();
+
+    /**
+     * Select a node and its contents.
      * 
-     * @param newParent The node to surround the contents with.
+     * @param refNode the node to select
+     */
+    void selectNode(Node refNode);
+
+    /**
+     * Select the contents within a node.
+     * 
+     * @param refNode the node to select from
+     */
+    void selectNodeContents(Node refNode);
+
+    /**
+     * Sets the attributes describing the end of this range.
+     * 
+     * @param refNode the {@link #endContainer} value. This parameter must be different from null.
+     * @param offset the {@link #endOffset} value
+     */
+    void setEnd(Node refNode, int offset);
+
+    /**
+     * Sets the end of this Range to be after the given node.
+     * 
+     * @param refNode the reference node, after which this range will end
+     */
+    void setEndAfter(Node refNode);
+
+    /**
+     * Sets the end position to be before the given node.
+     * 
+     * @param refNode the reference node, before which this range will end
+     */
+    void setEndBefore(Node refNode);
+
+    /**
+     * Sets the attributes describing the start of this range.
+     * 
+     * @param refNode the {@link #startContainer} value. This parameter must be different from null.
+     * @param offset the {@link #startOffset} value
+     */
+    void setStart(Node refNode, int offset);
+
+    /**
+     * Sets the start position to be after the given node.
+     * 
+     * @param refNode the reference node, after which this range will start
+     */
+    void setStartAfter(Node refNode);
+
+    /**
+     * Sets the start position to be before the given node.
+     * 
+     * @param refNode the reference node, before which this range will start
+     */
+    void setStartBefore(Node refNode);
+
+    /**
+     * Re-parents the contents of this range to the given node and inserts the node at the position of the start of this
+     * range.
+     * 
+     * @param newParent the node to surround the contents with
      */
     void surroundContents(Node newParent);
 
     /**
-     * Produces a new Range whose boundary-points are equal to the boundary-points of the Range.
-     * 
-     * @return The duplicated Range.
-     */
-    Range cloneRange();
-
-    /**
-     * Returns the contents of a Range as a string. This string contains only the data characters, not any mark-up.
-     * 
-     * @return The contents of the Range.
-     */
-    String toString();
-
-    /**
-     * @return The HTML contents of this range.
+     * @return the HTML contents of this range
      */
     String toHTML();
 
     /**
-     * Called to indicate that the Range is no longer in use and that the implementation may relinquish any resources
-     * associated with this Range.
+     * Returns the contents of this range as a string. This string contains only the data characters, not any mark-up.
+     * 
+     * @return the contents of this range
      */
-    void detach();
+    String toString();
 }

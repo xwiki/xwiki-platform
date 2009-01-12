@@ -19,141 +19,60 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.internal.mozilla.NativeRange;
+import com.xpn.xwiki.wysiwyg.client.dom.internal.mozilla.NativeSelection;
 
 /**
- * The default selection implementation just forwards the calls to the underlying browser implementation. It should be
- * used only for browsers that follow Mozilla's selection specification.
+ * The default selection implementation for browsers supporting the W3C Range specification and following Mozilla
+ * Selection API.
  * 
  * @version $Id$
  */
-public class DefaultSelection extends AbstractSelection<JavaScriptObject, JavaScriptObject>
+public class DefaultSelection extends AbstractSelection
 {
     /**
-     * Creates a new instance that wraps the given native selection object. All the calls will be forwarded to this
-     * JavaScript object.
-     * 
-     * @param jsSelection The native selection object to be wrapped.
+     * The underlying native selection object provided by the browser.
      */
-    DefaultSelection(JavaScriptObject jsSelection)
+    private final NativeSelection nativeSelection;
+
+    /**
+     * Creates a new selection object. This object will handle the conversion of {@link Range} objects to the native
+     * range supported by the browser. The native ranges obtained will be applied to the underlying native selection.
+     * 
+     * @param nativeSelection the underlying native selection to be used
+     */
+    public DefaultSelection(NativeSelection nativeSelection)
     {
-        super(jsSelection);
+        this.nativeSelection = nativeSelection;
+    }
+
+    /**
+     * @return {@link #nativeSelection}
+     */
+    protected NativeSelection getNativeSelection()
+    {
+        return nativeSelection;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractSelection#addRange(JavaScriptObject)
+     * @see AbstractSelection#addRange(Range)
      */
-    protected native void addRange(JavaScriptObject range)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().addRange(range);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#collapse(Node, int)
-     */
-    public native void collapse(Node parentNode, int offset)
-    /*-{
-        var range = this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()();
-        range.collapse(parentNode, offset);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#collapseToEnd()
-     */
-    public native void collapseToEnd()
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().collapseToEnd();
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#collapseToStart()
-     */
-    public native void collapseToStart()
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().collapseToStart();
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#containsNode(Node, boolean)
-     */
-    public native boolean containsNode(Node node, boolean partlyContained)
-    /*-{
-        return containsNode(node, partlyContained);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#deleteFromDocument()
-     */
-    public native void deleteFromDocument()
-    /*-{
-        var range = this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()();
-        range.deleteFromDocument();
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#extend(Node, int)
-     */
-    public native void extend(Node parentNode, int offset)
-    /*-{
-        var range = this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()();
-        range.extend(parentNode, offset);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getAnchorNode()
-     */
-    public native Node getAnchorNode()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().anchorNode;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getAnchorOffset()
-     */
-    public native int getAnchorOffset()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().anchorOffset;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getFocusNode()
-     */
-    public native Node getFocusNode()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().focusNode;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getFocusOffset()
-     */
-    public native int getFocusOffset()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().focusOffset;
-    }-*/;
+    public void addRange(Range range)
+    {
+        NativeRangeWrapper wrapper = ((NativeRangeWrapper) range);
+        if (wrapper.getNativeRange() == null) {
+            Document doc = (Document) range.getStartContainer().getOwnerDocument();
+            wrapper.setNativeRange(NativeRange.newInstance(doc));
+        }
+        NativeRange nativeRange = wrapper.getNativeRange().cast();
+        nativeRange.setStart(range.getStartContainer(), range.getStartOffset());
+        nativeRange.setEnd(range.getEndContainer(), range.getEndOffset());
+        nativeSelection.addRange(nativeRange);
+    }
 
     /**
      * {@inheritDoc}
@@ -162,88 +81,47 @@ public class DefaultSelection extends AbstractSelection<JavaScriptObject, JavaSc
      */
     public Range getRangeAt(int index)
     {
-        return new DefaultRange(getJSRangeAt(index));
-    }
+        if (index < 0 || index >= getRangeCount()) {
+            throw new IndexOutOfBoundsException();
+        }
 
-    /**
-     * @param index The index of the range to retrieve. Usually the selection contains just one range.
-     * @return The JavaScript range at the specified index in the JavaScript selection object wrapped by this object.
-     */
-    protected native JavaScriptObject getJSRangeAt(int index)
-    /*-{
-        var range = this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()();
-        return range.getRangeAt(index);
-    }-*/;
+        NativeRange nativeRange = nativeSelection.getRangeAt(index);
+        Range range = ((Document) nativeRange.getStartContainer().getOwnerDocument()).createRange();
+        range.setStart(nativeRange.getStartContainer(), nativeRange.getStartOffset());
+        range.setEnd(nativeRange.getEndContainer(), nativeRange.getEndOffset());
+        ((NativeRangeWrapper) range).setNativeRange(nativeRange);
+
+        return range;
+    }
 
     /**
      * {@inheritDoc}
      * 
      * @see AbstractSelection#getRangeCount()
      */
-    public native int getRangeCount()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().rangeCount;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#isCollapsed()
-     */
-    public native boolean isCollapsed()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().isCollapsed;
-    }-*/;
+    public int getRangeCount()
+    {
+        return nativeSelection.getRangeCount();
+    }
 
     /**
      * {@inheritDoc}
      * 
      * @see AbstractSelection#removeAllRanges()
      */
-    public native void removeAllRanges()
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().removeAllRanges();
-    }-*/;
+    public void removeAllRanges()
+    {
+        nativeSelection.removeAllRanges();
+    }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractSelection#removeRange(JavaScriptObject)
+     * @see AbstractSelection#removeRange(Range)
      */
-    protected native void removeRange(JavaScriptObject range)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().removeRange(range);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#selectAllChildren(Node)
-     */
-    public native void selectAllChildren(Node parentNode)
-    /*-{
-        var range = this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()();
-        range.selectAllChildren(parentNode);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#selectionLanguageChange(boolean)
-     */
-    public native void selectionLanguageChange(boolean langRTL)
-    /*-{
-        var range = this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()();
-        range.selectionLanguageChange(langRTL);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#toString()
-     */
-    public native String toString()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractSelection::getJSSelection()().toString();
-    }-*/;
+    public void removeRange(Range range)
+    {
+        NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
+        nativeSelection.removeRange((NativeRange) wrapper.getNativeRange());
+    }
 }

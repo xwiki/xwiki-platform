@@ -45,4 +45,22 @@ public class DocumentFragmentTest extends AbstractWysiwygClientTest
         assertEquals(element.getString() + text.getData(), df.getInnerHTML());
         assertEquals(2, df.getChildNodes().getLength());
     }
+
+    /**
+     * Unit test for {@link DocumentFragment#getInnerText()}.
+     */
+    public void testGetInnerText()
+    {
+        DocumentFragment df = ((Document) Document.get()).createDocumentFragment();
+
+        Element element = Document.get().createDelElement().cast();
+        element.setInnerHTML("d<!--c-->b<em>x</em>a");
+
+        Text text = Document.get().createTextNode("%").cast();
+
+        df.appendChild(element);
+        df.appendChild(text);
+        assertEquals(element.xGetInnerText() + text.getData(), df.getInnerText());
+        assertEquals(2, df.getChildNodes().getLength());
+    }
 }

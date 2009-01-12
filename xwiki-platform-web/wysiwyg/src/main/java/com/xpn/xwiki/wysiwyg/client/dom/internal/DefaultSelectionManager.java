@@ -19,10 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.dom.SelectionManager;
+import com.xpn.xwiki.wysiwyg.client.dom.internal.mozilla.NativeSelection;
 
 /**
  * The default {@link SelectionManager} implementation. Retrieves the selection object using Mozilla's API.
@@ -36,19 +36,8 @@ public class DefaultSelectionManager implements SelectionManager
      * 
      * @see SelectionManager#getSelection(Document)
      */
-    public Selection getSelection(Document doc)
+    public Selection getSelection(Document document)
     {
-        return new DefaultSelection(getJSSelection(doc));
+        return new DefaultSelection(NativeSelection.getInstance(document));
     }
-
-    /**
-     * Retrieves the native selection object using Mozilla's API.
-     * 
-     * @param doc The DOM document for which to retrieve the native selection.
-     * @return The selection JavaScript object associated with the specified document.
-     */
-    protected native JavaScriptObject getJSSelection(Document doc)
-    /*-{
-        return doc.defaultView.getSelection();
-    }-*/;
 }

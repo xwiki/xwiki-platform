@@ -527,7 +527,7 @@ public final class TextRange extends NativeRange
             textNode.setData(placeholder);
             xMoveToElementText(parent);
             findText(placeholder, 0, 0);
-            setText("");
+            textNode.setData("");
         } else {
             // We create a reference element and we insert it before the given text node in order to place the start of
             // the range after this element. In the end we remove the reference element.

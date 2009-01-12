@@ -69,4 +69,16 @@ public class ElementTest extends AbstractWysiwygClientTest
         element.appendChild(Document.get().createBRElement());
         assertEquals("&lt;\"'&gt;&amp;<br>", element.xGetInnerHTML().toLowerCase());
     }
+
+    /**
+     * Unit test for {@link Element#xGetInnerText()} when the element contains comment nodes.
+     * 
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3275
+     */
+    public void testXGetInnerTextWithCommentedText()
+    {
+        Element element = Document.get().createDivElement().cast();
+        element.setInnerHTML("x<!--y-->z");
+        assertEquals("xz", element.xGetInnerText());
+    }
 }

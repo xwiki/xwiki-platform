@@ -17,27 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.dom.internal;
+package com.xpn.xwiki.wysiwyg.client.dom.internal.mozilla;
 
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.dom.SelectionManager;
-import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.NativeSelection;
 
 /**
- * {@link SelectionManager} implementation for Internet Explorer.
+ * Implements {@link SelectionManager} for Firefox prior to version 3.0.
  * 
  * @version $Id$
  */
-public final class IESelectionManager implements SelectionManager
+public class MozillaSelectionManager implements SelectionManager
 {
     /**
      * {@inheritDoc}
      * 
      * @see SelectionManager#getSelection(Document)
      */
-    public Selection getSelection(Document doc)
+    public Selection getSelection(Document document)
     {
-        return new IESelection(NativeSelection.getInstance(doc));
+        return new MozillaSelection(NativeSelection.getInstance(document));
     }
 }

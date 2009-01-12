@@ -19,255 +19,121 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Node;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
 
 /**
- * The default range implementation just forwards the calls to the underlying browser implementation. It should be used
- * only for browsers that follow the W3C Range specification.
+ * This is a cross-browser implementation of the W3C Range specification.
+ * <p>
+ * Acknowledgment to Mozilla Foundation for making nsRange.cpp public.
  * 
  * @version $Id$
+ * @see http://hg.mozilla.org/mozilla-central/file/b945b4f67e7e/content/base/src/nsRange.cpp
  */
-public class DefaultRange extends AbstractRange<JavaScriptObject>
+public class DefaultRange implements Range
 {
     /**
-     * Creates a new instance that wraps the given native range object. All the calls will be forwarded to this native
-     * object.
-     * 
-     * @param jsRange The native range object to be wrapped.
+     * The DOM node containing the start of this range.
      */
-    DefaultRange(JavaScriptObject jsRange)
+    private Node startContainer;
+
+    /**
+     * The offset within the {@link #startContainer}.
+     */
+    private int startOffset;
+
+    /**
+     * The DOM node containing the end of this range.
+     */
+    private Node endContainer;
+
+    /**
+     * The offset within the {@link #endContainer}.
+     */
+    private int endOffset;
+
+    /**
+     * Specifies if both boundaries of this range have been successfully set to valid DOM nodes.
+     */
+    private boolean positioned;
+
+    /**
+     * Specifies if this range is in use.
+     */
+    private boolean detached;
+
+    /**
+     * Collection of DOM utility methods.
+     */
+    private DOMUtils domUtils = DOMUtils.getInstance();
+
+    /**
+     * Sets the boundaries of this range.
+     * 
+     * @param startContainer {@link #startContainer}
+     * @param startOffset {@link #startOffset}
+     * @param endContainer {@link #endContainer}
+     * @param endOffset {@link #endOffset}
+     */
+    private void setRange(Node startContainer, int startOffset, Node endContainer, int endOffset)
     {
-        super(jsRange);
+        boolean valid = !(startContainer == null ^ endContainer == null);
+        if (valid && startContainer != null) {
+            valid = valid && startContainer.getOwnerDocument() == endContainer.getOwnerDocument();
+            valid = valid && startOffset >= 0 && startOffset <= domUtils.getLength(startContainer);
+            valid = valid && endOffset >= 0 && endOffset <= domUtils.getLength(endContainer);
+        }
+
+        if (!valid) {
+            throw new IllegalArgumentException();
+        }
+
+        this.startContainer = startContainer;
+        this.startOffset = startOffset;
+        this.endContainer = endContainer;
+        this.endOffset = endOffset;
+        positioned = startContainer != null;
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#isCollapsed()
-     */
-    public native boolean isCollapsed()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().collapsed;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getCommonAncestorContainer()
-     */
-    public native Node getCommonAncestorContainer()
-    /*-{
-        var range = this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()();
-        return range.commonAncestorContainer;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getEndContainer()
-     */
-    public native Node getEndContainer()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().endContainer;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getEndOffset()
-     */
-    public native int getEndOffset()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().endOffset;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getStartContainer()
-     */
-    public native Node getStartContainer()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().startContainer;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getStartOffset()
-     */
-    public native int getStartOffset()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().startOffset;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setStart(Node, int)
-     */
-    public native void setStart(Node refNode, int offset)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().setStart(refNode, offset);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setEnd(Node, int)
-     */
-    public native void setEnd(Node refNode, int offset)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().setEnd(refNode, offset);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setStartBefore(Node)
-     */
-    public native void setStartBefore(Node refNode)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().setStartBefore(refNode);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setStartAfter(Node)
-     */
-    public native void setStartAfter(Node refNode)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().setStartAfter(refNode);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setEndBefore(Node)
-     */
-    public native void setEndBefore(Node refNode)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().setEndBefore(refNode);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setEndAfter(Node)
-     */
-    public native void setEndAfter(Node refNode)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().setEndAfter(refNode);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#selectNode(Node)
-     */
-    public native void selectNode(Node refNode)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().selectNode(refNode);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#selectNodeContents(Node)
-     */
-    public native void selectNodeContents(Node refNode)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().selectNodeContents(refNode);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#collapse(boolean)
-     */
-    public native void collapse(boolean toStart)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().collapse(toStart);
-    }-*/;
 
     /**
      * {@inheritDoc}
      * 
      * @see Range#cloneContents()
      */
-    public native DocumentFragment cloneContents()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().cloneContents();
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#deleteContents()
-     */
-    public native void deleteContents()
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().deleteContents();
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#extractContents()
-     */
-    public native DocumentFragment extractContents()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().extractContents();
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#insertNode(Node)
-     */
-    public native void insertNode(Node newNode)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().insertNode(newNode);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#surroundContents(Node)
-     */
-    public native void surroundContents(Node newParent)
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().surroundContents(newParent);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRange#compareBoundaryPoints(int, JavaScriptObject)
-     */
-    protected short compareBoundaryPoints(RangeCompare how, JavaScriptObject sourceRange)
+    public DocumentFragment cloneContents()
     {
-        return compareBoundaryPoints(how.ordinal(), sourceRange);
-    }
+        if (detached) {
+            throw new IllegalStateException();
+        }
 
-    /**
-     * Compare the boundary-points of two ranges in a document.
-     * 
-     * @param how The type of comparison.
-     * @param sourceRange The range to compared to.
-     * @return -1, 0 or 1 depending on whether the corresponding boundary-point of this range is respectively before,
-     *         equal to, or after the corresponding boundary-point of sourceRange.
-     */
-    private native short compareBoundaryPoints(int how, JavaScriptObject sourceRange)
-    /*-{
-        var range = this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()();
-        return range.compareBoundaryPoints(how, sourceRange);
-    }-*/;
+        Node root = getCommonAncestorContainer();
+
+        if (startContainer == endContainer) {
+            return domUtils.cloneNodeContents(root, startOffset, endOffset);
+        }
+
+        DocumentFragment contents = ((Document) root.getOwnerDocument()).createDocumentFragment();
+
+        int startIndex = startOffset;
+        if (startContainer != root) {
+            contents.appendChild(domUtils.cloneNode(root, startContainer, startOffset, false));
+            startIndex = domUtils.getNodeIndex(domUtils.getChild(root, startContainer)) + 1;
+        }
+
+        if (endContainer != root) {
+            int endIndex = domUtils.getNodeIndex(domUtils.getChild(root, endContainer));
+            contents.appendChild(domUtils.cloneNodeContents(root, startIndex, endIndex));
+            contents.appendChild(domUtils.cloneNode(root, endContainer, endOffset, true));
+        } else {
+            contents.appendChild(domUtils.cloneNodeContents(root, startIndex, endOffset));
+        }
+
+        return contents;
+    }
 
     /**
      * {@inheritDoc}
@@ -276,34 +142,361 @@ public class DefaultRange extends AbstractRange<JavaScriptObject>
      */
     public Range cloneRange()
     {
-        return new DefaultRange(cloneJSRange());
+        if (detached) {
+            throw new IllegalStateException();
+        }
+
+        // We should use Object.clone when it is implemented in GWT
+        // See http://code.google.com/p/google-web-toolkit/issues/detail?id=1843
+        DefaultRange clone = new DefaultRange();
+        clone.setRange(startContainer, startOffset, endContainer, endOffset);
+        return clone;
     }
 
     /**
-     * @return A clone of the underlying native range object.
+     * {@inheritDoc}
+     * 
+     * @see Range#collapse(boolean)
      */
-    private native JavaScriptObject cloneJSRange()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().cloneRange();
-    }-*/;
+    public void collapse(boolean toStart)
+    {
+        if (detached || !positioned) {
+            throw new IllegalStateException();
+        }
+
+        if (toStart) {
+            setRange(startContainer, startOffset, startContainer, startOffset);
+        } else {
+            setRange(endContainer, endOffset, endContainer, endOffset);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#compareBoundaryPoints(RangeCompare, Range)
+     */
+    public short compareBoundaryPoints(RangeCompare how, Range sourceRange)
+    {
+        if (detached || !positioned) {
+            throw new IllegalStateException();
+        }
+        if (startContainer.getOwnerDocument() != sourceRange.getStartContainer().getOwnerDocument()) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (how) {
+            case START_TO_START:
+                return domUtils.comparePoints(startContainer, startOffset, sourceRange.getStartContainer(), sourceRange
+                    .getStartOffset());
+            case START_TO_END:
+                return domUtils.comparePoints(endContainer, endOffset, sourceRange.getStartContainer(), sourceRange
+                    .getStartOffset());
+            case END_TO_START:
+                return domUtils.comparePoints(startContainer, startOffset, sourceRange.getEndContainer(), sourceRange
+                    .getEndOffset());
+            case END_TO_END:
+                return domUtils.comparePoints(endContainer, endOffset, sourceRange.getEndContainer(), sourceRange
+                    .getEndOffset());
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#deleteContents()
+     */
+    public void deleteContents()
+    {
+        if (detached || !positioned) {
+            throw new IllegalStateException();
+        }
+
+        Node root = getCommonAncestorContainer();
+
+        if (startContainer == endContainer) {
+            domUtils.deleteNodeContents(root, startOffset, endOffset);
+        } else {
+            int startIndex = startOffset;
+            if (startContainer != root) {
+                domUtils.deleteNodeContents(root, startContainer, startOffset, false);
+                startIndex = domUtils.getNodeIndex(domUtils.getChild(root, startContainer)) + 1;
+            }
+
+            int endIndex = endOffset;
+            if (endContainer != root) {
+                endIndex = domUtils.getNodeIndex(domUtils.getChild(root, endContainer));
+                domUtils.deleteNodeContents(root, endContainer, endOffset, true);
+            }
+            domUtils.deleteNodeContents(root, startIndex, endIndex);
+        }
+
+        setRange(startContainer, startOffset, startContainer, startOffset);
+    }
 
     /**
      * {@inheritDoc}
      * 
      * @see Range#detach()
      */
-    public native void detach()
-    /*-{
-        this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().detach();
-    }-*/;
+    public void detach()
+    {
+        if (detached) {
+            throw new IllegalStateException();
+        }
+
+        detached = true;
+        setRange(null, 0, null, 0);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#extractContents()
+     */
+    public DocumentFragment extractContents()
+    {
+        if (detached || !positioned) {
+            throw new IllegalStateException();
+        }
+
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#getCommonAncestorContainer()
+     */
+    public Node getCommonAncestorContainer()
+    {
+        if (detached || !positioned) {
+            throw new IllegalStateException();
+        }
+
+        return domUtils.getNearestCommonAncestor(startContainer, endContainer);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#getEndContainer()
+     */
+    public Node getEndContainer()
+    {
+        if (!positioned) {
+            throw new IllegalStateException();
+        }
+
+        return endContainer;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#getEndOffset()
+     */
+    public int getEndOffset()
+    {
+        if (!positioned) {
+            throw new IllegalStateException();
+        }
+
+        return endOffset;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#getStartContainer()
+     */
+    public Node getStartContainer()
+    {
+        if (!positioned) {
+            throw new IllegalStateException();
+        }
+
+        return startContainer;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#getStartOffset()
+     */
+    public int getStartOffset()
+    {
+        if (!positioned) {
+            throw new IllegalStateException();
+        }
+
+        return startOffset;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#insertNode(Node)
+     */
+    public void insertNode(Node newNode)
+    {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#isCollapsed()
+     */
+    public boolean isCollapsed()
+    {
+        if (detached || !positioned) {
+            throw new IllegalStateException();
+        }
+
+        return startContainer == endContainer && startOffset == endOffset;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#selectNode(Node)
+     */
+    public void selectNode(Node refNode)
+    {
+        Node parent = refNode.getParentNode();
+        int index = domUtils.getNodeIndex(refNode);
+        setRange(parent, index, parent, index + 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#selectNodeContents(Node)
+     */
+    public void selectNodeContents(Node refNode)
+    {
+        setRange(refNode, 0, refNode, domUtils.getLength(refNode));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#setEnd(Node, int)
+     */
+    public void setEnd(Node refNode, int offset)
+    {
+        if (!positioned || startContainer.getOwnerDocument() != refNode.getOwnerDocument()
+            || domUtils.comparePoints(startContainer, startOffset, refNode, offset) == 1) {
+            setRange(refNode, offset, refNode, offset);
+        } else {
+            setRange(startContainer, startOffset, refNode, offset);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#setEndAfter(Node)
+     */
+    public void setEndAfter(Node refNode)
+    {
+        setEnd(refNode.getParentNode(), domUtils.getNodeIndex(refNode) + 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#setEndBefore(Node)
+     */
+    public void setEndBefore(Node refNode)
+    {
+        setEnd(refNode.getParentNode(), domUtils.getNodeIndex(refNode));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#setStart(Node, int)
+     */
+    public void setStart(Node refNode, int offset)
+    {
+        if (!positioned || endContainer.getOwnerDocument() != refNode.getOwnerDocument()
+            || domUtils.comparePoints(refNode, offset, endContainer, endOffset) == 1) {
+            setRange(refNode, offset, refNode, offset);
+        } else {
+            setRange(refNode, offset, endContainer, endOffset);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#setStartAfter(Node)
+     */
+    public void setStartAfter(Node refNode)
+    {
+        setStart(refNode.getParentNode(), domUtils.getNodeIndex(refNode) + 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#setStartBefore(Node)
+     */
+    public void setStartBefore(Node refNode)
+    {
+        setStart(refNode.getParentNode(), domUtils.getNodeIndex(refNode));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#surroundContents(Node)
+     */
+    public void surroundContents(Node newParent)
+    {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Range#toHTML()
+     */
+    public String toHTML()
+    {
+        if (detached) {
+            throw new IllegalStateException();
+        }
+
+        if (positioned) {
+            return cloneContents().getInnerHTML();
+        } else {
+            return "";
+        }
+    }
 
     /**
      * {@inheritDoc}
      * 
      * @see Range#toString()
      */
-    public native String toString()
-    /*-{
-        return this.@com.xpn.xwiki.wysiwyg.client.dom.internal.AbstractRange::getJSRange()().toString();
-    }-*/;
+    public String toString()
+    {
+        if (detached) {
+            throw new IllegalStateException();
+        }
+
+        if (positioned) {
+            return cloneContents().getInnerText();
+        } else {
+            return "";
+        }
+    }
 }

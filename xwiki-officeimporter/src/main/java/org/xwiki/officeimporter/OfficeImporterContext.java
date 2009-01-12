@@ -44,7 +44,12 @@ public class OfficeImporterContext
      * Default document syntax id.
      */
     public static final String DEFAULT_SYNTAX_ID = new Syntax(SyntaxType.XWIKI, "1.0").toIdString();
-
+    
+    /**
+     * Default encoding for office imported documents.
+     */
+    public static final String DEFAULT_ENCODING = "UTF-8";
+    
     /**
      * Name of the presentation archive.
      */
@@ -193,14 +198,6 @@ public class OfficeImporterContext
     }
 
     /**
-     * @return Current state of the syntax transformation.
-     */
-    public String getTargetDocumentContent()
-    {
-        return bufferedContent;
-    }
-
-    /**
      * @return The binary sourceData of the original office document.
      */
     public byte[] getSourceData()
@@ -260,10 +257,8 @@ public class OfficeImporterContext
      */
     public String getEncodedContent() throws OfficeImporterException
     {
-        String encoding = null;
         try {
-            encoding = docBridge.getDefaultEncoding();
-            return new String(getTargetDocumentContent().getBytes(), encoding);
+            return new String(bufferedContent.getBytes(), DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException ex) {
             throw new OfficeImporterException("Inernal error while encoding document content.", ex);
         }

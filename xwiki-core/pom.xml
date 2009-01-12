@@ -575,56 +575,78 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-groovy</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-box</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-code</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-id</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-toc</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-include</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-html</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-parser-doxia</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-parser-xwiki10</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -635,11 +657,15 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-cache-jbosscache</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-cache-oscache</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

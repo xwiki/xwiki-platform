@@ -524,6 +524,11 @@
       <artifactId>poi</artifactId>
       <version>3.0-FINAL</version>
     </dependency>
+    <!-- Used by XWiki 1.0 Groovy macro -->
+    <dependency>
+      <groupId>com.sun.script</groupId>
+      <artifactId>groovy-engine</artifactId>
+    </dependency>
 
     <!-- Other XWiki modules -->
     <dependency>

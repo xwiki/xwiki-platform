@@ -41,7 +41,6 @@
     <dependency>
       <groupId>com.sun.script</groupId>
       <artifactId>groovy-engine</artifactId>
-      <version>1.6-RC-1-xwiki</version>
     </dependency>
 
     <!-- Testing dependencies -->

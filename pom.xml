@@ -40,6 +40,17 @@
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</url>
   </scm>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Standard dependencies used in several modules, essential for XWiki -->
+      <!-- Groovy engine -->
+      <dependency>
+        <groupId>com.sun.script</groupId>
+        <artifactId>groovy-engine</artifactId>
+        <version>1.6-RC-1-xwiki</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

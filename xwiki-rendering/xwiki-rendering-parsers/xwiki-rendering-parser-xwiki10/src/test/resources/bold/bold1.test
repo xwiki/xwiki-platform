@@ -6,5 +6,4 @@ this is * not bold *
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-**bold** not bold*
-this is * not bold *
+**bold** not bold* this is * not bold *

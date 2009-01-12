@@ -202,5 +202,25 @@
         <priority>1000</priority>
       </configuration>
     </component>
+    
+    <!-- XHTML spaces interpretation -->
+    <component>
+      <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
+      <role-hint>standalonenewlinecleanning</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.StandaloneNewLineCleaningFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <priority>2000</priority>
+      </configuration>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
+      <role-hint>spacescleanning</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.SpacesCleaningFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <priority>2000</priority>
+      </configuration>
+    </component>
   </components>
 </component-set>

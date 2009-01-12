@@ -1,9 +1,32 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-~~italic~~ not italic~~
-this is ~~ not italic ~~
+#set($var = "value")
+
+
+
+
+
+
+
+
+
+
+* $var 1
+* $var
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-//italic// not italic~~ this is ~~ not italic ~~
+{{velocity}}#set($var = "value"){{/velocity}}
+
+
+
+
+
+
+
+
+
+
+* {{velocity}}$var 1
+* $var{{/velocity}}

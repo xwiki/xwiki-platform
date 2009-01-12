@@ -38,7 +38,7 @@ public class FilterContext
      * Match registered content identifier.
      */
     public static final Pattern XWIKI1020TOKEN_PATTERN =
-        Pattern.compile("\\%" + FilterContext.XWIKI1020TOKEN + "([\\d]+)\\%");
+        Pattern.compile("\\00" + FilterContext.XWIKI1020TOKEN + "([\\d]+)\\00");
 
     public static final String XWIKI1020TOKEN = "XWIKI1020TOKEN";
 
@@ -55,7 +55,7 @@ public class FilterContext
     {
         this.protectedContentList.add(content);
 
-        return "%" + XWIKI1020TOKEN + (this.protectedContentList.size() - 1) + "%";
+        return "\0" + XWIKI1020TOKEN + (this.protectedContentList.size() - 1) + "\0";
     }
 
     /**

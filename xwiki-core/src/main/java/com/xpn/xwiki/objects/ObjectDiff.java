@@ -21,15 +21,22 @@
 
 package com.xpn.xwiki.objects;
 
-public class ObjectDiff extends Object {
+public class ObjectDiff extends Object
+{
     private String className;
+
     private int number;
+
     private String propName;
+
     private Object prevValue;
+
     private Object newValue;
+
     private String action;
 
-    public ObjectDiff(String className, int number, String action, String propName, Object prevValue, Object newValue) {
+    public ObjectDiff(String className, int number, String action, String propName, Object prevValue, Object newValue)
+    {
         this.setClassName(className);
         this.setNumber(number);
         this.setAction(action);
@@ -38,55 +45,69 @@ public class ObjectDiff extends Object {
         this.setNewValue(newValue);
     }
 
-    public String getClassName() {
-        return className;
+    public String getClassName()
+    {
+        return this.className;
     }
 
-    public void setClassName(String className) {
+    public void setClassName(String className)
+    {
         this.className = className;
     }
 
-    public int getNumber() {
-        return number;
+    public int getNumber()
+    {
+        return this.number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(int number)
+    {
         this.number = number;
     }
 
-    public String getPropName() {
-        return propName;
+    public String getPropName()
+    {
+        return this.propName;
     }
 
-    public void setPropName(String propName) {
+    public void setPropName(String propName)
+    {
         this.propName = propName;
     }
 
-    public Object getPrevValue() {
-        return prevValue;
+    public Object getPrevValue()
+    {
+        return this.prevValue;
     }
 
-    public void setPrevValue(Object prevValue) {
+    public void setPrevValue(Object prevValue)
+    {
         this.prevValue = prevValue;
     }
 
-    public Object getNewValue() {
-        return newValue;
+    public Object getNewValue()
+    {
+        return this.newValue;
     }
 
-    public void setNewValue(Object newValue) {
+    public void setNewValue(Object newValue)
+    {
         this.newValue = newValue;
     }
 
-    public String getAction() {
-        return action;
+    public String getAction()
+    {
+        return this.action;
     }
 
-    public void setAction(String action) {
+    public void setAction(String action)
+    {
         this.action = action;
     }
 
-    public String toString() {
+    @Override
+    public String toString()
+    {
         StringBuffer buffer = new StringBuffer();
         buffer.append(getClassName());
         buffer.append(".");

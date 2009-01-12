@@ -56,7 +56,7 @@
 </property>
 </object>
 <content> 
-&lt;h1&gt;XWiki Office Importer&lt;/h1&gt;
+1 Office Importer
 &lt;form action='$xwiki.getURL("XWiki.OfficeImporterResults","view")' enctype="multipart/form-data" method="post"&gt;
 {table}&lt;p&gt;Document&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
 &lt;p&gt;Target Space&lt;/p&gt;|&lt;p&gt;&lt;input name="targetSpace" type="text"/&gt;&lt;/p&gt;

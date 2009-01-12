@@ -19,9 +19,11 @@
  */
 package org.xwiki.rest.resources;
 
+import org.restlet.data.MediaType;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.XWikiRestApplication;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.XWikiRoot;
 
@@ -36,5 +38,22 @@ public class RootResource extends XWikiResource
         XWikiRoot xwikiRoot = DomainObjectFactory.createXWikiRoot(getRequest(), xwikiApi, resourceClassRegistry);
 
         return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), xwikiRoot);
+    }
+
+    /* Mimic the behavior of a OPTION request to the root of a WADL application in RESTlet */
+    @Override
+    public boolean allowOptions()
+    {
+        return true;
+    }
+
+    @Override
+    public void handleOptions()
+    {
+        if (isAutoDescribed()) {
+            XWikiRestApplication application = (XWikiRestApplication) getApplication();
+            getResponse().setEntity(
+                application.wadlRepresent(new Variant(MediaType.APPLICATION_WADL_XML), getRequest(), getResponse()));
+        }
     }
 }

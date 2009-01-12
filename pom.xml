@@ -72,5 +72,6 @@
     <module>xwiki-query</module>
     <module>xwiki-webdav</module>
     <module>xwiki-officeimporter</module>
+    <module>xwiki-rest</module>
   </modules>
 </project>

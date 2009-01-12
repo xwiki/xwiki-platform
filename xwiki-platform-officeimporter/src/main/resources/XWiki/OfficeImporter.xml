@@ -6,7 +6,7 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>XWiki.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
@@ -56,13 +56,14 @@
 </property>
 </object>
 <content> 
-&lt;h1&gt;Office Importer&lt;/h1&gt;
+&lt;h1&gt;XWiki Office Importer&lt;/h1&gt;
 &lt;form action='$xwiki.getURL("XWiki.OfficeImporterResults","view")' enctype="multipart/form-data" method="post"&gt;
-{table}&lt;p&gt;Document|&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
-&lt;p&gt;Target Space|&lt;input name="targetSpace" type="textarea"/&gt;&lt;/p&gt;
-&lt;p&gt;Target Page|&lt;input name="targetPage" type="textarea"/&gt;&lt;/p&gt;
-&lt;p&gt;Options&lt;/p&gt;|&lt;p&gt;Style Filtering :&lt;/p&gt;&lt;p&gt;&lt;input name="filterStyles" type="radio" value="strict"&gt;Strict (Clean Wiki Content)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="moderate" checked&gt;Moderate (Better Appearance)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="none"&gt;None (No Filtering)&lt;/p&gt;
+{table}&lt;p&gt;Document&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
+&lt;p&gt;Target Space&lt;/p&gt;|&lt;p&gt;&lt;input name="targetSpace" type="text"/&gt;&lt;/p&gt;
+&lt;p&gt;Target Page&lt;/p&gt;|&lt;p&gt;&lt;input name="targetPage" type="text"/&gt;&lt;/p&gt;
+&lt;p&gt;Options&lt;/p&gt;|&lt;p&gt;Style Filtering :&lt;/p&gt;&lt;p&gt;&lt;input name="filterStyles" type="radio" value="strict"/&gt;Strict (Clean Wiki Content)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="moderate" checked="checked"/&gt;Moderate (Better Appearance)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="none"/&gt;None (No Filtering)&lt;/p&gt;
 {table}
 &lt;p&gt;&lt;input type="submit" value="Import"/&gt;&lt;/p&gt;
-&lt;/form&gt;</content>
+&lt;/form&gt;
+</content>
 </xwikidoc>

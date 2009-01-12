@@ -35,7 +35,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-script</artifactId>
+      <artifactId>xwiki-core-rendering-macro-script</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
@@ -54,20 +54,20 @@
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-script</artifactId>
+      <artifactId>xwiki-core-rendering-macro-script</artifactId>
       <version>${pom.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-include</artifactId>
+      <artifactId>xwiki-core-rendering-macro-include</artifactId>
       <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-macro-html</artifactId>
+      <artifactId>xwiki-core-rendering-macro-html</artifactId>
       <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>

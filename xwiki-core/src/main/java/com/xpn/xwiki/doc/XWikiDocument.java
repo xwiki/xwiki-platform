@@ -1370,6 +1370,7 @@ public class XWikiDocument implements DocumentModelBridge
             for (BaseObject otherObject : templatedoc.getxWikiObjects().get(name)) {
                 if (otherObject != null) {
                     BaseObject myObject = (BaseObject) otherObject.clone();
+                    // BaseObject.clone copies the GUID, so randomize it for the copied object.
                     myObject.setGuid(UUID.randomUUID().toString());
                     myObjects.add(myObject);
                     myObject.setNumber(myObjects.size() - 1);
@@ -1880,6 +1881,7 @@ public class XWikiDocument implements DocumentModelBridge
                     BaseObject newobject =
                         (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_" + i), oldobject);
                     newobject.setNumber(oldobject.getNumber());
+                    newobject.setGuid(oldobject.getGuid());
                     newobject.setName(getFullName());
                     newObjects.set(newobject.getNumber(), newobject);
                 }
@@ -3566,8 +3568,8 @@ public class XWikiDocument implements DocumentModelBridge
                         // The object was deleted.
                         dlist = new BaseObject().getDiff(originalObj, context);
                         ObjectDiff deleteMarker =
-                            new ObjectDiff(originalObj.getClassName(), originalObj.getNumber(), "object-removed", "",
-                                "", "");
+                            new ObjectDiff(originalObj.getClassName(), originalObj.getNumber(), originalObj.getGuid(),
+                                "object-removed", "", "", "");
                         dlist.add(0, deleteMarker);
                     } else {
                         // The object exists in both versions, but might have been changed.
@@ -3591,9 +3593,11 @@ public class XWikiDocument implements DocumentModelBridge
                         originalObj = new BaseObject();
                         originalObj.setClassName(newObj.getClassName());
                         originalObj.setNumber(newObj.getNumber());
+                        originalObj.setGuid(newObj.getGuid());
                         List<ObjectDiff> dlist = newObj.getDiff(originalObj, context);
                         ObjectDiff addMarker =
-                            new ObjectDiff(newObj.getClassName(), newObj.getNumber(), "object-added", "", "", "");
+                            new ObjectDiff(newObj.getClassName(), newObj.getNumber(), newObj.getGuid(), "object-added",
+                                "", "", "");
                         dlist.add(0, addMarker);
                         if (dlist.size() > 0) {
                             difflist.add(dlist);
@@ -3766,6 +3770,9 @@ public class XWikiDocument implements DocumentModelBridge
         if (objects != null) {
             for (BaseObject object : objects) {
                 object.setName(newDocumentName);
+                // Since GUIDs are supposed to be Unique, although this object holds the same data, it is not exactly
+                // the same object, so it should have a different identifier.
+                object.setGuid(UUID.randomUUID().toString());
             }
         }
         XWikiDocumentArchive archive = newdoc.getDocumentArchive();
@@ -4005,14 +4012,10 @@ public class XWikiDocument implements DocumentModelBridge
         form.readRequest();
 
         String className = form.getClassName();
-        int nb = createNewObject(className, context);
-        BaseObject oldobject = getObject(className, nb);
-        BaseClass baseclass = oldobject.getxWikiClass(context);
-        BaseObject newobject = (BaseObject) baseclass.fromMap(form.getObject(className), oldobject);
-        newobject.setNumber(oldobject.getNumber());
-        newobject.setName(getFullName());
-        setObject(className, nb, newobject);
-        return newobject;
+        BaseObject object = newObject(className, context);
+        BaseClass baseclass = object.getxWikiClass(context);
+        baseclass.fromMap(form.getObject(className), object);
+        return object;
     }
 
     // This functions adds an object from an new object creation form
@@ -4068,16 +4071,10 @@ public class XWikiDocument implements DocumentModelBridge
     public BaseObject addObjectFromRequest(String className, String prefix, int num, XWikiContext context)
         throws XWikiException
     {
-        int nb = createNewObject(className, context);
-        BaseObject oldobject = getObject(className, nb);
-        BaseClass baseclass = oldobject.getxWikiClass(context);
-        BaseObject newobject =
-            (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), prefix + className + "_" + num),
-                oldobject);
-        newobject.setNumber(oldobject.getNumber());
-        newobject.setName(getFullName());
-        setObject(className, nb, newobject);
-        return newobject;
+        BaseObject object = newObject(className, context);
+        BaseClass baseclass = object.getxWikiClass(context);
+        baseclass.fromMap(Util.getObject(context.getRequest(), prefix + className + "_" + num), object);
+        return object;
     }
 
     // This functions adds an object from an new object creation form
@@ -4110,6 +4107,7 @@ public class XWikiDocument implements DocumentModelBridge
             (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), prefix + className + "_" + nb),
                 oldobject);
         newobject.setNumber(oldobject.getNumber());
+        newobject.setGuid(oldobject.getGuid());
         newobject.setName(getFullName());
         setObject(className, nb, newobject);
         return newobject;

@@ -22,9 +22,11 @@
 package com.xpn.xwiki.objects;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
@@ -37,6 +39,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable, Cloneable
 {
+    private String guid = UUID.randomUUID().toString();
+
     /**
      * {@inheritDoc}
      * 
@@ -127,6 +131,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public Object clone()
     {
         BaseObject object = (BaseObject) super.clone();
+        object.setGuid(getGuid());
 
         return object;
     }
@@ -172,6 +177,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         oel.add(exportProperty("name", getName()));
         oel.add(exportProperty("number", String.valueOf(getNumber())));
         oel.add(exportProperty("className", getClassName()));
+        oel.add(exportProperty("guid", getGuid()));
 
         // Iterate over values/properties sorted by field name so that the values are
         // exported to XML in a consistent order.
@@ -210,6 +216,15 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         if (number != null) {
             setNumber(Integer.parseInt(number));
         }
+
+        // If no GUID exists in the XML, then use the one randomly generated at initialization
+        Element guidElement = oel.element("guid");
+        if (guidElement != null) {
+            if (guidElement.getText() != null) {
+                this.guid = guidElement.getText();
+            }
+        }
+
         List list = oel.elements("property");
         for (int i = 0; i < list.size(); i++) {
             Element pcel = (Element) ((Element) list.get(i)).elements().get(0);
@@ -222,6 +237,77 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                 safeput(name, property);
             }
         }
+    }
+
+    @Override
+    public List<ObjectDiff> getDiff(Object oldEntity, XWikiContext context)
+    {
+        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        BaseObject oldObject = (BaseObject) oldEntity;
+        // Iterate over the new properties first, to handle changed and added objects
+        for (String propertyName : this.getPropertyList()) {
+            BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
+            BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
+
+            if (oldProperty == null) {
+                // The property exist in the new object, but not in the old one
+                if ((newProperty != null) && (!newProperty.toText().equals(""))) {
+                    String newPropertyValue =
+                        (newProperty.getValue() instanceof String) ? newProperty.toText()
+                            : ((PropertyClass) getxWikiClass(context).getField(propertyName)).displayView(propertyName,
+                                this, context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "added", propertyName, "",
+                        newPropertyValue));
+                }
+            } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
+                // The property exists in both objects and is different
+                BaseClass bclass = getxWikiClass(context);
+                PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+                if (pclass != null) {
+                    // Put the values as they would be displayed in the interface
+                    String newPropertyValue =
+                        (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
+                            propertyName, this, context);
+                    String oldPropertyValue =
+                        (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
+                            propertyName, oldObject, context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "changed", propertyName,
+                        oldPropertyValue, newPropertyValue));
+                } else {
+                    // Cannot get property definition, so use the plain value
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "changed", propertyName,
+                        oldProperty.toText(), newProperty.toText()));
+                }
+            }
+        }
+
+        // Iterate over the old properties, in case there are some removed properties
+        for (String propertyName : oldObject.getPropertyList()) {
+            BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
+            BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
+
+            if (newProperty == null) {
+                // The property exists in the old object, but not in the new one
+                if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
+                    BaseClass bclass = oldObject.getxWikiClass(context);
+                    PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+                    if (pclass != null) {
+                        // Put the values as they would be displayed in the interface
+                        String oldPropertyValue =
+                            (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
+                                propertyName, oldObject, context);
+                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(), oldObject
+                            .getGuid(), "removed", propertyName, oldPropertyValue, ""));
+                    } else {
+                        // Cannot get property definition, so use the plain value
+                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(), oldObject
+                            .getGuid(), "removed", propertyName, oldProperty.toText(), ""));
+                    }
+                }
+            }
+        }
+
+        return difflist;
     }
 
     public com.xpn.xwiki.api.Object newObjectApi(BaseObject obj, XWikiContext context)
@@ -248,5 +334,15 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         if (prop != null) {
             safeput(fieldname, prop);
         }
+    }
+
+    public String getGuid()
+    {
+        return this.guid;
+    }
+
+    public void setGuid(String guid)
+    {
+        this.guid = guid;
     }
 }

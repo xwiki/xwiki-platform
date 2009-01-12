@@ -362,6 +362,7 @@ public class DomainObjectFactory
         result.setPageMinorVersion(document.getRCSVersion().at(1));
         result.setClassName(object.getxWikiClass().getName());
         result.setId(object.getNumber());
+        result.setGuid(object.getGuid());
         result.setPrettyName(prettyName);
 
         return result;
@@ -408,6 +409,7 @@ public class DomainObjectFactory
         result.setPageMinorVersion(document.getRCSVersion().at(1));
         result.setClassName(object.getxWikiClass().getName());
         result.setId(object.getNumber());
+        result.setGuid(object.getGuid());
         result.setPrettyName(prettyName);
 
         return result;

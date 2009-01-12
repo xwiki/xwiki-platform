@@ -27,6 +27,8 @@ public class ObjectDiff extends Object
 
     private int number;
 
+    private String guid;
+
     private String propName;
 
     private Object prevValue;
@@ -37,8 +39,15 @@ public class ObjectDiff extends Object
 
     public ObjectDiff(String className, int number, String action, String propName, Object prevValue, Object newValue)
     {
+        this(className, number, "", action, propName, prevValue, newValue);
+    }
+
+    public ObjectDiff(String className, int number, String guid, String action, String propName, Object prevValue,
+        Object newValue)
+    {
         this.setClassName(className);
         this.setNumber(number);
+        this.setGuid(guid);
         this.setAction(action);
         this.setPropName(propName);
         this.setPrevValue(prevValue);
@@ -63,6 +72,16 @@ public class ObjectDiff extends Object
     public void setNumber(int number)
     {
         this.number = number;
+    }
+
+    public String getGuid()
+    {
+        return this.guid;
+    }
+
+    public void setGuid(String guid)
+    {
+        this.guid = guid;
     }
 
     public String getPropName()

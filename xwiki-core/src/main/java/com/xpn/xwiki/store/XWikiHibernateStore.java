@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.Vector;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -566,6 +567,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     for (BaseObject obj : objects) {
                         if (obj != null) {
                             obj.setName(doc.getFullName());
+                            /* If the object doesn't have a GUID, create it before saving */
+                            if (StringUtils.isEmpty(obj.getGuid())) {
+                                obj.setGuid(UUID.randomUUID().toString());
+                            }
                             saveXWikiCollection(obj, context, false);
                         }
                     }
@@ -704,6 +709,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             newobject.setClassName(object.getClassName());
                             newobject.setName(object.getName());
                             newobject.setNumber(object.getNumber());
+                            newobject.setGuid(object.getGuid());
                             object = newobject;
                         }
                         loadXWikiCollection(object, doc, context, false, true);
@@ -1173,6 +1179,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 cobject.setName(object.getName());
                 cobject.setClassName(object.getClassName());
                 cobject.setNumber(object.getNumber());
+                if (object instanceof BaseObject) {
+                    cobject.setGuid(((BaseObject) object).getGuid());
+                }
                 cobject.setId(object.getId());
                 if (evict) {
                     session.evict(cobject);

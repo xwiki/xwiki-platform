@@ -1043,13 +1043,29 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             throw new Exception(String.format("Unable to store object. Document locked by %s", doc.getLockingUser()));
         }
 
-        com.xpn.xwiki.api.Object xwikiObject = doc.getObject(object.getClassName(), object.getId());
+        com.xpn.xwiki.api.Object xwikiObject = null;
+
+        /* First try to lookup the object by guid, if it fails use classname[number] */
+        if (object.getGuid() != null) {
+            xwikiObject = XWikiUtils.getObjectByGuid(doc, object.getGuid());
+        }
+        if (xwikiObject == null) {
+            xwikiObject = doc.getObject(object.getClassName(), object.getId());
+        }
 
         /* If the object does not exist create it */
         if (xwikiObject == null) {
             int id = doc.createNewObject(object.getClassName());
             /* Get the newly created object for update */
             xwikiObject = doc.getObject(object.getClassName(), id);
+        }
+
+        /*
+         * Allow clients to specify/override a guid. This is necessary to allow replication of objects between xwikis.
+         * If it's null then a guid will be generated when the page is saved.
+         */
+        if (object.getGuid() != null) {
+            xwikiObject.setGuid(object.getGuid());
         }
 
         /*
@@ -1276,5 +1292,32 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         } else {
             return storeObject(token, objectMap);
         }
+    }
+
+    /**
+     * The getObject function will return an XWikiObject where only non-null properties are included in the mapping
+     * 'field' -> 'value' In order to know all the available fields and their respective types and attributes, clients
+     * should refer to the object's class.
+     * 
+     * @param token The authentication token.
+     * @param pageId The pageId.
+     * @param guid The object's guid.
+     * @return The XWikiObject containing the information about all the properties contained in the selected object.
+     * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
+     *             access it or no object with the given id exist in the page.
+     */
+    public Map getObject(String token, String pageId, String guid) throws Exception
+    {
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
+        LOG.debug(String.format("User %s has called getObject()", user.getName()));
+
+        Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
+
+        com.xpn.xwiki.api.Object object = XWikiUtils.getObjectByGuid(doc, guid);
+        if (object == null) {
+            throw new Exception(String.format("[Unable to find object with guid '%s']", guid));
+        }
+
+        return DomainObjectFactory.createXWikiObject(this.xwiki, this.xwikiContext, doc, object).toRawMap();
     }
 }

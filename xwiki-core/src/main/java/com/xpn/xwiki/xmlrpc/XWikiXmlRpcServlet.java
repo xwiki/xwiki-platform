@@ -46,7 +46,7 @@ public class XWikiXmlRpcServlet extends XmlRpcServlet
 {
     private static final long serialVersionUID = 3745689092652029366L;
 
-	@Override
+    @Override
     protected PropertyHandlerMapping newPropertyHandlerMapping(URL url) throws IOException, XmlRpcException
     {
         PropertyHandlerMapping mapping = new PropertyHandlerMapping();

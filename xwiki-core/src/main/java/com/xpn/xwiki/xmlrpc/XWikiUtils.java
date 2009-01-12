@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.xwiki.xmlrpc.model.XWikiExtendedId;
@@ -145,6 +147,20 @@ public class XWikiUtils
         }
 
         return doc;
+    }
+
+    public static com.xpn.xwiki.api.Object getObjectByGuid(Document doc, String guid)
+    {
+        Map<String, Vector<com.xpn.xwiki.api.Object>> classToObjectsMap = doc.getxWikiObjects();
+        for (Entry<String, Vector<com.xpn.xwiki.api.Object>> classObjects : classToObjectsMap.entrySet()) {
+            for (com.xpn.xwiki.api.Object object : classObjects.getValue()) {
+                if (guid.equals(object.getGuid())) {
+                    return object;
+                }
+            }
+        }
+
+        return null;
     }
 
     public static Object xmlRpcConvert(Object object)

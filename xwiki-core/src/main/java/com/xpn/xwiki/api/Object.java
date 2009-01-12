@@ -46,6 +46,16 @@ public class Object extends Collection
         }
     }
 
+    public String getGuid()
+    {
+        return getBaseObject().getGuid();
+    }
+
+    public void setGuid(String guid)
+    {
+        getBaseObject().setGuid(guid);
+    }
+
     public java.lang.Object get(String name)
     {
         String docname = getCollection().getName();

@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
@@ -62,7 +63,7 @@ public class HTMLFilter extends AbstractFilter
         int currentIndex = 0;
         boolean inHTMLMacro = false;
         boolean htmlMacroInVelocityMacro = false;
-        
+
         int nbVOpen = 0;
         int nbVClose = 0;
         int nbVOpenInHTML = 0;
@@ -84,9 +85,9 @@ public class HTMLFilter extends AbstractFilter
 
                     ++nbVOpen;
                 } else {
-                    result.append(before);
+                    result.append(StringEscapeUtils.unescapeHtml(before));
                     result.append(matchedContent);
-                    
+
                     htmlMacroInVelocityMacro = true;
                 }
             } else if (matcher.group(2) != null) {
@@ -94,10 +95,10 @@ public class HTMLFilter extends AbstractFilter
                     nonHtmlContent.append(before);
                     nonHtmlContentWithVelocity.append(before);
                     nonHtmlContentWithVelocity.append(matchedContent);
-                    
+
                     ++nbVClose;
                 } else {
-                    result.append(before);
+                    result.append(StringEscapeUtils.unescapeHtml(before));
                     result.append(matchedContent);
 
                     htmlMacroInVelocityMacro = false;
@@ -105,35 +106,39 @@ public class HTMLFilter extends AbstractFilter
             } else {
                 if (StringUtils.countMatches(nonHtmlContent.toString() + before, "\n") > 10) {
                     if (!htmlMacroInVelocityMacro && nbVOpen > 0) {
-                        result.append(filterContext.addProtectedContent("{{velocity}}", VelocityFilter.VELOCITYOPEN_SUFFIX));
+                        result.append(filterContext.addProtectedContent("{{velocity}}",
+                            VelocityFilter.VELOCITYOPEN_SUFFIX));
                     }
                     result.append(filterContext.addProtectedContent("{{html wiki=true}}"));
                     result.append(htmlContent);
                     result.append(filterContext.addProtectedContent("{{/html}}"));
-                    result.append(nonHtmlContentWithVelocity);
+                    result.append(StringEscapeUtils.unescapeHtml(nonHtmlContentWithVelocity.toString()));
                     if (nbVCloseInHTML > nbVOpenInHTML) {
-                        result.append(filterContext.addProtectedContent("{{/velocity}}", VelocityFilter.VELOCITYCLOSE_SUFFIX));
+                        result.append(filterContext.addProtectedContent("{{/velocity}}",
+                            VelocityFilter.VELOCITYCLOSE_SUFFIX));
                     }
 
-                    result.append(before);
+                    result.append(StringEscapeUtils.unescapeHtml(before));
 
                     htmlContent = new StringBuffer();
-                    htmlMacroInVelocityMacro = (htmlMacroInVelocityMacro && nbVOpen + nbVOpenInHTML == nbVClose + nbVCloseInHTML) || (!htmlMacroInVelocityMacro && nbVOpen + nbVOpenInHTML > nbVClose + nbVCloseInHTML);
+                    htmlMacroInVelocityMacro =
+                        (htmlMacroInVelocityMacro && nbVOpen + nbVOpenInHTML == nbVClose + nbVCloseInHTML)
+                            || (!htmlMacroInVelocityMacro && nbVOpen + nbVOpenInHTML > nbVClose + nbVCloseInHTML);
                     nbVOpenInHTML = 0;
                     nbVCloseInHTML = 0;
                 } else {
                     htmlContent.append(nonHtmlContent);
 
                     if (!inHTMLMacro) {
-                        result.append(before);
+                        result.append(StringEscapeUtils.unescapeHtml(before));
                     } else {
                         htmlContent.append(before);
-                        
+
                         nbVOpenInHTML += nbVOpen;
                         nbVCloseInHTML += nbVClose;
-                    }                    
+                    }
                 }
-                
+
                 nbVOpen = 0;
                 nbVClose = 0;
 
@@ -158,13 +163,13 @@ public class HTMLFilter extends AbstractFilter
             result.append(filterContext.addProtectedContent("{{html wiki=true}}"));
             result.append(htmlContent);
             result.append(filterContext.addProtectedContent("{{/html}}"));
-            result.append(nonHtmlContentWithVelocity);
+            result.append(StringEscapeUtils.unescapeHtml(nonHtmlContentWithVelocity.toString()));
             if (nbVCloseInHTML > nbVOpenInHTML) {
                 result.append(filterContext.addProtectedContent("{{/velocity}}", VelocityFilter.VELOCITYCLOSE_SUFFIX));
             }
         }
 
-        result.append(content.substring(currentIndex));
+        result.append(StringEscapeUtils.unescapeHtml(content.substring(currentIndex)));
 
         return result.toString();
     }

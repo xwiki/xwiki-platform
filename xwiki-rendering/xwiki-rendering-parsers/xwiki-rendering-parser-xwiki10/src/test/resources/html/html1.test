@@ -8,13 +8,13 @@
 
 
 
+&amp;
 
 
 
 
 
-
-<div class="class">*bold* some text</div>
+<div class="class">*bold* &amp; some text</div>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -23,10 +23,10 @@
 
 
 
+&
 
 
 
 
 
-
-{{html wiki="true"}}<div class="class">**bold** some text</div>{{/html}}
+{{html wiki="true"}}<div class="class">**bold** &amp; some text</div>{{/html}}

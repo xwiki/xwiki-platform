@@ -49,19 +49,28 @@ public class DefaultDocumentAccessBridgeTest extends AbstractBridgedXWikiCompone
         this.mockURLFactory = mock(XWikiURLFactory.class);
 
         getContext().setURLFactory((XWikiURLFactory) mockURLFactory.proxy());
-        getContext().setDoc(new XWikiDocument("Space", "Page"));
         getContext().setWiki((XWiki) mockXWiki.proxy());
 
         this.documentAccessBridge = (DocumentAccessBridge) getComponentManager().lookup(DocumentAccessBridge.ROLE);
     }
 
-    public void testGetUrl() throws Exception
+    public void testGetUrlWithOnlyAnchor() throws Exception
     {
-        this.mockXWiki.stubs().method("getDocument").will(returnValue(new XWikiDocument("Space", "Page")));
+        getContext().setDoc(new XWikiDocument("Space", "Page"));
         this.mockURLFactory.stubs().method("createURL").will(returnValue(new URL("http://127.0.0.1/xwiki/bn/view/Space/Page#id")));
         this.mockURLFactory.stubs().method("getURL").will(returnValue("/xwiki/bn/view/Space/Page#id"));
 
         assertEquals("/xwiki/bn/view/Space/Page#id", this.documentAccessBridge.getURL("", "view", "", "id"));
         assertEquals("/xwiki/bn/view/Space/Page#id", this.documentAccessBridge.getURL(null, "view", "", "id"));
+    }
+    
+    public void testGetUrlEmptyDocumentWithoutAnchor() throws Exception
+    {
+        this.mockXWiki.stubs().method("getDocument").will(returnValue(new XWikiDocument()));
+        this.mockURLFactory.stubs().method("createURL").will(returnValue(new URL("http://127.0.0.1/xwiki/bn/view/Main/WebHome")));
+        this.mockURLFactory.stubs().method("getURL").will(returnValue("/xwiki/bn/view/Main/WebHome"));
+
+        assertEquals("/xwiki/bn/view/Main/WebHome", this.documentAccessBridge.getURL("", "view", "", ""));
+        assertEquals("/xwiki/bn/view/Main/WebHome", this.documentAccessBridge.getURL(null, "view", "", ""));
     }
 }

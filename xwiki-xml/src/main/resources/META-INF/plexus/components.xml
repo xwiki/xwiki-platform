@@ -60,11 +60,6 @@
           <role>org.xwiki.xml.html.filter.CleaningFilter</role>
           <role-hint>list</role-hint>
           <field-name>filters</field-name>
-        </requirement>
-        <requirement>
-          <role>org.xwiki.xml.html.filter.CleaningFilter</role>
-          <role-hint>linebreak</role-hint>
-          <field-name>filters</field-name>
         </requirement>                
       </requirements>      
     </component>

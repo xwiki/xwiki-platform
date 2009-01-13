@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1154086661000</creationDate>
-<date>1212586489000</date>
-<contentUpdateDate>1212586489000</contentUpdateDate>
-<version>1.1</version>
+<date>1231859189000</date>
+<contentUpdateDate>1231859189000</contentUpdateDate>
+<version>3.1</version>
 <title>Document Information</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -95,6 +95,7 @@
 <name>Panels.DocumentInformation</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>883830ff-265e-4075-aec2-b7a4569f9266</guid>
 <property>
 <category>Tools</category>
 </property>
@@ -115,8 +116,9 @@ $xwiki.jsx.use($paneldoc.fullName)
 &lt;dd&gt;
 &lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
 &lt;option value="xwiki/1.0"#if($tdoc.getSyntaxId().equalsIgnoreCase("xwiki/1.0")) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
+#set($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
 #foreach ($syntax in $syntaxFactory.getAvailableSyntaxes())
-  #if($xwiki.getConfiguredSyntaxes().contains($syntax.toIdString()))
+  #if($configuredSyntaxes.contains($syntax.toIdString()) &amp;&amp; !$syntax.toIdString().equalsIgnoreCase("xwiki/1.0"))
     &lt;option value="$syntax.toIdString()"#if($tdoc.getSyntaxId().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
   #end  
 #end
@@ -145,7 +147,7 @@ $xwiki.jsx.use($paneldoc.fullName)
 #panelfooter()</content>
 </property>
 <property>
-<description>Displays and allows editing the document title, parent and inclded documents.</description>
+<description>Displays and allows editing the document title, parent and included documents.</description>
 </property>
 <property>
 <name>Document Information</name>
@@ -224,6 +226,7 @@ $xwiki.jsx.use($paneldoc.fullName)
 <name>Panels.DocumentInformation</name>
 <number>0</number>
 <className>XWiki.JavaScriptExtension</className>
+<guid>c91c93de-a33e-4426-86db-d7ab8751551d</guid>
 <property>
 <cache>long</cache>
 </property>

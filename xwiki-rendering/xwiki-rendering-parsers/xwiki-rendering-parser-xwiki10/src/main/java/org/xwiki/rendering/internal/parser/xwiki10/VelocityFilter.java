@@ -41,6 +41,10 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  */
 public class VelocityFilter extends AbstractFilter implements Composable
 {
+    public static final String VELOCITYOPEN_SUFFIX = "velocityopen";
+
+    public static final String VELOCITYCLOSE_SUFFIX = "velocityclose";
+
     public static final String VELOCITY_COMMENT_PATTERN = "((?m)\\n?\\#\\#.*$)|((?s)\\#\\*(.*?)\\*\\#)";
 
     public static final String VELOCITY_MACRO_PATTERN = "\\#(\\w+)\\(([^)]*)\\)";
@@ -75,6 +79,7 @@ public class VelocityFilter extends AbstractFilter implements Composable
         Matcher matcher = VELOCITY_PATTERN.matcher(content);
 
         int currentIndex = 0;
+
         boolean inVelocityMacro = false;
         VelocityMacroConverter currentMacro = null;
         String nonVelocityContent = null;
@@ -116,14 +121,14 @@ public class VelocityFilter extends AbstractFilter implements Composable
             }
 
             if (StringUtils.countMatches(nonVelocityContent, "\n") > 10) {
-                result.append(filterContext.addProtectedContent("{{/velocity}}"));
+                result.append(filterContext.addProtectedContent("{{/velocity}}", VELOCITYCLOSE_SUFFIX));
                 inVelocityMacro = false;
             }
 
             result.append(nonVelocityContent);
 
             if (!inVelocityMacro) {
-                result.append(filterContext.addProtectedContent("{{velocity}}"));
+                result.append(filterContext.addProtectedContent("{{velocity}}", VELOCITYOPEN_SUFFIX));
                 matchedContent = CleanUtil.removeFirstNewLines(matchedContent, 1, false);
                 inVelocityMacro = true;
             }
@@ -140,7 +145,7 @@ public class VelocityFilter extends AbstractFilter implements Composable
 
         // Close velocity macro
         if (inVelocityMacro) {
-            result.append(filterContext.addProtectedContent("{{/velocity}}"));
+            result.append(filterContext.addProtectedContent("{{/velocity}}", VELOCITYCLOSE_SUFFIX));
         }
 
         if (nonVelocityContent != null) {

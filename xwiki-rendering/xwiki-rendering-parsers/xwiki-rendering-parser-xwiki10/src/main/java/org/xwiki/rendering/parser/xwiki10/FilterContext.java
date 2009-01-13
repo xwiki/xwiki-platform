@@ -34,11 +34,19 @@ import java.util.regex.Pattern;
  */
 public class FilterContext
 {
+    public static final String XWIKI1020TOKEN_O = "\1";
+
+    public static final String XWIKI1020TOKEN_OP = "\\01";
+
+    public static final String XWIKI1020TOKEN_C = "\1";
+
+    public static final String XWIKI1020TOKEN_CP = "\\01";
+
     /**
      * Match registered content identifier.
      */
     public static final Pattern XWIKI1020TOKEN_PATTERN =
-        Pattern.compile("\\00" + FilterContext.XWIKI1020TOKEN + "([\\d]+)\\00");
+        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKEN + "(\\p{Alpha}*)([\\d]+)" + XWIKI1020TOKEN_CP);
 
     public static final String XWIKI1020TOKEN = "XWIKI1020TOKEN";
 
@@ -53,9 +61,14 @@ public class FilterContext
      */
     public String addProtectedContent(String content)
     {
+        return addProtectedContent(content, "");
+    }
+
+    public String addProtectedContent(String content, String suffix)
+    {
         this.protectedContentList.add(content);
 
-        return "\0" + XWIKI1020TOKEN + (this.protectedContentList.size() - 1) + "\0";
+        return XWIKI1020TOKEN_O + XWIKI1020TOKEN + suffix + (this.protectedContentList.size() - 1) + XWIKI1020TOKEN_C;
     }
 
     /**

@@ -37,7 +37,7 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test XWiki1.0 -> XWiki2.0 conversion");
 
-        // Velocity comments
+        // Velocity
         suite.addTestsFromResource("velocity/velocity1", false);
         suite.addTestsFromResource("velocity/velocity2", false);
         suite.addTestsFromResource("velocity/velocity3", false);
@@ -60,6 +60,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("link/link1", false);
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("section/section1", false);
+        
+        // HTML
+        suite.addTestsFromResource("html/html1", false);
+        suite.addTestsFromResource("html/html2", false);
         
         return new RenderingPlexusTestSetup(suite);
     }

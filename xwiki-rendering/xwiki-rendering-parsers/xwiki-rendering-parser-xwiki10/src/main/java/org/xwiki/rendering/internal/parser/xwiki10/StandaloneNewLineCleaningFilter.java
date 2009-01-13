@@ -33,7 +33,9 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
  */
 public class StandaloneNewLineCleaningFilter extends AbstractFilter
 {
-    private static final Pattern SANDALONENEWLINE_PATTERN = Pattern.compile("([^\\00\\n])\\n([^\\00\\n])");
+    private static final Pattern SANDALONENEWLINE_PATTERN =
+        Pattern.compile("([^" + FilterContext.XWIKI1020TOKEN_OP + "\\n])\\n([^" + FilterContext.XWIKI1020TOKEN_CP
+            + "\\n])");
 
     public String filter(String content, FilterContext filterContext)
     {

@@ -150,7 +150,7 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
             result.append(content.substring(current, matcher.start()));
             current = matcher.end();
 
-            int index = Integer.valueOf(matcher.group(1));
+            int index = Integer.valueOf(matcher.group(2));
 
             String storedContent = filterContext.getProtectedContent(index);
 

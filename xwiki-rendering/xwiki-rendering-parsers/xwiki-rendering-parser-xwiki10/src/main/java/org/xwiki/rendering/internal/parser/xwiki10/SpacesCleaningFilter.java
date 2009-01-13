@@ -33,7 +33,9 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
  */
 public class SpacesCleaningFilter extends AbstractFilter
 {
-    private static final Pattern SPACES_PATTERN = Pattern.compile("([^\\00 ])[ \\t]([^\\00 ])");
+    private static final Pattern SPACES_PATTERN =
+        Pattern.compile("([^" + FilterContext.XWIKI1020TOKEN_OP + " ])[ \\t]([" + FilterContext.XWIKI1020TOKEN_CP
+            + " ])");
 
     public String filter(String content, FilterContext filterContext)
     {

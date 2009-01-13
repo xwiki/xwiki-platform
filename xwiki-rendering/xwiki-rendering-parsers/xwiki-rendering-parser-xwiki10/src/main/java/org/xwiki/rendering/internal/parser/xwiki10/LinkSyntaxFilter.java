@@ -24,9 +24,9 @@ import java.util.regex.Pattern;
 
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
+import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
- * 
  * @version $Id$
  * @since 1.8M1
  */
@@ -41,8 +41,11 @@ public class LinkSyntaxFilter extends AbstractFilter
         Matcher matcher = LINKSYNTAX_PATTERN.matcher(content);
         int current = 0;
         while (matcher.find()) {
-            result.append(content.substring(current, matcher.start()));
+            String before = content.substring(current, matcher.start());
             current = matcher.end();
+
+            // a standalone new line is not interpreted by XWiki 1.0 rendering
+            result.append(CleanUtil.removeLastNewLines(before, 1, true));
 
             StringBuffer linkResult = new StringBuffer();
             linkResult.append("[[");

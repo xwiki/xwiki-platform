@@ -1,10 +1,32 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-[href]
-[label>href]
-[label>href>_blank]
+<table>
+<tr><td></td></tr>
+</table>
+
+
+
+
+
+
+
+
+
+
+<div class="class">*bold* some text</div>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-[[href]] [[label>>href]] [[label>>href||target="_blank"]]
+{{html wiki="true"}}<table> <tr><td></td></tr> </table>{{/html}}
+
+
+
+
+
+
+
+
+
+
+{{html wiki="true"}}<div class="class">**bold** some text</div>{{/html}}

@@ -222,5 +222,16 @@
         <priority>2000</priority>
       </configuration>
     </component>
+    
+    <!-- HTML syntax filter -->
+    <component>
+      <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
+      <role-hint>htmlmacro</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.HTMLFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <priority>3000</priority>
+      </configuration>
+    </component>
   </components>
 </component-set>

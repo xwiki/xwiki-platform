@@ -1,0 +1,96 @@
+.#-----------------------------------------------------
+.input|xwiki/1.0
+.#-----------------------------------------------------
+some text
+## commented
+
+### commented
+<table>
+<tr><td></td></tr>
+</table>
+
+\\## commented ## commented
+
+#* commented *#
+
+#*commented*#
+
+#*commented
+
+
+
+*# not commented
+
+
+#*commented
+
+
+
+\\\*#
+
+
+
+
+
+
+
+
+
+
+
+## standalone comment
+
+
+
+
+
+
+
+
+<div class="${variable}">*bold* some text</div>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+some text{{velocity}}## commented
+
+### commented
+{{html wiki=true}}<table> <tr><td></td></tr> </table>{{/html}}
+
+\\## commented ## commented
+
+#* commented *#
+
+#*commented*#
+
+#*commented
+
+
+
+*# not commented
+
+
+#*commented
+
+
+
+\\\*#{{/velocity}}
+
+
+
+
+
+
+
+
+
+
+{{velocity}}## standalone comment
+
+
+
+
+
+
+
+
+{{html wiki=true}}<div class="${variable}">**bold** some text</div>{{/html}}{{/velocity}}

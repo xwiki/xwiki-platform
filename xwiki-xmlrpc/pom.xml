@@ -27,13 +27,13 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-core-parent</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8-milestone-1</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-xmlrpc-parent</artifactId>
   <name>XWiki Platform - Core - XMLRPC Parent POM</name>
   <packaging>pom</packaging>
-  <version>1.8-SNAPSHOT</version>
+  <version>1.8-milestone-1</version>
   <description>XWiki Platform - Core - XMLRPC Parent POM</description>
   <properties>
     <!-- Version of swizzle-confluence dependencie used in XMLRPC modules -->

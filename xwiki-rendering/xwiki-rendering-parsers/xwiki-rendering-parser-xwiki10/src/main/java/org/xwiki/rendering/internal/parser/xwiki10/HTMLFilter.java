@@ -152,7 +152,7 @@ public class HTMLFilter extends AbstractFilter
         }
 
         if (currentIndex == 0) {
-            return content;
+            return StringEscapeUtils.unescapeHtml(content);
         }
 
         // Close html macro

@@ -37,12 +37,6 @@
       <implementation>org.xwiki.xml.internal.html.filter.ListCleaningFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>    
-    <component>
-      <role>org.xwiki.xml.html.filter.CleaningFilter</role>
-      <role-hint>linebreak</role-hint>
-      <implementation>org.xwiki.xml.internal.html.filter.LineBreakCleaningFilter</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
     <!-- Default HTML Cleaner -->    
     <component>
       <role>org.xwiki.xml.html.HTMLCleaner</role>

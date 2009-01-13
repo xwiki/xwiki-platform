@@ -301,21 +301,23 @@ XWiki.SyntaxConverter = Class.create({
     var syntax = this.syntaxField.options.item(syntaxIndex).value;
     if (this.validSourceSyntaxes.indexOf(this.originalSyntax) == -1 || this.validTargetSyntaxes.indexOf(syntax) == -1) {
       // Server does not support this conversion. Simply accept the new syntax.
-    } else if (confirm("Do you want to also convert the document's content to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content.")) {
-      this.disableEditingArea();
-      var url = '$doc.getURL('view', 'action=convertSyntax&amp;xpage=plain&amp;documentName=')' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
-      new Ajax.Request(
-        url,
-        {
-          method: 'post',
-          parameters: {
-            content: $('content').value
-          },
-          onSuccess: this.successfulConversion.bindAsEventListener(this),
-          onFailure: this.failedConversion.bindAsEventListener(this),
-          onComplete: this.enableEditingArea.bind(this)
-        }
-      );
+    } else if (this.contentField.value.trim() != "") {
+      if (confirm("Do you want to also convert the document's content to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content.")) {
+        this.disableEditingArea();
+        var url = '$doc.getURL('view', 'action=convertSyntax&amp;xpage=plain&amp;documentName=')' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
+        new Ajax.Request(
+          url,
+          {
+            method: 'post',
+            parameters: {
+              content: $('content').value
+            },
+            onSuccess: this.successfulConversion.bindAsEventListener(this),
+            onFailure: this.failedConversion.bindAsEventListener(this),
+            onComplete: this.enableEditingArea.bind(this)
+          }
+        );
+      }
       return;
     }
     this.storeNewSyntax();

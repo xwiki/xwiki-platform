@@ -589,6 +589,9 @@
         <property name="className" type="string">
             <column name="XWO_CLASSNAME" not-null="true" length="255"/>
         </property>
+        <property name="guid" type="string">
+            <column name="XWO_GUID" not-null="false" length="255"/>
+        </property>
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.DocumentStats" table="xwikistatsdoc">

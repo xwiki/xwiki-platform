@@ -138,7 +138,6 @@
 &lt;select name="tocreate" class="panelselect"&gt;
   &lt;option value="page"&gt;New Page\*&lt;/option&gt;
   &lt;option value="space"&gt;New Space&lt;/option&gt;
-  &lt;option value="post"&gt;New Blog Post&lt;/option&gt;
 &lt;/select&gt;
 &lt;/div&gt;
 &lt;div class="padded centered"&gt;

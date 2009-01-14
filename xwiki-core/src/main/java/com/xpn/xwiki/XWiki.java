@@ -4313,7 +4313,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         if (context.getRequest() != null) {
             String currentServletpath = context.getRequest().getServletPath();
-            if (servletPath.equals("")) {
+            if (StringUtils.isEmpty(servletPath)) {
                 if (currentServletpath.startsWith("/bin")) {
                     servletPath = "bin/";
                 } else if (currentServletpath.startsWith("/testbin")) {

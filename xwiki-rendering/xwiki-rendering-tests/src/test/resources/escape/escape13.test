@@ -2,10 +2,10 @@
 .input|xhtml/1.0
 .# Verify special characters in tables are escaped.
 .#-----------------------------------------------------
-<html><table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11|</td><td>cell12</td></tr><tr><td>cell21</td><td>cell22</td></tr></table></html>
+<html><table><tr><th>col1</th><th>col2</th></tr><tr><td>cell11|</td><td>cell12</td></tr><tr><td>cell21!!</td><td>cell22</td></tr></table></html>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 |=col1|=col2
 |cell11~||cell12
-|cell21|cell22
+|cell21~!!|cell22

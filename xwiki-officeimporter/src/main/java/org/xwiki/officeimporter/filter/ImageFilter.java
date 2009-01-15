@@ -21,7 +21,7 @@ package org.xwiki.officeimporter.filter;
 
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xwiki.bridge.DocumentAccessBridge;
 
@@ -52,21 +52,25 @@ public class ImageFilter implements HTMLFilter
         if (null != targetDocument && null != docBridge) {
             NodeList images = htmlDocument.getElementsByTagName("img");
             for (int i = 0; i < images.getLength(); i++) {
-                Node image = images.item(i);
-                Node src = null;
-                if (image.hasAttributes() && (src = image.getAttributes().getNamedItem("src")) != null) {
-                    String fileName = src.getNodeValue();
-                    // TODO : We might have to verify that fileName is indeed a file name. (a.k.a not a
+                Element image = (Element) images.item(i);
+                String src = image.getAttribute("src");
+                if (!src.equals("")) {
+                    // TODO : We might have to verify that src is a file name. (a.k.a not a
                     // url). There might be cases where documents have embedded urls (images).
-                    Comment beforeComment = htmlDocument.createComment("startimage:" + fileName);
+                    Comment beforeComment = htmlDocument.createComment("startimage:" + src);
                     Comment afterComment = htmlDocument.createComment("stopimage");
                     try {
-                        src.setNodeValue(docBridge.getAttachmentURL(targetDocument, fileName));
+                        image.setAttribute("src", docBridge.getAttachmentURL(targetDocument, src));
                     } catch (Exception ex) {
                         // Do nothing.
                     }
                     image.getParentNode().insertBefore(beforeComment, image);
                     image.getParentNode().insertBefore(afterComment, image.getNextSibling());
+                    // The 'align' attribute of images creates a lot of problems. First, OO server has a problem with
+                    // center aligning images (it aligns them to left). Next, OO server uses <br clear"xxx"> for
+                    // avoiding content wrapping around images which is not valid xhtml. There for, to be consistent and
+                    // simple we will remove the 'align' attribute of all the images so that they are all left aligned.
+                    image.removeAttribute("align");                    
                 }
             }
         }

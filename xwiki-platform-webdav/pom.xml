@@ -1,0 +1,14 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>xwiki-applications</artifactId>
+    <groupId>com.xpn.xwiki.platform.applications</groupId>
+    <version>14-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.xpn.xwiki.platform.applications</groupId>
+  <artifactId>xwiki-application-webdav</artifactId>
+  <packaging>xar</packaging>
+  <name>XWiki Platform - Applications - WebDAV</name>
+  <version>1.0-SNAPSHOT</version>
+  <description>Holds utility functions required for WebDAV ui integration.</description>
+</project>

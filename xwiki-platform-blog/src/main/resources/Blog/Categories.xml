@@ -70,7 +70,7 @@
 <description>Pseudo-category.</description>
 </property>
 <property>
-<name>Root</name>
+<name>Default</name>
 </property>
 </object>
 <content>#includeForm("Blog.CategorySheet")</content>

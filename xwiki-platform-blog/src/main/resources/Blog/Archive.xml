@@ -66,7 +66,6 @@
   #else
     #info("No articles yet...")
   #end
-  #panelfooter()
 #end
 ##
 ##
@@ -98,7 +97,6 @@
   #else
     #info("No articles in this year...")
   #end
-  #panelfooter()
 #end
 ##
 ##
@@ -121,9 +119,10 @@
   #else
     #info("No articles in this month...")
   #end
-  #panelfooter()
 #end
-
+##
+##
+##
 #set($space = "$!{request.space}")
 #if($space == '')
   #set($space = 'Blog')

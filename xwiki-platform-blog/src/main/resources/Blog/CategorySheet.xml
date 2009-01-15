@@ -29,22 +29,24 @@
 
 #if($context.action != "inline")
 1.1.1 Subcategories
-&lt;div style="float: right; width: 60%"&gt;
-&lt;div class="plainmessage"&gt;
-&lt;fieldset&gt;
-&lt;legend&gt;Add new subcategory&lt;/legend&gt;
-#set($parentCategory = $doc.fullName)
-#includeTopic("Blog.AddCategory")
-&lt;/fieldset&gt;
-&lt;/div&gt;
-&lt;/div&gt;
+#if($hasEdit)
+  &lt;div style="float: right; width: 60%"&gt;
+  &lt;div class="plainmessage"&gt;
+  &lt;fieldset&gt;
+  &lt;legend&gt;Add new subcategory&lt;/legend&gt;
+  #set($parentCategory = $doc.fullName)
+  #includeTopic("Blog.AddCategory")
+  &lt;/fieldset&gt;
+  &lt;/div&gt;
+  &lt;/div&gt;
+#end
 #getCategoriesHierarchy($doc.space $tree)
 #displayCategoriesHierarchyRecursive($tree $doc.fullName 1 'simple')
 &lt;div class="clearfloats"&gt;&lt;/div&gt;
 
 1.1.1 Articles from this category
 #getEntriesForCategory($doc.fullName $entries $total)
-#displayBlog($entries true)
+#displayBlog($entries 'category' true)
 #displayNavigationLinks()
 #end</content>
 </xwikidoc>

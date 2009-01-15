@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>Blog</web>
@@ -156,6 +156,7 @@
 <name>Blog.BlogStyle</name>
 <number>0</number>
 <className>XWiki.StyleSheetExtension</className>
+<guid>c8b0ef1d-4f35-4800-b2ca-5241ab3ee850</guid>
 <property>
 <cache>long</cache>
 </property>
@@ -205,7 +206,7 @@
   padding-top: 2em;
 }
 /* Grey-out the hidden and unpublished entries */
-.hidden-article, .hidden-article *, .unpublished-article, .unpublished-article *  {
+.index .hidden-article *, .index .unpublished-article *, .category .hidden-article *, .category .unpublished-article * {
   color: #ddd !important;
 }
 /* The current skins are not well designed. Ideally, the title should just have the skin style. Remove this once the skins are clean enough. */
@@ -239,6 +240,97 @@ div.hide-message{
   font-size: 140%;
   width: 100%;
   font-weight: bold;
+}
+## ###################################
+## Some style changes
+## ###################################
+## First establish the colors. Try to use the 
+## theme, if it is defined.
+##
+## text
+#set($textColor = "$!theme.dark1")
+#if($textColor == "")
+#set($textColor = '#4A4945')
+#end
+##
+## background
+#set($bgColor = "$!theme.light1")
+#if($bgColor == "")
+#set($bgColor = '#FFF')
+#end
+##
+## border
+#set($borderColor = "$!theme.light2")
+#if($borderColor == "")
+#set($borderColor = '#E5E5E5')
+#end
+##
+## shadow
+#set($shadowColor = "$!theme.light3")
+#if($shadowColor == "")
+#set($shadowColor = '#F8F8F8')
+#end
+##
+## highlighted text
+#set($htextColor = "$!theme.light1")
+#if($htextColor == "")
+#set($htextColor = '#4A4945')
+#set($htextColor = '#FFF')
+#end
+##
+## highlighted background
+#set($hbgColor = "$!theme.highlight1")
+#if($hbgColor == "")
+#set($hbgColor = '#E5E5E5')
+#set($hbgColor = '#4A4945')
+#end
+/* A blog day is a container for entries published in the same day. Space out days vertically. */
+#body .blogDay {
+  /* Make way for the calendarsheet-like day display */
+  margin-left: 56px;
+}
+/* Calendar sheet display of a blogging day */
+#body .blogdate {
+  font-size: 70%;
+  width: 48px;
+  padding: 0px;
+  /* Positioning: float it on the left side, in the extra-large margin left by the blogDay container */
+  float: left;
+  margin: 0px 8px 3px -56px;
+  background: $hbgColor;
+  border: 1px solid $borderColor;
+  border: 2px solid $shadowColor;
+  text-align: center;
+}
+/* The day is the most important part, make it extra large */
+#body .blogdate .day {
+  font-size: 250%;
+  font-weight: 900;
+  line-height: 110%;
+  color: $textColor;
+  float: left;
+  background: $bgColor;
+  border: 1px solid $borderColor;
+  width: 46px;
+}
+#body .blogdate .month, #body .blogdate .year {
+  display: inline;
+  color: $htextColor;
+}
+/* Restyle the paging links */
+.pagingLinks {
+  margin: 5px 0;
+  padding: 2px 0;
+  border: none;
+  border-top: 1px solid #DDD;
+  font-size: 75%;
+  font-variant: normal;
+}
+.pagingLinks .separator {
+  display: none;
+}
+.pagingLinks a:hover {
+  text-decoration: none;
 }</code>
 </property>
 <property>
@@ -249,45 +341,6 @@ div.hide-message{
 </property>
 <property>
 <use>onDemand</use>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>tags</name>
-<number>1</number>
-<picker>1</picker>
-<prettyName>Tags</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>30</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>Blog.BlogStyle</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
 </property>
 </object>
 <content>

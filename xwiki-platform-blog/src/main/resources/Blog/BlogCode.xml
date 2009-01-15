@@ -779,7 +779,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 ##
 #**
  * Determine the requested week, for using in a weekly-indexed blog. The relevant request parameters are
- * &lt;tt&gt;year&lt;/tt&gt; and &lt;tt&gtlweek&lt;/tt&gt;. By default, the current week is used.
+ * &lt;tt&gt;year&lt;/tt&gt; and &lt;tt&gt;week&lt;/tt&gt;. By default, the current week is used.
  * 
  * @param monthDate The resulting week, a JODATime MutableDateTime.
  *###

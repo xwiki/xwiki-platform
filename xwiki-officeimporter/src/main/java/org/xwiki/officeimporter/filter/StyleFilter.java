@@ -59,11 +59,11 @@ public class StyleFilter implements HTMLFilter
     {
         this.mode = mode;
         attributeMappingsStrict = new HashMap<String, String>();
-        attributeMappingsStrict.put("a", "|href|");
+        attributeMappingsStrict.put("a", "|href|name|");
         attributeMappingsStrict.put("img", "|alt|src|");
         attributeMappingsStrict.put("td", "|colspan|rowspan|");
         attributeMappingsModerate = new HashMap<String, String>();
-        attributeMappingsModerate.put("a", "|href|");
+        attributeMappingsModerate.put("a", "|href|name|");
         attributeMappingsModerate.put("img", "|alt|src|width|height|align|");
         attributeMappingsModerate.put("p", "|align|");
         attributeMappingsModerate.put("table", "|align|");

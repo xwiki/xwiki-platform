@@ -19,6 +19,9 @@
  */
 package org.xwiki.officeimporter.filter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,20 +43,82 @@ public class AnchorFilter implements HTMLFilter
     public void filter(Document document)
     {
         NodeList links = document.getElementsByTagName("a");
+        List<Node> anchorsToRemove = new ArrayList<Node>();
+        List<Node> anchorsToReplace = new ArrayList<Node>();
         for (int i = 0; i < links.getLength(); i++) {
-            if (links.item(i) instanceof Element) {
-                Element link = (Element) links.item(i);
-                String anchorName = link.getAttribute("name");
-                boolean isAnchor = !anchorName.equals("");
-                if (isAnchor) {
+            Node link = links.item(i);
+            if (link instanceof Element) {
+                if (isAnchor(link)) {
                     Node parent = link.getParentNode();
-                    Comment beforeComment =
-                        document.createComment(String.format("startmacro:id|-|name=\"%s\"|-|", anchorName));
-                    Comment afterComment = document.createComment("stopmacro");
-                    parent.insertBefore(beforeComment, link);
-                    parent.insertBefore(afterComment, link.getNextSibling());
+                    if (isSameAnchor(link, parent.getPreviousSibling())) {
+                        // Means this anchor was a result of close-before-copy-inside operation of default html cleaner.
+                        anchorsToRemove.add(link);
+                    } else {
+                        anchorsToReplace.add(link);
+                    }
                 }
             }
         }
+        for (Node anchor : anchorsToRemove) {
+            Node parent = anchor.getParentNode();
+            while (null != anchor.getFirstChild()) {
+                Node child = anchor.removeChild(anchor.getFirstChild());
+                parent.insertBefore(child, anchor);
+            }
+            parent.removeChild(anchor);
+        }
+        for (Node anchor : anchorsToReplace) {
+            replaceAnchor(document, anchor);
+        }
+    }
+
+    /**
+     * Checks whether the given node represents an html anchor.
+     * 
+     * @param node the {@link Node}
+     * @return true if the node represents an anchor.
+     */
+    private boolean isAnchor(Node node)
+    {
+        boolean isAnchor = false;
+        if (null != node && node instanceof Element) {
+            Element element = (Element) node;
+            isAnchor = !element.getAttribute("name").equals("");
+        }
+        return isAnchor;
+    }
+
+    /**
+     * Checks whether the given two nodes represents the same anchor.
+     * 
+     * @param first first {@link Node}
+     * @param second second {@link Node}
+     * @return true if both of the nodes are anchors and have the same 'name' attribute.
+     */
+    private boolean isSameAnchor(Node first, Node second)
+    {
+        boolean isSameAnchor = false;
+        if (isAnchor(first) && isAnchor(second)) {
+            Element firstElement = (Element) first;
+            Element secondElement = (Element) second;
+            isSameAnchor = firstElement.getAttribute("name").equals(secondElement.getAttribute("name"));
+        }
+        return isSameAnchor;
+    }
+
+    /**
+     * Converts the given anchor into xwiki conpatible xhtml.
+     * 
+     * @param document the {@link Document}.
+     * @param anchor the {@link Node} which is to be converted.
+     */
+    private void replaceAnchor(Document document, Node anchor)
+    {
+        Node parent = anchor.getParentNode();
+        String anchorName = ((Element) anchor).getAttribute("name");
+        Comment beforeComment = document.createComment(String.format("startmacro:id|-|name=\"%s\"|-|", anchorName));
+        Comment afterComment = document.createComment("stopmacro");
+        parent.insertBefore(beforeComment, anchor);
+        parent.insertBefore(afterComment, anchor.getNextSibling());
     }
 }

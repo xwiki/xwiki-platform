@@ -24,7 +24,8 @@
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>true</hidden>
 <content>#includeMacros("Blog.BlogCode")
-$xwiki.jsx.use($blogScriptsDocumentName)
+#if($hasEdit)
+$xwiki.jsx.use($blogScriptsDocumentName)##
 ##
 ##
 ##
@@ -56,5 +57,6 @@ $xwiki.jsx.use($blogScriptsDocumentName)
   #set($parent = $blogDoc.fullName)
   #set($title = $util.encodeURI($name))
   $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}"))
-#end</content>
+#end## name == ''
+#end## hasEdit</content>
 </xwikidoc>

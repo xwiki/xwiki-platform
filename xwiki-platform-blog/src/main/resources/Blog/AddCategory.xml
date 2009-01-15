@@ -45,14 +45,14 @@
     #warning("The category [$newCategoryDoc.name&gt;$newCategoryDoc.fullName] already exists.")
   #end
 #end
-&lt;form name="Add category" action="" method="post"&gt;
+&lt;form action="" method="post"&gt;
 &lt;div&gt;
 #if($space != "")
   &lt;input type="hidden" name="space" value="$space"/&gt;
 #end
 &lt;dl&gt;
 &lt;dt&gt;&lt;label for="name"&gt;Name:&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;&lt;input type="text" name="name" style="width: 95%"/&gt;&lt;/dd&gt;
+&lt;dd&gt;&lt;input type="text" name="name" id="name" style="width: 95%"/&gt;&lt;/dd&gt;
 #if("$!parentCategory" == "")
 &lt;dt&gt;&lt;label for="parent"&gt;Parent category:&lt;/label&gt;&lt;/dt&gt;
 #set($sql = ", BaseObject obj where ")
@@ -70,9 +70,9 @@
 &lt;dt&gt;&lt;input type="hidden" name="parent" value="$parentCategory"/&gt;&lt;/dt&gt;
 #end
 &lt;dt&gt;&lt;label for="description"&gt;Description:&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;&lt;textarea name="description" style="width: 95%"&gt;&lt;/textarea&gt;&lt;/dd&gt;
-&lt;dl&gt;
-&lt;input type="submit" value="Add"/&gt;
+&lt;dd&gt;&lt;textarea name="description" id="description" rows="2" cols="20" style="width: 95%"&gt;&lt;/textarea&gt;&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Add" class="button"/&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

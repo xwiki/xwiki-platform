@@ -31,7 +31,7 @@
  * Display a blog as a RSS feed. The output corresponds to the RSS 1.0 specification, and it makes use of the Dublin
  * Core module to specify metadata.
  * 
- * @param blogDoc The XDocument corresponding to the blog to be displayed.
+ * @param blogDoc The XDocument corresponding to the blog to be syndicated.
  * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
  *###
 #macro(displayBlogRss $blogDoc $entries)
@@ -75,11 +75,36 @@
 ##
 ##
 #**
+ * Display blog entries belonging to a target category as a RSS feed. The output corresponds to the RSS 1.0
+ * specification, and it makes use of the Dublin Core module to specify metadata.
+ * 
+ * @param blogDoc The XDocument corresponding to the blog to be syndicated.
+ * @param categoryDoc The XDocument corresponding to the blog category to be syndicated.
+ * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
+ *###
+#macro(displayBlogCategoryRss $blogDoc $categoryDoc $entries)
+{pre}
+  ## Create a Jodatime date formatter that will be used to format dates
+  #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
+  ## Set the right mimetype
+  $!response.setContentType('application/rdf+xml')##
+  #setBlogRssCacheSettings()
+  #printBlogRssHeader()
+  #printBlogCategoryRssChannelDescription($categoryDoc $entries)
+  #printBlogRssItems($entries)
+  #printBlogRssFooter()
+{/pre}
+#end
+##
+##
+##
+#**
  * Set the proper cache settings, both for the client (HTTP headers) and for the server (rendering cache).
  *###
 #macro(setBlogRssCacheSettings)
   ## Internally cache the rendered RSS for 30 minutes, for better performance
-  ## TODO: This is disabled for security reasons. Since the cache doesn't take into account the current user, it might serve hidden/unpublished entries to non-creators.
+  ## TODO: This is disabled for security reasons. Since the cache doesn't take into account the current user, it might
+  ## serve hidden/unpublished entries to non-creators.
   ## $!context.setCacheDuration(1800)
   ## Instruct the client to cache the response for 1 hour
   #set($expires = $xwiki.jodatime.getMutableDateTime())##
@@ -144,7 +169,7 @@
 #macro(printGlobalBlogRssChannelDescription $entries)
   ## TODO: Replace hardcoded Main.WebHome with a setting once the core provides this information.
   #set($mainDoc = $xwiki.getDocument('Main.WebHome'))
-  &lt;channel rdf:about="$mainDoc.getURL()"&gt;
+  &lt;channel rdf:about="$mainDoc.getExternalURL()"&gt;
     &lt;title&gt;$mainDoc.displayTitle&lt;/title&gt;
     &lt;link&gt;$mainDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
@@ -153,6 +178,34 @@
     &lt;image rdf:resource="$logoUrl"/&gt;
     &lt;dc:rights&gt;$escapetool.xml($xwiki.webCopyright)&lt;/dc:rights&gt;
     &lt;dc:publisher&gt;XWiki&lt;/dc:publisher&gt;
+    &lt;items&gt;
+      &lt;rdf:Seq&gt;
+      ## This is just a list of blog entries, which are detailed below.
+      #foreach ($entryDoc in $entries)
+        #if($xwiki.hasAccessLevel('view', ${entryDoc.fullName}))
+        &lt;rdf:li rdf:resource="$entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}")" /&gt;
+        #end
+      #end
+      &lt;/rdf:Seq&gt;
+    &lt;/items&gt;
+  &lt;/channel&gt;
+#end
+##
+##
+##
+#**
+ * Print the blog channel description: title, link, description, logo, creator, copyright, and the list of entries.
+ * 
+ * @param blogDoc The XDocument corresponding to the blog to be displayed.
+ * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
+ *###
+#macro(printBlogCategoryRssChannelDescription $categoryDoc $entries)
+  &lt;channel rdf:about="$categoryDoc.getURL()"&gt;
+    &lt;title&gt;$categoryDoc.display('name')&lt;/title&gt;
+    &lt;link&gt;$categoryDoc.getExternalURL()&lt;/link&gt;
+    ## TODO: Add a Description field in the blog class
+    &lt;description&gt;Most recent blog posts in the $categoryDoc.display('name') category&lt;/description&gt;
+    &lt;dc:rights&gt;$escapetool.xml($xwiki.webCopyright)&lt;/dc:rights&gt;
     &lt;items&gt;
       &lt;rdf:Seq&gt;
       ## This is just a list of blog entries, which are detailed below.
@@ -223,7 +276,7 @@
     &lt;description&gt;$desc&lt;/description&gt;
     ## Some metadata, using the Dublin Core extension to RSS.
     ## TODO: Display this in a better way.
-    &lt;dc:subject&gt;$escapetool.xml($entryDoc.display('category', 'view', $entryObj))&lt;/dc:subject&gt;
+    &lt;dc:subject&gt;$escapetool.xml($entryObj.display('category', 'view'))&lt;/dc:subject&gt;
     &lt;dc:date&gt;$dateFormatter.print($entryDoc.date.time)&lt;/dc:date&gt;
     &lt;dc:creator&gt;$escapetool.xml($xwiki.getUserName($entryDoc.creator, false))&lt;/dc:creator&gt;
     #if($entryDoc.creator != $entryDoc.author)

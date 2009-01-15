@@ -2,7 +2,7 @@
 
 <xwikidoc>
 <web>Blog</web>
-<name>BlogSheet</name>
+<name>Unpublished</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -11,24 +11,23 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1227130326000</creationDate>
-<date>1227680870000</date>
-<contentUpdateDate>1227680870000</contentUpdateDate>
+<creationDate>1231916998000</creationDate>
+<date>1231919168000</date>
+<contentUpdateDate>1231919168000</contentUpdateDate>
 <version>1.1</version>
-<title>Sheet for displaying blogs</title>
+<title>Unpublished blog posts</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
-<hidden>true</hidden>
+<hidden>false</hidden>
 <content>#includeMacros("Blog.BlogCode")
-##
-##
-##
-#showBlogInfo($doc)
-#if($context.action != 'inline')
-  #printBlog($doc)
-#end</content>
-</xwikidoc>
+
+1 Unpublished articles
+
+#getBlogEntriesBaseQuery($query)
+#getUnpublishedBlogEntries($xwiki.getDocument('Blog.WebHome') $query $entries)
+#displayBlog($entries 'unpublished' true)
+</content></xwikidoc>

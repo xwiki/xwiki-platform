@@ -35,13 +35,28 @@
  * @param articles Return parameter, where the list of entries is placed.
  * @param total Return parameter, where the total number of entries belonging to this category is
  *        placed. Useful for a paginated view.
- *#
+ *###
 #macro(getEntriesForCategory $category $entries $totalEntries)
+  #getCategoriesHierarchy('' $tree)
+  #set($subcategories = $util.arrayList)
+  #getSubcategories($tree $category $subcategories)
+  #set($categories = "'${category}'")
+  #foreach($subcategory in $subcategories)
+    #set($categories = "$!{categories}, '$subcategory'")
+  #end
   #getBlogEntriesBaseQuery($query)
-  #set ($query = ", DBStringListProperty as categories join categories.list as category${query} and obj.id = categories.id.id and categories.id.name='category' and category='${category}'")
+  #set ($query = ", DBStringListProperty as categories join categories.list as category${query} and obj.id = categories.id.id and categories.id.name='category' and category in (${categories})")
   #set($totalEntries = $xwiki.countDocuments(${query}))
   #preparePagedViewParams($totalEntries 10)
   #set($entries = $xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt))
+#end
+#macro(getSubcategories $tree $category $subcategories)
+  #if(!$subcategories.contains($category))
+    #foreach($subcategory in $tree.get($category))
+      #set($discard = $subcategories.add($subcategory))
+      #getSubcategories($tree $subcategory $subcategories)
+    #end
+  #end
 #end
 ##
 ##
@@ -55,7 +70,7 @@
  * @param tree Return parameter, HashMap&lt;String, List&lt;String&gt;&gt; structure holding the categories
  *        hierarchy, where the key is the name of a category, and the value contains the names of
  *        all its subcategories. To obtain the full hierarchy, start with the key 'Blog.Categories'.
- *#
+ *###
 #macro(getCategoriesHierarchy $space $tree)
   #set($tree = $util.hashMap)
   #set($query = ', BaseObject obj where ')
@@ -93,7 +108,7 @@
  *          allow such actions.&lt;/li&gt;
  *        &lt;/ul&gt;
  *        For any other value, the default ("simple") is considered.
- *#
+ *###
 #macro(displayCategoriesHierarchy $tree $displayMethod)
   #displayCategoriesHierarchyRecursive($tree $defaultCategoryParent 1 $displayMethod)
 #end
@@ -120,7 +135,7 @@
  *          allow such actions.&lt;/li&gt;
  *        &lt;/ul&gt;
  *        For any other value, the default ("simple") is considered.
- *#
+ *###
 #macro(displayCategoriesHierarchyRecursive $tree $root $level $displayMethod)
   #if(!$processedCategories)
     #set($processedCategories = $util.arrayList)
@@ -151,7 +166,7 @@
  *          allow such actions.&lt;/li&gt;
  *        &lt;/ul&gt;
  *        For any other value, the default ("simple") is considered.
- *#
+ *###
 #macro(displayCategory $name $level $displayMethod)
   #if("$!displayMethod" == "option")
     #displayOptionCategory($name $level)
@@ -172,7 +187,7 @@
  * 
  * @param name The full name of the document containing the category to be displayed.
  * @param level The depth where this category is in the tree, used for proper indentation.
- *#
+ *###
 #macro(displaySelectableCategory $name $level)
   #set($categoryDoc = $xwiki.getDocument($name))
   #foreach($i in [1..$level])*#end &lt;label id='blog_category_${name}' title="#getCategoryDescription($categoryDoc)"&gt;&lt;input name="${blogPostClassname}_$!{entryObj.number}_category" value="$name" type="checkbox"#if($entryObj.getProperty('category').getValue().contains($name)) checked="checked" #end/&gt; #getCategoryName($categoryDoc)&lt;/label&gt;
@@ -186,7 +201,7 @@
  * 
  * @param name The full name of the document containing the category to be displayed.
  * @param level The depth where this category is in the tree, used for proper indentation.
- *#
+ *###
 #macro(displayEditableCategory $name $level)
   #set($categoryDoc = $xwiki.getDocument($name))
   #foreach($i in [1..$level])*#end #getCategoryName($categoryDoc) &lt;a href="$doc.getURL('view', "action=delete&amp;amp;category=$name")"&gt;#toolImage('delete.png' 'delete ')&lt;/a&gt; &lt;a href="$categoryDoc.getURL('inline')"&gt;#toolImage('edit.png' 'edit ')&lt;/a&gt;
@@ -200,7 +215,7 @@
  * 
  * @param name The full name of the document containing the category to be displayed.
  * @param level The depth where this category is in the tree, used for proper indentation.
- *#
+ *###
 #macro(displayOptionCategory $name $level)
   &lt;option id="blog_category_${name}_option" value="$name"&gt;#if($level &gt; 1)#foreach($i in [2..$level])&amp;nbsp;&amp;nbsp;#end#end#getCategoryName($xwiki.getDocument($name))&lt;/option&gt;
 #end
@@ -212,10 +227,10 @@
  * 
  * @param name The full name of the document containing the category to be displayed.
  * @param level The depth where this category is in the tree, used for proper indentation.
- *#
+ *###
 #macro(displaySimpleCategory $name $level)
   #getEntriesForCategory($name $discard $totalEntries)
-  #foreach($i in [1..$level])*#end [#getCategoryName($xwiki.getDocument($name)) ($totalEntries)&gt;$name]
+  #foreach($i in [1..$level])*#end &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title=""&gt;&lt;img src="$xwiki.getSkinFile('icons/black-rss-mini.png')" alt="RSS"/&gt;&lt;/a&gt; [#getCategoryName($xwiki.getDocument($name)) ($totalEntries)&gt;$name]
 #end
 ##
 ##
@@ -224,7 +239,7 @@
  * Prints the name of a category, indicated by its document.
  * 
  * @param categoryDoc The document containing the category to be displayed.
- *#
+ *###
 #macro(getCategoryName $categoryDoc)
 ## Don't indent!
 #set($result = "$!categoryDoc.getObject(${blogCategoryClassname}).getProperty('name').value.trim()")##
@@ -240,7 +255,7 @@ $result##
  * Prints the description of a category, indicated by its document.
  * 
  * @param categoryDoc The document containing the category to be displayed.
- *#
+ *###
 #macro(getCategoryDescription $categoryDoc)
 ## Don't indent!
 $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').value.trim()##
@@ -256,7 +271,7 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
  *        is the name of a category, and the value contains the names of all its subcategories.
  * @todo When javascript is disabled, a link to "Manage categories" should be displayed instead.
  *       This "form" should be created from javascript.
- *#
+ *###
 #macro(showCreateCategoryBox $tree)
   &lt;form action="" method="post"&gt;
   &lt;div class='create-category'&gt;
@@ -280,7 +295,7 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
  * all existing blog entries.
  * 
  * @param category The full name of the document containing the category to be deleted.
- *#
+ *###
 #macro(deleteCategory $category)
   #set($categoryDoc = $xwiki.getDocument($category))
   #set($categoryParent = "$!categoryDoc.parent")

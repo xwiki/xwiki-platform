@@ -33,7 +33,7 @@
   #isPublished($entryObj $isPublished)
   #isHidden($entryObj $isHidden)
   ## displayBlog requires a list of documents, and whether to display only an extract or the full entry.
-  #displayBlog([$doc.fullName] false)
+  #displayBlog([$doc.fullName] 'single' false)
 #else
   &lt;dl&gt;
   &lt;dt&gt;Title:&lt;/dt&gt;

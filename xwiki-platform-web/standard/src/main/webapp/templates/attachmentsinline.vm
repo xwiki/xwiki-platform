@@ -37,6 +37,17 @@ ${Msz}Mb
           <span class="name"><a href="$doc.getAttachmentURL("${attach.filename}", "download")" title="$msg.get("downloadthisattachment")">#packName($attach.filename)</a></span>
 #if($hasEdit || $hasAdmin)
           <span class="xwikibuttonlinks"><a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></span>
+	  #set($documentUrl=$doc.getExternalURL("download"))
+      	  #set($attachmentUrl="$documentUrl/$attach.filename")
+          #set($attachmentSignature="/xwiki/bin/download/")
+          #set($webdavSignature="/xwiki/webdav/spaces/")
+          #set($fragments=$attachmentUrl.split($attachmentSignature))
+          #if($listtool.size($fragments) == 2)
+            #set($prefix=$listtool.get($fragments, 0))
+            #set($suffix=$listtool.get($fragments, 1))
+            #set($davUrl="$prefix$webdavSignature$suffix")
+            <span class="xwikibuttonlinks"><a class="deletelink" href="javascript:davEdit('$davUrl')">$msg.get("webdaveditattachment")</a></span>
+          #end                    
 #end
           <span class="version"><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></span>
           <div class="meta">

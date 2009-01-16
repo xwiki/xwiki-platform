@@ -26,11 +26,10 @@ import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -121,13 +120,6 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private PythonInterpreter pythonInterpreter;
 
     /**
-     * List all allowed languages.
-     * <p>
-     * This is only needed since Jython 2.5 is too slow for other languages to be parser in good conditions.
-     */
-    private Set<String> allowedLanguages = new HashSet<String>(Arrays.asList("html", "xml", "php", "html+php"));
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.component.phase.Initializable#initialize()
@@ -179,13 +171,11 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         interpreter.set(PY_LISTENER_VARNAME, listener);
         interpreter.set(PY_CODE_VARNAME, new PyUnicode(code));
 
-        if (syntaxId != null && syntaxId.length() > 0 && allowedLanguages.contains(syntaxId.toLowerCase())) {
+        if (!StringUtils.isEmpty(syntaxId)) {
             interpreter.exec(MessageFormat.format(PY_LEXER_CREATE, syntaxId));
+        } else {
+            interpreter.exec(PY_LEXER_FIND);
         }
-        // TODO: restore the following code when Jython speed problem will be fixed
-        // else {
-        // interpreter.exec(PY_LEXER_FIND);
-        // }
 
         PyObject lexer = interpreter.get(PY_LEXER_VARNAME);
         if (lexer == null || lexer == Py.None) {

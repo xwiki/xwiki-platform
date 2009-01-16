@@ -1,7 +1,6 @@
 .#-----------------------------------------------------
-.input|xwiki/2.0|skip
+.input|xwiki/2.0
 .# Validate that even when content syntax is wrong for provided language id the code macro highlight something.
-.# SKIP: Since Jython 2.5 is too slow to run Pygments java lexers in good conditions, this feature is disabled.
 .#-----------------------------------------------------
 {{code language=java}}
 <b>bold</b>
@@ -31,7 +30,7 @@ onWord [b]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [>]
 endFormat: [NONE] [[style]=[color: #666666; ]]
-onLineBreak
+onNewLine
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [<]
 endFormat: [NONE] [[style]=[color: #666666; ]]

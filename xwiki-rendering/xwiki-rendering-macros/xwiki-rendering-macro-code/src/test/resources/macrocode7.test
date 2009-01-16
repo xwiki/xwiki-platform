@@ -14,8 +14,136 @@ Google : {{map location="Romania" service="google" size="small" zoom="country"/}
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
 ]
 beginXMLNode [div] [class=code]
-onVerbatimInline [Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
-Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}]
+onWord [Google]
+onSpace
+onWord [:]
+onSpace
+beginFormat: [NONE] [[style]=[color: #BC7A00; ]]
+onWord [{{]
+endFormat: [NONE] [[style]=[color: #BC7A00; ]]
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [map]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [location]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ["Romania"]
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [service]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ["google"]
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [size]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ["small"]
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [zoom]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ["country"]
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [/]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BC7A00; ]]
+onWord [}}]
+endFormat: [NONE] [[style]=[color: #BC7A00; ]]
+onSpace
+onNewLine
+onWord [Yahoo!]
+onSpace
+onWord [:]
+onSpace
+beginFormat: [NONE] [[style]=[color: #BC7A00; ]]
+onWord [{{]
+endFormat: [NONE] [[style]=[color: #BC7A00; ]]
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [map]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [location]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ["10,]
+onSpace
+onWord [rue]
+onSpace
+onWord [Pernety,]
+onSpace
+onWord [Paris,]
+onSpace
+onWord [France"]
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [service]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ["yahoo"]
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [size]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ["small"]
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+onSpace
+beginFormat: [NONE] [[style]=[color: #19177C; ]]
+onWord [message]
+endFormat: [NONE] [[style]=[color: #19177C; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [=]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BA2121; ]]
+onWord ["One]
+onSpace
+onWord [of]
+onSpace
+onWord [the]
+onSpace
+onWord [XWiki]
+onSpace
+onWord [Offices"]
+endFormat: [NONE] [[style]=[color: #BA2121; ]]
+beginFormat: [NONE] [[style]=[color: #666666; ]]
+onWord [/]
+endFormat: [NONE] [[style]=[color: #666666; ]]
+beginFormat: [NONE] [[style]=[color: #BC7A00; ]]
+onWord [}}]
+endFormat: [NONE] [[style]=[color: #BC7A00; ]]
 endXMLNode [div] [class=code]
 endMacroMarker [code] [] [
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
@@ -28,10 +156,10 @@ endDocument
 <!--startmacro:code|-||-|
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
---><div class="code"><tt class="wikimodel-verbatim">Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
-Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}</tt></div><!--stopmacro-->
+--><div class="code">Google : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"Romania"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"google"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">zoom</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"country"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span> <br/>Yahoo! : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"10, rue Pernety, Paris, France"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"yahoo"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">message</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"One of the XWiki Offices"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span></div><!--stopmacro-->
 .#-----------------------------------------------------
-.expect|xwiki/2.0
+.expect|xwiki/2.0|skip
+.# TODO: Need to fix http://jira.xwiki.org/jira/browse/XWIKI-3122
 .#-----------------------------------------------------
 {{code}}
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
@@ -40,8 +168,7 @@ Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="s
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><!--startmacro:code|-||-|
+<!--startmacro:code|-||-|
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
---><div class="code"><p><tt class="wikimodel-verbatim">Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
-Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}</tt></p></div><!--stopmacro--></html>
+--><div class="code">Google : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"Romania"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"google"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">zoom</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"country"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span> <br/>Yahoo! : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"10, rue Pernety, Paris, France"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"yahoo"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">message</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"One of the XWiki Offices"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span></div><!--stopmacro-->

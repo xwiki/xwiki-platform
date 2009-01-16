@@ -30,10 +30,12 @@
 ## Blog entries
 #set($blogPostClassname = 'Blog.BlogPostClass')
 #set($blogPostTemplate = 'Blog.BlogPostTemplate')
+#set($blogPostSheet = 'Blog.BlogPostSheet')
 #set($oldArticleClassname = 'XWiki.ArticleClass')
 ## Categories
 #set($blogCategoryClassname = 'Blog.CategoryClass')
 #set($blogCategoryTemplate = 'Blog.CategoryTemplate')
+#set($blogCategorySheet = 'Blog.CategorySheet')
 #set($oldBlogCategoryClassname = 'Blog.Categories')
 #set($defaultCategoryParent = 'Blog.Categories')
 ## Style

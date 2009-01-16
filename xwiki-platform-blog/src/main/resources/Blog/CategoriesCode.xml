@@ -280,12 +280,13 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
     &lt;label&gt;Parent:
       &lt;select name="newCategoryParent" id="blog_category_selectBox"&gt;
         &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt;
-        $!processedCategories.clear()
+        $!processedCategories.clear()##
         #displayCategoriesHierarchy($tree 'option')
       &lt;/select&gt;
     &lt;/label&gt;
     &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="button" value="Add" id="blog_AddCategoryButton"&gt;&lt;/input&gt;&lt;/span&gt;
   &lt;/div&gt;
+  &lt;/form&gt;
 #end
 ##
 ##

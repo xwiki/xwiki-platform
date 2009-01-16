@@ -24,6 +24,7 @@
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>true</hidden>
 <content>#includeMacros("Blog.CategoriesCode")
+#if($doc.getObject($blogCategoryClassname))
 1 $doc.display("name")
 #info("$doc.display('description')")
 
@@ -50,5 +51,11 @@
 ## displayNavigationLinks requires a blog document, to determine how should the entries be split into pages. Return this
 ## document, as the macro fallbacks to 'paginated' in case the right setting cannot be determined.
 #displayNavigationLinks($doc)
+#end
+#elseif($doc.fullName == $blogCategorySheet)
+  1 Category sheet
+  This sheet should be used to display blog categories.
+#else
+  #warning('This is not a blog category!')
 #end</content>
 </xwikidoc>

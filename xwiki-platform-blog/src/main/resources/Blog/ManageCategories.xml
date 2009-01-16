@@ -38,7 +38,7 @@
   #set($name = "${doc.space}.${title}")
   $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${request.newCategoryParent}&amp;title=${title}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${doc.getURL()}"))
 #end
-&lt;form name="Add category" action="" method="post"&gt;
+&lt;form action="" method="post"&gt;
 &lt;div&gt;
 &lt;input type="hidden" name="action" value="delete"/&gt;
 #getCategoriesHierarchy("" $tree)

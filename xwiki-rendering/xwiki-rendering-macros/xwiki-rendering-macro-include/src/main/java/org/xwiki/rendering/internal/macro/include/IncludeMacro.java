@@ -73,7 +73,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     private ExecutionContextInitializerManager executionContextInitializerManager;
 
     /**
-     * USed to acces document content and check view acces right.
+     * USed to access document content and check view acces right.
      */
     private DocumentAccessBridge documentAccessBridge;
 

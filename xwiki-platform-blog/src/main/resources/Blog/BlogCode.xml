@@ -55,24 +55,31 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param blogDoc The blog document. It should contain a &lt;tt&gt;Blog.BlogClass&lt;/tt&gt; object.
  *###
 #macro(showBlogInfo $blogDoc)
-  #if($context.action == 'inline')
-    #macro(displayProperty $blogDoc $propname)
-      &lt;dt&gt;#displayPropName($xwiki.getClass($blogClassname).get($propname)):&lt;/dt&gt;
-      &lt;dd&gt;$blogDoc.display($propname)&lt;/dd&gt;
+  #if($blogDoc.getObject($blogClassname))
+    #if($context.action == 'inline')
+      #macro(displayProperty $blogDoc $propname)
+        &lt;dt&gt;#displayPropName($xwiki.getClass($blogClassname).get($propname)):&lt;/dt&gt;
+        &lt;dd&gt;$blogDoc.display($propname)&lt;/dd&gt;
+      #end
+      &lt;dl&gt;
+        #displayProperty($blogDoc 'title')
+        #displayProperty($blogDoc 'description')
+        #displayProperty($blogDoc 'blogType')
+        #displayProperty($blogDoc 'displayType')
+        #displayProperty($blogDoc 'itemsPerPage')
+      &lt;/dl&gt;
+    #else
+      #getBlogTitle($blogDoc $title)
+      #if($title != "")
+        1 $title
+      #end
+      $blogDoc.display('description')
     #end
-    &lt;dl&gt;
-      #displayProperty($blogDoc 'title')
-      #displayProperty($blogDoc 'description')
-      #displayProperty($blogDoc 'blogType')
-      #displayProperty($blogDoc 'displayType')
-      #displayProperty($blogDoc 'itemsPerPage')
-    &lt;/dl&gt;
+  #elseif($doc.fullName == $blogSheet)
+    1 Blog sheet
+    This sheet should be used to display blog documents.
   #else
-    #getBlogTitle($blogDoc $title)
-    #if($title != "")
-      1 $title
-    #end
-    $blogDoc.display('description')
+    #warning('This is not a blog document!')
   #end
 #end
 ##

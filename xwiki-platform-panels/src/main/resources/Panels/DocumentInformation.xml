@@ -110,14 +110,14 @@
 ##--------------------------------------------------------------------------
 ## Display wiki syntax combo box if there's more than one configured syntax.
 ##--------------------------------------------------------------------------
-$xwiki.jsx.use($paneldoc.fullName)
+$xwiki.jsx.use($paneldoc.fullName)##
 #if($xwiki.getConfiguredSyntaxes().size() &gt; 1)
 &lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;Page Syntax&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;
 &lt;select name="syntaxId" id="xwikidocsyntaxinput2"#if($request.editor &amp;&amp; $request.editor == "wysiwyg") disabled="disabled"#end&gt;
 &lt;option value="xwiki/1.0"#if($tdoc.getSyntaxId().equalsIgnoreCase("xwiki/1.0")) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
 #set($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
-#foreach ($syntax in $syntaxFactory.getAvailableSyntaxes())
+#foreach($syntax in $syntaxFactory.getAvailableSyntaxes())
   #if($configuredSyntaxes.contains($syntax.toIdString()) &amp;&amp; !$syntax.toIdString().equalsIgnoreCase("xwiki/1.0"))
     &lt;option value="$syntax.toIdString()"#if($tdoc.getSyntaxId().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
   #end  

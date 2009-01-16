@@ -52,7 +52,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * blog settings: title, description, blog type (global or in-space), index display type (fixed size pagination, weekly
  * index, monthly index, all entries).
  * 
- * @param blogDoc the XDocument holding the blog definition object.
+ * @param blogDoc The blog document. It should contain a &lt;tt&gt;Blog.BlogClass&lt;/tt&gt; object.
  *###
 #macro(showBlogInfo $blogDoc)
   #if($context.action == 'inline')
@@ -115,10 +115,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param title The resulting title.
  *###
 #macro(getBlogTitle $blogDoc $title)
-  #set($title = "$!{blogDoc.getObject(${blogClassname}).getProperty('title').value}")
-  #if($title == '')
-    #set($title = "$!{blogDoc.displayTitle}")
-  #end
+  #getBlogProperty($blogDoc 'title' $!blogDoc.displayTitle $title)
 #end
 ##
 ##
@@ -131,7 +128,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param description The resulting description.
  *###
 #macro(getBlogDescription $blogDoc $description)
-  #set($description = "$!{blogDoc.getObject(${blogClassname}).getProperty('description').value}")
+  #getBlogProperty($blogDoc 'description' '' $description)
 #end
 ##
 ##
@@ -178,10 +175,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(getPagedBlogEntries $blogDoc $query $entries)
   #set($totalEntries = $xwiki.countDocuments(${query}))
-  #set($defaultItemsPerPage = "$!{blogDoc.display('itemsPerPage')}")
-  #if($defaultItemsPerPage == '')
-    #set($defaultItemsPerPage = '10')
-  #end
+  #getBlogProperty($blogDoc 'itemsPerPage' '10' $defaultItemsPerPage)
   #set($defaultItemsPerPage = $util.parseInt($defaultItemsPerPage))
   ## This macro is defined in the default macros.vm library. It also sets $itemsPerPage and $startAt.
   #preparePagedViewParams($totalEntries $defaultItemsPerPage)
@@ -307,11 +301,12 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * Checks if the provided blog is global or in-space.
  * 
  * @param blogDoc The blog document. It should contain a &lt;tt&gt;Blog.BlogClass&lt;/tt&gt; object with the &lt;tt&gt;blogType&lt;/tt&gt; property set.
- * @param isGlobal The resulting boolean. If the blog object does not define anything, it is considered global.
+ * @param isGlobal The resulting boolean. If the blog object does not define anything, it is considered in-space.
  *###
 #macro(isBlogGlobal $blogDoc $isGlobal)
   #set($isGlobal = false)
-  #if("$!{blogDoc.getObject($blogClassname).getProperty('blogType').value}" == 'global')
+  #getBlogProperty($blogDoc 'blogType' '' $discard)
+  #if($discard == 'global')
     #set($isGlobal = true)
   #end
 #end
@@ -327,10 +322,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param displayType The resulting string. If the blog object does not define anything, it is considered paginated.
  *###
 #macro(getBlogDisplayType $blogDoc $displayType)
-  #set($displayType = "$!{blogDoc.getObject($blogClassname).getProperty('displayType').value}")
-  #if($displayType == '')
-    #set($displayType = 'paginated')
-  #end
+  #getBlogProperty($blogDoc 'displayType' 'paginated' $displayType)
 #end
 ##
 ##
@@ -808,6 +800,23 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #end
   #if("$!{request.month}" != '')
     $monthDate.setMonthOfYear($util.parseInt($request.month))
+  #end
+#end
+##
+##
+##
+#**
+ * Retrieve a blog property (title, display type, etc).
+ * 
+ * @param blogDoc The blog document. It should contain a &lt;tt&gt;Blog.BlogClass&lt;/tt&gt; object.
+ * @param propertyName The name of the property to be retrieved. One of the &lt;tt&gt;Blog.BlogClass&lt;/tt&gt;'s properties.
+ * @param defaultValue The default value to use in case the blog object does not define one.
+ * @param propertyValue The resulting value.
+ *###
+#macro(getBlogProperty $blogDoc $propertyName $defaultValue $propertyValue)
+  #set($propertyValue = "$!{blogDoc.getObject(${blogClassname}).getProperty($propertyName).value}")
+  #if($propertyValue == '')
+    #set($propertyValue = $defaultValue)
   #end
 #end</content>
 </xwikidoc>

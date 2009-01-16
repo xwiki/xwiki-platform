@@ -686,6 +686,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-officeimporter</artifactId>
       <version>${pom.version}</version>
+      <!-- 
+        Only required at runtime; otherwise this will reduce the build time because the library 
+        and all of it's dependencies get added to the classpath during building and testing.
+       -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

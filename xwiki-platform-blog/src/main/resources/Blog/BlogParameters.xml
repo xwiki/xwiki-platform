@@ -26,6 +26,7 @@
 <content>## Blog
 #set($blogClassname = 'Blog.BlogClass')
 #set($blogTemplate = 'Blog.BlogTemplate')
+#set($blogSheet = 'Blog.BlogSheet')
 ## Blog entries
 #set($blogPostClassname = 'Blog.BlogPostClass')
 #set($blogPostTemplate = 'Blog.BlogPostTemplate')

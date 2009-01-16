@@ -39,8 +39,8 @@ ${Msz}Mb
           <span class="xwikibuttonlinks"><a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></span>
 	  #set($documentUrl=$doc.getExternalURL("download"))
       	  #set($attachmentUrl="$documentUrl/$attach.filename")
-          #set($attachmentSignature="/xwiki/bin/download/")
-          #set($webdavSignature="/xwiki/webdav/spaces/")
+          #set($attachmentSignature="${request.contextPath}${request.servletPath}/download/")
+          #set($webdavSignature="${request.contextPath}/webdav/spaces/")
           #set($fragments=$attachmentUrl.split($attachmentSignature))
           #if($listtool.size($fragments) == 2)
             #set($prefix=$listtool.get($fragments, 0))

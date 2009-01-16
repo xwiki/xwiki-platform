@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 

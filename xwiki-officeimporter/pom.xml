@@ -65,19 +65,19 @@
       <artifactId>jodconverter</artifactId>
       <version>2.2.1</version>
     </dependency>
+    <!-- Required by jodconverter. Refer http://www.artofsolving.com/node/28 and http://www.slf4j.org/faq.html#maven2-->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.4.3</version>
+    </dependency>
     <!-- Testing dependencies -->
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>
       <version>${platform.tool.test.version}</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.4.3</version>
-      <scope>test</scope>
-    </dependency>
+    </dependency>    
   </dependencies>
   <build>
     <plugins>

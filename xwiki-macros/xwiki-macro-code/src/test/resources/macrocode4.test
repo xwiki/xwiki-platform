@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.input|xwiki/2.0|skip
+.input|xwiki/2.0
 .# Testing real bigger and more complex code snippet
 .# SKIP: Since Jython 2.5 is too slow to run Pygments javascript lexers in good conditions, this feature is disabled.
 .#-----------------------------------------------------
@@ -75,18 +75,18 @@ onWord [Juriy]
 onSpace
 onWord [Zaytsev]
 onSpace
-onLineBreak
+onNewLine
 onWord [//]
 onSpace
 onWord [http://github.com/kangax/protolicious/tree/master/get_json.js]
-onLineBreak
+onNewLine
 endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
 onWord [(]
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [function]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [(){]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
@@ -138,7 +138,7 @@ endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onWord [global]
@@ -162,7 +162,7 @@ onWord [callback]
 onWord [)]
 onSpace
 onWord [{]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
@@ -209,9 +209,9 @@ onWord [id]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
-onLineBreak
+onNewLine
 onSpace
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
@@ -230,7 +230,7 @@ onSpace
 onWord [global]
 onSpace
 onWord [function]
-onLineBreak
+onNewLine
 endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
 onSpace
 onSpace
@@ -249,9 +249,9 @@ onWord [callback]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
-onLineBreak
+onNewLine
 onSpace
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
@@ -288,7 +288,7 @@ onSpace
 onWord [callback]
 onSpace
 onWord [name]
-onLineBreak
+onNewLine
 endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
 onSpace
 onSpace
@@ -331,9 +331,9 @@ beginFormat: [NONE] [[style]=[color: #BA2121; ]]
 onWord ['$1']
 endFormat: [NONE] [[style]=[color: #BA2121; ]]
 onWord [);]
-onLineBreak
+onNewLine
 onSpace
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
@@ -370,7 +370,7 @@ onSpace
 onWord [callback]
 onSpace
 onWord [function]
-onLineBreak
+onNewLine
 endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
 onSpace
 onSpace
@@ -390,7 +390,7 @@ endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [()]
 onSpace
 onWord [{]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
@@ -401,7 +401,7 @@ onWord [script]
 onWord [.]
 onWord [remove]
 onWord [();]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
@@ -420,7 +420,7 @@ endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
@@ -433,13 +433,13 @@ onWord [global]
 onWord [[]
 onWord [token]
 onWord [];]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
 onSpace
 onWord [};]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
@@ -450,9 +450,9 @@ onWord [appendChild]
 onWord [(]
 onWord [script]
 onWord [);]
-onLineBreak
+onNewLine
 onSpace
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onSpace
@@ -469,7 +469,7 @@ onSpace
 onWord [be]
 onSpace
 onWord [unique]
-onLineBreak
+onNewLine
 endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
 onSpace
 onSpace
@@ -479,13 +479,12 @@ onWord [id]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [++;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
-onLineBreak
+onNewLine
 onSpace
 onSpace
 onWord [}]
-onLineBreak
+onNewLine
 onWord [})();]
-onLineBreak
 endXMLNode [div] [class=code]
 endMacroMarker [code] [language=javascript] [
 // getJSON function by Juriy Zaytsev 

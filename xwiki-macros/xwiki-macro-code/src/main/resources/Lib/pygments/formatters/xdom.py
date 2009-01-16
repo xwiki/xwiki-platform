@@ -20,8 +20,6 @@
 """
 
 from pygments.formatter import Formatter
-from pygments.token import Token
-from pygments.token import Error
 
 __all__ = ['XDOMFormatter']
 
@@ -44,13 +42,9 @@ class XDOMFormatter(Formatter):
         
         for ttype, value in tokensource:
             if ttype == lasttype:
-                if ttype != Error:
-                    lastval += value
+                lastval += value
             else:
                 if lastval:
                     self.listener.format(lasttype.__str__(), lastval, self.style.style_for_token(lasttype))
                 lasttype = ttype
-                if ttype != Error:
-                    lastval = value
-                else:
-                    lastval = ''
+                lastval = value

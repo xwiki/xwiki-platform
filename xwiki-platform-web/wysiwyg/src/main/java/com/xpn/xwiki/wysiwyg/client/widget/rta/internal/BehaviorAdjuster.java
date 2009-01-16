@@ -141,6 +141,9 @@ public class BehaviorAdjuster implements LoadListener
             case Event.ONKEYPRESS:
                 onKeyPress();
                 break;
+            case Event.ONFOCUS:
+                onFocus();
+                break;
             default:
                 break;
         }
@@ -546,6 +549,14 @@ public class BehaviorAdjuster implements LoadListener
      * Called before the underlying rich text area looses focus.
      */
     protected void onBeforeBlur()
+    {
+        // Nothing here by default. May be overridden by browser specific implementations.
+    }
+
+    /**
+     * Called each time the underlying rich text area gains the focus.
+     */
+    protected void onFocus()
     {
         // Nothing here by default. May be overridden by browser specific implementations.
     }

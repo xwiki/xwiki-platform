@@ -474,4 +474,47 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         assertEquals(getBody(), range.getEndContainer());
         assertEquals(2, range.getEndOffset());
     }
+
+    /**
+     * Test if the range boundary markers inserted by the selection preserver in the edited document appear in the HTML
+     * output.
+     */
+    public void testRangeBoundaryMarkersAreHidden()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestRangeBoundaryMarkersAreHidden();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Test if the range boundary markers inserted by the selection preserver in the edited document appear in the HTML
+     * output.
+     */
+    private void doTestRangeBoundaryMarkersAreHidden()
+    {
+        String content = "bluebird";
+        rta.setHTML(content);
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild(), 4);
+        select(range);
+
+        preserver.saveSelection();
+        assertTrue(rta.getCommandManager().execute(Command.BOLD));
+
+        preserver.restoreSelection();
+        assertEquals("blue", rta.getDocument().getSelection().toString());
+        assertEquals("<strong>blue</strong>bird", rta.getHTML().toLowerCase());
+
+        rta.getHistory().undo();
+        assertEquals(content, rta.getHTML());
+    }
 }

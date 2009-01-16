@@ -26,6 +26,7 @@ import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 
@@ -143,6 +144,8 @@ public class SelectionPreserver
             // * most web browsers (including FF and IE) allow a range boundary to be placed before and after an image
             // node.
             ImageElement img = document.xCreateImageElement();
+            // We have to make sure the range boundary markers don't appear in rich text area's HTML
+            img.setAttribute(Element.META_DATA_ATTR, "");
             img.setWidth(0);
             img.setHeight(0);
             return img;

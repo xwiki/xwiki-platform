@@ -479,4 +479,72 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         // The following shoudn't fail.
         DOMUtils.getInstance().detach(node);
     }
+
+    /**
+     * Unit test for {@link DOMUtils#isSerializable(Node)}.
+     */
+    public void testIsSerializable()
+    {
+        Text text = Document.get().createTextNode("1983").cast();
+        assertTrue(DOMUtils.getInstance().isSerializable(text));
+
+        text.setData("");
+        assertFalse(DOMUtils.getInstance().isSerializable(text));
+
+        Element element = Document.get().createSpanElement().cast();
+        assertTrue(DOMUtils.getInstance().isSerializable(element));
+
+        element.setAttribute(Element.META_DATA_ATTR, "");
+        assertFalse(DOMUtils.getInstance().isSerializable(element));
+
+        Node comment = ((Document) Document.get()).createComment("");
+        assertTrue(DOMUtils.getInstance().isSerializable(comment));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getNormalizedNodeIndex(Node)}.
+     */
+    public void testGetNormalizedNodeIndex()
+    {
+        container.appendChild(Document.get().createTextNode("void"));
+        assertEquals(0, DOMUtils.getInstance().getNormalizedNodeIndex(container.getFirstChild()));
+
+        container.getFirstChild().setNodeValue("");
+        assertEquals(0, DOMUtils.getInstance().getNormalizedNodeIndex(container.getFirstChild()));
+
+        container.appendChild(Document.get().createSpanElement());
+        assertEquals(0, DOMUtils.getInstance().getNormalizedNodeIndex(container.getLastChild()));
+
+        container.getFirstChild().setNodeValue("null");
+        assertEquals(1, DOMUtils.getInstance().getNormalizedNodeIndex(container.getLastChild()));
+
+        container.appendChild(Document.get().createTextNode("int"));
+        assertEquals(2, DOMUtils.getInstance().getNormalizedNodeIndex(container.getLastChild()));
+
+        Element.as(container.getChildNodes().getItem(1)).setAttribute(Element.META_DATA_ATTR, "");
+        assertEquals(0, DOMUtils.getInstance().getNormalizedNodeIndex(container.getLastChild()));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getNormalizedChildCount(Node)}.
+     */
+    public void testGetNormalizedChildCount()
+    {
+        assertEquals(0, DOMUtils.getInstance().getNormalizedChildCount(container));
+
+        container.appendChild(Document.get().createTextNode(""));
+        assertEquals(0, DOMUtils.getInstance().getNormalizedChildCount(container));
+
+        container.getFirstChild().setNodeValue("double");
+        assertEquals(1, DOMUtils.getInstance().getNormalizedChildCount(container));
+
+        container.appendChild(Document.get().createSpanElement());
+        assertEquals(2, DOMUtils.getInstance().getNormalizedChildCount(container));
+
+        Element.as(container.getLastChild()).setAttribute(Element.META_DATA_ATTR, "");
+        assertEquals(1, DOMUtils.getInstance().getNormalizedChildCount(container));
+
+        container.getFirstChild().setNodeValue("");
+        assertEquals(0, DOMUtils.getInstance().getNormalizedChildCount(container));
+    }
 }

@@ -30,8 +30,6 @@ import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.dom.Text;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyFactory;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
@@ -57,16 +55,6 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
      * entry we have to remove the oldest one to make room.
      */
     private final int capacity;
-
-    /**
-     * The shortcut key that triggers the undo action.
-     */
-    private final ShortcutKey undoKey = ShortcutKeyFactory.createCtrlShortcutKey('Z');
-
-    /**
-     * The shortcut key that triggers the redo action.
-     */
-    private final ShortcutKey redoKey = ShortcutKeyFactory.createCtrlShortcutKey('Y');
 
     /**
      * The oldest stored history entry.
@@ -97,8 +85,6 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
         this.capacity = capacity;
 
         this.textArea = textArea;
-        textArea.addShortcutKey(undoKey);
-        textArea.addShortcutKey(redoKey);
         textArea.addKeyboardListener(this);
         textArea.getCommandManager().addCommandListener(this);
     }
@@ -329,15 +315,7 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
      */
     public void onKeyUp(Widget sender, char keyCode, int modifiers)
     {
-        if (sender == textArea) {
-            if ((modifiers & KeyboardListener.MODIFIER_CTRL) != 0) {
-                if (keyCode == undoKey.getKeyCode()) {
-                    undo();
-                } else if (keyCode == redoKey.getKeyCode()) {
-                    redo();
-                }
-            }
-        }
+        // ignore
     }
 
     /**
@@ -349,6 +327,10 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
     {
         if (sender == textArea.getCommandManager()) {
             if (command != Command.UNDO && command != Command.REDO) {
+                // Make sure the rich text area is focused before saving its state:
+                // * some browsers associate the selection with the focused state
+                // * allow focus listeners to be called since they might change the content
+                textArea.setFocus(true);
                 save();
                 previousKeyboardAction = null;
             }

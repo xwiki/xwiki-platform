@@ -128,4 +128,14 @@ public class IEDOMUtils extends DOMUtils
     /*-{
         return element.innerText;
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#hasAttribute(Element, String)
+     */
+    public native boolean hasAttribute(Element element, String attrName)
+    /*-{
+        return element.getAttribute(attrName) != null;
+    }-*/;
 }

@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.client.dom;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
  * Extends the element implementation provided by GWT to add useful methods. All of them should be removed as soon as
@@ -137,8 +136,9 @@ public class Element extends com.google.gwt.dom.client.Element
     {
         String outerHTML;
         // We need to remove the meta data attribute on serialization
-        String metaDataHTML = xGetAttribute(META_DATA_ATTR);
-        if (!StringUtils.isEmpty(metaDataHTML)) {
+        String metaDataHTML = null;
+        if (hasAttribute(META_DATA_ATTR)) {
+            metaDataHTML = xGetAttribute(META_DATA_ATTR);
             // Remove the attribute from this element
             removeAttribute(META_DATA_ATTR);
         }
@@ -150,7 +150,7 @@ public class Element extends com.google.gwt.dom.client.Element
         } else {
             outerHTML = getString();
         }
-        if (!StringUtils.isEmpty(metaDataHTML)) {
+        if (metaDataHTML != null) {
             // Put the meta data attribute back
             setAttribute(META_DATA_ATTR, metaDataHTML);
             outerHTML = metaDataHTML.replace(INNER_HTML_PLACEHOLDER, outerHTML);
@@ -213,12 +213,11 @@ public class Element extends com.google.gwt.dom.client.Element
         if (metaData == null) {
             // There's no saved reference to the meta data.
             // Test if this element has stored meta data.
-            String html = xGetAttribute(META_DATA_ATTR);
-            if (!StringUtils.isEmpty(html)) {
+            if (hasAttribute(META_DATA_ATTR)) {
                 // This element could be the result of node cloning or copy&paste.
                 // Let's update the cached meta data reference.
                 Element container = (Element) getOwnerDocument().createDivElement().cast();
-                container.xSetInnerHTML(html);
+                container.xSetInnerHTML(xGetAttribute(META_DATA_ATTR));
                 metaData = container.extractContents();
                 ((JavaScriptObject) cast()).set(META_DATA_REF, metaData);
             }
@@ -280,5 +279,15 @@ public class Element extends com.google.gwt.dom.client.Element
     public final String xGetInnerText()
     {
         return DOMUtils.getInstance().getInnerText(this);
+    }
+
+    /**
+     * @param attrName a string representing the name of an attribute
+     * @return true is this element has an attribute with the specified name, false otherwise
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2852
+     */
+    public final boolean hasAttribute(String attrName)
+    {
+        return DOMUtils.getInstance().hasAttribute(this, attrName);
     }
 }

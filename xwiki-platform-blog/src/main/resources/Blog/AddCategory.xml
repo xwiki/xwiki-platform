@@ -60,7 +60,7 @@
   #set($sql = "${sql}doc.space = '${space}' and ")
 #end
 #set($sql = "${sql}obj.name = doc.fullName and obj.className = 'Blog.CategoryClass' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' order by doc.name")
-&lt;dd&gt;&lt;select name="parent"  style="width: 95%"&gt;
+&lt;dd&gt;&lt;select name="parent" id="parent" style="width: 95%"&gt;
 &lt;option selected="selected" value="Blog.Categories"&gt;None&lt;/option&gt;
 #foreach($category in $xwiki.searchDocuments($sql))
   &lt;option value="$category"&gt;$xwiki.getDocument($category).display('name', 'view')&lt;/option&gt;

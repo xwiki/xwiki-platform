@@ -24,6 +24,7 @@
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
 <content>#includeMacros("Blog.BlogCode")
+#if($hasAdmin)
 ##
 ##
 ## List existing blogs.
@@ -68,11 +69,11 @@
 &lt;div&gt;
 &lt;dl&gt;
   &lt;dt&gt;&lt;label for="blogSpace"&gt;Space:&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;&lt;input type="text" name="blogSpace" value=""/&gt;&lt;/dd&gt;
+  &lt;dd&gt;&lt;input type="text" name="blogSpace" id="blogSpace" value=""/&gt;&lt;/dd&gt;
   &lt;dt&gt;&lt;label for="blogTitle"&gt;Title:&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;&lt;input type="text" name="blogTitle" value="Blog title"/&gt;&lt;/dd&gt;
+  &lt;dd&gt;&lt;input type="text" name="blogTitle" id="blogTitle" value="Blog title"/&gt;&lt;/dd&gt;
   &lt;dt&gt;&lt;label for="blogType"&gt;Blog type:&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;&lt;select name="blogType"&gt;
+  &lt;dd&gt;&lt;select name="blogType" id="blogType"&gt;
     &lt;option value="inner" selected="selected"&gt;blog inside an existing space&lt;/option&gt;
     &lt;option value="main"&gt;blog as the main content of a space&lt;/option&gt;
   &lt;/select&gt;&lt;/dd&gt;
@@ -80,4 +81,8 @@
   &lt;input type="submit" value="Create"/&gt;
 &lt;/div&gt;
 &lt;/form&gt;
+#else ## !hasAdmin
+  #xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+  #xwikimessageboxend()
+#end
 </content></xwikidoc>

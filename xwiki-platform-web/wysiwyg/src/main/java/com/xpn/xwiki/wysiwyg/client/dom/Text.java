@@ -86,8 +86,12 @@ public class Text extends com.google.gwt.dom.client.Text
     {
         int offset = 0;
         Node leftSibling = this.getPreviousSibling();
-        while (leftSibling != null && leftSibling.getNodeType() == Node.TEXT_NODE) {
-            offset += leftSibling.getNodeValue().length();
+        while (leftSibling != null) {
+            if (leftSibling.getNodeType() == Node.TEXT_NODE) {
+                offset += leftSibling.getNodeValue().length();
+            } else if (DOMUtils.getInstance().isSerializable(leftSibling)) {
+                break;
+            }
             leftSibling = leftSibling.getPreviousSibling();
         }
         return offset;

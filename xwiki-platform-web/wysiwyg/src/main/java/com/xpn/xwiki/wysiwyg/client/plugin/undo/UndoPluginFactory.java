@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.undo;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link UndoPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class UndoPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static UndoPluginFactory instance;
 
+    /**
+     * Default constructor.
+     */
     private UndoPluginFactory()
     {
         super("undo");
     }
 
+    /**
+     * @return the singleton factory instance.
+     */
     public static synchronized UndoPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class UndoPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

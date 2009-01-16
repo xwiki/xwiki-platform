@@ -34,6 +34,17 @@ import com.xpn.xwiki.wysiwyg.client.dom.Range;
 public class MozillaBehaviorAdjuster extends BehaviorAdjuster
 {
     /**
+     * The CSS class name associated with BRs we have to add inside empty block elements to make them editable in
+     * Mozilla.
+     */
+    public static final String EMPTY_LINE = "emptyLine";
+
+    /**
+     * The class name attribute.
+     */
+    public static final String CLASS_NAME = "class";
+
+    /**
      * {@inheritDoc}
      * 
      * @see BehaviorAdjuster#adjustDragDrop(Document)
@@ -167,6 +178,9 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
     protected void onBeforeBlur()
     {
         super.onBeforeBlur();
+        // The edited content might be submitted so we have to mark the BRs that have been added to allow the user to
+        // edit the empty block elements. These BRs will be removed from rich text area's HTML output on the server
+        // side.
         markUnwantedBRs();
     }
 
@@ -193,9 +207,37 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
                 leaf = DOMUtils.getInstance().getNextLeaf(leaf);
             }
             if (emptyLine) {
-                br.setClassName("emptyLine");
+                br.setClassName(EMPTY_LINE);
             } else {
-                br.removeAttribute("class");
+                br.removeAttribute(CLASS_NAME);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see BehaviorAdjuster#onFocus()
+     */
+    protected void onFocus()
+    {
+        super.onFocus();
+        // It seems the edited content wasn't submitted so we have to unmark the unwanted BRs in order to avoid
+        // conflicts with the rich text area's history mechanism.
+        unmarkUnwantedBRs();
+    }
+
+    /**
+     * @see #markUnwantedBRs()
+     */
+    protected void unmarkUnwantedBRs()
+    {
+        Document document = getTextArea().getDocument();
+        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
+        for (int i = 0; i < brs.getLength(); i++) {
+            Element br = (Element) brs.getItem(i);
+            if (EMPTY_LINE.equals(br.getClassName())) {
+                br.removeAttribute(CLASS_NAME);
             }
         }
     }

@@ -188,33 +188,69 @@ public abstract class DOMUtils
     }
 
     /**
-     * @param node a DOM node.
-     * @return the index of the given DOM node among its siblings, considering successive text nodes as one single node.
+     * Computes the index that can be used with <code>getChildNodes().getItem()</code> to retrieve the given node from
+     * its parent after the parent is serialized and deserialized.
+     * 
+     * @param node a DOM node
+     * @return the index of the given DOM node among its siblings, considering successive text nodes as one single node
+     *         and ignoring hidden siblings
      */
     public int getNormalizedNodeIndex(Node node)
     {
         int count = 0;
-        Node leftSibling = node;
-        while (leftSibling.getPreviousSibling() != null) {
-            if (leftSibling.getNodeType() != Node.TEXT_NODE
-                || leftSibling.getPreviousSibling().getNodeType() != Node.TEXT_NODE) {
-                count++;
+        Node sibling = node;
+        while (sibling != null) {
+            Node left = sibling.getPreviousSibling();
+            if (sibling.getNodeType() == Node.TEXT_NODE) {
+                while (left != null && (left.getNodeType() == Node.TEXT_NODE || !isSerializable(left))) {
+                    left = left.getPreviousSibling();
+                }
+            } else {
+                while (left != null && !isSerializable(left)) {
+                    left = left.getPreviousSibling();
+                }
             }
-            leftSibling = leftSibling.getPreviousSibling();
+            count += (left != null) ? 1 : 0;
+            sibling = left;
         }
         return count;
     }
 
     /**
+     * Specifies if a node's HTML serialization is included in its parent node's HTML serialization. Normally the inner
+     * HTML of an element includes the HTML representation of all of its descendants. This is not the case when one of
+     * the descendants is an element with an empty meta data associated. Associating empty meta data to an element is a
+     * way to hide that element from the inner HTML of his ancestors.
+     * 
+     * @param node a DOM node
+     * @return true if the given node is represented in its parent inner HTML
+     */
+    public boolean isSerializable(Node node)
+    {
+        switch (node.getNodeType()) {
+            case Node.TEXT_NODE:
+                return node.getNodeValue().length() > 0;
+            case Node.ELEMENT_NODE:
+                Element element = (Element) node;
+                return !element.hasAttribute(Element.META_DATA_ATTR)
+                    || !"".equals(element.xGetAttribute(Element.META_DATA_ATTR));
+            default:
+                return true;
+        }
+    }
+
+    /**
      * @param node a DOM node.
      * @return the child count for the given DOM node, considering successive child text nodes as one single child.
+     * @see #getNormalizedNodeIndex(Node)
      */
     public int getNormalizedChildCount(Node node)
     {
         if (!node.hasChildNodes()) {
             return 0;
         } else {
-            return 1 + getNormalizedNodeIndex(node.getLastChild());
+            Node last = node.getLastChild();
+            return (isSerializable(last) ? 1 : 0) + getNormalizedNodeIndex(last);
         }
     }
 
@@ -897,4 +933,15 @@ public abstract class DOMUtils
         }
         return text.toString();
     }
+
+    /**
+     * @param element a DOM element
+     * @param attrName a string representing the name of an attribute
+     * @return true is the given element has an attribute with the specified name, false otherwise
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2852
+     */
+    public native boolean hasAttribute(Element element, String attrName)
+    /*-{
+        return element.hasAttribute(attrName);
+    }-*/;
 }

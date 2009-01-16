@@ -274,11 +274,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(getGlobalBlogEntries $entries)
   #getBlogEntriesBaseQuery($query)
   #set($totalEntries = $xwiki.countDocuments(${query}))
-  #set($defaultItemsPerPage = "$!{xwiki.getDocument('BLog.WebHome').display('itemsPerPage')}")
-  #if($defaultItemsPerPage == '')
-    #set($defaultItemsPerPage = '10')
-  #end
-  #set($defaultItemsPerPage = $util.parseInt($defaultItemsPerPage))
+  #set($defaultItemsPerPage = 20)
   ## This macro is defined in the default macros.vm library. It also sets $itemsPerPage and $startAt.
   #preparePagedViewParams($totalEntries $defaultItemsPerPage)
   #set($entries = $xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt))

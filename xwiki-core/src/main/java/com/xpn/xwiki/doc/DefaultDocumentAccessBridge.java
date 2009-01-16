@@ -198,7 +198,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         
         String url;
-        if ((documentName == null || documentName.length() == 0) && (anchor != null && anchor.length() > 0)) {
+        if (StringUtils.isEmpty(documentName) && !StringUtils.isEmpty(anchor)) {
             url = xcontext.getDoc().getURL(action, queryString, anchor, xcontext);
         } else {
             url = xcontext.getWiki().getDocument(documentName, xcontext).getURL(action, queryString, anchor, xcontext);

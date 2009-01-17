@@ -45,6 +45,7 @@ import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -990,12 +991,14 @@ public class Package
     public void addAllWikiDocuments(XWikiContext context) throws XWikiException
     {
         XWiki wiki = context.getWiki();
-        List<String> spaces = wiki.getSpaces(context);
-        for (int i = 0; i < spaces.size(); i++) {
-            List<String> docNameList = wiki.getSpaceDocsName(spaces.get(i), context);
-            for (String docName : docNameList) {
-                add(spaces.get(i) + "." + docName, DocumentInfo.ACTION_OVERWRITE, context);
+        try {
+            List<String> documentNames = wiki.getStore().getQueryManager().getNamedQuery("getAllDocuments").execute();
+            for (String docName : documentNames) {
+                add(docName, DocumentInfo.ACTION_OVERWRITE, context);
             }
+        } catch (QueryException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 

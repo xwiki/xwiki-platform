@@ -6,10 +6,16 @@
   <query name="getSpaceDocsName">
     select distinct doc.name from XWikiDocument doc where doc.space=:space and (doc.hidden &lt;&gt; 1 or doc.hidden is null)
   </query>
+  <query name="getAllSpaceDocuments">
+    select distinct doc.name from XWikiDocument doc where doc.space=:space
+  </query>
   <query name="getSpaces">
     select distinct doc.space from XWikiDocument doc
   </query>
   <query name="getAllDocuments">
+    select doc.fullName from XWikiDocument as doc
+  </query>
+  <query name="getAllPublicDocuments">
     select doc.fullName from XWikiDocument as doc where (doc.hidden &lt;&gt; 1 or doc.hidden is null)
   </query>
   <query name="listGroupsForUser">

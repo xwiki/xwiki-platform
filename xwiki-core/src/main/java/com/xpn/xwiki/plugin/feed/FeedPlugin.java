@@ -631,7 +631,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         needsUpdate |= bclass.addDateField("date", "date", "dd/MM/yyyy HH:mm:ss");
         needsUpdate |= bclass.addNumberField("flag", "Flag", 5, "integer");
         needsUpdate |= bclass.addNumberField("read", "Read", 5, "integer");
-        needsUpdate |= bclass.addStaticListField("tags", "Tags", 1, true, "");
+        needsUpdate |= bclass.addStaticListField("tags", "Tags", 1, true, true, "", null, null);
 
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {

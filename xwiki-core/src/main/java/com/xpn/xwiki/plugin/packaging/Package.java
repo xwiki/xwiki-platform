@@ -996,9 +996,9 @@ public class Package
             for (String docName : documentNames) {
                 add(docName, DocumentInfo.ACTION_OVERWRITE, context);
             }
-        } catch (QueryException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (QueryException ex) {
+            throw new PackageException(PackageException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
+                "Cannot retrieve the list of documents to export", ex);
         }
     }
 

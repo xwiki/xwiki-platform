@@ -10,8 +10,8 @@
 #-# [Since 1.7M1]
 #-# The cache component implementation to use as "normal" (can be local or distributed depending on the implementation)
 #-# cache component.
-# cache.cacheHint=jbosscache
+# cache.defaultCache=jbosscache
 
 #-# [Since 1.7M1]
 #-# The cache component to use as local cache component. 
-# cache.localCacheHint=jbosscache/local
+# cache.defaultLocalCache=jbosscache/local

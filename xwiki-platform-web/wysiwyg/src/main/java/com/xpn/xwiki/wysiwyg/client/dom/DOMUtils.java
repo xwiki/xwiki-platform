@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.dom;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -69,6 +70,11 @@ public abstract class DOMUtils
      * Constant for the CDATA node type.
      */
     public static final short CDATA_NODE = 4;
+
+    /**
+     * Constant for the DocumentFragment node type.
+     */
+    public static final short DOCUMENT_FRAGMENT_NODE = 11;
 
     /**
      * The instance in use.
@@ -414,17 +420,23 @@ public abstract class DOMUtils
     }
 
     /**
-     * @param node A DOM node.
-     * @return The list of ancestors of the given node, starting with it.
+     * @param node a DOM node
+     * @return the list of ancestors of the given node, starting with it
      */
     public List<Node> getAncestors(Node node)
     {
+        if (node == null) {
+            return Collections.emptyList();
+        }
         List<Node> ancestors = new ArrayList<Node>();
         Node ancestor = node;
-        while (ancestor != null) {
+        do {
             ancestors.add(ancestor);
+            if (ancestor.getNodeType() == DOCUMENT_FRAGMENT_NODE) {
+                break;
+            }
             ancestor = ancestor.getParentNode();
-        }
+        } while (ancestor != null);
         return ancestors;
     }
 
@@ -536,7 +548,7 @@ public abstract class DOMUtils
      */
     public Node cloneNode(Node parent, Node descendant, int offset, boolean left)
     {
-        int delta = left ? -1 : +1;
+        int delta = left ? 0 : 1;
         int index = getNodeIndex(descendant) + delta;
         Node clone = cloneNode(descendant, offset, left);
         Node node = descendant.getParentNode();
@@ -944,4 +956,118 @@ public abstract class DOMUtils
     /*-{
         return element.hasAttribute(attrName);
     }-*/;
+
+    /**
+     * Extracts the contents of the given node. If node type is text, CDATA or comment then only the data between
+     * startOffset (including) and endOffset is kept. If node type is element then only the child nodes with indexes
+     * between startOffset (including) and endOffset are included in the document fragment returned.
+     * 
+     * @param node the DOM node whose contents will be extracted
+     * @param startOffset the index of the first child to extract or the first character to include in the extracted
+     *            contents
+     * @param endOffset specifies where the extracted contents end
+     * @return the extracted contents of the given node, between start offset and end offset
+     */
+    public DocumentFragment extractNodeContents(Node node, int startOffset, int endOffset)
+    {
+        DocumentFragment contents = ((Document) node.getOwnerDocument()).createDocumentFragment();
+        switch (node.getNodeType()) {
+            case CDATA_NODE:
+            case COMMENT_NODE:
+            case Node.TEXT_NODE:
+                if (startOffset < endOffset) {
+                    Node clone = node.cloneNode(false);
+                    clone.setNodeValue(node.getNodeValue().substring(startOffset, endOffset));
+                    contents.appendChild(clone);
+                    node.setNodeValue(node.getNodeValue().substring(0, startOffset)
+                        + node.getNodeValue().substring(endOffset));
+                }
+                break;
+            case Node.ELEMENT_NODE:
+                for (int i = startOffset; i < endOffset; i++) {
+                    contents.appendChild(node.getChildNodes().getItem(startOffset));
+                }
+                break;
+            default:
+                // ignore
+        }
+        return contents;
+    }
+
+    /**
+     * Extracts the node specified by its parent and its descendant, including only the left or right part of the tree
+     * whose separator is the path from the given descendant to the parent of the extracted node.
+     * 
+     * @param parent the parent of the extracted node
+     * @param descendant a descendant of the extracted node
+     * @param offset the offset within the given descendant. It can be either a character index or a child index
+     *            depending on the descendant node type.
+     * @param left specifies which subtree to be extracted. Left and right subtrees are delimited by the path from the
+     *            given descendant to the parent of the extracted node.
+     * @return the extracted subtree
+     */
+    public Node extractNode(Node parent, Node descendant, int offset, boolean left)
+    {
+        int delta = left ? 0 : 1;
+        int index = getNodeIndex(descendant) + delta;
+        Node clone = extractNode(descendant, offset, left);
+        Node node = descendant.getParentNode();
+        while (node != parent) {
+            Node child = clone;
+            clone = extractNode(node, index, left);
+            if (left || clone.getFirstChild() == null) {
+                clone.appendChild(child);
+            } else {
+                clone.insertBefore(child, clone.getFirstChild());
+            }
+            index = getNodeIndex(node) + delta;
+            node = node.getParentNode();
+        }
+        return clone;
+    }
+
+    /**
+     * Extracts the left or right side of the subtree rooted in the given node.
+     * 
+     * @param node the root of the subtree whose left or right side will be extracted
+     * @param offset marks the boundary between the left and the right subtrees. It can be either a character index or a
+     *            child index, depending on the type of the given node.
+     * @param left specifies which of the subtrees to be extracted
+     * @return the extracted subtree
+     */
+    public Node extractNode(Node node, int offset, boolean left)
+    {
+        return left ? extractNode(node, 0, offset) : extractNode(node, offset, getLength(node));
+    }
+
+    /**
+     * Extracts the given DOM node, keeping only the contents between start and end offset. If node type is text, CDATA
+     * or comment then both offsets represent character indexes. Otherwise they represent child indexes.
+     * 
+     * @param node the DOM node to be extracted
+     * @param startOffset specifies where to start the extraction
+     * @param endOffset specifies where to end the extraction
+     * @return a shallow clone of the given node, containing only the contents between start and end offset, which have
+     *         been extracted from the input node
+     */
+    public Node extractNode(Node node, int startOffset, int endOffset)
+    {
+        Node clone = node.cloneNode(false);
+        switch (node.getNodeType()) {
+            case CDATA_NODE:
+            case COMMENT_NODE:
+            case Node.TEXT_NODE:
+                clone.setNodeValue(node.getNodeValue().substring(startOffset, endOffset));
+                node.setNodeValue(node.getNodeValue().substring(0, startOffset)
+                    + node.getNodeValue().substring(endOffset));
+                return clone;
+            case Node.ELEMENT_NODE:
+                for (int i = startOffset; i < endOffset; i++) {
+                    clone.appendChild(node.getChildNodes().getItem(startOffset));
+                }
+                return clone;
+            default:
+                throw new IllegalArgumentException(UNSUPPORTED_NODE_TYPE);
+        }
+    }
 }

@@ -218,6 +218,8 @@ public class DefaultRange implements Range
 
         if (startContainer == endContainer) {
             domUtils.deleteNodeContents(root, startOffset, endOffset);
+            // Take the range gravity into account.
+            collapse(true);
         } else {
             int startIndex = startOffset;
             if (startContainer != root) {
@@ -229,11 +231,69 @@ public class DefaultRange implements Range
             if (endContainer != root) {
                 endIndex = domUtils.getNodeIndex(domUtils.getChild(root, endContainer));
                 domUtils.deleteNodeContents(root, endContainer, endOffset, true);
+                // Take the range gravity into account.
+                setEnd(endContainer, 0);
+            } else {
+                // Take the range gravity into account.
+                setEnd(root, startIndex);
             }
             domUtils.deleteNodeContents(root, startIndex, endIndex);
         }
 
-        setRange(startContainer, startOffset, startContainer, startOffset);
+        // At this point we should be checking for the case where we have 2 adjacent text nodes left, each containing
+        // one of the range end points. The spec says the 2 nodes should be merged in that case, and to use Normalize()
+        // to do the merging, but calling Normalize() on the common parent to accomplish this might also normalize nodes
+        // that are outside the range but under the common parent. Need to verify with the range commitee members that
+        // this was the desired behavior. For now we don't merge anything!
+        // Filed as https://bugzilla.mozilla.org/show_bug.cgi?id=401276
+
+        collapseRangeAfterDelete();
+    }
+
+    /**
+     * Utility method that is used by {@link #deleteContents()} and {@link #extractContents()} to collapse the range in
+     * the correct place, under the range's root container (the range end points common container) as outlined by the
+     * Range spec: http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/ranges.html
+     * <p>
+     * The assumption made by this method is that the delete or extract has been done already, and left the range in a
+     * state where there is no content between the 2 end points.
+     */
+    private void collapseRangeAfterDelete()
+    {
+        // Check if range gravity took care of collapsing the range for us!
+        if (isCollapsed()) {
+            // The range is collapsed so there's nothing for us to do.
+            //
+            // There are 2 possible scenarios here:
+            //
+            // 1. the range could've been collapsed prior to the delete/extract,
+            // which would've resulted in nothing being removed, so the range
+            // is already where it should be.
+            //
+            // 2. Prior to the delete/extract, the range's start and end were in
+            // the same container which would mean everything between them
+            // was removed, causing range gravity to collapse the range.
+        } else {
+            // The range isn't collapsed so figure out the appropriate place to collapse!
+            Node commonAncestor = getCommonAncestorContainer();
+
+            // Collapse to one of the end points if they are already in the
+            // commonAncestor. This should work ok since this method is called
+            // immediately after a delete or extract that leaves no content
+            // between the 2 end points!
+            if (startContainer == commonAncestor) {
+                collapse(true);
+            } else if (endContainer == commonAncestor) {
+                collapse(false);
+            } else {
+                // End points are at differing levels. We want to collapse to the
+                // point that is between the 2 subtrees that contain each point,
+                // under the common ancestor.
+                Node startAncestor = domUtils.getChild(commonAncestor, startContainer);
+                selectNode(startAncestor);
+                collapse(false);
+            }
+        }
     }
 
     /**
@@ -255,6 +315,7 @@ public class DefaultRange implements Range
      * {@inheritDoc}
      * 
      * @see Range#extractContents()
+     * @see #deleteContents()
      */
     public DocumentFragment extractContents()
     {
@@ -262,8 +323,38 @@ public class DefaultRange implements Range
             throw new IllegalStateException();
         }
 
-        // TODO
-        throw new UnsupportedOperationException();
+        Node root = getCommonAncestorContainer();
+        DocumentFragment contents;
+
+        if (startContainer == endContainer) {
+            contents = domUtils.extractNodeContents(root, startOffset, endOffset);
+            // Take the range gravity into account.
+            collapse(true);
+        } else {
+            contents = ((Document) root.getOwnerDocument()).createDocumentFragment();
+
+            int startIndex = startOffset;
+            if (startContainer != root) {
+                contents.appendChild(domUtils.extractNode(root, startContainer, startOffset, false));
+                startIndex = domUtils.getNodeIndex(domUtils.getChild(root, startContainer)) + 1;
+            }
+
+            if (endContainer != root) {
+                int endIndex = domUtils.getNodeIndex(domUtils.getChild(root, endContainer));
+                contents.appendChild(domUtils.extractNodeContents(root, startIndex, endIndex));
+                contents.appendChild(domUtils.extractNode(root, endContainer, endOffset, true));
+                // Take the range gravity into account.
+                setEnd(endContainer, 0);
+            } else {
+                contents.appendChild(domUtils.extractNodeContents(root, startIndex, endOffset));
+                // Take the range gravity into account.
+                setEnd(root, startIndex);
+            }
+        }
+
+        collapseRangeAfterDelete();
+
+        return contents;
     }
 
     /**
@@ -343,8 +434,35 @@ public class DefaultRange implements Range
      */
     public void insertNode(Node newNode)
     {
-        // TODO
-        throw new UnsupportedOperationException();
+        // Compute the number of nodes to insert.
+        int delta = newNode.getNodeType() == DOMUtils.DOCUMENT_FRAGMENT_NODE ? newNode.getChildNodes().getLength() : 1;
+        if (delta == 0) {
+            // There's nothing to insert.
+            return;
+        }
+        switch (startContainer.getNodeType()) {
+            case DOMUtils.CDATA_NODE:
+            case DOMUtils.COMMENT_NODE:
+            case Node.TEXT_NODE:
+                Node sibling = domUtils.splitNode(startContainer, startOffset);
+                sibling.getParentNode().insertBefore(newNode, sibling);
+                if (startContainer == endContainer) {
+                    setEnd(sibling, endOffset - startOffset);
+                } else if (startContainer.getParentNode() == endContainer) {
+                    // Move the end with the number of inserted nodes plus 1 text node resulted after the split.
+                    setEnd(endContainer, endOffset + delta + 1);
+                }
+                break;
+            case Node.ELEMENT_NODE:
+                domUtils.insertAt(startContainer, newNode, startOffset);
+                if (startContainer == endContainer) {
+                    // Move the end with the number of inserted nodes.
+                    setEnd(endContainer, endOffset + delta);
+                }
+                break;
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     /**
@@ -391,7 +509,7 @@ public class DefaultRange implements Range
     public void setEnd(Node refNode, int offset)
     {
         if (!positioned || startContainer.getOwnerDocument() != refNode.getOwnerDocument()
-            || domUtils.comparePoints(startContainer, startOffset, refNode, offset) == 1) {
+            || isAfterOrDisconnected(startContainer, startOffset, refNode, offset)) {
             setRange(refNode, offset, refNode, offset);
         } else {
             setRange(startContainer, startOffset, refNode, offset);
@@ -426,10 +544,29 @@ public class DefaultRange implements Range
     public void setStart(Node refNode, int offset)
     {
         if (!positioned || endContainer.getOwnerDocument() != refNode.getOwnerDocument()
-            || domUtils.comparePoints(refNode, offset, endContainer, endOffset) == 1) {
+            || isAfterOrDisconnected(refNode, offset, endContainer, endOffset)) {
             setRange(refNode, offset, refNode, offset);
         } else {
             setRange(refNode, offset, endContainer, endOffset);
+        }
+    }
+
+    /**
+     * Utility method for testing if one boundary point is after another or it they are disconnected.
+     * 
+     * @param alice first point's node
+     * @param aliceOffset first point's offset
+     * @param bob second point's node
+     * @param bobOffset second point's offset
+     * @return true if the first point is after the second point or if the given points are disconnected
+     */
+    private boolean isAfterOrDisconnected(Node alice, int aliceOffset, Node bob, int bobOffset)
+    {
+        try {
+            return domUtils.comparePoints(alice, aliceOffset, bob, bobOffset) == 1;
+        } catch (IllegalArgumentException e) {
+            // The given boundary points are disconnected.
+            return true;
         }
     }
 
@@ -454,14 +591,60 @@ public class DefaultRange implements Range
     }
 
     /**
+     * The {@link #surroundContents(Node)} method raises an exception if the Range partially selects a non-Text node. An
+     * example of a Range for which {@link #surroundContents(Node)} raises an exception is:
+     * <code>&lt;FOO&gt;A<strong>B&lt;BAR&gt;C</strong>D&lt;/BAR&gt;E&lt;/FOO&gt;</code>
+     * 
+     * @return true if {@link #surroundContents(Node)} can be called on the current range
+     */
+    private boolean canSurroundContents()
+    {
+        if (startContainer == endContainer) {
+            return true;
+        }
+
+        boolean startIsText = startContainer.getNodeType() == Node.TEXT_NODE;
+        boolean endIsText = endContainer.getNodeType() == Node.TEXT_NODE;
+        Node startParent = startContainer.getParentNode();
+        Node endParent = endContainer.getParentNode();
+
+        // I'm using the bitwise AND operator to reduce the cyclomatic complexity.
+        boolean can = (startIsText & endIsText) && startParent != null && startParent == endParent;
+        can = can || (startIsText && startParent != null && startParent == endContainer);
+        return can || (endIsText && endParent != null && endParent == startContainer);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see Range#surroundContents(Node)
      */
     public void surroundContents(Node newParent)
     {
-        // TODO
-        throw new UnsupportedOperationException();
+        // The surroundContents() method raises an exception if the Range partially selects a non-Text node. An example
+        // of a Range for which surroundContents() raises an exception is: <FOO>A|B<BAR>C|D</BAR>E</FOO>
+        if (!canSurroundContents()) {
+            throw new IllegalStateException();
+        }
+
+        // Extract the contents within the range.
+        DocumentFragment contents = extractContents();
+
+        // Spec says we need to remove all of newParent's children prior to insertion.
+        Node child = newParent.getFirstChild();
+        while (child != null) {
+            newParent.removeChild(child);
+            child = newParent.getFirstChild();
+        }
+
+        // Insert newParent at the range's start point.
+        insertNode(newParent);
+
+        // Append the contents we extracted under newParent.
+        newParent.appendChild(contents);
+
+        // Select newParent, and its contents.
+        selectNode(newParent);
     }
 
     /**

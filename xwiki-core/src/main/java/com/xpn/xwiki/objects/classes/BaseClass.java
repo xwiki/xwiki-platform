@@ -561,12 +561,22 @@ public class BaseClass extends BaseCollection implements ClassInterface
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         String values, String displayType, String separators)
     {
+        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, false, values, displayType, separators);
+    }
+
+    /**
+     * @since 1.8M1
+     */
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String values, String displayType, String separators)
+    {
         if (get(fieldName) == null) {
             StaticListClass list_class = new StaticListClass();
             list_class.setName(fieldName);
             list_class.setPrettyName(fieldPrettyName);
             list_class.setSize(size);
             list_class.setMultiSelect(multiSelect);
+            list_class.setRelationalStorage(relationalStorage);
             list_class.setValues(values);
             if (displayType != null) {
                 list_class.setDisplayType(displayType);
@@ -637,13 +647,22 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public boolean addDBListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String sql)
     {
+        return addDBListField(fieldName, fieldPrettyName, size, multiSelect, multiSelect, sql);
+    }
+
+    /**
+     * @since 1.8M1
+     */
+    public boolean addDBListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String sql)
+    {
         if (get(fieldName) == null) {
             DBListClass list_class = new DBListClass();
             list_class.setName(fieldName);
             list_class.setPrettyName(fieldPrettyName);
             list_class.setSize(size);
             list_class.setMultiSelect(multiSelect);
-            list_class.setRelationalStorage(multiSelect);
+            list_class.setRelationalStorage(relationalStorage);
             list_class.setSql(sql);
             list_class.setObject(this);
             put(fieldName, list_class);
@@ -662,13 +681,22 @@ public class BaseClass extends BaseCollection implements ClassInterface
     public boolean addDBTreeListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         String sql)
     {
+        return addDBTreeListField(fieldName, fieldPrettyName, size, multiSelect, multiSelect, sql);
+    }
+
+    /**
+     * @since 1.8M1
+     */
+    public boolean addDBTreeListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String sql)
+    {
         if (get(fieldName) == null) {
             DBTreeListClass list_class = new DBTreeListClass();
             list_class.setName(fieldName);
             list_class.setPrettyName(fieldPrettyName);
             list_class.setSize(size);
             list_class.setMultiSelect(multiSelect);
-            list_class.setRelationalStorage(multiSelect);
+            list_class.setRelationalStorage(relationalStorage);
             list_class.setSql(sql);
             list_class.setObject(this);
             put(fieldName, list_class);

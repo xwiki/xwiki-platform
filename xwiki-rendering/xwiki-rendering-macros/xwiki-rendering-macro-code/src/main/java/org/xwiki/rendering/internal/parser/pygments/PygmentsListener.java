@@ -30,7 +30,7 @@ import java.util.Map;
 public interface PygmentsListener
 {
     /**
-     * Called by pygments each time token type changed.
+     * Called by Pygments each time token type changed.
      * 
      * @param tokenType the token type.
      * @param value the value.

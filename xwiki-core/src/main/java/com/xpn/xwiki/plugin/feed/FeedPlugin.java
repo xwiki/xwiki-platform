@@ -179,7 +179,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             configuration.setConfigurationId("xwiki.plugin.feedcache");
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(iCapacity);
-            lru.setTimeToLive(refreshPeriod);
+            lru.setTimeToLive(this.refreshPeriod);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
             this.feedCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
@@ -359,7 +359,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     nbfeedsErrors++;
                 }
 
-                UpdateThread updateThread = updateThreads.get(space);
+                UpdateThread updateThread = this.updateThreads.get(space);
                 if (updateThread != null) {
                     updateThread.setNbLoadedFeeds(nbfeeds + updateThread.getNbLoadedFeeds());
                     updateThread.setNbLoadedFeedsErrors(nbfeedsErrors + updateThread.getNbLoadedFeedsErrors());
@@ -631,7 +631,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         needsUpdate |= bclass.addDateField("date", "date", "dd/MM/yyyy HH:mm:ss");
         needsUpdate |= bclass.addNumberField("flag", "Flag", 5, "integer");
         needsUpdate |= bclass.addNumberField("read", "Read", 5, "integer");
-        needsUpdate |= bclass.addStaticListField("tags", "Tags", 1, true, "");
+        needsUpdate |= bclass.addStaticListField("tags", "Tags", 1, true, true, "", null, null);
 
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {

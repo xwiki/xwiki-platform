@@ -28,8 +28,10 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.officeimporter.filter.AnchorFilter;
 import org.xwiki.officeimporter.filter.HTMLFilter;
 import org.xwiki.officeimporter.filter.ImageFilter;
+import org.xwiki.officeimporter.filter.LineBreakFilter;
 import org.xwiki.officeimporter.filter.LinkFilter;
 import org.xwiki.officeimporter.filter.ListFilter;
 import org.xwiki.officeimporter.filter.ParagraphFilter;
@@ -79,8 +81,10 @@ public class OpenOfficeHTMLCleaner extends AbstractLogEnabled implements HTMLCle
         filterList.add(new ParagraphFilter());
         filterList.add(new ImageFilter(docBridge, params.get("targetDocument")));
         filterList.add(new LinkFilter());
+        filterList.add(new AnchorFilter());
         filterList.add(new ListFilter());
         filterList.add(new TableFilter());
+        filterList.add(new LineBreakFilter());
         // Default cleaning.
         Document document = defaultHtmlCleaner.clean(originalHtmlContent);
         // Apply filters.

@@ -45,6 +45,7 @@ import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -586,11 +587,11 @@ public class Package
                 }
             }
             try {
-                if (!backupPack) {
+                if (!this.backupPack) {
                     doc.getDoc().setAuthor(context.getUser());
                 }
 
-                if ((!preserveVersion) && (!withVersions)) {
+                if ((!this.preserveVersion) && (!this.withVersions)) {
                     doc.getDoc().setVersion("1.1");
                 }
 
@@ -607,7 +608,7 @@ public class Package
                 doc.getDoc().saveAllAttachments(false, true, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
-                if (withVersions) {
+                if (this.withVersions) {
                     // we need to force the saving the document archive.
                     if (doc.getDoc().getDocumentArchive() != null) {
                         context.getWiki().getVersioningStore().saveXWikiDocArchive(
@@ -618,7 +619,7 @@ public class Package
                 // then archive was not saved
                 // so we need save it via resetArchive
                 if ((doc.getDoc().getDocumentArchive() == null)
-                    || (doc.getDoc().getDocumentArchive().getNodes() == null) || (!withVersions)) {
+                    || (doc.getDoc().getDocumentArchive().getNodes() == null) || (!this.withVersions)) {
                     doc.getDoc().resetArchive(context);
                 }
             } catch (XWikiException e) {
@@ -789,31 +790,31 @@ public class Package
         docel.add(elInfos);
 
         Element el = new DOMElement("name");
-        el.addText(name);
+        el.addText(this.name);
         elInfos.add(el);
 
         el = new DOMElement("description");
-        el.addText(description);
+        el.addText(this.description);
         elInfos.add(el);
 
         el = new DOMElement("licence");
-        el.addText(licence);
+        el.addText(this.licence);
         elInfos.add(el);
 
         el = new DOMElement("author");
-        el.addText(authorName);
+        el.addText(this.authorName);
         elInfos.add(el);
 
         el = new DOMElement("version");
-        el.addText(version);
+        el.addText(this.version);
         elInfos.add(el);
 
         el = new DOMElement("backupPack");
-        el.addText(new Boolean(backupPack).toString());
+        el.addText(new Boolean(this.backupPack).toString());
         elInfos.add(el);
 
         el = new DOMElement("preserveVersion");
-        el.addText(new Boolean(preserveVersion).toString());
+        el.addText(new Boolean(this.preserveVersion).toString());
         elInfos.add(el);
 
         Element elfiles = new DOMElement("files");
@@ -990,12 +991,14 @@ public class Package
     public void addAllWikiDocuments(XWikiContext context) throws XWikiException
     {
         XWiki wiki = context.getWiki();
-        List<String> spaces = wiki.getSpaces(context);
-        for (int i = 0; i < spaces.size(); i++) {
-            List<String> docNameList = wiki.getSpaceDocsName(spaces.get(i), context);
-            for (String docName : docNameList) {
-                add(spaces.get(i) + "." + docName, DocumentInfo.ACTION_OVERWRITE, context);
+        try {
+            List<String> documentNames = wiki.getStore().getQueryManager().getNamedQuery("getAllDocuments").execute();
+            for (String docName : documentNames) {
+                add(docName, DocumentInfo.ACTION_OVERWRITE, context);
             }
+        } catch (QueryException ex) {
+            throw new PackageException(PackageException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
+                "Cannot retrieve the list of documents to export", ex);
         }
     }
 

@@ -64,6 +64,7 @@ public class XWikiSyntaxEscapeHandler
         
         if (blockListener.isInTable()) {
             replaceAll(accumulatedBuffer, "|", "~|");
+            replaceAll(accumulatedBuffer, "!!", "~!!");
         }
 
         if (escapeFirstIfMatching != null) {

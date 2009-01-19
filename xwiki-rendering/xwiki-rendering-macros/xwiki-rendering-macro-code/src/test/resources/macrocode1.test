@@ -1,7 +1,6 @@
 .#-----------------------------------------------------
-.input|xwiki/2.0|skip
+.input|xwiki/2.0
 .# Validate that the code macro is able to find the right language for provided content and highlight it.
-.# SKIP: Since Jython 2.5 is too slow to run most of Pygments lexers in good conditions, this feature is disabled.
 .#-----------------------------------------------------
 {{code}}
 <b>bold</b>
@@ -23,7 +22,7 @@ onWord [bold]
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [</b>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-onLineBreak
+onNewLine
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [<i>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]

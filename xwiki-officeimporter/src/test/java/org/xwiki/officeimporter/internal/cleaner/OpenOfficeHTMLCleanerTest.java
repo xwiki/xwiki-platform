@@ -270,4 +270,16 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
         assertEquals(Node.COMMENT_NODE, stopLinkComment.getNodeType());
         assertTrue(stopLinkComment.getNodeValue().startsWith("stopwikilink"));
     }
+    
+    /**
+     * Test filtering of {@code<br/>} elements placed in between block elements.
+     */
+    public void testLineBreakFiltering() {
+        String html = header + "<p>para1</p><br/><br/><p>para2</p>" + footer;
+        Document doc = cleaner.clean(new StringReader(html), Collections.singletonMap("targetDocument", "Import.Test"));
+        NodeList lineBreaks = doc.getElementsByTagName("br");
+        assertEquals(0, lineBreaks.getLength());
+        NodeList divs = doc.getElementsByTagName("div");
+        assertEquals(2, divs.getLength());
+    }
 }

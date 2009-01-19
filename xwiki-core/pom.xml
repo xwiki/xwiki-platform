@@ -686,6 +686,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-officeimporter</artifactId>
       <version>${pom.version}</version>
+      <!-- 
+        Only required at runtime; otherwise this will reduce the build time because the library 
+        and all of it's dependencies get added to the classpath during building and testing.
+       -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -705,13 +710,6 @@
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>
       <version>${platform.tool.test.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Required by jodconverter; see http://www.slf4j.org/faq.html#maven2 -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.4.3</version>
       <scope>test</scope>
     </dependency>
 

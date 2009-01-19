@@ -37,6 +37,7 @@ import com.xpn.xwiki.store.migration.XWikiMigratorInterface;
 
 /**
  * Migration manager for hibernate store.
+ * 
  * @version $Id$
  */
 public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManager
@@ -49,38 +50,48 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
     {
         super(context);
     }
+
     /**
      * @return store system for execute store-specific actions.
      * @param context - used everywhere
      */
-    public XWikiHibernateBaseStore getStore(XWikiContext context) {
+    public XWikiHibernateBaseStore getStore(XWikiContext context)
+    {
         return context.getWiki().getHibernateStore();
     }
+
     /** {@inheritDoc} */
-    public XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException {
+    @Override
+    public XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException
+    {
         XWikiDBVersion ver = getDBVersionFromConfig(context);
-        return ver != null ? ver : getStore(context).executeRead(context, true,
-            new HibernateCallback<XWikiDBVersion>() { 
+        return ver != null ? ver : getStore(context).executeRead(context, true, new HibernateCallback<XWikiDBVersion>()
+        {
             public XWikiDBVersion doInHibernate(Session session) throws HibernateException
             {
-                XWikiDBVersion result = (XWikiDBVersion) session.createCriteria(
-                    XWikiDBVersion.class).uniqueResult();
-                return result==null ? new XWikiDBVersion(0) : result;
+                XWikiDBVersion result = (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
+                return result == null ? new XWikiDBVersion(0) : result;
             }
         });
     }
+
     /** {@inheritDoc} */
-    protected void setDBVersion(final XWikiDBVersion version, XWikiContext context) throws XWikiException {
-        getStore(context).executeWrite(context, true, new HibernateCallback<Object>() {
+    @Override
+    protected void setDBVersion(final XWikiDBVersion version, XWikiContext context) throws XWikiException
+    {
+        getStore(context).executeWrite(context, true, new HibernateCallback<Object>()
+        {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                session.createQuery("delete from "+XWikiDBVersion.class.getName()).executeUpdate();
+                session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
                 session.save(version);
                 return null;
             }
         });
     }
+
     /** {@inheritDoc} */
+    @Override
     protected List<XWikiMigratorInterface> getAllMigrations(XWikiContext context) throws XWikiException
     {
         List<XWikiMigratorInterface> result = new ArrayList<XWikiMigratorInterface>();
@@ -91,8 +102,9 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         result.add(new R6079XWIKI1878Migrator());
         result.add(new R6405XWIKI1933Migrator());
         result.add(new R7350XWIKI2079Migrator());
+        result.add(new R15428XWIKI2977Migrator());
         // 2nd way - via component manager
-        
+
         return result;
     }
 }

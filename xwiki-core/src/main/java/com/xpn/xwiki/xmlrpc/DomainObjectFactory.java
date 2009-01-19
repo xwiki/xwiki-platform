@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.codehaus.swizzle.confluence.Attachment;
 import org.codehaus.swizzle.confluence.Comment;
 import org.codehaus.swizzle.confluence.SearchResult;
@@ -55,6 +57,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public class DomainObjectFactory
 {
+    private static final Log LOG = LogFactory.getLog(DomainObjectFactory.class);
+    
     /**
      * Create a space summary
      * 
@@ -384,7 +388,13 @@ public class DomainObjectFactory
 
             String propertyName = property.getName();
             Object propertyType = getPropertyType(xwiki, xwikiContext, object, propertyName);
-            result.setPropertyType(propertyName, propertyType.getClass().getName());
+
+            if (propertyType != null) {
+                result.setPropertyType(propertyName, propertyType.getClass().getName());
+            } else {
+                LOG.warn(String.format("Property %s of object %s:%s has a null type", propertyName, document
+                    .getFullName(), object.getPrettyName()));
+            }
 
             if (propertyType instanceof ListClass) {
                 ListClass listClass = (ListClass) propertyType;

@@ -56,8 +56,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
-        throws DavException
+    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
     {
         if (next < tokens.length) {
             String nextToken = tokens[next];
@@ -71,10 +70,15 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                 subView.init(this, nextToken.toUpperCase(), "/" + nextToken.toUpperCase());
                 stack.push(subView);
                 subView.decode(stack, tokens, next + 1);
-            } else if (getContext().isCreateCollectionRequest()
-                || getContext().exists(this.name + "." + nextToken)) {
+            } else if (getContext().isCreateCollectionRequest() || getContext().exists(this.name + "." + nextToken)) {
                 DavPage page = new DavPage();
                 page.init(this, this.name + "." + nextToken, "/" + nextToken);
+                stack.push(page);
+                page.decode(stack, tokens, next + 1);
+            } else if (nextToken.startsWith(this.name + ".") && getContext().exists(nextToken)) {
+                // For compatibility with FoXWiki
+                DavPage page = new DavPage();
+                page.init(this, nextToken, "/" + nextToken);
                 stack.push(page);
                 page.decode(stack, tokens, next + 1);
             } else {
@@ -125,8 +129,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
             for (String subViewName : subViewNames) {
                 try {
                     String modName =
-                        XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX + subViewName
-                            + XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX;
+                        XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX + subViewName + XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX;
                     PagesByFirstLettersSubView subView = new PagesByFirstLettersSubView();
                     subView.init(this, modName, "/" + modName);
                     children.add(subView);
@@ -178,10 +181,8 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         } else if (member instanceof PagesByFirstLettersSubView) {
             // We are going to force a recursive delete.
             String filter =
-                member.getDisplayName().substring(
-                    XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX.length(),
-                    member.getDisplayName().length()
-                        - XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX.length());
+                member.getDisplayName().substring(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX.length(),
+                    member.getDisplayName().length() - XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX.length());
             String sql = "where doc.web='" + this.name + "'";
             List<String> docNames = getContext().searchDocumentsNames(sql);
             List<String> filteredDocNames = new ArrayList<String>();

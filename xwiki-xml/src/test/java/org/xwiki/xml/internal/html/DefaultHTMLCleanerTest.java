@@ -93,17 +93,6 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
     }
 
     /**
-     * Verify that {@code <br/>} elements between block elements are replaced properly.
-     */
-    public void testCleanLineBreaks()
-    {
-        assertHTML("<p>para1</p><div class=\"wikimodel-emptyline\" /><p>para2</p>", "<p>para1</p><br/><p>para2</p>");
-        assertHTML(
-            "<p>para1</p><div class=\"wikimodel-emptyline\" /><div class=\"wikimodel-emptyline\" /><p>para2</p>",
-            "<p>para1</p><br/><br/><p>para2</p>");
-    }
-
-    /**
      * Verify that scripts are not cleaned and that we can have a CDATA section inside.
      */
     public void testScript()

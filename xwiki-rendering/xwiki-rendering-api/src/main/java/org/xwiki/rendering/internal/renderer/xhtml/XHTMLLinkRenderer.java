@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.renderer.xhtml;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
@@ -116,7 +117,7 @@ public class XHTMLLinkRenderer
             // This is a link to a document.
 
             // Check for the document existence.
-            if (link.getReference() == null || this.documentAccessBridge.exists(link.getReference())) {
+            if (StringUtils.isEmpty(link.getReference()) || this.documentAccessBridge.exists(link.getReference())) {
                 spanAttributes.put("class", "wikilink");
                 aAttributes.put("href", this.documentAccessBridge.getURL(link.getReference(), "view", link
                     .getQueryString(), link.getAnchor()));

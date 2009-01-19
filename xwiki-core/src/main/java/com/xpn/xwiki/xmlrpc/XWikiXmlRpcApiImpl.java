@@ -1015,7 +1015,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         if (object != null) {
             return DomainObjectFactory.createXWikiObject(this.xwiki, this.xwikiContext, doc, object).toRawMap();
         } else {
-            throw new Exception(String.format("[Unable to find object id %d]", id));
+            throw new Exception(String.format("[Unable to find object %s[%d] on page '%s']", className, id, pageId));
         }
     }
 
@@ -1058,6 +1058,14 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             int id = doc.createNewObject(object.getClassName());
             /* Get the newly created object for update */
             xwikiObject = doc.getObject(object.getClassName(), id);
+
+            /* We must initialize all the fields to an empty value in order to correctly create the object */
+            com.xpn.xwiki.api.Class xwikiClass = this.xwikiApi.getClass(object.getClassName());
+            for (Object propertyNameObject : xwikiClass.getPropertyNames()) {
+                String propertyName = (String) propertyNameObject;
+
+                xwikiObject.set(propertyName, "");
+            }
         }
 
         /*
@@ -1240,9 +1248,9 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             extendedId.setParameter(XWikiExtendedId.LANGUAGE_PARAMETER, page.getLanguage());
             extendedId.setParameter(XWikiExtendedId.VERSION_PARAMETER, null);
             extendedId.setParameter(XWikiExtendedId.MINOR_VERSION_PARAMETER, null);
-            
+
             /* If the page doesn't exist then use directly the standard storePage */
-            if(!this.xwikiApi.exists(extendedId.getBasePageId())) {
+            if (!this.xwikiApi.exists(extendedId.getBasePageId())) {
                 return storePage(token, pageMap);
             }
 
@@ -1320,7 +1328,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
         com.xpn.xwiki.api.Object object = XWikiUtils.getObjectByGuid(doc, guid);
         if (object == null) {
-            throw new Exception(String.format("[Unable to find object with guid '%s']", guid));
+            throw new Exception(String.format("[Unable to find object with guid '%s' on page '%s']", guid, pageId));
         }
 
         return DomainObjectFactory.createXWikiObject(this.xwiki, this.xwikiContext, doc, object).toRawMap();

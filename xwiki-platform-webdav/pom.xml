@@ -29,7 +29,6 @@
     <version>18-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.xpn.xwiki.platform.applications</groupId>
   <artifactId>xwiki-application-webdav</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Applications - WebDAV</name>

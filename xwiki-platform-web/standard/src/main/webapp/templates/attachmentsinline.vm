@@ -46,7 +46,7 @@ ${Msz}Mb
             #set($prefix=$listtool.get($fragments, 0))
             #set($suffix=$listtool.get($fragments, 1))
             #set($davUrl="$prefix$webdavSignature$suffix")
-            <span class="xwikibuttonlinks"><a class="deletelink" href="javascript:davEdit('$davUrl')">$msg.get("webdaveditattachment")</a></span>
+            <span class="xwikibuttonlinks"><a class="deletelink" href="$davUrl" onclick="davEdit('$davUrl'); return false;">$msg.get("webdaveditattachment")</a></span>
           #end                    
 #end
           <span class="version"><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></span>

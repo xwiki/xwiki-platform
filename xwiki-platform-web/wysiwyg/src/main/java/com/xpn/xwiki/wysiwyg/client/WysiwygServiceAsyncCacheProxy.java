@@ -25,7 +25,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 
 /**
  * Cache proxy for {@link WysiwygServiceAsync}. This proxy is used to store on the client a set of values from the
@@ -71,6 +70,16 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
         service.cleanHTML(dirtyHTML, async);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#cleanOfficeHTML(String, String, AsyncCallback)
+     */
+    public void cleanOfficeHTML(String htmlPaste, String cleanerHint, AsyncCallback<String> async)
+    {
+        service.cleanOfficeHTML(htmlPaste, cleanerHint, async);
+    }
+    
     /**
      * {@inheritDoc}
      * 

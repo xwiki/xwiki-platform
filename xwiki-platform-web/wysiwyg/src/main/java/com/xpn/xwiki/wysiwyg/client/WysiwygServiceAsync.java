@@ -25,7 +25,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 
 /**
  * Service interface used on the client. It should have all the methods from {@link WysiwygService} with an additional
@@ -60,6 +59,17 @@ public interface WysiwygServiceAsync
      * @param async The callback to be used for notifying the caller after receiving the response from the server.
      */
     void cleanHTML(String dirtyHTML, AsyncCallback<String> async);
+    
+    /**
+     * Makes a request to the server to clean the given HTML fragment which comes from an office
+     * application.
+     * 
+     * @param htmlPaste Dirty html pasted by the user.
+     * @param cleanerHint Role hint for which cleaner to be used.
+     * @param async The callback to be used for notifying the caller after receiving the response
+     *            from the server.
+     */
+    void cleanOfficeHTML(String htmlPaste, String cleanerHint, AsyncCallback<String> async);
 
     /**
      * Synchronizes this editor with others that edit the same page.

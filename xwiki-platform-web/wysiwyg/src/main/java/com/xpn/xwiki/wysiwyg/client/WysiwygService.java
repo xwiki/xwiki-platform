@@ -93,6 +93,17 @@ public interface WysiwygService extends RemoteService
     String cleanHTML(String dirtyHTML);
 
     /**
+     * Cleans dirty html content produced from an office application like MsWord, MsExcel,
+     * OpenOffice Writer etc. This method is primarily utilized by the office importer wysiwyg
+     * plugin.
+     * 
+     * @param htmlPaste Dirty html pasted by the user.
+     * @param cleanerHint Role hint for which cleaner to be used.
+     * @return The cleaned html content.
+     */
+    String cleanOfficeHTML(String htmlPaste, String cleanerHint);
+    
+    /**
      * @param syncedRevision The changes to this editor's content, since the last update.
      * @param pageName The page being edited.
      * @param version The version affected by syncedRevision.

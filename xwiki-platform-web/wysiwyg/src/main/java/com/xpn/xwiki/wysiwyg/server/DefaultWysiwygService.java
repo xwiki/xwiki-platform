@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.server;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -55,6 +57,11 @@ import com.xpn.xwiki.wysiwyg.server.sync.SyncEngine;
  */
 public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygService
 {
+    /**
+     * Class version.
+     */
+    private static final long serialVersionUID = 7555724420345951844L;
+
     /**
      * Default XWiki logger to report errors correctly.
      */
@@ -130,6 +137,18 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public String cleanHTML(String dirtyHTML)
     {
         return getHTMLCleaner().clean(dirtyHTML);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#cleanOfficeHTML(String, String)
+     */
+    public String cleanOfficeHTML(String htmlPaste, String cleanerHint)
+    {
+        org.xwiki.xml.html.HTMLCleaner cleaner =
+            (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.ROLE, cleanerHint);
+        return XMLUtils.toString(cleaner.clean(new StringReader(htmlPaste)));
     }
 
     /**

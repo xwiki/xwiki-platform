@@ -272,4 +272,16 @@ public interface Strings extends Constants
     String tablePixel();
     
     String tableInsertButton();
+    
+    String importerCaption();
+    
+    String importerClipboardTab();
+    
+    String importerClipboardInfoLabel();
+    
+    String importerClipboardImportButton();
+    
+    String importerFileTab();
+    
+    String importerFileInfoLabel();
 }

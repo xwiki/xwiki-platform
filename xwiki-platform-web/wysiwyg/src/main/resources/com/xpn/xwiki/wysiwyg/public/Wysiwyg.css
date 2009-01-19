@@ -534,3 +534,27 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 .xTablePanel .gwt-CheckBox {
   display: inline;
 }
+
+.xImporterTabPanel {
+  width: 420px;
+}
+
+.xImporterClipboardInfoLabel,
+.xImporterFileInfoLabel {
+  text-align: center;  
+}
+
+.xImporterClipboardInfoLabel {
+  padding-bottom: 5px;
+}
+
+.xImporterClipboardEditor {
+  width: 400px;
+  height: 300px;
+  border: solid 1px #000000;
+}
+
+.xImporterClipboardImportButton {
+  width: 50px;
+  margin-left: 352px;
+}

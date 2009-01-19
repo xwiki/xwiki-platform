@@ -52,6 +52,9 @@ public interface Images extends ImageBundle
 
     @Resource("image.gif")
     AbstractImagePrototype image();
+    
+    @Resource("importer.gif")
+    AbstractImagePrototype importer();
 
     @Resource("indent.gif")
     AbstractImagePrototype indent();

@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-rendering-parsers-parent</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8-milestone-1</version>
   </parent>
   <artifactId>xwiki-core-rendering-parser-doxia</artifactId>
   <name>XWiki Platform - Core - Rendering - Parser - Doxia</name>

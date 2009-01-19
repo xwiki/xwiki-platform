@@ -31,17 +31,11 @@
   </parent>
   <artifactId>xwiki-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty Configuration Resources</name>
-  <version>1.11</version>
+  <version>1.12-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>
     Packages a Jetty installation. This module is used to generate a valid Jetty installation.
     In the future we should rather use Cargo for doing this (but some work has to be done on
     Cargo before it's ready to be used).
   </description>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-jetty-resources-1.11</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-jetty-resources-1.11</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-jetty-resources-1.11</url>
-  </scm>
 </project>

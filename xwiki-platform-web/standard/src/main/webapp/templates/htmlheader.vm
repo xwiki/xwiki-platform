@@ -15,7 +15,7 @@
       #if ( $title != "")
         $xwiki.parseContent($title).replaceAll('&(?!#)', '&#38;')
       #else
-        XWiki - $!doc.space.replaceAll('&(?!#)', '&#38;') - $!doc.displayTitle.replaceAll('&(?!#)', '&#38;')
+        XWiki - $!doc.space.replaceAll('&(?!#)', '&#38;') - $!tdoc.displayTitle.replaceAll('&(?!#)', '&#38;')
       #end
     #else
       $title

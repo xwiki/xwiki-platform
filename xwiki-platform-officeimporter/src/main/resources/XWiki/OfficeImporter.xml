@@ -61,7 +61,7 @@
 {table}&lt;p&gt;Document&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
 &lt;p&gt;Target Space&lt;/p&gt;|&lt;p&gt;&lt;input name="targetSpace" type="text"/&gt;&lt;/p&gt;
 &lt;p&gt;Target Page&lt;/p&gt;|&lt;p&gt;&lt;input name="targetPage" type="text"/&gt;&lt;/p&gt;
-&lt;p&gt;Options&lt;/p&gt;|&lt;p&gt;Style Filtering :&lt;/p&gt;&lt;p&gt;&lt;input name="filterStyles" type="radio" value="strict"/&gt;Strict (Clean Wiki Content)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="moderate" checked="checked"/&gt;Moderate (Better Appearance)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="none"/&gt;None (No Filtering)&lt;/p&gt;
+&lt;p&gt;Options&lt;/p&gt;|&lt;p&gt;Style Filtering :&lt;/p&gt;&lt;p&gt;&lt;input name="filterStyles" type="radio" value="strict"/&gt;Strict (No styles, content only)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="moderate" checked="checked"/&gt;Moderate (Keep alignments)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="none"/&gt;None (Keep all styles)&lt;/p&gt;
 {table}
 &lt;p&gt;&lt;input type="submit" value="Import"/&gt;&lt;/p&gt;
 &lt;/form&gt;

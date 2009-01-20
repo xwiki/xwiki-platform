@@ -1953,7 +1953,7 @@ Your account on $wikiname has been successfully activated. You can now login at 
 <stylesheets>style.css</stylesheets>
 </property>
 <property>
-<title>$doc.displayTitle ($doc.fullName) - XWiki</title>
+<title>$tdoc.displayTitle ($doc.fullName) - XWiki</title>
 </property>
 <property>
 <upload_maxsize>33554432</upload_maxsize>

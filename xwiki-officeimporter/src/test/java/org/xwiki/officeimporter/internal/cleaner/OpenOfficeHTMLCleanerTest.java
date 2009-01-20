@@ -212,13 +212,6 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
         cellContent = nodes.item(0).getFirstChild();
         assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
         assertEquals("Test", cellContent.getNodeValue());
-        // Empty cells should be replaced by a '-' (this is temporary)
-        html = header + "<table><tr><td><br/><p><br/></p> </td></tr></table>" + footer;
-        doc = cleaner.clean(new StringReader(html));
-        nodes = doc.getElementsByTagName("td");
-        cellContent = nodes.item(0).getFirstChild();
-        assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
-        assertEquals("-", cellContent.getNodeValue());
     }
 
     /**

@@ -54,18 +54,6 @@ public class TableFilter implements HTMLFilter
         for (int i = 0; i < cellItems.getLength(); i++) {
             Node cellItem = cellItems.item(i);
             cleanNode(cellItem);
-            // Workaround empty cells.
-            if (cellItem.getTextContent().equals("")) {
-                boolean empty = true;
-                for (int j = 0; j < cellItem.getChildNodes().getLength(); j++) {
-                    if (cellItem.getChildNodes().item(j).getNodeType() != Node.TEXT_NODE) {
-                        empty = false;
-                    }
-                }
-                if (empty) {
-                    cellItem.setTextContent("-");
-                }
-            }
         }
     }
 

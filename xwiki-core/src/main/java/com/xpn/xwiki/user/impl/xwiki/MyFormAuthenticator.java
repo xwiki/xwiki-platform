@@ -126,16 +126,20 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
                 convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
             String password = this.persistentLoginManager.getRememberedPassword(request, response);
 
-            Principal principal = authenticate(username, password, context);
+            Principal principal = request.getUserPrincipal();
 
-            if (principal != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("User " + principal.getName() + " has been authentified from cookie");
+            if (principal == null || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1) {
+                principal = authenticate(username, password, context);
+
+                if (principal != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("User " + principal.getName() + " has been authentified from cookie");
+                    }
+                    request.setUserPrincipal(principal);
+                } else if (username != null || password != null) {
+                    // failed authentication with remembered login, better forget login now
+                    this.persistentLoginManager.forgetLogin(request, response);
                 }
-                request.setUserPrincipal(principal);
-            } else if (username != null || password != null) {
-                // failed authentication with remembered login, better forget login now
-                this.persistentLoginManager.forgetLogin(request, response);
             }
         }
 

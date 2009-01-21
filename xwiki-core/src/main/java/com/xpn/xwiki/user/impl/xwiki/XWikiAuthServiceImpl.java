@@ -195,9 +195,6 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
         XWikiAuthenticator auth = getAuthenticator(context);
         SecurityRequestWrapper wrappedRequest = new SecurityRequestWrapper(request, null, null, auth.getAuthMethod());
-        // We need to make we will not user the principal
-        // associated with the app server session
-        wrappedRequest.setUserPrincipal(null);
 
         try {
             if (auth.processLogin(wrappedRequest, response, context)) {

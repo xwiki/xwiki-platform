@@ -493,7 +493,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
         }
 
         // Apply applications installation
-        for (DocumentInfoAPI docinfo : (List<DocumentInfoAPI>) importer.getFiles()) {
+        for (DocumentInfoAPI docinfo : importer.getFiles()) {
             XWikiDocument doc = docinfo.getDocInfo().getDoc();
 
             if (XWikiApplicationClass.getInstance(context).isInstance(doc)) {

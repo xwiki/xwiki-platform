@@ -24,8 +24,8 @@ import java.net.URL;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultXObjectDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultXObjectDocument;
 
 /**
  * This class manage an XWiki document containing XWiki.XWikiServerClass object. It add some specifics methods, getters
@@ -100,7 +100,7 @@ public class XWikiServer extends DefaultXObjectDocument
      */
     public String getOwner()
     {
-        return getLargeStringValue(XWikiServerClass.FIELD_OWNER);
+        return getStringValue(XWikiServerClass.FIELD_OWNER);
     }
 
     /**
@@ -110,7 +110,7 @@ public class XWikiServer extends DefaultXObjectDocument
      */
     public void setOwner(String owner)
     {
-        setLargeStringValue(XWikiServerClass.FIELD_OWNER, owner);
+        setStringValue(XWikiServerClass.FIELD_OWNER, owner);
     }
 
     /**
@@ -128,7 +128,7 @@ public class XWikiServer extends DefaultXObjectDocument
      */
     public void setDescription(String description)
     {
-        setLargeStringValue(XWikiServerClass.FIELD_DESCRIPTION, description);
+        setStringValue(XWikiServerClass.FIELD_DESCRIPTION, description);
     }
 
     /**

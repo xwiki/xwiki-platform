@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xwiki.officeimporter.filter.utils.AbstractHTMLFilter;
-import org.xwiki.officeimporter.filter.utils.ElementFilterCriterion;
+import org.xwiki.officeimporter.filter.common.AbstractHTMLFilter;
+import org.xwiki.officeimporter.filter.common.ElementFilterCriterion;
 
 /**
  * Presently xwiki rendering module doesn't support complex table cell items. This filter is used to rip-off or modify

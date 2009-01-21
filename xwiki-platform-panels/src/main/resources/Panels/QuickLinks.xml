@@ -140,8 +140,6 @@
 * [Index&gt;Main.AllDocs]
 * [What's New&gt;Main.Dashboard] &lt;a href="$xwiki.getURL("Main.RssFeeds")"&gt;&lt;img src="$xwiki.getSkinFile('icons/black-rss-mini3.png')" title="RSS Feeds" alt="RSS Feeds"/&gt;&lt;/a&gt;
 * [Blog&gt;Blog.WebHome]
-* [Calendar&gt;Main.EventCalendar]
-* [Photo Albums&gt;Photos.WebHome]
 * [Sandbox&gt;Sandbox.WebHome]
 * [Tags&gt;Main.Tags]
 #if ($xwiki.hasAdminRights())

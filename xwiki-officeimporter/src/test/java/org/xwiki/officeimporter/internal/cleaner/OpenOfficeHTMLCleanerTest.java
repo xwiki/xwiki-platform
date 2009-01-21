@@ -191,27 +191,25 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
      */
     public void testTableFiltering()
     {
-        // Leading or trailing spaces inside cell items are not allowed.
-        String html = header + "<table><tr><td> Test </td></tr></table>" + footer;
+        // Paragraphs are not allowed inside cell items.
+        String html = header + "<table><tr><td><p>Test</p></td></tr></table>" + footer;
         Document doc = cleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("td");
         Node cellContent = nodes.item(0).getFirstChild();
         assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
         assertEquals("Test", cellContent.getNodeValue());
-        // Paragraphs are not allowed inside cell items.
-        html = header + "<table><tr><td> <p>Test</p> </td></tr></table>" + footer;
-        doc = cleaner.clean(new StringReader(html));
-        nodes = doc.getElementsByTagName("td");
-        cellContent = nodes.item(0).getFirstChild();
-        assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
-        assertEquals("Test", cellContent.getNodeValue());
         // Line breaks are not allowed inside cell items.
-        html = header + "<table><tr><td><br/><p><br/>Test</p> </td></tr></table>" + footer;
+        html = header + "<table><tr><td><br/><p><br/>Test</p></td></tr></table>" + footer;
         doc = cleaner.clean(new StringReader(html));
         nodes = doc.getElementsByTagName("td");
         cellContent = nodes.item(0).getFirstChild();
         assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
         assertEquals("Test", cellContent.getNodeValue());
+        // Empty rows are not allowed.
+        html = header + "<table><tbody><tr></tr></tbody></table>" + footer;
+        doc = cleaner.clean(new StringReader(html));
+        nodes = doc.getElementsByTagName("tr");
+        assertEquals(0, nodes.getLength());
     }
 
     /**

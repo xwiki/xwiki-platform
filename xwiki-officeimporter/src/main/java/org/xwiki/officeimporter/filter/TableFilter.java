@@ -19,81 +19,77 @@
  */
 package org.xwiki.officeimporter.filter;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
+import org.xwiki.officeimporter.filter.utils.AbstractHTMLFilter;
+import org.xwiki.officeimporter.filter.utils.ElementFilterCriterion;
 
 /**
- * Presently xwiki rendering module doesn't support complex table cell items. This filter is used to
- * rip-off or modify html tables so that they can be rendered properly. The corresponding JIRA issue
- * is located at http://jira.xwiki.org/jira/browse/XWIKI-2804.
+ * Presently xwiki rendering module doesn't support complex table cell items. This filter is used to rip-off or modify
+ * html tables so that they can be rendered properly. The corresponding JIRA issue is located at
+ * http://jira.xwiki.org/jira/browse/XWIKI-2804.
  * 
  * @version $Id$
  * @since 1.8M1
  */
-public class TableFilter implements HTMLFilter
+public class TableFilter extends AbstractHTMLFilter
 {
     /**
      * Tags that need to be removed from cell items while preserving there children.
      */
-    private static final String[] FILTER_TAGS = new String[] {"p"};
+    private static final String[] REPLACE_TAGS = new String[] {TAG_P};
 
     /**
      * Tags that need to be completely removed from cell items.
      */
-    private static final String[] REMOVE_TAGS = new String[] {"br"};
+    private static final String[] STRIP_TAGS = new String[] {TAG_BR};
 
     /**
      * {@inheritDoc}
      */
     public void filter(Document document)
     {
-        NodeList cellItems = document.getElementsByTagName("td");
-        for (int i = 0; i < cellItems.getLength(); i++) {
-            Node cellItem = cellItems.item(i);
-            cleanNode(cellItem);
+        // Clean table cell items first.
+        List<Element> cells = filterChildren(document.getDocumentElement(), TAG_TD);
+        for (Element cell : cells) {
+            cleanCell(cell);
+        }
+        // Strip off empty table rows. see http://jira.xwiki.org/jira/browse/XWIKI-3136.
+        List<Element> emptyRows = filterChildren(document.getDocumentElement(), TAG_TR, new ElementFilterCriterion()
+        {
+            public boolean isFiltered(Element element)
+            {
+                return element.getChildNodes().getLength() == 0;
+            }
+        });
+        stripElements(emptyRows);
+        // Remove problematic rowspan attributes.
+        List<Element> rows = filterChildren(document.getDocumentElement(), TAG_TR);
+        for (Element row : rows) {
+            List<Element> childCells = filterChildren(row, TAG_TD);
+            if (hasAttribute(childCells, ATT_ROWSPAN, true)) {
+                stripAttribute(childCells, ATT_ROWSPAN);
+            }
         }
     }
 
     /**
-     * Cleans this particular node.
+     * Cleans this particular table cell by stripping off / replacing those tags which are not yet supported inside
+     * table cell items in xwiki 2.0 syntax.
      * 
-     * @param node Node to be cleaned.
-     * @return True if this node was ripped off.
+     * @param cell The {@link Element} representing a table cell.
      */
-    private boolean cleanNode(Node node)
+    private void cleanCell(Element cell)
     {
-        Node parent = node.getParentNode();
-        NodeList children = node.getChildNodes();
-        boolean removed = false;
-        if (node.getNodeType() == Node.TEXT_NODE) {
-            String trimmedContent = node.getTextContent().trim();
-            if (trimmedContent.equals("")) {
-                parent.removeChild(node);
-                removed = true;
-            } else {
-                node.setTextContent(trimmedContent);
-            }
-        } else if (Arrays.binarySearch(FILTER_TAGS, node.getNodeName()) >= 0) {
-            while (children.getLength() > 0) {
-                Node child = children.item(0);
-                parent.insertBefore(children.item(0), node);
-                cleanNode(child);
-            }
-            parent.removeChild(node);
-            removed = true;
-        } else if (Arrays.binarySearch(REMOVE_TAGS, node.getNodeName()) >= 0) {
-            parent.removeChild(node);
-            removed = true;
-        } else {
-            for (int i = 0; i < children.getLength(); i++) {
-                if (cleanNode(children.item(i))) {
-                    --i;
-                }
-            }
+        for (String stripTagName : STRIP_TAGS) {
+            List<Element> stripTags = filterChildren(cell, stripTagName);
+            stripElements(stripTags);
         }
-        return removed;
+        for (String replaceTagName : REPLACE_TAGS) {
+            List<Element> replaceTags = filterChildren(cell, replaceTagName);
+            replaceWithChildren(replaceTags);
+        }
     }
 }

@@ -217,6 +217,11 @@ xwiki.inactiveuser.allowedpages=
 #-# Authentication type. You can use 'basic' to always use basic authentication.
 # xwiki.authentication=form
 
+#-# Indicate if the authentication has do be done for each request
+#-# 0: the default value, authentication is done only once by session.
+#-# 1: the authentication is done for each request. 
+# xwiki.authentication.always=0
+
 #-# Cookie encryption keys. You SHOULD replace these values with any random string,
 #-# as long as the length is the same.
 xwiki.authentication.validationKey=totototototototototototototototo

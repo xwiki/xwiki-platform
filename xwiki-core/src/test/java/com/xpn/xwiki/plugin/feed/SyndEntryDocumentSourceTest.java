@@ -97,6 +97,11 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         getContext().getWiki().saveDocument(doc, getContext());
         getContext().setDoc(doc);
 
+        // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
+        // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
+        // not providing it in our unit test resources).
+        getContext().getWiki().getConfig().setProperty("xwiki.render.velocity.macrolist", "");
+
         source = new SyndEntryDocumentSource();
     }
 

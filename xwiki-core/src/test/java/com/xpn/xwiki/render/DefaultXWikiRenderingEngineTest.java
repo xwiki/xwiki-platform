@@ -62,14 +62,15 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
             returnValue(new ByteArrayInputStream("".getBytes())));
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache-local.properties")).will(
             returnValue(new ByteArrayInputStream("".getBytes())));
-        mockServletContext.stubs().method("getResourceAsStream").with(eq("/skins/albatross/macros.vm")).will(
-            returnValue(new ByteArrayInputStream("".getBytes())));
-        mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.vm")).will(
-            returnValue(new ByteArrayInputStream("".getBytes())));
         XWikiServletContext engineContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
 
         XWiki xwiki = new XWiki(config, getContext(), engineContext, false);
         xwiki.setVersion("1.0");
+        
+        // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
+        // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
+        // not providing it in our unit test resources).
+        xwiki.getConfig().setProperty("xwiki.render.velocity.macrolist", "");
 
         this.engine = (DefaultXWikiRenderingEngine) xwiki.getRenderingEngine();
     }

@@ -74,6 +74,11 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.document = new XWikiDocument("MilkyWay", "Fidis");
         this.xwiki = new XWiki(new XWikiConfig(), getContext());
 
+        // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
+        // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
+        // not providing it in our unit test resources).
+        this.xwiki.getConfig().setProperty("xwiki.render.velocity.macrolist", "");
+
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
             getContext()});

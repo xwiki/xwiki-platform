@@ -63,6 +63,7 @@
         <module>lucene</module>
         <module>activitystream</module>
         <module>invitationmanager</module>
+        <module>calendar</module>
       </modules>
     </profile>
     <profile>

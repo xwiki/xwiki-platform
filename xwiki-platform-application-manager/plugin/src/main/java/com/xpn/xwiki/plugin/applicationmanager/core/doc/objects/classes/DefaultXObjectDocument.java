@@ -28,7 +28,9 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * Default implementation of XObjectDocument. This class manage an XWiki document containing provided XWiki class. It
@@ -279,6 +281,8 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
 
     /**
      * Modify the value of the field <code>fieldName</code> of the managed object's class.
+     * <p>
+     * This method makes sure the right property type between LargeStringProperty and StringProperty is used.
      * 
      * @param fieldName the name of the field from the managed object's class where to find the value.
      * @param value the new value of the field <code>fieldName</code> of the managed object's class.
@@ -289,7 +293,12 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
         BaseObject obj = getBaseObject(true);
 
         if (obj != null) {
-            obj.setStringValue(fieldName, value);
+            PropertyClass pclass = (PropertyClass) this.sclass.getBaseClass().get(fieldName);
+            BaseProperty prop = (BaseProperty) obj.safeget(fieldName);
+            prop = pclass.fromString(value);
+            if (prop != null) {
+                obj.safeput(fieldName, prop);
+            }
         }
     }
 
@@ -299,7 +308,9 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
      * @param fieldName the name of the field from the managed object's class where to find the value.
      * @return the value in {@link String} of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#getStringValue(java.lang.String)
+     * @deprecated Use {@link #getStringValue(String)} which support LargeStringProperty and StringProperty.
      */
+    @Deprecated
     public String getLargeStringValue(String fieldName)
     {
         BaseObject obj = getBaseObject(false);
@@ -313,18 +324,18 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
 
     /**
      * Modify the value of the field <code>fieldName</code> of the managed object's class.
+     * <p>
+     * This method makes sure the right property type between LargeStringProperty and StringProperty is used.
      * 
      * @param fieldName the name of the field from the managed object's class where to find the value.
      * @param value the new value of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#setLargeStringValue(java.lang.String,java.lang.String,java.lang.String)
+     * @deprecated Use {@link #setStringValue(String, String)} which support LargeStringProperty and StringProperty.
      */
+    @Deprecated
     public void setLargeStringValue(String fieldName, String value)
     {
-        BaseObject obj = getBaseObject(true);
-
-        if (obj != null) {
-            obj.setLargeStringValue(fieldName, value);
-        }
+        setStringValue(fieldName, value);
     }
 
     /**

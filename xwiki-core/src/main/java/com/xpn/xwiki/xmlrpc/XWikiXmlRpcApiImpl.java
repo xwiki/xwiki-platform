@@ -1035,6 +1035,11 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
         XWikiObject object = new XWikiObject(objectMap);
 
+        /* The passed object must specify a class name otherwise we cannot set properties on the xwiki object */
+        if (object.getClassName() == null) {
+            throw new Exception(String.format("[Object doesn't specify a class]"));
+        }
+
         /* Ignore the language or version parameters passed with the page id, and use the base page id */
         XWikiExtendedId extendedId = new XWikiExtendedId(object.getPageId());
         Document doc = XWikiUtils.getDocument(this.xwikiApi, extendedId.getBasePageId(), true);

@@ -19,7 +19,32 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
-public class QuoteRadeoxMacroConverter
-{
+import org.apache.commons.lang.StringUtils;
+import org.xwiki.rendering.parser.xwiki10.Filter;
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
+import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
+import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
+public class QuoteRadeoxMacroConverter extends AbstractRadeoxMacroConverter
+{
+    private Filter standaloneNewLineCleaningFilter;
+
+    @Override
+    public String convert(String name, RadeoxMacroParameters parameters, String content, FilterContext filterContext)
+    {
+        StringBuffer result = new StringBuffer();
+
+        if (!StringUtils.isEmpty(content.replaceAll("[ \t]", ""))) {
+            result.append(">");
+            result.append(CleanUtil.removeLastNewLines(CleanUtil.removeFirstNewLines(this.standaloneNewLineCleaningFilter.filter(content, filterContext))).replaceAll("\n", "\n>"));
+        }
+
+        return result.toString();
+    }
+
+    public boolean supportContent()
+    {
+        return true;
+    }
 }

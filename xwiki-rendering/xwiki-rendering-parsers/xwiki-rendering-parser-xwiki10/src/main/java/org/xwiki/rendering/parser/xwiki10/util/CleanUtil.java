@@ -118,7 +118,7 @@ public class CleanUtil
      * @param nb the number of new lines the string need to contains at the beginning.
      * @return the converted string.
      */
-    public static String setFirstNL(String content, int nb)
+    public static String setFirstNewLines(String content, int nb)
     {
         String cleanedContent = content;
 
@@ -140,7 +140,7 @@ public class CleanUtil
      * @param nb the number of new lines the string need to contains at the end.
      * @return the converted string.
      */
-    public static String setLastNL(String content, int nb)
+    public static String setLastNewLines(String content, int nb)
     {
         String cleanedContent = content;
 
@@ -172,7 +172,7 @@ public class CleanUtil
      * @param content the content to convert.
      * @return the converted string.
      */
-    public static String removeLastNL(String content)
+    public static String removeLastNewLines(String content)
     {
         return ENDING_NL_GROUP_PATTERN.matcher(content).replaceAll("");
     }

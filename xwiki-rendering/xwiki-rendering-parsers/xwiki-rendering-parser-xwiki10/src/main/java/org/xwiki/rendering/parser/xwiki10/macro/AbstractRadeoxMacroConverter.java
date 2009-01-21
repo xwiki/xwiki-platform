@@ -24,6 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
+
 /**
  * Base class for Radeox macros converters.
  * 
@@ -97,7 +99,7 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
         return content;
     }
 
-    public String convert(String name, RadeoxMacroParameters parameters, String content)
+    public String convert(String name, RadeoxMacroParameters parameters, String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
 

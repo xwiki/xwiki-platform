@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
 import java.util.Map;
 
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
@@ -44,7 +45,7 @@ public class ImageRadeoxMacroConverter extends AbstractRadeoxMacroConverter
     }
 
     @Override
-    public String convert(String name, RadeoxMacroParameters parameters, String content)
+    public String convert(String name, RadeoxMacroParameters parameters, String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
 

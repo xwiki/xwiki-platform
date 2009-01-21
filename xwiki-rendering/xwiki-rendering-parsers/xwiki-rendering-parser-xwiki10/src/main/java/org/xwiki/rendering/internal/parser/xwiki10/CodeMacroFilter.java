@@ -48,12 +48,12 @@ public class CodeMacroFilter extends AbstractFilter
             String before = content.substring(currentIndex, matcher.start());
 
             if (currentIndex > 0) {
-                before = CleanUtil.setFirstNL(before, 2);
+                before = CleanUtil.setFirstNewLines(before, 2);
             }
 
             String macroResult =
                 this.codeMacroConverter.convert("code", RadeoxMacrosFilter.getMacroParameters(this.codeMacroConverter,
-                    matcher.group(2)), matcher.group(3));
+                    matcher.group(2)), matcher.group(3), filterContext);
 
             result.append(before);
             result.append(filterContext.addProtectedContent(macroResult));
@@ -63,7 +63,7 @@ public class CodeMacroFilter extends AbstractFilter
             return content;
         }
 
-        result.append(CleanUtil.setFirstNL(content.substring(currentIndex), 2));
+        result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
 
         return result.toString();
     }

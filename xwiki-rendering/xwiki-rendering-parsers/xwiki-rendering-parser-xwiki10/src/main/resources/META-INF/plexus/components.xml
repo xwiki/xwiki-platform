@@ -144,6 +144,18 @@
       <implementation>org.xwiki.rendering.internal.parser.xwiki10.macro.TableRadeoxMacroConverter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
+    <component>
+      <role>org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroConverter</role>
+      <role-hint>quote</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.macro.QuoteRadeoxMacroConverter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
+          <role-hint>standalonenewlinecleanning</role-hint>
+        </requirement>
+      </requirements>
+    </component>
     
     <!-- Pre filter -->
     <component>

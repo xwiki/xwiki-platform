@@ -62,7 +62,7 @@ public class SectionSyntaxFilter extends AbstractFilter
             return content;
         }
 
-        result.append(CleanUtil.setFirstNL(content.substring(currentIndex), 2));
+        result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
 
         return result.toString();
     }

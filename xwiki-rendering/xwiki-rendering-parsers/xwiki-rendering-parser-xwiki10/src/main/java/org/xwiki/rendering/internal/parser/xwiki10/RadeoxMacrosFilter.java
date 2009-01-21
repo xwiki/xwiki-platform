@@ -83,7 +83,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable
             String before = content.substring(currentIndex, matcher.start());
 
             if (currentMacro != null && !currentMacro.isInline()) {
-                before = CleanUtil.setFirstNL(before, 2);
+                before = CleanUtil.setFirstNewLines(before, 2);
             }
 
             String allcontent = matcher.group(0);
@@ -101,11 +101,12 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable
                     before = CleanUtil.removeLastNewLines(before, 1, true);
 
                     if (!currentMacro.isInline()) {
-                        before = CleanUtil.setLastNL(before, 2);
+                        before = CleanUtil.setLastNewLines(before, 2);
                     }
 
                     allcontent =
-                        currentMacro.convert(macroName, getMacroParameters(currentMacro, params), macroContent);
+                        currentMacro.convert(macroName, getMacroParameters(currentMacro, params), macroContent,
+                            filterContext);
                     if (currentMacro.protectResult()) {
                         allcontent = filterContext.addProtectedContent(allcontent);
                     }
@@ -129,7 +130,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable
         }
 
         if (currentMacro != null && !currentMacro.isInline()) {
-            result.append(CleanUtil.setFirstNL(content.substring(currentIndex), 2));
+            result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
         } else {
             result.append(content.substring(currentIndex));
         }

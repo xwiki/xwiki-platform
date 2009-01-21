@@ -24,13 +24,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
- * 
  * @version $Id$
  * @since 1.8M1
  */
@@ -44,7 +42,7 @@ public class ListSyntaxFilter extends AbstractFilter
         Pattern.compile("^([\\p{Blank}]*+)([-#*]++|[-1iIaAghHkKj]++\\.)([\\p{Blank}]++[^\r\n]++)([ \t]*+[\r\n]++)*+",
             Pattern.MULTILINE);
 
-    public String filter(String content, FilterContext filterContext) throws ParseException
+    public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
 
@@ -53,9 +51,9 @@ public class ListSyntaxFilter extends AbstractFilter
         int currentIndex = 0;
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = content.substring(currentIndex, matcher.start());
-            
+
             if (currentIndex > 0) {
-                before = CleanUtil.setLastNL(CleanUtil.setFirstNL(before, 2), 2);
+                before = CleanUtil.setLastNewLines(CleanUtil.setFirstNewLines(before, 2), 2);
             }
 
             result.append(before);
@@ -66,12 +64,12 @@ public class ListSyntaxFilter extends AbstractFilter
             return content;
         }
 
-        result.append(CleanUtil.setFirstNL(content.substring(currentIndex), 1));
+        result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 1));
 
         return result.toString();
     }
 
-    public String filterList(String content, FilterContext filterContext) throws ParseException
+    public String filterList(String content, FilterContext filterContext)
     {
         StringBuffer listResult = new StringBuffer();
 
@@ -81,9 +79,9 @@ public class ListSyntaxFilter extends AbstractFilter
         char currentListSign = 0;
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = content.substring(currentIndex, matcher.start());
-            
+
             if (currentIndex > 0) {
-                before = CleanUtil.setFirstNL(before, 1);
+                before = CleanUtil.setFirstNewLines(before, 1);
             }
 
             StringBuffer listItemResult = new StringBuffer();
@@ -137,13 +135,15 @@ public class ListSyntaxFilter extends AbstractFilter
                     listString = listSigns;
                 } else {
                     // This should never append
-                    throw new ParseException("Unknown list sign");
+                    getLogger().error("Unknown list sign: " + listSign);
+
+                    listString = StringUtils.repeat("*", listSigns.length());
                 }
             }
 
             if (listSign != currentListSign) {
                 if (currentListSign != 0 && currentIndex > 0) {
-                    before = CleanUtil.setLastNL(before, 2);
+                    before = CleanUtil.setLastNewLines(before, 2);
                 }
 
                 if (listStyle.length() > 0) {

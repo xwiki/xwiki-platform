@@ -51,6 +51,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/radeox/image1", false);
         suite.addTestsFromResource("macros/radeox/code1", false);
         suite.addTestsFromResource("macros/radeox/table1", false);
+        suite.addTestsFromResource("macros/radeox/quote1", false);
 
         suite.addTestsFromResource("pre/pre1", false);
 

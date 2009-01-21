@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.parser.xwiki10;
 
-import org.xwiki.rendering.parser.ParseException;
-
 /**
  * Filter provided content into another content.
  * 
@@ -36,5 +34,5 @@ public interface Filter
 
     int getPriority();
 
-    String filter(String content, FilterContext filterContext) throws ParseException;
+    String filter(String content, FilterContext filterContext);
 }

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
@@ -50,13 +51,13 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
     }
 
     @Override
-    public String convert(String name, RadeoxMacroParameters parameters, String content)
+    public String convert(String name, RadeoxMacroParameters parameters, String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
 
         appendParameters(result, convertFormatParameters(parameters));
 
-        super.convert(name, parameters, content);
+        super.convert(name, parameters, content, filterContext);
 
         return result.toString();
     }

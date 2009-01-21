@@ -100,7 +100,7 @@ public class VelocityFilter extends AbstractFilter implements Composable
                         (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.ROLE, macroName);
 
                     if (!currentMacro.isInline()) {
-                        nonVelocityContent = CleanUtil.setLastNL(nonVelocityContent, 2);
+                        nonVelocityContent = CleanUtil.setLastNewLines(nonVelocityContent, 2);
                     } else {
                         // A standalone new line is not interpreted by XWiki 1.0 rendering
                         nonVelocityContent = CleanUtil.removeLastNewLines(nonVelocityContent, 1, true);
@@ -154,7 +154,7 @@ public class VelocityFilter extends AbstractFilter implements Composable
 
         // Make sure the last non inline macro is followed by 2 new lines
         if (currentMacro != null && !currentMacro.isInline()) {
-            result.append(CleanUtil.setFirstNL(content.substring(currentIndex), 2));
+            result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
         } else {
             result.append(content.substring(currentIndex));
         }

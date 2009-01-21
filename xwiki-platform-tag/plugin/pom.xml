@@ -69,10 +69,13 @@
     <profile>
       <!-- XWiki Enterprise -->
       <id>xe</id>
-      <modules>
+      <modules>     
         <module>scheduler</module>
-        <module>mailsender</module>
+        <module>mailsender</module>        
         <module>watchlist</module>
+        <module>jodatime</module>
+        <module>skinx</module>
+        <module>lucene</module>
       </modules>
     </profile>
     <profile>

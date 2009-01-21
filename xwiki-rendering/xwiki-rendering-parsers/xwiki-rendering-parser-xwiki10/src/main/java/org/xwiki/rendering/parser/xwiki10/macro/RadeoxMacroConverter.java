@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.parser.xwiki10.macro;
 
-import java.util.Map;
-
 /**
  * Convert Velocity macro to XWiki 2.0 syntax or macro.
  * 
@@ -34,11 +32,13 @@ public interface RadeoxMacroConverter
      */
     String ROLE = RadeoxMacroConverter.class.getName();
 
+    public String getParameterName(int parameterIndex);
+
     boolean supportContent();
 
     boolean protectResult();
-    
+
     boolean isInline();
 
-    String convert(String name, Map<String, String> parameters, String content);
+    String convert(String name, RadeoxMacroParameters parameters, String content);
 }

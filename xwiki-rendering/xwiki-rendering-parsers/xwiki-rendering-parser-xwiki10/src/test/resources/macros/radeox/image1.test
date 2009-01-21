@@ -3,12 +3,14 @@
 .#-----------------------------------------------------
 {image:gamesigns.jpg}
 {image:gamesigns.jpg|document=Space.Page}
-{image:gamesigns.jpg|height=128|width=128}
+{image:gamesigns.jpg|height=100|width=200}
 
 {image:gamesigns.jpg}
+{image:gamesigns.jpg|100|200}
+{image:gamesigns.jpg|width=100|200}
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-image:gamesigns.jpg image:Space.Page@gamesigns.jpg [[image:gamesigns.jpg||height="128" width="128"]]
+image:gamesigns.jpg image:Space.Page@gamesigns.jpg [[image:gamesigns.jpg||height="100" width="200"]]
 
-image:gamesigns.jpg
+image:gamesigns.jpg [[image:gamesigns.jpg||height="100" width="200"]] [[image:gamesigns.jpg||width="200"]]

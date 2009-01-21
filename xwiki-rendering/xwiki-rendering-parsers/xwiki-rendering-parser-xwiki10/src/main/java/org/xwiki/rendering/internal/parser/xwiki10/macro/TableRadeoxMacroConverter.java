@@ -19,20 +19,19 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
 
 /**
- * 
  * @version $Id$
  * @since 1.8M1
  */
 public class TableRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 {
     @Override
-    public String convert(String name, Map<String, String> parameters, String content)
+    public String convert(String name, RadeoxMacroParameters parameters, String content)
     {
         StringBuffer result = new StringBuffer();
 

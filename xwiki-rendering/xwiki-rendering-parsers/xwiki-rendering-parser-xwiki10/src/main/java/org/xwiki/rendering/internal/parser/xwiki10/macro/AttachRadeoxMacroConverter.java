@@ -19,20 +19,31 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameter;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
 
 /**
- * 
  * @version $Id$
  * @since 1.8M1
  */
 public class AttachRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 {
+    public AttachRadeoxMacroConverter()
+    {
+        registerParameter("");
+        registerParameter("file");
+        registerParameter("document");
+        registerParameter("title");
+        registerParameter("rel");
+        registerParameter("id");
+        registerParameter("fromIncludingDoc");
+    }
+
     @Override
-    public String convert(String name, Map<String, String> parameters, String content)
+    public String convert(String name, RadeoxMacroParameters parameters, String content)
     {
         StringBuffer result = new StringBuffer();
 
@@ -40,11 +51,16 @@ public class AttachRadeoxMacroConverter extends AbstractRadeoxMacroConverter
             appendSimpleAttach(result, parameters);
         } else {
             result.append("[[");
+            if (parameters.containsKey("file")) {
+                result.append(parameters.get(""));
+                result.append(">>");
+            }
             appendSimpleAttach(result, parameters);
             result.append("||");
-            Map<String, String> parametersClone = new LinkedHashMap<String, String>(parameters);
+            Map<String, String> parametersClone = convertParameters(parameters);
             parametersClone.remove("");
             parametersClone.remove("document");
+            parametersClone.remove("file");
             appendParameters(result, parametersClone);
             result.append("]]");
         }
@@ -52,17 +68,17 @@ public class AttachRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         return result.toString();
     }
 
-    private void appendSimpleAttach(StringBuffer result, Map<String, String> parameters)
+    private void appendSimpleAttach(StringBuffer result, RadeoxMacroParameters parameters)
     {
         result.append("attach:");
 
-        String document = parameters.get("document");
+        RadeoxMacroParameter document = parameters.get("document");
         if (document != null) {
             result.append(document);
             result.append("@");
         }
 
-        result.append(parameters.get(""));
+        result.append(parameters.containsKey("file") ? parameters.get("file") : parameters.get(""));
     }
 
     public boolean supportContent()

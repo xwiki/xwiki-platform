@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.parser.xwiki10.macro;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +34,8 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
 {
     private String name;
 
+    private List<String> parametersNames = new ArrayList<String>();
+
     protected AbstractRadeoxMacroConverter()
     {
 
@@ -40,6 +44,16 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
     protected AbstractRadeoxMacroConverter(String name)
     {
         this.name = name;
+    }
+
+    public String getParameterName(int parameterIndex)
+    {
+        return parametersNames.get(parameterIndex);
+    }
+
+    protected void registerParameter(String parameterName)
+    {
+        this.parametersNames.add(parameterName);
     }
 
     public boolean protectResult()
@@ -57,15 +71,20 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
         return this.name == null ? name : this.name;
     }
 
-    protected Map<String, String> convertParameters(Map<String, String> parameters)
+    protected Map<String, String> convertParameters(RadeoxMacroParameters parameters)
     {
         Map<String, String> parameters20 = new LinkedHashMap<String, String>(parameters.size());
 
-        for (Map.Entry<String, String> parameter : parameters.entrySet()) {
-            convertParameter(parameters20, parameter.getKey(), parameter.getValue());
+        for (RadeoxMacroParameter radeoxParameter : parameters.values()) {
+            convertParameter(parameters20, radeoxParameter);
         }
 
         return parameters20;
+    }
+
+    protected void convertParameter(Map<String, String> parameters20, RadeoxMacroParameter radeoxParameter)
+    {
+        convertParameter(parameters20, radeoxParameter.getName(), radeoxParameter.getValue());
     }
 
     protected void convertParameter(Map<String, String> parameters20, String key, String value)
@@ -78,7 +97,7 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
         return content;
     }
 
-    public String convert(String name, Map<String, String> parameters, String content)
+    public String convert(String name, RadeoxMacroParameters parameters, String content)
     {
         StringBuffer result = new StringBuffer();
 

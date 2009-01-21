@@ -19,20 +19,32 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameter;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
 
 /**
- * 
  * @version $Id$
  * @since 1.8M1
  */
 public class ImageRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 {
+    public ImageRadeoxMacroConverter()
+    {
+        registerParameter("");
+        registerParameter("height");
+        registerParameter("width");
+        registerParameter("align");
+        registerParameter("halign");
+        registerParameter("document");
+        registerParameter("alt");
+        registerParameter("link");
+    }
+
     @Override
-    public String convert(String name, Map<String, String> parameters, String content)
+    public String convert(String name, RadeoxMacroParameters parameters, String content)
     {
         StringBuffer result = new StringBuffer();
 
@@ -42,7 +54,7 @@ public class ImageRadeoxMacroConverter extends AbstractRadeoxMacroConverter
             result.append("[[");
             appendSimpleImage(result, parameters);
             result.append("||");
-            Map<String, String> parametersClone = new LinkedHashMap<String, String>(parameters);
+            Map<String, String> parametersClone = convertParameters(parameters);
             parametersClone.remove("");
             parametersClone.remove("document");
             appendParameters(result, parametersClone);
@@ -52,13 +64,13 @@ public class ImageRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         return result.toString();
     }
 
-    private void appendSimpleImage(StringBuffer result, Map<String, String> parameters)
+    private void appendSimpleImage(StringBuffer result, RadeoxMacroParameters parameters)
     {
         result.append("image:");
 
-        String document = parameters.get("document");
+        RadeoxMacroParameter document = parameters.get("document");
         if (document != null) {
-            result.append(document);
+            result.append(document.getValue());
             result.append("@");
         }
 

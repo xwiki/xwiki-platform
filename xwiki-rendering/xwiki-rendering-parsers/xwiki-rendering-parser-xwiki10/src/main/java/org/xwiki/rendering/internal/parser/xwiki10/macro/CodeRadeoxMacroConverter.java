@@ -30,6 +30,11 @@ import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
  */
 public class CodeRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 {
+    public CodeRadeoxMacroConverter()
+    {
+        registerParameter("");
+    }
+
     @Override
     protected void convertParameter(Map<String, String> parameters20, String key, String value)
     {

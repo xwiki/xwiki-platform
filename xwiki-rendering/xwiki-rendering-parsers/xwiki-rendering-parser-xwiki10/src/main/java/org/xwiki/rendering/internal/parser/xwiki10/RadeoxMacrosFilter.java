@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +28,7 @@ import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroConverter;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
@@ -105,7 +104,8 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable
                         before = CleanUtil.setLastNL(before, 2);
                     }
 
-                    allcontent = currentMacro.convert(macroName, getMacroParameters(params), macroContent);
+                    allcontent =
+                        currentMacro.convert(macroName, getMacroParameters(currentMacro, params), macroContent);
                     if (currentMacro.protectResult()) {
                         allcontent = filterContext.addProtectedContent(allcontent);
                     }
@@ -137,26 +137,28 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable
         return result.toString();
     }
 
-    public static Map<String, String> getMacroParameters(String parameters)
+    public static RadeoxMacroParameters getMacroParameters(RadeoxMacroConverter macroConverter, String parameters)
     {
-        Map<String, String> parameterMap = new LinkedHashMap<String, String>();
+        RadeoxMacroParameters parameterMap = new RadeoxMacroParameters();
 
         if (parameters != null) {
             String[] parameterTable = parameters.split("\\|");
 
-            for (String parameter : parameterTable) {
-                int index = parameter.indexOf('=');
+            for (int parameterIndex = 0; parameterIndex < parameterTable.length; ++parameterIndex) {
+                String parameter = parameterTable[parameterIndex];
+                int equalIndex = parameter.indexOf('=');
 
-                String parameterName = "";
+                String parameterName = null;
                 String parameterValue;
-                if (index >= 0) {
-                    parameterName = parameter.substring(0, index);
-                    parameterValue = parameter.substring(index + 1);
+                if (equalIndex >= 0) {
+                    parameterName = parameter.substring(0, equalIndex);
+                    parameterValue = parameter.substring(equalIndex + 1);
                 } else {
+                    parameterName = macroConverter.getParameterName(parameterIndex);
                     parameterValue = parameter;
                 }
 
-                parameterMap.put(parameterName, parameterValue);
+                parameterMap.addParameter(parameterIndex, parameterName, parameterValue);
             }
         }
 

@@ -248,6 +248,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocumentSyntaxId(java.lang.String)
+     */
+    public String getDocumentSyntaxId(String documentName) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#setDocumentSyntaxId(String, String)
      */
     public void setDocumentSyntaxId(String documentName, String syntaxId) throws Exception

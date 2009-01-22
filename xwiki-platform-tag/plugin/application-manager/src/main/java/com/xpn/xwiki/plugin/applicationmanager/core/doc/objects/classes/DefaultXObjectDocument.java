@@ -294,10 +294,13 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
 
         if (obj != null) {
             PropertyClass pclass = (PropertyClass) this.sclass.getBaseClass().get(fieldName);
-            BaseProperty prop = (BaseProperty) obj.safeget(fieldName);
-            prop = pclass.fromString(value);
-            if (prop != null) {
-                obj.safeput(fieldName, prop);
+
+            if (pclass != null) {
+                BaseProperty prop = (BaseProperty) obj.safeget(fieldName);
+                prop = pclass.fromString(value);
+                if (prop != null) {
+                    obj.safeput(fieldName, prop);
+                }
             }
         }
     }

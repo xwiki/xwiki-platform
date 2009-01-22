@@ -229,16 +229,19 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
         DefaultXObjectDocument sdoc2 = (DefaultXObjectDocument) sclass.newXObjectDocument(context);
 
-        sdoc1.setStringValue("field1", "valuesdoc1");
-        sdoc1.setStringValue("field2", "value2sdoc1");
+        sdoc1.setStringValue(TestAbstractXClassManagerTest.FIELD_string, "valuesdoc1");
+        sdoc1.setStringValue(TestAbstractXClassManagerTest.FIELD_string2, "value2sdoc1");
 
-        sdoc2.setStringValue("field1", "valuesdoc2");
-        sdoc2.setIntValue("field3", 2);
+        sdoc2.setStringValue(TestAbstractXClassManagerTest.FIELD_string, "valuesdoc2");
+        sdoc2.setIntValue(TestAbstractXClassManagerTest.FIELD_int, 2);
 
         sdoc1.mergeObject(sdoc2);
 
-        assertEquals("The field is not overwritten", sdoc1.getStringValue("field1"), sdoc2.getStringValue("field1"));
-        assertEquals("The field is removed", "value2sdoc1", sdoc1.getStringValue("field2"));
-        assertEquals("The field is not added", sdoc1.getIntValue("field3"), sdoc1.getIntValue("field3"));
+        assertEquals("The field is not overwritten", sdoc1.getStringValue(TestAbstractXClassManagerTest.FIELD_string),
+            sdoc2.getStringValue(TestAbstractXClassManagerTest.FIELD_string));
+        assertEquals("The field is removed", "value2sdoc1", sdoc1
+            .getStringValue(TestAbstractXClassManagerTest.FIELD_string2));
+        assertEquals("The field is not added", sdoc1.getIntValue(TestAbstractXClassManagerTest.FIELD_int), sdoc1
+            .getIntValue(TestAbstractXClassManagerTest.FIELD_int));
     }
 }

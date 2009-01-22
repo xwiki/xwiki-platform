@@ -207,6 +207,8 @@ public interface Strings extends Constants
 
     String linkNewPageTextBoxTooltip();
 
+    String importer();
+    
     String image();
 
     String fileUploadLabel();

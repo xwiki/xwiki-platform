@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImporterDialog;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
@@ -75,6 +76,7 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_HTML)) {
             importPushButton = new PushButton(Images.INSTANCE.importer().createImage(), this);
+            importPushButton.setTitle(Strings.INSTANCE.importer());
             toolBarExtension.addFeature("importer", importPushButton);
         }
 

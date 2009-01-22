@@ -102,7 +102,7 @@ $xwiki.getTextArea($tdoc.content)
       plugins: 'separator text valign list indent undo format symbol link image table importer',
 #end 
       syntax: "$doc.syntaxId",
-      toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | image | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol | importer',
+      toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer | image | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol',
       space: '${doc.space}',
       page: '${doc.name}',
       debug: #if($request.debug)'true'#else'false'#end

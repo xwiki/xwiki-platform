@@ -65,6 +65,16 @@ public interface DocumentAccessBridge
     String getDocumentContent(String documentName) throws Exception;
 
     /**
+     * Get the syntax Id of the target document. If the target document
+     * does not exists, the default syntax of a new document is returned.
+     * 
+     * @param documentName Name of the target document.
+     * @return the syntax id.
+     * @throws Exception If the storage cannot be accessed.
+     */
+    String getDocumentSyntaxId(String documentName) throws Exception;
+    
+    /**
      * Changes the syntax Id of the target document to the given syntaxId. If the target document
      * does not exists, a new one will be created.
      * 

@@ -23,6 +23,8 @@ import java.io.StringReader;
 import java.util.List;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Composable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializerException;
@@ -37,15 +39,13 @@ import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
+public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implements Composable
 {
     /**
      * The description of the macro.
@@ -53,14 +53,9 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     private static final String DESCRIPTION = "Include other pages into the current page.";
 
     /**
-     * The XWiki 2.0 syntax identifier.
+     * Used to find the parser from syntax identifier.
      */
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");
-
-    /**
-     * Injected by the Component Manager.
-     */
-    private Parser parser;
+    private ComponentManager componentManager;
 
     /**
      * Injected by the Component Manager.
@@ -85,6 +80,16 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         super(new DefaultMacroDescriptor(DESCRIPTION, IncludeMacroParameters.class));
 
         registerConverter(new EnumConverter(Context.class), Context.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
+     */
+    public void compose(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
     }
 
     /**
@@ -120,9 +125,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 
         // Retrieve the included document's content
         String includedContent = null;
+        String includedSyntax = null;
         try {
             if (this.documentAccessBridge.isDocumentViewable(documentName)) {
                 includedContent = this.documentAccessBridge.getDocumentContent(documentName);
+                includedSyntax = this.documentAccessBridge.getDocumentSyntaxId(documentName);
             } else {
                 throw new MacroExecutionException("Current user doesn't have view rights on document [" + documentName
                     + "]");
@@ -145,9 +152,10 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // to be executed at this stage since they should be executed by the currently running
         // Macro Transformation.
         if (actualContext == Context.NEW) {
-            result = executeWithNewContext(documentName, includedContent, context.getMacroTransformation());
+            result =
+                executeWithNewContext(documentName, includedContent, includedSyntax, context.getMacroTransformation());
         } else {
-            result = executeWithCurrentContext(documentName, includedContent);
+            result = executeWithCurrentContext(documentName, includedContent, includedSyntax);
         }
 
         return result;
@@ -158,12 +166,13 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * 
      * @param includedDocumentName the name of the document to include.
      * @param includedContent the content of the document to include.
+     * @param includedSyntax the syntax identifier of the provided content.
      * @param macroTransformation the macro transformation.
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
     private List<Block> executeWithNewContext(String includedDocumentName, String includedContent,
-        MacroTransformation macroTransformation) throws MacroExecutionException
+        String includedSyntax, MacroTransformation macroTransformation) throws MacroExecutionException
     {
         List<Block> result;
 
@@ -178,7 +187,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             this.execution.pushContext(ec);
             // TODO: Need to set the current document, space and wiki. This is required for wiki syntax acting on
             // documents. For example if a link says "WebHome" it should point to the webhome of the current space.
-            result = generateIncludedPageDOM(includedDocumentName, includedContent, macroTransformation);
+            result =
+                generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, macroTransformation);
         } catch (ExecutionContextInitializerException e) {
             throw new MacroExecutionException("Failed to create new Execution Context for included page ["
                 + includedDocumentName + "]", e);
@@ -195,13 +205,14 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * 
      * @param includedDocumentName the name of the document to include.
      * @param includedContent the content of the document to include.
+     * @param includedSyntax the syntax identifier of the provided content.
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> executeWithCurrentContext(String includedDocumentName, String includedContent)
-        throws MacroExecutionException
+    private List<Block> executeWithCurrentContext(String includedDocumentName, String includedContent,
+        String includedSyntax) throws MacroExecutionException
     {
-        return generateIncludedPageDOM(includedDocumentName, includedContent, null);
+        return generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, null);
     }
 
     /**
@@ -209,23 +220,25 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * 
      * @param includedDocumentName the name of the document to include.
      * @param includedContent the content of the document to include.
+     * @param includedSyntax the syntax identifier of the provided content.
      * @param macroTransformation the macro transformation.
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
     private List<Block> generateIncludedPageDOM(String includedDocumentName, String includedContent,
-        MacroTransformation macroTransformation) throws MacroExecutionException
+        String includedSyntax, MacroTransformation macroTransformation) throws MacroExecutionException
     {
         XDOM includedDom;
         try {
-            includedDom = this.parser.parse(new StringReader(includedContent));
+            Parser parser = (Parser) this.componentManager.lookup(Parser.ROLE, includedSyntax);
+            includedDom = parser.parse(new StringReader(includedContent));
 
             // Only run Macro transformation when the context is a new one as otherwise we need the macros in the
             // included page to be added to the list of macros on the including page so that they're all sorted
             // and executed in the right order. Note that this works only because the Include macro has the highest
             // execution priority and is thus executed first.
             if (macroTransformation != null) {
-                macroTransformation.transform(includedDom, SYNTAX);
+                macroTransformation.transform(includedDom, parser.getSyntax());
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to parse included page [" + includedDocumentName + "]", e);

@@ -110,6 +110,19 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocumentSyntaxId(java.lang.String)
+     */
+    public String getDocumentSyntaxId(String documentName) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
+
+        return doc.getSyntaxId();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#setDocumentSyntaxId(String, String)
      */
     public void setDocumentSyntaxId(String documentName, String syntaxId) throws Exception

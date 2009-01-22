@@ -39,10 +39,6 @@
         <requirement>
           <role>org.xwiki.bridge.DocumentAccessBridge</role>
         </requirement>
-        <requirement>
-          <role>org.xwiki.rendering.parser.Parser</role>
-          <role-hint>xwiki/2.0</role-hint>
-        </requirement>
       </requirements>
       <configuration>
         <!-- The include macro must execute first since if it runs with the current context it needs to bring

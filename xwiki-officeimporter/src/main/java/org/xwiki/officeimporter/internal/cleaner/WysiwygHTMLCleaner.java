@@ -53,7 +53,7 @@ public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleane
      */
     public Document clean(Reader originalHtmlContent)
     {
-        return clean(originalHtmlContent, Collections.singletonMap("filterStyle", "moderate"));
+        return clean(originalHtmlContent, Collections.singletonMap("filterStyles", "moderate"));
     }
 
     /**
@@ -64,7 +64,7 @@ public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleane
         // Initialize filters.
         List<HTMLFilter> filterList = new ArrayList<HTMLFilter>();
         filterList.add(new StripperFilter());
-        filterList.add(new StyleFilter("moderate"));
+        filterList.add(new StyleFilter(params.get("filterStyles")));
         filterList.add(new RedundancyFilter());
         filterList.add(new ParagraphFilter());
         // Default cleaning.        

@@ -186,6 +186,26 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
     public static final String FIELDPN_string = "String";
 
     /**
+     * Name of field <code>string2</code>.
+     */
+    public static final String FIELD_string2 = "string2";
+
+    /**
+     * Pretty name of field <code>string2</code>.
+     */
+    public static final String FIELDPN_string2 = "String2";
+
+    /**
+     * Name of field <code>int</code>.
+     */
+    public static final String FIELD_int = "int";
+
+    /**
+     * Pretty name of field <code>int</code>.
+     */
+    public static final String FIELDPN_int = "Int";
+
+    /**
      * Name of field <code>stringlist</code>.
      */
     public static final String FIELD_stringlist = "stringlist";
@@ -269,11 +289,14 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
             super(spaceprefix, prefix, dispatch);
         }
 
+        @Override
         protected boolean updateBaseClass(BaseClass baseClass)
         {
             boolean needsUpdate = super.updateBaseClass(baseClass);
 
             needsUpdate |= baseClass.addTextField(FIELD_string, FIELDPN_string, 30);
+            needsUpdate |= baseClass.addTextField(FIELD_string2, FIELDPN_string2, 30);
+            needsUpdate |= baseClass.addNumberField(FIELD_int, FIELDPN_int, 10, "integer");
             needsUpdate |= baseClass.addTextField(FIELD_stringlist, FIELDPN_stringlist, 80);
 
             return needsUpdate;

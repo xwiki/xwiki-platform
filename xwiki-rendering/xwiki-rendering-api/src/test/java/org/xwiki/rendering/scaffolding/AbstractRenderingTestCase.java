@@ -23,9 +23,6 @@ import java.util.List;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.MockDocumentAccessBridge;
-import org.xwiki.rendering.internal.configuration.MockConfigurationSourceCollection;
-import org.xwiki.rendering.internal.util.MockIdGenerator;
 import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;

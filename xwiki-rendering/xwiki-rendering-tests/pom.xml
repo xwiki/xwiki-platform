@@ -31,65 +31,124 @@
   </parent>
   <artifactId>xwiki-core-rendering-tests</artifactId>
   <name>XWiki Platform - Core - Rendering - Tests</name>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <description>XWiki Platform - Core - Rendering - Tests</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component</artifactId>
       <version>${pom.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-bridge</artifactId>
       <version>${pom.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-api</artifactId>
       <version>${pom.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-api</artifactId>
       <version>${pom.version}</version>
       <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-parser-doxia</artifactId>
       <version>${pom.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
       <version>${pom.version}</version>
+      <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.2</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>jmock</groupId>
       <artifactId>jmock-cglib</artifactId>
       <version>1.2.0</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>
       <version>${platform.tool.test.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
+      <!-- Force compilation of tests as the packaging being pom tests won't be compiled
+            with the default pom lifecycle -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Force copy of test resources file as the packaging being pom resource files won't
+           be copied with the default pom lifecycle -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>testResources</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Create jar containing integration tests which will be installed so that other 
+           modules can depend on it -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/scaffolding/**.class</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <includes>
-            <include>**/*TestSuite.java</include>
             <include>**/*Test.java</include>
             <include>**/RenderingTests.java</include>
           </includes>

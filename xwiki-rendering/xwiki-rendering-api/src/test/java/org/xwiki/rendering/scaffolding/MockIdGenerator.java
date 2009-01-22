@@ -17,24 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.configuration;
-
-import java.util.Collections;
-import java.util.List;
+package org.xwiki.rendering.scaffolding;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.configuration.ConfigurationSourceCollection;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
- * Mock {@link org.xwiki.configuration.ConfigurationSourceCollection} that returns an empty list of configuration
- * sources.
+ * Default implementation of {@link org.xwiki.rendering.util.IdGenerator}.
  * 
  * @version $Id: $
- * @since 1.6M2
  */
-public class MockConfigurationSourceCollection implements ConfigurationSourceCollection
+public class MockIdGenerator implements IdGenerator
 {
     /**
      * Create and return a descriptor for this component.
@@ -45,15 +39,20 @@ public class MockConfigurationSourceCollection implements ConfigurationSourceCol
     {
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
 
-        componentDescriptor.setRole(ConfigurationSourceCollection.ROLE);
+        componentDescriptor.setRole(IdGenerator.ROLE);
         componentDescriptor.setRoleHint("default");
-        componentDescriptor.setImplementation(MockConfigurationSourceCollection.class.getName());
+        componentDescriptor.setImplementation(MockIdGenerator.class.getName());
 
         return componentDescriptor;
     }
 
-    public List<ConfigurationSource> getConfigurationSources()
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.util.IdGenerator#generateRandomUniqueId()
+     */
+    public String generateRandomUniqueId()
     {
-        return Collections.emptyList();
+        return "testid";
     }
 }

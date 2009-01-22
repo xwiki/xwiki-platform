@@ -45,6 +45,29 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-tests</artifactId>
       <version>${pom.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Seems like there's no transitive dependencies for test-jar types so we need
+         to specify these dependencies even though they are in the xwiki-core-rendering-tests
+         POM. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-api</artifactId>
+      <version>${pom.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.tools</groupId>
+      <artifactId>xwiki-shared-tests</artifactId>
+      <version>${platform.tool.test.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -55,7 +78,7 @@
     <module>xwiki-rendering-macro-html</module>
     <module>xwiki-rendering-macro-script</module>
     <module>xwiki-rendering-macro-velocity</module>
-    <module>xwiki-rendering-macro-groovy</module>
+    <!--module>xwiki-rendering-macro-groovy</module-->
     <module>xwiki-rendering-macro-box</module>
     <module>xwiki-rendering-macro-code</module>
   </modules>

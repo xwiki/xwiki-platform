@@ -28,7 +28,6 @@ import java.util.StringTokenizer;
 
 import junit.framework.TestSuite;
 
-import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.internal.parser.DefaultAttachmentParser;
 import org.xwiki.rendering.internal.parser.DefaultSyntaxFactory;

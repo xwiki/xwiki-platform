@@ -103,9 +103,16 @@
               <goal>test-jar</goal>
             </goals>
             <configuration>
-              <excludes>
-                <exclude>**/*Test.class</exclude>
-              </excludes>
+              <includes>
+                <include>**/scaffolding/**.class</include>
+                <!-- Required since we're using test components in the integration test module  -->
+                <include>**/Test*Macro.class</include>
+                <include>**/components.xml</include>
+                <!-- HACK here: there's some problem loading components in the integration test 
+                     module if the implementation classes are not in the generated test jar.
+                     Need to be investigated and fixed -->
+                <include>**/**.class</include>
+              </includes>
             </configuration>
           </execution>
         </executions>

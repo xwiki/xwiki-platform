@@ -1,8 +1,5 @@
 package org.xwiki.rendering.scaffolding;
 
-import org.xwiki.rendering.internal.MockDocumentAccessBridge;
-import org.xwiki.rendering.internal.configuration.MockConfigurationSourceCollection;
-import org.xwiki.rendering.internal.util.MockIdGenerator;
 
 import junit.framework.TestSuite;
 

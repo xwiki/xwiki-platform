@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -144,11 +145,11 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      * 
      * @see WysiwygService#cleanOfficeHTML(String, String)
      */
-    public String cleanOfficeHTML(String htmlPaste, String cleanerHint)
+    public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
     {
         org.xwiki.xml.html.HTMLCleaner cleaner =
             (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.ROLE, cleanerHint);
-        return XMLUtils.toString(cleaner.clean(new StringReader(htmlPaste)));
+        return XMLUtils.toString(cleaner.clean(new StringReader(htmlPaste), cleaningParams));
     }
 
     /**

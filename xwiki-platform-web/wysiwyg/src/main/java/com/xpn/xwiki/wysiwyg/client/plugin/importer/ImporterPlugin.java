@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -43,8 +46,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class ImporterPlugin extends AbstractPlugin implements ClickListener, PopupListener,
-    AsyncCallback<String>
+public class ImporterPlugin extends AbstractPlugin implements ClickListener, PopupListener, AsyncCallback<String>
 {
     /**
      * Import button placed on the tool bar.
@@ -57,8 +59,7 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
     private ImporterDialog importerDialog;
 
     /**
-     * A {@link SelectionPreserver} for saving / restoring user selections on the main wysiwyg
-     * editor.
+     * A {@link SelectionPreserver} for saving / restoring user selections on the main wysiwyg editor.
      */
     private SelectionPreserver selectionPreserver;
 
@@ -76,7 +77,7 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_HTML)) {
             importPushButton = new PushButton(Images.INSTANCE.importer().createImage(), this);
-            importPushButton.setTitle(Strings.INSTANCE.importer());
+            importPushButton.setTitle(Strings.INSTANCE.importerToolTip());
             toolBarExtension.addFeature("importer", importPushButton);
         }
 
@@ -126,12 +127,12 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
     public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
     {
         if (importerDialog.isClipBoardImport()) {
-            String inputHtml = importerDialog.getHtmlPaste();
-            if (!inputHtml.trim().equals("")) {
-                // For the moment we'll use the default wysiwyg html cleaner.
-                WysiwygService.Singleton.getInstance()
-                    .cleanOfficeHTML(inputHtml, "wysiwyg", this);
+            String inputHtml = importerDialog.getHtmlPaste();            
+            Map<String, String> params = new HashMap<String, String>();
+            if (importerDialog.isFilterStyles()) {
+                params.put("filterStyles", "strict");
             }
+            WysiwygService.Singleton.getInstance().cleanOfficeHTML(inputHtml, "wysiwyg", params, this);            
         }
     }
 

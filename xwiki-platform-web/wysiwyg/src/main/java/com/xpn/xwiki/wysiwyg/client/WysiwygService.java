@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -93,23 +94,24 @@ public interface WysiwygService extends RemoteService
     String cleanHTML(String dirtyHTML);
 
     /**
-     * Cleans dirty html content produced from an office application like MsWord, MsExcel,
-     * OpenOffice Writer etc. This method is primarily utilized by the office importer wysiwyg
-     * plugin.
+     * Cleans dirty html content produced from an office application like MsWord, MsExcel, OpenOffice Writer etc. This
+     * method is primarily utilized by the office importer wysiwyg plugin.
      * 
-     * @param htmlPaste Dirty html pasted by the user.
-     * @param cleanerHint Role hint for which cleaner to be used.
+     * @param htmlPaste dirty html pasted by the user.
+     * @param cleanerHint role hint for which cleaner to be used.
+     * @param cleaningParams additional parameters to be used when cleaning.
      * @return The cleaned html content.
      */
-    String cleanOfficeHTML(String htmlPaste, String cleanerHint);
-    
+    String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams);
+
     /**
      * @param syncedRevision The changes to this editor's content, since the last update.
      * @param pageName The page being edited.
      * @param version The version affected by syncedRevision.
      * @return The result of synchronizing this editor with others editing the same page.
      */
-    SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset) throws XWikiGWTException;
+    SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset)
+        throws XWikiGWTException;
 
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).

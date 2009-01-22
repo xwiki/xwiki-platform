@@ -65,7 +65,7 @@ public class ImporterDialog extends CompositeDialogBox implements ClickListener
         tabPanel.add(clipboardImportTab, Strings.INSTANCE.importerClipboardTab());
         tabPanel.add(fileImportTab, Strings.INSTANCE.importerFileTab());
         tabPanel.selectTab(0);
-        clipBoardImport = true;
+        clipBoardImport = false;
 
         // Finalize.
         initWidget(tabPanel);
@@ -77,11 +77,7 @@ public class ImporterDialog extends CompositeDialogBox implements ClickListener
      */
     public void onClick(Widget sender)
     {
-        if (sender == clipboardImportTab.getImportButton()) {
-            clipBoardImport = true;
-        } else {
-            clipBoardImport = false;
-        }
+        clipBoardImport = (sender == clipboardImportTab.getImportButton()) && !getHtmlPaste().trim().equals("");
         hide();
     }
 
@@ -95,18 +91,26 @@ public class ImporterDialog extends CompositeDialogBox implements ClickListener
     }
 
     /**
-     * @return The html content of the clipboard import tab.
-     */
-    public String getHtmlPaste()
-    {
-        return clipboardImportTab.getHtmlPaste();
-    }
-
-    /**
      * @return Whether the import is from clipboard or not.
      */
     public boolean isClipBoardImport()
     {
         return clipBoardImport;
+    }
+    
+    /**
+     * @return The html content of the clipboard import tab.
+     */
+    public String getHtmlPaste()
+    {
+        return clipboardImportTab.getEditor().getHTML();
+    }
+
+    /**
+     * @return if the styles present in the html paste should be filtered or not.
+     */
+    public boolean isFilterStyles()
+    {
+        return clipboardImportTab.getFilterStylesCheckBox().isChecked();
     }
 }

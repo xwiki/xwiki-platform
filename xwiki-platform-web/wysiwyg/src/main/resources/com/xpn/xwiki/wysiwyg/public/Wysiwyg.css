@@ -554,7 +554,15 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
   border: solid 1px #000000;
 }
 
+.xImporterClipboardFilterStylesCheckBox {  
+}
+
 .xImporterClipboardImportButton {
-  width: 50px;
-  margin-left: 352px;
+  width: 60px;
+  margin-left: 172px;
+}
+
+.xImporterClipboardCancelImportButton {
+  width: 60px;
+  margin-left: 5px;
 }

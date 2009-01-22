@@ -20,8 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -50,9 +52,19 @@ public class ClipboardImportTab extends Composite
     private RichTextArea editor;
 
     /**
+     * Filter Styles check box.
+     */
+    private CheckBox filterStylesCheckBox;
+    
+    /**
      * Import button.
      */
     private Button importButton;
+    
+    /**
+     * Cancel button.
+     */
+    private Button cancelButton;
 
     /**
      * Default constructor.
@@ -76,10 +88,20 @@ public class ClipboardImportTab extends Composite
         mainPanel.add(editor);
 
         // Button panel.
+        HorizontalPanel buttonPanel = new HorizontalPanel();
+        filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importerClipboardFilterStylesCheckBox());
+        filterStylesCheckBox.addStyleName("xImporterClipboardFilterStylesCheckBox");
+        filterStylesCheckBox.setChecked(true);
+        buttonPanel.add(filterStylesCheckBox);
         importButton = new Button(Strings.INSTANCE.importerClipboardImportButton());
         importButton.addStyleName("xImporterClipboardImportButton");
         importButton.addClickListener(listener);
-        mainPanel.add(importButton);
+        buttonPanel.add(importButton);
+        cancelButton = new Button(Strings.INSTANCE.importerClipboardCancelImportButton());
+        cancelButton.addStyleName("xImporterClipboardCancelImportButton");
+        cancelButton.addClickListener(listener);
+        buttonPanel.add(cancelButton);
+        mainPanel.add(buttonPanel);
 
         // Finalize.
         initWidget(mainPanel);
@@ -92,13 +114,13 @@ public class ClipboardImportTab extends Composite
     {
         editor.setHTML("");
     }
-
+    
     /**
-     * @return The html content of the editor rta.
+     * @return the editor.
      */
-    public String getHtmlPaste()
+    public RichTextArea getEditor()
     {
-        return editor.getHTML();
+        return editor;
     }
 
     /**
@@ -108,4 +130,12 @@ public class ClipboardImportTab extends Composite
     {
         return importButton;
     }
+
+    /**
+     * @return the filter styles check box.
+     */
+    public CheckBox getFilterStylesCheckBox()
+    {
+        return filterStylesCheckBox;
+    }    
 }

@@ -206,8 +206,6 @@ public interface Strings extends Constants
     String linkNewSpaceTextBoxTooltip();
 
     String linkNewPageTextBoxTooltip();
-
-    String importer();
     
     String image();
 
@@ -275,13 +273,19 @@ public interface Strings extends Constants
     
     String tableInsertButton();
     
+    String importerToolTip();
+    
     String importerCaption();
     
     String importerClipboardTab();
     
     String importerClipboardInfoLabel();
     
-    String importerClipboardImportButton();
+    String importerClipboardFilterStylesCheckBox();
+    
+    String importerClipboardImportButton();    
+    
+    String importerClipboardCancelImportButton();
     
     String importerFileTab();
     

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -73,13 +74,14 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#cleanOfficeHTML(String, String, AsyncCallback)
+     * @see WysiwygServiceAsync#cleanOfficeHTML(String, String, Map, AsyncCallback)
      */
-    public void cleanOfficeHTML(String htmlPaste, String cleanerHint, AsyncCallback<String> async)
+    public void cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams,
+        AsyncCallback<String> async)
     {
-        service.cleanOfficeHTML(htmlPaste, cleanerHint, async);
+        service.cleanOfficeHTML(htmlPaste, cleanerHint, cleaningParams, async);
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -95,8 +97,9 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * 
      * @see WysiwygServiceAsync#syncEditorContent(Revision, String, int, boolean, AsyncCallback)
      */
-    public void syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset, 
-        AsyncCallback<SyncResult> async) {
+    public void syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset,
+        AsyncCallback<SyncResult> async)
+    {
         service.syncEditorContent(syncedRevision, pageName, version, syncReset, async);
     }
 

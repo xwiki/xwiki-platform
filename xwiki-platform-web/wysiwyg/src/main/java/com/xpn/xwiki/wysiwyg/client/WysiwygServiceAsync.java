@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -59,17 +60,17 @@ public interface WysiwygServiceAsync
      * @param async The callback to be used for notifying the caller after receiving the response from the server.
      */
     void cleanHTML(String dirtyHTML, AsyncCallback<String> async);
-    
+
     /**
-     * Makes a request to the server to clean the given HTML fragment which comes from an office
-     * application.
+     * Makes a request to the server to clean the given HTML fragment which comes from an office application.
      * 
      * @param htmlPaste Dirty html pasted by the user.
      * @param cleanerHint Role hint for which cleaner to be used.
-     * @param async The callback to be used for notifying the caller after receiving the response
-     *            from the server.
+     * @param cleaningParams additional parameters to be used when cleaning.
+     * @param async The callback to be used for notifying the caller after receiving the response from the server.
      */
-    void cleanOfficeHTML(String htmlPaste, String cleanerHint, AsyncCallback<String> async);
+    void cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams,
+        AsyncCallback<String> async);
 
     /**
      * Synchronizes this editor with others that edit the same page.
@@ -81,7 +82,7 @@ public interface WysiwygServiceAsync
      * @param async The callback to be used for notifying the caller after receiving the response from the server.
      */
     void syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset,
-                           AsyncCallback<SyncResult> async);
+        AsyncCallback<SyncResult> async);
 
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).
@@ -139,8 +140,7 @@ public interface WysiwygServiceAsync
      * @param wikiName the name of the wiki to get images from
      * @param spaceName the name of the space to get image attachments from
      * @param pageName the name of the page to get image attachments from
-     * @param async object used for asynchronous communication between server and client. 
+     * @param async object used for asynchronous communication between server and client.
      */
-    void getImageAttachments(String wikiName, String spaceName, String pageName,
-        AsyncCallback<List<ImageConfig>> async);
+    void getImageAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<ImageConfig>> async);
 }

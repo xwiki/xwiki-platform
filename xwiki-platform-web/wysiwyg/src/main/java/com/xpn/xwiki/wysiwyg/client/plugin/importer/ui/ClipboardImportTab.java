@@ -91,7 +91,6 @@ public class ClipboardImportTab extends Composite
         HorizontalPanel buttonPanel = new HorizontalPanel();
         filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importerClipboardFilterStylesCheckBox());
         filterStylesCheckBox.addStyleName("xImporterClipboardFilterStylesCheckBox");
-        filterStylesCheckBox.setChecked(true);
         buttonPanel.add(filterStylesCheckBox);
         importButton = new Button(Strings.INSTANCE.importerClipboardImportButton());
         importButton.addStyleName("xImporterClipboardImportButton");

@@ -22,6 +22,8 @@ package org.xwiki.rendering.scaffolding;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
 
 /**
  * Mock {@link DocumentAccessBridge} implementation used for testing, since we don't want to pull any dependency on the
@@ -176,14 +178,14 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         throw new RuntimeException("Not implemented");
     }
-       
+
     /**
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#setAttachmentContent(String, String, byte[])
      */
-    public void setAttachmentContent(String documentName, String AttachmentName,
-        byte[] attachmentData) throws Exception
+    public void setAttachmentContent(String documentName, String AttachmentName, byte[] attachmentData)
+        throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
@@ -193,12 +195,22 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#setDocumentContent(String, String, String, boolean)
      */
-    public void setDocumentContent(String documentName, String content, String editComment,
-        boolean isMinorEdit) throws Exception
+    public void setDocumentContent(String documentName, String content, String editComment, boolean isMinorEdit)
+        throws Exception
     {
-        throw new RuntimeException("Not implemented");        
+        throw new RuntimeException("Not implemented");
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocumentSyntaxId(java.lang.String)
+     */
+    public String getDocumentSyntaxId(String documentName) throws Exception
+    {
+        return new Syntax(SyntaxType.XWIKI, "2.0").toIdString();
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -218,7 +230,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -257,5 +269,5 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     public String getDefaultEncoding()
     {
         throw new RuntimeException("Not implemented");
-    }        
+    }
 }

@@ -41,6 +41,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrobox2", true);
         suite.addTestsFromResource("macrobox3", true);
         suite.addTestsFromResource("macrobox4", true);
+        suite.addTestsFromResource("macrobox5", true);
 
         return new RenderingPlexusTestSetup(suite);
     }

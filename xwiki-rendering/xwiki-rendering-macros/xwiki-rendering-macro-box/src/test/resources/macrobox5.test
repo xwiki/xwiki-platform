@@ -1,0 +1,12 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{box title="[[XWiki>>http://www.xwiki.org]]" cssClass="myCLASS" image="http://l.yimg.com/i/i/fr/tr/usa4.jpg"}}alabala{{/box}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:box|-|title="[[XWiki>>http://www.xwiki.org]]" cssClass="myCLASS" image="http://l.yimg.com/i/i/fr/tr/usa4.jpg"|-|alabala--><div class="box myCLASS"><!--startimage:http://l.yimg.com/i/i/fr/tr/usa4.jpg--><img src="http://l.yimg.com/i/i/fr/tr/usa4.jpg" class="wikimodel-freestanding" alt="http://l.yimg.com/i/i/fr/tr/usa4.jpg"/><!--stopimage--><br/><!--startwikilink:http://www.xwiki.org--><span class="wikiexternallink"><a href="http://www.xwiki.org">XWiki</a></span><!--stopwikilink--><p>alabala</p></div><!--stopmacro-->
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+{{box title="[[XWiki>>http://www.xwiki.org]]" cssClass="myCLASS" image="http://l.yimg.com/i/i/fr/tr/usa4.jpg"}}alabala{{/box}}

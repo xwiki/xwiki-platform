@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.macro.box;
 import java.io.StringReader;
 import java.util.List;
 
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
@@ -46,7 +45,7 @@ public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMa
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Draw a box around provided content.";
-
+    
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -66,22 +65,6 @@ public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMa
         throws MacroExecutionException
     {
         return parseSourceSyntax(content, context);
-    }
-
-    /**
-     * Get the parser of the current wiki syntax.
-     * 
-     * @param context the context of the macro transformation.
-     * @return the parser of the current wiki syntax.
-     * @throws MacroExecutionException Failed to find source parser.
-     */
-    protected Parser getSyntaxParser(MacroTransformationContext context) throws MacroExecutionException
-    {
-        try {
-            return (Parser) getComponentManager().lookup(Parser.ROLE, context.getSyntax().toIdString());
-        } catch (ComponentLookupException e) {
-            throw new MacroExecutionException("Failed to find source parser", e);
-        }
     }
 
     /**

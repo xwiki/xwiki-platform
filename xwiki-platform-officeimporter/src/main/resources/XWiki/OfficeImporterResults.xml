@@ -15,7 +15,7 @@
 <date>1219045325000</date>
 <contentUpdateDate>1219045325000</contentUpdateDate>
 <version>7.1</version>
-<title></title>
+<title>Office Importer Results</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -56,40 +56,45 @@
 </property>
 </object>
 <content>
-1 Office Importer
-## Check the space
-#if(!$request.targetSpace || $request.targetSpace=="")
-	#error("Missing target space name. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
+#if($isguest)
+  #error("Guests are not allowed to view the contents of this page.")  
 #else
-	#set($targetSpace=$request.targetSpace)
-#end
+  1 Office Importer
+  
+  ## Validate fileName
+  #set($fileUpload=$xwiki.fileupload)
+  #set($fileName=$fileUpload.getFileName("filePath"))
+  #if(!$fileName || $fileName=="")
+    #error("Missing input file. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
+  #end
+  
+  ## Validate targetSpace
+  #if(!$request.targetSpace || $request.targetSpace=="")
+    #error("Missing target space name. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
+  #else
+    #set($targetSpace=$request.targetSpace)
+  #end
 
-## Check the pagename
-#if(!$request.targetPage || $request.targetPage=="")
-	#error("Missing target page name. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
-#else
-	#set($targetPage=$request.targetPage)
-#end
+  ## Validate targetPage
+  #if(!$request.targetPage || $request.targetPage=="")
+    #error("Missing target page name. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
+  #else
+    #set($targetPage=$request.targetPage)
+  #end  
 
-## Check the file path
-#set($fileUpload=$xwiki.fileupload)
-#set($fileName=$fileUpload.getFileName("filePath"))
-#if(!$fileName || $fileName=="")
-	#error("Missing input file. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
-#end
-
-## do convert
-#if(!$targetSpace || !$targetPage || !$fileName)
-	#error("Invalid input. Please [go back&gt;XWiki.OfficeImporter] and correct it.")
-#else
-	#set($fileContent=$fileUpload.getFileItemData("filePath"))
-	#set($options={"filterStyles":${request.filterStyles}})
-	#set($targetDocument="${targetSpace}.${targetPage}")
-	#set($result=$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options))
+  ## Import
+  #if($fileName &amp;&amp; $targetSpace &amp;&amp; $targetPage)    
+    #set($fileContent=$fileUpload.getFileItemData("filePath"))
+    #set($options={"filterStyles":${request.filterStyles}})
+    #set($targetDocument="${targetSpace}.${targetPage}")
+    #set($result=$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options))
     #if($result)
-        #info("Conversion succeeded. You can view the *[result&gt;$targetSpace.$targetPage]*, or you can [go back&gt;XWiki.OfficeImporter] to convert another document.")
+      #info("Conversion succeeded. You can view the *[result&gt;$targetSpace.$targetPage]*, or you can [go back&gt;XWiki.OfficeImporter] to convert another document.")
     #else
-        #error($officeimporter.getMessage())
+      #error($officeimporter.getMessage())
     #end
-#end</content>
+  #end
+  
+#end
+</content>
 </xwikidoc>

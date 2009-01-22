@@ -1050,11 +1050,10 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
         com.xpn.xwiki.api.Object xwikiObject = null;
 
-        /* First try to lookup the object by guid, if it fails use classname[number] */
+        /* First try to lookup the object by guid if specified, otherwise use classname[number] */
         if (object.getGuid() != null) {
             xwikiObject = XWikiUtils.getObjectByGuid(doc, object.getGuid());
-        }
-        if (xwikiObject == null) {
+        } else if (xwikiObject == null) {
             xwikiObject = doc.getObject(object.getClassName(), object.getId());
         }
 

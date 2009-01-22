@@ -28,10 +28,10 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.macro.velocity.VelocityMacro;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
-import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.scaffolding.AbstractScriptRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
@@ -45,27 +45,6 @@ import org.xwiki.velocity.VelocityManager;
  */
 public class IncludeMacroTest extends AbstractScriptRenderingTestCase
 {
-    public void testIncludeMacroWithCurrentContext() throws Exception
-    {
-        String expected = "beginDocument\n"
-            + "onMacroStandalone [someMacro] [] []\n"
-            + "endDocument";
-
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.ROLE, "include");
-        Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
-        mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
-        mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
-        macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
-
-        IncludeMacroParameters parameters = new IncludeMacroParameters();
-        parameters.setDocument("wiki:Space.Page");
-        parameters.setContext(Context.CURRENT);
-
-        List<Block> blocks = macro.execute(parameters, null, new MacroTransformationContext());
-
-        assertBlocks(expected, blocks);
-    }
-
     public void testIncludeMacroWithNewContext() throws Exception
     {
         String expected = "beginDocument\n"
@@ -89,6 +68,8 @@ public class IncludeMacroTest extends AbstractScriptRenderingTestCase
         mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(
             returnValue("{{velocity}}$myvar{{/velocity}}"));
+        mockDocumentAccessBridge.expects(once()).method("getDocumentSyntaxId").will(
+            returnValue(new Syntax(SyntaxType.XWIKI, "2.0").toIdString()));
         macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();

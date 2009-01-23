@@ -19,11 +19,14 @@
  */
 package org.xwiki.officeimporter.filter;
 
+import java.util.List;
+
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.officeimporter.filter.common.AbstractHTMLFilter;
+import org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner;
 
 /**
  * This filter will replace the {@code <img>} tag with corresponding xwiki xhtml syntax. This is required because
@@ -32,12 +35,25 @@ import org.xwiki.bridge.DocumentAccessBridge;
  * @version $Id: ImageTagFilter.java 13998 2008-11-06 06:29:46Z asiri $
  * @since 1.8M1
  */
-public class ImageFilter implements HTMLFilter
+public class ImageFilter extends AbstractHTMLFilter
 {
+    /**
+     * The {@link DocumentAccessBridge}
+     */
     private DocumentAccessBridge docBridge;
 
+    /**
+     * Target document name.
+     */
     private String targetDocument;
 
+    /**
+     * Constructs an {@link ImageFilter} with the given {@link DocumentAccessBridge} and the targetDocument. If this
+     * constructor is used, all cleaning operations will be done w.r.t the targetDocument.
+     * 
+     * @param docBridge the {@link DocumentAccessBridge}
+     * @param targetDocument target document.
+     */
     public ImageFilter(DocumentAccessBridge docBridge, String targetDocument)
     {
         this.docBridge = docBridge;
@@ -45,34 +61,43 @@ public class ImageFilter implements HTMLFilter
     }
 
     /**
+     * Default constructor. This constructor is used by {@link WysiwygHTMLCleaner} to strip images from html.
+     */
+    public ImageFilter()
+    {
+
+    }
+
+    /**
      * {@inheritDoc}
      */
     public void filter(Document htmlDocument)
     {
-        if (null != targetDocument && null != docBridge) {
-            NodeList images = htmlDocument.getElementsByTagName("img");
-            for (int i = 0; i < images.getLength(); i++) {
-                Element image = (Element) images.item(i);
-                String src = image.getAttribute("src");
-                if (!src.equals("")) {
-                    // TODO : We might have to verify that src is a file name. (a.k.a not a
-                    // url). There might be cases where documents have embedded urls (images).
-                    Comment beforeComment = htmlDocument.createComment("startimage:" + src);
-                    Comment afterComment = htmlDocument.createComment("stopimage");
-                    try {
-                        image.setAttribute("src", docBridge.getAttachmentURL(targetDocument, src));
-                    } catch (Exception ex) {
-                        // Do nothing.
-                    }
-                    image.getParentNode().insertBefore(beforeComment, image);
-                    image.getParentNode().insertBefore(afterComment, image.getNextSibling());
-                    // The 'align' attribute of images creates a lot of problems. First, OO server has a problem with
-                    // center aligning images (it aligns them to left). Next, OO server uses <br clear"xxx"> for
-                    // avoiding content wrapping around images which is not valid xhtml. There for, to be consistent and
-                    // simple we will remove the 'align' attribute of all the images so that they are all left aligned.
-                    image.removeAttribute("align");                    
+        List<Element> images = filterChildren(htmlDocument.getDocumentElement(), "img");
+        for (Element image : images) {
+            String src = image.getAttribute("src");
+            // TODO : We might have to verify that src is a file name. (a.k.a not a
+            // url). There might be cases where documents have embedded urls (images).
+            if (!src.equals("") && null != targetDocument && null != docBridge) {
+                try {
+                    image.setAttribute("src", docBridge.getAttachmentURL(targetDocument, src));
+                } catch (Exception ex) {
+                    // Do nothing.
                 }
+                // The 'align' attribute of images creates a lot of problems. First, OO server has a problem with
+                // center aligning images (it aligns them to left). Next, OO server uses <br clear"xxx"> for
+                // avoiding content wrapping around images which is not valid xhtml. There for, to be consistent and
+                // simple we will remove the 'align' attribute of all the images so that they are all left aligned.
+                image.removeAttribute("align");
+            } else if (src.startsWith("file://")) {
+                src = "Missing.png";
+                image.setAttribute("src", src);
+                image.setAttribute("alt", src);
             }
+            Comment beforeComment = htmlDocument.createComment("startimage:" + src);
+            Comment afterComment = htmlDocument.createComment("stopimage");
+            image.getParentNode().insertBefore(beforeComment, image);
+            image.getParentNode().insertBefore(afterComment, image.getNextSibling());
         }
     }
 }

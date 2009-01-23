@@ -28,6 +28,8 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.filter.HTMLFilter;
+import org.xwiki.officeimporter.filter.ImageFilter;
+import org.xwiki.officeimporter.filter.LinkFilter;
 import org.xwiki.officeimporter.filter.ListFilter;
 import org.xwiki.officeimporter.filter.ParagraphFilter;
 import org.xwiki.officeimporter.filter.RedundancyFilter;
@@ -69,6 +71,8 @@ public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleane
         filterList.add(new StyleFilter(params.get("filterStyles")));
         filterList.add(new RedundancyFilter());
         filterList.add(new ParagraphFilter());
+        filterList.add(new ImageFilter());
+        filterList.add(new LinkFilter());
         filterList.add(new ListFilter());
         filterList.add(new TableFilter());
         // Default cleaning.        

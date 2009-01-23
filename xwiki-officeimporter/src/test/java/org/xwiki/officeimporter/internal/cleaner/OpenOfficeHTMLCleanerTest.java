@@ -26,10 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
 import org.xwiki.xml.html.HTMLCleaner;
-
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Test case for default open office html cleaner.
@@ -37,24 +34,8 @@ import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.8M1
  */
-public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
+public class OpenOfficeHTMLCleanerTest extends AbstractHTMLCleanerTest
 {
-    /**
-     * Beginning of the test html document.
-     */
-    private String header = "<html><head><title>Title</title></head><body>";
-
-    /**
-     * Beginning of the test html document, which has a {@code <style> tag.}
-     */
-    private String headerWithStyles =
-        "<html><head><style type=\"text/css\">h1 {color:red} p {color:blue} </style><title>Title</title></head><body>";
-
-    /**
-     * Ending of the test html document..
-     */
-    private String footer = "</body></html>";
-
     /**
      * Open office html cleaner.
      */
@@ -64,8 +45,7 @@ public class OpenOfficeHTMLCleanerTest extends AbstractXWikiComponentTestCase
      * {@inheritDoc}
      */
     protected void setUp() throws Exception
-    {
-        getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
+    {        
         super.setUp();
         cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "openoffice");
     }

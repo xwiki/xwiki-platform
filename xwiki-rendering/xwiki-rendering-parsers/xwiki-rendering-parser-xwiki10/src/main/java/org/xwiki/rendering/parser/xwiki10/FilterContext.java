@@ -42,13 +42,34 @@ public class FilterContext
 
     public static final String XWIKI1020TOKEN_CP = "\\01";
 
+    public static final String XWIKI1020TOKEN_INLINE = "inline";
+
+    public static final String XWIKI1020TOKEN = "XWIKI1020TOKEN";
+
+    public static final String XWIKI1020TOKENNI = XWIKI1020TOKEN + "NI";
+
+    public static final String XWIKI1020TOKENIL = XWIKI1020TOKEN + "IL";
+
+    /**
+     * Match registered inline content identifier.
+     */
+    public static final Pattern XWIKI1020TOKENIL_PATTERN =
+        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + "(\\p{Alpha}*)([\\d]+)"
+            + XWIKI1020TOKEN_CP);
+
+    /**
+     * Match registered content identifier.
+     */
+    public static final Pattern XWIKI1020TOKENNI_PATTERN =
+        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + "(\\p{Alpha}*)([\\d]+)"
+            + XWIKI1020TOKEN_CP);
+
     /**
      * Match registered content identifier.
      */
     public static final Pattern XWIKI1020TOKEN_PATTERN =
-        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKEN + "(\\p{Alpha}*)([\\d]+)" + XWIKI1020TOKEN_CP);
-
-    public static final String XWIKI1020TOKEN = "XWIKI1020TOKEN";
+        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKEN + "(?:IL|NI)" + "(\\p{Alpha}*)([\\d]+)"
+            + XWIKI1020TOKEN_CP);
 
     private List<String> protectedContentList = new LinkedList<String>();
 
@@ -61,14 +82,35 @@ public class FilterContext
      */
     public String addProtectedContent(String content)
     {
-        return addProtectedContent(content, "");
+        return addProtectedContent(content, false);
     }
 
-    public String addProtectedContent(String content, String suffix)
+    /**
+     * Register a content and return the corresponding identifier to be able the reinsert it after the conversion
+     * process.
+     * 
+     * @param content the content to protect/register.
+     * @param inline indicate if i's a inline or not inline string.
+     * @return the content identifier to insert in place of provided content.
+     */
+    public String addProtectedContent(String content, boolean inline)
+    {
+        return addProtectedContent(content, "", inline);
+    }
+
+    public String addProtectedContent(String content, String suffix, boolean inline)
     {
         this.protectedContentList.add(content);
 
-        return XWIKI1020TOKEN_O + XWIKI1020TOKEN + suffix + (this.protectedContentList.size() - 1) + XWIKI1020TOKEN_C;
+        StringBuffer str = new StringBuffer();
+
+        str.append(XWIKI1020TOKEN_O);
+        str.append(inline ? XWIKI1020TOKENIL : XWIKI1020TOKENNI);
+        str.append(suffix);
+        str.append(this.protectedContentList.size() - 1);
+        str.append(XWIKI1020TOKEN_C);
+
+        return str.toString();
     }
 
     /**

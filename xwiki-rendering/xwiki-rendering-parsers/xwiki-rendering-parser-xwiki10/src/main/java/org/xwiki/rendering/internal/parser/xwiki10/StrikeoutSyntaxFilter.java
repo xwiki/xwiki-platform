@@ -27,13 +27,13 @@ import org.xwiki.rendering.parser.xwiki10.AbstractSyntaxFilter;
  * @version $Id$
  * @since 1.8M1
  */
-public class ItalicSyntaxFilter extends AbstractSyntaxFilter
+public class StrikeoutSyntaxFilter extends AbstractSyntaxFilter
 {
-    private static final Pattern ITALICSYNTAX_PATTERN =
-        Pattern.compile("(?<!~)~~([^\\p{Space}](?:[^~\n]*+|~)*?(?<=[^\\p{Space}]))~~(?!~)");
+    private static final Pattern UNDERLINESYNTAX_PATTERN =
+        Pattern.compile("(?<![-!])--([^\\p{Space}>](?:[^-\n]*+|-)*?(?<=[^\\p{Space}]))--(?!-)");
 
-    public ItalicSyntaxFilter()
+    public StrikeoutSyntaxFilter()
     {
-        super(ITALICSYNTAX_PATTERN, "//");
+        super(UNDERLINESYNTAX_PATTERN, "--");
     }
 }

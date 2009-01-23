@@ -56,8 +56,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("pre/pre1", false);
 
         // Wiki syntaxes
-        suite.addTestsFromResource("bold/bold1", false);
         suite.addTestsFromResource("italic/italic1", false);
+        suite.addTestsFromResource("bold/bold1", false);
+        suite.addTestsFromResource("underline/underline1", false);
+        suite.addTestsFromResource("strikeout/strikeout1", false);
         suite.addTestsFromResource("link/link1", false);
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("section/section1", false);
@@ -65,6 +67,9 @@ public class RenderingTests extends TestCase
         // HTML
         suite.addTestsFromResource("html/html1", false);
         suite.addTestsFromResource("html/html2", false);
+        
+        // Cleaning
+        suite.addTestsFromResource("cleaning/cleaning1", false);
         
         return new RenderingPlexusTestSetup(suite);
     }

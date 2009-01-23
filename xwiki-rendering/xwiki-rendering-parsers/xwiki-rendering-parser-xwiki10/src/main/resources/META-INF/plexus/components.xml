@@ -180,8 +180,17 @@
     </component>
     <component>
       <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
-      <role-hint>bold</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.xwiki10.BoldSyntaxFilter</implementation>
+      <role-hint>link</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.LinkSyntaxFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <priority>1000</priority>
+      </configuration>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
+      <role-hint>section</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.SectionSyntaxFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>
         <priority>1000</priority>
@@ -198,8 +207,8 @@
     </component>
     <component>
       <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
-      <role-hint>link</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.xwiki10.LinkSyntaxFilter</implementation>
+      <role-hint>bold</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.BoldSyntaxFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>
         <priority>1000</priority>
@@ -207,8 +216,17 @@
     </component>
     <component>
       <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
-      <role-hint>section</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.xwiki10.SectionSyntaxFilter</implementation>
+      <role-hint>strikeout</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.StrikeoutSyntaxFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <priority>1000</priority>
+      </configuration>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
+      <role-hint>underline</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.UnderlineSyntaxFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>
         <priority>1000</priority>
@@ -243,6 +261,17 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>
         <priority>3000</priority>
+      </configuration>
+    </component>
+    
+    <!-- 2.0 syntax escaping filter -->
+    <component>
+      <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
+      <role-hint>escape</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.Escape20SyntaxFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <priority>10000</priority>
       </configuration>
     </component>
   </components>

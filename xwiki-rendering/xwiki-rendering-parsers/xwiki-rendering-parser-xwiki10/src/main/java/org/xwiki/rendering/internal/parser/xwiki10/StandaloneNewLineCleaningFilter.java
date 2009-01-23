@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
@@ -33,12 +34,23 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
  */
 public class StandaloneNewLineCleaningFilter extends AbstractFilter
 {
-    private static final Pattern SANDALONENEWLINE_PATTERN =
-        Pattern.compile("([^" + FilterContext.XWIKI1020TOKEN_OP + "\\n])\\n([^" + FilterContext.XWIKI1020TOKEN_CP
-            + "\\n])");
+    private static final Pattern SANDALONENEWLINE_PATTERN = Pattern.compile("([^\\n])\\n([^\\n])");
 
     public String filter(String content, FilterContext filterContext)
     {
-        return SANDALONENEWLINE_PATTERN.matcher(content).replaceAll("$1 $2");
+        StringBuffer result = new StringBuffer();
+
+        Matcher matcher = FilterContext.XWIKI1020TOKENNI_PATTERN.matcher(content);
+        int current = 0;
+        for (; matcher.find(); current = matcher.end()) {
+            String before = content.substring(current, matcher.start());
+
+            result.append(SANDALONENEWLINE_PATTERN.matcher(before).replaceAll("$1 $2"));
+            result.append(matcher.group(0));
+        }
+
+        result.append(SANDALONENEWLINE_PATTERN.matcher(content.substring(current)).replaceAll("$1 $2"));
+
+        return result.toString();
     }
 }

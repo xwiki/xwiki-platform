@@ -45,14 +45,22 @@ public class VelocityFilter extends AbstractFilter implements Composable
 
     public static final String VELOCITYCLOSE_SUFFIX = "velocityclose";
 
-    public static final String VELOCITY_COMMENT_PATTERN = "((?m)\\n?\\#\\#.*$)|((?s)\\#\\*(.*?)\\*\\#)";
+    public static final String VELOCITY_COMMENT_SPATTERN = "((?m)\\n?\\#\\#.*$)|((?s)\\#\\*(.*?)\\*\\#)";
 
-    public static final String VELOCITY_MACRO_PATTERN = "\\#(\\w+)\\(([^)]*)\\)";
+    public static final String VELOCITY_MACRO_SPATTERN = "\\#(\\w+)\\(([^)]*)\\)";
 
-    public static final String VELOCITY_VARIABLE_PATTERN = "\\$\\{?\\p{Alpha}\\w*\\}?";
+    public static final String VELOCITY_VARIABLE_SPATTERN = "\\$\\{?\\p{Alpha}\\w*\\}?";
 
     public static final Pattern VELOCITY_PATTERN =
-        Pattern.compile(VELOCITY_COMMENT_PATTERN + "|" + VELOCITY_MACRO_PATTERN + "|" + VELOCITY_VARIABLE_PATTERN);
+        Pattern.compile(VELOCITY_COMMENT_SPATTERN + "|" + VELOCITY_MACRO_SPATTERN + "|" + VELOCITY_VARIABLE_SPATTERN);
+
+    public static final String VELOCITYOPEN_SPATTERN =
+        "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VelocityFilter.VELOCITYOPEN_SUFFIX
+            + "[\\d]+" + FilterContext.XWIKI1020TOKEN_CP + ")";
+
+    public static final String VELOCITYCLOSE_SPATTERN =
+        "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VelocityFilter.VELOCITYCLOSE_SUFFIX
+            + "[\\d]+" + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     private ComponentManager componentManager;
 
@@ -121,14 +129,14 @@ public class VelocityFilter extends AbstractFilter implements Composable
             }
 
             if (StringUtils.countMatches(nonVelocityContent, "\n") > 10) {
-                result.append(filterContext.addProtectedContent("{{/velocity}}", VELOCITYCLOSE_SUFFIX));
+                appendVelocityClose(result, filterContext);
                 inVelocityMacro = false;
             }
 
             result.append(nonVelocityContent);
 
             if (!inVelocityMacro) {
-                result.append(filterContext.addProtectedContent("{{velocity}}", VELOCITYOPEN_SUFFIX));
+                appendVelocityOpen(result, filterContext);
                 matchedContent = CleanUtil.removeFirstNewLines(matchedContent, 1, false);
                 inVelocityMacro = true;
             }
@@ -145,7 +153,7 @@ public class VelocityFilter extends AbstractFilter implements Composable
 
         // Close velocity macro
         if (inVelocityMacro) {
-            result.append(filterContext.addProtectedContent("{{/velocity}}", VELOCITYCLOSE_SUFFIX));
+            appendVelocityClose(result, filterContext);
         }
 
         if (nonVelocityContent != null) {
@@ -177,5 +185,15 @@ public class VelocityFilter extends AbstractFilter implements Composable
         }
 
         return parameterList;
+    }
+
+    public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext)
+    {
+        result.append(filterContext.addProtectedContent("{{velocity}}", VELOCITYOPEN_SUFFIX, true));
+    }
+
+    public static void appendVelocityClose(StringBuffer result, FilterContext filterContext)
+    {
+        result.append(filterContext.addProtectedContent("{{/velocity}}", VELOCITYCLOSE_SUFFIX, true));
     }
 }

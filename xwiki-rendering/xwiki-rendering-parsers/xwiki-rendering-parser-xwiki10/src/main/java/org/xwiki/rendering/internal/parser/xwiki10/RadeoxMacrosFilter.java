@@ -108,7 +108,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable
                         currentMacro.convert(macroName, getMacroParameters(currentMacro, params), macroContent,
                             filterContext);
                     if (currentMacro.protectResult()) {
-                        allcontent = filterContext.addProtectedContent(allcontent);
+                        allcontent = filterContext.addProtectedContent(allcontent, currentMacro.isInline());
                     }
                 } else {
                     currentMacro = null;

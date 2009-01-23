@@ -19,21 +19,42 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.xwiki.rendering.parser.xwiki10.AbstractSyntaxFilter;
+import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
 
 /**
  * @version $Id$
  * @since 1.8M1
  */
-public class ItalicSyntaxFilter extends AbstractSyntaxFilter
+public class Escape20SyntaxFilter extends AbstractFilter
 {
-    private static final Pattern ITALICSYNTAX_PATTERN =
-        Pattern.compile("(?<!~)~~([^\\p{Space}](?:[^~\n]*+|~)*?(?<=[^\\p{Space}]))~~(?!~)");
+    private static final Pattern SYNTAX_PATTERN = Pattern.compile("\\~|\\/\\/|\\_\\_|\\*\\*|\\-\\-|\\#\\#|\\^\\^|\\,\\,");
 
-    public ItalicSyntaxFilter()
+    public String filter(String content, FilterContext filterContext)
     {
-        super(ITALICSYNTAX_PATTERN, "//");
+        StringBuffer result = new StringBuffer();
+
+        Matcher matcher = SYNTAX_PATTERN.matcher(content);
+        int current = 0;
+        for (; matcher.find(); current = matcher.end()) {
+            result.append(content.substring(current, matcher.start()));
+
+            String matchedContent = matcher.group(0);
+            for (char c : matchedContent.toCharArray()) {
+                result.append('~');
+                result.append(c);
+            }
+        }
+
+        if (current == 0) {
+            return content;
+        }
+
+        result.append(content.substring(current));
+
+        return result.toString();
     }
 }

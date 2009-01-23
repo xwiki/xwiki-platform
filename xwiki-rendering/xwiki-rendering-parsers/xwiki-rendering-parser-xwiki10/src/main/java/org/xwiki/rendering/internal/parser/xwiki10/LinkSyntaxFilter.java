@@ -40,9 +40,8 @@ public class LinkSyntaxFilter extends AbstractFilter
 
         Matcher matcher = LINKSYNTAX_PATTERN.matcher(content);
         int current = 0;
-        while (matcher.find()) {
+        for (; matcher.find(); current = matcher.end()) {
             String before = content.substring(current, matcher.start());
-            current = matcher.end();
 
             // a standalone new line is not interpreted by XWiki 1.0 rendering
             result.append(CleanUtil.removeLastNewLines(before, 1, true));
@@ -112,7 +111,7 @@ public class LinkSyntaxFilter extends AbstractFilter
 
             linkResult.append("]]");
 
-            result.append(filterContext.addProtectedContent(linkResult.toString()));
+            result.append(filterContext.addProtectedContent(linkResult.toString(), true));
         }
 
         if (current == 0) {

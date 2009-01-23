@@ -21,8 +21,7 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 
 import java.util.regex.Pattern;
 
-import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
-import org.xwiki.rendering.parser.xwiki10.FilterContext;
+import org.xwiki.rendering.parser.xwiki10.AbstractSyntaxFilter;
 
 /**
  * Convert 1.0 bold syntax into 2.0 bold syntax.
@@ -30,13 +29,13 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
  * @version $Id$
  * @since 1.8M1
  */
-public class BoldSyntaxFilter extends AbstractFilter
+public class BoldSyntaxFilter extends AbstractSyntaxFilter
 {
     private static final Pattern BOLDSYNTAX_PATTERN =
         Pattern.compile("(?<!\\*)\\*([^\\p{Space}](?:[^*\n]*+|\\*)*?(?<=[^\\p{Space}]))\\*(?!\\*)");
 
-    public String filter(String content, FilterContext filterContext)
+    public BoldSyntaxFilter()
     {
-        return BOLDSYNTAX_PATTERN.matcher(content).replaceAll("**$1**");
+        super(BOLDSYNTAX_PATTERN, "**");
     }
 }

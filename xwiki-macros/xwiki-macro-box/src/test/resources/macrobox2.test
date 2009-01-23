@@ -20,3 +20,7 @@ endFormat: [NONE] [[class]=[box]]
 endMacroMarker [box] [] [**box**]
 endParagraph
 endDocument
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+Some inline {{box}}**box**{{/box}}

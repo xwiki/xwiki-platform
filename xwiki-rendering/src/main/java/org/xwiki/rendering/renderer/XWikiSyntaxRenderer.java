@@ -88,6 +88,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     private Map<String, String> previousFormatParameters;
 
+    private Map<String, String> previousFormatParametersBeforeMacroMarker;
+
     private BlockStateListener blockListener = new BlockStateListener();
     
     private TextOnNewLineStateListener textListener = new TextOnNewLineStateListener();
@@ -492,7 +494,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
         super.beginMacroMarker(name, parameters, content);
-        
+
+        this.previousFormatParametersBeforeMacroMarker = this.previousFormatParameters;
+
         // When we encounter a macro marker we ignore all other blocks inside since we're going to use the macro
         // definition wrapped by the macro marker to construct the xwiki syntax.
         pushPrinter(new XWikiSyntaxEscapeWikiPrinter(VoidWikiPrinter.VOIDWIKIPRINTER, this.blockListener, 
@@ -507,6 +511,9 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
         popPrinter();
+
+        this.previousFormatParameters = this.previousFormatParametersBeforeMacroMarker;
+
         print(this.macroPrinter.print(name, parameters, content));
         
         super.endMacroMarker(name, parameters, content);

@@ -34,4 +34,13 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Tag application for XWiki</description>
+  <dependencies>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-tag</artifactId>
+      <!-- We want to release the tag plugin and application together. Hence they should have the same version -->
+      <version>1.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

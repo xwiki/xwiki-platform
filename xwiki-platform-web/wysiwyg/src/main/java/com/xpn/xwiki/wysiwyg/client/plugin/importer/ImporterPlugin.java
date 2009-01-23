@@ -132,6 +132,7 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
             if (importerDialog.isFilterStyles()) {
                 params.put("filterStyles", "strict");
             }
+            params.put("namespacesAware", "false"); // For Office2007
             WysiwygService.Singleton.getInstance().cleanOfficeHTML(inputHtml, "wysiwyg", params, this);            
         }
     }

@@ -64,6 +64,7 @@
         <module>activitystream</module>
         <module>invitationmanager</module>
         <module>calendar</module>
+        <module>tag</module>
       </modules>
     </profile>
     <profile>
@@ -76,6 +77,7 @@
         <module>jodatime</module>
         <module>skinx</module>
         <module>lucene</module>
+        <module>tag</module>
       </modules>
     </profile>
     <profile>

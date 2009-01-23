@@ -38,6 +38,16 @@ public interface HTMLCleaner
     String ROLE = HTMLCleaner.class.getName();
 
     /**
+     * String representing the true state of a boolean flag.
+     */
+    String TRUE = "true";
+
+    /**
+     * Cleaning property identifier which decides if parsing should omit/keep namespace information.
+     */
+    String NAMESPACES_AWARE = "namespacesAware";
+    
+    /**
      * Transforms any HTML content into valid XHTML that can be fed to the XHTML Parser for example.
      * 
      * @param originalHtmlContent the original content (HTML) to clean

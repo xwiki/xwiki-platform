@@ -28,10 +28,12 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.filter.HTMLFilter;
+import org.xwiki.officeimporter.filter.ListFilter;
 import org.xwiki.officeimporter.filter.ParagraphFilter;
 import org.xwiki.officeimporter.filter.RedundancyFilter;
 import org.xwiki.officeimporter.filter.StripperFilter;
 import org.xwiki.officeimporter.filter.StyleFilter;
+import org.xwiki.officeimporter.filter.TableFilter;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 
@@ -44,7 +46,7 @@ import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleaner
 {
     /**
-     * The {@link DefaultHTMLCleaner} used internally. 
+     * The {@link DefaultHTMLCleaner} used internally.
      */
     private HTMLCleaner defaultHtmlCleaner;
 
@@ -67,8 +69,10 @@ public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleane
         filterList.add(new StyleFilter(params.get("filterStyles")));
         filterList.add(new RedundancyFilter());
         filterList.add(new ParagraphFilter());
+        filterList.add(new ListFilter());
+        filterList.add(new TableFilter());
         // Default cleaning.        
-        Document document = defaultHtmlCleaner.clean(originalHtmlContent);
+        Document document = defaultHtmlCleaner.clean(originalHtmlContent, params);
         // Apply filters.
         for (HTMLFilter filter : filterList) {
             filter.filter(document);

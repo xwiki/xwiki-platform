@@ -82,27 +82,43 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      * @see org.xwiki.xml.html.HTMLCleaner#clean(String)
      */
     public org.w3c.dom.Document clean(Reader originalHtmlContent)
+    {                
+        return clean(originalHtmlContent, getDefaultCleanerProperties(), getDefaultCleanerTransformations());
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * {@link DefaultHTMLCleaner} supports following cleaning parameters:<br/>
+     * 'namespacesAware' : if set to 'true' namespace information will be preserved during cleaning.<br/>
+     * </p>
+     */
+    public org.w3c.dom.Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters)
+    {
+        CleanerProperties cleanerProperties = getDefaultCleanerProperties();
+        String param = cleaningParameters.get(NAMESPACES_AWARE);
+        boolean namespacesAware = param != null ? param.equals(TRUE) : cleanerProperties.isNamespacesAware();
+        cleanerProperties.setNamespacesAware(namespacesAware);
+        return clean(originalHtmlContent, cleanerProperties, getDefaultCleanerTransformations());
+    }
+
+    /**
+     * Cleans the given html content with supplied {@link CleanerProperties} and {@link CleanerTransformations}.
+     * 
+     * @param originalHtmlContent original html content.
+     * @param cleanerProperties {@link CleanerProperties} to be used for cleaning.
+     * @param cleanerTransformations {@link CleanerTransformations} to be used when cleaning.
+     * @return the cleaned html as a {@link org.w3c.dom.Document}.
+     */
+    private org.w3c.dom.Document clean(Reader originalHtmlContent, CleanerProperties cleanerProperties,
+        CleanerTransformations cleanerTransformations) 
     {
         org.w3c.dom.Document result;
-
         // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise we would need
         // to synchronize this clean() method which would slow down the whole system by queuing up cleaning requests.
         // See http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=903699
-        HtmlCleaner cleaner = new HtmlCleaner();
-        cleaner.setTransformations(getCleaningTransformations());
-        CleanerProperties cleanerProperties = cleaner.getProperties();
-        cleanerProperties.setOmitUnknownTags(true);
-
-        // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if we use the best
-        // practice of using CDATA inside a script. For example:
-        //  <script type="text/javascript">
-        //  <![CDATA[
-        //  ...
-        //  ]]>
-        //  </script>
-        // Thus we need to turn off this feature.
-        cleanerProperties.setUseCdataForScriptAndStyle(false);
-
+        HtmlCleaner cleaner = new HtmlCleaner(cleanerProperties);
+        cleaner.setTransformations(cleanerTransformations);        
         TagNode cleanedNode;
         try {
             cleanedNode = cleaner.clean(originalHtmlContent);
@@ -111,72 +127,74 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             // Cleaner.
             throw new RuntimeException("Unhandled error when cleaning HTML", e);
         }
-
         // Fix cleaned node bug
         fixCleanedNodeBug(cleanedNode);
-
         Document document = new JDomSerializer(cleanerProperties, false).createJDom(cleanedNode);
-
         // Perform other cleaning operation this time using the W3C Document interface.
         for (CleaningFilter filter : this.filters) {
             filter.filter(document);
         }
-
         try {
             DOMOutputter outputter = new DOMOutputter();
             result = outputter.output(document);
         } catch (JDOMException e) {
             throw new RuntimeException("Failed to convert JDOM Document to W3C Document", e);
         }
-
-        return result;
+        return result;        
     }
-
+    
     /**
-     * {@inheritDoc}
-     * <p>
-     * {@link DefaultHTMLCleaner} doesn't support any HTML cleaning parameters and thus any parameters passed will be
-     * ignored.
-     * </p>
+     * @return the default {@link CleanerProperties} to be used for cleaning.
      */
-    public org.w3c.dom.Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters)
+    private CleanerProperties getDefaultCleanerProperties()
     {
-        return clean(originalHtmlContent);
+        CleanerProperties defaultProperties = new CleanerProperties();
+        defaultProperties.setOmitUnknownTags(true);
+        // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if we use the best
+        // practice of using CDATA inside a script. For example:
+        //  <script type="text/javascript">
+        //  <![CDATA[
+        //  ...
+        //  ]]>
+        //  </script>
+        // Thus we need to turn off this feature.
+        defaultProperties.setUseCdataForScriptAndStyle(false);        
+        return defaultProperties;
     }
-
+    
     /**
-     * @return the cleaning transformations to perform on tags, in addition to the base transformations done by HTML
-     *         Cleaner
+     * @return the default cleaning transformations to perform on tags, in addition to the base transformations done
+     *         by HTML Cleaner
      */
-    private CleanerTransformations getCleaningTransformations()
+    private CleanerTransformations getDefaultCleanerTransformations()
     {
-        CleanerTransformations transformations = new CleanerTransformations();
+        CleanerTransformations defaultTransformations = new CleanerTransformations();
 
         TagTransformation tt = new TagTransformation(HTMLConstants.B, HTMLConstants.STRONG, false);
-        transformations.addTransformation(tt);
+        defaultTransformations.addTransformation(tt);
 
         tt = new TagTransformation(HTMLConstants.I, HTMLConstants.EM, false);
-        transformations.addTransformation(tt);
+        defaultTransformations.addTransformation(tt);
 
         tt = new TagTransformation(HTMLConstants.U, HTMLConstants.INS, false);
-        transformations.addTransformation(tt);
+        defaultTransformations.addTransformation(tt);
 
         tt = new TagTransformation(HTMLConstants.S, HTMLConstants.DEL, false);
-        transformations.addTransformation(tt);
+        defaultTransformations.addTransformation(tt);
 
         tt = new TagTransformation(HTMLConstants.STRIKE, HTMLConstants.DEL, false);
-        transformations.addTransformation(tt);
+        defaultTransformations.addTransformation(tt);
 
         tt = new TagTransformation(HTMLConstants.CENTER, HTMLConstants.P, false);
         tt.addAttributeTransformation(HTMLConstants.STYLE_ATTRIBUTE, "text-align:center");
-        transformations.addTransformation(tt);
+        defaultTransformations.addTransformation(tt);
 
         tt = new TagTransformation(HTMLConstants.FONT, HTMLConstants.SPAN, false);
         tt.addAttributeTransformation(HTMLConstants.STYLE_ATTRIBUTE,
             "color:${color};font-family=${face};font-size=${size}pt;");
-        transformations.addTransformation(tt);
+        defaultTransformations.addTransformation(tt);
 
-        return transformations;
+        return defaultTransformations;
     }
 
     /**

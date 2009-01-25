@@ -26,7 +26,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
 
 public class XWikiComponentInitializer
 {

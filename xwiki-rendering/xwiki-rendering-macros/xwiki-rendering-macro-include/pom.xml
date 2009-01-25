@@ -38,6 +38,26 @@
       <artifactId>xwiki-core-context</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-velocity</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
+      <version>${pom.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -47,6 +67,7 @@
         <configuration>
           <includes>
             <include>**/RenderingTests.java</include>
+            <include>**/*Test.java</include>
           </includes>
         </configuration>
       </plugin>

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources;
+package org.xwiki.rest.resources.pages;
 
 import java.util.List;
 
@@ -36,11 +36,11 @@ import org.xwiki.rest.model.History;
 import org.xwiki.rest.model.HistorySummary;
 
 /**
- * Resource for the page history.
+ * Resource for the page history. This base resource is able to retrieve history for pages and translations.
  * 
  * @version $Id$
  */
-public class BaseHistoryResource extends XWikiResource
+public class BasePageHistoryResource extends XWikiResource
 {
     /**
      * Get the page history for a page.
@@ -48,6 +48,7 @@ public class BaseHistoryResource extends XWikiResource
     @Override
     public Representation represent(Variant variant)
     {
+        String wikiName = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);
         String spaceName = (String) getRequest().getAttributes().get(Constants.SPACE_NAME_PARAMETER);
         String pageName = (String) getRequest().getAttributes().get(Constants.PAGE_NAME_PARAMETER);
         String languageId = (String) getRequest().getAttributes().get(Constants.LANGUAGE_ID_PARAMETER);
@@ -80,7 +81,7 @@ public class BaseHistoryResource extends XWikiResource
         for (Object object : queryResult) {
             Object[] fields = (Object[]) object;
             HistorySummary historySummary =
-                DomainObjectFactory.createHistorySummary(getRequest(), resourceClassRegistry, languageId, fields);
+                DomainObjectFactory.createHistorySummary(getRequest(), resourceClassRegistry, wikiName, languageId, fields);
             history.addHistorySummary(historySummary);
         }
 

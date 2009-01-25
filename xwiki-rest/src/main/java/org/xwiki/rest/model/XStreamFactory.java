@@ -58,6 +58,8 @@ public class XStreamFactory
         "version", "minorVersion", "language", "xwikiUrl", "created", "creator", "modified", "modifier",
         "translations", "content", "links"});
 
+        sorter.registerFieldOrder(Comment.class, new String[] {"id", "author", "date", "highlight", "text", "links"});
+
         XStream xstream = new XStream(new Sun14ReflectionProvider(new FieldDictionary(sorter)), new DomDriver());
 
         xstream.processAnnotations(Link.class);
@@ -71,7 +73,8 @@ public class XStreamFactory
         xstream.processAnnotations(Page.class);
         xstream.processAnnotations(History.class);
         xstream.processAnnotations(HistorySummary.class);
-
+        xstream.processAnnotations(Comments.class);
+        xstream.processAnnotations(Comment.class);
         return xstream;
 
     }

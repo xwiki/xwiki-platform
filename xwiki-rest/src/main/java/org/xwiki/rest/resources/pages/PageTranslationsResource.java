@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources;
+package org.xwiki.rest.resources.pages;
 
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
@@ -33,7 +33,7 @@ import com.xpn.xwiki.api.Document;
  * 
  * @version $Id$
  */
-public class TranslationsResource extends XWikiResource
+public class PageTranslationsResource extends XWikiResource
 {
     /**
      * Get all the available translations for a page.

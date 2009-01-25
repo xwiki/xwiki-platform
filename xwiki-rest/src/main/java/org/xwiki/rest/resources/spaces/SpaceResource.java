@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources;
+package org.xwiki.rest.resources.spaces;
 
 import java.util.List;
 
@@ -25,52 +25,47 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.xwiki.rest.Constants;
-import org.xwiki.rest.Utils;
+import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Link;
-import org.xwiki.rest.model.Relations;
-import org.xwiki.rest.model.Wiki;
-import org.xwiki.rest.model.Wikis;
+import org.xwiki.rest.model.Space;
 
 import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
  */
-public class WikisResource extends XWikiResource
+public class SpaceResource extends XWikiResource
 {
     @Override
     public Representation represent(Variant variant)
     {
         try {
-            Wikis wikis = new Wikis();
+            String spaceName = (String) getRequest().getAttributes().get(Constants.SPACE_NAME_PARAMETER);
 
-            List<String> databaseNames = xwiki.getVirtualWikisDatabaseNames(xwikiContext);
+            xwiki.setDatabase("xwiki");
 
-            if (databaseNames.isEmpty()) {
-                databaseNames.add("xwiki");
+            List<String> docNames = xwikiApi.getSpaceDocsName(spaceName);
+            String home = String.format("%s.WebHome", spaceName);
+
+            if (!xwikiApi.exists(home)) {
+                home = null;
             }
 
-            for (String databaseName : databaseNames) {
-                Wiki wiki = new Wiki(databaseName);
+            String wiki = "xwiki";
 
-                String fullUri =
-                    String.format("%s%s", getRequest().getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(SpacesResource.class));
-                Link link = new Link(Utils.formatUriTemplate(fullUri, Constants.WIKI_NAME_PARAMETER, databaseName));
-                link.setRel(Relations.SPACES);
-                wiki.addLink(link);
+            Space space =
+                DomainObjectFactory.createSpace(getRequest(), resourceClassRegistry, wiki, spaceName, home, docNames
+                    .size());
 
-                wikis.addWiki(wiki);
-            }
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), wikis);
+            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), space);
         } catch (XWikiException e) {
             e.printStackTrace();
             getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+        } finally {
+            xwiki.setDatabase("xwiki");
         }
 
         return null;
-
     }
+
 }

@@ -63,6 +63,8 @@ public class XWikiResource extends WadlResource
 
     protected com.xpn.xwiki.api.XWiki xwikiApi;
 
+    protected String xwikiUser;
+
     /**
      * A wrapper class for returning an XWiki document enriched with information about its status.
      */
@@ -148,6 +150,7 @@ public class XWikiResource extends WadlResource
         xwikiContext = (XWikiContext) context.getAttributes().get(Constants.XWIKI_CONTEXT);
         xwiki = (com.xpn.xwiki.XWiki) context.getAttributes().get(Constants.XWIKI);
         xwikiApi = (com.xpn.xwiki.api.XWiki) context.getAttributes().get(Constants.XWIKI_API);
+        xwikiUser = (String) context.getAttributes().get(Constants.XWIKI_USER);
     }
 
     protected XWikiResourceRepresenter getRepresenterFor(Variant variant)

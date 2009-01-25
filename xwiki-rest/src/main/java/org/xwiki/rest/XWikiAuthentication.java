@@ -78,12 +78,20 @@ public class XWikiAuthentication extends Guard
             if (identifier.equals("Guest")) {
                 xwikiContext.setUser("XWiki.XWikiGuest");
                 getLogger().log(Level.INFO, String.format("Authenticated as '%s'.", identifier));
+
+                getContext().getAttributes().put(Constants.XWIKI_USER, "XWiki.XWikiGuest");
+
                 return true;
             }
 
             if (xwiki.getAuthService().authenticate(identifier, new String(secret), xwikiContext) != null) {
-                xwikiContext.setUser(String.format("XWiki.%s", identifier));
+                String xwikiUser = String.format("XWiki.%s", identifier);
+
+                xwikiContext.setUser(xwikiUser);
                 getLogger().log(Level.INFO, String.format("Authenticated as '%s'.", identifier));
+
+                getContext().getAttributes().put(Constants.XWIKI_USER, xwikiUser);
+
                 return true;
             }
         } catch (XWikiException e) {

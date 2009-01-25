@@ -17,12 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources;
+package org.xwiki.rest.resources.pages;
+
 
 /**
  * @version $Id$
  */
-public class PageTranslationResource extends ModifiablePageResource
+public class PageHistoryResource extends BasePageHistoryResource
 {
     /*
      * This class is needed because we need to associate a resource component to each URI exposed in the API.

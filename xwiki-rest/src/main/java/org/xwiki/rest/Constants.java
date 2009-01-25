@@ -30,6 +30,8 @@ public class Constants
 
     public static String XWIKI_API = "xwiki_api";
 
+    public static String XWIKI_USER = "xwiki_user";
+
     /* These are relevant parameter names that are used in URI templates. */
     public static final String WIKI_NAME_PARAMETER = "wikiName";
 
@@ -38,6 +40,8 @@ public class Constants
     public static final String PAGE_NAME_PARAMETER = "pageName";
 
     public static final String LANGUAGE_ID_PARAMETER = "languageId";
+
+    public static final String COMMENT_ID_PARAMETER = "commentId";
 
     public static final String VERSION_PARAMETER = "version";
 

@@ -19,59 +19,74 @@
  */
 package org.xwiki.rest.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * @version $Id$
  */
-public class LinkCollection
-{
-    @XStreamImplicit
-    private List<Link> links;
+@XStreamAlias("comment")
+public class Comment extends LinkCollection
+{    
+    private Integer id;
+    
+    private String author;
 
-    public void addLink(Link link)
+    private Long date;
+
+    private String highlight;
+
+    private String text;
+ 
+    public String getAuthor()
     {
-        if (links == null) {
-            links = new ArrayList<Link>();
-        }
-
-        links.add(link);
+        return author;
     }
 
-    public List<Link> getLinks()
+    public void setAuthor(String author)
     {
-        return links;
+        this.author = author;
     }
 
-    public List<Link> getLinksByRelation(String rel)
+    public Long getDate()
     {
-        List<Link> result = new ArrayList<Link>();
-
-        if (links != null) {
-            for (Link link : links) {
-                if (rel.equals(link.getRel())) {
-                    result.add(link);
-                }
-            }
-        }
-
-        return result;
+        return date;
     }
 
-    public Link getFirstLinkByRelation(String rel)
+    public void setDate(Long date)
     {
-        if (links != null) {
-            for (Link link : links) {
-                if (rel.equals(link.getRel())) {
-                    return link;
-                }
-            }
-        }
+        this.date = date;
+    }
 
-        return null;
+    public String getHighlight()
+    {
+        return highlight;
+    }
+
+    public void setHighlight(String highlight)
+    {
+        this.highlight = highlight;
+    }
+
+    public String getText()
+    {
+        return text;
+    }
+
+    public void setText(String text)
+    {
+        this.text = text;
+    }
+
+    public Integer getId()
+    {
+        return id;
+    }
+
+    public void setId(Integer id)
+    {
+        this.id = id;
     }
 
 }

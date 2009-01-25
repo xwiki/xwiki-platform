@@ -432,9 +432,6 @@ public abstract class DOMUtils
         Node ancestor = node;
         do {
             ancestors.add(ancestor);
-            if (ancestor.getNodeType() == DOCUMENT_FRAGMENT_NODE) {
-                break;
-            }
             ancestor = ancestor.getParentNode();
         } while (ancestor != null);
         return ancestors;
@@ -567,9 +564,9 @@ public abstract class DOMUtils
     }
 
     /**
-     * @param parent The parent node of the retrieved child.
-     * @param descendant A descendant of the retrieved child.
-     * @return The child of the given parent, which has the specified descendant.
+     * @param parent the parent node of the retrieved child
+     * @param descendant a descendant of the retrieved child
+     * @return the child of the given parent, which has the specified descendant
      */
     public Node getChild(Node parent, Node descendant)
     {

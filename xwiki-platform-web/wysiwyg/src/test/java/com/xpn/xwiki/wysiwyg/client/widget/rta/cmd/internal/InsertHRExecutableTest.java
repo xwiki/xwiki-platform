@@ -106,9 +106,9 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         assertTrue(executable.execute(rta, null));
         assertEquals("<ul><li>a<em>b</em><hr><del>f</del>g</li></ul>", clean(rta.getHTML()));
         assertTrue(rta.getDocument().getSelection().isCollapsed());
+        assertEquals(3, rta.getDocument().getSelection().getRangeAt(0).getStartOffset());
         assertEquals(getBody().getFirstChild().getFirstChild(), rta.getDocument().getSelection().getRangeAt(0)
             .getStartContainer());
-        assertEquals(3, rta.getDocument().getSelection().getRangeAt(0).getStartOffset());
     }
 
     /**

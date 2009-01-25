@@ -475,7 +475,9 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         Node node = container.getChildNodes().getItem(1);
         DOMUtils.getInstance().detach(node);
         assertEquals("13", container.getInnerHTML());
-        assertNull("IE fails because orphan nodes are attached to a document fragment.", node.getParentNode());
+        // IE fails because orphan nodes that have been created with the innerHTML property are attached to a document
+        // fragment.
+        assertNull(node.getParentNode());
         // The following shoudn't fail.
         DOMUtils.getInstance().detach(node);
     }

@@ -87,10 +87,10 @@ public class IESelectionTest extends AbstractWysiwygClientTest
         TextRange refRange = textRange.duplicate();
         refRange.moveToElementText(container);
         if (refRange.findText(PIPE, 0, 0)) {
-            refRange.setHTML("");
+            refRange.setText("");
             textRange.setEndPoint(RangeCompare.END_TO_START, refRange);
             refRange.findText(PIPE, html.length() - html.indexOf(PIPE), 0);
-            refRange.setHTML("");
+            refRange.setText("");
             textRange.setEndPoint(RangeCompare.START_TO_END, refRange);
         } else {
             textRange.moveToElementText(container);

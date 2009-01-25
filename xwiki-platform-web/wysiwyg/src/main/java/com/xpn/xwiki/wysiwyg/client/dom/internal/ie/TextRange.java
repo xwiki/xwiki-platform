@@ -19,13 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.dom.internal.ie;
 
-import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.Random;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
-import com.xpn.xwiki.wysiwyg.client.dom.Text;
 
 /**
  * A text range is a DOM fragment that usually starts and ends inside a text node. It can be used to visually select a
@@ -81,36 +77,9 @@ public final class TextRange extends NativeRange
     }-*/;
 
     /**
-     * Creates a new text range from the given control range. Only the first element in the control range is taken into
-     * account. If this element has inner text then the return text range starts before the first character of the first
-     * text node descendent and ends after the last character of the last text node descendent. Otherwise, the returned
-     * text range starts before this element and ends after it.
-     * 
-     * @param controlRange The source of the new text range.
-     * @return The created text range.
-     */
-    public static TextRange newInstance(ControlRange controlRange)
-    {
-        TextRange textRange = newInstance(controlRange.getOwnerDocument());
-        textRange.setEndPoint(RangeCompare.START_TO_START, controlRange.get(0));
-        textRange.setEndPoint(RangeCompare.END_TO_END, controlRange.get(0));
-        return textRange;
-    }
-
-    /**
      * @return The HTML source as a valid HTML fragment.
      */
-    public String getHTML()
-    {
-        // We overwrite the default behavior because when we place the caret inside an empty element like span the
-        // htmlText property is wrongly set to "<span></span>", although pasting HTML code doesn't overwrite the span.
-        return isCollapsed() ? "" : xGetHTML();
-    }
-
-    /**
-     * @return The HTML source as a valid HTML fragment.
-     */
-    private native String xGetHTML()
+    public native String getHTML()
     /*-{
         return this.htmlText;
     }-*/;
@@ -123,22 +92,7 @@ public final class TextRange extends NativeRange
      * 
      * @param html The HTML text to paste. The string can contain text and any combination of the HTML tags.
      */
-    public void setHTML(String html)
-    {
-        // We do this because IE trims the leading comment (if any) in the html, so we add a dummy text before it and
-        // remove it afterwards. We need this when adding wikilinks for example, who's html start with a comment. Even
-        // if we hadn't the links, it is generally a good method to make sure that "what you set is what you get".
-        String id = "org.xwiki.wysiwyg.iesucks";
-        xSetHTML("<span id=\"" + id + "\">iesucks</span>" + html);
-        Node marker = getOwnerDocument().getElementById(id);
-        marker.getParentNode().removeChild(marker);
-    }
-
-    /**
-     * @param html The HTML text to paste.
-     * @see #setHTML(String)
-     */
-    private native void xSetHTML(String html)
+    public native void setHTML(String html)
     /*-{
         this.pasteHTML(html);
     }-*/;
@@ -165,20 +119,7 @@ public final class TextRange extends NativeRange
      * @param toStart if true moves the insertion point to the beginning of the text range. Otherwise, moves the
      *            insertion point to the end of the text range.
      */
-    public void collapse(boolean toStart)
-    {
-        if (!isCollapsed()) {
-            xCollapse(toStart);
-        }
-    }
-
-    /**
-     * Moves the insertion point to the beginning or end of the current range.
-     * 
-     * @param toStart if true moves the insertion point to the beginning of the text range. Otherwise, moves the
-     *            insertion point to the end of the text range.
-     */
-    private native void xCollapse(boolean toStart)
+    public native void collapse(boolean toStart)
     /*-{
         this.collapse(toStart);
     }-*/;
@@ -340,24 +281,7 @@ public final class TextRange extends NativeRange
      * 
      * @param element The element object to move to.
      */
-    public void moveToElementText(Element element)
-    {
-        if (element.getInnerText().length() > 0 || element.getOffsetWidth() > 0 || element.mustBeEmpty()) {
-            xMoveToElementText(element);
-        } else {
-            element.appendChild(getOwnerDocument().createTextNode(" "));
-            xMoveToElementText(element);
-            findText(" ", 0, 0);
-            setText("");
-        }
-    }
-
-    /**
-     * Moves the text range so that the start and end positions of the range encompass the text in the given element.
-     * 
-     * @param element The element object to move to.
-     */
-    private native void xMoveToElementText(Element element)
+    public native void moveToElementText(Element element)
     /*-{
         this.moveToElementText(element);
     }-*/;
@@ -446,157 +370,6 @@ public final class TextRange extends NativeRange
     }-*/;
 
     /**
-     * Sets the end point of this range based on the given DOM node. A text range has two end points: one at the
-     * beginning of the text range and one at the end. An end point can also be the position between two characters in
-     * an HTML document.
-     * 
-     * @param how Specifies the end point to transfer using one of the following values:
-     *            <ul>
-     *            <li>{@link RangeCompare#START_TO_END}: Move the end of this TextRange object before the refNode.</li>
-     *            <li>{@link RangeCompare#START_TO_START}: Move the start of this TextRange object before the refNode.</li>
-     *            <li>{@link RangeCompare#END_TO_START}: Move the start of this TextRange object after the refNode.</li>
-     *            <li>{@link RangeCompare#END_TO_END}: Move the end of this TextRange object after the refNode.</li>
-     *            </ul>
-     * @param refNode The reference point.
-     */
-    public void setEndPoint(RangeCompare how, Node refNode)
-    {
-        setEndPoint(how, refNode, 0);
-    }
-
-    /**
-     * Sets the end point of this range based on the given DOM node and the specified offset. A text range has two end
-     * points: one at the beginning of the text range and one at the end. An end point can also be the position between
-     * two characters in an HTML document.
-     * 
-     * @param how Specifies the end point to transfer using one of the following values:
-     *            <ul>
-     *            <li>{@link RangeCompare#START_TO_END}: Move the end of this TextRange object before the refNode.</li>
-     *            <li>{@link RangeCompare#START_TO_START}: Move the start of this TextRange object before the refNode.</li>
-     *            <li>{@link RangeCompare#END_TO_START}: Move the start of this TextRange object after the refNode.</li>
-     *            <li>{@link RangeCompare#END_TO_END}: Move the end of this TextRange object after the refNode.</li>
-     *            </ul>
-     * @param refNode The reference point.
-     * @param offset The number of possible-cursor-positions to move from the reference point.
-     */
-    public void setEndPoint(RangeCompare how, Node refNode, int offset)
-    {
-        TextRange refRange = duplicate();
-        switch (refNode.getNodeType()) {
-            case Node.ELEMENT_NODE:
-                refRange.moveToElementText(Element.as(refNode));
-                break;
-            case Node.TEXT_NODE:
-                refRange.moveToTextNode(Text.as(refNode));
-                break;
-            case 4:
-                // CDATA
-            case 8:
-                // COMMENT
-                refRange.moveToCommentNode(refNode);
-                break;
-            default:
-                throw new IllegalArgumentException(DOMUtils.UNSUPPORTED_NODE_TYPE);
-        }
-        // We shift and not collapse because the reference range can change its end points after being collapsed.
-        refRange.shift(Unit.CHARACTER, offset);
-        setEndPoint(how, refRange);
-    }
-
-    /**
-     * Position the start of this text range before the first character of the given text node and the end after the
-     * last character.
-     * 
-     * @param textNode The text node to be wrapped by this range.
-     */
-    public void moveToTextNode(Text textNode)
-    {
-        if (textNode.getLength() == 0) {
-            // NOTE: The following code manages to place both end points of this text range inside the empty text node,
-            // but unfortunately the end points don't remain there after the range is selected.
-
-            // NOTE: This trick won't work in some case when the parent element contains comment child nodes.
-
-            // We search for a place holder text that isn't already contained by the parent element.
-            String placeholder = String.valueOf(Random.nextInt());
-            Element parent = (Element) textNode.getParentNode();
-            while (parent.getInnerText().contains(placeholder)) {
-                placeholder = String.valueOf(Random.nextInt());
-            }
-            // We insert the place holder text, find it and delete it.
-            textNode.setData(placeholder);
-            xMoveToElementText(parent);
-            findText(placeholder, 0, 0);
-            textNode.setData("");
-        } else {
-            // We create a reference element and we insert it before the given text node in order to place the start of
-            // the range after this element. In the end we remove the reference element.
-            Element refElement = getOwnerDocument().xCreateSpanElement().cast();
-            refElement.setInnerText(" ");
-            textNode.getParentNode().insertBefore(refElement, textNode);
-            moveToElementText(refElement);
-            collapse(false);
-            moveEnd(Unit.CHARACTER, textNode.getLength());
-            refElement.getParentNode().removeChild(refElement);
-        }
-    }
-
-    /**
-     * Since IE's text range cannot start or end inside a comment, we try to wrap the given comment node.
-     * 
-     * @param comment The comment node to be wrapped by this text range.
-     */
-    public void moveToCommentNode(Node comment)
-    {
-        Node rightSibling = comment.getNextSibling();
-        while (rightSibling != null && rightSibling.getNodeType() != Node.ELEMENT_NODE
-            && rightSibling.getNodeType() != Node.TEXT_NODE) {
-            rightSibling = rightSibling.getNextSibling();
-        }
-
-        Node leftSibling = comment.getPreviousSibling();
-        while (leftSibling != null && leftSibling.getNodeType() != Node.ELEMENT_NODE
-            && leftSibling.getNodeType() != Node.TEXT_NODE) {
-            leftSibling = leftSibling.getPreviousSibling();
-        }
-
-        if (leftSibling == rightSibling) {
-            moveToElementText(Element.as(comment.getParentNode()));
-        } else {
-            if (rightSibling != null) {
-                setEndPoint(RangeCompare.START_TO_END, rightSibling);
-            } else {
-                setEndPoint(RangeCompare.END_TO_END, comment.getParentNode());
-            }
-            if (leftSibling != null) {
-                setEndPoint(RangeCompare.END_TO_START, leftSibling);
-            } else {
-                setEndPoint(RangeCompare.START_TO_START, comment.getParentNode());
-            }
-        }
-    }
-
-    /**
-     * Moves both end points of this range by the given number of units.
-     * 
-     * @param unit Specifies the units to move.
-     * @param count Specifies the number of units to move. This can be positive or negative.
-     * @return The number of units moved.
-     */
-    public int shift(Unit unit, int count)
-    {
-        if (count == 0) {
-            return 0;
-        } else if (count > 0) {
-            moveEnd(unit, count);
-            return moveStart(unit, count);
-        } else {
-            moveStart(unit, count);
-            return moveEnd(unit, count);
-        }
-    }
-
-    /**
      * Searches for text in the document and positions the start and end points of the range to encompass the search
      * string.<br/>
      * The value passed for the searchScope parameter controls the part of the document, relative to the range, that is
@@ -678,14 +451,33 @@ public final class TextRange extends NativeRange
     }-*/;
 
     /**
-     * @return true if this text range is collapsed.
+     * Expands the range so that partial units are completely contained.
+     * 
+     * @param unit specifies the units that have to be completely included in the range
+     * @return {@code true} if the range was successfully expanded, {@code false} otherwise
      */
-    public native boolean isCollapsed()
+    public boolean expand(Unit unit)
+    {
+        return expand(unit.toString());
+    }
+
+    /**
+     * Expands the range so that partial units are completely contained.
+     * 
+     * @param unit specifies the units that have to be completely included in the range, using one of the following
+     *            values:
+     *            <ul>
+     *            <li>character: Moves one or more characters.</li>
+     *            <li>word: Moves one or more words. A word is a collection of characters terminated by a space or some
+     *            other white-space character, such as a tab.</li>
+     *            <li>sentence: Moves one or more sentences. A sentence is a collection of words terminated by a
+     *            punctuation character, such as a period.</li>
+     *            <li>textedit: Moves to the start or end of the original range.</li>
+     *            </ul>
+     * @return {@code true} if the range was successfully expanded, {@code false} otherwise
+     */
+    private native boolean expand(String unit)
     /*-{
-        // IE seems to forbid the selection of DOM elements with no inner text and with 0-width.
-        // We use this way to detect the collapsed state because when we place the caret inside 
-        // an empty element like span the htmlText property is wrongly set to "<span></span>".
-        // Thus we cannot use the htmlText property to detect the collapsed state.
-        return this.text.length == 0 && this.boundingWidth == 0;
+        return this.expand(unit);
     }-*/;
 }

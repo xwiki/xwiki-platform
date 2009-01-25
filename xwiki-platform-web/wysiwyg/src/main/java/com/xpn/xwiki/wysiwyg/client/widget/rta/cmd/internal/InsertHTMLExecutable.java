@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
-import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
@@ -45,41 +45,15 @@ public class InsertHTMLExecutable extends AbstractExecutable
      */
     public boolean execute(RichTextArea rta, String param)
     {
-        Range range = rta.getDocument().getSelection().getRangeAt(0);
-        range.deleteContents();
-
         Element container = rta.getDocument().xCreateDivElement().cast();
         container.xSetInnerHTML(param);
 
-        Node rangeContainer = range.getCommonAncestorContainer();
-        if (rangeContainer.getNodeType() == Node.ELEMENT_NODE) {
-            if (range.getStartOffset() == rangeContainer.getChildNodes().getLength()) {
-                rangeContainer.appendChild(container);
-            } else {
-                rangeContainer.insertBefore(container, rangeContainer.getChildNodes().getItem(range.getStartOffset()));
-            }
-        } else {
-            // Text or Comment DOM node
-            if (range.getStartOffset() == 0) {
-                rangeContainer.getParentNode().insertBefore(container, rangeContainer);
-            } else if (range.getStartOffset() < rangeContainer.getNodeValue().length()) {
-                Node clone = rangeContainer.cloneNode(false);
-                clone.setNodeValue(rangeContainer.getNodeValue().substring(range.getStartOffset()));
-                rangeContainer.setNodeValue(rangeContainer.getNodeValue().substring(0, range.getStartOffset()));
-                if (rangeContainer.getNextSibling() != null) {
-                    rangeContainer.getParentNode().insertBefore(clone, rangeContainer.getNextSibling());
-                } else {
-                    rangeContainer.getParentNode().appendChild(clone);
-                }
-                rangeContainer.getParentNode().insertBefore(container, clone);
-            } else if (rangeContainer.getNextSibling() != null) {
-                rangeContainer.getParentNode().insertBefore(container, rangeContainer.getNextSibling());
-            } else {
-                rangeContainer.getParentNode().appendChild(container);
-            }
-        }
-
-        container.unwrap();
+        Selection selection = rta.getDocument().getSelection();
+        Range range = selection.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(container.extractContents());
+        selection.removeAllRanges();
+        selection.addRange(range);
 
         return true;
     }

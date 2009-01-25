@@ -32,7 +32,6 @@ import com.xpn.xwiki.wysiwyg.client.dom.RangeTest;
 import com.xpn.xwiki.wysiwyg.client.dom.StyleTest;
 import com.xpn.xwiki.wysiwyg.client.dom.TextTest;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.IESelectionTest;
-import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.TextRangeTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManagerTest;
@@ -48,6 +47,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserverTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.FormatBlockExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHRExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutableTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.StyleExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.history.HistoryTest;
 
 /**
@@ -76,7 +76,6 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(RangeTest.class);
         suite.addTestSuite(StyleTest.class);
         suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);
-        suite.addTestSuite(TextRangeTest.class);
         suite.addTestSuite(IESelectionTest.class);
 
         // plugin
@@ -101,6 +100,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(InsertHTMLExecutableTest.class);
         suite.addTestSuite(InsertHRExecutableTest.class);
         suite.addTestSuite(FormatBlockExecutableTest.class);
+        suite.addTestSuite(StyleExecutableTest.class);
         suite.addTestSuite(SelectionPreserverTest.class);
 
         return suite;

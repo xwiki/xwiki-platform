@@ -37,7 +37,6 @@ import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.dom.TableCellElement;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -487,14 +486,7 @@ public class BehaviorAdjuster implements LoadListener
             // Do nothing.
         } else {
             if (getTextArea().getCommandManager().isEnabled(Command.INSERT_HTML)) {
-                // Save the selection.
-                SelectionPreserver preserver = new SelectionPreserver(getTextArea());
-                preserver.saveSelection();
-                // Replace the selection.
                 getTextArea().getCommandManager().execute(Command.INSERT_HTML, "&nbsp;&nbsp;&nbsp;&nbsp;");
-                // Restore the selection and collapse it to the end in order to have the caret after the inserted
-                // spaces.
-                preserver.restoreSelection();
                 getTextArea().getDocument().getSelection().collapseToEnd();
             }
         }

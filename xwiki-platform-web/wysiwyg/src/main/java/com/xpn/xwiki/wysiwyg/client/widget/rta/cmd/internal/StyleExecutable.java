@@ -71,6 +71,11 @@ public class StyleExecutable extends AbstractExecutable
     private final boolean multipleValue;
 
     /**
+     * Collection of DOM utility methods.
+     */
+    private DOMUtils domUtils = DOMUtils.getInstance();
+
+    /**
      * Creates a new instance.
      * 
      * @param tagName {@link #tagName}
@@ -130,16 +135,11 @@ public class StyleExecutable extends AbstractExecutable
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
-        Document doc = rta.getDocument();
-        boolean executed = isExecuted(rta);
-        Selection selection = doc.getSelection();
+        Selection selection = rta.getDocument().getSelection();
         List<Range> ranges = new ArrayList<Range>();
+        boolean executed = isExecuted(rta);
         for (int i = 0; i < selection.getRangeCount(); i++) {
-            if (executed) {
-                ranges.add(removeStyle(doc, DOMUtils.getInstance().getTextRange(selection.getRangeAt(i))));
-            } else {
-                ranges.add(addStyle(doc, DOMUtils.getInstance().getTextRange(selection.getRangeAt(i))));
-            }
+            ranges.add(execute(selection.getRangeAt(i), executed));
         }
         selection.removeAllRanges();
         for (Range range : ranges) {
@@ -149,200 +149,156 @@ public class StyleExecutable extends AbstractExecutable
     }
 
     /**
-     * Adds in-line formatting to the given range from the specified document.
+     * Adds to or removes from the given range the in-line formatting.
      * 
-     * @param doc The document who hosts the range.
-     * @param range The range on which the formatting will be applied.
-     * @return The new range corresponding to the formatted text.
+     * @param range the target range
+     * @param executed whether to add or remove the style
+     * @return the given range after being processed
      */
-    protected Range addStyle(Document doc, Range range)
+    protected Range execute(Range range, boolean executed)
     {
-        Range newRange = doc.createRange();
-        if (range.getCommonAncestorContainer().getNodeType() == Node.TEXT_NODE) {
-            Text text = Text.as(range.getCommonAncestorContainer());
-            addStyle(text, range.getStartOffset(), range.getEndOffset());
-            newRange.selectNodeContents(text);
-        } else if (range.isCollapsed()) {
-            Element leafElement = Element.as(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
-            assert (!leafElement.hasChildNodes());
-            Text text = leafElement.getOwnerDocument().createTextNode("").cast();
-            leafElement.getParentNode().insertBefore(text, leafElement);
-            addStyle(text, 0, 0);
-            newRange.selectNodeContents(text);
+        if (range.isCollapsed()) {
+            switch (range.getStartContainer().getNodeType()) {
+                case Node.TEXT_NODE:
+                    Text text = (Text) range.getStartContainer();
+                    text = execute(text, range.getStartOffset(), range.getEndOffset(), executed).getText();
+                    range.selectNodeContents(text);
+                    break;
+                case Node.ELEMENT_NODE:
+                    Text empty = (Text) range.getStartContainer().getOwnerDocument().createTextNode("");
+                    domUtils.insertAt(range.getStartContainer(), empty, range.getStartOffset());
+                    range.selectNodeContents(execute(empty, 0, 0, executed).getText());
+                    break;
+                default:
+                    // Do nothing.
+                    break;
+            }
         } else {
-            Text firstText = Text.as(range.getStartContainer());
-            Text lastText = Text.as(range.getEndContainer());
-            if (!matchesStyle(firstText)) {
-                addStyle(firstText, range.getStartOffset(), firstText.getLength());
-                newRange.setStart(firstText, 0);
-            } else {
-                newRange.setStart(firstText, range.getStartOffset());
-            }
-
-            Node node = DOMUtils.getInstance().getNextLeaf(firstText);
-            while (node != null && node != lastText) {
-                if (node.getNodeType() == Node.TEXT_NODE && !matchesStyle(node)) {
-                    Text text = Text.as(node);
-                    addStyle(text, 0, text.getLength());
+            // Iterate through all the text nodes within the given range and apply the underlying style.
+            TextFragment startContainer = null;
+            TextFragment endContainer = null;
+            List<Text> textNodes = getNonEmptyTextNodes(range);
+            for (int i = 0; i < textNodes.size(); i++) {
+                Text text = textNodes.get(i);
+                int startIndex = 0;
+                if (text == range.getStartContainer()) {
+                    startIndex = range.getStartOffset();
                 }
-                node = DOMUtils.getInstance().getNextLeaf(node);
+                int endIndex = text.getLength();
+                if (text == range.getEndContainer()) {
+                    endIndex = range.getEndOffset();
+                }
+                endContainer = execute(text, startIndex, endIndex, executed);
+                if (startContainer == null) {
+                    startContainer = endContainer;
+                }
             }
-
-            if (node == lastText && !matchesStyle(lastText)) {
-                addStyle(lastText, 0, range.getEndOffset());
-                newRange.setEnd(lastText, lastText.getLength());
-            } else {
-                newRange.setEnd(lastText, range.getEndOffset());
+            if (startContainer != null) {
+                range.setEnd(endContainer.getText(), endContainer.getEndIndex());
+                range.setStart(startContainer.getText(), startContainer.getStartIndex());
             }
         }
-        return newRange;
+        return range;
+    }
+
+    /**
+     * @param range a DOM range
+     * @return the list of non empty text nodes that are completely or partially (at least one character) included in
+     *         the given range
+     */
+    private List<Text> getNonEmptyTextNodes(Range range)
+    {
+        Node leaf = domUtils.getFirstLeaf(range);
+        Node lastLeaf = domUtils.getLastLeaf(range);
+        List<Text> textNodes = new ArrayList<Text>();
+        // If the range starts at the end of a text node we have to ignore that node.
+        if (isNonEmptyTextNode(leaf)
+            && (leaf != range.getStartContainer() || range.getStartOffset() < leaf.getNodeValue().length())) {
+            textNodes.add((Text) leaf);
+        }
+        while (leaf != lastLeaf) {
+            leaf = domUtils.getNextLeaf(leaf);
+            if (isNonEmptyTextNode(leaf)) {
+                textNodes.add((Text) leaf);
+            }
+        }
+        // If the range ends at the start of a text node then we have to ignore that node.
+        int lastIndex = textNodes.size() - 1;
+        if (lastIndex >= 0 && range.getEndOffset() == 0 && textNodes.get(lastIndex) == range.getEndContainer()) {
+            textNodes.remove(lastIndex);
+        }
+        return textNodes;
+    }
+
+    /**
+     * @param node a DOM node
+     * @return {@code true} if the given node is of type {@link Node#TEXT_NODE} and it's not empty, {@code false}
+     *         otherwise
+     */
+    private boolean isNonEmptyTextNode(Node node)
+    {
+        return node.getNodeType() == Node.TEXT_NODE && node.getNodeValue().length() > 0;
+    }
+
+    /**
+     * Adds to or removes from the given text node the underlying style.
+     * 
+     * @param text the target text node
+     * @param startIndex the first character to be processed
+     * @param endIndex the last character to be processed
+     * @param executed whether to add or remove the style
+     * @return a text fragment indicating what has been processed
+     */
+    protected TextFragment execute(Text text, int startIndex, int endIndex, boolean executed)
+    {
+        return executed ? removeStyle(text, startIndex, endIndex) : addStyle(text, startIndex, endIndex);
     }
 
     /**
      * Formats the given text node, from the begin index to the end index.
      * 
-     * @param text The text node to be formatted.
-     * @param firstCharIndex The first character on which we apply the style.
-     * @param lastCharIndex The last character on which we apply the style.
+     * @param text the text node to be formatted
+     * @param firstCharIndex the first character on which we apply the style
+     * @param lastCharIndex the last character on which we apply the style
+     * @return a text fragment indicating what has been formatted
      */
-    protected void addStyle(Text text, int firstCharIndex, int lastCharIndex)
+    protected TextFragment addStyle(Text text, int firstCharIndex, int lastCharIndex)
     {
-        int beginIndex = firstCharIndex;
-        int endIndex = lastCharIndex;
-        if (beginIndex > 0) {
-            String leftData = text.getData().substring(0, beginIndex);
-            Text left = text.getOwnerDocument().createTextNode(leftData).cast();
-            text.getParentNode().insertBefore(left, text);
-            text.setData(text.getData().substring(beginIndex));
-            endIndex -= beginIndex;
-            beginIndex = 0;
+        if (matchesStyle(text)) {
+            // Already styled. Skip.
+            return new TextFragment(text, firstCharIndex, lastCharIndex);
         }
 
-        if (endIndex < text.getLength()) {
-            String rightData = text.getData().substring(endIndex);
-            Text right = text.getOwnerDocument().createTextNode(rightData).cast();
-            if (text.getNextSibling() != null) {
-                text.getParentNode().insertBefore(right, text.getNextSibling());
-            } else {
-                text.getParentNode().appendChild(right);
-            }
-            text.setData(text.getData().substring(beginIndex, endIndex));
-        }
-
-        com.google.gwt.dom.client.Element styleElement = ((Document) text.getOwnerDocument()).xCreateElement(tagName);
+        Element styleElement = ((Document) text.getOwnerDocument()).xCreateElement(tagName);
         if (className != null) {
             styleElement.setClassName(className);
         }
 
-        Node ancestor = text;
-        while (ancestor.getParentNode() != null && ancestor.getPreviousSibling() == null
-            && ancestor.getNextSibling() == null && DOMUtils.getInstance().isInline(ancestor.getParentNode())) {
-            ancestor = ancestor.getParentNode();
-        }
-        ancestor.getParentNode().replaceChild(styleElement, ancestor);
-        styleElement.appendChild(ancestor);
+        text.crop(firstCharIndex, lastCharIndex);
+        text.getParentNode().replaceChild(styleElement, text);
+        styleElement.appendChild(text);
+
+        return new TextFragment(text, 0, text.getLength());
     }
 
     /**
-     * Removes in-line formatting on the given range from the specified document.
+     * Removes the underlying style from the given text node.
      * 
-     * @param doc The document who hosts the range.
-     * @param range The range from which the formatting will be removed.
-     * @return The new range corresponding to the text without the formatting.
+     * @param text the target text node
+     * @param firstCharIndex the first character on which we remove the style
+     * @param lastCharIndex the last character on which we remove the style
+     * @return a text fragment indicating what has been unformatted
      */
-    protected Range removeStyle(Document doc, Range range)
+    protected TextFragment removeStyle(Text text, int firstCharIndex, int lastCharIndex)
     {
-        Range newRange = doc.createRange();
-        if (range.getCommonAncestorContainer().getNodeType() == Node.TEXT_NODE) {
-            Text text = Text.as(range.getCommonAncestorContainer());
-            removeStyle(text, range.getStartOffset(), range.getEndOffset());
-
-            TextFragment fragment = text.normalize();
-            newRange.setStart(fragment.getText(), fragment.getStartIndex());
-            newRange.setEnd(fragment.getText(), fragment.getEndIndex());
-        } else if (range.isCollapsed()) {
-            Element leafElement = Element.as(range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
-            assert (!leafElement.hasChildNodes());
-            Text text = leafElement.getOwnerDocument().createTextNode("").cast();
-            leafElement.getParentNode().insertBefore(text, leafElement);
-            removeStyle(text, 0, 0);
-
-            TextFragment fragment = text.normalize();
-            newRange.setStart(fragment.getText(), fragment.getStartIndex());
-            newRange.setEnd(fragment.getText(), fragment.getEndIndex());
-        } else {
-            Text firstText = Text.as(range.getStartContainer());
-            Text lastText = Text.as(range.getEndContainer());
-            removeStyle(firstText, range.getStartOffset(), firstText.getLength());
-
-            Node node = DOMUtils.getInstance().getNextLeaf(firstText);
-            while (node != null && node != lastText) {
-                if (node.getNodeType() == Node.TEXT_NODE) {
-                    Text text = Text.as(node);
-                    removeStyle(text, 0, text.getLength());
-                }
-                node = DOMUtils.getInstance().getNextLeaf(node);
-            }
-
-            if (node == lastText) {
-                removeStyle(lastText, 0, range.getEndOffset());
-                int lastTextOffset = lastText.getOffset();
-
-                TextFragment firstFragment = firstText.normalize();
-                newRange.setStart(firstFragment.getText(), firstFragment.getStartIndex());
-                if (lastText.getParentNode() != null) {
-                    TextFragment lastFragment = lastText.normalize();
-                    newRange.setEnd(lastFragment.getText(), lastFragment.getEndIndex());
-                } else {
-                    newRange.setEnd(firstFragment.getText(), lastTextOffset + lastText.getLength());
-                }
-            } else {
-                TextFragment firstFragment = firstText.normalize();
-                newRange.setStart(firstFragment.getText(), firstFragment.getStartIndex());
-                newRange.setEnd(firstFragment.getText(), firstFragment.getStartIndex());
-            }
-        }
-        return newRange;
-    }
-
-    /**
-     * Removes in-line formatting on the given text node, from the begin index to the end index.
-     * 
-     * @param text The text node whose formatting will be removed.
-     * @param firstCharIndex The first character on which we remove the style
-     * @param lastCharIndex The last character on which we remove the style.
-     */
-    protected void removeStyle(Text text, int firstCharIndex, int lastCharIndex)
-    {
-        int beginIndex = firstCharIndex;
-        int endIndex = lastCharIndex;
-        if (beginIndex > 0) {
-            String leftData = text.getData().substring(0, beginIndex);
-            Text left = text.getOwnerDocument().createTextNode(leftData).cast();
-            text.getParentNode().insertBefore(left, text);
-            text.setData(text.getData().substring(beginIndex));
-            endIndex -= beginIndex;
-            beginIndex = 0;
-        }
-
-        if (endIndex < text.getLength()) {
-            String rightData = text.getData().substring(endIndex);
-            Text right = text.getOwnerDocument().createTextNode(rightData).cast();
-            if (text.getNextSibling() != null) {
-                text.getParentNode().insertBefore(right, text.getNextSibling());
-            } else {
-                text.getParentNode().appendChild(right);
-            }
-            text.setData(text.getData().substring(beginIndex, endIndex));
-        }
-
+        text.crop(firstCharIndex, lastCharIndex);
         Node child = text;
         Node parent = child.getParentNode();
-        while (parent != null && matchesStyle(parent) && DOMUtils.getInstance().isInline(parent)
-            && split(parent, child)) {
+        while (parent != null && matchesStyle(parent) && domUtils.isInline(parent) && split(parent, child)) {
             child = child.getParentNode();
             parent = child.getParentNode();
         }
+        return new TextFragment(text, 0, text.getLength());
     }
 
     /**
@@ -354,7 +310,7 @@ public class StyleExecutable extends AbstractExecutable
     {
         Selection selection = rta.getDocument().getSelection();
         for (int i = 0; i < selection.getRangeCount(); i++) {
-            if (!isExecuted(DOMUtils.getInstance().getTextRange(selection.getRangeAt(i)))) {
+            if (!isExecuted(selection.getRangeAt(i))) {
                 return false;
             }
         }
@@ -362,47 +318,44 @@ public class StyleExecutable extends AbstractExecutable
     }
 
     /**
-     * @param range The range to be inspected.
-     * @return true if this executable was executed on the given range.
+     * @param range the range to be inspected
+     * @return {@code true} if this executable was executed on the given range
      */
-    private boolean isExecuted(Range range)
+    protected boolean isExecuted(Range range)
     {
-        if (range.isCollapsed() || range.getCommonAncestorContainer().getNodeType() == Node.TEXT_NODE
-            || range.getStartContainer() == range.getEndContainer()) {
-            return matchesStyle(range.getCommonAncestorContainer());
+        if (range.isCollapsed()) {
+            return matchesStyle(range.getStartContainer());
         } else {
-            Node node = range.getStartContainer();
-            if (!matchesStyle(node)) {
-                return false;
-            }
-            while (node != range.getEndContainer()) {
-                node = DOMUtils.getInstance().getNextLeaf(node);
-                if (!matchesStyle(node)) {
+            List<Text> textNodes = getNonEmptyTextNodes(range);
+            for (int i = 0; i < textNodes.size(); i++) {
+                if (!matchesStyle(textNodes.get(i))) {
                     return false;
                 }
             }
-            return true;
+            return textNodes.size() > 0;
         }
     }
 
     /**
-     * @param inputNode A DOM node.
-     * @return true if the given node matches the style associated with this executable.
+     * @param inputNode a DOM node
+     * @return {@code true} if the given node matches the style associated with this executable, {@code false} otherwise
      */
     protected boolean matchesStyle(Node inputNode)
     {
         Node node = inputNode;
-        if (node.getNodeType() == Node.DOCUMENT_NODE) {
-            node = ((Document) node).getDocumentElement();
-        } else if (node.getNodeType() != Node.ELEMENT_NODE) {
+        if (node.getNodeType() != Node.ELEMENT_NODE) {
             node = node.getParentNode();
+        }
+        if (node == null || node.getNodeType() != Node.ELEMENT_NODE) {
+            return false;
         }
         return matchesStyle(Element.as(node));
     }
 
     /**
-     * @param inputElement A DOM element.
-     * @return true if the given element matches the style associated with this executable.
+     * @param inputElement a DOM element
+     * @return {@code true} if the given element matches the style associated with this executable, {@code false}
+     *         otherwise
      */
     protected boolean matchesStyle(Element inputElement)
     {
@@ -411,7 +364,7 @@ public class StyleExecutable extends AbstractExecutable
         } else {
             Node node = inputElement;
             while (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
-                if (matchesInheritedStyle(Element.as(node))) {
+                if (matchesInheritedStyle((Element) node)) {
                     return true;
                 }
                 node = node.getParentNode();
@@ -421,9 +374,9 @@ public class StyleExecutable extends AbstractExecutable
     }
 
     /**
-     * @param element A DOM element.
-     * @return true if the given element matches the style associated with this executable, without testing the
-     *         ancestors of the element.
+     * @param element a DOM element
+     * @return {@code true} if the given element matches the style associated with this executable, without testing the
+     *         ancestors of the element
      */
     protected boolean matchesInheritedStyle(Element element)
     {
@@ -439,9 +392,9 @@ public class StyleExecutable extends AbstractExecutable
      * Splits the given parent node in two subtrees: left siblings of the given child in one side and right siblings on
      * the other side. The given child will then go up one level to the root, between the two sides.
      * 
-     * @param parent The node that will be split.
-     * @param child The node that marks the place where the split is done.
-     * @return true if the split was done.
+     * @param parent the node that will be split
+     * @param child the node that marks the place where the split is done
+     * @return {@code true} if the split was done
      */
     private boolean split(Node parent, Node child)
     {

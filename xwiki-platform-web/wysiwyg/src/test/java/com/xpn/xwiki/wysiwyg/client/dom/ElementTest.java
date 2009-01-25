@@ -81,4 +81,23 @@ public class ElementTest extends AbstractWysiwygClientTest
         element.setInnerHTML("x<!--y-->z");
         assertEquals("xz", element.xGetInnerText());
     }
+
+    /**
+     * Unit test for {@link Element#xSetInnerHTML(String)} when the input HTML starts and ends with comment nodes.
+     */
+    public void testXSetInnerHTMLWithComments()
+    {
+        String html = "<!--x--><span>y</span><!--z-->";
+        Element element = Document.get().createDivElement().cast();
+        element.xSetInnerHTML(html);
+        assertEquals(html, element.getInnerHTML().toLowerCase());
+
+        DocumentFragment contents = element.extractContents();
+        assertEquals(html, contents.getInnerHTML().toLowerCase());
+
+        Element container = Document.get().createDivElement().cast();
+        container.setInnerHTML("ab<em>c</em><ins></ins>ij");
+        DOMUtils.getInstance().insertAt(container, contents, 2);
+        assertEquals("ab<em>c</em>" + html + "<ins></ins>ij", container.getInnerHTML().toLowerCase());
+    }
 }

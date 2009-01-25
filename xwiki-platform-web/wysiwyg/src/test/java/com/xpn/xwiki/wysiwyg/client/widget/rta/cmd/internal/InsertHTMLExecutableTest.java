@@ -69,8 +69,7 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
 
         assertEquals("cd", rta.getDocument().getSelection().toString());
         assertTrue(executable.execute(rta, "<!--x-->y<del>z</del>"));
-        assertEquals("IE fails because the start point of the range falls inside em.",
-            "<em>ab</em><!--x-->y<del>z</del><ins>ef</ins>", clean(rta.getHTML()));
+        assertEquals("<em>ab</em><!--x-->y<del>z</del><ins>ef</ins>", clean(rta.getHTML()));
     }
 
     /**
@@ -106,7 +105,7 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
 
         assertEquals("ij", rta.getDocument().getSelection().toString());
         assertTrue(executable.execute(rta, "#"));
-        assertEquals("IE fails because range end points fall on text nodes.", "<em>ab</em>#", clean(rta.getHTML()));
+        assertEquals("<em>ab</em>#", clean(rta.getHTML()));
     }
 
     /**

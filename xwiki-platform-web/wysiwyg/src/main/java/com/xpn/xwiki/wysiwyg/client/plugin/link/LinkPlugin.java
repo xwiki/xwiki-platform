@@ -177,20 +177,16 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
             // show the dialog
             getLinkDialog().center();
         } else {
+            // restore selection to be sure to execute the command on the right selection.
+            selectionPreserver.restoreSelection();
             String url = getLinkDialog().getLink();
             if (url != null) {
-                // restore selection to be sure to execute the command on the right selection, but don't reset the state
-                // of the preserver
-                selectionPreserver.restoreSelection(false);
                 getTextArea().getCommandManager().execute(Command.CREATE_LINK, url);
             } else {
                 // We get here if the link dialog has been closed by clicking the close button.
                 // In this case we return the focus to the text area.
                 getTextArea().setFocus(true);
             }
-            // restore the selection once again to select the inserted text or to have the initial selection back in
-            // place, this time resetting the state of the preserver.
-            selectionPreserver.restoreSelection();
         }
     }
 

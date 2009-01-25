@@ -87,14 +87,4 @@ public final class ControlRange extends NativeRange
     /*-{
         this.remove(index);
     }-*/;
-
-    /**
-     * Removes all the elements from this control range.
-     */
-    public void clear()
-    {
-        while (getLength() > 0) {
-            remove(0);
-        }
-    }
 }

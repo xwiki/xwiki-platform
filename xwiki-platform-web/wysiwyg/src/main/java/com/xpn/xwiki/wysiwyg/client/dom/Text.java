@@ -27,7 +27,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class Text extends com.google.gwt.dom.client.Text
+public final class Text extends com.google.gwt.dom.client.Text
 {
     /**
      * Default constructor. Needs to be protected because all instances are created from JavaScript.
@@ -54,7 +54,7 @@ public class Text extends com.google.gwt.dom.client.Text
      * 
      * @return a text fragment showing the place of this text in the node obtained after the merge.
      */
-    public final TextFragment normalize()
+    public TextFragment normalize()
     {
         StringBuffer leftText = new StringBuffer();
         Node leftSibling = this.getPreviousSibling();
@@ -82,7 +82,7 @@ public class Text extends com.google.gwt.dom.client.Text
      * @return the offset of this text node relative to the left-most successive text node sibling. The offset is
      *         expressed as the number of characters between this text node and the reference point.
      */
-    public final int getOffset()
+    public int getOffset()
     {
         int offset = 0;
         Node leftSibling = this.getPreviousSibling();
@@ -95,5 +95,30 @@ public class Text extends com.google.gwt.dom.client.Text
             leftSibling = leftSibling.getPreviousSibling();
         }
         return offset;
+    }
+
+    /**
+     * Keeps the text between the given indexes as the value of this node. The remaining text, if present, is placed in
+     * sibling text nodes.
+     * 
+     * @param startIndex crop start
+     * @param endIndex crop end
+     */
+    public void crop(int startIndex, int endIndex)
+    {
+        if (startIndex > 0) {
+            String leftData = getData().substring(0, startIndex);
+            Text left = getOwnerDocument().createTextNode(leftData).cast();
+            getParentNode().insertBefore(left, this);
+            setData(getData().substring(startIndex));
+        }
+
+        int length = endIndex - startIndex;
+        if (length < getLength()) {
+            String rightData = getData().substring(length);
+            Text right = getOwnerDocument().createTextNode(rightData).cast();
+            DOMUtils.getInstance().insertAfter(right, this);
+            setData(getData().substring(0, length));
+        }
     }
 }

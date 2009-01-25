@@ -88,7 +88,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
             // do the initial extracting on the loaded document
             extractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
             getTextArea().getDocument().addInnerHTMLListener(new ImageMetaDataExtractor());
-            
+
             // Create an image behavior adjuster for this text area
             new ImageBehaviorAdjuster(getTextArea());
         }
@@ -140,28 +140,25 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
             // store current selection, we'll need it after to add the image in the right place
             selectionPreserver.saveSelection();
             ImageConfig config = new ImageConfig();
-            String imageParam = 
+            String imageParam =
                 getTextArea().getCommandManager().getExecutable(Command.INSERT_IMAGE).getParameter(getTextArea());
             if (imageParam != null) {
                 config.fromJSON(imageParam);
             } else {
-                // get selection, textify and set as the default alternative text                
+                // get selection, textify and set as the default alternative text
                 config.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
             }
             getImageDialog().setImageConfig(config);
             getImageDialog().center();
         } else {
+            // restore the selection before executing the command.
+            selectionPreserver.restoreSelection();
             String imageHTML = getImageDialog().getImageHTMLBlock();
             if (imageHTML != null) {
-                // restore the selection before executing the command, without resetting the state of the preserver.
-                selectionPreserver.restoreSelection(false);
                 getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageHTML);
             } else {
                 getTextArea().setFocus(true);
             }
-            // restore the selection (once again) to select the inserted image or to have the initial selection back in
-            // place, resetting the state of the preserver.
-            selectionPreserver.restoreSelection();
         }
     }
 

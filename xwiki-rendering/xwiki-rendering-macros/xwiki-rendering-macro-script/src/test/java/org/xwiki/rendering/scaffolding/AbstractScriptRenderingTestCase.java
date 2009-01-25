@@ -25,7 +25,7 @@ public abstract class AbstractScriptRenderingTestCase extends AbstractRenderingT
 {
     public AbstractScriptRenderingTestCase()
     {
-
+        super();
     }
 
     public AbstractScriptRenderingTestCase(String testName)

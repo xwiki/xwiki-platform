@@ -35,7 +35,7 @@
   <packaging>jar</packaging>
   <description>Test framework classes shared between functional test modules</description>
     <properties>
-    <platform.core.version>1.7-SNAPSHOT</platform.core.version>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

@@ -25,8 +25,9 @@ import java.text.MessageFormat;
 import org.xwiki.component.logging.Logger;
 
 /**
- * Logger implementation that should be used when the component manager used is Plexus. That this is a wrapper over the
- * Plexus logging facade, further configuration of the logging system should be done
+ * Logger implementation that should be used when the component manager used is Plexus. Note that this is a wrapper
+ * over the Plexus logging facade itself, which can be configured to decide what actual underlying logging system 
+ * to use.
  * 
  * @see Logger
  * @version $Id$
@@ -35,6 +36,16 @@ public class PlexusLogger implements Logger
 {
     /** Wrapped Plexus logger object. This communicates with the underlying logging framework. */
     private org.codehaus.plexus.logging.Logger logger;
+
+    /**
+     * Default constructor, wrapping the actual logger created by Plexus.
+     * 
+     * @param logger The internal Plexus logger.
+     */
+    public PlexusLogger(org.codehaus.plexus.logging.Logger logger)
+    {
+        this.logger = logger;
+    }
 
     /**
      * Formats the message like {@code MessageFormat.format(String, Object...)} but also checks for Exceptions and
@@ -68,16 +79,6 @@ public class PlexusLogger implements Logger
             }
             return message;
         }
-    }
-
-    /**
-     * Default constructor, wrapping the actual logger created by Plexus.
-     * 
-     * @param logger The internal Plexus logger.
-     */
-    public PlexusLogger(org.codehaus.plexus.logging.Logger logger)
-    {
-        this.logger = logger;
     }
 
     /**

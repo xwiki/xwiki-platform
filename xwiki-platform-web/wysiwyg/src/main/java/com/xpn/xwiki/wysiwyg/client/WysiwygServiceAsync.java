@@ -25,7 +25,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 
 /**
  * Service interface used on the client. It should have all the methods from {@link WysiwygService} with an additional

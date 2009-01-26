@@ -26,7 +26,6 @@ import java.util.Map;
 
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableBlockElementsInTable;
 import com.xpn.xwiki.wysiwyg.client.syntax.rule.ImageSelectionBehaviourRule;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -86,18 +85,24 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("hr", Command.INSERT_HORIZONTAL_RULE));
         addValidationRule(new DefaultValidationRule("symbol", Command.INSERT_HTML));
         // FIXME : implement this in the table plugin when possible
-        addValidationRule(new DefaultValidationRule("deletecol", new Command("deletecol")));
-        addValidationRule(new DefaultValidationRule("deleterow", new Command("deleterow")));
-        addValidationRule(new DefaultValidationRule("deletetable", new Command("deletetable")));
-        addValidationRule(new DefaultValidationRule("insertcolafter", new Command("insertcolafter")));
-        addValidationRule(new DefaultValidationRule("insertcolbefore", new Command("insertcolbefore")));
-        addValidationRule(new DefaultValidationRule("insertrowafter", new Command("insertrowafter")));
-        addValidationRule(new DefaultValidationRule("insertrowbefore", new Command("insertrowbefore")));
-        addValidationRule(new DefaultValidationRule("inserttable", new Command("inserttable")));
-        // FIXME : find a generic way of disabling inline/block/both elements on some identified elements
-        addValidationRule(new DisableBlockElementsInTable());
+        addTableValidationRules();
         // Add the validation rule for the image selection behaviour
         addValidationRule(new ImageSelectionBehaviourRule());
+    }
+
+    /**
+     * Adds constraints for table features.
+     */
+    private void addTableValidationRules()
+    {
+        addValidationRule(new DefaultValidationRule("deletecol"));
+        addValidationRule(new DefaultValidationRule("deleterow"));
+        addValidationRule(new DefaultValidationRule("deletetable"));
+        addValidationRule(new DefaultValidationRule("insertcolafter"));
+        addValidationRule(new DefaultValidationRule("insertcolbefore"));
+        addValidationRule(new DefaultValidationRule("insertrowafter"));
+        addValidationRule(new DefaultValidationRule("insertrowbefore"));
+        addValidationRule(new DefaultValidationRule("inserttable"));
     }
 
     /**

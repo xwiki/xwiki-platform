@@ -26,11 +26,11 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.MockPluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MockUIExtension;
 
 /**
- * Unit tests for any concrete implementation of {@link PluginManagerTest}.
+ * Unit tests for any concrete implementation of {@link AbstractPluginManagerTest}.
  * 
  * @version $Id$
  */
-public abstract class PluginManagerTest extends AbstractWysiwygClientTest
+public abstract class AbstractPluginManagerTest extends AbstractWysiwygClientTest
 {
     /**
      * @return A new instance of the concrete {@link PluginManager} being tested.

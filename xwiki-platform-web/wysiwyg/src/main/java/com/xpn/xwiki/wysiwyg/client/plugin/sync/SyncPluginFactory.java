@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.sync;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link SyncPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class SyncPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static SyncPluginFactory instance;
 
+    /**
+     * Default constructor.
+     */
     private SyncPluginFactory()
     {
         super("sync");
     }
 
+    /**
+     * @return the singleton factory instance
+     */
     public static synchronized SyncPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class SyncPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

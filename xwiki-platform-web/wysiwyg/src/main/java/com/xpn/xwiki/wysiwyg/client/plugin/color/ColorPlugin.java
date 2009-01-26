@@ -27,7 +27,6 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
@@ -36,19 +35,36 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link RichTextEditor} plug-in for controlling the text color and the background color. It installs two push buttons
- * on the tool bar, each opening a color picker dialog, which is synchronized with the text area.
+ * Plug-in for controlling the text color and the background color. It installs two push buttons on the tool bar, each
+ * opening a color picker dialog, which is synchronized with the text area.
+ * 
+ * @version $Id$
  */
 public class ColorPlugin extends AbstractPlugin implements ClickListener, MouseListener, PopupListener
 {
+    /**
+     * The tool bar button that opens the background color picker.
+     */
     private PushButton backColor;
 
+    /**
+     * The background color picker.
+     */
     private ColorPicker backColorPicker;
 
+    /**
+     * The tool bar button that opens the foreground color picker.
+     */
     private PushButton foreColor;
 
+    /**
+     * The foreground color picker.
+     */
     private ColorPicker foreColorPicker;
 
+    /**
+     * User interface extension for the editor tool bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
@@ -204,6 +220,9 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, MouseL
         }
     }
 
+    /**
+     * @param show whether to show the foreground color picker or to change the foreground color
+     */
     public void onForeColor(boolean show)
     {
         if (show) {
@@ -223,6 +242,9 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, MouseL
         }
     }
 
+    /**
+     * @param show whether to show the background color picker or to change the background color
+     */
     public void onBackColor(boolean show)
     {
         if (show) {

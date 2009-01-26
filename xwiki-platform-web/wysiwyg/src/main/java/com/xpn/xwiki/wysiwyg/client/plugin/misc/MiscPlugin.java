@@ -30,10 +30,21 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
+/**
+ * Legacy plugin that offers miscellaneous features. Should be removed in the near future.
+ * 
+ * @version $Id$
+ */
 public class MiscPlugin extends AbstractPlugin implements ClickListener
 {
+    /**
+     * The tool bar button used for removing the formatting from the current selection.
+     */
     private PushButton unformat;
 
+    /**
+     * User interface extension for the editor tool bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
@@ -80,6 +91,9 @@ public class MiscPlugin extends AbstractPlugin implements ClickListener
         }
     }
 
+    /**
+     * Removes the formatting of the current selection.
+     */
     public void onUnformat()
     {
         // TODO

@@ -20,38 +20,32 @@
 package com.xpn.xwiki.wysiwyg.client.syntax;
 
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
-import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRule;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
 
 /**
- * Unit test for any concrete implementation of {@link SyntaxValidator}.
+ * Unit test for any concrete implementation of {@link SyntaxValidatorManager}.
  * 
  * @version $Id$
  */
-public abstract class SyntaxValidatorTest extends AbstractWysiwygClientTest
+public abstract class AbstractSyntaxValidatorManagerTest extends AbstractWysiwygClientTest
 {
     /**
-     * @return A new instance of the concrete implementation of {@link SyntaxValidator} being tested.
+     * @return A new instance of the concrete implementation of {@link SyntaxValidatorManager} being tested.
      */
-    protected abstract SyntaxValidator newSyntaxValidator();
+    protected abstract SyntaxValidatorManager newSyntaxValidatorManager();
 
     /**
-     * Tests if adding a {@link DisablingRule} for a feature disables that feature and removing it re-enables the
-     * feature.
+     * Tests the basic operations: add, get and remove a {@link SyntaxValidator}.
      */
-    public void testAddRemoveDisablingRule()
+    public void testAddGetRemove()
     {
-        String feature = "feature";
-        RichTextArea textArea = new RichTextArea();
-        SyntaxValidator sv = newSyntaxValidator();
-        DisablingRule dr = new DisablingRule(new String[] {feature});
+        SyntaxValidatorManager svm = newSyntaxValidatorManager();
+        XWikiSyntaxValidator xsv = new XWikiSyntaxValidator();
 
-        assertTrue(sv.isValid(feature, textArea));
-
-        sv.addValidationRule(dr);
-        assertFalse(sv.isValid(feature, textArea));
-
-        sv.removeValidationRule(dr);
-        assertTrue(sv.isValid(feature, textArea));
+        assertNull(svm.getSyntaxValidator(xsv.getSyntax()));
+        assertNull(svm.addSyntaxValidator(xsv));
+        assertEquals(xsv, svm.getSyntaxValidator(xsv.getSyntax()));
+        assertEquals(xsv, svm.removeSyntaxValidator(xsv.getSyntax()));
+        assertNull(svm.getSyntaxValidator(xsv.getSyntax()));
     }
 }

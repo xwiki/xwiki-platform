@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link LinkPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class LinkPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static LinkPluginFactory instance;
 
+    /**
+     * Default constructor.
+     */
     private LinkPluginFactory()
     {
         super("link");
     }
 
+    /**
+     * @return the singleton factory instance
+     */
     public static synchronized LinkPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class LinkPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

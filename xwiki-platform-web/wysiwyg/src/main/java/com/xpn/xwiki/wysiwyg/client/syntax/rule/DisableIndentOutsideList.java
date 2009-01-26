@@ -23,6 +23,13 @@ import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
+/**
+ * Validation rule for disabling the indent and outdent features when the selection is outside a list item. These two
+ * features behave differently according to the context in which they are called. For the moment we use them only to
+ * indent and outdent list items. We'll drop this constraint when we'll add support for block-quotes in the editor.
+ * 
+ * @version $Id$
+ */
 public class DisableIndentOutsideList implements ValidationRule
 {
     /**

@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.justify;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link JustifyPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class JustifyPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static JustifyPluginFactory instance;
 
+    /**
+     * Default constructor.
+     */
     private JustifyPluginFactory()
     {
         super("justify");
     }
 
+    /**
+     * @return the singleton factory instance
+     */
     public static synchronized JustifyPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class JustifyPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

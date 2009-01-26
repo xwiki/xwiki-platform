@@ -24,7 +24,6 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
@@ -33,15 +32,26 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link RichTextEditor} plug-in for indenting or outdenting text. It installs two toggle buttons on the tool bar and
- * updates their status depending on the current cursor position.
+ * Plug-in for indenting or outdenting text. It installs two toggle buttons on the tool bar and updates their status
+ * depending on the current cursor position.
+ * 
+ * @version $Id$
  */
 public class IndentPlugin extends AbstractPlugin implements ClickListener
 {
+    /**
+     * The tool bar button used for indenting the current selection.
+     */
     private PushButton indent;
 
+    /**
+     * The tool bar button used for outdenting the current selection.
+     */
     private PushButton outdent;
 
+    /**
+     * User interface extension for the editor tool bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
@@ -108,6 +118,9 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
         }
     }
 
+    /**
+     * Indents the current selection.
+     */
     public void onIndent()
     {
         if (indent.isEnabled()) {
@@ -115,6 +128,9 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
         }
     }
 
+    /**
+     * Outdents the current selection.
+     */
     public void onOutdent()
     {
         if (outdent.isEnabled()) {

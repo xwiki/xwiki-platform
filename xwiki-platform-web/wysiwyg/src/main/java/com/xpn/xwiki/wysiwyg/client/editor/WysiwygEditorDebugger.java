@@ -62,11 +62,6 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
     private TextArea eventsTextArea;
 
     /**
-     * Displays the debug messages
-     */
-    private TextArea messagesTextArea;
-
-    /**
      * Timer used to schedule periodically updates.
      */
     private Timer timer;
@@ -93,11 +88,6 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
         String width = "400px";
         String height = "220px";
 
-        messagesTextArea = new TextArea();
-        messagesTextArea.setWidth(width);
-        messagesTextArea.setHeight(height);
-        panel.add(messagesTextArea);
-        
         dirtyHTMLTextArea = new TextArea();
         dirtyHTMLTextArea.setWidth(width);
         dirtyHTMLTextArea.setHeight(height);
@@ -179,14 +169,6 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
                 eventsTextArea.setText(result);
             }
         });
-    }
-
-    public void debugMessage(String text) {
-        String oldtext =  messagesTextArea.getText();
-        if (oldtext.length()>2000)
-         oldtext = oldtext.substring(0, 2000) + "\n";
-        String newtext = oldtext + text + "\n";
-        messagesTextArea.setText(newtext);
     }
 
     /**

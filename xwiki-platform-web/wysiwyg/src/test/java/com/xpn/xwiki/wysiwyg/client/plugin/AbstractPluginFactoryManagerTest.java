@@ -27,7 +27,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.MockPluginFactory;
  * 
  * @version $Id$
  */
-public abstract class PluginFactoryManagerTest extends AbstractWysiwygClientTest
+public abstract class AbstractPluginFactoryManagerTest extends AbstractWysiwygClientTest
 {
     /**
      * @return A new instance of the concrete {@link PluginFactoryManager} being tested.

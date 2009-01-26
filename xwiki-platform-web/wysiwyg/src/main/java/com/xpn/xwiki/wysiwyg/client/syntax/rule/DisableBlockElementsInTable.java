@@ -50,7 +50,7 @@ public class DisableBlockElementsInTable implements ValidationRule
     public String[] getFeatures()
     {
         // List of block elements commands.
-        return new String[] { "unorderedlist", "orderedlist", "outdent", "indent", "format", "hr" };
+        return new String[] {"unorderedlist", "orderedlist", "outdent", "indent", "format", "hr"};
     }
 
 }

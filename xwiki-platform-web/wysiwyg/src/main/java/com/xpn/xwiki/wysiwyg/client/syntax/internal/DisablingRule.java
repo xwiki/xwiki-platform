@@ -24,16 +24,32 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Utility rule for disabling some of the editor's features.
+ * 
+ * @version $Id$
  */
 public class DisablingRule implements ValidationRule
 {
+    /**
+     * The features that are disabled.
+     */
     private String[] features;
 
+    /**
+     * Creates a new validation rule that always disables the specified features.
+     * 
+     * @param features the features to be disabled
+     */
     public DisablingRule(String[] features)
     {
         this.features = copy(features);
     }
 
+    /**
+     * Utility method for making a copy of the features array.
+     * 
+     * @param source the array to be copied
+     * @return the copy
+     */
     private String[] copy(String[] source)
     {
         // In the future, move this to an utility class or use a library method.

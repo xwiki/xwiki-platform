@@ -23,6 +23,15 @@ import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
+/**
+ * Validation rule for disabling the list features when the selection or caret is inside a header. HTML headers can
+ * contain only in-line content so list are forbidden in headers anyway. The problem is that by clicking the ordered or
+ * unordered list button when the selection is inside a header we get a new list containing that header. At this moment
+ * xwiki/2.0 syntax doesn't support block elements inside list items. We should drop this constraint as soon as the
+ * syntax for embedded documents is implemented.
+ * 
+ * @version $Id$
+ */
 public class DisableListInHeader implements ValidationRule
 {
     /**

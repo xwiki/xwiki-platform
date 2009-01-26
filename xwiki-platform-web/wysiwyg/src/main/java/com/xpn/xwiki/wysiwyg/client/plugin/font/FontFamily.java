@@ -19,14 +19,34 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.font;
 
+/**
+ * Defines an entry in the font family list box.
+ * 
+ * @version $Id$
+ */
 public class FontFamily
 {
+    /**
+     * The label.
+     */
     private String name;
 
+    /**
+     * The value, a comma-separated list of font families.
+     */
     private String sValue;
 
+    /**
+     * The array of font families associated with {@link #name}. This array is obtained by splitting {@link #sValue}.
+     */
     private String[] aValue;
 
+    /**
+     * Creates a new entry in the font family list box.
+     * 
+     * @param name {@link #name}
+     * @param sValue {@link #sValue}
+     */
     public FontFamily(String name, String sValue)
     {
         this.name = name;
@@ -34,21 +54,36 @@ public class FontFamily
         this.aValue = sValue.split(",");
     }
 
+    /**
+     * @return {@link #name}
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * @return {@link #sValue}
+     */
     public String getStringValue()
     {
         return sValue;
     }
 
+    /**
+     * @return {@link #aValue}
+     */
     public String[] getArrayValue()
     {
         return aValue;
     }
 
+    /**
+     * Computes the number of font families that are common between {@link #aValue} and the given array.
+     * 
+     * @param aValue an array of font families
+     * @return the number of common font families
+     */
     public int match(String[] aValue)
     {
         int match = 0;

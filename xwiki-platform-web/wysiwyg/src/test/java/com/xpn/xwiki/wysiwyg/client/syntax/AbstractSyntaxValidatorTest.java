@@ -20,32 +20,38 @@
 package com.xpn.xwiki.wysiwyg.client.syntax;
 
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
-import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
+import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRule;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
- * Unit test for any concrete implementation of {@link SyntaxValidatorManager}.
+ * Unit test for any concrete implementation of {@link SyntaxValidator}.
  * 
  * @version $Id$
  */
-public abstract class SyntaxValidatorManagerTest extends AbstractWysiwygClientTest
+public abstract class AbstractSyntaxValidatorTest extends AbstractWysiwygClientTest
 {
     /**
-     * @return A new instance of the concrete implementation of {@link SyntaxValidatorManager} being tested.
+     * @return A new instance of the concrete implementation of {@link SyntaxValidator} being tested.
      */
-    protected abstract SyntaxValidatorManager newSyntaxValidatorManager();
+    protected abstract SyntaxValidator newSyntaxValidator();
 
     /**
-     * Tests the basic operations: add, get and remove a {@link SyntaxValidator}.
+     * Tests if adding a {@link DisablingRule} for a feature disables that feature and removing it re-enables the
+     * feature.
      */
-    public void testAddGetRemove()
+    public void testAddRemoveDisablingRule()
     {
-        SyntaxValidatorManager svm = newSyntaxValidatorManager();
-        XWikiSyntaxValidator xsv = new XWikiSyntaxValidator();
+        String feature = "feature";
+        RichTextArea textArea = new RichTextArea();
+        SyntaxValidator sv = newSyntaxValidator();
+        DisablingRule dr = new DisablingRule(new String[] {feature});
 
-        assertNull(svm.getSyntaxValidator(xsv.getSyntax()));
-        assertNull(svm.addSyntaxValidator(xsv));
-        assertEquals(xsv, svm.getSyntaxValidator(xsv.getSyntax()));
-        assertEquals(xsv, svm.removeSyntaxValidator(xsv.getSyntax()));
-        assertNull(svm.getSyntaxValidator(xsv.getSyntax()));
+        assertTrue(sv.isValid(feature, textArea));
+
+        sv.addValidationRule(dr);
+        assertFalse(sv.isValid(feature, textArea));
+
+        sv.removeValidationRule(dr);
+        assertTrue(sv.isValid(feature, textArea));
     }
 }

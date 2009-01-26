@@ -23,52 +23,99 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.xpn.xwiki.wysiwyg.client.dom.Style;
 
+/**
+ * Defines a cell in the {@link ColorPalette} that can be selected by being clicked.
+ * 
+ * @version $Id$
+ */
 public class ColorCell extends FlowPanel
 {
+    /**
+     * The CSS class name used when the color cell is neither selected nor hovered.
+     */
+    public static final String NORMAL_STYLE_NAME = "colorCell";
+
+    /**
+     * The CSS class name used when the color cell is selected.
+     */
+    public static final String SELECTED_STYLE_NAME = "colorCell-selected";
+
+    /**
+     * The CSS class name used when the color cell is hovered.
+     */
+    public static final String HOVERED_STYLE_NAME = "colorCell-hover";
+
+    /**
+     * This cell's color code.
+     */
     private final String color;
 
-    private boolean selected = false;
+    /**
+     * Flag indicating if this cell was clicked, thus selected.
+     */
+    private boolean selected;
 
+    /**
+     * Creates a new color cell using the specified color code.
+     * 
+     * @param color the code of the color to fill the new cell
+     */
     public ColorCell(String color)
     {
         super();
 
         this.color = color;
         getElement().getStyle().setProperty(Style.BACKGROUND_COLOR, color);
-        addStyleName("colorCell");
+        addStyleName(NORMAL_STYLE_NAME);
 
         sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
     }
 
+    /**
+     * @return {@link #color}
+     */
     public String getColor()
     {
         return color;
     }
 
+    /**
+     * @return {@link #selected}
+     */
     public boolean isSelected()
     {
         return selected;
     }
 
+    /**
+     * Sets the selected state of this color cell.
+     * 
+     * @param selected {@code true} to mark this cell as selected, {@code false} otherwise
+     */
     public void setSelected(boolean selected)
     {
         this.selected = selected;
         if (selected) {
-            removeStyleName("colorCell");
-            removeStyleName("colorCell-hover");
-            addStyleName("colorCell-selected");
+            removeStyleName(NORMAL_STYLE_NAME);
+            removeStyleName(HOVERED_STYLE_NAME);
+            addStyleName(SELECTED_STYLE_NAME);
         } else {
-            removeStyleName("colorCell-selected");
-            addStyleName("colorCell");
+            removeStyleName(SELECTED_STYLE_NAME);
+            addStyleName(NORMAL_STYLE_NAME);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see FlowPanel#onBrowserEvent(Event)
+     */
     public void onBrowserEvent(Event event)
     {
         if (event.getTypeInt() == Event.ONMOUSEOVER) {
-            addStyleName("colorCell-hover");
+            addStyleName(HOVERED_STYLE_NAME);
         } else if (event.getTypeInt() == Event.ONMOUSEOUT) {
-            removeStyleName("colorCell-hover");
+            removeStyleName(HOVERED_STYLE_NAME);
         }
         super.onBrowserEvent(event);
     }

@@ -47,18 +47,6 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 {
     /**
-     * Wysiwyg debugger
-     */
-    private WysiwygEditorDebugger debugger;
-
-
-    /** Get the debugger
-     */
-    public WysiwygEditorDebugger getWysiwygEditorDebugger() {
-        return debugger;
-    }
-    
-    /**
      * {@inheritDoc}
      * 
      * @see EntryPoint#onModuleLoad()
@@ -127,8 +115,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
             // Insert the WYSIWYG Editor
             if ("true".equals(config.getParameter("debug", "false"))) {
-                debugger = new WysiwygEditorDebugger(editor);
-                RootPanel.get(containerId).add(debugger);
+                RootPanel.get(containerId).add(new WysiwygEditorDebugger(editor));
             } else {
                 RootPanel.get(containerId).add(editor.getUI());
             }

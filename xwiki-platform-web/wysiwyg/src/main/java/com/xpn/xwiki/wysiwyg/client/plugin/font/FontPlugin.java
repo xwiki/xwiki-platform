@@ -24,42 +24,66 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
+/**
+ * Plug-in for manipulating the font size and font family used while editing.
+ * 
+ * @version $Id$
+ */
 public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
 {
+    /**
+     * The list of known font families.
+     */
     public static final FontFamily[] FAMILIES;
 
+    /**
+     * The list box used for changing the font family. The selected option in the list corresponds to the font family of
+     * the current selection.
+     */
     private ListBox families;
 
+    /**
+     * The list box used for changing the font size. The selected option in the list corresponds to the font size of the
+     * current selection.
+     */
     private ListBox sizes;
 
+    /**
+     * User interface extension for the editor tool bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     static {
         FAMILIES =
             new FontFamily[] {new FontFamily("Andale Mono", "andale mono,times"),
-            new FontFamily("Arial", "arial,helvetica,sans-serif"),
-            new FontFamily("Arial Black", "arial black,avant garde"),
-            new FontFamily("Book Antiqua", "book antiqua,palatino"),
-            new FontFamily("Comic Sans MS", "comic sans ms,sand"),
-            new FontFamily("Courier New", "courier new,courier"), new FontFamily("Georgia", "georgia,palatino"),
-            new FontFamily("Helvetica", "helvetica"), new FontFamily("Impact", "impact,chicago"),
-            new FontFamily("Symbol", "symbol"), new FontFamily("Tahoma", "tahoma,arial,helvetica,sans-serif"),
-            new FontFamily("Terminal", "terminal,monaco"), new FontFamily("Times New Roman", "times new roman,times"),
-            new FontFamily("Trebuchet MS", "trebuchet ms,geneva"), new FontFamily("Verdana", "verdana,geneva"),
-            new FontFamily("Webdings", "webdings"), new FontFamily("Wingdings", "wingdings,zapf dingbats")};
+                new FontFamily("Arial", "arial,helvetica,sans-serif"),
+                new FontFamily("Arial Black", "arial black,avant garde"),
+                new FontFamily("Book Antiqua", "book antiqua,palatino"),
+                new FontFamily("Comic Sans MS", "comic sans ms,sand"),
+                new FontFamily("Courier New", "courier new,courier"),
+                new FontFamily("Georgia", "georgia,palatino"),
+                new FontFamily("Helvetica", "helvetica"),
+                new FontFamily("Impact", "impact,chicago"),
+                new FontFamily("Symbol", "symbol"),
+                new FontFamily("Tahoma", "tahoma,arial,helvetica,sans-serif"),
+                new FontFamily("Terminal", "terminal,monaco"),
+                new FontFamily("Times New Roman", "times new roman,times"),
+                new FontFamily("Trebuchet MS", "trebuchet ms,geneva"),
+                new FontFamily("Verdana", "verdana,geneva"),
+                new FontFamily("Webdings", "webdings"),
+                new FontFamily("Wingdings", "wingdings,zapf dingbats")};
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractStatefulPlugin#init(Wysiwyg, RichTextArea, Config)
      */
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
@@ -106,7 +130,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#destroy()
+     * @see AbstractStatefulPlugin#destroy()
      */
     public void destroy()
     {
@@ -146,6 +170,9 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
         }
     }
 
+    /**
+     * Changes the font family for the current selection.
+     */
     public void onFamily()
     {
         if (families.isEnabled()) {
@@ -154,6 +181,9 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
         }
     }
 
+    /**
+     * Changes the font size for the current selection.
+     */
     public void onSize()
     {
         if (sizes.isEnabled()) {
@@ -195,6 +225,10 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
         }
     }
 
+    /**
+     * @param family a font family, as the value of the CSS {@code font-family} property
+     * @return the index of the {@link #FAMILIES} entry associated with the given font family
+     */
     private static int indexOfFamily(String family)
     {
         if (family == null) {

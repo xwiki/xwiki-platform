@@ -21,24 +21,52 @@ package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * Defines a cell in the {@link SymbolPalette} that can be selected by being clicked.
+ * 
+ * @version $Id$
+ */
 public class SymbolCell extends FlowPanel
 {
+    /**
+     * The CSS class name used when the symbol cell is not hovered.
+     */
+    public static final String NORMAL_STYLE_NAME = "symbolCell";
+
+    /**
+     * The CSS class name used when the symbol cell is hovered.
+     */
+    public static final String HOVERED_STYLE_NAME = "symbolCell-hover";
+
+    /**
+     * This cell's symbol.
+     */
     private final String symbol;
 
+    /**
+     * Flag indicating if this cell was clicked, thus selected.
+     */
     private boolean selected;
 
+    /**
+     * Creates a new symbol cell using the specified symbol.
+     * 
+     * @param symbol the symbol to put inside the new cell
+     */
     public SymbolCell(String symbol)
     {
         super();
 
         this.symbol = symbol;
         getElement().setInnerHTML(symbol);
-        addStyleName("symbolCell");
+        addStyleName(NORMAL_STYLE_NAME);
         sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
     }
 
+    /**
+     * @return {@link #symbol}
+     */
     public String getSymbol()
     {
         if (selected) {
@@ -49,25 +77,30 @@ public class SymbolCell extends FlowPanel
         }
     }
 
+    /**
+     * Sets the selected state of this symbol cell.
+     * 
+     * @param selected {@code true} to mark this cell as selected, {@code false} otherwise
+     */
     public void setSelected(boolean selected)
     {
         this.selected = selected;
         if (selected) {
-            removeStyleName("symbolCell-hover");
+            removeStyleName(HOVERED_STYLE_NAME);
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Widget#onBrowserEvent(Event)
+     * @see FlowPanel#onBrowserEvent(Event)
      */
     public void onBrowserEvent(Event event)
     {
         if (event.getTypeInt() == Event.ONMOUSEOVER) {
-            addStyleName("symbolCell-hover");
+            addStyleName(HOVERED_STYLE_NAME);
         } else if (event.getTypeInt() == Event.ONMOUSEOUT) {
-            removeStyleName("symbolCell-hover");
+            removeStyleName(HOVERED_STYLE_NAME);
         }
         super.onBrowserEvent(event);
     }

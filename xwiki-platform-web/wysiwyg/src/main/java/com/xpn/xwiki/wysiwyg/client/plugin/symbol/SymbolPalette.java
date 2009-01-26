@@ -28,14 +28,36 @@ import com.google.gwt.user.client.ui.SourcesClickEvents;
 import com.google.gwt.user.client.ui.SourcesTableEvents;
 import com.google.gwt.user.client.ui.TableListener;
 
+/**
+ * A set of symbols from which the user can choose one by clicking.
+ * 
+ * @version $Id$
+ */
 public class SymbolPalette extends Composite implements SourcesClickEvents, TableListener
 {
+    /**
+     * The list of click listeners that are notified whenever one of the symbols form the palette is clicked.
+     */
     private final ClickListenerCollection clickListeners = new ClickListenerCollection();
 
+    /**
+     * The selected cell in {@link #symbolGrid}.
+     */
     private SymbolCell selectedCell;
 
+    /**
+     * The symbol grid that makes up this palette.
+     */
     private final Grid symbolGrid;
 
+    /**
+     * Creates a new symbol palette using the given list of symbols to fill a symbol grid with the specified number of
+     * rows and columns.
+     * 
+     * @param symbols the list of symbols that are used to fill the symbol grid
+     * @param rows the number of rows in the symbol grid
+     * @param columns the number of columns in the symbol grid
+     */
     public SymbolPalette(Object[][] symbols, int rows, int columns)
     {
         symbolGrid = new Grid(columns, rows);
@@ -46,7 +68,8 @@ public class SymbolPalette extends Composite implements SourcesClickEvents, Tabl
         symbolGrid.addTableListener(this);
 
         SymbolCell charCell;
-        int j = 0, k = 0;
+        int j = 0;
+        int k = 0;
         for (int i = 0; i < symbols.length; i++) {
             if ((Boolean) symbols[i][2]) {
                 charCell = new SymbolCell(symbols[i][0].toString());
@@ -96,18 +119,27 @@ public class SymbolPalette extends Composite implements SourcesClickEvents, Tabl
         }
     }
 
+    /**
+     * Selects a symbol in the symbol grid by its row/column indexes.
+     * 
+     * @param row the row where the symbol is placed
+     * @param column the column where the symbol is placed
+     */
     private void setSelectedCell(int row, int column)
     {
-        SymbolCell selectedCell = (SymbolCell) symbolGrid.getWidget(row, column);
-        if (this.selectedCell != selectedCell) {
-            if (this.selectedCell != null) {
-                this.selectedCell.setSelected(false);
+        SymbolCell wantedCell = (SymbolCell) symbolGrid.getWidget(row, column);
+        if (selectedCell != wantedCell) {
+            if (selectedCell != null) {
+                selectedCell.setSelected(false);
             }
-            this.selectedCell = selectedCell;
-            this.selectedCell.setSelected(true);
+            selectedCell = wantedCell;
+            selectedCell.setSelected(true);
         }
     }
 
+    /**
+     * @return the symbol within the grid cell that was last clicked
+     */
     public String getSelectedSymbol()
     {
         if (selectedCell != null) {

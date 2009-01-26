@@ -27,16 +27,38 @@ import com.google.gwt.user.client.ui.SourcesClickEvents;
 import com.google.gwt.user.client.ui.SourcesTableEvents;
 import com.google.gwt.user.client.ui.TableListener;
 
+/**
+ * A set of colors from which the user can choose one by clicking.
+ * 
+ * @version $Id$
+ */
 public class ColorPalette extends Composite implements SourcesClickEvents, TableListener
 {
+    /**
+     * The list of click listeners that are notified whenever one of the colors form the palette is clicked.
+     */
     private final ClickListenerCollection clickListeners = new ClickListenerCollection();
 
+    /**
+     * The selected cell in the color grid that make up the palette.
+     */
     private ColorCell selectedCell;
 
+    /**
+     * The color grid that makes up the palette.
+     */
     private final Grid colorGrid;
 
+    /**
+     * The matrix of color codes used to fill the color grid.
+     */
     private final String[][] colors;
 
+    /**
+     * Creates a new color palette using the specified color codes to fill the color grid.
+     * 
+     * @param colors the matrix of color codes that are used to fill the color grid.
+     */
     public ColorPalette(String[][] colors)
     {
         colorGrid = new Grid(colors.length, colors[0].length);
@@ -89,18 +111,27 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
         }
     }
 
+    /**
+     * Selects a color in the color grid by its row/column indexes.
+     * 
+     * @param row the row where the color is placed
+     * @param column the column where the color is placed
+     */
     private void setSelectedCell(int row, int column)
     {
-        ColorCell selectedCell = (ColorCell) colorGrid.getWidget(row, column);
-        if (this.selectedCell != selectedCell) {
-            if (this.selectedCell != null) {
-                this.selectedCell.setSelected(false);
+        ColorCell wantedCell = (ColorCell) colorGrid.getWidget(row, column);
+        if (selectedCell != wantedCell) {
+            if (selectedCell != null) {
+                selectedCell.setSelected(false);
             }
-            this.selectedCell = selectedCell;
-            this.selectedCell.setSelected(true);
+            selectedCell = wantedCell;
+            selectedCell.setSelected(true);
         }
     }
 
+    /**
+     * @return the color code for the grid cell that was last clicked
+     */
     public String getSelectedColor()
     {
         if (selectedCell != null) {
@@ -110,6 +141,11 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
         }
     }
 
+    /**
+     * Selects a color in the color grid by its color code.
+     * 
+     * @param color the code of the color to be selected
+     */
     public void setSelectedColor(String color)
     {
         for (int i = 0; i < colors.length; i++) {

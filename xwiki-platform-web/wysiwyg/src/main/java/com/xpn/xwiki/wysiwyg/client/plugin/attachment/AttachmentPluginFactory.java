@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.attachment;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link AttachmentPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class AttachmentPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static AttachmentPluginFactory instance;
 
+    /**
+     * Default constructor.
+     */
     private AttachmentPluginFactory()
     {
         super("attachment");
     }
 
+    /**
+     * @return the singleton factory instance
+     */
     public static synchronized AttachmentPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class AttachmentPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

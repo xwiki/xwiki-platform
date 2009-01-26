@@ -20,19 +20,19 @@
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
-import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorTest;
+import com.xpn.xwiki.wysiwyg.client.syntax.AbstractSyntaxValidatorTest;
 
 /**
  * Unit test for {@link XWikiSyntaxValidator}.
  * 
  * @version $Id$
  */
-public class XWikiSyntaxValidatorTest extends SyntaxValidatorTest
+public class XWikiSyntaxValidatorTest extends AbstractSyntaxValidatorTest
 {
     /**
      * {@inheritDoc}
      * 
-     * @see SyntaxValidatorTest#newSyntaxValidator()
+     * @see AbstractSyntaxValidatorTest#newSyntaxValidator()
      */
     protected SyntaxValidator newSyntaxValidator()
     {

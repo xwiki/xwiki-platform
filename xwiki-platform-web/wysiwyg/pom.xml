@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
@@ -212,7 +213,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <dependentWarExcludes />
+          <dependentWarExcludes/>
           <archiveClasses>true</archiveClasses>
           <webResources>
             <resource>
@@ -237,6 +238,34 @@
             specify the JRE to be used when running the tests.
           -->
           <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>com.xpn.xwiki.platform.tools</groupId>
+            <artifactId>xwiki-verification-resources</artifactId>
+            <version>${platform.tool.verification.version}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <failsOnError>true</failsOnError>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <!-- New code should follow checkstyle rules -->
+          <excludes>com/xpn/xwiki/wysiwyg/client/diff/**/*,
+            com/xpn/xwiki/wysiwyg/client/sync/**/*, com/xpn/xwiki/wysiwyg/server/sync/**/*,
+            com/xpn/xwiki/wysiwyg/client/dom/DOMUtils.java, com/xpn/xwiki/wysiwyg/client/editor/Images.java,
+            com/xpn/xwiki/wysiwyg/client/editor/Strings.java, com/xpn/xwiki/wysiwyg/client/editor/WysiwygEditor.java,
+            com/xpn/xwiki/wysiwyg/client/plugin/image/exec/InsertImageExecutable.java,
+            com/xpn/xwiki/wysiwyg/client/plugin/image/ImageConfig.java,
+            com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
+            com/xpn/xwiki/wysiwyg/server/DefaultWysiwygService.java,
+            com/xpn/xwiki/wysiwyg/client/dom/DepthFirstPreOrderIteratorTest.java,
+            com/xpn/xwiki/wysiwyg/client/plugin/link/LinkMetaDataExtractorTest.java,
+            com/xpn/xwiki/wysiwyg/server/DefaultWysiwygServiceTest.java</excludes>
         </configuration>
       </plugin>
     </plugins>

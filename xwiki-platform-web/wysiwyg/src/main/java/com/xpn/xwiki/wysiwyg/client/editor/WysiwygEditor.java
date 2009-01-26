@@ -398,39 +398,39 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
      */
     private void fillToolBar()
     {
-        String[] toolBarFeatures = config.getParameter(TOOLBAR_ROLE, DEFAULT_TOOLBAR).split(WHITE_SPACE_SEPARATOR);
+        String[] toolBarFeatureNames = config.getParameter(TOOLBAR_ROLE, DEFAULT_TOOLBAR).split(WHITE_SPACE_SEPARATOR);
         boolean emptyGroup = true;
         boolean emptyLine = true;
         boolean uieNotFound = false;
         UIExtension verticalBar = null;
         UIExtension lineBreak = null;
-        this.toolBarFeatures = new HashMap<String, UIExtension>();
-        for (int i = 0; i < toolBarFeatures.length; i++) {
-            UIExtension uie = pm.getUIExtension(TOOLBAR_ROLE, toolBarFeatures[i]);
+        toolBarFeatures = new HashMap<String, UIExtension>();
+        for (int i = 0; i < toolBarFeatureNames.length; i++) {
+            UIExtension uie = pm.getUIExtension(TOOLBAR_ROLE, toolBarFeatureNames[i]);
             if (uie != null) {
-                if (ToolBarSeparator.VERTICAL_BAR.equals(toolBarFeatures[i])) {
+                if (ToolBarSeparator.VERTICAL_BAR.equals(toolBarFeatureNames[i])) {
                     if (emptyGroup && uieNotFound) {
                         continue;
                     } else {
                         if (verticalBar != null) {
                             ui.getToolbar().add((Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
-                            this.toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
+                            toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
                         } else if (lineBreak != null) {
                             ui.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
-                            this.toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
+                            toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                             lineBreak = null;
                         }
                         verticalBar = uie;
                         emptyGroup = true;
                         uieNotFound = false;
                     }
-                } else if (ToolBarSeparator.LINE_BREAK.equals(toolBarFeatures[i])) {
+                } else if (ToolBarSeparator.LINE_BREAK.equals(toolBarFeatureNames[i])) {
                     if (emptyLine && uieNotFound) {
                         continue;
                     } else {
                         if (lineBreak != null) {
                             ui.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
-                            this.toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
+                            toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                         }
                         lineBreak = uie;
                         verticalBar = null;
@@ -441,15 +441,15 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
                 } else {
                     if (verticalBar != null) {
                         ui.getToolbar().add((Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
-                        this.toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
+                        toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
                         verticalBar = null;
                     } else if (lineBreak != null) {
                         ui.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
-                        this.toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
+                        toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                         lineBreak = null;
                     }
-                    ui.getToolbar().add((Widget) uie.getUIObject(toolBarFeatures[i]));
-                    this.toolBarFeatures.put(toolBarFeatures[i], uie);
+                    ui.getToolbar().add((Widget) uie.getUIObject(toolBarFeatureNames[i]));
+                    toolBarFeatures.put(toolBarFeatureNames[i], uie);
                     emptyGroup = false;
                     emptyLine = false;
                 }

@@ -27,7 +27,7 @@ import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
  * 
  * @version $Id$
  */
-public abstract class UIExtensionTest extends AbstractWysiwygClientTest
+public abstract class AbstractUIExtensionTest extends AbstractWysiwygClientTest
 {
     /**
      * @return A new instance of the concrete {@link UIExtension} being tested.

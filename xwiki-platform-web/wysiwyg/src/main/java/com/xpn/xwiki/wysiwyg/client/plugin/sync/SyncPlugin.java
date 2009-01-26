@@ -46,6 +46,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncTools;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.Console;
 import com.xpn.xwiki.wysiwyg.client.util.Timer;
 import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
@@ -321,10 +322,11 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
 
     }
 
-    public void debugMessage(String text) {
-        WysiwygEditorDebugger debugger = getWysiwyg().getWysiwygEditorDebugger();
-        if (debugger!=null)
-         debugger.debugMessage(text);
+    public void debugMessage(String text)
+    {
+        if ("true".equals(getConfig().getParameter("debug", "false"))) {
+            Console.getInstance().info(text);
+        }
     }
 
 

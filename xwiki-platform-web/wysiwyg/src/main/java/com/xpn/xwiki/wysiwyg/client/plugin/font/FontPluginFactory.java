@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.font;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link FontPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class FontPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static FontPluginFactory instance;
 
+    /**
+     * Default constructor.
+     */
     private FontPluginFactory()
     {
         super("font");
     }
 
+    /**
+     * @return the singleton factory instance
+     */
     public static synchronized FontPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class FontPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

@@ -20,19 +20,19 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginManagerTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.AbstractPluginManagerTest;
 
 /**
  * Unit tests for {@link DefaultPluginManager}.
  * 
  * @version $Id$
  */
-public class DefaultPluginManagerTest extends PluginManagerTest
+public class DefaultPluginManagerTest extends AbstractPluginManagerTest
 {
     /**
      * {@inheritDoc}
      * 
-     * @see PluginManagerTest#newPluginManager()
+     * @see AbstractPluginManagerTest#newPluginManager()
      */
     protected PluginManager newPluginManager()
     {

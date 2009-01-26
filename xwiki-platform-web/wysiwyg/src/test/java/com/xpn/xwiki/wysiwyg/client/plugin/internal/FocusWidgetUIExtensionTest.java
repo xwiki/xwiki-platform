@@ -23,14 +23,14 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
-import com.xpn.xwiki.wysiwyg.client.plugin.UIExtensionTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.AbstractUIExtensionTest;
 
 /**
  * Unit tests for {@link FocusWidgetUIExtension}.
  * 
  * @version $Id$
  */
-public class FocusWidgetUIExtensionTest extends UIExtensionTest
+public class FocusWidgetUIExtensionTest extends AbstractUIExtensionTest
 {
     /**
      * {@inheritDoc}

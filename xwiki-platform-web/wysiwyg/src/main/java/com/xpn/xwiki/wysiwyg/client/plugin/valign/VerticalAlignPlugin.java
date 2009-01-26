@@ -24,9 +24,7 @@ import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -34,25 +32,36 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link RichTextEditor} plug-in for making text superscript or subscript. It installs two toggle buttons on the tool
- * bar and updates their status depending on the current cursor position and the direction of the navigation using the
- * arrow keys. For instance, if you navigate from a subscript region to a superscript one and you type a character it
- * will be subscript.<br/>
+ * Plug-in for making text superscript or subscript. It installs two toggle buttons on the tool bar and updates their
+ * status depending on the current cursor position and the direction of the navigation using the arrow keys. For
+ * instance, if you navigate from a subscript region to a superscript one and you type a character it will be subscript.
+ * <p>
  * <b>Known issues:</b> When you navigate backwards, from right to left, using the arrow keys, the status of the toggle
  * buttons is not synchronized with the text area. The text area behaves properly though.
+ * 
+ * @version $Id$
  */
 public class VerticalAlignPlugin extends AbstractStatefulPlugin implements ClickListener
 {
+    /**
+     * The tool bar button that toggles the superscript style.
+     */
     private ToggleButton superScript;
 
+    /**
+     * The tool bar button that toggles the subscript style.
+     */
     private ToggleButton subScript;
 
+    /**
+     * User interface extension for the editor tool bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractStatefulPlugin#init(Wysiwyg, RichTextArea, Config)
      */
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
@@ -81,7 +90,7 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#destroy()
+     * @see AbstractStatefulPlugin#destroy()
      */
     public void destroy()
     {
@@ -121,6 +130,9 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
         }
     }
 
+    /**
+     * Toggles superscript style.
+     */
     public void onSuperScript()
     {
         if (superScript.isEnabled()) {
@@ -128,6 +140,9 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
         }
     }
 
+    /**
+     * Toggles subscript style.
+     */
     public void onSubScript()
     {
         if (subScript.isEnabled()) {

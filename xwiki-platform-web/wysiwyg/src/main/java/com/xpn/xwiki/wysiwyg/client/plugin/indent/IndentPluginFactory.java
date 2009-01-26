@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.indent;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link IndentPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class IndentPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static IndentPluginFactory instance;
 
+    /**
+     * Default constructor.
+     */
     private IndentPluginFactory()
     {
         super("indent");
     }
 
+    /**
+     * @return the singleton factory instance
+     */
     public static synchronized IndentPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class IndentPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

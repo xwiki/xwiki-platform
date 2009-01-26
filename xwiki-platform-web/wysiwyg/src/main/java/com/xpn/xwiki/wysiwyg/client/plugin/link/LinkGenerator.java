@@ -61,8 +61,7 @@ public final class LinkGenerator
      */
     public String getExternalLink(String label, String externalURL)
     {
-        return "<!--startwikilink:" + externalURL + "--><span class=\"wikiexternallink\"><a href=\"" + externalURL
-            + "\">" + label + "</a></span><!--stopwikilink-->";
+        return createLinkHTML(externalURL, "wikiexternallink", externalURL, label);
     }
 
     /**
@@ -72,7 +71,7 @@ public final class LinkGenerator
      * @param wikiName wiki of the targeted page
      * @param spaceName space of the targeted page
      * @param pageName name of the targeted page
-     * @param async callback to handle async call on the caller side 
+     * @param async callback to handle async call on the caller side
      * @return the html link block.
      */
     public String getNewPageLink(final String label, final String wikiName, final String spaceName,
@@ -89,9 +88,7 @@ public final class LinkGenerator
                 public void onSuccess(String result)
                 {
                     String link =
-                        "<!--startwikilink:" + getWikiPageReference(result, wikiName) + "-->"
-                            + "<span class=\"wikicreatelink\"><a href=\"" + result + "\">" + label
-                            + "</a></span><!--stopwikilink-->";
+                        createLinkHTML(getWikiPageReference(result, wikiName), "wikicreatelink", result, label);
                     async.onSuccess(link);
                 }
             });
@@ -124,10 +121,7 @@ public final class LinkGenerator
 
                 public void onSuccess(String result)
                 {
-                    String link =
-                        "<!--startwikilink:" + getWikiPageReference(result, wikiName) + "-->"
-                            + "<span class=\"wikilink\"><a href=\"" + result + "\">" + label
-                            + "</a></span><!--stopwikilink-->";
+                    String link = createLinkHTML(getWikiPageReference(result, wikiName), "wikilink", result, label);
                     async.onSuccess(link);
                 }
             });
@@ -170,7 +164,20 @@ public final class LinkGenerator
             spaceName = "Main";
         }
 
-        return (wikiName != null && wikiName.length() > 0) ? wikiName + ":" + spaceName + "." + pageName + params
-            : spaceName + "." + pageName + params;
+        return ((wikiName != null && wikiName.length() > 0) ? wikiName + ":" : "") + spaceName + "." + pageName
+            + params;
+    }
+
+    /**
+     * @param linkReference the reference of the link to create
+     * @param wrappingSpanClassName the value of the class attribute of the wrapping span
+     * @param anchorHref the href of the link anchor
+     * @param label the label of the created link
+     * @return the link html, created for the specified parameters.
+     */
+    private String createLinkHTML(String linkReference, String wrappingSpanClassName, String anchorHref, String label)
+    {
+        return "<!--startwikilink:" + linkReference + "--><span class=\"" + wrappingSpanClassName + "\"><a href=\""
+            + anchorHref + "\">" + label + "</a></span><!--stopwikilink-->";
     }
 }

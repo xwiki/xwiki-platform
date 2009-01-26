@@ -30,10 +30,21 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
+/**
+ * Plug-in for managing attachments.
+ * 
+ * @version $Id$
+ */
 public class AttachmentPlugin extends AbstractPlugin implements ClickListener
 {
+    /**
+     * The tool bar button that opens the attachments dialog.
+     */
     private PushButton attachment;
 
+    /**
+     * User interface extension for the editor tool bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
@@ -80,6 +91,9 @@ public class AttachmentPlugin extends AbstractPlugin implements ClickListener
         }
     }
 
+    /**
+     * Opens the attachments dialog and inserts an attachment link.
+     */
     public void onAttachment()
     {
         // TODO

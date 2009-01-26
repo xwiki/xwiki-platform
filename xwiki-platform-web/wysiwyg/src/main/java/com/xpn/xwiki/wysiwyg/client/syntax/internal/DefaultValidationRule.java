@@ -26,13 +26,37 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 /**
  * Validation rule for text area's commands. Verifies if a specific command can be executed on the current state of the
  * given text area.
+ * 
+ * @version $Id$
  */
 public class DefaultValidationRule implements ValidationRule
 {
+    /**
+     * The constrained feature.
+     */
     private final String feature;
 
+    /**
+     * The command associated with {@link #feature}, used for determining the disabling state of the {@link #feature}.
+     */
     private final Command command;
 
+    /**
+     * Creates a constraint for the given feature based on a command with the same name.
+     * 
+     * @param feature the feature to be constrained
+     */
+    public DefaultValidationRule(String feature)
+    {
+        this(feature, new Command(feature));
+    }
+
+    /**
+     * Creates a constraint for the given feature based on its associated command.
+     * 
+     * @param feature the feature to be constrained
+     * @param command the command used for determining the disabling state of the given feature
+     */
     public DefaultValidationRule(String feature, Command command)
     {
         this.feature = feature;

@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.valign;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link VerticalAlignPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class VerticalAlignPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static VerticalAlignPluginFactory instance;
 
+    /**
+     * Default constructor.
+     */
     private VerticalAlignPluginFactory()
     {
         super("valign");
     }
 
+    /**
+     * @return the singleton factory instance
+     */
     public static synchronized VerticalAlignPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class VerticalAlignPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

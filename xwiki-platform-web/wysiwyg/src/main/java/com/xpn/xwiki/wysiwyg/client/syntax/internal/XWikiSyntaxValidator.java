@@ -19,14 +19,20 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
+import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableBlockElementsInTable;
 import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableIndentOutsideList;
 import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableListInHeader;
 
 /**
  * Validator for the <em>xwiki/2.0</em> syntax.
+ * 
+ * @version $Id$
  */
 public class XWikiSyntaxValidator extends DefaultSyntaxValidator
 {
+    /**
+     * Default constructor.
+     */
     public XWikiSyntaxValidator()
     {
         super("xwiki/2.0");
@@ -35,5 +41,7 @@ public class XWikiSyntaxValidator extends DefaultSyntaxValidator
         addValidationRule(new DisablingRule(new String[] {"justifyfull"}));
         addValidationRule(new DisableListInHeader());
         addValidationRule(new DisableIndentOutsideList());
+        // FIXME : find a generic way of disabling inline/block/both elements on some identified elements
+        addValidationRule(new DisableBlockElementsInTable());
     }
 }

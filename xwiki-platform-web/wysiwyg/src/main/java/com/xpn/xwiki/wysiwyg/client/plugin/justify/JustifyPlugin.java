@@ -24,9 +24,7 @@ import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -34,26 +32,43 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link RichTextEditor} plug-in for justifying text. It can be used to align text to the left, to the right, in center
- * or to make it expand to fill the entire line. It installs four toggle buttons on the tool bar and updates their
- * status depending on the current cursor position.
+ * Plug-in for justifying text. It can be used to align text to the left, to the right, in center or to make it expand
+ * to fill the entire line. It installs four toggle buttons on the tool bar and updates their status depending on the
+ * current cursor position.
+ * 
+ * @version $Id$
  */
 public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListener
 {
+    /**
+     * The tool bar button that toggles justify left.
+     */
     private ToggleButton left;
 
+    /**
+     * The tool bar button that toggles justify center.
+     */
     private ToggleButton center;
 
+    /**
+     * The tool bar button that toggles justify right.
+     */
     private ToggleButton right;
 
+    /**
+     * The tool bar button that toggles justify full.
+     */
     private ToggleButton full;
 
+    /**
+     * User interface extension for the editor tool bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractStatefulPlugin#init(Wysiwyg, RichTextArea, Config)
      */
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
@@ -94,7 +109,7 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#destroy()
+     * @see AbstractStatefulPlugin#destroy()
      */
     public void destroy()
     {
@@ -150,6 +165,9 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
         }
     }
 
+    /**
+     * Toggles justify left.
+     */
     public void onJustifyLeft()
     {
         if (left.isEnabled()) {
@@ -157,6 +175,9 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
         }
     }
 
+    /**
+     * Toggles justify center.
+     */
     public void onJustifyCenter()
     {
         if (center.isEnabled()) {
@@ -164,6 +185,9 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
         }
     }
 
+    /**
+     * Toggles justify right.
+     */
     public void onJustifyRight()
     {
         if (right.isEnabled()) {
@@ -171,6 +195,9 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
         }
     }
 
+    /**
+     * Toggles justify full.
+     */
     public void onJustifyFull()
     {
         if (full.isEnabled()) {

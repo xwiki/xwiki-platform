@@ -25,9 +25,7 @@ import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -37,37 +35,66 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link RichTextEditor} plug-in for making text bold, italic, underline or strike through. It installs four toggle
- * buttons on the tool bar and updates their status depending on the current cursor position and the direction of the
- * navigation using the arrow keys. For instance, if you navigate from a bold region to an italic one and you type a
- * character it will be bold.<br/>
+ * Plug-in for making text bold, italic, underline or strike through. It installs four toggle buttons on the tool bar
+ * and updates their status depending on the current cursor position and the direction of the navigation using the arrow
+ * keys. For instance, if you navigate from a bold region to an italic one and you type a character it will be bold.
+ * <p>
  * <b>Known issues:</b> When you navigate backwards, from right to left, using the arrow keys, the status of the toggle
  * buttons is not synchronized with the text area. The text area behaves properly though.
+ * 
+ * @version $Id$
  */
 public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
 {
+    /**
+     * The tool bar button that toggles the bold style.
+     */
     private ToggleButton bold;
 
+    /**
+     * The shortcut key that toggles the bold style.
+     */
     private ShortcutKey boldKey;
 
+    /**
+     * The tool bar button that toggles the italic style.
+     */
     private ToggleButton italic;
 
+    /**
+     * The shortcut key that toggles the italic style.
+     */
     private ShortcutKey italicKey;
 
+    /**
+     * The tool bar button that toggles the underline style.
+     */
     private ToggleButton underline;
 
+    /**
+     * The shortcut key that toggles the underline style.
+     */
     private ShortcutKey underlineKey;
 
+    /**
+     * The tool bar button that toggles the strike through style.
+     */
     private ToggleButton strikeThrough;
 
+    /**
+     * The tool bar button that toggles the teletype style.
+     */
     private ToggleButton teletype;
 
+    /**
+     * User interface extension for the editor tool bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractStatefulPlugin#init(Wysiwyg, RichTextArea, Config)
      */
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
@@ -120,7 +147,7 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#destroy()
+     * @see AbstractStatefulPlugin#destroy()
      */
     public void destroy()
     {
@@ -211,6 +238,9 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
         }
     }
 
+    /**
+     * Toggles bold style.
+     */
     public void onBold()
     {
         if (bold.isEnabled()) {
@@ -218,6 +248,9 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
         }
     }
 
+    /**
+     * Toggles italic style.
+     */
     public void onItalic()
     {
         if (italic.isEnabled()) {
@@ -225,6 +258,9 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
         }
     }
 
+    /**
+     * Toggles underline style.
+     */
     public void onUnderline()
     {
         if (underline.isEnabled()) {
@@ -232,6 +268,9 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
         }
     }
 
+    /**
+     * Toggles strike through style.
+     */
     public void onStrikeThrough()
     {
         if (strikeThrough.isEnabled()) {
@@ -239,6 +278,9 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
         }
     }
 
+    /**
+     * Toggles teletype style.
+     */
     public void onTeletype()
     {
         if (teletype.isEnabled()) {

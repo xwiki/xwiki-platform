@@ -20,18 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.text;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
+/**
+ * Factory for {@link TextPlugin}.
+ * 
+ * @version $Id$
+ */
 public final class TextPluginFactory extends AbstractPluginFactory
 {
+    /**
+     * The singleton factory instance.
+     */
     private static TextPluginFactory instance;
 
+    /**
+     * Default constructor.
+     */
     private TextPluginFactory()
     {
         super("text");
     }
 
+    /**
+     * @return the singleton factory instance
+     */
     public static synchronized TextPluginFactory getInstance()
     {
         if (instance == null) {
@@ -43,7 +56,7 @@ public final class TextPluginFactory extends AbstractPluginFactory
     /**
      * {@inheritDoc}
      * 
-     * @see PluginFactory#newInstance()
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {

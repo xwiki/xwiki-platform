@@ -24,9 +24,7 @@ import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.RichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -34,21 +32,32 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * {@link RichTextEditor} plug-in for inserting ordered (numbered) and unordered (bullet) lists. It installs two toggle
- * buttons on the tool bar and updates their status depending on the current cursor position.
+ * Plug-in for inserting ordered (numbered) and unordered (bullet) lists. It installs two toggle buttons on the tool bar
+ * and updates their status depending on the current cursor position.
+ * 
+ * @version $Id$
  */
 public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
 {
+    /**
+     * The tool bar button that toggles the order list.
+     */
     private ToggleButton ol;
 
+    /**
+     * The tool bar button that toggles the unordered list.
+     */
     private ToggleButton ul;
 
+    /**
+     * User interface extension for the editor menu bar.
+     */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractStatefulPlugin#init(Wysiwyg, RichTextArea, Config)
      */
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
@@ -77,7 +86,7 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#destroy()
+     * @see AbstractStatefulPlugin#destroy()
      */
     public void destroy()
     {
@@ -117,6 +126,9 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
         }
     }
 
+    /**
+     * Toggles the ordered list.
+     */
     public void onOrderedList()
     {
         if (ol.isEnabled()) {
@@ -124,6 +136,9 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
         }
     }
 
+    /**
+     * Toggles the unordered list.
+     */
     public void onUnorderedList()
     {
         if (ul.isEnabled()) {

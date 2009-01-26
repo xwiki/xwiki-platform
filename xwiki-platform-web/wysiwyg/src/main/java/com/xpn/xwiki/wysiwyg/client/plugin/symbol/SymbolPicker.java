@@ -24,10 +24,17 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 
+/**
+ * A popup panel which allows you to pick a symbol from a symbol palette by clicking on that symbol.
+ * 
+ * @version $Id$
+ */
 public class SymbolPicker extends CompositeDialogBox implements ClickListener
 {
-    public final static Object[][] SYMBOLS =
-        {
+    /**
+     * The default list of symbols.
+     */
+    public static final Object[][] SYMBOLS = {
         {"&nbsp;", "&#160;", true, "no-break space"},
         {"&amp;", "&#38;", true, "ampersand"},
         {"&quot;", "&#34;", true, "quotation mark"},
@@ -289,12 +296,24 @@ public class SymbolPicker extends CompositeDialogBox implements ClickListener
         {"&rlm;", "&#8207;", false, "right-to-left mark"}, 
         {"&shy;", "&#173;", false, "soft hyphen"}};
 
+    /**
+     * The default number of rows in the grid that makes up the symbol palette.
+     */
+    private static final int SYMBOLS_PER_ROW = 20;
+
+    /**
+     * The default number of columns in the grid that makes up the symbol palette.
+     */
+    private static final int SYMBOLS_PER_COL = 10;
+
+    /**
+     * The symbol palette used for picking the symbol.
+     */
     private final SymbolPalette symbolPalette;
 
-    private final static int SYMBOLS_PER_ROW = 20;
-
-    private final static int SYMBOLS_PER_COL = 10;
-
+    /**
+     * Creates a new symbol picker using the default list of symbols.
+     */
     public SymbolPicker()
     {
         super(false, true);
@@ -320,6 +339,9 @@ public class SymbolPicker extends CompositeDialogBox implements ClickListener
         }
     }
 
+    /**
+     * @return the selected symbol
+     */
     public String getSymbol()
     {
         return symbolPalette.getSelectedSymbol();

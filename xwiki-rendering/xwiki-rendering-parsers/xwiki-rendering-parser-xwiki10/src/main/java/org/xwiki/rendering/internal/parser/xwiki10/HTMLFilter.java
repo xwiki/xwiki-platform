@@ -101,9 +101,11 @@ public class HTMLFilter extends AbstractFilter
                     if (!htmlMacroInVelocityMacro && nbVOpen > 0) {
                         VelocityFilter.appendVelocityOpen(result, filterContext);
                     }
-                    appendHTMLOpen(result, filterContext);
-                    result.append(htmlContent);
-                    appendHTMLClose(result, filterContext);
+                    if (htmlContent.length() > 0) {
+                        appendHTMLOpen(result, filterContext);
+                        result.append(htmlContent);
+                        appendHTMLClose(result, filterContext);
+                    }
                     result.append(StringEscapeUtils.unescapeHtml(nonHtmlContentWithVelocity.toString()));
                     if (nbVCloseInHTML > nbVOpenInHTML) {
                         VelocityFilter.appendVelocityClose(result, filterContext);

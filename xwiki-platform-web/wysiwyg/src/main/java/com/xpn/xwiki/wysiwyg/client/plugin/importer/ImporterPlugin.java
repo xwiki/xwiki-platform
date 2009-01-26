@@ -132,7 +132,10 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
             if (importerDialog.isFilterStyles()) {
                 params.put("filterStyles", "strict");
             }
-            // For Office2007
+            // For Office2007: Office2007 generates an xhtml document (when copied) which has attributes and tags of
+            // several namespaces. But the document itself doesn't contain the namespace definitions, which causes
+            // the HTMLCleaner (the DomSerializer) to fail while performing it's operations. As a workaround we force
+            // HTMLCleaner to avoid parsing of namespace information.  
             params.put("namespacesAware", "false");
             WysiwygService.Singleton.getInstance().cleanOfficeHTML(inputHtml, "wysiwyg", params, this);            
         }

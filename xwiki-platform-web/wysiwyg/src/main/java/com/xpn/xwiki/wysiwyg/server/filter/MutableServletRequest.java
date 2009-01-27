@@ -35,55 +35,63 @@ public interface MutableServletRequest extends ServletRequest
     /**
      * Sets the value of a request parameter.
      * 
-     * @param name The name of the request parameter.
-     * @param value The new value of the request parameter.
-     * @return The old value of the specified request parameter, or <code>null</code> if this is the first time we set
-     *         its value.
+     * @param name the name of the request parameter
+     * @param value the new value of the request parameter
+     * @return the old value of the specified request parameter, or {@code null} if this is the first time we set its
+     *         value
      */
     String setParameter(String name, String value);
 
     /**
      * Sets the values of a request parameter.
      * 
-     * @param name The name of the request parameter.
-     * @param values The new array of values for the specified request parameter.
-     * @return The old values of the specified request parameter, or <code>null</code> if this is the first time we set
-     *         its values.
+     * @param name the name of the request parameter
+     * @param values the new array of values for the specified request parameter
+     * @return the old values of the specified request parameter, or {@code null} if this is the first time we set its
+     *         values
      */
     String[] setParameterValues(String name, String[] values);
+
+    /**
+     * Removes the request parameter with the specified name.
+     * 
+     * @param name a string representing the name of the request parameter to be removed
+     * @return the old value of the specified request parameter, or {@code null} if it wasn't set
+     */
+    String removeParameter(String name);
 
     /**
      * Redirects this request to the specified URL. We had to add this method since there's no generic way to redirect a
      * {@link ServletRequest}.
      * 
-     * @param response The response object used to redirect.
-     * @param url The location where to redirect.
-     * @throws IOException if the redirect fails.
+     * @param response the response object used to redirect
+     * @param url the location where to redirect
+     * @throws IOException if the redirect fails
      */
     void sendRedirect(ServletResponse response, String url) throws IOException;
 
     /**
-     * @return The URL of the requester.
+     * @return the URL of the requester
      */
     String getReferer();
 
     /**
-     * @param attrName The name of the session attribute whose value should be retrieved.
-     * @return The value of the specified session attribute.
+     * @param attrName the name of the session attribute whose value should be retrieved
+     * @return the value of the specified session attribute
      */
     Object getSessionAttribute(String attrName);
 
     /**
      * Sets the value of a session attribute.
      * 
-     * @param attrName The name of the session attribute.
-     * @param attrValue The value to be set.
-     * @return The previous value of the specified session attribute.
+     * @param attrName the name of the session attribute
+     * @param attrValue the value to be set
+     * @return the previous value of the specified session attribute
      */
     Object setSessionAttribute(String attrName, Object attrValue);
 
     /**
-     * @return The request object wrapped by this object.
+     * @return the request object wrapped by this object
      */
     ServletRequest getRequest();
 }

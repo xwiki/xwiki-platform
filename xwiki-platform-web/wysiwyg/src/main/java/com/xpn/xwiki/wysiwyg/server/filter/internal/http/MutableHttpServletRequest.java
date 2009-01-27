@@ -81,6 +81,17 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
     /**
      * {@inheritDoc}
      * 
+     * @see MutableServletRequest#removeParameter(String)
+     */
+    public String removeParameter(String name)
+    {
+        String[] previousValues = params.remove(name);
+        return (previousValues == null || previousValues.length == 0) ? null : previousValues[0];
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see HttpServletRequestWrapper#getParameter(String)
      */
     public String getParameter(String name)

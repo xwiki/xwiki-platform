@@ -18,7 +18,7 @@
     #set( $stylenb = $stylenb + 1 )
   #end
 #end
-<link href="${request.contextPath}/yui/treeview/assets/tree.css" rel="stylesheet" type="text/css"/>
+<link href="$xwiki.getSkinFile("js/yui/treeview/assets/tree.css")" rel="stylesheet" type="text/css"/>
 <link href="$xwiki.getSkinFile("css/lightbox/lightbox.css", true)" rel="stylesheet" type="text/css" />
 <!--[if IE]>
   <link href="$xwiki.getSkinFile("css/lightbox/lightboxIE.css", true)" rel="stylesheet" type="text/css" />

@@ -1,8 +1,8 @@
 <script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
-<script type="text/javascript" src="${request.contextPath}/prototype.js"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("scriptaculous/scriptaculous.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("accordion/accordion.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("browserdetect.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("chwScripts.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("scripts/table/tablefilterNsort.js", true)"></script>

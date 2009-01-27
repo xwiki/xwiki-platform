@@ -321,7 +321,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (forceSkinAction) {
             addAction(newpath, "skin", context);
         }
-        newpath.append("resources/");
+        newpath.append("resources");
         addFileName(newpath, filename, false, context);
         try {
             return new URL(getServerURL(context), newpath.toString());

@@ -59,6 +59,13 @@ public class ConversionFilter implements Filter
     private static final Log LOG = LogFactory.getLog(ConversionFilter.class);
 
     /**
+     * The name of the request parameter holding the list of WYSIWYG editor names. Each WYSIWYG editor has its own name
+     * which is also a request parameter holding the content of that editor. The name of a WYSIWYG editor is also used
+     * as a prefix for other request parameters like syntax.
+     */
+    private static final String WYSIWYG_NAME = "wysiwyg";
+
+    /**
      * The name of the session attribute holding the map with the data that is about to be displayed in different
      * WYSIWYG editors. An editor gets the key to its data through configuration. A key is a random string. Each data
      * should be removed from the map after it is displayed.<br/>
@@ -91,11 +98,13 @@ public class ConversionFilter implements Filter
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
         ServletException
     {
-        String[] wysiwygNames = req.getParameterValues("wysiwyg");
+        String[] wysiwygNames = req.getParameterValues(WYSIWYG_NAME);
         if (wysiwygNames != null) {
             MutableServletRequestFactory mreqFactory =
                 (MutableServletRequestFactory) Utils.getComponent(MutableServletRequestFactory.ROLE, req.getProtocol());
             MutableServletRequest mreq = mreqFactory.newInstance(req);
+            // Remove the list of WYSIWYG names from this request to avoid recurrency.
+            mreq.removeParameter(WYSIWYG_NAME);
             Throwable[] errors = new Throwable[wysiwygNames.length];
             boolean sendBack = false;
             for (int i = 0; i < wysiwygNames.length; i++) {
@@ -103,7 +112,8 @@ public class ConversionFilter implements Filter
                 if (StringUtils.isEmpty(wysiwygName)) {
                     continue;
                 }
-                String syntax = req.getParameter(wysiwygName + "_syntax");
+                // Remove the syntax parameter from this request to avoid interference with further request processing.
+                String syntax = mreq.removeParameter(wysiwygName + "_syntax");
                 try {
                     HTMLCleaner cleaner = (HTMLCleaner) Utils.getComponent(HTMLCleaner.ROLE);
                     HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax);

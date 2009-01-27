@@ -1782,7 +1782,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
             }
 
-            // Look for a filesystem file
+            // Look for a skin file
             String path = "/skins/" + skin + "/" + filename;
             if (resourceExists(path)) {
                 URL url;
@@ -1794,6 +1794,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
                 return urlf.getURL(url, context);
             }
+            
+            // Look for a resource file
+            path = "/resources/" + filename;
+            if (resourceExists(path)) {
+                URL url;
+                url = urlf.createResourceURL(filename, forceSkinAction, context);                
+                return urlf.getURL(url, context);
+            }
+            
         } catch (Exception e) {
         }
 

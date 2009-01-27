@@ -46,13 +46,15 @@ public interface XWikiURLFactory
         XWikiContext context);
 
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
-        String xwikidb, XWikiContext context);
+        String xwikidb, XWikiContext context);       
 
     public URL createSkinURL(String filename, String skin, XWikiContext context);
 
     public URL createSkinURL(String filename, String web, String name, XWikiContext context);
 
     public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context);
+    
+    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
     public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         XWikiContext context);

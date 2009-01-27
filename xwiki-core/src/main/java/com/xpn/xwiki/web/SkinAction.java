@@ -60,6 +60,9 @@ public class SkinAction extends XWikiAction
 
     /** The directory where the skins are placed in the webapp. */
     private static final String SKINS_DIRECTORY = "skins";
+    
+    /** The directory where resources are placed in the webapp. */
+    private static final String RESOURCES_DIRECTORY = "resources";
 
     /** The encoding to use when reading text resources from the filesystem and when sending css/javascript responses. */
     private static final String ENCODING = "UTF-8";
@@ -120,11 +123,17 @@ public class SkinAction extends XWikiAction
                 if (!(doc.getName().equals(defaultbaseskin) || baseskin.equals(defaultbaseskin))) {
                     // defaultbaseskin can only be on the filesystem, so don't try to use it as a
                     // skin document.
-                    if (renderSkinFromFilesystem(filename, defaultbaseskin, context)) {
+                    if (renderFileFromFilesystem(getSkinFilePath(filename, defaultbaseskin), context)) {
                         found = true;
                         break;
                     }
                 }
+
+                // Try in the resources directory.
+                if (renderFileFromFilesystem(filename, context)) {
+                    found = true;
+                    break;
+                }                                                
             } catch (XWikiException ex) {
                 if (ex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
                     // This means that the response couldn't be sent, although the file was
@@ -140,6 +149,27 @@ public class SkinAction extends XWikiAction
             return "docdoesnotexist";
         }
         return null;
+    }
+    
+    /**
+     * Get the path for the given skin file in the given skin.
+     * 
+     * @param filename Name of the file.
+     * @param skin Name of the skin to search in.
+     */
+    public String getSkinFilePath(String filename, String skin)
+    {
+        return DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename;
+    }
+    
+    /**
+     * Get the path for the given file in resources.
+     * 
+     * @param filename Name of the file.
+     */
+    public String getResourceFilePath(String filename)
+    {
+        return DELIMITER + RESOURCES_DIRECTORY + DELIMITER + filename;
     }
 
     /**
@@ -171,37 +201,36 @@ public class SkinAction extends XWikiAction
             } else {
                 return renderFileFromObjectField(filename, doc, context)
                     || renderFileFromAttachment(filename, doc, context)
-                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderSkinFromFilesystem(filename, doc.getName(),
+                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()),
                         context));
             }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response:", e);
-        }
-
-        return renderSkinFromFilesystem(filename, doc.getName(), context);
+        }        
+        
+        return renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()), context);
     }
 
     /**
-     * Tries to serve a skin file from the filesystem.
+     * Tries to serve a file from the filesystem.
      * 
-     * @param filename The name of the skin file that should be rendered.
-     * @param skin The skin name, it should be a subdirectory in &lt;webapp-root&gt;/skins/
+     * @param path Path of the file that should be rendered.
      * @param context The current {@link XWikiContext request context}.
      * @return <tt>true</tt> if the file was found and its content was successfully sent.
      * @throws XWikiException If the response cannot be sent.
      */
-    private boolean renderSkinFromFilesystem(String filename, String skin, XWikiContext context) throws XWikiException
+    private boolean renderFileFromFilesystem(String path, XWikiContext context) throws XWikiException
     {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Rendering filesystem file '" + filename + "' from the '" + skin + "' skin directory");
+            LOG.debug("Rendering filesystem file from path [" + path + "]");
         }
-        XWikiResponse response = context.getResponse();
-        String path = DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename;
+        XWikiResponse response = context.getResponse();        
         try {
             byte[] data;
             data = context.getWiki().getResourceContentAsBytes(path);
             if (data != null && data.length > 0) {
+                String filename = path.substring(path.lastIndexOf("/") + 1, path.length());
                 String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
                 Date modified = null;
                 if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {

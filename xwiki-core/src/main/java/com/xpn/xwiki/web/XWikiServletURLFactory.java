@@ -314,6 +314,22 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             return null;
         }
     }
+    
+    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
+    {
+        StringBuffer newpath = new StringBuffer(this.contextPath);
+        if (forceSkinAction) {
+            addAction(newpath, "skin", context);
+        }
+        newpath.append("resources/");
+        addFileName(newpath, filename, false, context);
+        try {
+            return new URL(getServerURL(context), newpath.toString());
+        } catch (MalformedURLException e) {
+            // This should not happen
+            return null;
+        }
+    }
 
     public URL createTemplateURL(String filename, XWikiContext context)
     {

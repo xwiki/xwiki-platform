@@ -165,8 +165,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-
-        if (!this.blockListener.isInChildLink()) {
+        // The links in a top level link label are not rendered as link (only the label is printed) 
+        if (this.blockListener.getLinkDepth() > 1) {
             this.linkBlocksPrinter.flush();
             String content = this.linkBlocksPrinter.toString();
             popPrinter();

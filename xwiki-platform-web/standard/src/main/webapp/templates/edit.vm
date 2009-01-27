@@ -49,8 +49,12 @@
 <div id="editcolumn" class="editor">
 <div class="alleditcontent">
 #if($editor == "wiki" || $editor == "wysiwyg")
+#set($docTitle = $request.getParameter("title"))
+#if("$!docTitle" == "")
+#set($docTitle = $!tdoc.title)
+#end
 <label>$msg.get("titlefield"):
-<input type="text" id="xwikidoctitleinput" name="title" value="$!tdoc.title"/></label>
+<input type="text" id="xwikidoctitleinput" name="title" value="$!docTitle"/></label>
 #end
 #template("editmodes.vm")
 #template("edit${editor}.vm")

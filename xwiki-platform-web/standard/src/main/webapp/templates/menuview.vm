@@ -124,21 +124,27 @@
 ##
 ## Actions menu
 ##
-#if((!$doc.isNew()) && $xwiki.checkAccess($doc.fullName, "delete"))
-#xwikitopmenuentrystart("" $msg.get("core.menu.actions") "tmFile")
-#submenuitem($doc.getURL("delete", $languageparams) $msg.get("core.menu.delete") "tmActionDelete")
-#submenuitem($doc.getURL("view", "xpage=rename&amp;step=1") $msg.get("core.menu.rename") "tmActionRename")
-#submenuitem($doc.getURL("view", "xpage=copy") $msg.get("core.menu.copy") "tmActionCopy")
-#submenuitem($xwiki.getURL("XWiki.OfficeImporter", "view") $msg.get("core.menu.import") "tmActionImport")
-#xwikitopmenuentryend()
-#if($keyboardShortcutsEnabled)
-<script type="text/javascript">
-//<![CDATA[
-  shortcut.add("$msg.get("core.shortcuts.view.delete")",function() { location.href="$doc.getURL("delete", $languageparams)"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-  shortcut.add("$msg.get("core.shortcuts.view.rename")",function() { location.href="$doc.getURL("view", "xpage=rename&amp;step=1")"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-//]]>
-</script>
-#end
+#set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, "delete"))
+#set ($canImport = $xwiki.exists("XWiki.OfficeImporter") && $xwiki.checkAccess("XWiki.OfficeImporter", "view") && !$isguest)
+#if($canDelete || $canImport)
+  #xwikitopmenuentrystart("" $msg.get("core.menu.actions") "tmFile")
+  #if($canDelete)
+    #submenuitem($doc.getURL("delete", $languageparams) $msg.get("core.menu.delete") "tmActionDelete")
+    #submenuitem($doc.getURL("view", "xpage=rename&amp;step=1") $msg.get("core.menu.rename") "tmActionRename")
+    #submenuitem($doc.getURL("view", "xpage=copy") $msg.get("core.menu.copy") "tmActionCopy")
+  #end
+  #if($canImport)
+    #submenuitem($xwiki.getURL("XWiki.OfficeImporter", "view") $msg.get("core.menu.import") "tmActionImport")
+  #end
+  #xwikitopmenuentryend()
+  #if($canDelete && $keyboardShortcutsEnabled)
+    <script type="text/javascript">
+      //<![CDATA[
+      shortcut.add("$msg.get("core.shortcuts.view.delete")",function() { location.href="$doc.getURL("delete", $languageparams)"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$msg.get("core.shortcuts.view.rename")",function() { location.href="$doc.getURL("view", "xpage=rename&amp;step=1")"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      //]]>
+    </script>
+  #end
 #end
 ##
 ## Watch menu

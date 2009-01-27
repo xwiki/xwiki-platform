@@ -334,7 +334,7 @@ public abstract class AbstractBlock implements Block
         // themselves. Using an iterator would lead to a ConcurrentModificationException
         Object[] objectArray = getChildren().toArray();
         block.childrenBlocks = new ArrayList<Block>();
-        for(Object object: objectArray) {
+        for (Object object : objectArray) {
             Block childBlock = (Block) object;
             block.addChild((Block) childBlock.clone());
         }

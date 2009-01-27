@@ -41,11 +41,6 @@ import com.artofsolving.jodconverter.DocumentFormatRegistry;
 public class OfficeImporterContext
 {
     /**
-     * Default document syntax id.
-     */
-    public static final String DEFAULT_SYNTAX_ID = new Syntax(SyntaxType.XWIKI, "1.0").toIdString();
-    
-    /**
      * Default encoding for office imported documents.
      */
     public static final String DEFAULT_ENCODING = "UTF-8";
@@ -79,11 +74,6 @@ public class OfficeImporterContext
      * Name of the target document.
      */
     private String targetDocument;
-
-    /**
-     * SyntaxId of the target wiki page.
-     */
-    private String syntaxId;
 
     /**
      * Content of the wiki page. This can be html, xhtml, xwiki 2.0 depending on the current phase of transformation.
@@ -132,7 +122,6 @@ public class OfficeImporterContext
         this.targetDocument = targetDocument;
         this.options = options;
         this.docBridge = bridge;
-        this.syntaxId = DEFAULT_SYNTAX_ID;
         this.finalized = false;
     }
 
@@ -146,10 +135,8 @@ public class OfficeImporterContext
     {
         try {
             if (!finalized) {
-                docBridge.setDocumentContent(targetDocument, bufferedContent, "Created by office importer", false);
-                if (!DEFAULT_SYNTAX_ID.equals(syntaxId)) {
-                    docBridge.setDocumentSyntaxId(targetDocument, syntaxId);
-                }
+                docBridge.setDocumentSyntaxId(targetDocument, new Syntax(SyntaxType.XWIKI, "2.0").toIdString());
+                docBridge.setDocumentContent(targetDocument, bufferedContent, "Created by office importer", false);                
                 if (!isPresentation) {
                     for (String artifactName : artifacts.keySet()) {
                         // Filter out the html output.
@@ -185,16 +172,6 @@ public class OfficeImporterContext
     public void setTargetDocumentContent(String content)
     {
         this.bufferedContent = content;
-    }
-
-    /**
-     * Updates the syntaxId of the target document.
-     * 
-     * @param syntaxId Syntax ID to be set.
-     */
-    public void setTargetDocumentSyntaxId(String syntaxId)
-    {
-        this.syntaxId = syntaxId;
     }
 
     /**

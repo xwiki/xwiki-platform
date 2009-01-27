@@ -29,8 +29,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.transformer.DocumentTransformer;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 
 /**
  * Transforms an html document (+artifacts) into an xwiki presentation.
@@ -45,14 +43,12 @@ public class HtmlToPresentationTransformer extends AbstractLogEnabled implements
      */
     public void transform(OfficeImporterContext importerContext) throws OfficeImporterException
     {
-        importerContext.setTargetDocumentSyntaxId(new Syntax(SyntaxType.XWIKI, "1.0").toIdString());
         // Build the xwiki presentation.
         try {
             byte[] archive = buildArchive(importerContext.getArtifacts());
             importerContext.addArtifact(OfficeImporterContext.PRESENTATION_ARCHIVE_NAME, archive);
             importerContext.setTargetDocumentContent(buildPresentationFrameCode(
                 OfficeImporterContext.PRESENTATION_ARCHIVE_NAME, "output.html"));
-            importerContext.finalizeDocument(true);
         } catch (IOException ex) {
             String message = "Error while building presentation archive.";
             getLogger().error(message, ex);
@@ -91,7 +87,7 @@ public class HtmlToPresentationTransformer extends AbstractLogEnabled implements
      */
     private String buildPresentationFrameCode(String zipFilename, String index)
     {
-        return "#set ($url = $xwiki.zipexplorer.getFileLink($doc, \"" + zipFilename + "\", \"" + index + "\"))\n"
-            + "<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>";
+        return "{{velocity}}#set($url=$xwiki.zipexplorer.getFileLink($doc, \"" + zipFilename + "\", \"" + index
+            + "\")){{html}}<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>{{/html}}{{/velocity}}";
     }
 }

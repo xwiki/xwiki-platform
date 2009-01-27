@@ -76,10 +76,9 @@ public class HtmlToXWikiTransformer extends AbstractLogEnabled implements Docume
      */
     public void transform(OfficeImporterContext importerContext) throws OfficeImporterException
     {
-        importerContext.setTargetDocumentSyntaxId(new Syntax(SyntaxType.XWIKI, "2.0").toIdString());
-        String encodedContent = importerContext.getEncodedContent();
         // Perform cleaning & Filtering.
-        Document document = htmlCleaner.clean(new StringReader(encodedContent), importerContext.getOptions());
+        Document document =
+            htmlCleaner.clean(new StringReader(importerContext.getEncodedContent()), importerContext.getOptions());
         // Strip the html envelop.
         XMLUtils.stripHTMLEnvelope(document);
         try {
@@ -90,7 +89,6 @@ public class HtmlToXWikiTransformer extends AbstractLogEnabled implements Docume
             Listener listener = new XWikiSyntaxRenderer(printer);
             xdom.traverse(listener);
             importerContext.setTargetDocumentContent(printer.toString());
-            importerContext.finalizeDocument(false);
         } catch (ComponentLookupException ex) {
             String message = "Internal error while looking up for xhtml to xwiki 2.0 parser.";
             getLogger().error(message, ex);

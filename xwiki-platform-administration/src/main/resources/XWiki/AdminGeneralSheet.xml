@@ -58,7 +58,7 @@
 <content>### Administrate general wiki preferences, at global level
 #set($legend = ["language", "editor", "admin", "server"])
 #set($params = $util.hashMap)
-#set($params.language = ["multilingual", "languages" , "default_language"])
+#set($params.language = ["multilingual", "languages" , "default_language", "dateformat"])
 #set($params.editor = ["editor"])
 #set($params.admin = ["admin_email"])
 #set($params.server = ["smtp_server"])

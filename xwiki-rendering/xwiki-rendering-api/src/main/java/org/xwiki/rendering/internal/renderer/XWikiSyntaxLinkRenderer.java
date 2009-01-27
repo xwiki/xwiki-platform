@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.renderer;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
@@ -65,7 +66,7 @@ public class XWikiSyntaxLinkRenderer
     public void renderLinkContent(WikiPrinter printer, String wikiSyntaxContent)
     {
         // If there was some link content specified then output the character separator ">>".
-        if ((wikiSyntaxContent != null) && (wikiSyntaxContent.length() > 0)) {
+        if (!StringUtils.isEmpty(wikiSyntaxContent)) {
             printer.print(wikiSyntaxContent);
             printer.print(">>");
         }

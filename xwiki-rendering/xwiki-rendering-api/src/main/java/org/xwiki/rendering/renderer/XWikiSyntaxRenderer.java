@@ -142,14 +142,20 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
+        boolean isInLink = this.blockListener.isInLink();
+
         super.beginLink(link, isFreeStandingURI, parameters);
 
-        this.linkRenderer.beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
+        if (!isInLink) {
+            this.linkRenderer.beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
 
-        // Defer printing the link content since we need to gather all nested elements
-        this.linkBlocksPrinter =
-            new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), this.blockListener, this.textListener);
-        pushPrinter(this.linkBlocksPrinter);
+            // Defer printing the link content since we need to gather all nested elements
+            this.linkBlocksPrinter =
+                new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), this.blockListener, this.textListener);
+            pushPrinter(this.linkBlocksPrinter);
+        } else if (isFreeStandingURI) {
+            print(this.linkRenderer.renderLinkReference(link));
+        }
     }
 
     /**
@@ -159,12 +165,15 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.linkBlocksPrinter.flush();
-        String content = this.linkBlocksPrinter.toString();
-        popPrinter();
 
-        this.linkRenderer.renderLinkContent(getPrinter(), content);
-        this.linkRenderer.endRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
+        if (!this.blockListener.isInChildLink()) {
+            this.linkBlocksPrinter.flush();
+            String content = this.linkBlocksPrinter.toString();
+            popPrinter();
+
+            this.linkRenderer.renderLinkContent(getPrinter(), content);
+            this.linkRenderer.endRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
+        }
 
         super.endLink(link, isFreeStandingURI, parameters);
     }

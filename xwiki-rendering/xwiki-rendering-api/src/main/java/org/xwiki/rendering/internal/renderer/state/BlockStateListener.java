@@ -41,35 +41,35 @@ public class BlockStateListener implements Listener
 
     private boolean isInSection;
 
-    private boolean isInLink;
+    private int isInLink = 0;
 
     private boolean isInTable;
 
     private boolean isInTableCell;
-    
+
     private boolean isInDefinitionList;
-    
+
     private boolean isInList;
-    
+
     private boolean isInQuotation;
-    
+
     private boolean isInQuotationLine;
-    
+
     public boolean isInParagraph()
     {
         return this.isInParagraph;
     }
-    
+
     public boolean isInSection()
     {
         return this.isInSection;
     }
-    
+
     public boolean isInTable()
     {
         return this.isInTable;
     }
-    
+
     public boolean isInTableCell()
     {
         return this.isInTableCell;
@@ -79,7 +79,7 @@ public class BlockStateListener implements Listener
     {
         return this.isInDefinitionList;
     }
-    
+
     public boolean isInList()
     {
         return this.isInList;
@@ -87,19 +87,24 @@ public class BlockStateListener implements Listener
 
     public boolean isInLink()
     {
-        return this.isInLink;
+        return this.isInLink > 0;
     }
     
+    public boolean isInChildLink()
+    {
+        return this.isInLink > 1;
+    }
+
     public boolean isInQuotation()
     {
         return this.isInQuotation;
     }
-    
+
     public boolean isInQuotationLine()
     {
         return this.isInQuotationLine;
     }
-    
+
     public void beginDefinitionDescription()
     {
         // Nothing to do
@@ -132,7 +137,7 @@ public class BlockStateListener implements Listener
 
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.isInLink = true;
+        ++this.isInLink;
     }
 
     public void beginList(ListType listType, Map<String, String> parameters)
@@ -228,7 +233,7 @@ public class BlockStateListener implements Listener
 
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.isInLink = false;
+        --this.isInLink;
     }
 
     public void endList(ListType listType, Map<String, String> parameters)

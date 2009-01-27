@@ -2827,6 +2827,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("version", "Version", 30);
         needsUpdate |= bclass.addTextAreaField("menu", "Menu", 60, 8);
         needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8);
+        needsUpdate |= bclass.addTextField("dateformat", "Date Format", 30);
 
         needsUpdate |= bclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
         needsUpdate |= bclass.addTextField("smtp_server", "SMTP Server", 30);

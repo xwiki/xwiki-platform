@@ -38,12 +38,25 @@ public interface OfficeImporter
      * Imports the passed Office document into the target wiki page.
      * 
      * @param fileContent the binary content of the input document
-     * @param fileName the name of the source document name (should have a valid extension since the extension is 
-     *        used to find out the office document's format)
+     * @param fileName the name of the source document name (should have a valid extension since the extension is used
+     *            to find out the office document's format)
      * @param targetDocument the name of the resulting wiki page
      * @param options the optional parameters for the conversion
      * @throws OfficeImporterException if an error occurred during the import
      */
-    void importDocument(byte[] fileContent, String fileName, String targetDocument,
-        Map<String, String> options) throws OfficeImporterException;
+    void importDocument(byte[] fileContent, String fileName, String targetDocument, Map<String, String> options)
+        throws OfficeImporterException;
+
+    /**
+     * Imports an office document attached to a wiki page into xhtml. This method only returns the resulting xhtml, it
+     * does not modify the original content of targetDocument. Although, if there are non-textual content present in the
+     * office document, they will be attached to targetDocument.
+     * 
+     * @param targetDocument the name of the target wiki page.
+     * @param attachmentName name of the attached office document.
+     * @param options additional options for the import operation.
+     * @throws OfficeImporterException if an error occurs during the import.
+     */
+    String importDocument(String targetDocument, String attachmentName, Map<String, String> options)
+        throws OfficeImporterException;
 }

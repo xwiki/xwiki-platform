@@ -1,22 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!--
-    * * See the NOTICE file distributed with this work for additional * information regarding copyright ownership. * *
-    This is free software; you can redistribute it and/or modify it * under the terms of the GNU Lesser General Public
-    License as * published by the Free Software Foundation; either version 2.1 of * the License, or (at your option) any
-    later version. * * This software is distributed in the hope that it will be useful, * but WITHOUT ANY WARRANTY;
-    without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU * Lesser
-    General Public License for more details. * * You should have received a copy of the GNU Lesser General Public *
-    License along with this software; if not, write to the Free * Software Foundation, Inc., 51 Franklin St, Fifth
-    Floor, Boston, MA * 02110-1301 USA, or see the FSF site: http://www.fsf.org. *
-  -->
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
 <component-set>
   <components>
   <!-- HTML Cleaners -->
     <component>
       <role>org.xwiki.xml.html.HTMLCleaner</role>
       <role-hint>openoffice</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.cleaner.OpenOfficeHTMLCleaner
-      </implementation>
+      <implementation>org.xwiki.officeimporter.internal.cleaner.OpenOfficeHTMLCleaner</implementation>
       <requirements>
         <requirement>
           <role>org.xwiki.xml.html.HTMLCleaner</role>
@@ -30,8 +40,7 @@
     <component>
       <role>org.xwiki.xml.html.HTMLCleaner</role>
       <role-hint>wysiwyg</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner
-      </implementation>
+      <implementation>org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner</implementation>
       <requirements>
         <requirement>
           <role>org.xwiki.xml.html.HTMLCleaner</role>
@@ -43,8 +52,7 @@
     <component>
       <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
       <role-hint>officetohtml</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.transformer.OfficeToHtmlTransformer
-      </implementation>
+      <implementation>org.xwiki.officeimporter.internal.transformer.OfficeToHtmlTransformer</implementation>
       <configuration>
         <openOfficeServerIp>127.0.0.1</openOfficeServerIp>
         <openOfficeServerPort>8100</openOfficeServerPort>
@@ -54,8 +62,7 @@
     <component>
       <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
       <role-hint>htmltoxwiki</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToXWikiTransformer
-      </implementation>
+      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToXWikiTransformer</implementation>
       <requirements>
         <requirement>
           <role>org.xwiki.xml.html.HTMLCleaner</role>
@@ -67,16 +74,25 @@
     <component>
       <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
       <role-hint>htmltopresentation</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToPresentationTransformer
-      </implementation>          
+      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToPresentationTransformer</implementation>          
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
+      <role-hint>xwikitoxhtml</role-hint>
+      <implementation>org.xwiki.officeimporter.internal.transformer.XWikiToXhtmlTransformer</implementation>          
+      <requirements>
+        <requirement>
+          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+        </requirement>
+      </requirements>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <!-- Office Importer -->
     <component>
       <role>org.xwiki.officeimporter.OfficeImporter</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.DefaultOfficeImporter
-      </implementation>
+      <implementation>org.xwiki.officeimporter.internal.DefaultOfficeImporter</implementation>
       <requirements>
         <requirement>
           <role>org.xwiki.bridge.DocumentAccessBridge</role>
@@ -96,6 +112,11 @@
           <role-hint>htmltopresentation</role-hint>
           <field-name>htmlToPresentationTransformer</field-name>
         </requirement>
+        <requirement>
+          <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
+          <role-hint>xwikitoxhtml</role-hint>
+          <field-name>xwikiToXhtmlTransformer</field-name>
+        </requirement>
         <instantiation-strategy>singleton</instantiation-strategy>
       </requirements>      
     </component>
@@ -103,8 +124,7 @@
     <component>
       <role>org.xwiki.velocity.VelocityContextInitializer</role>
       <role-hint>officeimporter</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.OfficeImporterVelocityContextInitializer
-      </implementation>
+      <implementation>org.xwiki.officeimporter.internal.OfficeImporterVelocityContextInitializer</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>

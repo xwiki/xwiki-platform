@@ -19,17 +19,14 @@
  */
 package org.xwiki.officeimporter.internal;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.transformer.DocumentTransformer;
-
-import com.artofsolving.jodconverter.DocumentFormat;
 
 /**
  * Default implementation of the office importer component.
@@ -37,13 +34,8 @@ import com.artofsolving.jodconverter.DocumentFormat;
  * @version $Id$
  * @since 1.8M1
  */
-public class DefaultOfficeImporter implements OfficeImporter
+public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeImporter
 {
-    /**
-     * File extensions corresponding to slide presentations.
-     */
-    private static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
-
     /**
      * Document access bridge used to access wiki documents.
      */
@@ -63,7 +55,12 @@ public class DefaultOfficeImporter implements OfficeImporter
      * Transforms an XHTML document into XWiki 2.0 syntax.
      */
     private DocumentTransformer htmlToXWikiTransformer;
-
+    
+    /**
+     * Transforms an XWiki 2.0 document into Xhtml 1.0 syntax.
+     */
+    private DocumentTransformer xwikiToXhtmlTransformer;
+    
     /**
      * {@inheritDoc} Supports converting the Office document to HTML or XWiki Syntax 2.0.
      * 
@@ -78,14 +75,44 @@ public class DefaultOfficeImporter implements OfficeImporter
             new OfficeImporterContext(fileContent, fileName, targetDocument, options, docBridge);
         officeToHtmlTransformer.transform(importerContext);
         DocumentTransformer htmlTransformer = null;
-        boolean isPresentation = isPresentation(importerContext.getSourceFormat());
-        if (isPresentation) {
+        if (importerContext.isPresentation()) {
             htmlTransformer = htmlToPresentationTransformer;
         } else {
             htmlTransformer = htmlToXWikiTransformer;
         }
         htmlTransformer.transform(importerContext);
-        importerContext.finalizeDocument(isPresentation);
+        importerContext.finalizeDocument(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see OfficeImporter#importDocument(String, String, Map)
+     */
+    public String importDocument(String targetDocument, String attachmentName, Map<String, String> options)
+        throws OfficeImporterException
+    {
+        validateRequest(targetDocument);
+        options.put("targetDocument", targetDocument);
+        byte[] attachmentContent = null;
+        try {
+            attachmentContent = docBridge.getAttachmentContent(targetDocument, attachmentName);
+        } catch (Exception ex) {
+            throw new OfficeImporterException("Error while accessing " + targetDocument + ":" + attachmentName, ex);
+        }
+        OfficeImporterContext importerContext =
+            new OfficeImporterContext(attachmentContent, attachmentName, targetDocument, options, docBridge);
+        officeToHtmlTransformer.transform(importerContext);
+        DocumentTransformer htmlTransformer = null;
+        if (importerContext.isPresentation()) {
+            htmlTransformer = htmlToPresentationTransformer;
+        } else {
+            htmlTransformer = htmlToXWikiTransformer;
+        }
+        htmlTransformer.transform(importerContext);
+        xwikiToXhtmlTransformer.transform(importerContext);
+        importerContext.finalizeDocument(true);            
+        return importerContext.getEncodedContent();
     }
 
     /**
@@ -108,14 +135,5 @@ public class DefaultOfficeImporter implements OfficeImporter
         } else if (!docBridge.isDocumentEditable(targetDocument)) {
             throw new OfficeImporterException("Inadequate privileges.");
         }
-    }
-
-    /**
-     * @param format the input document's format
-     * @return true if the given format corresponds to a slide presentation.
-     */
-    private boolean isPresentation(DocumentFormat format)
-    {
-        return PRESENTATION_FORMAT_EXTENSIONS.contains(format.getFileExtension().toLowerCase());
     }
 }

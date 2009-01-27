@@ -20,7 +20,9 @@
 package org.xwiki.officeimporter;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -41,10 +43,15 @@ import com.artofsolving.jodconverter.DocumentFormatRegistry;
 public class OfficeImporterContext
 {
     /**
+     * File extensions corresponding to slide presentations.
+     */
+    private static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
+
+    /**
      * Default encoding for office imported documents.
      */
     public static final String DEFAULT_ENCODING = "UTF-8";
-    
+
     /**
      * Name of the presentation archive.
      */
@@ -91,6 +98,11 @@ public class OfficeImporterContext
     private Map<String, String> options;
 
     /**
+     * Syntax id of the target document.
+     */
+    private String syntaxId = new Syntax(SyntaxType.XWIKI, "2.0").toIdString();
+
+    /**
      * Indicates if the document wrapped in this context has been finalized.
      */
     private boolean finalized;
@@ -129,15 +141,17 @@ public class OfficeImporterContext
      * This method should be invoked when all the transformations are done. A single {@link OfficeImporterContext} can
      * be finalized only once. After that, calling this method has no effect.
      * 
-     * @param isPresentation If true, skips the packaging of artifacts as attachments.
+     * @param skipContent if true skips writing importer output into target wiki page.
      */
-    public void finalizeDocument(boolean isPresentation) throws OfficeImporterException
+    public void finalizeDocument(boolean skipContent) throws OfficeImporterException
     {
         try {
             if (!finalized) {
-                docBridge.setDocumentSyntaxId(targetDocument, new Syntax(SyntaxType.XWIKI, "2.0").toIdString());
-                docBridge.setDocumentContent(targetDocument, bufferedContent, "Created by office importer", false);                
-                if (!isPresentation) {
+                if (!skipContent) {
+                    docBridge.setDocumentSyntaxId(targetDocument, syntaxId);
+                    docBridge.setDocumentContent(targetDocument, bufferedContent, "Created by office importer", false);
+                }
+                if (!isPresentation()) {
                     for (String artifactName : artifacts.keySet()) {
                         // Filter out the html output.
                         if (!artifactName.equals("output.html")) {
@@ -175,6 +189,14 @@ public class OfficeImporterContext
     }
 
     /**
+     * @param syntaxId syntax-id to be set for the target document.
+     */
+    public void setTargetDocumentSyntaxId(String syntaxId)
+    {
+        this.syntaxId = syntaxId;
+    }
+
+    /**
      * @return The binary sourceData of the original office document.
      */
     public byte[] getSourceData()
@@ -204,6 +226,14 @@ public class OfficeImporterContext
     public String getTargetDocumentName()
     {
         return targetDocument;
+    }
+
+    /**
+     * @return true if the source format represents a presentation document type.
+     */
+    public boolean isPresentation()
+    {
+        return PRESENTATION_FORMAT_EXTENSIONS.contains(sourceFormat.getFileExtension().toLowerCase());
     }
 
     /**

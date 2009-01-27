@@ -2797,6 +2797,13 @@ public class XWikiDocument implements DocumentModelBridge
     {
         return getStore(context).loadLinks(getId(), context, true);
     }
+    
+    public List<String> getChildren(XWikiContext context) throws XWikiException 
+    {
+        String hql ="select doc.fullName from XWikiDocument doc " +
+        		"where doc.parent='" + getFullName() + "' order by doc.fullName";
+        return context.getWiki().search(hql, context);       
+    }
 
     public void renameProperties(String className, Map fieldsToRename)
     {

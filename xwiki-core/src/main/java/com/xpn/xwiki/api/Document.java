@@ -1418,6 +1418,11 @@ public class Document extends Api
     {
         return this.doc.getLinks(getXWikiContext());
     }
+    
+    public List<String> getChildren() throws XWikiException
+    {
+        return this.doc.getChildren(getXWikiContext());
+    }
 
     public String getDefaultEditURL() throws XWikiException
     {

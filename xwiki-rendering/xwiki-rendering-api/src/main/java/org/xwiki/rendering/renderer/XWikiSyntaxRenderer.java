@@ -165,7 +165,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        // The links in a top level link label are not rendered as link (only the label is printed) 
+        // The links in a top level link label are not rendered as link (only the label is printed)
         if (this.blockListener.getLinkDepth() == 1) {
             this.linkBlocksPrinter.flush();
             String content = this.linkBlocksPrinter.toString();
@@ -943,8 +943,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (!parameters.isEmpty()) {
             StringBuffer buffer = new StringBuffer("(%");
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(entry.getValue())
-                    .append('\"');
+                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(
+                    entry.getValue().replaceAll("[\\\\\"]", "\\\\$0").replaceAll("\\%\\)", "~%)")).append('\"');
             }
             buffer.append(" %)");
 

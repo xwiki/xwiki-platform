@@ -32,16 +32,20 @@ import org.xwiki.rendering.listener.Listener;
 public class ErrorBlock extends AbstractFatherBlock
 {
     /**
-     * The error message.
+     * @see #getMessage()
      */
     private String message;
     
     /**
-     * The error description, can be technical such as a stack trace. Provides more details than the error
-     * message.
+     * @see #getDescription()
      */
     private String description;
     
+    /**
+     * @param childrenBlocks the nested children blocks
+     * @param message the error message
+     * @param description the error description
+     */
     public ErrorBlock(List<Block> childrenBlocks, String message, String description)
     {
         super(childrenBlocks);
@@ -49,21 +53,36 @@ public class ErrorBlock extends AbstractFatherBlock
         this.description = description;
     }
 
+    /**
+     * @return the error message
+     */
     public String getMessage()
     {
         return this.message;
     }
     
+    /**
+     * @return the error description, can be technical such as a stack trace. Provides more details than the error
+     *         message.
+     */
     public String getDescription()
     {
         return this.description;
     }
     
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginError(getMessage(), getDescription());
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)  
+     */
     public void after(Listener listener)
     {
         listener.endError(getMessage(), getDescription());

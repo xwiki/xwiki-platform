@@ -133,8 +133,9 @@
             **/Listener.java
             **/block/Block.java
             **/block/FatherBlock.java
-            **/block/AbstractBlock.java
             **/block/AbstractFatherBlock.java
+            **/block/AbstractMacroBlock.java
+            **/block/AbstractVerbatimBlock.java
             **/block/*ListBlock.java
             **/block/FormatBlock.java
             **/block/EscapeBlock.java
@@ -147,6 +148,7 @@
             **/block/MacroBlock.java
             **/block/XDOM.java
             **/block/Table*.java
+            **/block/ErrorBlock.java
           </includes>
         </configuration>
       </plugin>

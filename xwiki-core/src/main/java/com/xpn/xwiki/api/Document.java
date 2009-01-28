@@ -273,6 +273,15 @@ public class Document extends Api
     }
 
     /**
+     * @return the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
+     *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
+     */
+    public String getSyntaxId()
+    {
+        return this.doc.getSyntaxId();
+    }
+
+    /**
      * return the language of the document if it's a traduction, otherwise, it return default
      */
     public String getLanguage()
@@ -1498,6 +1507,10 @@ public class Document extends Api
         getDoc().setContent(content);
     }
 
+    /**
+     * @param syntaxId the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
+     *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
+     */
     public void setSyntaxId(String syntaxId)
     {
         getDoc().setSyntaxId(syntaxId);
@@ -1900,15 +1913,6 @@ public class Document extends Api
     }
 
     /**
-     * @return the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
-     *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
-     */
-    public String getSyntaxId()
-    {
-        return this.doc.getSyntaxId();
-    }
-
-    /**
      * Convert the current document content from its current syntax to the new syntax passed as parameter.
      * 
      * @param targetSyntaxId the syntax to convert to (eg "xwiki/2.0", "xhtml/1.0", etc)
@@ -1917,7 +1921,7 @@ public class Document extends Api
     public boolean convertSyntax(String targetSyntaxId) throws XWikiException
     {
         try {
-            this.doc.convertSyntax(targetSyntaxId);
+            getDoc().convertSyntax(targetSyntaxId);
         } catch (Exception ex) {
             return false;
         }

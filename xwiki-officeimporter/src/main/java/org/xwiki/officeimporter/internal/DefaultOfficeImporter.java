@@ -19,6 +19,7 @@
  */
 package org.xwiki.officeimporter.internal;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -26,7 +27,9 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.officeimporter.OfficeImporterResult;
 import org.xwiki.officeimporter.transformer.DocumentTransformer;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
  * Default implementation of the office importer component.
@@ -55,85 +58,57 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * Transforms an XHTML document into XWiki 2.0 syntax.
      */
     private DocumentTransformer htmlToXWikiTransformer;
-    
+
     /**
      * Transforms an XWiki 2.0 document into Xhtml 1.0 syntax.
      */
     private DocumentTransformer xwikiToXhtmlTransformer;
-    
-    /**
-     * {@inheritDoc} Supports converting the Office document to HTML or XWiki Syntax 2.0.
-     * 
-     * @see OfficeImporter#importDocument(byte[], String, String, Map)
-     */
-    public void importDocument(byte[] fileContent, String fileName, String targetDocument, Map<String, String> options)
-        throws OfficeImporterException
-    {
-        validateRequest(targetDocument);
-        options.put("targetDocument", targetDocument);
-        OfficeImporterContext importerContext =
-            new OfficeImporterContext(fileContent, fileName, targetDocument, options, docBridge);
-        officeToHtmlTransformer.transform(importerContext);
-        DocumentTransformer htmlTransformer = null;
-        if (importerContext.isPresentation()) {
-            htmlTransformer = htmlToPresentationTransformer;
-        } else {
-            htmlTransformer = htmlToXWikiTransformer;
-        }
-        htmlTransformer.transform(importerContext);
-        importerContext.finalizeDocument(false);
-    }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see OfficeImporter#importDocument(String, String, Map)
      */
-    public String importDocument(String targetDocument, String attachmentName, Map<String, String> options)
-        throws OfficeImporterException
+    public OfficeImporterResult doImport(byte[] fileContent, String fileName, String targetDocument,
+        Syntax targetSyntax, Map<String, String> options) throws OfficeImporterException
     {
-        validateRequest(targetDocument);
         options.put("targetDocument", targetDocument);
-        byte[] attachmentContent = null;
-        try {
-            attachmentContent = docBridge.getAttachmentContent(targetDocument, attachmentName);
-        } catch (Exception ex) {
-            throw new OfficeImporterException("Error while accessing " + targetDocument + ":" + attachmentName, ex);
-        }
-        OfficeImporterContext importerContext =
-            new OfficeImporterContext(attachmentContent, attachmentName, targetDocument, options, docBridge);
-        officeToHtmlTransformer.transform(importerContext);
+        OfficeImporterContext context =
+            new OfficeImporterContext(fileContent, fileName, targetDocument, options, docBridge);
+        officeToHtmlTransformer.transform(context);
         DocumentTransformer htmlTransformer = null;
-        if (importerContext.isPresentation()) {
+        if (context.isPresentation()) {
             htmlTransformer = htmlToPresentationTransformer;
         } else {
             htmlTransformer = htmlToXWikiTransformer;
         }
-        htmlTransformer.transform(importerContext);
-        xwikiToXhtmlTransformer.transform(importerContext);
-        importerContext.finalizeDocument(true);            
-        return importerContext.getEncodedContent();
+        htmlTransformer.transform(context);
+        if (targetSyntax.equals(XWIKI_20)) {
+            return buildResult(context);
+        } else if (targetSyntax.equals(XHTML_10)) {
+            xwikiToXhtmlTransformer.transform(context);
+            return buildResult(context);
+        } else {
+            throw new OfficeImporterException("Target syntax " + targetSyntax.toIdString() + " is not supported.");
+        }        
     }
 
     /**
-     * Checks if this request is valid. For a request to be valid, the requested target document should not exist and
-     * the user should have enough privileges to create & edit that particular page.
+     * Builds an {@link OfficeImporterResult} using information extracted from an {@link OfficeImporterContext} object.
      * 
-     * @param targetDocument the target document.
-     * @throws OfficeImporterException if the request is invalid.
+     * @param context the {@link OfficeImporterContext}.
+     * @return the {@link OfficeImporterResult} object containing the results of the import operation.
+     * @throws OfficeImporterException If an error occurs while encoding the office importer results.
      */
-    private void validateRequest(String targetDocument) throws OfficeImporterException
+    private OfficeImporterResult buildResult(OfficeImporterContext context) throws OfficeImporterException
     {
-        boolean exists = true;
-        try {
-            exists = docBridge.exists(targetDocument);
-        } catch (Exception ex) {
-            throw new OfficeImporterException("Internal error.", ex);
+        Map<String, byte[]> resultArtifacts = null;
+        if (context.isPresentation()) {
+            resultArtifacts = new HashMap<String, byte[]>();
+            resultArtifacts.put(OfficeImporterContext.PRESENTATION_ARCHIVE_NAME, context.getArtifacts().get(
+                OfficeImporterContext.PRESENTATION_ARCHIVE_NAME));
+        } else {
+            resultArtifacts = context.getArtifacts();
         }
-        if (exists) {
-            throw new OfficeImporterException("The target document " + targetDocument + " already exists.");
-        } else if (!docBridge.isDocumentEditable(targetDocument)) {
-            throw new OfficeImporterException("Inadequate privileges.");
-        }
-    }
+        OfficeImporterResult result = new OfficeImporterResult(context.getEncodedContent(), XWIKI_20, resultArtifacts);
+        return result;
+    }    
 }

@@ -128,6 +128,9 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
+          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+        </requirement>
+        <requirement>
           <role>org.xwiki.officeimporter.OfficeImporter</role>
         </requirement>
       </requirements>

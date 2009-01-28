@@ -20,6 +20,7 @@
 package org.xwiki.officeimporter.internal;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.velocity.VelocityContextInitializer;
 
@@ -37,6 +38,11 @@ public class OfficeImporterVelocityContextInitializer implements VelocityContext
     public static final String VELOCITY_CONTEXT_KEY = "officeimporter";
     
     /**
+     * The {@link DocumentAccessBridge}.
+     */
+    private DocumentAccessBridge docBridge;
+    
+    /**
      * Office importer component injected by component manager.
      */
     private OfficeImporter officeImporter;
@@ -46,6 +52,6 @@ public class OfficeImporterVelocityContextInitializer implements VelocityContext
      */
     public void initialize(VelocityContext context)
     {
-        context.put(VELOCITY_CONTEXT_KEY, new OfficeImporterVelocityBridge(this.officeImporter));
+        context.put(VELOCITY_CONTEXT_KEY, new OfficeImporterVelocityBridge(officeImporter, docBridge));
     }
 }

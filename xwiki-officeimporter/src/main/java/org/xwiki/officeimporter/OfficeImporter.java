@@ -21,6 +21,9 @@ package org.xwiki.officeimporter;
 
 import java.util.Map;
 
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
+
 /**
  * Entry point to import Office documents into wiki pages.
  * 
@@ -33,30 +36,29 @@ public interface OfficeImporter
      * This component's role, used when code needs to look it up.
      */
     String ROLE = OfficeImporter.class.getName();
-
+    
     /**
-     * Imports the passed Office document into the target wiki page.
-     * 
-     * @param fileContent the binary content of the input document
-     * @param fileName the name of the source document name (should have a valid extension since the extension is used
-     *            to find out the office document's format)
-     * @param targetDocument the name of the resulting wiki page
-     * @param options the optional parameters for the conversion
-     * @throws OfficeImporterException if an error occurred during the import
+     * XHTML/1.0 syntax.
      */
-    void importDocument(byte[] fileContent, String fileName, String targetDocument, Map<String, String> options)
-        throws OfficeImporterException;
+    Syntax XHTML_10 = new Syntax(SyntaxType.XHTML, "1.0");
 
     /**
-     * Imports an office document attached to a wiki page into xhtml. This method only returns the resulting xhtml, it
-     * does not modify the original content of targetDocument. Although, if there are non-textual content present in the
-     * office document, they will be attached to targetDocument.
+     * XWiki/2.0 syntax.
+     */
+    Syntax XWIKI_20 = new Syntax(SyntaxType.XWIKI, "2.0");
+
+    /**
+     * Imports an office document into a given syntax. Although the import operation is carried out w.r.t target
+     * document, this method does not modify the target document. It is up to the caller to update the target document
+     * if it wishes so. Currently xwiki/2.0 and xhtml/1.0 syntaxes are supported.
      * 
-     * @param targetDocument the name of the target wiki page.
-     * @param attachmentName name of the attached office document.
+     * @param fileContent content of the office document.
+     * @param fileName name of the office document (for determining document type).
+     * @param targetDocument target wiki page.
      * @param options additional options for the import operation.
-     * @throws OfficeImporterException if an error occurs during the import.
+     * @return an {@link OfficeImporterResult} containing the results of the import operation.
+     * @throws OfficeImporterException if the import operation fails.
      */
-    String importDocument(String targetDocument, String attachmentName, Map<String, String> options)
-        throws OfficeImporterException;
+    OfficeImporterResult doImport(byte[] fileContent, String fileName, String targetDocument, Syntax targetSyntax,
+        Map<String, String> options) throws OfficeImporterException;
 }

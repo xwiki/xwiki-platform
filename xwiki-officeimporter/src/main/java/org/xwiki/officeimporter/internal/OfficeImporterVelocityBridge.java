@@ -21,8 +21,10 @@ package org.xwiki.officeimporter.internal;
 
 import java.util.Map;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.officeimporter.OfficeImporterResult;
 
 /**
  * A bridge between velocity and office importer.
@@ -38,28 +40,34 @@ public class OfficeImporterVelocityBridge
     private OfficeImporter importer;
 
     /**
+     * The {@link DocumentAccessBridge}.
+     */
+    private DocumentAccessBridge docBridge;
+
+    /**
      * Holds any error messages thrown during the import operation.
      */
     private String message;
-    
+
     /**
      * Default constructor.
      * 
      * @param importer internal {@link OfficeImporter} component.
      */
-    public OfficeImporterVelocityBridge(OfficeImporter importer)
+    public OfficeImporterVelocityBridge(OfficeImporter importer, DocumentAccessBridge docBridge)
     {
         this.importer = importer;
+        this.docBridge = docBridge;
     }
 
     /**
      * Imports the passed Office document into the target wiki page.
      * 
-     * @param fileContent the binary content of the input document
-     * @param fileName the name of the source document name (should have a valid extension since the extension is 
-     *        used to find out the office document's format)
-     * @param targetDocument the name of the resulting wiki page
-     * @param options the optional parameters for the conversion
+     * @param fileContent the binary content of the input document.
+     * @param fileName the name of the source document (should have a valid extension since the extension is used to
+     *            find out the office document's format).
+     * @param targetDocument the name of the resulting wiki page.
+     * @param options the optional parameters for the conversion.
      * @return true if the operation was a success.
      */
     public boolean importDocument(byte[] fileContent, String fileName, String targetDocument,
@@ -67,18 +75,50 @@ public class OfficeImporterVelocityBridge
     {
         boolean success = false;
         try {
-            importer.importDocument(fileContent, fileName, targetDocument, options);
+            validateRequest(targetDocument);
+            OfficeImporterResult result =
+                importer.doImport(fileContent, fileName, targetDocument, OfficeImporter.XWIKI_20, options);
+            docBridge.setDocumentSyntaxId(targetDocument, OfficeImporter.XWIKI_20.toIdString());
+            docBridge.setDocumentContent(targetDocument, result.getContent(), "Created by office importer", false);
+            for (String artifactName : result.getArtifacts().keySet()) {
+                docBridge.setAttachmentContent(targetDocument, artifactName, result.getArtifacts().get(artifactName));
+            }
             success = true;
-        } catch(OfficeImporterException ex) {
+        } catch (OfficeImporterException ex) {
             this.message = ex.getMessage();
+        } catch (Exception ex) {
+            this.message = "Internal error while finalizing the target document.";
         }
         return success;
     }
-    
+
+    /**
+     * Checks if this request is valid. For a request to be valid, the requested target document should not exist and
+     * the user should have enough privileges to create & edit that particular page.
+     * 
+     * @param targetDocument the target document.
+     * @throws OfficeImporterException if the request is invalid.
+     */
+    private void validateRequest(String targetDocument) throws OfficeImporterException
+    {
+        boolean exists = true;
+        try {
+            exists = docBridge.exists(targetDocument);
+        } catch (Exception ex) {
+            throw new OfficeImporterException("Internal error.", ex);
+        }
+        if (exists) {
+            throw new OfficeImporterException("The target document " + targetDocument + " already exists.");
+        } else if (!docBridge.isDocumentEditable(targetDocument)) {
+            throw new OfficeImporterException("Inadequate privileges.");
+        }
+    }
+
     /**
      * @return any error messages thrown while importing or null.
      */
-    public String getMessage() {
+    public String getMessage()
+    {
         return this.message;
     }
 }

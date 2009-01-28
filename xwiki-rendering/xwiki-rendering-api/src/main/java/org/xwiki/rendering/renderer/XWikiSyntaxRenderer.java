@@ -943,8 +943,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (!parameters.isEmpty()) {
             StringBuffer buffer = new StringBuffer("(%");
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(
-                    entry.getValue().replaceAll("[\\\\\"]", "\\\\$0").replaceAll("\\%\\)", "~%)")).append('\"');
+                String value = entry.getValue();
+                // Escape quotes in value to not break parameter value syntax
+                value = value.replaceAll("[\\\\\"]", "\\\\$0");
+                // Escape ending custom parameters syntax
+                value = value.replaceAll("\\%\\)", "~%)");
+                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(value).append('\"');
             }
             buffer.append(" %)");
 

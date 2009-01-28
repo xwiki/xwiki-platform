@@ -10,7 +10,7 @@ content
 content
 {{/testsimplemacro}}
 .#-----------------------------------------------------
-.expect|event/1.0
+.expect|event
 .#-----------------------------------------------------
 beginDocument
 onMacroStandalone [testsimplemacro] [] []
@@ -23,7 +23,7 @@ content
 ]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|xhtml
 .#-----------------------------------------------------
 <!--startmacro:testsimplemacro|-||-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
 content
@@ -31,7 +31,7 @@ content
 content
 --><!--stopmacro-->
 .#-----------------------------------------------------
-.expect|xwiki/2.0
+.expect|xwiki
 .#-----------------------------------------------------
 {{testsimplemacro/}}
 

@@ -131,9 +131,9 @@
       #else
         #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;prefsdoc=${currentDoc}"))
       #end
-      &lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/Drag.js")"&gt;&lt;/script&gt;
-      &lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/ieemu.js")"&gt;&lt;/script&gt;
-      &lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/toolTip.js")"&gt;&lt;/script&gt;
+      &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/Drag.js")"&gt;&lt;/script&gt;
+      &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/ieemu.js")"&gt;&lt;/script&gt;
+      &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/toolTip.js")"&gt;&lt;/script&gt;
       &lt;script type="text/javascript"&gt;
       //&lt;![CDATA[
       window.ajaxurl = "$ajaxurl";
@@ -184,7 +184,7 @@
       Event.observe(window,'load',createAccordion.bind(this,obj));
       //]]&gt;
       &lt;/script&gt;
-      &lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/panelWizard.js")"&gt;&lt;/script&gt;
+      &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/panelWizard.js")"&gt;&lt;/script&gt;
       &lt;div id="allviewpanels"&gt;
         &lt;div id="panellistaccordion" class="accordion"&gt; ## start of accordion
           #foreach($category in $categoryList)

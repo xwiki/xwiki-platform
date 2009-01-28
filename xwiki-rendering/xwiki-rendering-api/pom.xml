@@ -149,6 +149,7 @@
             **/block/XDOM.java
             **/block/Table*.java
             **/block/ErrorBlock.java
+            **/block/WordBlock.java
           </includes>
         </configuration>
       </plugin>

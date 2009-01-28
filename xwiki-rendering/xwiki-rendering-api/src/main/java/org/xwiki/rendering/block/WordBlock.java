@@ -29,18 +29,32 @@ import org.xwiki.rendering.listener.Listener;
  */
 public class WordBlock extends AbstractBlock
 {
+    /**
+     * @see #getWord()
+     */
     private String word;
 
+    /**
+     * @param word the word wrapped by this block. Note that this is supposed to be a single word
+     *        and space or special symbols should be represented by other blocks
+     */
     public WordBlock(String word)
     {
         this.word = word;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see AbstractBlock#traverse(Listener)
+     */
     public void traverse(Listener listener)
     {
         listener.onWord(getWord());
     }
 
+    /**
+     * @return the word wrapped by this block
+     */
     public String getWord()
     {
         return this.word;

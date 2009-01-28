@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -49,6 +50,11 @@ import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConv
  */
 public class OfficeToHtmlTransformer extends AbstractLogEnabled implements DocumentTransformer, Initializable
 {
+    /**
+     * Default encoding for office imported documents.
+     */
+    public static final String DEFAULT_ENCODING = "UTF-8";
+    
     /**
      * The host address of the Open Office server.
      */
@@ -125,7 +131,7 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
             byte[] content = new byte[(int) storage.getOutputFile().length()];
             fis.read(content);
             fis.close();
-            importerContext.setTargetDocumentContent(new String(content));
+            importerContext.setContent(getEncodedHtml(new String(content)));
         } catch (IOException ex) {
             String message = "Internal error while reading temporary files.";
             getLogger().error(message, ex);
@@ -148,5 +154,20 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
         }
         // Cleanup the mess.
         storage.cleanUp();
+    }
+    
+    /**
+     * Encodes the given html fragment with the default encoding for oo.
+     * 
+     * @param html the html content.
+     * @return the html string encoded with default encoding for oo server.
+     */
+    public String getEncodedHtml(String html) throws OfficeImporterException
+    {
+        try {
+            return new String(html.getBytes(), DEFAULT_ENCODING);
+        } catch (UnsupportedEncodingException ex) {
+            throw new OfficeImporterException("Inernal error while encoding document content.", ex);
+        }
     }
 }

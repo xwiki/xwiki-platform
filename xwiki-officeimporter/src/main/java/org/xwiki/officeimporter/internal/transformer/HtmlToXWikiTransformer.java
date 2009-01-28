@@ -78,7 +78,7 @@ public class HtmlToXWikiTransformer extends AbstractLogEnabled implements Docume
     {
         // Perform cleaning & Filtering.
         Document document =
-            htmlCleaner.clean(new StringReader(importerContext.getEncodedContent()), importerContext.getOptions());
+            htmlCleaner.clean(new StringReader(importerContext.getContent()), importerContext.getOptions());
         // Strip the html envelop.
         XMLUtils.stripHTMLEnvelope(document);
         try {
@@ -88,7 +88,7 @@ public class HtmlToXWikiTransformer extends AbstractLogEnabled implements Docume
             WikiPrinter printer = new DefaultWikiPrinter();
             Listener listener = new XWikiSyntaxRenderer(printer);
             xdom.traverse(listener);
-            importerContext.setTargetDocumentContent(printer.toString());
+            importerContext.setContent(printer.toString());
         } catch (ComponentLookupException ex) {
             String message = "Internal error while looking up for xhtml 1.0 parser.";
             getLogger().error(message, ex);

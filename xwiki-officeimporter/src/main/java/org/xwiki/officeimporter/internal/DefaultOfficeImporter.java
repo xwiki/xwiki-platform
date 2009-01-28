@@ -108,7 +108,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         } else {
             resultArtifacts = context.getArtifacts();
         }
-        OfficeImporterResult result = new OfficeImporterResult(context.getEncodedContent(), XWIKI_20, resultArtifacts);
+        OfficeImporterResult result = new OfficeImporterResult(context.getContent(), XWIKI_20, resultArtifacts);
         return result;
     }    
 }

@@ -74,17 +74,16 @@ public class XWikiToXhtmlTransformer extends AbstractLogEnabled implements Docum
      */
     public void transform(OfficeImporterContext importerContext) throws OfficeImporterException
     {
-        importerContext.setTargetDocumentSyntaxId(new Syntax(SyntaxType.XHTML, "1.0").toIdString());
         try {
             Parser parser =
                 (Parser) componentManager.lookup(Parser.ROLE, new Syntax(SyntaxType.XWIKI, "2.0").toIdString());
-            XDOM xdom = parser.parse(new StringReader(importerContext.getEncodedContent()));
+            XDOM xdom = parser.parse(new StringReader(importerContext.getContent()));
             WikiPrinter printer = new DefaultWikiPrinter();
             RenderingConfiguration configuraiton = new DefaultRenderingConfiguration();
             AttachmentParser attachmentParser = new DefaultAttachmentParser();
             Listener listener = new XHTMLRenderer(printer, docBridge, configuraiton, attachmentParser);
             xdom.traverse(listener);
-            importerContext.setTargetDocumentContent(printer.toString());
+            importerContext.setContent(printer.toString());
         } catch (ComponentLookupException ex) {
             String message = "Internal error while looking up for xwiki 2.0 parser.";
             getLogger().error(message, ex);

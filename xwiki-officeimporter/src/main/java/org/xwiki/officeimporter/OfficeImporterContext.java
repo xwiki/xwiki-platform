@@ -19,15 +19,12 @@
  */
 package org.xwiki.officeimporter;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 
 import com.artofsolving.jodconverter.DefaultDocumentFormatRegistry;
 import com.artofsolving.jodconverter.DocumentFormat;
@@ -46,11 +43,6 @@ public class OfficeImporterContext
      * File extensions corresponding to slide presentations.
      */
     private static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
-
-    /**
-     * Default encoding for office imported documents.
-     */
-    public static final String DEFAULT_ENCODING = "UTF-8";
 
     /**
      * Name of the presentation archive.
@@ -98,16 +90,6 @@ public class OfficeImporterContext
     private Map<String, String> options;
 
     /**
-     * Syntax id of the target document.
-     */
-    private String syntaxId = new Syntax(SyntaxType.XWIKI, "2.0").toIdString();
-
-    /**
-     * Indicates if the document wrapped in this context has been finalized.
-     */
-    private boolean finalized;
-
-    /**
      * The default constructor.
      * 
      * @param input Binary sourceData of the office document to be transformed.
@@ -134,39 +116,6 @@ public class OfficeImporterContext
         this.targetDocument = targetDocument;
         this.options = options;
         this.docBridge = bridge;
-        this.finalized = false;
-    }
-
-    /**
-     * This method should be invoked when all the transformations are done. A single {@link OfficeImporterContext} can
-     * be finalized only once. After that, calling this method has no effect.
-     * 
-     * @param skipContent if true skips writing importer output into target wiki page.
-     */
-    public void finalizeDocument(boolean skipContent) throws OfficeImporterException
-    {
-        try {
-            if (!finalized) {
-                if (!skipContent) {
-                    docBridge.setDocumentSyntaxId(targetDocument, syntaxId);
-                    docBridge.setDocumentContent(targetDocument, bufferedContent, "Created by office importer", false);
-                }
-                if (!isPresentation()) {
-                    for (String artifactName : artifacts.keySet()) {
-                        // Filter out the html output.
-                        if (!artifactName.equals("output.html")) {
-                            docBridge.setAttachmentContent(targetDocument, artifactName, artifacts.get(artifactName));
-                        }
-                    }
-                } else {
-                    docBridge.setAttachmentContent(targetDocument, PRESENTATION_ARCHIVE_NAME, artifacts
-                        .get(PRESENTATION_ARCHIVE_NAME));
-                }
-                finalized = true;
-            }
-        } catch (Exception ex) {
-            throw new OfficeImporterException("Internal error while finalizing document.", ex);
-        }
     }
 
     /**
@@ -181,21 +130,21 @@ public class OfficeImporterContext
     }
 
     /**
-     * @param content The target document content to be set.
+     * @param content the content.
      */
-    public void setTargetDocumentContent(String content)
+    public void setContent(String content)
     {
         this.bufferedContent = content;
     }
 
     /**
-     * @param syntaxId syntax-id to be set for the target document.
+     * @return current result of the import operation.
      */
-    public void setTargetDocumentSyntaxId(String syntaxId)
+    public String getContent()
     {
-        this.syntaxId = syntaxId;
+        return this.bufferedContent;
     }
-
+    
     /**
      * @return The binary sourceData of the original office document.
      */
@@ -256,19 +205,6 @@ public class OfficeImporterContext
     public String getCurrentUser()
     {
         return docBridge.getCurrentUser();
-    }
-
-    /**
-     * @return The target document content encoded with the default encoding for this wiki.
-     * @throws OfficeImporterException If the default encoding is not supported.
-     */
-    public String getEncodedContent() throws OfficeImporterException
-    {
-        try {
-            return new String(bufferedContent.getBytes(), DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException ex) {
-            throw new OfficeImporterException("Inernal error while encoding document content.", ex);
-        }
     }
 
     /**

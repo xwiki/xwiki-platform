@@ -47,7 +47,7 @@ public class HtmlToPresentationTransformer extends AbstractLogEnabled implements
         try {
             byte[] archive = buildArchive(importerContext.getArtifacts());
             importerContext.addArtifact(OfficeImporterContext.PRESENTATION_ARCHIVE_NAME, archive);
-            importerContext.setTargetDocumentContent(buildPresentationFrameCode(
+            importerContext.setContent(buildPresentationFrameCode(
                 OfficeImporterContext.PRESENTATION_ARCHIVE_NAME, "output.html"));
         } catch (IOException ex) {
             String message = "Error while building presentation archive.";

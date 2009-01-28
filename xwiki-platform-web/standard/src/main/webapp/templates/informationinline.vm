@@ -2,40 +2,53 @@
 ### Display document information
 ###
 <div id="informationcontent" class="xwikiintracontent">
-<div id="_information">
-  #if ($xwiki.hasAccessLevel("edit"))
-    #template("tagedit.vm")
-  #end
-  <dl>
-    <dt><label for="xwikidocparentinput2">$msg.get("docextra.parent")</label></dt>
-    <dd>
-    ## <input type="text" id="xwikidocparentinput2" name="parent" value="$!tdoc.parent" size="30"/>
-    #set($rdoc = $xwiki.getDocument($tdoc.parent))<a href="$rdoc.getURL("view")">$rdoc.displayTitle</a>
-    </dd>
-    #set($pages = $tdoc.includedPages)
-    #if($pages.size() > 0)
-      <dt>
-        <label for="">
-        #if($pages.size() == 1)
-          $xwiki.parseMessage("editincludepagemsgone"):
+<div id="_information"> 
+  <div id="informationleft" style="float:left; width: 49.9%;">  
+    <dl>
+      <dt><label for="xwikidocparentinput2">$msg.get("docextra.parent")</label></dt>
+      <dd>
+        ## <input type="text" id="xwikidocparentinput2" name="parent" value="$!tdoc.parent" size="30"/>        
+        #if("$!tdoc.parent" != "")
+          #displayDocumentList([$tdoc.parent] false [])
         #else
-          $xwiki.parseMessage("editincludepagemsgmore"):
-        #end
-        </label>
-      </dt>
-      <dd>
-        #foreach($page in $pages)#set($rdoc = $xwiki.getDocument($page).getTranslatedDocument())#if($velocityCount > 1), #end<a href="$rdoc.getURL()">$rdoc.getDisplayTitle()</a>#end
+          No parent
+        #end      
       </dd>
-    #end
-    #set($blinks = $doc.getBacklinks())
-    #if($blinks.size()>0)
-      <dt><label for="">$msg.get("docextra.backlinks", [$blinks.size()])</label></dt>
+      <dt><label for="xwikidocparentinput2">$msg.get("docextra.children")</label></dt>
       <dd>
-        #foreach($docname in $blinks)#set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())#if($velocityCount > 1), #end<a href="$rdoc.getURL("view")">$rdoc.displayTitle</a>#end
-      <dd>
+        #set($children = $doc.getChildren())         
+        #if($children.size() > 0)
+		  #displayDocumentList($children true $blacklistedSpaces)
+        #else
+          No children
+        #end
+      </dd>
+    </dl>      
+  </div>
+  <div id="informationright" style="float:right; width: 50.1%;">           
+    #if ($xwiki.hasAccessLevel("edit"))
+      #template("tagedit.vm")
     #end
-    <dt><label for="">$msg.get("docextra.creation")</label></dt>
-    <dd>$msg.get("docextra.createdby", [$xwiki.getLocalUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])</dd>
-  </dl>
-</div>
+    <dl>
+      <dt><label for="">$msg.get("docextra.creation")</label></dt>
+      <dd>$msg.get("docextra.createdby", [$xwiki.getLocalUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])</dd>          
+      #if($isAdvancedUser)
+        #set($pages = $tdoc.includedPages)
+        #if($pages.size() > 0)
+          <dt><label for="">$msg.get("docextra.includedpages")</label></dt>
+          <dd>
+            #displayDocumentList($pages true $blacklistedSpaces)
+          </dd>
+      #end
+      #end
+      #set($blinks = $doc.getBacklinks())
+      #if($blinks.size()>0)
+        <dt><label for="">$msg.get("docextra.backlinks")</label></dt>
+        <dd>          
+          #displayDocumentList($blinks true $blacklistedSpaces)
+        <dd>
+      #end
+    </dl>      
+  </div>
+  <div class="clearfloats">&nbsp;</div>  
 </div>

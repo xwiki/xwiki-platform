@@ -1264,3 +1264,35 @@ $html
 <iframe src="//www.google.com/calendar/embed?title=Test&amp;showTitle=${showTitle}&amp;showNav=${showNav}&amp;showDate=${showDate}&amp;showPrint=${showPrint}&amp;showTabs=${showTabs}&amp;showCalendars=${showCalendars}&amp;showTz=${showTz}&amp;mode=${mode}&amp;height=${height}&amp;wkst=2&amp;hl=${language}&amp;bgcolor=${bgcolor}&amp;src=${id.replaceAll("@","%40")}&amp;color=${color}&amp;ctz=${ctz}" style=" border:solid ${border}px #777 " width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>
 {/pre}
 #end
+#**
+ * Displays a list of documents.   
+ * 
+ * @param docNames list of document names.
+ * @param displaySpaces true to group documents by space.
+ * @param blacklistedSpaces spaces to exclude from the list.
+ *#
+#macro(displayDocumentList $docNames $displaySpaces $blacklistedSpaces)
+  #set($documentList = $util.getArrayList())
+  #foreach($docName in $docNames)
+    #set($document = $xwiki.getDocument($docName).getTranslatedDocument())      
+    #if(!$blacklistedSpaces.contains($document.getSpace()))    
+      #set($discard = $documentList.add($document))
+    #end
+  #end
+  #if($documentList.size() > 0)
+    #set($previousSpace = "")      
+    <ul class="xlist">
+      #foreach($document in $documentList)             
+        #if ($document.getSpace() != $previousSpace && $displaySpaces)
+          #if($velocityCount > 1) </ul></div></li> #end ## Close previous space item if needed
+          <li class="xitem space"><div class="xitemcontainer">$document.getSpace()<ul class="xlist"> ## Open new space item
+          #set($previousSpace = $document.getSpace())
+        #end
+        <li class="xitem page"><div class="xitemcontainer"><a href="$document.getURL()">$document.getDisplayTitle()</a></div></li>        
+      #end
+      #if($displaySpaces)          
+        </ul></div></li> ## Close last space item
+      #end
+    </ul>
+  #end
+#end

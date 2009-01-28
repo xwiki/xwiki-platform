@@ -8,15 +8,15 @@
 <meta http-equiv="Content-Type" content="text/xhtml+xml; charset=$xwiki.encoding" />
 <meta http-equiv="imagetoolbar" content="no"/>
 $!xwiki.getWebPreference("meta") 
-<link href="$xwiki.getSkinFile("tdwSkin.css")" rel="stylesheet" type="text/css"/>
+<link href="$xwiki.getSkinFile("js/xwiki/chartwizard/tdwSkin.css")" rel="stylesheet" type="text/css"/>
 #template("stylesheets.vm")
-<script type="text/javascript" src="$xwiki.getSkinFile("tdwScripts.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/chartwizard/tdwScripts.js")"></script>
 </head>
 #set($saveAddress = $xwiki.getURL("Main.WebHome", "objectadd"))
 #set($saveAddress = $saveAddress.substring(0, $saveAddress.indexOf("Main/WebHome")))
 #set($baseAddress = $xwiki.getURL("Main.WebHome", "gettables"))
 #set($baseAddress = $baseAddress.substring(0, $baseAddress.indexOf("Main/WebHome")))
-<body onload="window.wizard.initialize('$baseAddress', '$xwiki.getSkinFile("")', '$saveAddress');">
+<body onload="window.wizard.initialize('$baseAddress', '$xwiki.getSkinFile("js/xwiki/chartwizard/")', '$saveAddress');">
 <div id="tableWizard">
   <table id="tdwWizard" summary="Table Datasource Wizard Content">
     <tbody>

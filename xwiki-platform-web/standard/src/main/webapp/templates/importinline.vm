@@ -38,7 +38,7 @@
 ## to import from that XAR.
 ##---------------------------------------------------------------------------
 #else
-  <script type="text/javascript" src="$xwiki.getSkinFile("import.js", true)"></script>
+  <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/importer/import.js", true)"></script>
   <h4 class="legend">$msg.get("availablefilestoimport")</h4>
   $msg.get("selectfiletoimport"):
   #set($attachments = $doc.attachmentList)

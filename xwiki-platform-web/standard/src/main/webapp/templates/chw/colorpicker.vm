@@ -1,5 +1,5 @@
 <div id="chwColorPicker">
-  <img src="$xwiki.getSkinFile("chwempty.png")" id="chwColorPickerScreen"/>
+  <img src="$xwiki.getSkinFile("js/xwiki/chartwizard/chwempty.png")" id="chwColorPickerScreen"/>
   <fieldset id="chwColorPickerFieldset" class="chwLargeFieldset">
     <legend id="chwColorPickerLegend" class="chwLargeLegend">Color picker</legend>
     <table summary="Color picker maps layout" id="chwColorpickerTable">
@@ -7,7 +7,7 @@
         <tr>
           <td class="chwColorpickerHSTd">
             <div class="chwColorpickerHSDiv">
-            <img src="$xwiki.getSkinFile("chwcolormap.png")" title="" alt="" class="chwColorpickerHSImg" id="chwColorpickerHSMap"
+            <img src="$xwiki.getSkinFile("js/xwiki/chartwizard/chwcolormap.png")" title="" alt="" class="chwColorpickerHSImg" id="chwColorpickerHSMap"
             onclick="window.colorPicker.hsChanged(event, this)"
             onmousedown="return window.colorPicker.mouseDown(event, this)"
             onmouseup="return window.colorPicker.mouseUp(event, this)"
@@ -16,15 +16,15 @@
           </td>
           <td>
             <div class="chwColorpickerLDiv">
-            <img src="$xwiki.getSkinFile("chwluminancemoz.png")" title="" alt="" class="chwColorpickerLImg" id="chwColorpickerLMap"
+            <img src="$xwiki.getSkinFile("js/xwiki/chartwizard/chwluminancemoz.png")" title="" alt="" class="chwColorpickerLImg" id="chwColorpickerLMap"
             onclick="window.colorPicker.lChanged(event, this)"
             onmousedown="window.colorPicker.mouseDown(event, this)"
             onmouseup="window.colorPicker.mouseUp(event, this)"
             onmousemove="window.colorPicker.mouseMove(event, this)"/>
             </div>
           </td>
-          <td class="chwColorpickerLPointerContainer" id="chwColorpickerLPointerContainer" style="background-image: url($xwiki.getSkinFile("chwpointer.png"));">
-            <img src="$xwiki.getSkinFile("chwempty.png")" title="" alt="" class="chwColorpickerLPointerImg" id="chwColorpickerLPointer"
+          <td class="chwColorpickerLPointerContainer" id="chwColorpickerLPointerContainer" style="background-image: url($xwiki.getSkinFile("js/xwiki/chartwizard/chwpointer.png"));">
+            <img src="$xwiki.getSkinFile("js/xwiki/chartwizard/chwempty.png")" title="" alt="" class="chwColorpickerLPointerImg" id="chwColorpickerLPointer"
             onclick="window.colorPicker.lChanged(event, this)"
             onmousedown="window.colorPicker.mouseDown(event, this)"
             onmouseup="window.colorPicker.mouseUp(event, this)"

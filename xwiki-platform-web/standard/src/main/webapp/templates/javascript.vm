@@ -1,16 +1,31 @@
-<script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
+##
+## CSS files related to JS libraries.
+##
+<link href="$xwiki.getSkinFile("js/xwiki/fullscreenedit/fullscreenEdit.css")" rel="stylesheet" type="text/css" />
+<link href="$xwiki.getSkinFile("js/xwiki/table/table.css", true)" rel="stylesheet" type="text/css" />
+<link href="$xwiki.getSkinFile("js/xwiki/usersandgroups/usersandgroups.css", true)" rel="stylesheet" type="text/css" />
+<link href="$xwiki.getSkinFile("js/xwiki/suggest/ajaxSuggest.css")" rel="stylesheet" type="text/css" />
+<link href="$xwiki.getSkinFile("js/yui/treeview/assets/tree.css")" rel="stylesheet" type="text/css"/>
+<link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightbox.css", true)" rel="stylesheet" type="text/css" />
+<!--[if IE]>
+  <link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightboxIE.css", true)" rel="stylesheet" type="text/css" />
+<![endif]-->
+##
+## JS Libraries.
+##
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/xwiki.js", true)"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/util/skin.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/util/browserdetect.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/util/shortcuts.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("scriptaculous/scriptaculous.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("accordion/accordion.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js", true)"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("browserdetect.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("chwScripts.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("scripts/table/tablefilterNsort.js", true)"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("fullscreenEdit.js", true)"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("usersandgroups.js", true)"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("suggest/ajaxSuggest.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("scripts/lightbox/lightbox.js", true)"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("scripts/shortcuts.js", true)"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/scriptaculous/scriptaculous.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/scriptaculous/3rdparty/accordion/accordion.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/chartwizard/chwScripts.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/table/tablefilterNsort.js", true)"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/fullscreenedit/fullscreenEdit.js", true)"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/usersandgroups/usersandgroups.js", true)"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/suggest/ajaxSuggest.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/lightbox/lightbox.js", true)"></script>
 <script type="text/javascript">
 // <![CDATA[
 XWiki.webapppath = "${xwiki.webAppPath}";

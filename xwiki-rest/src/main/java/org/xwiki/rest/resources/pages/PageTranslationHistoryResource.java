@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.resources.pages;
 
-
 /**
  * @version $Id$
  */

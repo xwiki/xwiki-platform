@@ -81,7 +81,8 @@ public class BasePageHistoryResource extends XWikiResource
         for (Object object : queryResult) {
             Object[] fields = (Object[]) object;
             HistorySummary historySummary =
-                DomainObjectFactory.createHistorySummary(getRequest(), resourceClassRegistry, wikiName, languageId, fields);
+                DomainObjectFactory.createHistorySummary(getRequest(), resourceClassRegistry, wikiName, languageId,
+                    fields);
             history.addHistorySummary(historySummary);
         }
 

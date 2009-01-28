@@ -53,9 +53,8 @@ public class PagesResource extends XWikiResource
 
             Form queryForm = getRequest().getResourceRef().getQueryAsForm();
             RangeIterable<String> ri =
-                new RangeIterable<String>(pageNames, Utils.parseInt(queryForm
-                    .getFirstValue(Constants.START_PARAMETER), 0), Utils.parseInt(queryForm
-                    .getFirstValue(Constants.NUMBER_PARAMETER), -1));
+                new RangeIterable<String>(pageNames, Utils.parseInt(queryForm.getFirstValue(Constants.START_PARAMETER),
+                    0), Utils.parseInt(queryForm.getFirstValue(Constants.NUMBER_PARAMETER), -1));
 
             for (String pageName : ri) {
                 String pageFullName = String.format("%s.%s", spaceName, pageName);

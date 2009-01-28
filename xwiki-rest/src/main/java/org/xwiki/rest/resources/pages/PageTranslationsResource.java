@@ -59,7 +59,7 @@ public class PageTranslationsResource extends XWikiResource
             return null;
         }
 
-        Page page = DomainObjectFactory.createPage(getRequest(), resourceClassRegistry, doc);
+        Page page = DomainObjectFactory.createPage(getRequest(), resourceClassRegistry, doc, false);
         if (page == null) {
             getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
             return null;

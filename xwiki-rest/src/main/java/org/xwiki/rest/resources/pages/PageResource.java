@@ -19,12 +19,207 @@
  */
 package org.xwiki.rest.resources.pages;
 
+import java.io.IOException;
+
+import org.restlet.data.MediaType;
+import org.restlet.data.Status;
+import org.restlet.resource.Representation;
+import org.restlet.resource.StringRepresentation;
+import org.restlet.resource.Variant;
+import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
+import org.xwiki.rest.model.Page;
+import org.xwiki.rest.model.XStreamFactory;
+
+import com.thoughtworks.xstream.XStream;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
+
 /**
  * @version $Id$
  */
 public class PageResource extends ModifiablePageResource
 {
-    /*
-     * This class is needed because we need to associate a resource component to each URI exposed in the API.
-     */
+    @Override
+    public Representation represent(Variant variant)
+    {
+        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), true);
+        if (documentInfo == null) {
+            /* If the document doesn't exist send a not found header */
+            getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+            return null;
+        }
+
+        Document doc = documentInfo.getDocument();
+
+        /* Check if we have access to it */
+        if (doc == null) {
+            getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+            return null;
+        }
+
+        Page page = DomainObjectFactory.createPage(getRequest(), resourceClassRegistry, doc, false);
+        if (page == null) {
+            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            return null;
+        }
+
+        return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), page);
+    }
+
+    @Override
+    public boolean allowPut()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean allowDelete()
+    {
+        return true;
+    }
+
+    @Override
+    public void handlePut()
+    {
+        MediaType mediaType = getRequest().getEntity().getMediaType();
+
+        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), false);
+        if (documentInfo == null) {
+            /* Should not happen since we requested not to fail if the document doesn't exist */
+            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            return;
+
+        }
+
+        Document doc = documentInfo.getDocument();
+        /* If the doc is null we don't have the rights to access it. */
+        if (doc == null) {
+            getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+            return;
+        }
+
+        /* If the doc is locked then return */
+        if (doc.getLocked()) {
+            getResponse().setStatus(Status.CLIENT_ERROR_LOCKED);
+            return;
+        }
+
+        /* Process the entity */
+        if (MediaType.TEXT_PLAIN.equals(mediaType)) {
+            try {
+                doc.setContent(getRequest().getEntity().getText());
+                doc.save();
+            } catch (IOException e) {
+                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+                return;
+            } catch (XWikiException e) {
+                if (e.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
+                    getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+                } else {
+                    getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+                }
+
+                return;
+            }
+        } else if (MediaType.APPLICATION_XML.equals(mediaType)) {
+            XStream xstream = XStreamFactory.getXStream();
+
+            Page page = null;
+
+            /* If we receive an XML that is not convertible to a Page object we reject it */
+            try {
+                page = (Page) xstream.fromXML(getRequest().getEntity().getText());
+            } catch (Exception e) {
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
+                return;
+            }
+
+            /* We will only save if something changes... */
+            boolean save = false;
+
+            if (page.getContent() != null) {
+                doc.setContent(page.getContent());
+                save = true;
+            }
+
+            if (page.getParent() != null) {
+                if (!page.getParent().equals(doc.getParent())) {
+                    doc.setParent(page.getParent());
+                    save = true;
+                }
+            }
+
+            if (page.getTitle() != null) {
+                if (!page.getTitle().equals(doc.getTitle())) {
+                    doc.setTitle(page.getTitle());
+                    save = true;
+                }
+            }
+
+            if (save) {
+                try {
+                    doc.save();
+                } catch (XWikiException e) {
+                    if (e.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
+                        getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+                    } else {
+                        getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+                    }
+
+                    return;
+                }
+
+                /* Set the correct response code, depending whether the document existed or not */
+                if (documentInfo.isCreated()) {
+                    getResponse().setStatus(Status.SUCCESS_CREATED);
+                } else {
+                    getResponse().setStatus(Status.SUCCESS_ACCEPTED);
+                }
+
+                /* Set the entity as being the new/updated document XML representation */
+                getResponse().setEntity(
+                    new StringRepresentation(Utils.toXml(DomainObjectFactory.createPage(getRequest(),
+                        resourceClassRegistry, doc, false)), MediaType.APPLICATION_XML));
+            }
+        }
+    }
+
+    @Override
+    public void handleDelete()
+    {
+        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), false);
+        if (documentInfo == null) {
+            /* Should not happen since we requested not to fail if the document doesn't exist */
+            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            return;
+
+        }
+
+        Document doc = documentInfo.getDocument();
+        /* If the doc is null we don't have the rights to access it. */
+        if (doc == null) {
+            getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+            return;
+        }
+
+        /* If the doc is locked then return */
+        if (doc.getLocked()) {
+            getResponse().setStatus(Status.CLIENT_ERROR_LOCKED);
+            return;
+        }
+
+        try {
+            doc.delete();
+        } catch (XWikiException e) {
+            if (e.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
+                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+            } else {
+                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            }
+
+            return;
+        }
+    }
+
 }

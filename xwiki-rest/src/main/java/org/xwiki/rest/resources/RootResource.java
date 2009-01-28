@@ -23,8 +23,8 @@ import org.restlet.data.MediaType;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.xwiki.rest.DomainObjectFactory;
-import org.xwiki.rest.XWikiRestApplication;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.XWikiRestApplication;
 import org.xwiki.rest.model.XWikiRoot;
 
 /**

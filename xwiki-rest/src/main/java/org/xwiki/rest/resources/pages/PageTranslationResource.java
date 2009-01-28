@@ -22,7 +22,7 @@ package org.xwiki.rest.resources.pages;
 /**
  * @version $Id$
  */
-public class PageTranslationResource extends ModifiablePageResource
+public class PageTranslationResource extends PageResource
 {
     /*
      * This class is needed because we need to associate a resource component to each URI exposed in the API.

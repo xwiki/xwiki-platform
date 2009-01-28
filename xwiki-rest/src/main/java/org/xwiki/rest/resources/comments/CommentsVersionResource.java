@@ -17,10 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources.spaces;
+package org.xwiki.rest.resources.comments;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Vector;
 
 import org.restlet.data.Form;
 import org.restlet.data.Status;
@@ -31,54 +30,57 @@ import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Spaces;
+import org.xwiki.rest.model.Comments;
 
-import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 
 /**
  * @version $Id$
  */
-public class SpacesResource extends XWikiResource
+public class CommentsVersionResource extends XWikiResource
 {
+
     @Override
     public Representation represent(Variant variant)
     {
-        String database = xwikiContext.getDatabase();
-
         try {
-            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);
-            xwikiContext.setDatabase(wiki);
-
-            Spaces spaces = new Spaces();
-
-            List<String> spaceNames = xwikiApi.getSpaces();
-            Collections.sort(spaceNames);
-
-            Form queryForm = getRequest().getResourceRef().getQueryAsForm();
-            RangeIterable<String> ri =
-                new RangeIterable<String>(spaceNames, Utils.parseInt(
-                    queryForm.getFirstValue(Constants.START_PARAMETER), 0), Utils.parseInt(queryForm
-                    .getFirstValue(Constants.NUMBER_PARAMETER), -1));
-
-            for (String spaceName : ri) {
-                List<String> docNames = xwikiApi.getSpaceDocsName(spaceName);
-                String home = String.format("%s.WebHome", spaceName);
-                if (!xwikiApi.exists(home)) {
-                    home = null;
-                }
-
-                spaces.addSpace(DomainObjectFactory.createSpace(getRequest(), resourceClassRegistry, wiki, spaceName,
-                    home, docNames.size()));
+            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), true);
+            if (documentInfo == null) {
+                /* If the document doesn't exist send a not found header */
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+                return null;
             }
 
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), spaces);
-        } catch (XWikiException e) {
+            Document doc = documentInfo.getDocument();
+
+            /* Check if we have access to it */
+            if (doc == null) {
+                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+                return null;
+            }
+
+            Comments comments = new Comments();
+
+            Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
+
+            Form queryForm = getRequest().getResourceRef().getQueryAsForm();
+            RangeIterable<com.xpn.xwiki.api.Object> ri =
+                new RangeIterable<com.xpn.xwiki.api.Object>(xwikiComments, Utils.parseInt(queryForm
+                    .getFirstValue(Constants.START_PARAMETER), 0), Utils.parseInt(queryForm
+                    .getFirstValue(Constants.NUMBER_PARAMETER), -1));
+
+            for (com.xpn.xwiki.api.Object xwikiComment : ri) {
+                comments.addComment(DomainObjectFactory.createComment(getRequest(), resourceClassRegistry, doc,
+                    xwikiComment, true));
+            }
+
+            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), comments);
+        } catch (Exception e) {
             e.printStackTrace();
             getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-        } finally {
-            xwikiContext.setDatabase(database);
         }
 
         return null;
     }
+
 }

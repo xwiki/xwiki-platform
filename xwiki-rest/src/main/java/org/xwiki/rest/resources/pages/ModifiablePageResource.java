@@ -26,6 +26,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.StringRepresentation;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
+import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.Page;
 import org.xwiki.rest.model.XStreamFactory;
 
@@ -38,7 +39,7 @@ import com.xpn.xwiki.api.Document;
  * 
  * @version $Id$
  */
-public abstract class ModifiablePageResource extends BasePageResource
+public abstract class ModifiablePageResource extends XWikiResource
 {
     @Override
     public boolean allowPut()
@@ -153,7 +154,7 @@ public abstract class ModifiablePageResource extends BasePageResource
                 /* Set the entity as being the new/updated document XML representation */
                 getResponse().setEntity(
                     new StringRepresentation(Utils.toXml(DomainObjectFactory.createPage(getRequest(),
-                        resourceClassRegistry, doc)), MediaType.APPLICATION_XML));
+                        resourceClassRegistry, doc, false)), MediaType.APPLICATION_XML));
             }
         }
     }

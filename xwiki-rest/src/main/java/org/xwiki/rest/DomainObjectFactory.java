@@ -20,7 +20,6 @@
 package org.xwiki.rest;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,21 +35,20 @@ import org.xwiki.rest.model.PageSummary;
 import org.xwiki.rest.model.Relations;
 import org.xwiki.rest.model.Space;
 import org.xwiki.rest.model.Translations;
-import org.xwiki.rest.model.Wikis;
 import org.xwiki.rest.model.XWikiRoot;
 import org.xwiki.rest.resources.RootResource;
 import org.xwiki.rest.resources.comments.CommentResource;
+import org.xwiki.rest.resources.comments.CommentVersionResource;
 import org.xwiki.rest.resources.comments.CommentsResource;
+import org.xwiki.rest.resources.comments.CommentsVersionResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.rest.resources.pages.PageTranslationVersionResource;
 import org.xwiki.rest.resources.pages.PageVersionResource;
 import org.xwiki.rest.resources.pages.PagesResource;
 import org.xwiki.rest.resources.spaces.SpaceResource;
-import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Property;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
@@ -79,32 +77,6 @@ public class DomainObjectFactory
         xwikiRoot.addLink(link);
 
         return xwikiRoot;
-    }
-
-    public static Wikis createWikis(Request request, com.xpn.xwiki.XWiki xwiki,
-        com.xpn.xwiki.XWikiContext xwikiContext, XWikiResourceClassRegistry registry)
-    {
-        Wikis wikis = new Wikis();
-
-        List<String> databaseNames = new ArrayList<String>();
-
-        try {
-            databaseNames = xwiki.getVirtualWikisDatabaseNames(xwikiContext);
-        } catch (XWikiException e) {
-            /* Ignore */
-        }
-
-        for (String databaseName : databaseNames) {
-            String fullUri =
-                String.format("%s%s", request.getRootRef(), registry
-                    .getUriPatternForResourceClass(SpacesResource.class));
-            Link link = new Link(fullUri);
-            link.setRel(Relations.SPACES);
-            wikis.addLink(link);
-        }
-
-        return wikis;
-
     }
 
     public static Space createSpace(Request request, XWikiResourceClassRegistry resourceClassRegistry, String wiki,
@@ -211,7 +183,8 @@ public class DomainObjectFactory
         }
     }
 
-    public static Page createPage(Request request, XWikiResourceClassRegistry resourceClassRegistry, Document doc)
+    public static Page createPage(Request request, XWikiResourceClassRegistry resourceClassRegistry, Document doc,
+        boolean useVersion)
     {
         try {
             Page page = new Page();
@@ -247,13 +220,22 @@ public class DomainObjectFactory
             Link link;
 
             for (String language : languages) {
-                fullUri =
-                    String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(PageTranslationResource.class));
+                if (useVersion) {
+                    fullUri =
+                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                            .getUriPatternForResourceClass(PageTranslationVersionResource.class));
+                } else {
+                    fullUri =
+                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                            .getUriPatternForResourceClass(PageTranslationResource.class));
+                }
+
                 parametersMap = new HashMap<String, String>();
                 parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
                 parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
                 parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
+                parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
+                    .getRCSVersion().at(1)));
                 parametersMap.put(Constants.LANGUAGE_ID_PARAMETER, language);
                 link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
                 link.setRel(Relations.TRANSLATION);
@@ -293,14 +275,21 @@ public class DomainObjectFactory
                 page.addLink(link);
             }
 
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(CommentsResource.class));
-
+            if (useVersion) {
+                fullUri =
+                    String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                        .getUriPatternForResourceClass(CommentsVersionResource.class));
+            } else {
+                fullUri =
+                    String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                        .getUriPatternForResourceClass(CommentsResource.class));
+            }
             parametersMap = new HashMap<String, String>();
             parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
             parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
             parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
+            parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
+                .getRCSVersion().at(1)));
             link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
             link.setRel(Relations.COMMENTS);
             page.addLink(link);
@@ -369,7 +358,7 @@ public class DomainObjectFactory
     }
 
     public static Comment createComment(Request request, XWikiResourceClassRegistry resourceClassRegistry,
-        Document doc, com.xpn.xwiki.api.Object xwikiComment)
+        Document doc, com.xpn.xwiki.api.Object xwikiComment, boolean useVersionInformation)
     {
         Comment comment = new Comment();
         comment.setId(xwikiComment.getNumber());
@@ -398,24 +387,40 @@ public class DomainObjectFactory
         Map<String, String> parametersMap;
         Link link;
 
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(PageResource.class));
+        if (useVersionInformation) {
+            fullUri =
+                String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                    .getUriPatternForResourceClass(PageVersionResource.class));
+        } else {
+            fullUri =
+                String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                    .getUriPatternForResourceClass(PageResource.class));
+        }
         parametersMap = new HashMap<String, String>();
         parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
         parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
         parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
+        parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
+            .getRCSVersion().at(1)));
         link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
         link.setRel(Relations.PAGE);
         comment.addLink(link);
 
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(CommentResource.class));
+        if (useVersionInformation) {
+            fullUri =
+                String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                    .getUriPatternForResourceClass(CommentVersionResource.class));
+        } else {
+            fullUri =
+                String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                    .getUriPatternForResourceClass(CommentResource.class));
+        }
         parametersMap = new HashMap<String, String>();
         parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
         parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
         parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
+        parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
+            .getRCSVersion().at(1)));
         parametersMap.put(Constants.COMMENT_ID_PARAMETER, String.format("%d", xwikiComment.getNumber()));
         link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
         link.setRel(Relations.SELF);

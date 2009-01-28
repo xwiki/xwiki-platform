@@ -79,7 +79,7 @@ public class CommentsResource extends XWikiResource
 
             for (com.xpn.xwiki.api.Object xwikiComment : ri) {
                 comments.addComment(DomainObjectFactory.createComment(getRequest(), resourceClassRegistry, doc,
-                    xwikiComment));
+                    xwikiComment, false));
             }
 
             return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), comments);
@@ -173,7 +173,7 @@ public class CommentsResource extends XWikiResource
                     /* Set the entity as being the new/updated document XML representation */
                     getResponse().setEntity(
                         new StringRepresentation(Utils.toXml(DomainObjectFactory.createComment(getRequest(),
-                            resourceClassRegistry, doc, commentObject)), MediaType.APPLICATION_XML));
+                            resourceClassRegistry, doc, commentObject, false)), MediaType.APPLICATION_XML));
                 }
             }
         } catch (XWikiException e) {

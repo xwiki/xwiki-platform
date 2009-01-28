@@ -48,7 +48,9 @@ public class CommentResource extends XWikiResource
             Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
             for (com.xpn.xwiki.api.Object xwikiComment : xwikiComments) {
                 if (xwikiComment.getNumber() == commentId) {
-                    comment = DomainObjectFactory.createComment(getRequest(), resourceClassRegistry, doc, xwikiComment);
+                    comment =
+                        DomainObjectFactory
+                            .createComment(getRequest(), resourceClassRegistry, doc, xwikiComment, false);
                     break;
                 }
             }

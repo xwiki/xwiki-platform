@@ -19,8 +19,6 @@
  */
 package org.xwiki.rest.model;
 
-import java.util.Date;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -28,9 +26,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("comment")
 public class Comment extends LinkCollection
-{    
+{
     private Integer id;
-    
+
     private String author;
 
     private Long date;
@@ -38,7 +36,7 @@ public class Comment extends LinkCollection
     private String highlight;
 
     private String text;
- 
+
     public String getAuthor()
     {
         return author;

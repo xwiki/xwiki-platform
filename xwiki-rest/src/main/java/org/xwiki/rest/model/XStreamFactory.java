@@ -75,6 +75,7 @@ public class XStreamFactory
         xstream.processAnnotations(HistorySummary.class);
         xstream.processAnnotations(Comments.class);
         xstream.processAnnotations(Comment.class);
+
         return xstream;
 
     }

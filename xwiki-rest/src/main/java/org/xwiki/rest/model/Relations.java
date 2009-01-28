@@ -39,8 +39,8 @@ public class Relations
     public static final String TRANSLATION = "http://www.xwiki.org/rel/translation";
 
     public static final String PAGE = "http://www.xwiki.org/rel/page";
-    
+
     public static final String COMMENTS = "http://www.xwiki.org/rel/comments";
-        
+
     public static final String PARENT = "http://www.xwiki.org/rel/page/parent";
 }

@@ -757,6 +757,100 @@
 			</implementation>
 		</component>
 		
+		<!-- ************************************* -->
+		<!-- * Comments version resource * -->
+		<!-- ************************************* -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.comments.CommentsVersionResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.resources.comments.CommentsVersionResource
+			</implementation>
+			<requirements>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceClassRegistry
+					</role>
+				</requirement>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceRepresenter
+					</role>
+					<role-hint>org.xwiki.rest.resources.comments.CommentsVersionResource
+					</role-hint>
+					<field-name>descriptorToRepresenterMap
+					</field-name>
+				</requirement>
+			</requirements>
+			<configuration>
+				<uriPattern>
+					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/comments
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for Comments resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.comments.CommentsVersionResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
+		
+		<!-- ************************************* -->
+		<!-- * Comment version resource * -->
+		<!-- ************************************* -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.comments.CommentVersionResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.resources.comments.CommentVersionResource
+			</implementation>
+			<requirements>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceClassRegistry
+					</role>
+				</requirement>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceRepresenter
+					</role>
+					<role-hint>org.xwiki.rest.resources.comments.CommentVersionResource
+					</role-hint>
+					<field-name>descriptorToRepresenterMap
+					</field-name>
+				</requirement>
+			</requirements>
+			<configuration>
+				<uriPattern>
+					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/comments/{commentId}
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for Comment version resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.comments.CommentVersionResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
+		
 	</components>
 </component-set>
 

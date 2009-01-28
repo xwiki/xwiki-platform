@@ -41,7 +41,7 @@ public class XmlTextXStreamRepresenter implements XWikiResourceRepresenter
 
     public Representation represent(Context context, Request request, Response response, Object... objects)
     {
-        return new StringRepresentation(Utils.toXml(objects[0]), MediaType.APPLICATION_XML);
+        return new StringRepresentation(Utils.toXml(objects[0]), getMediaType());
     }
 
 }

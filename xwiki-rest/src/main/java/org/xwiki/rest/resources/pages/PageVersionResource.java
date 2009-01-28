@@ -19,12 +19,44 @@
  */
 package org.xwiki.rest.resources.pages;
 
+import org.restlet.data.Status;
+import org.restlet.resource.Representation;
+import org.restlet.resource.Variant;
+import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.model.Page;
+
+import com.xpn.xwiki.api.Document;
+
 /**
  * @version $Id$
  */
-public class PageVersionResource extends BasePageResource
+public class PageVersionResource extends XWikiResource
 {
-    /*
-     * This class is needed because we need to associate a resource component to each URI exposed in the API.
-     */
+    @Override
+    public Representation represent(Variant variant)
+    {
+        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), true);
+        if (documentInfo == null) {
+            /* If the document doesn't exist send a not found header */
+            getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+            return null;
+        }
+
+        Document doc = documentInfo.getDocument();
+
+        /* Check if we have access to it */
+        if (doc == null) {
+            getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+            return null;
+        }
+
+        Page page = DomainObjectFactory.createPage(getRequest(), resourceClassRegistry, doc, true);
+        if (page == null) {
+            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            return null;
+        }
+
+        return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), page);
+    }
 }

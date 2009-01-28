@@ -319,6 +319,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
         if (forceSkinAction) {
+            addServletPath(newpath, context.getWiki().getDatabase(), context);
             addAction(newpath, "skin", context);
         }
         newpath.append("resources");

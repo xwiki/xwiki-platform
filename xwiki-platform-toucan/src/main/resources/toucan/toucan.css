@@ -3707,10 +3707,11 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 #_information dd, #_information dt {
   padding-top: 4px;
   padding-bottom: 4px;
+  background: none;
 }
 
 input#tags {
-	width: 400px;
+	width: 80%;
 }
 
 #tageditsavesuccess {
@@ -3722,3 +3723,65 @@ input#tags {
 	color: red;
 	margin-left: 6px;
 }
+
+.xspacer {
+  clear:both !important;
+  height: 0 !important;
+  width: 0 !important;
+  line-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 
+** Wiki items lists (spaces, pages, comments, attachments)
+*/
+
+ul.xlist {
+  margin: 0 0 0 0.5em !important;
+  padding: 0 !important;
+}
+
+ul.xlist li.xunderline {
+  border-bottom: solid 1px #efefef !important;
+}
+
+ul.xlist li.xhighlight:hover {
+  background-color: lemonChiffon;
+}
+
+ul.xlist li {
+  width: 100% !important;
+  padding-top: 0.2em;
+  list-style-type: none;
+}
+
+ul.xlist li.space, ul.xlist li.page, ul.xlist li.comment, ul.xlist li.attachment {
+  background-repeat: no-repeat;
+  background-position: 2px 3px;
+}
+
+ul.xlist li.space {
+  background-image: url( ../../resources/icons/silk/folder.png );
+}
+
+ul.xlist li.page {
+  background-image: url( ../../resources/icons/silk/page_white_text.png );
+}
+
+ul.xlist li.comment {
+  background-image: url( ../../resources/icons/silk/comment.png );
+}
+
+ul.xlist li.attachment {
+  background-image: url( ../../resources/icons/silk/attach.png );
+}
+
+ul.xlist li.xitem div.xitemcontainer {
+  text-indent: 1.5em;
+}
+
+ul.xlist li.xitem div.xitemcontainer ul.xlist {
+  text-indent: 0em;
+}
+

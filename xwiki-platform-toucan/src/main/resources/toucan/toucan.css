@@ -3762,19 +3762,19 @@ ul.xlist li.space, ul.xlist li.page, ul.xlist li.comment, ul.xlist li.attachment
 }
 
 ul.xlist li.space {
-  background-image: url( ../../resources/icons/silk/folder.png );
+  background-image: url( ../../resources/icons/silk/folder.gif );
 }
 
 ul.xlist li.page {
-  background-image: url( ../../resources/icons/silk/page_white_text.png );
+  background-image: url( ../../resources/icons/silk/page_white_text.gif );
 }
 
 ul.xlist li.comment {
-  background-image: url( ../../resources/icons/silk/comment.png );
+  background-image: url( ../../resources/icons/silk/comment.gif );
 }
 
 ul.xlist li.attachment {
-  background-image: url( ../../resources/icons/silk/attach.png );
+  background-image: url( ../../resources/icons/silk/attach.gif );
 }
 
 ul.xlist li.xitem div.xitemcontainer {

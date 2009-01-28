@@ -1,0 +1,26 @@
+.#---------------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.#---------------------------------------------------------------------------------------------------------
+(% style="font-(%weight: bold; ~%)font-family: \"monospace\"; font-size: 14pt;" %)
+foobar
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph [[style]=[font-(%weight: bold; %)font-family: "monospace"; font-size: 14pt;]]
+onWord [foobar]
+endParagraph [[style]=[font-(%weight: bold; %)font-family: "monospace"; font-size: 14pt;]]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p style="font-(%weight: bold; %)font-family: &quot;monospace&quot;; font-size: 14pt;">foobar</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+(% style="font-(%weight: bold; ~%)font-family: \"monospace\"; font-size: 14pt;" %)
+foobar
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<p style="font-(%weight: bold; %)font-family: &quot;monospace&quot;; font-size: 14pt;">foobar</p>

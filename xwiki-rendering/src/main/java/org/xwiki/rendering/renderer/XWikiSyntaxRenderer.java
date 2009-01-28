@@ -934,8 +934,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         if (!parameters.isEmpty()) {
             StringBuffer buffer = new StringBuffer("(%");
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(entry.getValue())
-                    .append('\"');
+                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(
+                    entry.getValue().replaceAll("[\\\\\"]", "\\\\$0").replaceAll("\\%\\)", "~%)")).append('\"');
             }
             buffer.append(" %)");
 

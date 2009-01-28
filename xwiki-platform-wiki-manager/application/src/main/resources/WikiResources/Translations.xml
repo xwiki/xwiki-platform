@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
-<date>1223296940000</date>
-<contentUpdateDate>1223296940000</contentUpdateDate>
-<version>1.1</version>
+<date>1233158003000</date>
+<contentUpdateDate>1233158003000</contentUpdateDate>
+<version>4.1</version>
 <title>Translations</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -52,6 +52,7 @@
 <name>WikiResources.Translations</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
+<guid>8616e117-9dd8-41f8-81cd-f92527d50897</guid>
 <property>
 <tags/>
 </property>
@@ -160,10 +161,10 @@ wikimanager.prop.wiki.secure=Secure (SSL)
 wikimanager.prop.wiki.visibility=Visibility
 wikimanager.prop.wiki.language=Language
 wikimanager.prop.wiki.description=Description
-wikimanager.prop.wiki.server=Domain name
+wikimanager.prop.wiki.server=Alias
 wikimanager.prop.wiki.homepage=Home page
 wikimanager.prop.wiki.iswikitemplate=Wiki template
-wikimanager.prop.alias.server=Domain name
+wikimanager.prop.alias.server=Alias
 wikimanager.prop.alias.homepage=Home page
 wikimanager.prop.alias.description=Description
 XWiki.XWikiServerClass_visibility_public=Public
@@ -180,8 +181,8 @@ Wiki identifier has to contains only lowercase alphanumeric characters (0-9, a-z
 wikimanager.doc.createwiki.desc=Set all the properties  of your wiki here. All theses properties can be changed at any time in the wiki's descriptor page.
 wikimanager.doc.createwiki.desc.wikiprettyname=The display name of the wiki.
 wikimanager.doc.createwiki.desc.description=A brief wiki description.
-wikimanager.doc.createwiki.desc.server=The domain name used to access the wiki.
-wikimanager.doc.createwiki.desc.server.creation=The domain name used to access the wiki. The default domain name suffix is ~~{0}~~. To change it edit this wiki page and search the \"$DOMAINNAME\" in TOOLS section.&lt;br /&gt;You can add more domains latter in the wiki's descriptor page.
+wikimanager.doc.createwiki.desc.server=The alias used to access the wiki.
+wikimanager.doc.createwiki.desc.server.creation=The alias used to access the wiki. The current alias suffix is ~~{0}~~. To change it edit this wiki page and search the \"$ALIASSUFFIX\" in TOOLS section.&lt;br /&gt;You can add more aliases latter in the wiki's descriptor page.
 wikimanager.doc.createwiki.desc.owner=A global user who will have all the rights on this wiki.
 wikimanager.doc.createwiki.desc.iswikitemplate=Indicate if this wiki can be use as template when creating a new wiki.
 wikimanager.doc.createwiki.desc.secure=If enabled, all this wiki's URLs will starting with ~~https~~.

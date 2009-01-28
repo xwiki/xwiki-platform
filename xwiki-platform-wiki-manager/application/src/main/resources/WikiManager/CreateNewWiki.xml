@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1228223842000</date>
-<contentUpdateDate>1228223842000</contentUpdateDate>
-<version>2.1</version>
+<date>1233157893000</date>
+<contentUpdateDate>1233157893000</contentUpdateDate>
+<version>4.1</version>
 <title>CreateNewWiki</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -52,6 +52,7 @@
 <name>WikiManager.CreateNewWiki</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
+<guid>afccd63d-a604-48bc-84a9-22ac9c9e065c</guid>
 <property>
 <tags/>
 </property>
@@ -140,7 +141,7 @@
 ############################################################################################
 ## TOOLS
 #set ($Exception = $WikiManager.DefaultException)
-#set ($DOMAINNAME = "localdomain.com")
+#set ($ALIASSUFFIX = ".localdomain.com")
 #set ($WSTEPID_INTRO = 0)    ## Wiki creation introduction
 #set ($WSTEPNAME_INTRO = "wstep_intro")
 #set ($WSTEPID_WIKINAME = 1) ## Wiki name
@@ -410,7 +411,7 @@
    validateWikiName();
 
    if (domainnamesetted == false) {
-     $("XWiki.XWikiServerClass_0_server").value = $("wikiname").value + ".$DOMAINNAME";
+     $("XWiki.XWikiServerClass_0_server").value = $("wikiname").value + "$ALIASSUFFIX";
    }
 
    if (prettynamesetted == false) {
@@ -499,7 +500,7 @@
             &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_server" name="XWiki.XWikiServerClass_0_server" type="text" onchange="domainNameChanged();" /&gt;&lt;/dd&gt;
           &lt;/dl&gt;
         &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.server.creation", [$DOMAINNAME])&lt;/td&gt; #end
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.server.creation", [$ALIASSUFFIX])&lt;/td&gt; #end
       &lt;/tr&gt;
       &lt;tr&gt;
         &lt;td&gt;

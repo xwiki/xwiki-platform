@@ -71,6 +71,17 @@ public interface WysiwygServiceAsync
      */
     void cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams,
         AsyncCallback<String> async);
+    
+    /**
+     * Imports an office document attached to a wiki page into XHTML/1.0.
+     * 
+     * @param pageName the wiki page into which the office document is attached.
+     * @param attachmentName name of the attached office document.
+     * @param cleaningParams additional parameters for the import operation.
+     * @param async the callback to be used for notifying the caller after receiving the response from the server.
+     */
+    void officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams, 
+        AsyncCallback<String> async);
 
     /**
      * Synchronizes this editor with others that edit the same page.

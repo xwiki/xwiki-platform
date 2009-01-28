@@ -105,6 +105,19 @@ public interface WysiwygService extends RemoteService
     String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams);
 
     /**
+     * Imports an office document attached to a wiki page into XHTML/1.0. The resulting xhtml content will be returned
+     * from this method while if there are non-textual content in the original office document, they will be attached
+     * to the wiki page identified by pageName. Note that this method does not alter the content of the wiki page
+     * identified by pageName.
+     * 
+     * @param pageName the wiki page into which the office document is attached.
+     * @param attachmentName name of the attached office document.
+     * @param cleaningParams additional parameters for the import operation.
+     * @return the xhtml result from the office importer.
+     */
+    String officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams);
+    
+    /**
      * @param syncedRevision The changes to this editor's content, since the last update.
      * @param pageName The page being edited.
      * @param version The version affected by syncedRevision.

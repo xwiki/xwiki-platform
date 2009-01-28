@@ -29,6 +29,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.officeimporter.OfficeImporter;
+import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.officeimporter.OfficeImporterResult;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -150,6 +153,30 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         org.xwiki.xml.html.HTMLCleaner cleaner =
             (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.ROLE, cleanerHint);
         return XMLUtils.toString(cleaner.clean(new StringReader(htmlPaste), cleaningParams));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#officeToXHTML(String, String, Map)
+     */
+    public String officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams)
+    {
+        DocumentAccessBridge docBridge = getDocumentAccessBridge();
+        OfficeImporter officeImporter = (OfficeImporter) Utils.getComponent(OfficeImporter.ROLE);
+        try {
+            byte[] attachmentContent = docBridge.getAttachmentContent(pageName, attachmentName);
+            OfficeImporterResult result = officeImporter.doImport(attachmentContent, attachmentName, pageName,
+                OfficeImporter.XHTML_10, cleaningParams);
+            for (String artifactName : result.getArtifacts().keySet()) {
+                docBridge.setAttachmentContent(pageName, artifactName, result.getArtifacts().get(artifactName));
+            }
+            return result.getContent();
+        } catch (OfficeImporterException ex) {
+            throw new RuntimeException(ex.getMessage());
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to import " + pageName + ":" + attachmentName);
+        }
     }
 
     /**

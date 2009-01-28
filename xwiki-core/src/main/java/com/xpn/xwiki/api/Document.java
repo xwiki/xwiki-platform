@@ -58,12 +58,27 @@ import com.xpn.xwiki.util.Util;
 
 public class Document extends Api
 {
+    /**
+     * The XWikiDocument object wrapped by this API.
+     */
     protected XWikiDocument doc;
 
+    /**
+     * Indicates if this API wraps a cloned XWikiDocument. 
+     */
     protected boolean cloned = false;
 
+    /**
+     * Convenience object used by object related methods.
+     */
     protected Object currentObj;
 
+    /**
+     * Document constructor.
+     * 
+     * @param doc The XWikiDocument object to wrap.
+     * @param context The current request context.
+     */
     public Document(XWikiDocument doc, XWikiContext context)
     {
         super(context);
@@ -71,8 +86,11 @@ public class Document extends Api
     }
 
     /**
-     * this function is accessible only if you have the programming rights give access to the priviledged API of the
-     * Document
+     * Get the XWikiDocument wrapped by this API.
+     * This function is accessible only if you have the programming rights give access to the priviledged API of the
+     * Document.
+     * 
+     * @return The XWikiDocument wrapped by this API.
      */
     public XWikiDocument getDocument()
     {
@@ -83,6 +101,11 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Get a clone of the XWikiDocument wrapped by this API.
+     * 
+     * @return A clone of the XWikiDocument wrapped by this API.
+     */
     protected XWikiDocument getDoc()
     {
         if (!this.cloned) {
@@ -94,9 +117,9 @@ public class Document extends Api
     }
 
     /**
-     * return the ID of the document. this ID is uniq accross the wiki.
+     * return the ID of the document. this ID is unique across the wiki.
      * 
-     * @return the id of the document
+     * @return the id of the document.
      */
     public long getId()
     {
@@ -104,7 +127,7 @@ public class Document extends Api
     }
 
     /**
-     * return the name of a document. for exemple if the fullName of a document is "MySpace.Mydoc", the name is MyDoc
+     * return the name of a document. for exemple if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
      * 
      * @return the name of the document
      */
@@ -115,7 +138,7 @@ public class Document extends Api
 
     /**
      * return the name of the space of the document for example if the fullName of a document is "MySpace.Mydoc", the
-     * name is MySpace
+     * name is MySpace.
      * 
      * @return the name of the space of the document
      */
@@ -125,7 +148,9 @@ public class Document extends Api
     }
 
     /**
-     * @return the name of the wiki where this document is stored.
+     * Get the name wiki where the document is stored.
+     * 
+     * @return The name of the wiki where this document is stored.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     public String getWiki()
@@ -134,10 +159,11 @@ public class Document extends Api
     }
 
     /**
-     * return the name of the space of the document for exemple if the fullName of a document is "MySpace.Mydoc", the
-     * name is MySpace
+     * Get the name of the space of the document for exemple if the fullName of a document is "MySpace.Mydoc", the
+     * name is MySpace.
      * 
-     * @deprecated use {@link #getSpace()} instead of this function
+     * @return The name of the space of the document.
+     * @deprecated use {@link #getSpace()} instead of this function.
      */
     @Deprecated
     public String getWeb()
@@ -146,8 +172,11 @@ public class Document extends Api
     }
 
     /**
-     * return the fullName of a document if a document has for name "MyDoc" and space "MySpace", the fullname is
-     * "MySpace.MyDoc" In a wiki, all the documents have a different fullName.
+     * Get the fullName of the document. 
+     * If a document is named "MyDoc" in space "MySpace", the fullname is
+     * "MySpace.MyDoc". In a wiki, all the documents have a different fullName.
+     * 
+     * @return fullName of the document.
      */
     public String getFullName()
     {
@@ -155,8 +184,12 @@ public class Document extends Api
     }
 
     /**
-     * @return the real full name of a document containing wiki name where document is stored. For document in "xwiki"
-     *         wiki, with name "MyDoc" and space "MySpace" the extended full name is "xwiki:MySpace.MyDoc".
+     * Get the complete fullName of the document.
+     * The real full name of the document containing the name of the wiki where the document is stored. 
+     * For a document stored in the wiki "xwiki", in space "MySpace", named "MyDoc", its complete full 
+     * name is "xwiki:MySpace.MyDoc".
+     * 
+     * @return The complete fullName of the document.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     public String getPrefixedFullName()
@@ -164,13 +197,20 @@ public class Document extends Api
         return (getWiki() != null ? getWiki() + ":" : "") + getFullName();
     }
 
+    /**
+     * Get a Version object representing the current version of the document. 
+     * 
+     * @return A Version object representing the current version of the document
+     */
     public Version getRCSVersion()
     {
         return this.doc.getRCSVersion();
     }
 
     /**
-     * return a String with the version of the document.
+     * Get a string representing the current version of the document.
+     * 
+     * @return A string representing the current version of the document.
      */
     public String getVersion()
     {
@@ -178,7 +218,9 @@ public class Document extends Api
     }
 
     /**
-     * return a String with the previous version of the document.
+     * Get a string representing the previous version of the document.
+     * 
+     * @return A string representing the previous version of the document.
      */
     public String getPreviousVersion()
     {
@@ -186,7 +228,9 @@ public class Document extends Api
     }
 
     /**
-     * return the title of a document
+     * Get the value of the title field of the document.
+     * 
+     * @return The value of the title field of the document.
      */
     public String getTitle()
     {
@@ -194,22 +238,31 @@ public class Document extends Api
     }
 
     /**
-     * @return the document title. If a title has not been provided, look for a section title in the document's content
-     *         and if not found return the page name. The returned title is also interpreted which means it's allowed to
-     *         use Velocity, Groovy, etc syntax within a title.
+     * Get document title.
+     * If a title has not been provided through the title field, it looks for a section title in 
+     * the document's content and if not found return the page name. The returned title is also 
+     * interpreted which means it's allowed to use Velocity, Groovy, etc syntax within a title.
+     * 
+     * @return The document title.
      */
     public String getDisplayTitle()
     {
         return this.doc.getDisplayTitle(getXWikiContext());
     }
 
+    /**
+     * TODO: document this.
+     */
     public String getFormat()
     {
         return this.doc.getFormat();
     }
 
     /**
-     * return the name of the last author of the document
+     * Get fullName of the profile document of the author of the current version of the document.
+     * Example: XWiki.Admin.
+     * 
+     * @return The  fullName of the profile document of the author of the current version of the document.
      */
     public String getAuthor()
     {
@@ -217,7 +270,10 @@ public class Document extends Api
     }
 
     /**
-     * return the name of the last author of the content of the document
+     * Get fullName of the profile document of the author of the last content modification in the document.
+     * Example: XWiki.Admin.
+     * 
+     * @return The fullName of the profile document of the author of the last content modification in the document.
      */
     public String getContentAuthor()
     {
@@ -225,7 +281,10 @@ public class Document extends Api
     }
 
     /**
-     * return the modification date
+     * Get the date when the current document version has been created, i.e. the date of the last 
+     * modification of the document.
+     * 
+     * @return The date where the current document version has been created.
      */
     public Date getDate()
     {
@@ -233,7 +292,9 @@ public class Document extends Api
     }
 
     /**
-     * return the date of the last modification of the content
+     * Get the date when the last content modification has been done on the document.
+     * 
+     * @return The date where the last content modification has been done on the document.
      */
     public Date getContentUpdateDate()
     {
@@ -241,7 +302,8 @@ public class Document extends Api
     }
 
     /**
-     * return the date of the creation of the document
+     * Get the date when the document has been created.
+     * return The date when the document has been created.
      */
     public Date getCreationDate()
     {
@@ -249,7 +311,9 @@ public class Document extends Api
     }
 
     /**
-     * return the name of the parent document
+     * Get the name of the parent of this document.
+     * 
+     * @return The name of the parent of this document.
      */
     public String getParent()
     {
@@ -257,7 +321,9 @@ public class Document extends Api
     }
 
     /**
-     * return the name of the creator of the document
+     * Get fullName of the profile document of the document creator.
+     * 
+     * @return The fullName of the profile document of the document creator.
      */
     public String getCreator()
     {
@@ -265,7 +331,9 @@ public class Document extends Api
     }
 
     /**
-     * return the content of the document
+     * Get raw content of the document, i.e. the content that is visible through the wiki editor.
+     * 
+     * @return The raw content of the document.
      */
     public String getContent()
     {
@@ -273,8 +341,10 @@ public class Document extends Api
     }
 
     /**
-     * @return the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
-     *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
+     * Get the Syntax id representing the syntax used for the document. For example "xwiki/1.0" represents
+     * the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax. 
+     *
+     * @return The syntax id representing the syntax used for the document. 
      */
     public String getSyntaxId()
     {
@@ -282,13 +352,18 @@ public class Document extends Api
     }
 
     /**
-     * return the language of the document if it's a traduction, otherwise, it return default
+     * Get the language of the document.
+     * If the document is a translation it returns the language set for it, otherwise, it returns the default
+     * language in the wiki where the document is stored.
+     * 
+     * @return The language of the document. 
      */
     public String getLanguage()
     {
         return this.doc.getLanguage();
     }
 
+    
     public String getTemplate()
     {
         return this.doc.getTemplate();
@@ -1428,6 +1503,12 @@ public class Document extends Api
         return this.doc.getLinks(getXWikiContext());
     }
     
+    /**
+     * Get document children. Children are document with the current document as parent.
+     * 
+     * @return The list of children for the current document.
+     * @since 1.8 Milestone 2
+     */
     public List<String> getChildren() throws XWikiException
     {
         return this.doc.getChildren(getXWikiContext());

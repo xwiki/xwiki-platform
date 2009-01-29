@@ -136,6 +136,8 @@ To protect a Wiki or Space by disallowing banned users to edit documents use:
 &lt;/div&gt;
 #panelfooter()
 &lt;/div&gt;
+$xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
+$xwiki.jsfx.use("js/scriptaculous/3rdparty/accordion/accordion.js")
 &lt;script type="text/javascript"&gt;
 var obj = {div:'xwikirightstips',no:0,height:250};
 var acc = createAccordion(obj);

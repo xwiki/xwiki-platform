@@ -127,6 +127,8 @@ This field should contain &lt;em&gt;Allow&lt;/em&gt; to specify that this is an 
 &lt;/div&gt;
 #panelfooter()
 &lt;/div&gt;
+$xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
+$xwiki.jsfx.use("js/scriptaculous/3rdparty/accordion/accordion.js")
 &lt;script type="text/javascript"&gt;
 var obj = {div:'xwikirightshelp',no:0,height:512};
 var acc = createAccordion(obj);

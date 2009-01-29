@@ -131,9 +131,11 @@
       #else
         #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;prefsdoc=${currentDoc}"))
       #end
-      &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/Drag.js")"&gt;&lt;/script&gt;
-      &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/ieemu.js")"&gt;&lt;/script&gt;
-      &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/toolTip.js")"&gt;&lt;/script&gt;
+      $xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
+      $xwiki.jsfx.use("js/scriptaculous/3rdparty/accordion/accordion.js")
+      $xwiki.jsfx.use("js/xwiki/panelwizard/Drag.js")
+      $xwiki.jsfx.use("js/xwiki/panelwizard/ieemu.js")
+      $xwiki.jsfx.use("js/xwiki/panelwizard/toolTip.js")
       &lt;script type="text/javascript"&gt;
       //&lt;![CDATA[
       window.ajaxurl = "$ajaxurl";

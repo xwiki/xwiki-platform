@@ -23,6 +23,7 @@ import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Inserts an HTML fragment in place of the current selection. We overwrite the default implementation provided by the
@@ -49,8 +50,16 @@ public class InsertHTMLExecutable extends AbstractExecutable
         container.xSetInnerHTML(param);
 
         Selection selection = rta.getDocument().getSelection();
+        if (!selection.isCollapsed()) {
+            // Delete the selected contents. The given HTML fragment will be inserted in place of the deleted text.
+            // NOTE: We cannot use Range#deleteContents because it may lead to DTD-invalid HTML. That's because it
+            // operates on any DOM tree without taking care of the underlying XML syntax, (X)HTML in our case. Let's use
+            // the Delete command instead which is HTML-aware. Moreover, others could listen to this command and adjust
+            // the DOM before we insert the HTML.
+            rta.getCommandManager().execute(Command.DELETE);
+        }
+        // At this point the selection should be collapsed.
         Range range = selection.getRangeAt(0);
-        range.deleteContents();
         range.insertNode(container.extractContents());
         selection.removeAllRanges();
         selection.addRange(range);

@@ -74,6 +74,11 @@ public class BehaviorAdjuster implements LoadListener
     private RichTextArea textArea;
 
     /**
+     * Collection of DOM utility methods.
+     */
+    private DOMUtils domUtils = DOMUtils.getInstance();
+
+    /**
      * @return The rich text area whose behavior is being adjusted.
      */
     public RichTextArea getTextArea()
@@ -182,9 +187,17 @@ public class BehaviorAdjuster implements LoadListener
         Selection selection = getTextArea().getDocument().getSelection();
         if (selection.getRangeCount() == 0) {
             return;
+        } else if (!selection.isCollapsed()) {
+            // Selection + Enter = Selection + Delete + Enter
+            // NOTE: We cannot use Range#deleteContents because it may lead to DTD-invalid HTML. That's because it
+            // operates on any DOM tree without taking care of the underlying XML syntax, (X)HTML in our case. Let's use
+            // the Delete command instead which is HTML-aware.
+            getTextArea().getCommandManager().execute(Command.DELETE);
         }
+
+        // At this point the selection should be collapsed.
         Range range = selection.getRangeAt(0);
-        Node ancestor = DOMUtils.getInstance().getNearestBlockContainer((range.getStartContainer()));
+        Node ancestor = domUtils.getNearestBlockContainer((range.getStartContainer()));
         String tagName = ancestor.getNodeName().toLowerCase();
         if (LI.equals(tagName)) {
             // Leave the default behavior for now.
@@ -207,16 +220,6 @@ public class BehaviorAdjuster implements LoadListener
 
         Selection selection = getTextArea().getDocument().getSelection();
         Range range = selection.getRangeAt(0);
-
-        // If range ends with a BR tag then we must not delete it.
-        if (!range.isCollapsed()) {
-            Node leaf = DOMUtils.getInstance().getLastLeaf(range);
-            if (BR.equalsIgnoreCase(leaf.getNodeName())) {
-                range.setEndBefore(leaf);
-            }
-        }
-        // Delete the text from the first range and leave the text of the other ranges untouched.
-        range.deleteContents();
 
         onEnterParagraphOnce(cell, range);
 
@@ -244,16 +247,6 @@ public class BehaviorAdjuster implements LoadListener
         Selection selection = getTextArea().getDocument().getSelection();
         Range range = selection.getRangeAt(0);
 
-        // If range ends with a BR tag then we must not delete it.
-        if (!range.isCollapsed()) {
-            Node leaf = DOMUtils.getInstance().getLastLeaf(range);
-            if (BR.equalsIgnoreCase(leaf.getNodeName())) {
-                range.setEndBefore(leaf);
-            }
-        }
-        // Delete the text from the first range and leave the text of the other ranges untouched.
-        range.deleteContents();
-
         if (isAtStart(container, range)) {
             onEnterParagraphThrice(container, range);
         } else if (isAfterBR(container, range)) {
@@ -280,8 +273,7 @@ public class BehaviorAdjuster implements LoadListener
         if (range.getStartOffset() > 0) {
             return false;
         }
-        return DOMUtils.getInstance().getFirstLeaf(container) == DOMUtils.getInstance().getFirstLeaf(
-            range.getStartContainer());
+        return domUtils.getFirstLeaf(container) == domUtils.getFirstLeaf(range.getStartContainer());
     }
 
     /**
@@ -295,16 +287,16 @@ public class BehaviorAdjuster implements LoadListener
         if (range.getStartOffset() > 0) {
             if (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE) {
                 leaf = range.getStartContainer().getChildNodes().getItem(range.getStartOffset() - 1);
-                leaf = DOMUtils.getInstance().getLastLeaf(leaf);
+                leaf = domUtils.getLastLeaf(leaf);
             } else {
                 // We are in the middle of the text.
                 return false;
             }
         } else {
-            leaf = DOMUtils.getInstance().getPreviousLeaf(range.getStartContainer());
+            leaf = domUtils.getPreviousLeaf(range.getStartContainer());
         }
         // We have to additionally test if the found BR is in the given container.
-        return isBR(leaf) && container == DOMUtils.getInstance().getNearestBlockContainer(leaf);
+        return isBR(leaf) && container == domUtils.getNearestBlockContainer(leaf);
     }
 
     /**
@@ -329,14 +321,14 @@ public class BehaviorAdjuster implements LoadListener
         switch (range.getStartContainer().getNodeType()) {
             case DOMUtils.CDATA_NODE:
             case DOMUtils.COMMENT_NODE:
-                DOMUtils.getInstance().insertAfter(br, range.getStartContainer());
+                domUtils.insertAfter(br, range.getStartContainer());
                 break;
             case Node.TEXT_NODE:
-                Node refNode = DOMUtils.getInstance().splitNode(range.getStartContainer(), range.getStartOffset());
+                Node refNode = domUtils.splitNode(range.getStartContainer(), range.getStartOffset());
                 refNode.getParentNode().insertBefore(br, refNode);
                 break;
             case Node.ELEMENT_NODE:
-                DOMUtils.getInstance().insertAt(range.getStartContainer(), br, range.getStartOffset());
+                domUtils.insertAt(range.getStartContainer(), br, range.getStartOffset());
                 break;
             default:
                 break;
@@ -346,7 +338,7 @@ public class BehaviorAdjuster implements LoadListener
         Node start = br.getNextSibling();
         if (start == null || start.getNodeType() != Node.TEXT_NODE) {
             start = getTextArea().getDocument().createTextNode("");
-            DOMUtils.getInstance().insertAfter(start, br);
+            domUtils.insertAfter(start, br);
         }
         range.setStart(start, 0);
     }
@@ -364,42 +356,40 @@ public class BehaviorAdjuster implements LoadListener
         if (range.getStartOffset() > 0) {
             if (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE) {
                 br = range.getStartContainer().getChildNodes().getItem(range.getStartOffset() - 1);
-                br = DOMUtils.getInstance().getLastLeaf(br);
+                br = domUtils.getLastLeaf(br);
             } else {
                 return;
             }
         } else {
-            br = DOMUtils.getInstance().getPreviousLeaf(range.getStartContainer());
+            br = domUtils.getPreviousLeaf(range.getStartContainer());
         }
 
         // Create a new paragraph.
         Node paragraph = getTextArea().getDocument().xCreatePElement();
 
         // Split the container after the found BR.
-        if (DOMUtils.getInstance().isFlowContainer(container)) {
-            Node child = DOMUtils.getInstance().getChild(container, br);
+        if (domUtils.isFlowContainer(container)) {
+            Node child = domUtils.getChild(container, br);
             if (child != br) {
-                DOMUtils.getInstance()
-                    .splitNode(container, br.getParentNode(), DOMUtils.getInstance().getNodeIndex(br));
+                domUtils.splitNode(container, br.getParentNode(), domUtils.getNodeIndex(br));
             }
             // Insert the created paragraph before the split.
-            DOMUtils.getInstance().insertAfter(paragraph, child);
+            domUtils.insertAfter(paragraph, child);
             // Move all the in-line nodes after the split in the created paragraph.
             child = paragraph.getNextSibling();
-            while (child != null && DOMUtils.getInstance().isInline(child)) {
+            while (child != null && domUtils.isInline(child)) {
                 paragraph.appendChild(child);
                 child = paragraph.getNextSibling();
             }
         } else {
-            DOMUtils.getInstance().splitNode(container.getParentNode(), br.getParentNode(),
-                DOMUtils.getInstance().getNodeIndex(br));
+            domUtils.splitNode(container.getParentNode(), br.getParentNode(), domUtils.getNodeIndex(br));
             paragraph.appendChild(Element.as(container.getNextSibling()).extractContents());
             container.getParentNode().replaceChild(paragraph, container.getNextSibling());
         }
         br.getParentNode().removeChild(br);
 
         // Place the caret inside the created paragraph, at the beginning.
-        Node start = DOMUtils.getInstance().getFirstLeaf(paragraph);
+        Node start = domUtils.getFirstLeaf(paragraph);
         if (start == paragraph) {
             start = getTextArea().getDocument().createTextNode("");
             paragraph.appendChild(start);
@@ -424,10 +414,10 @@ public class BehaviorAdjuster implements LoadListener
         // Create a new paragraph.
         Element paragraph = document.xCreatePElement().cast();
 
-        if (DOMUtils.getInstance().isFlowContainer(container)) {
+        if (domUtils.isFlowContainer(container)) {
             // We are at the beginning of a flow container. Since it can contain block elements we insert the paragraph
             // before its first child.
-            DOMUtils.getInstance().insertAt(container, paragraph, 0);
+            domUtils.insertAt(container, paragraph, 0);
             // We place the caret after the inserted paragraph.
             range.setStartAfter(paragraph);
         } else {
@@ -524,7 +514,7 @@ public class BehaviorAdjuster implements LoadListener
             Range range = selection.getRangeAt(0);
 
             // Place the caret at the beginning of the next cell.
-            Node leaf = DOMUtils.getInstance().getFirstLeaf(nextCell);
+            Node leaf = domUtils.getFirstLeaf(nextCell);
             if (leaf == nextCell || leaf.getNodeType() == Node.TEXT_NODE) {
                 range.setStart(leaf, 0);
             } else {

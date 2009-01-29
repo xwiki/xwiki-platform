@@ -161,15 +161,18 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     public void insertTable(RichTextArea rta, TableConfig config)
     {
         Selection selection = rta.getDocument().getSelection();
-        Range range = selection.getRangeAt(0);
+        if (!selection.isCollapsed()) {
+            // Delete the selected contents. The table will be inserted in place of the deleted text.
+            // NOTE: We cannot use Range#deleteContents because it may lead to DTD-invalid HTML. That's because it
+            // operates on any DOM tree without taking care of the underlying XML syntax, (X)HTML in our case. Let's use
+            // the Delete command instead which is HTML-aware. Moreover, others could listen to this command and adjust
+            // the DOM before we insert the table.
+            rta.getCommandManager().execute(Command.DELETE);
+        }
 
-        // Leave the rest of the ranges intact.
-        selection.removeAllRanges();
-
-        // Delete the contents of the first range. The horizontal rule will be inserted in place of the deleted text.
-        range.deleteContents();
-
+        // At this point the selection should be collapsed.
         // Split the DOM tree up to the nearest flow container and insert the table.
+        Range range = selection.getRangeAt(0);
         Node start = range.getStartContainer();
         int offset = range.getStartOffset();
         Node flowContainer = DOMUtils.getInstance().getNearestFlowContainer(start);
@@ -188,6 +191,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
         range.selectNodeContents(DOMUtils.getInstance().getFirstDescendant(table,
             config.hasHeader() ? TableUtils.COL_HNODENAME : TableUtils.COL_NODENAME));
         range.collapse(false);
+        selection.removeAllRanges();
         selection.addRange(range);
     }
 

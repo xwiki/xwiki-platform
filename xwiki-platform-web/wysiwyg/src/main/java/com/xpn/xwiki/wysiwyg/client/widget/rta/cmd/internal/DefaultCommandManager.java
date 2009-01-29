@@ -58,6 +58,7 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES.put(Command.BACK_COLOR, (Executable) GWT.create(BackColorExecutable.class));
         EXECUTABLES.put(Command.BOLD, new BoldExecutable());
         EXECUTABLES.put(Command.CREATE_LINK, new CreateLinkExecutable());
+        EXECUTABLES.put(Command.DELETE, new DefaultExecutable(Command.DELETE.toString()));
         EXECUTABLES.put(Command.FONT_NAME, new DefaultExecutable(Command.FONT_NAME.toString()));
         EXECUTABLES.put(Command.FONT_SIZE, new DefaultExecutable(Command.FONT_SIZE.toString()));
         EXECUTABLES.put(Command.FORE_COLOR, new DefaultExecutable(Command.FORE_COLOR.toString()));

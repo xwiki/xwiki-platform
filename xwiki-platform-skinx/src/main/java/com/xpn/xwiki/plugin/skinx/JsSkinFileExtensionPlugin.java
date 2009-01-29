@@ -72,7 +72,7 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     public String getLink(String filename, XWikiContext context)
     {
         return "<script type='text/javascript' src='"
-            + context.getWiki().getSkinFile(filename, context)
+            + context.getWiki().getSkinFile(filename, true, context)
             + "'></script>";
     }
     

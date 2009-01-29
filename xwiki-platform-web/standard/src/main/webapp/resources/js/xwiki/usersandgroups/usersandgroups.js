@@ -957,25 +957,3 @@ function setGuestExtendedRights(self)
   }
 }
 
-
-function setGuestExtendedRights(self)
-{
-  return function() { 
-      var url = '$xwiki.getURL("XWiki.XWikiPreferences", "save")';
-      var pivot = self;
-      if(self.getAttribute('alt') == "yes")
-      {
-        if(self.id.indexOf('view') > 0)
-           new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "0"}, onSuccess: function() { pivot.alt = "no"; pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')"; }  }); 
-        else
-           new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "0"}, onSuccess: function() { pivot.alt = "no"; pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')"; }  });
-      }
-      else {
-           if(self.id.indexOf('view') > 0)
-             new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"}, onSuccess: function() { pivot.alt = "yes"; pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')"; }  }); 
-           else
-             new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"}, onSuccess: function() { pivot.alt = "yes"; pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')"; }  });
-      }  	
-  }
-}
-

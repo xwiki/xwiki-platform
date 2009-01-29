@@ -5,7 +5,6 @@
 <link href="$xwiki.getSkinFile("js/xwiki/table/table.css", true)" rel="stylesheet" type="text/css" />
 <link href="$xwiki.getSkinFile("js/xwiki/usersandgroups/usersandgroups.css", true)" rel="stylesheet" type="text/css" />
 <link href="$xwiki.getSkinFile("js/xwiki/suggest/ajaxSuggest.css")" rel="stylesheet" type="text/css" />
-<link href="$xwiki.getSkinFile("js/yui/treeview/assets/tree.css")" rel="stylesheet" type="text/css"/>
 <link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightbox.css", true)" rel="stylesheet" type="text/css" />
 <!--[if IE]>
   <link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightboxIE.css", true)" rel="stylesheet" type="text/css" />
@@ -18,8 +17,6 @@
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/util/browserdetect.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/util/shortcuts.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
-##<script type="text/javascript" src="$xwiki.getSkinFile("js/scriptaculous/scriptaculous.js")"></script>
-##<script type="text/javascript" src="$xwiki.getSkinFile("js/scriptaculous/3rdparty/accordion/accordion.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/chartwizard/chwScripts.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/table/tablefilterNsort.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/fullscreenedit/fullscreenEdit.js", true)"></script>

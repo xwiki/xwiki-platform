@@ -26,6 +26,5 @@ $xwiki.getTextArea($tdoc.content)
 ## #template("tagedit.vm")
 </div> ## noname
 <div class="bottombuttons">#template("editactions.vm")</div>
-<script type="text/javascript">
-Event.observe(window, "load", function() {fullscreenEdit('wiki'); }, true);
-</script>
+## full screen edit
+$xwiki.jsfx.use("js/xwiki/fullscreenedit/fullscreenEdit.js")

@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.Set;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
  * Javascript Skin File Extension plugin to use js files from the skin.
@@ -62,6 +64,17 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     {
         return PLUGIN_NAME;
     }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
+     */
+    @Override
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    {
+        return new SkinFileExtensionPluginApi((AbstractSkinExtensionPlugin) plugin, context);
+    }
 
     /**
      * {@inheritDoc}
@@ -71,8 +84,9 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     @Override
     public String getLink(String filename, XWikiContext context)
     {
+        boolean forceSkinAction = (Boolean) getParametersForResource(filename, context).get("forceSkinAction");
         return "<script type='text/javascript' src='"
-            + context.getWiki().getSkinFile(filename, true, context)
+            + context.getWiki().getSkinFile(filename, forceSkinAction, context)
             + "'></script>";
     }
     

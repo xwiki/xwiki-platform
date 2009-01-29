@@ -8,6 +8,9 @@
 ## display the new interface
 ##############################
 #if($interface == "new")
+    ## inject the needed JS files
+    $xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true)
+    $xwiki.jsfx.use("js/xwiki/table/livetable.js", true)
     #set($interface = $xwiki.rightsmanager.defaultUi)
     #set($rightsLevels = {"view":0, "comment":1, "edit":2, "delete": 3, "admin": 4, "register": 5, "programming": 6})
     #set($levelsRights = $util.hashMap)

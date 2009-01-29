@@ -19,11 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -52,55 +48,23 @@ public class ClipboardImportTab extends Composite
     private RichTextArea editor;
 
     /**
-     * Filter Styles check box.
-     */
-    private CheckBox filterStylesCheckBox;
-    
-    /**
-     * Import button.
-     */
-    private Button importButton;
-    
-    /**
-     * Cancel button.
-     */
-    private Button cancelButton;
-
-    /**
      * Default constructor.
-     * 
-     * @param listener Listener for the import button.
      */
-    public ClipboardImportTab(ClickListener listener)
+    public ClipboardImportTab()
     {
         // Main container panel.
         mainPanel = new VerticalPanel();
         mainPanel.setSpacing(5);
 
         // Info label.
-        infoLabel = new Label(Strings.INSTANCE.importerClipboardInfoLabel());
-        infoLabel.addStyleName("xImporterClipboardInfoLabel");
+        infoLabel = new Label(Strings.INSTANCE.importerClipboardTabInfoLabel());
+        infoLabel.addStyleName("xImporterClipboardTabInfoLabel");
         mainPanel.add(infoLabel);
 
         // Editor panel.
         editor = new RichTextArea();
-        editor.addStyleName("xImporterClipboardEditor");
+        editor.addStyleName("xImporterClipboardTabEditor");
         mainPanel.add(editor);
-
-        // Button panel.
-        HorizontalPanel buttonPanel = new HorizontalPanel();
-        filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importerClipboardFilterStylesCheckBox());
-        filterStylesCheckBox.addStyleName("xImporterClipboardFilterStylesCheckBox");
-        buttonPanel.add(filterStylesCheckBox);
-        importButton = new Button(Strings.INSTANCE.importerClipboardImportButton());
-        importButton.addStyleName("xImporterClipboardImportButton");
-        importButton.addClickListener(listener);
-        buttonPanel.add(importButton);
-        cancelButton = new Button(Strings.INSTANCE.importerClipboardCancelImportButton());
-        cancelButton.addStyleName("xImporterClipboardCancelImportButton");
-        cancelButton.addClickListener(listener);
-        buttonPanel.add(cancelButton);
-        mainPanel.add(buttonPanel);
 
         // Finalize.
         initWidget(mainPanel);
@@ -115,26 +79,10 @@ public class ClipboardImportTab extends Composite
     }
     
     /**
-     * @return the editor.
+     * @return the html content of editor.
      */
-    public RichTextArea getEditor()
+    public String getHtmlPaste()
     {
-        return editor;
+        return editor.getHTML();
     }
-
-    /**
-     * @return The import button.
-     */
-    public Button getImportButton()
-    {
-        return importButton;
-    }
-
-    /**
-     * @return the filter styles check box.
-     */
-    public CheckBox getFilterStylesCheckBox()
-    {
-        return filterStylesCheckBox;
-    }    
 }

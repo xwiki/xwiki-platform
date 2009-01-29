@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -44,18 +43,16 @@ public class FileImportTab extends Composite
 
     /**
      * Default constructor.
-     * 
-     * @param listener Listener for the import button.
      */
-    public FileImportTab(ClickListener listener)
+    public FileImportTab()
     {
         // Main container panel.
         verticalPanel = new VerticalPanel();
         verticalPanel.setSpacing(5);
 
         // Info label.
-        infoLabel = new Label(Strings.INSTANCE.importerFileInfoLabel());
-        infoLabel.addStyleName("xImporterFileInfoLabel");
+        infoLabel = new Label(Strings.INSTANCE.importerFileTabInfoLabel());
+        infoLabel.addStyleName("xImporterFileTabInfoLabel");
         verticalPanel.add(infoLabel);
 
         // Finalize.

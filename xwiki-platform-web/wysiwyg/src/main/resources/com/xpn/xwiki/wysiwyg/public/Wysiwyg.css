@@ -539,30 +539,30 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
   width: 420px;
 }
 
-.xImporterClipboardInfoLabel,
-.xImporterFileInfoLabel {
+.xImporterClipboardTabInfoLabel,
+.xImporterFileTabInfoLabel {
   text-align: center;  
 }
 
-.xImporterClipboardInfoLabel {
+.xImporterClipboardTabInfoLabel {
   padding-bottom: 5px;
 }
 
-.xImporterClipboardEditor {
+.xImporterClipboardTabEditor {
   width: 400px;
   height: 300px;
   border: solid 1px #000000;
 }
 
-.xImporterClipboardFilterStylesCheckBox {  
+.xImporterFilterStylesCheckBox {  
 }
 
-.xImporterClipboardImportButton {
+.xImporterImportButton {
   width: 60px;
   margin-left: 172px;
 }
 
-.xImporterClipboardCancelImportButton {
+.xImporterCancelButton {
   width: 60px;
   margin-left: 5px;
 }

@@ -277,17 +277,17 @@ public interface Strings extends Constants
     
     String importerCaption();
     
-    String importerClipboardTab();
+    String importerClipboardTabCaption();
     
-    String importerClipboardInfoLabel();
+    String importerClipboardTabInfoLabel();
     
-    String importerClipboardFilterStylesCheckBox();
+    String importerFileTabCaption();
     
-    String importerClipboardImportButton();    
+    String importerFileTabInfoLabel();
     
-    String importerClipboardCancelImportButton();
+    String importerFilterStylesCheckBoxCaption();
     
-    String importerFileTab();
+    String importerImportButtonCaption();    
     
-    String importerFileInfoLabel();
+    String importerCancelButtonCaption();
 }

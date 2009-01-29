@@ -25,6 +25,7 @@ import java.util.Map;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,9 +42,24 @@ import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<String>, ClickListener
 {
     /**
+     * 'loading' style name.
+     */
+    private static final String STYLE_LOADING = "loading";
+
+    /**
+     * CSS style used by tab panel.
+     */
+    private static final String STYLE_TAB_PANEL = "xImporterTabPanel";
+
+    /**
      * Container panel.
      */
     private VerticalPanel mainPanel;
+
+    /**
+     * Hidden panel for displaying progress.
+     */
+    private HorizontalPanel progressPanel;
 
     /**
      * Tab panel.
@@ -83,11 +99,18 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
         mainPanel = new VerticalPanel();
         mainPanel.setSpacing(5);
 
+        // Progress panel
+        progressPanel = new HorizontalPanel();
+        progressPanel.addStyleName(STYLE_TAB_PANEL);
+        progressPanel.addStyleName(STYLE_LOADING);
+        progressPanel.setVisible(false);
+        mainPanel.add(progressPanel);
+
         // Tab panel.
         tabPanel.add(clipboardImportTab, Strings.INSTANCE.importerClipboardTabCaption());
         tabPanel.add(fileImportTab, Strings.INSTANCE.importerFileTabCaption());
         tabPanel.selectTab(0);
-        tabPanel.addStyleName("xImporterTabPanel");
+        tabPanel.addStyleName(STYLE_TAB_PANEL);
         mainPanel.add(tabPanel);
 
         // Button panel.
@@ -106,6 +129,7 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
             WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
             String htmlPaste = clipboardImportTab.getHtmlPaste();
             if (clipboardImportTab.isVisible() && !htmlPaste.trim().equals("")) {
+                startProgress();
                 wysiwygService.cleanOfficeHTML(htmlPaste, "wysiwyg", getCleaningParams(), this);
             }
         } else if (sender == buttonPanel.getCancelButton()) {
@@ -133,10 +157,42 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
     }
 
     /**
+     * Starts progress display.
+     */
+    private void startProgress()
+    {
+        tabPanel.setVisible(false);
+        enableControls(false);        
+        progressPanel.setVisible(true);
+    }
+
+    /**
+     * Stops progress display.
+     */
+    private void stopProgress()
+    {
+        progressPanel.setVisible(false);        
+        tabPanel.setVisible(true);
+        enableControls(true);
+    }
+    
+    /**
+     * Enables / Disables the control buttons.
+     * 
+     * @param enable if true, all controls will be enabled.
+     */
+    private void enableControls(boolean enable) {
+        buttonPanel.getFilterStylesCheckBox().setEnabled(enable);
+        buttonPanel.getImportButton().setEnabled(enable);
+        buttonPanel.getCancelButton().setEnabled(enable);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public void onSuccess(String result)
     {
+        stopProgress();
         this.result = result;
         hide();
     }
@@ -146,6 +202,7 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
      */
     public void onFailure(Throwable caught)
     {
+        stopProgress();
         Window.alert(caught.getMessage());
         hide();
     }
@@ -156,6 +213,7 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
     public void center()
     {
         clipboardImportTab.resetEditor();
+        enableControls(true);
         super.center();
     }
 

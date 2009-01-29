@@ -536,7 +536,8 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 }
 
 .xImporterTabPanel {
-  width: 420px;
+  width: 480px;
+  height: 360px;
 }
 
 .xImporterClipboardTabInfoLabel,
@@ -549,17 +550,17 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 }
 
 .xImporterClipboardTabEditor {
-  width: 400px;
-  height: 300px;
+  width: 440px;
+  height: 260px;
   border: solid 1px #000000;
 }
 
-.xImporterFilterStylesCheckBox {  
+.xImporterFilterStylesCheckBox { 
 }
 
 .xImporterImportButton {
   width: 60px;
-  margin-left: 172px;
+  margin-left: 250px;
 }
 
 .xImporterCancelButton {

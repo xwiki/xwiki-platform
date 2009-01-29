@@ -141,4 +141,38 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
         assertTrue(executable.execute(rta, "*2<em>=</em>1+"));
         assertEquals("x*2<em>=</em>1+z", clean(rta.getHTML()));
     }
+
+    /**
+     * Tests the {@link InsertHTMLExecutable} when the selection spans multiple list items.
+     */
+    public void testReplaceCrossListItemSelection()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestReplaceCrossListItemSelection();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests the {@link InsertHTMLExecutable} when the selection spans multiple list items.
+     */
+    private void doTestReplaceCrossListItemSelection()
+    {
+        rta.setHTML("<ul><li>foo</li><li>bar</li></ul>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild().getLastChild().getFirstChild(), 1);
+        select(range);
+
+        assertEquals("oob", rta.getDocument().getSelection().toString());
+        assertTrue(executable.execute(rta, "<img/>"));
+        assertEquals("<ul><li>f<img>ar</li></ul>", clean(rta.getHTML()));
+    }
 }

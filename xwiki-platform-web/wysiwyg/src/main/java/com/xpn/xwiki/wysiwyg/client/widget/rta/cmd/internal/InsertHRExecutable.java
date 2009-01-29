@@ -24,6 +24,7 @@ import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Inserts a horizontal rule in place of the current selection. It should be noted that hr, being a block level element,
@@ -35,6 +36,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 public class InsertHRExecutable extends AbstractExecutable
 {
     /**
+     * Collection of DOM utility methods.
+     */
+    private DOMUtils domUtils = DOMUtils.getInstance();
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractExecutable#execute(RichTextArea, String)
@@ -42,34 +48,38 @@ public class InsertHRExecutable extends AbstractExecutable
     public boolean execute(RichTextArea rta, String param)
     {
         Selection selection = rta.getDocument().getSelection();
-        Range range = selection.getRangeAt(0);
+        if (!selection.isCollapsed()) {
+            // Delete the selected contents. The horizontal rule will be inserted in place of the deleted text.
+            // NOTE: We cannot use Range#deleteContents because it may lead to DTD-invalid HTML. That's because it
+            // operates on any DOM tree without taking care of the underlying XML syntax, (X)HTML in our case. Let's use
+            // the Delete command instead which is HTML-aware. Moreover, others could listen to this command and adjust
+            // the DOM before we insert the HR.
+            rta.getCommandManager().execute(Command.DELETE);
+        }
 
-        // Leave the rest of the ranges intact.
-        selection.removeAllRanges();
-
-        // Delete the contents of the first range. The horizontal rule will be inserted in place of the deleted text.
-        range.deleteContents();
-
+        // At this point the selection should be collapsed.
         // Split the DOM tree up to the nearest flow container, insert a horizontal rule and place the caret after the
         // inserted horizontal rule.
+        Range range = selection.getRangeAt(0);
         Node start = range.getStartContainer();
         int offset = range.getStartOffset();
-        Node flowContainer = DOMUtils.getInstance().getNearestFlowContainer(start);
+        Node flowContainer = domUtils.getNearestFlowContainer(start);
         if (flowContainer == null) {
             return false;
         }
         Node hr = rta.getDocument().xCreateHRElement();
         if (flowContainer == start) {
-            DOMUtils.getInstance().insertAt(flowContainer, hr, offset);
+            domUtils.insertAt(flowContainer, hr, offset);
             range.setEndAfter(hr);
         } else {
-            Node startNextLevelSibling = DOMUtils.getInstance().splitNode(flowContainer, start, offset);
-            DOMUtils.getInstance().insertAfter(hr, DOMUtils.getInstance().getChild(flowContainer, start));
+            Node startNextLevelSibling = domUtils.splitNode(flowContainer, start, offset);
+            domUtils.insertAfter(hr, domUtils.getChild(flowContainer, start));
             // We need to update the range after inserting the horizontal rule because otherwise the caret might jump
             // before it (this happens in IE for instance).
             range.setEnd(startNextLevelSibling, 0);
         }
         range.collapse(false);
+        selection.removeAllRanges();
         selection.addRange(range);
 
         return true;

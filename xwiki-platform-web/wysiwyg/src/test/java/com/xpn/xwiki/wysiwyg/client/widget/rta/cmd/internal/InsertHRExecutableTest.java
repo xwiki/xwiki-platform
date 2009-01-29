@@ -20,8 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
 import com.google.gwt.user.client.Timer;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
@@ -34,7 +36,21 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
     /**
      * The executable being tested.
      */
-    private Executable executable = new InsertHRExecutable();
+    private Executable executable;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractRichTextAreaTest#gwtSetUp()
+     */
+    protected void gwtSetUp() throws Exception
+    {
+        super.gwtSetUp();
+
+        if (executable == null) {
+            executable = new InsertHRExecutable();
+        }
+    }
 
     /**
      * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
@@ -68,7 +84,8 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         select(range);
 
         assertTrue(executable.execute(rta, null));
-        assertEquals("a<p>b<ins><!--x-->c</ins></p><hr><p><ins>d</ins></p>e", clean(rta.getHTML()));
+        assertEquals("a<p>b<ins><!--x-->c</ins></p><hr><p><ins>d</ins></p>e", removeNonBreakingSpaces(clean(rta
+            .getHTML())));
     }
 
     /**
@@ -104,11 +121,12 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
 
         assertEquals("cde", rta.getDocument().getSelection().toString());
         assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>a<em>b</em><hr><del>f</del>g</li></ul>", clean(rta.getHTML()));
-        assertTrue(rta.getDocument().getSelection().isCollapsed());
-        assertEquals(3, rta.getDocument().getSelection().getRangeAt(0).getStartOffset());
-        assertEquals(getBody().getFirstChild().getFirstChild(), rta.getDocument().getSelection().getRangeAt(0)
-            .getStartContainer());
+        assertEquals("<ul><li>a<em>b</em><hr><em></em><del>f</del>g</li></ul>", removeNonBreakingSpaces(clean(rta
+            .getHTML())));
+
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertTrue(range.isCollapsed());
+        assertEquals("<em></em>", ((Element) range.getStartContainer().getParentNode()).getString().toLowerCase());
     }
 
     /**
@@ -174,6 +192,118 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
 
         assertEquals("b", rta.getDocument().getSelection().toString());
         assertTrue(executable.execute(rta, null));
-        assertEquals("a<strong></strong><hr><strong></strong>c", clean(rta.getHTML()));
+        assertEquals("a<strong></strong><hr><strong></strong>c", removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Inserts a horizontal rule in place of a selection that spans multiple list items.
+     * 
+     * @see XWIKI-2993: Insert horizontal line on a selection of unordered list
+     */
+    public void testReplaceCrossListItemSelection()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestReplaceCrossListItemSelection();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Inserts a horizontal rule in place of a selection that spans multiple list items.
+     * 
+     * @see XWIKI-2993: Insert horizontal line on a selection of unordered list
+     */
+    private void doTestReplaceCrossListItemSelection()
+    {
+        rta.setHTML("<ul><li>foo</li><li>bar</li></ul>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild().getLastChild().getFirstChild(), 1);
+        select(range);
+
+        assertEquals("oob", rta.getDocument().getSelection().toString());
+        assertTrue(executable.execute(rta, null));
+        assertEquals("<ul><li>f<hr>ar</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Inserts a horizontal rule in place of a selection that spans all the list items of a list.
+     * 
+     * @see XWIKI-2993: Insert horizontal line on a selection of unordered list
+     */
+    public void testReplaceSelectedList()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestReplaceSelectedList();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Inserts a horizontal rule in place of a selection that spans all the list items of a list.
+     * 
+     * @see XWIKI-2993: Insert horizontal line on a selection of unordered list
+     */
+    private void doTestReplaceSelectedList()
+    {
+        rta.setHTML("x<ul><li>one</li><li>two</li></ul>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getLastChild().getFirstChild().getFirstChild(), 0);
+        range.setEnd(getBody().getLastChild().getLastChild().getFirstChild(), 3);
+        select(range);
+
+        assertEquals("onetwo", rta.getDocument().getSelection().toString());
+        assertTrue(executable.execute(rta, null));
+        assertEquals("x<hr>", clean(rta.getHTML()));
+    }
+
+    /**
+     * Inserts a horizontal rule and then reverts.
+     */
+    public void testInsertAndUndo()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestInsertAndUndo();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Inserts a horizontal rule and then reverts.
+     */
+    private void doTestInsertAndUndo()
+    {
+        String html = "<ul><li><!--x-->alice</li><li><em></em>bob</li></ul>";
+        rta.setHTML(html);
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getFirstChild().getLastChild(), 5);
+        range.setEnd(getBody().getFirstChild().getLastChild().getLastChild(), 3);
+        select(range);
+
+        assertEquals("bob", rta.getDocument().getSelection().toString());
+        assertTrue(executable.execute(rta, null));
+        assertTrue(rta.getCommandManager().execute(Command.UNDO));
+        assertEquals(html, clean(rta.getHTML()));
     }
 }

@@ -100,6 +100,19 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest
     }
 
     /**
+     * Removes the non-breaking spaces, {@code &nbsp;}, from the given HTML. The is method is needed because the
+     * Selection implementation for Internet Explorer adds {@code &nbsp;} when it cannot place the caret at the
+     * specified place.
+     * 
+     * @param html the HTML fragment to be cleaned of non-breaking spaces
+     * @return the input HTML fragment without any non-breaking spaces
+     */
+    protected String removeNonBreakingSpaces(String html)
+    {
+        return html.replace("&nbsp;", "");
+    }
+
+    /**
      * @return The body element of the DOM document edited with the rich text area.
      */
     protected Element getBody()

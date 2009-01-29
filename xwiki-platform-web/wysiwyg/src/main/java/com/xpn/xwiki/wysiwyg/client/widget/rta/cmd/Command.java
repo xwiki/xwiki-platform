@@ -42,9 +42,14 @@ public class Command
 
     /**
      * This command will insert a link in place of the current selection, either if it is a collapsed selection or an
-     * expanded one. It is based on the insert HTML command, and it will insert the link HTML received as a parameter.  
+     * expanded one. It is based on the insert HTML command, and it will insert the link HTML received as a parameter.
      */
     public static final Command CREATE_LINK = new Command("createlink");
+
+    /**
+     * Deletes the current selection.
+     */
+    public static final Command DELETE = new Command("delete");
 
     /**
      * This command will set the font face for a selection or at the insertion point if there is no selection.<br/>

@@ -38,6 +38,11 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     private Element container;
 
     /**
+     * The collection of DOM utility methods being tested.
+     */
+    private DOMUtils domUtils;
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractWysiwygClientTest#gwtSetUp()
@@ -45,6 +50,10 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
+
+        if (domUtils == null) {
+            domUtils = DOMUtils.getInstance();
+        }
 
         container = ((Document) Document.get()).xCreateDivElement().cast();
         Document.get().getBody().appendChild(container);
@@ -73,7 +82,7 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         range.setStart(container, 1);
         range.setEnd(container, 2);
 
-        Range textRange = DOMUtils.getInstance().getTextRange(range);
+        Range textRange = domUtils.getTextRange(range);
 
         assertEquals(range.toString(), textRange.toString());
 
@@ -95,7 +104,7 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         range.setStart(container.getFirstChild(), container.getFirstChild().getNodeValue().length());
         range.setEnd(container.getLastChild(), container.getLastChild().getNodeValue().length());
 
-        Range textRange = DOMUtils.getInstance().getTextRange(range);
+        Range textRange = domUtils.getTextRange(range);
 
         assertEquals(range.toString(), textRange.toString());
         assertEquals(Node.TEXT_NODE, textRange.getStartContainer().getNodeType());
@@ -120,17 +129,17 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         String anchorTagName = anchor.getNodeName();
 
         // check if there is a first ancestor of type a for the bold inside the anchor
-        assertSame("There isn't an anchor ancestor for the bold inside the anchor", anchor, DOMUtils.getInstance()
-            .getFirstAncestor(boldWiki, anchorTagName));
+        assertSame("There isn't an anchor ancestor for the bold inside the anchor", anchor, domUtils.getFirstAncestor(
+            boldWiki, anchorTagName));
         // check if there is a first ancestor of type a for the text inside bold in the anchor
         assertSame("There isn't an anchor ancestor for the text in the bold inside the anchor", anchor, DOMUtils
             .getInstance().getFirstAncestor(labelBoldWiki, anchorTagName));
         // check there is no a ancestor of the wikilink span
-        assertNull("There is an anchor ancestor for the wikilink span", DOMUtils.getInstance().getFirstAncestor(
-            wrappingSpan, anchorTagName));
+        assertNull("There is an anchor ancestor for the wikilink span", domUtils.getFirstAncestor(wrappingSpan,
+            anchorTagName));
         // check a finds itself as ancestor
-        assertSame("The anchor is not an anhor ancestor of itself", anchor, DOMUtils.getInstance().getFirstAncestor(
-            anchor, anchorTagName));
+        assertSame("The anchor is not an anhor ancestor of itself", anchor, domUtils.getFirstAncestor(anchor,
+            anchorTagName));
         // check div ancestor search stops at startContainer
         assertSame("Div ancestor search for the anchor does not stop at first div", container.getFirstChild(), DOMUtils
             .getInstance().getFirstAncestor(anchor, container.getTagName()));
@@ -151,20 +160,19 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         String anchorTagName = anchor.getNodeName();
 
         // check anchor shows up as descendant of startContainer
-        assertSame("Anchor does not show up as descendant of startContainer", anchor, DOMUtils.getInstance()
-            .getFirstDescendant(container.getFirstChild(), anchorTagName));
+        assertSame("Anchor does not show up as descendant of startContainer", anchor, domUtils.getFirstDescendant(
+            container.getFirstChild(), anchorTagName));
         // check anchor shows up as descendant of itself
-        assertSame("Anchor does not show up as descendant of itself", anchor, DOMUtils.getInstance()
-            .getFirstDescendant(anchor, anchorTagName));
+        assertSame("Anchor does not show up as descendant of itself", anchor, domUtils.getFirstDescendant(anchor,
+            anchorTagName));
         // check there is no descendant of type bold in the wrapping span
-        assertNull("There is a descendant of type bold in the wrapping span", DOMUtils.getInstance()
-            .getFirstDescendant(wrappingSpan, "strong"));
+        assertNull("There is a descendant of type bold in the wrapping span", domUtils.getFirstDescendant(wrappingSpan,
+            "strong"));
         // check the first span descendant stops at the wrapping span
-        assertSame("The first span descendant does not stop at the wrapping span", wrappingSpan, DOMUtils.getInstance()
+        assertSame("The first span descendant does not stop at the wrapping span", wrappingSpan, domUtils
             .getFirstDescendant(container, wrappingSpan.getNodeName()));
         // check there is no anchor descendant of a text
-        assertNull("There is an anchor descendant of a text", DOMUtils.getInstance().getFirstDescendant(preambleText,
-            anchorTagName));
+        assertNull("There is an anchor descendant of a text", domUtils.getFirstDescendant(preambleText, anchorTagName));
     }
 
     /**
@@ -180,7 +188,7 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         ancestors.add(container.getOwnerDocument().getBody());
         ancestors.add(((Document) container.getOwnerDocument()).getDocumentElement());
         ancestors.add(container.getOwnerDocument());
-        assertEquals(ancestors, DOMUtils.getInstance().getAncestors(ancestors.get(0)));
+        assertEquals(ancestors, domUtils.getAncestors(ancestors.get(0)));
     }
 
     /**
@@ -189,8 +197,8 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testGetNearestCommonAncestor()
     {
         container.setInnerHTML("<em>x</em>y<del>z</del>");
-        assertEquals(container, DOMUtils.getInstance().getNearestCommonAncestor(
-            container.getFirstChild().getFirstChild(), container.getLastChild().getFirstChild()));
+        assertEquals(container, domUtils.getNearestCommonAncestor(container.getFirstChild().getFirstChild(), container
+            .getLastChild().getFirstChild()));
     }
 
     /**
@@ -200,14 +208,14 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     {
         container.setInnerHTML("xwiki<span><em>$</em><ins>#</ins></span>");
 
-        DocumentFragment contents = DOMUtils.getInstance().cloneNodeContents(container.getFirstChild(), 0, 2);
+        DocumentFragment contents = domUtils.cloneNodeContents(container.getFirstChild(), 0, 2);
         assertEquals(1, contents.getChildNodes().getLength());
         assertEquals("xw", contents.getInnerHTML());
 
-        contents = DOMUtils.getInstance().cloneNodeContents(container.getFirstChild(), 5, 5);
+        contents = domUtils.cloneNodeContents(container.getFirstChild(), 5, 5);
         assertEquals(0, contents.getChildNodes().getLength());
 
-        contents = DOMUtils.getInstance().cloneNodeContents(container.getLastChild(), 0, 2);
+        contents = domUtils.cloneNodeContents(container.getLastChild(), 0, 2);
         assertEquals(2, contents.getChildNodes().getLength());
         assertEquals("<em>$</em><ins>#</ins>", contents.getInnerHTML().toLowerCase());
     }
@@ -218,13 +226,13 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testCloneNodeBetweenOffsets()
     {
         container.setInnerHTML("toucan<span><em>+</em><ins>-</ins></span>");
-        assertEquals("an", DOMUtils.getInstance().cloneNode(container.getFirstChild(), 4, 6).getNodeValue());
-        assertEquals("", DOMUtils.getInstance().cloneNode(container.getFirstChild(), 0, 0).getNodeValue());
+        assertEquals("an", domUtils.cloneNode(container.getFirstChild(), 4, 6).getNodeValue());
+        assertEquals("", domUtils.cloneNode(container.getFirstChild(), 0, 0).getNodeValue());
 
-        Element clone = DOMUtils.getInstance().cloneNode(container.getLastChild(), 1, 2).cast();
+        Element clone = domUtils.cloneNode(container.getLastChild(), 1, 2).cast();
         assertEquals("<ins>-</ins>", clone.getInnerHTML().toLowerCase());
 
-        clone = DOMUtils.getInstance().cloneNode(container.getLastChild(), 0, 0).cast();
+        clone = domUtils.cloneNode(container.getLastChild(), 0, 0).cast();
         assertEquals("<span></span>", clone.getString().toLowerCase());
     }
 
@@ -234,9 +242,9 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testGetLength()
     {
         container.setInnerHTML("xwiki<strong></strong><ins>x<del>y</del>z</ins>");
-        assertEquals(5, DOMUtils.getInstance().getLength(container.getFirstChild()));
-        assertEquals(0, DOMUtils.getInstance().getLength(container.getChildNodes().getItem(1)));
-        assertEquals(3, DOMUtils.getInstance().getLength(container.getLastChild()));
+        assertEquals(5, domUtils.getLength(container.getFirstChild()));
+        assertEquals(0, domUtils.getLength(container.getChildNodes().getItem(1)));
+        assertEquals(3, domUtils.getLength(container.getLastChild()));
     }
 
     /**
@@ -245,15 +253,13 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testCloneNodeLeftRight()
     {
         container.setInnerHTML("abc");
-        assertEquals("ab", DOMUtils.getInstance().cloneNode(container.getFirstChild(), 2, true).getNodeValue());
-        assertEquals("c", DOMUtils.getInstance().cloneNode(container.getFirstChild(), 2, false).getNodeValue());
+        assertEquals("ab", domUtils.cloneNode(container.getFirstChild(), 2, true).getNodeValue());
+        assertEquals("c", domUtils.cloneNode(container.getFirstChild(), 2, false).getNodeValue());
 
         container.setInnerHTML("a<!--x--><em>b</em>");
 
-        assertEquals("a<!--x-->", ((Element) DOMUtils.getInstance().cloneNode(container, 2, true)).getInnerHTML()
-            .toLowerCase());
-        assertEquals("<em>b</em>", ((Element) DOMUtils.getInstance().cloneNode(container, 2, false)).getInnerHTML()
-            .toLowerCase());
+        assertEquals("a<!--x-->", ((Element) domUtils.cloneNode(container, 2, true)).getInnerHTML().toLowerCase());
+        assertEquals("<em>b</em>", ((Element) domUtils.cloneNode(container, 2, false)).getInnerHTML().toLowerCase());
     }
 
     /**
@@ -264,13 +270,12 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         container.setInnerHTML("<em><ins>abc<del>d</del></ins></em>e");
 
         Element clone =
-            DOMUtils.getInstance().cloneNode(container.getParentNode(),
-                container.getFirstChild().getFirstChild().getFirstChild(), 2, false).cast();
+            domUtils.cloneNode(container.getParentNode(), container.getFirstChild().getFirstChild().getFirstChild(), 2,
+                false).cast();
         assertEquals("<em><ins>c<del>d</del></ins></em>e", clone.getInnerHTML().toLowerCase());
 
         clone =
-            DOMUtils.getInstance().cloneNode(container.getParentNode(), container.getFirstChild().getFirstChild(), 1,
-                true).cast();
+            domUtils.cloneNode(container.getParentNode(), container.getFirstChild().getFirstChild(), 1, true).cast();
         assertEquals("<em><ins>abc</ins></em>", clone.getInnerHTML().toLowerCase());
     }
 
@@ -280,9 +285,9 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testGetChild()
     {
         container.setInnerHTML("%<strong>@<em>^</em></strong>");
-        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getChild(container, container.getFirstChild()));
-        assertEquals(container.getLastChild(), DOMUtils.getInstance().getChild(container,
-            container.getLastChild().getLastChild().getFirstChild()));
+        assertEquals(container.getFirstChild(), domUtils.getChild(container, container.getFirstChild()));
+        assertEquals(container.getLastChild(), domUtils.getChild(container, container.getLastChild().getLastChild()
+            .getFirstChild()));
     }
 
     /**
@@ -291,11 +296,11 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testDeleteNodeContentsBetweenOffsets()
     {
         container.setInnerHTML("foo");
-        DOMUtils.getInstance().deleteNodeContents(container.getFirstChild(), 1, 2);
+        domUtils.deleteNodeContents(container.getFirstChild(), 1, 2);
         assertEquals("fo", container.getInnerHTML());
 
         container.setInnerHTML("<em>1</em>2<!--3-->");
-        DOMUtils.getInstance().deleteNodeContents(container, 1, 2);
+        domUtils.deleteNodeContents(container, 1, 2);
         assertEquals("<em>1</em><!--3-->", container.getInnerHTML().toLowerCase());
     }
 
@@ -305,15 +310,15 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testDeleteNodeContentsLeftRight()
     {
         container.setInnerHTML("foo<del></del>bar");
-        DOMUtils.getInstance().deleteNodeContents(container.getFirstChild(), 2, true);
+        domUtils.deleteNodeContents(container.getFirstChild(), 2, true);
         assertEquals("o<del></del>bar", container.getInnerHTML().toLowerCase());
-        DOMUtils.getInstance().deleteNodeContents(container.getLastChild(), 0, false);
+        domUtils.deleteNodeContents(container.getLastChild(), 0, false);
         assertEquals("o<del></del>", container.getInnerHTML().toLowerCase());
 
         container.setInnerHTML("<ins>1</ins><!--2-->3");
-        DOMUtils.getInstance().deleteNodeContents(container, 1, true);
+        domUtils.deleteNodeContents(container, 1, true);
         assertEquals("<!--2-->3", container.getInnerHTML());
-        DOMUtils.getInstance().deleteNodeContents(container, 1, false);
+        domUtils.deleteNodeContents(container, 1, false);
         assertEquals("<!--2-->", container.getInnerHTML());
     }
 
@@ -323,9 +328,9 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testDeleteSiblings()
     {
         container.setInnerHTML("1<strong>2</strong><!--3-->");
-        DOMUtils.getInstance().deleteSiblings(container.getFirstChild(), true);
+        domUtils.deleteSiblings(container.getFirstChild(), true);
         assertEquals(3, container.getChildNodes().getLength());
-        DOMUtils.getInstance().deleteSiblings(container.getFirstChild(), false);
+        domUtils.deleteSiblings(container.getFirstChild(), false);
         assertEquals("1", container.getInnerHTML());
     }
 
@@ -335,13 +340,13 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testDeleteNodeContentsUpwards()
     {
         container.setInnerHTML("<span>x<em>y<!--z--><del>wiki</del></em></span>");
-        DOMUtils.getInstance().deleteNodeContents(container,
-            container.getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(2).getFirstChild(), 2, true);
+        domUtils.deleteNodeContents(container, container.getFirstChild().getChildNodes().getItem(1).getChildNodes()
+            .getItem(2).getFirstChild(), 2, true);
         assertEquals("<span><em><del>ki</del></em></span>", container.getInnerHTML().toLowerCase());
 
         container.setInnerHTML("<span><em><del>wiki</del><!--z-->y</em>x</span>");
-        DOMUtils.getInstance().deleteNodeContents(container,
-            container.getFirstChild().getFirstChild().getFirstChild().getFirstChild(), 1, false);
+        domUtils.deleteNodeContents(container, container.getFirstChild().getFirstChild().getFirstChild()
+            .getFirstChild(), 1, false);
         assertEquals("<span><em><del>w</del></em></span>", container.getInnerHTML().toLowerCase());
     }
 
@@ -351,14 +356,14 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testSplitNodeAtOffset()
     {
         container.setInnerHTML("xwiki");
-        Node rightNode = DOMUtils.getInstance().splitNode(container.getFirstChild(), 3);
+        Node rightNode = domUtils.splitNode(container.getFirstChild(), 3);
         assertEquals(container.getLastChild(), rightNode);
         assertEquals(2, container.getChildNodes().getLength());
         assertEquals("xwi", container.getFirstChild().getNodeValue());
         assertEquals("ki", container.getLastChild().getNodeValue());
 
         container.setInnerHTML("q<span><!--x--><em>w</em>e</span>rty");
-        rightNode = DOMUtils.getInstance().splitNode(container.getChildNodes().getItem(1), 0);
+        rightNode = domUtils.splitNode(container.getChildNodes().getItem(1), 0);
         assertEquals("<span><!--x--><em>w</em>e</span>", Element.as(rightNode).getString().toLowerCase());
         assertEquals("q<span></span><span><!--x--><em>w</em>e</span>rty", container.getInnerHTML().toLowerCase());
     }
@@ -370,11 +375,27 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     {
         container.setInnerHTML("u<del>v<strong><ins><!--x-->y</ins>z</strong><em>a</em></del>b");
         Node rightNode =
-            DOMUtils.getInstance().splitNode(container,
-                container.getChildNodes().getItem(1).getChildNodes().getItem(1).getFirstChild(), 1);
+            domUtils.splitNode(container, container.getChildNodes().getItem(1).getChildNodes().getItem(1)
+                .getFirstChild(), 1);
         assertEquals("<ins>y</ins>", Element.as(rightNode).getString().toLowerCase());
         assertEquals("u<del>v<strong><ins><!--x--></ins></strong></del>"
             + "<del><strong><ins>y</ins>z</strong><em>a</em></del>b", container.getInnerHTML().toLowerCase());
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#splitNode(Node, Node, int)} at the beginning of a paragraph.
+     * 
+     * @see XWIKI-3053: When a HR is inserted at the beginning of a paragraph an extra empty paragraph is generated
+     *      before that HR
+     */
+    public void testSplitNodeUpwardsAtTheBeginningOfAParagraph()
+    {
+        container.setInnerHTML("<p>test</p>");
+        Node rightNode = domUtils.splitNode(container, container.getFirstChild().getFirstChild(), 0);
+        assertEquals("test", rightNode.getNodeValue());
+        // I think it's normal to have the empty paragraph. We just have to make sure it is editable.
+        assertEquals("<p></p><p>test</p>", container.getInnerHTML().toLowerCase().replaceAll("[\r\n\t]+", ""));
+        assertEquals(1, container.getFirstChild().getChildNodes().getLength());
     }
 
     /**
@@ -383,10 +404,10 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testIsFlowContainer()
     {
         container.setInnerHTML("<ul><li>foo</li></ul>");
-        assertTrue(DOMUtils.getInstance().isFlowContainer(container));
-        assertFalse(DOMUtils.getInstance().isFlowContainer(container.getFirstChild()));
-        assertTrue(DOMUtils.getInstance().isFlowContainer(container.getFirstChild().getFirstChild()));
-        assertFalse(DOMUtils.getInstance().isFlowContainer(container.getFirstChild().getFirstChild().getFirstChild()));
+        assertTrue(domUtils.isFlowContainer(container));
+        assertFalse(domUtils.isFlowContainer(container.getFirstChild()));
+        assertTrue(domUtils.isFlowContainer(container.getFirstChild().getFirstChild()));
+        assertFalse(domUtils.isFlowContainer(container.getFirstChild().getFirstChild().getFirstChild()));
     }
 
     /**
@@ -395,8 +416,7 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testGetNearestFlowContainer()
     {
         container.setInnerHTML("x<del>y</del>z");
-        assertEquals(container, DOMUtils.getInstance().getNearestFlowContainer(
-            container.getChildNodes().getItem(1).getFirstChild()));
+        assertEquals(container, domUtils.getNearestFlowContainer(container.getChildNodes().getItem(1).getFirstChild()));
     }
 
     /**
@@ -407,15 +427,15 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         container.xSetInnerHTML("<!--x-->y<em>z</em>");
 
         Text text = container.getOwnerDocument().createTextNode(":").cast();
-        DOMUtils.getInstance().insertAt(container, text, container.getChildNodes().getLength());
+        domUtils.insertAt(container, text, container.getChildNodes().getLength());
         assertEquals("<!--x-->y<em>z</em>:", container.getInnerHTML().toLowerCase());
 
         text = container.getOwnerDocument().createTextNode("{").cast();
-        DOMUtils.getInstance().insertAt(container, text, 0);
+        domUtils.insertAt(container, text, 0);
         assertEquals("{<!--x-->y<em>z</em>:", container.getInnerHTML().toLowerCase());
 
         text = container.getOwnerDocument().createTextNode("}").cast();
-        DOMUtils.getInstance().insertAt(container, text, 2);
+        domUtils.insertAt(container, text, 2);
         assertEquals("{<!--x-->}y<em>z</em>:", container.getInnerHTML().toLowerCase());
     }
 
@@ -426,11 +446,11 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     {
         container.xSetInnerHTML("#<em>$</em>#");
 
-        assertEquals(container.getChildNodes().getItem(1), DOMUtils.getInstance().getFarthestInlineAncestor(
-            container.getChildNodes().getItem(1).getFirstChild()));
-        assertEquals(container.getChildNodes().getItem(1), DOMUtils.getInstance().getFarthestInlineAncestor(
-            container.getChildNodes().getItem(1)));
-        assertNull(DOMUtils.getInstance().getFarthestInlineAncestor(container));
+        assertEquals(container.getChildNodes().getItem(1), domUtils.getFarthestInlineAncestor(container.getChildNodes()
+            .getItem(1).getFirstChild()));
+        assertEquals(container.getChildNodes().getItem(1), domUtils.getFarthestInlineAncestor(container.getChildNodes()
+            .getItem(1)));
+        assertNull(domUtils.getFarthestInlineAncestor(container));
     }
 
     /**
@@ -443,27 +463,26 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
 
         range.setStart(container.getFirstChild(), 1);
         range.collapse(true);
-        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getFirstLeaf(range));
-        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getLastLeaf(range));
+        assertEquals(container.getFirstChild(), domUtils.getFirstLeaf(range));
+        assertEquals(container.getFirstChild(), domUtils.getLastLeaf(range));
 
         range.setEnd(container.getFirstChild(), 2);
-        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getFirstLeaf(range));
-        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getLastLeaf(range));
+        assertEquals(container.getFirstChild(), domUtils.getFirstLeaf(range));
+        assertEquals(container.getFirstChild(), domUtils.getLastLeaf(range));
 
         range.setEnd(container.getLastChild(), 1);
-        assertEquals(container.getFirstChild(), DOMUtils.getInstance().getFirstLeaf(range));
-        assertEquals(container.getLastChild(), DOMUtils.getInstance().getLastLeaf(range));
+        assertEquals(container.getFirstChild(), domUtils.getFirstLeaf(range));
+        assertEquals(container.getLastChild(), domUtils.getLastLeaf(range));
 
         range.setStart(container.getChildNodes().getItem(1), 1);
         range.setEnd(container.getChildNodes().getItem(3), 0);
-        assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance()
-            .getFirstLeaf(range));
-        assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), DOMUtils.getInstance()
-            .getLastLeaf(range));
+        Node lastLeaf = domUtils.getLastLeaf(range);
+        assertEquals(lastLeaf, domUtils.getFirstLeaf(range));
+        assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), lastLeaf);
 
         range.collapse(true);
-        assertNull(DOMUtils.getInstance().getFirstLeaf(range));
-        assertNull(DOMUtils.getInstance().getLastLeaf(range));
+        assertNull(domUtils.getFirstLeaf(range));
+        assertNull(domUtils.getLastLeaf(range));
     }
 
     /**
@@ -473,13 +492,13 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     {
         container.setInnerHTML("1<span>2</span>3");
         Node node = container.getChildNodes().getItem(1);
-        DOMUtils.getInstance().detach(node);
+        domUtils.detach(node);
         assertEquals("13", container.getInnerHTML());
         // IE fails because orphan nodes that have been created with the innerHTML property are attached to a document
         // fragment.
         assertNull(node.getParentNode());
         // The following shoudn't fail.
-        DOMUtils.getInstance().detach(node);
+        domUtils.detach(node);
     }
 
     /**
@@ -488,19 +507,19 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testIsSerializable()
     {
         Text text = Document.get().createTextNode("1983").cast();
-        assertTrue(DOMUtils.getInstance().isSerializable(text));
+        assertTrue(domUtils.isSerializable(text));
 
         text.setData("");
-        assertFalse(DOMUtils.getInstance().isSerializable(text));
+        assertFalse(domUtils.isSerializable(text));
 
         Element element = Document.get().createSpanElement().cast();
-        assertTrue(DOMUtils.getInstance().isSerializable(element));
+        assertTrue(domUtils.isSerializable(element));
 
         element.setAttribute(Element.META_DATA_ATTR, "");
-        assertFalse(DOMUtils.getInstance().isSerializable(element));
+        assertFalse(domUtils.isSerializable(element));
 
         Node comment = ((Document) Document.get()).createComment("");
-        assertTrue(DOMUtils.getInstance().isSerializable(comment));
+        assertTrue(domUtils.isSerializable(comment));
     }
 
     /**
@@ -509,22 +528,22 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     public void testGetNormalizedNodeIndex()
     {
         container.appendChild(Document.get().createTextNode("void"));
-        assertEquals(0, DOMUtils.getInstance().getNormalizedNodeIndex(container.getFirstChild()));
+        assertEquals(0, domUtils.getNormalizedNodeIndex(container.getFirstChild()));
 
         container.getFirstChild().setNodeValue("");
-        assertEquals(0, DOMUtils.getInstance().getNormalizedNodeIndex(container.getFirstChild()));
+        assertEquals(0, domUtils.getNormalizedNodeIndex(container.getFirstChild()));
 
         container.appendChild(Document.get().createSpanElement());
-        assertEquals(0, DOMUtils.getInstance().getNormalizedNodeIndex(container.getLastChild()));
+        assertEquals(0, domUtils.getNormalizedNodeIndex(container.getLastChild()));
 
         container.getFirstChild().setNodeValue("null");
-        assertEquals(1, DOMUtils.getInstance().getNormalizedNodeIndex(container.getLastChild()));
+        assertEquals(1, domUtils.getNormalizedNodeIndex(container.getLastChild()));
 
         container.appendChild(Document.get().createTextNode("int"));
-        assertEquals(2, DOMUtils.getInstance().getNormalizedNodeIndex(container.getLastChild()));
+        assertEquals(2, domUtils.getNormalizedNodeIndex(container.getLastChild()));
 
         Element.as(container.getChildNodes().getItem(1)).setAttribute(Element.META_DATA_ATTR, "");
-        assertEquals(0, DOMUtils.getInstance().getNormalizedNodeIndex(container.getLastChild()));
+        assertEquals(0, domUtils.getNormalizedNodeIndex(container.getLastChild()));
     }
 
     /**
@@ -532,21 +551,21 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
      */
     public void testGetNormalizedChildCount()
     {
-        assertEquals(0, DOMUtils.getInstance().getNormalizedChildCount(container));
+        assertEquals(0, domUtils.getNormalizedChildCount(container));
 
         container.appendChild(Document.get().createTextNode(""));
-        assertEquals(0, DOMUtils.getInstance().getNormalizedChildCount(container));
+        assertEquals(0, domUtils.getNormalizedChildCount(container));
 
         container.getFirstChild().setNodeValue("double");
-        assertEquals(1, DOMUtils.getInstance().getNormalizedChildCount(container));
+        assertEquals(1, domUtils.getNormalizedChildCount(container));
 
         container.appendChild(Document.get().createSpanElement());
-        assertEquals(2, DOMUtils.getInstance().getNormalizedChildCount(container));
+        assertEquals(2, domUtils.getNormalizedChildCount(container));
 
         Element.as(container.getLastChild()).setAttribute(Element.META_DATA_ATTR, "");
-        assertEquals(1, DOMUtils.getInstance().getNormalizedChildCount(container));
+        assertEquals(1, domUtils.getNormalizedChildCount(container));
 
         container.getFirstChild().setNodeValue("");
-        assertEquals(0, DOMUtils.getInstance().getNormalizedChildCount(container));
+        assertEquals(0, domUtils.getNormalizedChildCount(container));
     }
 }

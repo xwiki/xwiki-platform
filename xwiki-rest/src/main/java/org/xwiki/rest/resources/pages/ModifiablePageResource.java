@@ -58,26 +58,13 @@ public abstract class ModifiablePageResource extends XWikiResource
     {
         MediaType mediaType = getRequest().getEntity().getMediaType();
 
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), false);
+        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), false, true);
         if (documentInfo == null) {
-            /* Should not happen since we requested not to fail if the document doesn't exist */
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
             return;
 
         }
 
         Document doc = documentInfo.getDocument();
-        /* If the doc is null we don't have the rights to access it. */
-        if (doc == null) {
-            getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-            return;
-        }
-
-        /* If the doc is locked then return */
-        if (doc.getLocked()) {
-            getResponse().setStatus(Status.CLIENT_ERROR_LOCKED);
-            return;
-        }
 
         /* Process the entity */
         if (MediaType.TEXT_PLAIN.equals(mediaType)) {
@@ -162,26 +149,12 @@ public abstract class ModifiablePageResource extends XWikiResource
     @Override
     public void handleDelete()
     {
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), false);
+        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, true);
         if (documentInfo == null) {
-            /* Should not happen since we requested not to fail if the document doesn't exist */
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
             return;
-
         }
 
         Document doc = documentInfo.getDocument();
-        /* If the doc is null we don't have the rights to access it. */
-        if (doc == null) {
-            getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-            return;
-        }
-
-        /* If the doc is locked then return */
-        if (doc.getLocked()) {
-            getResponse().setStatus(Status.CLIENT_ERROR_LOCKED);
-            return;
-        }
 
         try {
             doc.delete();

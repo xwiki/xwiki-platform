@@ -27,6 +27,7 @@ import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.ext.wadl.WadlResource;
 import org.restlet.resource.Variant;
 import org.xwiki.rest.representers.NullRepresenter;
@@ -193,7 +194,8 @@ public class XWikiResource extends WadlResource
      * @param failIfDoesntExist
      * @return A DocumentInfo containing the document or null if the document doesn't exist or an exception was thrown.
      */
-    public DocumentInfo getDocumentFromRequest(Request request, boolean failIfDoesntExist)
+    public DocumentInfo getDocumentFromRequest(Request request, Response response, boolean failIfDoesntExist,
+        boolean failIfLocked)
     {
         try {
             String wikiName = (String) request.getAttributes().get(Constants.WIKI_NAME_PARAMETER);
@@ -208,6 +210,7 @@ public class XWikiResource extends WadlResource
 
             if (failIfDoesntExist) {
                 if (!existed) {
+                    response.setStatus(Status.CLIENT_ERROR_NOT_FOUND);
                     return null;
                 }
             }
@@ -216,7 +219,8 @@ public class XWikiResource extends WadlResource
 
             /* If doc is null, we don't have the rights to access the document */
             if (doc == null) {
-                return new DocumentInfo(null, false);
+                response.setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+                return null;
             }
 
             if (language != null) {
@@ -229,6 +233,7 @@ public class XWikiResource extends WadlResource
                 if (!language.equals(doc.getLanguage())) {
                     /* If we are here the requested translation doesn't exist */
                     if (failIfDoesntExist) {
+                        response.setStatus(Status.CLIENT_ERROR_NOT_FOUND);
                         return null;
                     } else {
                         XWikiDocument xwikiDocument = new XWikiDocument(spaceName, pageName);
@@ -243,6 +248,12 @@ public class XWikiResource extends WadlResource
             /* Get a specific version if requested to */
             if (version != null) {
                 doc = doc.getDocumentRevision(version);
+            }
+
+            /* If the doc is locked then return */
+            if (doc.getLocked()) {
+                response.setStatus(Status.CLIENT_ERROR_LOCKED);
+                return null;
             }
 
             return new DocumentInfo(doc, !existed);

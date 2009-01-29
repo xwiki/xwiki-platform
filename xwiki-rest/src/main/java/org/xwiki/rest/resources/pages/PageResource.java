@@ -43,20 +43,12 @@ public class PageResource extends ModifiablePageResource
     @Override
     public Representation represent(Variant variant)
     {
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), true);
+        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
         if (documentInfo == null) {
-            /* If the document doesn't exist send a not found header */
-            getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
             return null;
         }
 
         Document doc = documentInfo.getDocument();
-
-        /* Check if we have access to it */
-        if (doc == null) {
-            getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-            return null;
-        }
 
         Page page = DomainObjectFactory.createPage(getRequest(), resourceClassRegistry, doc, false);
         if (page == null) {
@@ -84,26 +76,12 @@ public class PageResource extends ModifiablePageResource
     {
         MediaType mediaType = getRequest().getEntity().getMediaType();
 
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), false);
+        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), false, true);
         if (documentInfo == null) {
-            /* Should not happen since we requested not to fail if the document doesn't exist */
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
             return;
-
         }
 
         Document doc = documentInfo.getDocument();
-        /* If the doc is null we don't have the rights to access it. */
-        if (doc == null) {
-            getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-            return;
-        }
-
-        /* If the doc is locked then return */
-        if (doc.getLocked()) {
-            getResponse().setStatus(Status.CLIENT_ERROR_LOCKED);
-            return;
-        }
 
         /* Process the entity */
         if (MediaType.TEXT_PLAIN.equals(mediaType)) {
@@ -188,26 +166,12 @@ public class PageResource extends ModifiablePageResource
     @Override
     public void handleDelete()
     {
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), false);
+        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, true);
         if (documentInfo == null) {
-            /* Should not happen since we requested not to fail if the document doesn't exist */
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
             return;
-
         }
 
         Document doc = documentInfo.getDocument();
-        /* If the doc is null we don't have the rights to access it. */
-        if (doc == null) {
-            getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-            return;
-        }
-
-        /* If the doc is locked then return */
-        if (doc.getLocked()) {
-            getResponse().setStatus(Status.CLIENT_ERROR_LOCKED);
-            return;
-        }
 
         try {
             doc.delete();

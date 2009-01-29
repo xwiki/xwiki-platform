@@ -35,20 +35,12 @@ public class AttachmentResource extends XWikiResource
     public Representation represent(Variant variant)
     {
         try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), true);
+            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
             if (documentInfo == null) {
-                /* If the document doesn't exist send a not found header */
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
                 return null;
             }
 
             Document doc = documentInfo.getDocument();
-
-            /* Check if we have access to it */
-            if (doc == null) {
-                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                return null;
-            }
 
             String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
 
@@ -98,26 +90,14 @@ public class AttachmentResource extends XWikiResource
     public void handlePut()
     {
         try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), false);
+            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), false, true);
             if (documentInfo == null) {
-                /* Should not happen since we requested not to fail if the document doesn't exist */
                 getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
                 return;
 
             }
 
             Document doc = documentInfo.getDocument();
-            /* If the doc is null we don't have the rights to access it. */
-            if (doc == null) {
-                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                return;
-            }
-
-            /* If the doc is locked then return */
-            if (doc.getLocked()) {
-                getResponse().setStatus(Status.CLIENT_ERROR_LOCKED);
-                return;
-            }
 
             String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
             boolean existed = false;
@@ -164,26 +144,14 @@ public class AttachmentResource extends XWikiResource
     public void handleDelete()
     {
         try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), false);
+            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, true);
             if (documentInfo == null) {
-                /* Should not happen since we requested not to fail if the document doesn't exist */
                 getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
                 return;
 
             }
 
             Document doc = documentInfo.getDocument();
-            /* If the doc is null we don't have the rights to access it. */
-            if (doc == null) {
-                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                return;
-            }
-
-            /* If the doc is locked then return */
-            if (doc.getLocked()) {
-                getResponse().setStatus(Status.CLIENT_ERROR_LOCKED);
-                return;
-            }
 
             String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
 

@@ -28,20 +28,12 @@ public class CommentResource extends XWikiResource
                 return null;
             }
 
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), true);
+            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
             if (documentInfo == null) {
-                /* If the document doesn't exist send a not found header */
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
                 return null;
             }
 
             Document doc = documentInfo.getDocument();
-
-            /* Check if we have access to it */
-            if (doc == null) {
-                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                return null;
-            }
 
             Comment comment = null;
 

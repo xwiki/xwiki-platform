@@ -163,6 +163,6 @@
 	margin-right: 10px;
 	width: 30px;
 	cursor: pointer;
-	background-image: url($xwiki.getSkinFile("icons/rights-manager/btnClose.png"));
+	background-image: url($xwiki.getSkinFile("js/xwiki/lightbox/btnClose.png"));
 	background-repeat: no-repeat;
 }

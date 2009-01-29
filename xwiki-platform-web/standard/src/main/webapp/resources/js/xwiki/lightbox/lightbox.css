@@ -28,7 +28,7 @@
 .rounded .b12, .rounded .b12b { height: 3px; margin: 0 1px; }
 
 #lb-bg {
-  background-image: url("$xwiki.getSkinFile("icons/rights-manager/back.png")");
+  background-image: url("$xwiki.getSkinFile("js/xwiki/lightbox/back.png")");
   background-repeat: repeat;
   height: 100%;
   width: 100%;
@@ -150,6 +150,6 @@
 	margin-right: 10px;
 	width: 30px;
 	cursor: pointer;
-	background-image: url("$xwiki.getSkinFile("icons/rights-manager/btnClose.png")");
+	background-image: url("$xwiki.getSkinFile("js/xwiki/lightbox/btnClose.png")");
 	background-repeat: no-repeat;
 }

@@ -17,7 +17,6 @@
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/util/browserdetect.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/util/shortcuts.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/chartwizard/chwScripts.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/table/tablefilterNsort.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/fullscreenedit/fullscreenEdit.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/usersandgroups/usersandgroups.js", true)"></script>

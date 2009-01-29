@@ -78,6 +78,34 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Javascript and CSS files compression -->
+      <plugin>
+        <groupId>net.sf.alchim</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <!-- force version 0.6.2 to avoid 'single var statement per scope' warning from YUI compressor 2.3.5 -->
+        <version>0.6.2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+          </execution>
+        </executions>        
+        <configuration>
+          <!-- Overwrite existing files -->
+          <nosuffix>true</nosuffix>
+          <includes>
+            <exclude>resources/js/**.js</exclude>
+            <exclude>resources/js/**.css</exclude>
+          </includes>
+          <!-- Exclude already minified files -->
+          <excludes>
+            <exclude>**/*-min.js</exclude>
+            <exclude>**/*-debug.js</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
       <!-- Inject XWiki's configuration -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

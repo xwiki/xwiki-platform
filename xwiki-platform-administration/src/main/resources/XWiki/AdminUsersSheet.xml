@@ -67,6 +67,11 @@
 ##############################
 #if($interface == "new")
 ##
+## inject needed JS files
+##
+$xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true)    
+$xwiki.jsfx.use("js/xwiki/table/livetable.js", true)
+##
 ## url to get the users for displaying them in the ajax-based table
 ##
 #set($url = "?xpage=getusers")

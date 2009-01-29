@@ -66,6 +66,11 @@
 ## display the new interface
 ##############################
 #if($interface == "new")
+## 
+## Inject needed JS files
+##
+$xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true)    
+$xwiki.jsfx.use("js/xwiki/table/livetable.js", true)
 ##
 ## url to get the groups for displaying them in the ajax-based table
 ##

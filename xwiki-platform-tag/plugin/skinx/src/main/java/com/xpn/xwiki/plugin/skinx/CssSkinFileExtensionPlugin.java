@@ -72,7 +72,7 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     public String getLink(String filename, XWikiContext context)
     {
         return "<link rel='stylesheet' type='text/css' href='"
-            + context.getWiki().getSkinFile(filename, context) + "'/>";
+            + context.getWiki().getSkinFile(filename, true, context) + "'/>";
     }
     
     /**

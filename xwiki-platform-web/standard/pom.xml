@@ -205,6 +205,48 @@
     </plugins>
   </build>
   <profiles>
+    <profile>      
+      <id>debug</id>
+      <!-- The debug profile doesn't have any property, its goal is to avoid JS/CSS compression -->      
+    </profile>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <!-- Javascript and CSS files compression -->
+          <plugin>
+            <groupId>net.sf.alchim</groupId>
+            <artifactId>yuicompressor-maven-plugin</artifactId>
+            <!-- force version 0.6.2 to avoid 'single var statement per scope' warning from YUI compressor 2.3.5 -->
+            <version>0.6.2</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>compress</goal>
+                </goals>
+              </execution>
+            </executions>        
+            <configuration>
+              <!-- Overwrite existing files -->
+              <nosuffix>true</nosuffix>
+              <includes>
+                <include>resources/js/**.js</include>
+                <include>resources/js/**.css</include>
+              </includes>
+              <!-- Exclude already minified files -->
+              <excludes>
+                <exclude>**/*-min.js</exclude>
+                <exclude>**/*-debug.js</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>jettyrun</id>      
       <build>
@@ -297,6 +339,34 @@
               <doUpdate>true</doUpdate>
             </configuration>
           </plugin>
+          <!-- Javascript and CSS files compression -->
+          <plugin>
+            <groupId>net.sf.alchim</groupId>
+            <artifactId>yuicompressor-maven-plugin</artifactId>
+            <!-- force version 0.6.2 to avoid 'single var statement per scope' warning from YUI compressor 2.3.5 -->
+            <version>0.6.2</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>compress</goal>
+                </goals>
+              </execution>
+            </executions>        
+            <configuration>
+              <!-- Overwrite existing files -->
+              <nosuffix>true</nosuffix>
+              <includes>
+                <include>resources/js/**.js</include>
+                <include>resources/js/**.css</include>
+              </includes>
+              <!-- Exclude already minified files -->
+              <excludes>
+                <exclude>**/*-min.js</exclude>
+                <exclude>**/*-debug.js</exclude>
+              </excludes>
+            </configuration>
+          </plugin>          
         </plugins>
       </build>
     </profile>

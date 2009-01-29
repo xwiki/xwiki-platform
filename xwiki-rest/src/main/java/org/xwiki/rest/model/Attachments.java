@@ -19,32 +19,34 @@
  */
 package org.xwiki.rest.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 /**
  * @version $Id$
  */
-public class Relations
+@XStreamAlias("attachments")
+public class Attachments extends LinkCollection
 {
-    public static final String SELF = "self";
+    @XStreamImplicit
+    private List<Attachment> attachmentList;
 
-    public static final String WADL = "wadl";
+    public Attachments()
+    {
+        attachmentList = new ArrayList<Attachment>();
+    }
 
-    public static final String WIKIS = "http://www.xwiki.org/rel/wikis";
+    public List<Attachment> getAttachmentList()
+    {
+        return attachmentList;
+    }
 
-    public static final String SPACES = "http://www.xwiki.org/rel/spaces";
+    public void addAttachment(Attachment attachment)
+    {
+        attachmentList.add(attachment);
+    }
 
-    public static final String SPACE = "http://www.xwiki.org/rel/space";
-
-    public static final String PAGES = "http://www.xwiki.org/rel/pages";
-
-    public static final String TRANSLATION = "http://www.xwiki.org/rel/translation";
-
-    public static final String PAGE = "http://www.xwiki.org/rel/page";
-
-    public static final String COMMENTS = "http://www.xwiki.org/rel/comments";
-
-    public static final String PARENT = "http://www.xwiki.org/rel/page/parent";
-
-    public static final String ATTACHMENTS = "http://www.xwiki.org/rel/attachments";
-
-    public static final String ATTACHMENT_DATA = "http://www.xwiki.org/rel/attachmentData";
 }

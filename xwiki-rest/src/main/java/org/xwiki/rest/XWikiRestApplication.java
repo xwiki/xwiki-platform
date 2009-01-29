@@ -68,7 +68,8 @@ public class XWikiRestApplication extends WadlApplication implements Composable
     public Restlet createRoot()
     {
         getTunnelService().setEnabled(true);
-        getTunnelService().setExtensionsTunnel(true);
+        /* We cannot activate the extension tunnel service because otherwise attachments will not be correctly handled */
+        getTunnelService().setExtensionsTunnel(false);
 
         Router router = new XWikiRouter(componentManager, getContext());
 

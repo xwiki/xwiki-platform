@@ -420,7 +420,8 @@
 			<role-hint>org.xwiki.rest.resources.pages.PageTranslationsResource
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
-			<implementation>org.xwiki.rest.resources.pages.PageTranslationsResource
+			<implementation>
+				org.xwiki.rest.resources.pages.PageTranslationsResource
 			</implementation>
 			<requirements>
 				<requirement>
@@ -470,7 +471,8 @@
 			<role-hint>org.xwiki.rest.resources.pages.PageTranslationResource
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
-			<implementation>org.xwiki.rest.resources.pages.PageTranslationResource
+			<implementation>
+				org.xwiki.rest.resources.pages.PageTranslationResource
 			</implementation>
 			<requirements>
 				<requirement>
@@ -517,7 +519,8 @@
 		<component>
 			<role>org.xwiki.rest.XWikiResource
 			</role>
-			<role-hint>org.xwiki.rest.resources.pages.PageTranslationVersionResource
+			<role-hint>
+				org.xwiki.rest.resources.pages.PageTranslationVersionResource
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
@@ -531,7 +534,8 @@
 				<requirement>
 					<role>org.xwiki.rest.XWikiResourceRepresenter
 					</role>
-					<role-hint>org.xwiki.rest.resources.pages.PageTranslationVersionResource
+					<role-hint>
+						org.xwiki.rest.resources.pages.PageTranslationVersionResource
 					</role-hint>
 					<field-name>descriptorToRepresenterMap
 					</field-name>
@@ -618,7 +622,8 @@
 		<component>
 			<role>org.xwiki.rest.XWikiResource
 			</role>
-			<role-hint>org.xwiki.rest.resources.pages.PageTranslationHistoryResource
+			<role-hint>
+				org.xwiki.rest.resources.pages.PageTranslationHistoryResource
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
@@ -632,7 +637,8 @@
 				<requirement>
 					<role>org.xwiki.rest.XWikiResourceRepresenter
 					</role>
-					<role-hint>org.xwiki.rest.resources.pages.PageTranslationHistoryResource
+					<role-hint>
+						org.xwiki.rest.resources.pages.PageTranslationHistoryResource
 					</role-hint>
 					<field-name>descriptorToRepresenterMap
 					</field-name>
@@ -658,7 +664,7 @@
 				org.xwiki.rest.representers.XmlTextXStreamRepresenter
 			</implementation>
 		</component>
-		
+
 		<!--
 			*************************************************************************************************
 		-->
@@ -709,7 +715,7 @@
 				org.xwiki.rest.representers.XmlTextXStreamRepresenter
 			</implementation>
 		</component>
-		
+
 		<!-- ************************************* -->
 		<!-- * Comment resource * -->
 		<!-- ************************************* -->
@@ -756,7 +762,7 @@
 				org.xwiki.rest.representers.XmlTextXStreamRepresenter
 			</implementation>
 		</component>
-		
+
 		<!-- ************************************* -->
 		<!-- * Comments version resource * -->
 		<!-- ************************************* -->
@@ -777,7 +783,8 @@
 				<requirement>
 					<role>org.xwiki.rest.XWikiResourceRepresenter
 					</role>
-					<role-hint>org.xwiki.rest.resources.comments.CommentsVersionResource
+					<role-hint>
+						org.xwiki.rest.resources.comments.CommentsVersionResource
 					</role-hint>
 					<field-name>descriptorToRepresenterMap
 					</field-name>
@@ -803,7 +810,7 @@
 				org.xwiki.rest.representers.XmlTextXStreamRepresenter
 			</implementation>
 		</component>
-		
+
 		<!-- ************************************* -->
 		<!-- * Comment version resource * -->
 		<!-- ************************************* -->
@@ -824,7 +831,8 @@
 				<requirement>
 					<role>org.xwiki.rest.XWikiResourceRepresenter
 					</role>
-					<role-hint>org.xwiki.rest.resources.comments.CommentVersionResource
+					<role-hint>
+						org.xwiki.rest.resources.comments.CommentVersionResource
 					</role-hint>
 					<field-name>descriptorToRepresenterMap
 					</field-name>
@@ -850,7 +858,97 @@
 				org.xwiki.rest.representers.XmlTextXStreamRepresenter
 			</implementation>
 		</component>
-		
+
+		<!--
+			*************************************************************************************************
+		-->
+
+		<!-- ************************ -->
+		<!-- * Attachments resource * -->
+		<!-- ************************ -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.attachments.AttachmentsResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.resources.attachments.AttachmentsResource
+			</implementation>
+			<requirements>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceClassRegistry
+					</role>
+				</requirement>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceRepresenter
+					</role>
+					<role-hint>
+						org.xwiki.rest.resources.attachments.AttachmentsResource
+					</role-hint>
+					<field-name>descriptorToRepresenterMap
+					</field-name>
+				</requirement>
+			</requirements>
+			<configuration>
+				<uriPattern>
+					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for Attachments resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.attachments.AttachmentsResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
+
+		<!-- ************************ -->
+		<!-- * Attachment resource * -->
+		<!-- ************************ -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.attachments.AttachmentResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.resources.attachments.AttachmentResource
+			</implementation>
+			<requirements>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceClassRegistry
+					</role>
+				</requirement>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceRepresenter
+					</role>
+					<role-hint>org.xwiki.rest.resources.attachments.AttachmentResource
+					</role-hint>
+					<field-name>descriptorToRepresenterMap
+					</field-name>
+				</requirement>
+			</requirements>
+			<configuration>
+				<uriPattern>
+					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}
+				</uriPattern>
+			</configuration>
+		</component>
+		<!--
+			No representers for the attachment resource because the
+			representation is directly derived from the attachment and its media
+			type.
+		-->
+
 	</components>
 </component-set>
 

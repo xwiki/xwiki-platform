@@ -60,6 +60,9 @@ public class XStreamFactory
 
         sorter.registerFieldOrder(Comment.class, new String[] {"id", "author", "date", "highlight", "text", "links"});
 
+        sorter.registerFieldOrder(Attachment.class, new String[] {"name", "size", "version", "mimeType", "author",
+        "date", "xwikiUrl", "links"});
+
         XStream xstream = new XStream(new Sun14ReflectionProvider(new FieldDictionary(sorter)), new DomDriver());
 
         xstream.processAnnotations(Link.class);
@@ -75,6 +78,8 @@ public class XStreamFactory
         xstream.processAnnotations(HistorySummary.class);
         xstream.processAnnotations(Comments.class);
         xstream.processAnnotations(Comment.class);
+        xstream.processAnnotations(Attachments.class);
+        xstream.processAnnotations(Attachment.class);
 
         return xstream;
 

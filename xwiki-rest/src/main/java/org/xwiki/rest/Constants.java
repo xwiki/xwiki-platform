@@ -48,4 +48,6 @@ public class Constants
     public static final String NUMBER_PARAMETER = "number";
 
     public static final String START_PARAMETER = "start";
+
+    public static final String ATTACHMENT_NAME_PARAMETER = "attachmentName";
 }

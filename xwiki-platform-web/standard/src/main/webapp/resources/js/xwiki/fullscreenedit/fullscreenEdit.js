@@ -68,7 +68,7 @@ function fullscreenEdit(what) {
     var showBtn = document.createElement("div");
     showBtn.setAttribute("id", "show-dialog-btn");
     Event.observe(showBtn, "click", new Function(what+"Fullscreen()"), true);
-    showBtn.setAttribute("title", "$msg.get("fullScreenTooltip")");
+    showBtn.setAttribute("title", "$msg.get('fullScreenTooltip')");
     var textdiv = document.getElementById("xwikieditcontent");
     textdiv.insertBefore(showBtn, textdiv.firstChild);
 

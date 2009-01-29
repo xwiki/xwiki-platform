@@ -103,7 +103,8 @@ Lightbox = Class.create({
   },
 
   getWaiting: function() {
-    return '<div style="padding: 30px;"><img src="$xwiki.getSkinFile('icons/ajax-loader.gif')"/></div>';
+    var msg = "$xwiki.getSkinFile('icons/ajax-loader.gif')";
+    return '<div style="padding: 30px;"><img src="' + msg + '"/></div>';
   },
 
   lbcustominit: function(lbbgcolor, lbbordercolor, lbfontcolor, lbtype) {

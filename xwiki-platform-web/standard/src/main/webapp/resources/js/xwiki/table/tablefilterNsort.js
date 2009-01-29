@@ -51,9 +51,9 @@
     The sort function required access to three a few pictures to "look good"
     Change these values with regards to your specific set up */
     var image_path = "";
-    var image_up = "$xwiki.getSkinFile("icons/table/arrow-up.gif")";
-    var image_down = "$xwiki.getSkinFile("js/xwiki/table/img/arrow-down.gif")";
-    var image_none = "$xwiki.getSkinFile("js/xwiki/table/img/arrow-none.gif")";
+    var image_up = "$xwiki.getSkinFile('icons/table/arrow-up.gif')";
+    var image_down = "$xwiki.getSkinFile('js/xwiki/table/img/arrow-down.gif')";
+    var image_none = "$xwiki.getSkinFile('js/xwiki/table/img/arrow-none.gif')";
 
 /*====================================================
 	- HTML Table Filter Generator v1.3.jan1

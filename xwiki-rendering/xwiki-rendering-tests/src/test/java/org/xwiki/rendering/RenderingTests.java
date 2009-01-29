@@ -77,7 +77,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("verbatim/verbatim4", false);
         suite.addTestsFromResource("verbatim/verbatim5", false);
         suite.addTestsFromResource("verbatim/verbatim6", false);
-
+        suite.addTestsFromResource("verbatim/verbatim7", false);
+        
         // Tables
         suite.addTestsFromResource("table/table1", false);
         suite.addTestsFromResource("table/table2", false);
@@ -174,7 +175,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image1", false);
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
-
+        
         return new RenderingPlexusTestSetup(suite);
     }
 }

@@ -541,6 +541,16 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListenerInline#onImage(org.wikimodel.wem.WikiReference)
+     */
+    public void onImage(WikiReference ref)
+    {
+        
+    }
+    
+    /**
      * Convert Wikimodel parameters to XWiki parameters format.
      * 
      * @param params the wikimodel parameters to convert

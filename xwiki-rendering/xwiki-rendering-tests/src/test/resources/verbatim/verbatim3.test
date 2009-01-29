@@ -10,25 +10,23 @@ Paragraph2
 beginDocument
 beginParagraph
 onWord [Paragraph1]
-endParagraph
-onVerbatimStandalone [verbatim]
-beginParagraph
+onNewLine
+onVerbatimInline [verbatim]
+onNewLine
 onWord [Paragraph2]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Paragraph1</p><pre>verbatim</pre><p>Paragraph2</p>
+<p>Paragraph1<br/><tt class="wikimodel-verbatim">verbatim</tt><br/>Paragraph2</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 Paragraph1
-
 {{{verbatim}}}
-
 Paragraph2
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Paragraph1</p><pre>verbatim</pre><p>Paragraph2</p></html>
+<p>Paragraph1<br/><tt class="wikimodel-verbatim">verbatim</tt><br/>Paragraph2</p>

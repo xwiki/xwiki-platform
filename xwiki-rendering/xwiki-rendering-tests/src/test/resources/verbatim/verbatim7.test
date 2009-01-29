@@ -1,26 +1,28 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that 2 verbatim blocks next to each other generate standalone verbatim events and not inline ones
 .#---------------------------------------------------------------------------------------------------------
-{{{abc}}}{{{def}}}
+(% param="value" %)
+(% param2="value2" %){{{abc}}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
+beginParagraph [[param]=[value]]
+beginFormat: [NONE] [[param2]=[value2]]
 onVerbatimInline [abc]
-onVerbatimInline [def]
-endParagraph
+endFormat: [NONE] [[param2]=[value2]]
+endParagraph [[param]=[value]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><tt class="wikimodel-verbatim">abc</tt><tt class="wikimodel-verbatim">def</tt></p>
+<p param="value"><span param2="value2"><tt class="wikimodel-verbatim">abc</tt></span></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{{abc}}}{{{def}}}
+(% param="value" %)
+(% param2="value2" %){{{abc}}}
 .#-----------------------------------------------------
-.input|xhtml/1.0
+.input|xhtml/1.0|skip
 .#-----------------------------------------------------
-<p><tt class="wikimodel-verbatim">abc</tt><tt class="wikimodel-verbatim">def</tt></p>
+<p param="value"><span param2="value2"><tt class="wikimodel-verbatim">abc</tt></span></p>

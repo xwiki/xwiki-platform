@@ -11,8 +11,5 @@
 {/pre}
 .#-----------------------------------------------------
 .expect|xwiki/2.0
-.# TODO: Need to fix XWiki 2.0 inline detection, see http://jira.xwiki.org/jira/browse/XWIKI-3070
 .#-----------------------------------------------------
-{{{* some verbatim * **with mixed syntax**}}}
-
- {{{* some verbatim * **with mixed syntax**}}}
+{{{* some verbatim * **with mixed syntax**}}} {{{* some verbatim * **with mixed syntax**}}}

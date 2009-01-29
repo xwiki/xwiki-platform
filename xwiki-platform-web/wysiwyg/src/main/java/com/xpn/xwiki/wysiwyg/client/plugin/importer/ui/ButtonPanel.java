@@ -56,7 +56,6 @@ public class ButtonPanel extends HorizontalPanel
     public ButtonPanel(ClickListener listener)
     {
         filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importerFilterStylesCheckBoxCaption());
-        filterStylesCheckBox.addStyleName("xImporterFilterStylesCheckBox");
         add(filterStylesCheckBox);
         importButton = new Button(Strings.INSTANCE.importerImportButtonCaption());
         importButton.addStyleName("xImporterImportButton");

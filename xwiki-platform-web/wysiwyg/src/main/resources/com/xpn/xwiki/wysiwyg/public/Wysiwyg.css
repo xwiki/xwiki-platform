@@ -540,22 +540,15 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
   height: 360px;
 }
 
-.xImporterClipboardTabInfoLabel,
-.xImporterFileTabInfoLabel {
-  text-align: center;  
-}
-
-.xImporterClipboardTabInfoLabel {
-  padding-bottom: 5px;
+.xImporterInfoLabel {
+  text-align: center;
+  padding-bottom: 5px;  
 }
 
 .xImporterClipboardTabEditor {
   width: 440px;
   height: 260px;
   border: solid 1px #000000;
-}
-
-.xImporterFilterStylesCheckBox { 
 }
 
 .xImporterImportButton {

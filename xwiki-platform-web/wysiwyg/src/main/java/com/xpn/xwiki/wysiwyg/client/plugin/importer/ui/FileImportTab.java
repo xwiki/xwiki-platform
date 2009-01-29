@@ -20,6 +20,9 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.FormHandler;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -42,9 +45,22 @@ public class FileImportTab extends Composite
     private Label infoLabel;
 
     /**
-     * Default constructor.
+     * A {@link FormPanel} to hold the fileUpload widget.
      */
-    public FileImportTab()
+    private FormPanel formPanel;    
+    
+    /**
+     * The {@link FileUpload} widget.
+     */
+    private FileUpload fileUpload;
+    
+    /**
+     * Default constructor.
+     * 
+     * @param uploadUrl the url to be set for 'action' attribute of the internal form.
+     * @param formHandler the {@link FormHandler} for handling form events.
+     */
+    public FileImportTab(String uploadUrl, FormHandler formHandler)
     {
         // Main container panel.
         verticalPanel = new VerticalPanel();
@@ -52,10 +68,37 @@ public class FileImportTab extends Composite
 
         // Info label.
         infoLabel = new Label(Strings.INSTANCE.importerFileTabInfoLabel());
-        infoLabel.addStyleName("xImporterFileTabInfoLabel");
+        infoLabel.addStyleName("xImporterInfoLabel");
         verticalPanel.add(infoLabel);
+        
+        // Form panel.
+        formPanel = new FormPanel();
+        formPanel.setAction(uploadUrl);
+        formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
+        formPanel.setMethod(FormPanel.METHOD_POST);
+        fileUpload = new FileUpload();
+        fileUpload.setName("filepath");
+        formPanel.add(fileUpload);  
+        formPanel.addFormHandler(formHandler);
+        verticalPanel.add(formPanel);
 
         // Finalize.
         initWidget(verticalPanel);
     }
+    
+    /**
+     * Submits the internal form.
+     */
+    public void sumbit()
+    {
+        formPanel.submit();
+    }
+    
+    /**
+     * @return the file name entered into {@link FileUpload} widget.
+     */
+    public String getFileName() 
+    {
+        return fileUpload.getFilename();
+    }        
 }

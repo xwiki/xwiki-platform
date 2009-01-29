@@ -121,7 +121,7 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
     public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
     {
         selectionPreserver.restoreSelection();
-        if (importerDialog.getResult() != null) {            
+        if (importerDialog.getResult() != null) {
             getTextArea().getCommandManager().execute(Command.INSERT_HTML, importerDialog.getResult());
         }
     }
@@ -132,7 +132,9 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
     private ImporterDialog getImporterDialog()
     {
         if (null == importerDialog) {
-            importerDialog = new ImporterDialog();
+            importerDialog =
+                new ImporterDialog(getConfig().getParameter("space", "Main"), getConfig().getParameter("page",
+                    "WebHome"));
             importerDialog.addPopupListener(this);
         }
         return importerDialog;

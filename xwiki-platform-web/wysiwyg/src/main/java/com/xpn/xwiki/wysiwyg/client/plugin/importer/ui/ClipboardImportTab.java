@@ -58,7 +58,7 @@ public class ClipboardImportTab extends Composite
 
         // Info label.
         infoLabel = new Label(Strings.INSTANCE.importerClipboardTabInfoLabel());
-        infoLabel.addStyleName("xImporterClipboardTabInfoLabel");
+        infoLabel.addStyleName("xImporterInfoLabel");
         mainPanel.add(infoLabel);
 
         // Editor panel.

@@ -85,6 +85,8 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
 #if($hasobjs)
+$xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
+$xwiki.jsfx.use("js/scriptaculous/3rdparty/accordion/accordion.js")
 <script type="text/javascript">
 var obj={div:'xwikiobjects', no:0};
 Event.observe(window,'load',createAccordion.bind(this,obj));

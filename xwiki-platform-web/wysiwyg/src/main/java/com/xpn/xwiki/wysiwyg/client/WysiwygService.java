@@ -114,8 +114,10 @@ public interface WysiwygService extends RemoteService
      * @param attachmentName name of the attached office document.
      * @param cleaningParams additional parameters for the import operation.
      * @return the xhtml result from the office importer.
+     * @throws XWikiGWTException if the import operation fails.
      */
-    String officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams);
+    String officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams)
+        throws XWikiGWTException;
     
     /**
      * @param syncedRevision The changes to this editor's content, since the last update.

@@ -262,9 +262,9 @@ $xwiki.ssx.use("Main.Tags")
     &lt;/div&gt;
     &lt;div id="dashboardright" style="float:left; width: 55.1%;"&gt;
       &lt;div style="padding-left: 20px;"&gt;
-        ##&lt;h3 class="xapp"&gt;$msg.get("xe.tag.recentchanges", [$tag])&lt;/span&gt;&lt;/h3&gt;      
-        ##set($rcTag = [$tag])
-        ##includeInContext('Main.RecentChanges')
+        &lt;h3 class="xapp"&gt;$msg.get("xe.tag.recentchanges", [$tag])&lt;/span&gt;&lt;/h3&gt;      
+        #set($rcTag = [$tag])
+        #includeInContext('Main.RecentChanges')
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div style="clear:both; margin-bottom: 40px;"&gt;&lt;!-- --&gt;&lt;/div&gt;

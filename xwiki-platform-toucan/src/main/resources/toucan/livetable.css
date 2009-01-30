@@ -1,0 +1,86 @@
+div.scrollbar {
+    overflow: auto;
+    height: 250px;
+    margin:0px;
+    padding:0px;
+    width: 25px;
+    left: -10px;
+    position: relative;
+}
+
+div.inscrollbar {
+    width:1px;
+    margin:0px;
+    padding:0px;
+    height:3000px;
+}
+
+.display {
+    border-collapse: collapse;
+    border: 1px solid #e8e8e8;
+    width: 100%;
+}
+
+.display td {
+    border: 1px solid #e8e8e8;
+    padding: 3px;
+}
+
+
+#showLimits {
+   font-size: 12px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+
+.icon-manage {
+   cursor: pointer;
+   padding-right: 10px;
+}
+
+.icon-manageg {
+   padding-right: 10px;
+}
+
+#ajax-loader {
+   margin: 0px;
+   padding: 0px;
+   position: absolute;
+   top: 50%;
+   left: 35%;
+   z-index: 1000000000;
+   display: none;
+   width: 220px;
+   background-color: #fff;
+   border: 1px solid #999;
+   font-size: 11px;
+   padding: 8px;
+   text-indent: 5px;
+}
+
+.theader {
+   background-color: #ccc;
+   color: #FFF;
+   font-weight: bold;
+   font-size: 1em;
+}
+
+#table-filters {
+    background-color: #efefef;
+}
+
+.filter {
+	width: 70%;
+}
+
+.theader td {
+	padding: 3px 0 3px 10px;
+}
+
+table.livetable {
+    width: 100%;
+    position: relative;
+    border: 5px solid #fff;
+    margin: 0px;
+    left: 0px;
+}

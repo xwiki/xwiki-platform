@@ -45,7 +45,21 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
     /**
      * The executable being tested.
      */
-    private Executable executable = new FormatBlockExecutable();
+    private Executable executable;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractRichTextAreaTest#gwtSetUp()
+     */
+    protected void gwtSetUp() throws Exception
+    {
+        super.gwtSetUp();
+
+        if (executable == null) {
+            executable = new FormatBlockExecutable();
+        }
+    }
 
     /**
      * @see http://jira.xwiki.org/jira/browse/XWIKI-2730
@@ -67,7 +81,7 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
     /**
      * @see http://jira.xwiki.org/jira/browse/XWIKI-2730
      */
-    public void doTestInsertHeaderOnEmptyDocument()
+    private void doTestInsertHeaderOnEmptyDocument()
     {
         rta.setHTML("");
         assertEquals("", rta.getHTML());
@@ -99,7 +113,7 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
     /**
      * Unit test for inserting header when the selection is empty.
      */
-    public void doTestInsertHeaderAroundCaret()
+    private void doTestInsertHeaderAroundCaret()
     {
         rta.setHTML("xwiki <span><em>is</em> the</span> <p>best</p>");
         Node xwiki = getBody().getFirstChild();
@@ -146,7 +160,7 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
     /**
      * Unit test for inserting header around the selected text.
      */
-    public void doTestInsertHeaderAroundSelection()
+    private void doTestInsertHeaderAroundSelection()
     {
         rta.setHTML("<strong>toucan</strong> is <!--my--><em>favorite</em> skin");
         Node toucan = getBody().getFirstChild();
@@ -189,7 +203,7 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
     /**
      * Unit test for changing a paragraph formatting to in-line.
      */
-    public void doTestRemoveParagraph()
+    private void doTestRemoveParagraph()
     {
         rta.setHTML("once <p>upon a <ins>time</ins></p> there..");
 
@@ -228,7 +242,7 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
     /**
      * Unit test for changing the current block format.
      */
-    public void doTestChangeBlock()
+    private void doTestChangeBlock()
     {
         rta.setHTML("a <h1>b</h1> c <h2>d</h2> e");
 
@@ -250,5 +264,48 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
 
         range = rta.getDocument().getSelection().getRangeAt(0);
         assertEquals(selectedText, clean(range.toString()));
+    }
+
+    /**
+     * Tests if the header is detected correctly when the caret is inside a {@code span} with {@code display:block}.
+     * 
+     * @see XWIKI-3109: Headers generated from wiki syntax look and behave differently
+     */
+    public void testDetectHeaderFromASpanWithDisplayBlock()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestDetectHeaderFromASpanWithDisplayBlock();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the header is detected correctly when the caret is inside a {@code span} with {@code display:block}.
+     * 
+     * @see XWIKI-3109: Headers generated from wiki syntax look and behave differently
+     */
+    private void doTestDetectHeaderFromASpanWithDisplayBlock()
+    {
+        rta.setHTML("<h1><span style=\"display: block;\">header</span></h1>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 3);
+        range.collapse(true);
+        select(range);
+
+        assertEquals(H1, executable.getParameter(rta));
+        assertTrue(executable.execute(rta, P));
+        assertEquals("<p><span style=\"display: block;\">header</span></p>", clean(rta.getHTML()));
+        assertEquals(P, executable.getParameter(rta));
+
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertTrue(range.isCollapsed());
+        assertEquals(3, range.getStartOffset());
     }
 }

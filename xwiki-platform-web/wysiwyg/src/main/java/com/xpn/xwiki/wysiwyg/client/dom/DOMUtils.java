@@ -43,11 +43,30 @@ public abstract class DOMUtils
     public static final String UNSUPPORTED_NODE_TYPE = "Unsupported node type!";
 
     /**
-     * The list of all HTML elements that can have both in-line and block content, as specified by the strict DTD.<br/>
-     * NOTE: We added the body element since the editor allows you to write text directly on document body.
+     * The list of all HTML elements that can have both in-line and block-level content, as specified by the XHTML 1.0
+     * strict DTD.
+     * <p>
+     * NOTE: We added the {@code body} and {@code blockquote} elements since the editor allows us to write text directly
+     * inside them. We also kept only the most important (used) flow containers to improve the search speed.
      */
-    public static final String[] FLOW_CONTAINERS =
-        new String[] {"body", "li", "td", "div", "dd", "th", "object", "button", "fieldset"};
+    public static final String[] HTML_FLOW_CONTAINERS =
+        new String[] {"body", "li", "td", "th", "dd", "div", "blockquote"};
+
+    /**
+     * The list of all block-level HTML elements that can have only in-line content, as specified by the XHTML 1.0
+     * strict DTD.
+     * <p>
+     * NOTE: We kept only the most important (used) elements to improve the search speed.
+     */
+    public static final String[] HTML_BLOCK_LEVEL_INLINE_CONTAINERS =
+        new String[] {"p", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "dt", "address"};
+
+    /**
+     * The list of all block-level HTML elements that can have only special content, or no content at all, as specified
+     * by the XHTML 1.0 strict DTD.
+     */
+    public static final String[] HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS =
+        new String[] {"hr", "ul", "ol", "dl", "table", "tbody", "thead", "tfoot", "tr"};
 
     /**
      * The list of all HTML tags that must be empty. All of them appear as <code>&lt;tagName/&gt;</code> in the HTML
@@ -261,37 +280,61 @@ public abstract class DOMUtils
     }
 
     /**
-     * Tests if the computed value of the display CSS property on the given node is inline.
-     * 
-     * @param node a DOM node.
-     * @return true if the given DOM node is displayed in-line.
+     * @param node a DOM node
+     * @return {@code true} if the given DOM node represents in-line content
      */
     public boolean isInline(Node node)
     {
-        return Style.Display.INLINE.equalsIgnoreCase(getDisplay(node));
+        return !isBlock(node);
     }
 
     /**
-     * @param node a DOM node.
-     * @return the computed value of the display CSS property on the specified DOM node.
+     * @param node a DOM node
+     * @return {@code true} if the given node is a block-level element, {@code false} otherwise
      */
-    public String getDisplay(Node node)
+    public boolean isBlock(Node node)
     {
-        switch (node.getNodeType()) {
-            case CDATA_NODE:
-            case COMMENT_NODE:
-            case Node.TEXT_NODE:
-                return Style.Display.INLINE;
-            case Node.ELEMENT_NODE:
-                // An image is always an inline element, even if it is displayed as a block
-                if ("img".equalsIgnoreCase(node.getNodeName())) {
-                    return Style.Display.INLINE;
-                } else {
-                    return getComputedStyleProperty((Element) node, Style.DISPLAY);
-                }
-            default:
-                return null;
+        return isFlowContainer(node) || isBlockLevelInlineContainer(node) || isSpecialBlock(node);
+    }
+
+    /**
+     * @param node a DOM node
+     * @return {@code true} if the given node is a block-level element that can have only in-line content, {@code false}
+     *         otherwise
+     * @see #HTML_BLOCK_LEVEL_INLINE_CONTAINERS
+     */
+    public boolean isBlockLevelInlineContainer(Node node)
+    {
+        if (node.getNodeType() != Node.ELEMENT_NODE) {
+            return false;
         }
+        String tagName = node.getNodeName().toLowerCase();
+        for (int i = 0; i < HTML_BLOCK_LEVEL_INLINE_CONTAINERS.length; i++) {
+            if (tagName.equals(HTML_BLOCK_LEVEL_INLINE_CONTAINERS[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param node a DOM node
+     * @return {@code true} if the given node is a block-level element that can have only special content, {@code false}
+     *         otherwise
+     * @see #HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS
+     */
+    public boolean isSpecialBlock(Node node)
+    {
+        if (node.getNodeType() != Node.ELEMENT_NODE) {
+            return false;
+        }
+        String tagName = node.getNodeName().toLowerCase();
+        for (int i = 0; i < HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS.length; i++) {
+            if (tagName.equals(HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -740,8 +783,8 @@ public abstract class DOMUtils
             return false;
         }
         String tagName = node.getNodeName().toLowerCase();
-        for (int i = 0; i < FLOW_CONTAINERS.length; i++) {
-            if (tagName.equals(FLOW_CONTAINERS[i])) {
+        for (int i = 0; i < HTML_FLOW_CONTAINERS.length; i++) {
+            if (tagName.equals(HTML_FLOW_CONTAINERS[i])) {
                 return true;
             }
         }
@@ -779,11 +822,11 @@ public abstract class DOMUtils
     }
 
     /**
-     * Walks from the given node up to the root of the DOM tree as long as the ancestors are displayed in-line. Returns
-     * the last node in the walk.
+     * Walks from the given node up to the root of the DOM tree as long as the ancestors represent in-line content.
+     * Returns the last node in the walk.
      * 
-     * @param node A DOM node.
-     * @return the farthest ancestor of the given node that is displayed in-line.
+     * @param node a DOM node
+     * @return the farthest ancestor of the given node that represents in-line content
      */
     public Node getFarthestInlineAncestor(Node node)
     {

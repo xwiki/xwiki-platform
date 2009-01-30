@@ -20,12 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
-import com.xpn.xwiki.wysiwyg.client.dom.Style;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 
@@ -64,14 +62,14 @@ public class FormatBlockExecutable extends AbstractExecutable
      */
     protected void execute(Range range, String tagName)
     {
-        Node leaf = DOMUtils.getInstance().getFirstLeaf(range);
+        Node leaf = domUtils.getFirstLeaf(range);
         if (leaf == null) {
             execute(range.getStartContainer(), range.getStartOffset(), tagName);
         } else {
-            Node lastLeaf = DOMUtils.getInstance().getLastLeaf(range);
+            Node lastLeaf = domUtils.getLastLeaf(range);
             execute(leaf, tagName);
             while (leaf != lastLeaf) {
-                leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+                leaf = domUtils.getNextLeaf(leaf);
                 execute(leaf, tagName);
             }
         }
@@ -86,7 +84,7 @@ public class FormatBlockExecutable extends AbstractExecutable
      */
     protected void execute(Node node, String tagName)
     {
-        execute(Element.as(node.getParentNode()), DOMUtils.getInstance().getNodeIndex(node), tagName);
+        execute(Element.as(node.getParentNode()), domUtils.getNodeIndex(node), tagName);
     }
 
     /**
@@ -102,18 +100,18 @@ public class FormatBlockExecutable extends AbstractExecutable
     {
         Node ancestor = parent;
         int index = offset;
-        if (DOMUtils.getInstance().isInline(parent)) {
-            ancestor = DOMUtils.getInstance().getFarthestInlineAncestor(parent);
-            index = DOMUtils.getInstance().getNodeIndex(ancestor);
+        if (domUtils.isInline(parent)) {
+            ancestor = domUtils.getFarthestInlineAncestor(parent);
+            index = domUtils.getNodeIndex(ancestor);
             ancestor = ancestor.getParentNode();
         }
 
-        if (DOMUtils.getInstance().isFlowContainer(ancestor)) {
+        if (domUtils.isFlowContainer(ancestor)) {
             // Currently we have in-line formatting.
             if (tagName.length() > 0) {
                 wrap(ancestor, index, tagName);
             }
-        } else if (Style.Display.BLOCK.equalsIgnoreCase(DOMUtils.getInstance().getDisplay(ancestor))) {
+        } else if (domUtils.isBlockLevelInlineContainer(ancestor)) {
             // Currently we have block formatting.
             if (tagName.length() == 0) {
                 Element.as(ancestor).unwrap();
@@ -134,19 +132,19 @@ public class FormatBlockExecutable extends AbstractExecutable
     protected void wrap(Node parent, int offset, String tagName)
     {
         int startIndex = offset;
-        while (startIndex > 0 && DOMUtils.getInstance().isInline(parent.getChildNodes().getItem(startIndex - 1))) {
+        while (startIndex > 0 && domUtils.isInline(parent.getChildNodes().getItem(startIndex - 1))) {
             startIndex--;
         }
         int endIndex = offset;
         while (endIndex < parent.getChildNodes().getLength()
-            && DOMUtils.getInstance().isInline(parent.getChildNodes().getItem(endIndex))) {
+            && domUtils.isInline(parent.getChildNodes().getItem(endIndex))) {
             endIndex++;
         }
         Element element = ((Document) parent.getOwnerDocument()).xCreateElement(tagName);
         for (int i = startIndex; i < endIndex; i++) {
             element.appendChild(parent.getChildNodes().getItem(startIndex));
         }
-        DOMUtils.getInstance().insertAt(parent, element, startIndex);
+        domUtils.insertAt(parent, element, startIndex);
     }
 
     /**
@@ -194,14 +192,14 @@ public class FormatBlockExecutable extends AbstractExecutable
      */
     protected String getFormat(Range range)
     {
-        Node leaf = DOMUtils.getInstance().getFirstLeaf(range);
+        Node leaf = domUtils.getFirstLeaf(range);
         if (leaf == null) {
             return getFormat(range.getStartContainer());
         }
         String rangeFormat = getFormat(leaf);
-        Node lastLeaf = DOMUtils.getInstance().getLastLeaf(range);
+        Node lastLeaf = domUtils.getLastLeaf(range);
         while (leaf != lastLeaf) {
-            leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+            leaf = domUtils.getNextLeaf(leaf);
             String leafFormat = getFormat(leaf);
             if (rangeFormat == null) {
                 rangeFormat = leafFormat;
@@ -220,15 +218,15 @@ public class FormatBlockExecutable extends AbstractExecutable
      */
     protected String getFormat(Node node)
     {
-        Node target = DOMUtils.getInstance().getFarthestInlineAncestor(node);
+        Node target = domUtils.getFarthestInlineAncestor(node);
         if (target == null) {
             target = node;
         } else {
             target = target.getParentNode();
         }
-        if (DOMUtils.getInstance().isFlowContainer(target)) {
+        if (domUtils.isFlowContainer(target)) {
             return "";
-        } else if (Style.Display.BLOCK.equalsIgnoreCase(DOMUtils.getInstance().getDisplay(target))) {
+        } else if (domUtils.isBlockLevelInlineContainer(target)) {
             return target.getNodeName().toLowerCase();
         } else {
             return null;

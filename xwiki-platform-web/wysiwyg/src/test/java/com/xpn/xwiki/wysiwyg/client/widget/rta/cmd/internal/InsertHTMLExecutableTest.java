@@ -34,7 +34,21 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
     /**
      * The executable being tested.
      */
-    private Executable executable = new InsertHTMLExecutable();
+    private Executable executable;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractRichTextAreaTest#gwtSetUp()
+     */
+    protected void gwtSetUp() throws Exception
+    {
+        super.gwtSetUp();
+
+        if (executable == null) {
+            executable = new InsertHTMLExecutable();
+        }
+    }
 
     /**
      * Tests the {@link InsertHTMLExecutable} when the caret goes between DOM child nodes after the selection is

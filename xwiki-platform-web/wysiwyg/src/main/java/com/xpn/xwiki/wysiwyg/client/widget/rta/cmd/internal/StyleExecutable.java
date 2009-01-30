@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
@@ -69,11 +68,6 @@ public class StyleExecutable extends AbstractExecutable
      * Flag that specifies if {@link #propertyName} can have multiple values.
      */
     private final boolean multipleValue;
-
-    /**
-     * Collection of DOM utility methods.
-     */
-    private DOMUtils domUtils = DOMUtils.getInstance();
 
     /**
      * Creates a new instance.

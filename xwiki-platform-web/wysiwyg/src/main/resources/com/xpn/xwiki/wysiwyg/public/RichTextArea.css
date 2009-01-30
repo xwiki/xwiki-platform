@@ -21,3 +21,23 @@ body.main {
 .main ul, .main ol {
   list-style-position: outside !important;
 }
+
+/*
+  XWiki 2.0 renderer places the contents of a header inside a span, which is styled in the skin. Since this is not
+  common to all the syntaxes and the CSS rules can be applied directly to the header, the editor doesn't generate this
+  span when applying header style to the selection. In order to view headers as in view mode we have to block some of
+  the CSS rules applied to the span and add then to the header. 
+*/
+.main h1 span, .main h2 span, .main h3 span, .main h4 span {
+  border-bottom: 0 none;
+  margin: 0;
+}
+
+.main h1, .main h2, .main h3, .main h4 {
+  border-bottom: 1px solid #CCCCCC;
+  margin: 20px 0;
+}
+
+.main h1 {
+  margin: 25px 0 20px 0;
+}

@@ -49,11 +49,23 @@ public class EventsRenderer extends AbstractPrintRenderer
         super(printer);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginDocument()
+     */
+    @Override
     public void beginDocument()
     {
         getPrinter().println("beginDocument");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endDocument()
+     */
+    @Override
     public void endDocument()
     {
         getPrinter().print("endDocument");
@@ -64,6 +76,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      * 
      * @see Listener#beginFormat(Format, Map)
      */
+    @Override
     public void beginFormat(Format format, Map<String, String> parameters)
     {
         getPrinter().println("beginFormat: [" + format + "]" + serializeParameters(parameters));
@@ -74,111 +87,247 @@ public class EventsRenderer extends AbstractPrintRenderer
      * 
      * @see Listener#endFormat(Format, Map)
      */
+    @Override
     public void endFormat(Format format, Map<String, String> parameters)
     {
         getPrinter().println("endFormat: [" + format + "]" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginParagraph(java.util.Map)
+     */
+    @Override
     public void beginParagraph(Map<String, String> parameters)
     {
         getPrinter().println("beginParagraph" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endParagraph(java.util.Map)
+     */
+    @Override
     public void endParagraph(Map<String, String> parameters)
     {
         getPrinter().println("endParagraph" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onNewLine()
+     */
+    @Override
     public void onNewLine()
     {
         getPrinter().println("onNewLine");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginLink(org.xwiki.rendering.listener.Link, boolean,
+     *      java.util.Map)
+     */
+    @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         getPrinter().println("beginLink [" + link + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endLink(org.xwiki.rendering.listener.Link, boolean,
+     *      java.util.Map)
+     */
+    @Override
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         getPrinter().println("endLink [" + link + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onInlineMacro(java.lang.String, java.util.Map,
+     *      java.lang.String)
+     */
+    @Override
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
     {
         printMacroData("onMacroInline", name, parameters, content);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onStandaloneMacro(java.lang.String, java.util.Map,
+     *      java.lang.String)
+     */
+    @Override
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
         printMacroData("onMacroStandalone", name, parameters, content);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginSection(org.xwiki.rendering.listener.SectionLevel,
+     *      java.util.Map)
+     */
+    @Override
     public void beginSection(SectionLevel level, Map<String, String> parameters)
     {
         getPrinter().println("beginSection [" + level + "]" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endSection(org.xwiki.rendering.listener.SectionLevel,
+     *      java.util.Map)
+     */
+    @Override
     public void endSection(SectionLevel level, Map<String, String> parameters)
     {
         getPrinter().println("endSection [" + level + "]" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onWord(java.lang.String)
+     */
+    @Override
     public void onWord(String word)
     {
         getPrinter().println("onWord [" + getEscaped(word) + "]");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginList(org.xwiki.rendering.listener.ListType,
+     *      java.util.Map)
+     */
+    @Override
     public void beginList(ListType listType, Map<String, String> parameters)
     {
         getPrinter().println("beginList [" + listType + "]" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginListItem()
+     */
+    @Override
     public void beginListItem()
     {
         getPrinter().println("beginListItem");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map)
+     */
+    @Override
     public void endList(ListType listType, Map<String, String> parameters)
     {
         getPrinter().println("endList [" + listType + "]" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endListItem()
+     */
+    @Override
     public void endListItem()
     {
         getPrinter().println("endListItem");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onSpace()
+     */
+    @Override
     public void onSpace()
     {
         getPrinter().println("onSpace");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onSpecialSymbol(char)
+     */
+    @Override
     public void onSpecialSymbol(char symbol)
     {
         getPrinter().println("onSpecialSymbol [" + symbol + "]");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
+     */
+    @Override
     public void beginXMLNode(XMLNode node)
     {
         getPrinter().println("beginXMLNode " + node);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
+     */
+    @Override
     public void endXMLNode(XMLNode node)
     {
         getPrinter().println("endXMLNode " + node);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginMacroMarker(java.lang.String, java.util.Map,
+     *      java.lang.String)
+     */
+    @Override
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
         printMacroData("beginMacroMarker", name, parameters, content);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endMacroMarker(java.lang.String, java.util.Map,
+     *      java.lang.String)
+     */
+    @Override
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
         printMacroData("endMacroMarker", name, parameters, content);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onId(java.lang.String)
+     */
+    @Override
     public void onId(String name)
     {
         getPrinter().println("onId [" + name + "]");
@@ -189,6 +338,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#onHorizontalLine(Map)
      */
+    @Override
     public void onHorizontalLine(Map<String, String> parameters)
     {
         getPrinter().println("onHorizontalLine" + serializeParameters(parameters));
@@ -199,6 +349,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)
      */
+    @Override
     public void onEmptyLines(int count)
     {
         getPrinter().println("onEmptyLines [" + count + "]");
@@ -209,6 +360,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
      */
+    @Override
     public void onVerbatimInline(String protectedString)
     {
         getPrinter().println("onVerbatimInline [" + protectedString + "]");
@@ -219,6 +371,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
      */
+    @Override
     public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
         getPrinter().println("onVerbatimStandalone [" + protectedString + "]" + serializeParameters(parameters));
@@ -228,8 +381,8 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
-     * @since 1.6M2
      */
+    @Override
     public void beginDefinitionList()
     {
         getPrinter().println("beginDefinitionList");
@@ -239,8 +392,8 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
-     * @since 1.6M2
      */
+    @Override
     public void endDefinitionList()
     {
         getPrinter().println("endDefinitionList");
@@ -250,8 +403,8 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
-     * @since 1.6M2
      */
+    @Override
     public void beginDefinitionTerm()
     {
         getPrinter().println("beginDefinitionTerm");
@@ -261,8 +414,8 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
-     * @since 1.6M2
      */
+    @Override
     public void beginDefinitionDescription()
     {
         getPrinter().println("beginDefinitionDescription");
@@ -272,8 +425,8 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
-     * @since 1.6M2
      */
+    @Override
     public void endDefinitionTerm()
     {
         getPrinter().println("endDefinitionTerm");
@@ -283,8 +436,8 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
-     * @since 1.6M2
      */
+    @Override
     public void endDefinitionDescription()
     {
         getPrinter().println("endDefinitionDescription");
@@ -294,8 +447,8 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
-     * @since 1.6M2
      */
+    @Override
     public void beginQuotation(Map<String, String> parameters)
     {
         getPrinter().println("beginQuotation" + serializeParameters(parameters));
@@ -305,8 +458,8 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
-     * @since 1.6M2
      */
+    @Override
     public void endQuotation(Map<String, String> parameters)
     {
         getPrinter().println("endQuotation" + serializeParameters(parameters));
@@ -316,8 +469,8 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
-     * @since 1.6M2
      */
+    @Override
     public void beginQuotationLine()
     {
         getPrinter().println("beginQuotationLine");
@@ -327,48 +480,96 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#endQuotationLine()
-     * @since 1.6M2
      */
+    @Override
     public void endQuotationLine()
     {
         getPrinter().println("endQuotationLine");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginTable(java.util.Map)
+     */
+    @Override
     public void beginTable(Map<String, String> parameters)
     {
         getPrinter().println("beginTable" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginTableCell(java.util.Map)
+     */
+    @Override
     public void beginTableCell(Map<String, String> parameters)
     {
         getPrinter().println("beginTableCell" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginTableHeadCell(java.util.Map)
+     */
+    @Override
     public void beginTableHeadCell(Map<String, String> parameters)
     {
         getPrinter().println("beginTableHeadCell" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginTableRow(java.util.Map)
+     */
+    @Override
     public void beginTableRow(Map<String, String> parameters)
     {
         getPrinter().println("beginTableRow" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endTable(java.util.Map)
+     */
+    @Override
     public void endTable(Map<String, String> parameters)
     {
         getPrinter().println("endTable" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endTableCell(java.util.Map)
+     */
+    @Override
     public void endTableCell(Map<String, String> parameters)
     {
         getPrinter().println("endTableCell" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endTableHeadCell(java.util.Map)
+     */
+    @Override
     public void endTableHeadCell(Map<String, String> parameters)
     {
         getPrinter().println("endTableHeadCell" + serializeParameters(parameters));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endTableRow(java.util.Map)
+     */
+    @Override
     public void endTableRow(Map<String, String> parameters)
     {
         getPrinter().println("endTableRow" + serializeParameters(parameters));
@@ -380,17 +581,20 @@ public class EventsRenderer extends AbstractPrintRenderer
      * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
      * @since 1.7M2
      */
+    @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         if (image.getType() == ImageType.DOCUMENT) {
             DocumentImage documentImage = (DocumentImage) image;
-            getPrinter().println("onImage: " + (documentImage.getDocumentName() != null ? "[" 
-                + documentImage.getDocumentName() + "] " : "") + "[" + documentImage.getAttachmentName() + "] [" 
-                + isFreeStandingURI + "]" + serializeParameters(parameters));
+            getPrinter().println(
+                "onImage: "
+                    + (documentImage.getDocumentName() != null ? "[" + documentImage.getDocumentName() + "] " : "")
+                    + "[" + documentImage.getAttachmentName() + "] [" + isFreeStandingURI + "]"
+                    + serializeParameters(parameters));
         } else {
             URLImage urlImage = (URLImage) image;
-            getPrinter().println("onImage: [" + urlImage.getURL() + "] [" + isFreeStandingURI + "]" 
-                + serializeParameters(parameters));
+            getPrinter().println(
+                "onImage: [" + urlImage.getURL() + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
         }
     }
 
@@ -400,6 +604,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
      * @since 1.7M3
      */
+    @Override
     public void beginError(String message, String description)
     {
         getPrinter().println("beginError: [" + message + "] [" + description + "]");
@@ -411,6 +616,7 @@ public class EventsRenderer extends AbstractPrintRenderer
      * @see org.xwiki.rendering.listener.Listener#endError(String, String)
      * @since 1.7M3
      */
+    @Override
     public void endError(String message, String description)
     {
         getPrinter().println("endError: [" + message + "] [" + description + "]");
@@ -422,7 +628,7 @@ public class EventsRenderer extends AbstractPrintRenderer
 
         if (str == null) {
             printableStr = null;
-        } else  if (StringUtils.isAsciiPrintable(str)) {
+        } else if (StringUtils.isAsciiPrintable(str)) {
             printableStr = str;
         } else {
             StringBuffer buffer = new StringBuffer();
@@ -457,7 +663,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     {
         StringBuffer buffer = new StringBuffer();
         if (!parameters.isEmpty()) {
-        	buffer.append(' ').append('[');
+            buffer.append(' ').append('[');
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
                 buffer.append('[').append(getEscaped(entry.getKey())).append(']').append('=').append('[').append(
                     getEscaped(entry.getValue())).append(']');

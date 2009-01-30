@@ -55,8 +55,9 @@ $xwiki.getTextArea($tdoc.content)
 	  }
 //]]>
 </script>
-## fullscreen editing
-$xwiki.jsfx.use("js/xwiki/fullscreenedit/fullscreenEdit.js")
+## Insert JS and CSS needed for the fullscreen edit feature
+$xwiki.jsfx.use("js/xwiki/fullscreenedit/fullscreenEdit.js", true)
+$xwiki.ssfx.use("js/xwiki/fullscreenedit/fullscreenEdit.css", true)
 #else ## doc.syntaxId != "xwiki/1.0"
 #template("editwysiwygnew.vm")
 #end

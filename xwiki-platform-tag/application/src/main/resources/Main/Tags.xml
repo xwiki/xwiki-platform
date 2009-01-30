@@ -12,14 +12,158 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1165750865000</creationDate>
-<date>1189160450000</date>
-<contentUpdateDate>1189160450000</contentUpdateDate>
-<version>1.9</version>
-<title>All Tags</title>
+<date>1233332767000</date>
+<contentUpdateDate>1233332767000</contentUpdateDate>
+<version>1.1</version>
+<title>Tags</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>onDemand=On demand|always=Always</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>Main.Tags</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>842b2aaf-cc25-4c1d-b0de-c23318aa9cbe</guid>
+<property>
+<cache>default</cache>
+</property>
+<property>
+<code>h1.xapp {margin-bottom: 1em;}
+h1.xapp span {border:0;}
+h1.xapp span {display: inline;}
+h1.xapp span span.xapphome {} 
+h1.xapp span span.highlight {
+  display: inline-block;
+  background-color: lemonChiffon;   
+  border: solid 1px Gainsboro; 
+  font-weight:bold;  
+  white-space: nowrap;
+  padding: 2px 10px 0 25px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+h1.xapp span span.tag{
+background: lemonChiffon url($xwiki.getSkinFile("icons/silk/tag_red.gif")) no-repeat 5px 50%;
+}
+h1.xapp span span.highlight a.button {
+  font-size: 12px;    
+  font-weight: normal;
+  line-height: 18px;
+  display : inline-block;
+  background-color: lightYellow;   
+  border: solid 1px Gainsboro; 
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  padding: 2px 5px 0 5px;
+  vertical-align: middle; 
+}
+h1.xapp span span.highlight a.delete{
+background: lightYellow url($xwiki.getSkinFile("icons/silk/cross.gif")) no-repeat 3px 50%;
+  padding: 2px 5px 0px 20px;
+}
+h1.xapp span span.highlight a.rename{
+background: lightYellow url($xwiki.getSkinFile("icons/silk/textfield_rename.gif")) no-repeat 3px 50%;
+  padding: 2px 5px 0px 20px;
+}
+h1.xapp span span.highlight a:hover.button {
+  background-color: Lavender ;
+  border: solid 1px Gainsboro;
+}
+h1.xapp span span.highlight span:hover.button a,
+h1.xapp span span.highlight span:hover.button a:link,
+h1.xapp span span.highlight span:hover.button a:active,
+h1.xapp span span.highlight span:hover.button a:visited{
+  text-decoration: none; 
+}
+h3.xapp {
+  margin-top:0;
+}
+h3.xapp span {
+  margin-top:0;
+  border:0;
+  color:gray;
+  font-size:0.6em;
+  font-weight:bold;
+  margin:0;
+}
+</code></property><property><name></name></property><property><parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -49,42 +193,137 @@
 <name>Main.Tags</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
+<guid>07d48d88-54b6-497f-a37a-23faa61211ff</guid>
 <property>
 <tags/>
 </property>
 </object>
-<content>#if(!$request.tag)
-
-#set($sql = "select distinct tag from BaseObject as obj, DBStringListProperty as prop join prop.list as tag where obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags' order by 1 asc")
-#set ($tags = $xwiki.search($sql))
-
-#set ($title = 'All Tags')
-#if ($tags.size() &gt; 0)
-  #set ($title = "$title &lt;a href='$xwiki.getURL('Main.TagsRss', 'view', 'xpage=rdf')' style=''&gt;&lt;img src='$xwiki.getSkinFile('icons/black-rss.png')'/&gt;&lt;/a&gt;")
+<content>##
+## Tag application.
+##
+## - See a Tag Cloud of all tags within the wiki.
+## - See all the pages tagged with the given tag.
+## - Rename a tag.
+## - Delete a tag.
+##
+$xwiki.ssx.use("Main.Tags")
+##
+## Set application variables (action and tag) from URL parameters.
+##
+#set($action = $request.get("action"))
+#if("$!action" == "")
+  #set($action = "")
+#else  
+  #set($tag = $request.get("tag"))
+  ## If the action is related to a tag (view, rename or delete) 
+  ## but this tag is not set in the request, fallback on cloud.
+  #if("$!tag" == "")
+    #set($tag = "")
+  #end
 #end
-
-1 $title
-
-#if ($tags.size() == 0)
-No documents have been tagged yet. To tag a document, edit it and enter the tags you wish to use in the Tag field visible on that page. For more information on tagging please refer to the [XWiki User Guide&gt;http://www.xwiki.org/xwiki/bin/view/UserGuide/].
+##
+## Macro displayTagAppTitle. Display level1 title of this app.
+##
+#macro(displayTagAppTitle $tag $displayButtons)
+  &lt;h1 class="xapp"&gt;
+    &lt;span&gt;
+      &lt;a href="$doc.getURL("view")"&gt;$msg.get("xe.tag.tags")&lt;/a&gt;
+      #if("$!tag" != "")
+        / 
+      &lt;span class="highlight tag"&gt;
+        &lt;a href="$doc.getURL("view", "action=viewTag&amp;amp;tag=${tag}")"&gt;$tag&lt;/a&gt;   
+        #if($xwiki.hasAdminRights() &amp;&amp; $displayButtons) 
+          &lt;a href="$doc.getURL("view", "action=prepareRename&amp;amp;tag=${tag}")" class="button rename"&gt;Rename&lt;/a&gt;&amp;nbsp;&lt;a href="$doc.getURL("view", "action=prepareDelete&amp;amp;tag=${tag}")" class="button delete"&gt;Delete&lt;/a&gt;
+        #end
+      &lt;/span&gt;
+     #end
+    &lt;/span&gt;
+  &lt;/h1&gt;
+#end
+##
+## Switch between all possible actions:
+## viewTag, prepareRename, rename, prepareDelete, delete, default (Tag cloud)
+##
+#if($action == "viewTag")
+  ##
+  ## View tag
+  ##  
+  #displayTagAppTitle($tag true)
+  #if("$!request.get('renamedTag')" != "")
+    #info("$msg.get('xe.tag.rename.success', [$request.get('renamedTag')])")
+  #end 
+  #set ($list = $xwiki.tag.getDocumentsWithTag($tag))
+  &lt;div&gt;
+    &lt;div id="dashboardleft" style="float:left; width: 44.9%;"&gt;
+      &lt;div style="padding-right:20px;"&gt;      
+        &lt;h3 class="xapp"&gt;$msg.get("xe.tag.alldocs", [$tag])&lt;/span&gt;&lt;/h3&gt;        
+        #displayDocumentList($list true $blacklistedSpaces)
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div id="dashboardright" style="float:left; width: 55.1%;"&gt;
+      &lt;div style="padding-left: 20px;"&gt;
+        ##&lt;h3 class="xapp"&gt;$msg.get("xe.tag.recentchanges", [$tag])&lt;/span&gt;&lt;/h3&gt;      
+        ##set($rcTag = [$tag])
+        ##includeInContext('Main.RecentChanges')
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style="clear:both; margin-bottom: 40px;"&gt;&lt;!-- --&gt;&lt;/div&gt;
+&lt;/div&gt;  
+#elseif($action == "prepareRename")
+  ##
+  ## Prepare rename tag
+  ##
+  #displayTagAppTitle($tag false)
+  &lt;form id="renameForm" action="no-follow" method="post"&gt;
+    &lt;input name="action" type="hidden" value="renameTag" /&gt;
+    &lt;input name="tag" type="hidden" value="$tag" /&gt;
+    $msg.get("xe.tag.rename.renameto", [$tag]) &lt;input type="text" name="renameTo" /&gt; &lt;input type="submit" value="$msg.get("xe.tag.rename")" onclick="$('renameForm').action='$doc.getURL("view")'; return true;" /&gt;
+  &lt;/form&gt;
+#elseif($action == "renameTag")
+  ##
+  ## Rename tag
+  ##
+  #set($renameTo = $request.get("renameTo"))
+  #set($success = false)
+  #if ("$!renameTo" != "")
+    #set($success = $xwiki.tag.renameTag($tag, $renameTo))
+  #end
+  #if ($success == true)
+    $response.sendRedirect($doc.getURL("view", "action=viewTag&amp;tag=${renameTo}&amp;renamedTag=${tag}"))
+  #else
+    #error("$msg.get('xe.tag.renane.failure', [$tag, $renameTo])")
+  #end
+#elseif($action == "prepareDelete")
+  ##
+  ## Prepare delete tag
+  ##
+  #displayTagAppTitle($tag false)
+  &lt;form id="deleteForm" action="no-follow" method="post"&gt;
+    &lt;input name="action" type="hidden" value="deleteTag" /&gt;
+    &lt;input name="tag" type="hidden" value="$tag" /&gt;
+    &lt;input type="submit" value="$msg.get("xe.tag.deletetag", [$tag])" onclick="$('deleteForm').action='$doc.getURL("view")'; return true;" /&gt;
+  &lt;/form&gt;
+#elseif($action == "deleteTag")
+  ##
+  ## Delete tag
+  ##  
+  #set($success = $xwiki.tag.deleteTag($tag))
+  #if ($success == true)
+    $response.sendRedirect($doc.getURL("view", "deletedTag=${tag}"))
+  #else
+    #error("$msg.get('xe.tag.delete.failure', [$tag])")
+  #end
 #else
-The following tags are available on this wiki:
-#foreach($tag in $tags)
-* [$tag&gt;$doc.fullName?tag=$tag] &lt;a href="$xwiki.getURL('Main.TagsRss', 'view', "tag=$tag&amp;xpage=rdf")" style=""&gt;&lt;img src="$xwiki.getSkinFile('icons/black-rss-mini.png')"&gt;&lt;/a&gt;
-#end
-#end
-
-#else
-1 Documents tagged with '$request.tag' &lt;a href="$xwiki.getURL('Main.TagsRss', 'view', "tag=$request.tag&amp;xpage=rdf")" style=""&gt;&lt;img src="$xwiki.getSkinFile('icons/black-rss.png')" border="0px" /&gt;&lt;/a&gt;
-
-[View all tags&gt;$doc.fullName]
-
-#set($tagFilter = '')
-#foreach($requestedTag in $request.getParameterValues('tag'))
-  #set($tagFilter = "${tagFilter} and '${requestedTag}' in elements(prop.list)")
-#end
-#set($sql = ", BaseObject as obj, DBStringListProperty as prop where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags' ${tagFilter} order by doc.name asc")
-#set ($list = $xwiki.searchDocuments($sql))
-#includeInContext('XWiki.Results')
-#end
-</content></xwikidoc>
+  ##
+  ## View all tags (Tag Cloud)
+  ##
+  #set($tags = $xwiki.tag.getTags(true))
+  #set ($title = 'All Tags')
+  #displayTagAppTitle("" false)
+  #if("$!request.get('deletedTag')" != "")
+    #info("$msg.get('xe.tag.delete.success', [$request.get('deletedTag')])")
+  #end
+  #set($docextras = [])  
+  #includeInContext("XWiki.TagCloud")  
+#end</content>
+</xwikidoc>

@@ -67,10 +67,12 @@
 ##############################
 #if($interface == "new")
 ##
-## inject needed JS files
+## inject needed JS and CSS files
 ##
-$xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true)    
-$xwiki.jsfx.use("js/xwiki/table/livetable.js", true)
+#set($ok = $xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true))
+#set($ok = $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css", true))
+#set($ok = $xwiki.jsfx.use("js/xwiki/table/livetable.js", true))
+#set($ok = $xwiki.ssfx.use("js/xwiki/table/livetable.css", true))
 ##
 ## url to get the users for displaying them in the ajax-based table
 ##
@@ -84,7 +86,7 @@ $xwiki.jsfx.use("js/xwiki/table/livetable.js", true)
   &lt;div id="ajax-loader"&gt;Loading...&lt;br /&gt;
     &lt;img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." /&gt;
   &lt;/div&gt;
-  &lt;table id="userstable"&gt;
+  &lt;table id="userstable" class="livetable"&gt;
     &lt;tr&gt;&lt;td colspan="3" id="showLimits"&gt;&lt;/td&gt;&lt;/tr&gt;
     &lt;tr&gt;
      &lt;td style="width:100%;"&gt;

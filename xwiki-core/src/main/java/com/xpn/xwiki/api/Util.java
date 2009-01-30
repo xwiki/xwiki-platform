@@ -291,6 +291,16 @@ public class Util extends Api
     {
         return "\n";
     }
+    
+    /**
+     * @param str the String containing the boolean representation to be parsed 
+     * @return the boolean represented by the string argument, false if the string is not representing a boolean.
+     * @since 1.8 Milestone 2
+     */
+    public Boolean parseBoolean(String str)
+    {
+        return Boolean.parseBoolean(str);
+    }
 
     /**
      * @param str the String to convert to an integer

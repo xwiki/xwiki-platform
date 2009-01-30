@@ -370,28 +370,6 @@ function eraseCookie(name) {
 }
 
 /**
- * Method used by several velocity templates and panels to create scriptaculous accordions.
- * 
- * @param params Configuration parameters.
- * @return
- */
-function createAccordion(params)
-{
-	var acc = new accordion(params.div, {
-		resizeSpeed:10,
-		classNames: {
-		toggle: "accordionTabTitleBar",
-		content: "accordionTabContentBox"
-	},
-	defaultSize: {
-		width: ('width' in params ? params.width : null),
-		height: ('height' in params ? params.height : null)
-	}
-	});
-	acc.activate($$('#'+params.div+' .accordionTabTitleBar')[params.no]);
-}
-
-/**
  * Method used by docextra.vm to emulate tabbed panes.  
  * 
  * @param extraID Id of the pane to show.

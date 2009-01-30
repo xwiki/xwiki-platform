@@ -35,7 +35,7 @@ $response.sendRedirect($doc.getURL($context.action, "editor=class"))
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
 $xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
-$xwiki.jsfx.use("js/scriptaculous/3rdparty/accordion/accordion.js")
+$xwiki.jsfx.use("js/xwiki/accordion/accordion.js")
 #if($hasProps)
 <script type="text/javascript">
 var obj={div:'xwikiclassproperties',no:0};

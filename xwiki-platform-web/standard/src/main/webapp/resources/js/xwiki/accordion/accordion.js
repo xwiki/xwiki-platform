@@ -1,18 +1,11 @@
-// accordion.js v2.0
-//
-// Copyright (c) 2007 stickmanlabs
-// Author: Kevin P Miller | http://www.stickmanlabs.com
-// 
-// Accordion is freely distributable under the terms of an MIT-style license.
-//
-// I don't care what you think about the file size...
-//   Be a pro: 
-//	    http://www.thinkvitamin.com/features/webapps/serving-javascript-fast
-//      http://rakaz.nl/item/make_your_pages_load_faster_by_combining_and_compressing_javascript_and_css_files
-//
-
-/*-----------------------------------------------------------------------------------------------*/
-
+/**
+ * Scriptaculous based Accordion.
+ *  
+ * Version: 2.0
+ * URL: http://www.stickmanlabs.com
+ * Author: Kevin P Miller
+ * License: Accordion is freely distributable under the terms of an MIT-style license. 
+ */
 if (typeof Effect == 'undefined') 
 	throw("accordion.js requires including script.aculo.us' effects.js library!");
 
@@ -197,3 +190,26 @@ var accordion = Class.create({
 		});
 	}
 });
+
+/**
+ * XWiki wrapper to the Accordion above.
+ * Used by several velocity templates and panels to create accordions.
+ * 
+ * @param params Configuration parameters.
+ * @return
+ */
+function createAccordion(params)
+{
+	var acc = new accordion(params.div, {
+		resizeSpeed:10,
+		classNames: {
+		toggle: "accordionTabTitleBar",
+		content: "accordionTabContentBox"
+	},
+	defaultSize: {
+		width: ('width' in params ? params.width : null),
+		height: ('height' in params ? params.height : null)
+	}
+	});
+	acc.activate($$('#'+params.div+' .accordionTabTitleBar')[params.no]);
+}

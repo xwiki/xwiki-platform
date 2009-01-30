@@ -107,6 +107,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 OfficeImporterContext.PRESENTATION_ARCHIVE_NAME));
         } else {
             resultArtifacts = context.getArtifacts();
+            resultArtifacts.remove("output.html");
         }
         OfficeImporterResult result = new OfficeImporterResult(context.getContent(), XWIKI_20, resultArtifacts);
         return result;

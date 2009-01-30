@@ -33,6 +33,8 @@ public class Attachment extends LinkCollection
 
     private String version;
 
+    private String pageVersion;
+
     private String mimeType;
 
     private String author;
@@ -109,5 +111,15 @@ public class Attachment extends LinkCollection
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String getPageVersion()
+    {
+        return pageVersion;
+    }
+
+    public void setPageVersion(String pageVersion)
+    {
+        this.pageVersion = pageVersion;
     }
 }

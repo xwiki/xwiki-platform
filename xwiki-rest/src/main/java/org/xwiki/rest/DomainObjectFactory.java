@@ -439,6 +439,7 @@ public class DomainObjectFactory
         attachment.setName(xwikiAttachment.getFilename());
         attachment.setSize(xwikiAttachment.getFilesize());
         attachment.setVersion(xwikiAttachment.getVersion());
+        attachment.setPageVersion(xwikiAttachment.getDocument().getVersion());
         attachment.setMimeType(xwikiAttachment.getMimeType());
         attachment.setAuthor(xwikiAttachment.getAuthor());
         attachment.setDate(xwikiAttachment.getDate().getTime());

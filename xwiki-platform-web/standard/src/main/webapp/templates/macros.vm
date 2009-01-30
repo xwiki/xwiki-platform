@@ -1296,3 +1296,51 @@ $html
     </ul>
   #end
 #end
+#**
+ * Set a variable from request parameters.
+ * If the parameter is not present in the request and the variable has not been set
+ * earlier in the script, set it to the default value.
+ *
+ * Note that request parameters will be cast to the type of the defaultValue.
+ * Handled types: ArrayList, Boolean, Integer, Float, Long, Double.
+ *
+ * @param variable the variable to set.
+ * @param variableName name of the variable in the calling script and in the request parameters.
+ * @defaultValue if the variable has not been set before and is not set in the HTTP request, it is set to this value.
+ *#
+#macro(setVariableFromRequest $variable $variableName $defaultValue)
+  #set($isList = false)
+  ## Try to get the variable value from HTTP request.    
+  #if($defaultValue.class == "class java.util.ArrayList")
+    #set($isList = true)
+    #set($httpParam = $util.getArrayList())
+    #set($rawHttpParam = $request.getParameterValues("${variableName}"))
+    #foreach($param in $rawHttpParam)      
+      #set($discard = $httpParam.add($param))
+    #end
+    #set($rawHttpParam = "")    
+  #else    
+    #set($httpParam = $request.getParameter("${variableName}"))
+    #if("$!httpParam" != "")
+      #if($defaultValue.class == "class java.lang.Boolean")
+        #set($httpParam = $util.parseBoolean($httpParam))
+      #elseif($defaultValue.class == "class java.lang.Integer")
+        #set($httpParam = $util.parseInt($httpParam))
+      #elseif($defaultValue.class == "class java.lang.Float")
+        #set($httpParam = $util.parseFloat($httpParam))
+      #elseif($defaultValue.class == "class java.lang.Long")
+        #set($httpParam = $util.parseLong($httpParam))
+      #elseif($defaultValue.class == "class java.lang.Double")
+        #set($httpParam = $util.parseDouble($httpParam))
+      #end
+    #end
+  #end 
+  #if(!$isList && "$!httpParam" != "" || $isList && $httpParam.size() > 0)
+    #set($variable = $httpParam)
+    #set($httpParam = "")
+  #end
+  ## If the variable has not been set from velocity, fallback on default.      
+  #if("$!variable" == "")      
+    #set($variable = $defaultValue)
+  #end
+#end

@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.RangeCompare;
@@ -50,8 +49,8 @@ public class UnlinkExecutable extends AbstractExecutable
     public boolean execute(RichTextArea rta, String param)
     {
         // Get the wrapping anchor
-        Range range = DOMUtils.getInstance().getTextRange(rta.getDocument().getSelection().getRangeAt(0));
-        Element anchor = (Element) DOMUtils.getInstance().getFirstAncestor(range.getCommonAncestorContainer(), ANCHOR);
+        Range range = domUtils.getTextRange(rta.getDocument().getSelection().getRangeAt(0));
+        Element anchor = (Element) domUtils.getFirstAncestor(range.getCommonAncestorContainer(), ANCHOR);
         if (anchor == null) {
             return false;
         }
@@ -91,7 +90,7 @@ public class UnlinkExecutable extends AbstractExecutable
         Range anchorRange = rta.getDocument().createRange();
         anchorRange.setStart(anchor, 0);
         anchorRange.setEnd(anchor, anchor.getChildNodes().getLength());
-        Range anchorTextRange = DOMUtils.getInstance().getTextRange(anchorRange);
+        Range anchorTextRange = domUtils.getTextRange(anchorRange);
         return anchorTextRange;
     }
 
@@ -107,7 +106,7 @@ public class UnlinkExecutable extends AbstractExecutable
         }
 
         // Check the selection, to be either void or inside a link.
-        Range range = DOMUtils.getInstance().getTextRange(rta.getDocument().getSelection().getRangeAt(0));
-        return DOMUtils.getInstance().getFirstAncestor(range.getCommonAncestorContainer(), ANCHOR) != null;
+        Range range = domUtils.getTextRange(rta.getDocument().getSelection().getRangeAt(0));
+        return domUtils.getFirstAncestor(range.getCommonAncestorContainer(), ANCHOR) != null;
     }
 }

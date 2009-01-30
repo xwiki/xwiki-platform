@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
@@ -29,6 +30,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
  */
 public abstract class AbstractExecutable implements Executable
 {
+    /**
+     * Collection of DOM utility methods.
+     */
+    protected DOMUtils domUtils = DOMUtils.getInstance();
+
     /**
      * {@inheritDoc}
      * 

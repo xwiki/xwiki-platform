@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
@@ -35,11 +34,6 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  */
 public class InsertHRExecutable extends AbstractExecutable
 {
-    /**
-     * Collection of DOM utility methods.
-     */
-    private DOMUtils domUtils = DOMUtils.getInstance();
-
     /**
      * {@inheritDoc}
      * 

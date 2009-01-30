@@ -41,7 +41,7 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
     /**
      * Utility executable used for inserting text after styling.
      */
-    private Executable insertHTML = new InsertHTMLExecutable();
+    private Executable insertHTML;
 
     /**
      * {@inheritDoc}
@@ -54,6 +54,7 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
 
         if (executable == null) {
             executable = new StyleExecutable("em", null, Style.FONT_STYLE, Style.FontStyle.ITALIC, true, false);
+            insertHTML = new InsertHTMLExecutable();
         }
     }
 

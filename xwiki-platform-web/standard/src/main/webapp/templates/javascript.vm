@@ -2,7 +2,6 @@
 ## CSS files related to JS libraries.
 ##
 <link href="$xwiki.getSkinFile("js/xwiki/fullscreenedit/fullscreenEdit.css")" rel="stylesheet" type="text/css" />
-<link href="$xwiki.getSkinFile("js/xwiki/usersandgroups/usersandgroups.css", true)" rel="stylesheet" type="text/css" />
 <link href="$xwiki.getSkinFile("js/xwiki/suggest/ajaxSuggest.css")" rel="stylesheet" type="text/css" />
 <link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightbox.css", true)" rel="stylesheet" type="text/css" />
 <!--[if IE]>

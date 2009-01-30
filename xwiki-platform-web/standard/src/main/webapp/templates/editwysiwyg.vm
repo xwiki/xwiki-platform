@@ -2,8 +2,8 @@
 #set($formname = "edit")
 #set($saveaction = "save")
 #set($previewenabled = true)
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg10/tiny_mce/tiny_mce.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg10/wiki_editor/wiki_editor.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/tiny_mce/tiny_mce.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/wiki_editor/wiki_editor.js")"></script>
 #set($xredirect=$!request.getParameter("xredirect"))
 ## <form id="edit" method="post" action="$doc.getURL("preview")" onsubmit="tinyMCE.triggerSave();">
 ## #set($editactions = "top")

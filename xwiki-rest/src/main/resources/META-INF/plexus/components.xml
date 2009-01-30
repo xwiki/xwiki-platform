@@ -996,6 +996,44 @@
 				org.xwiki.rest.representers.XmlTextXStreamRepresenter
 			</implementation>
 		</component>
+		
+		<!-- ************************************ -->
+		<!-- * AttachmentAtPageVersion resource * -->
+		<!-- ************************************ -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource
+			</implementation>
+			<requirements>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceClassRegistry
+					</role>
+				</requirement>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceRepresenter
+					</role>
+					<role-hint>org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource
+					</role-hint>
+					<field-name>descriptorToRepresenterMap
+					</field-name>
+				</requirement>
+			</requirements>
+			<configuration>
+				<uriPattern>
+					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/attachments/{attachmentName}
+				</uriPattern>
+			</configuration>
+		</component>
+		<!--
+			No representers for the attachment resource because the
+			representation is directly derived from the attachment and its media
+			type.
+		-->
 
 	</components>
 </component-set>

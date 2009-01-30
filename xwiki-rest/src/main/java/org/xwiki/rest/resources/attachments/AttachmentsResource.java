@@ -18,7 +18,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class AttachmentsResource extends XWikiResource
 {
-
     @Override
     public Representation represent(Variant variant)
     {
@@ -53,7 +52,7 @@ public class AttachmentsResource extends XWikiResource
                         .toString();
 
                 attachments.addAttachment(DomainObjectFactory.createAttachment(getRequest(), resourceClassRegistry,
-                    xwikiAttachment, attachmentXWikiUrl));
+                    xwikiAttachment, attachmentXWikiUrl, false));
             }
 
             return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), attachments);

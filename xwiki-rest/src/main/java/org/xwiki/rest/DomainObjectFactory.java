@@ -38,6 +38,7 @@ import org.xwiki.rest.model.Space;
 import org.xwiki.rest.model.Translations;
 import org.xwiki.rest.model.XWikiRoot;
 import org.xwiki.rest.resources.RootResource;
+import org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.comments.CommentResource;
 import org.xwiki.rest.resources.comments.CommentVersionResource;
@@ -432,7 +433,7 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachment(Request request, XWikiResourceClassRegistry resourceClassRegistry,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl, boolean useVersion)
     {
         Attachment attachment = new Attachment();
 
@@ -449,9 +450,15 @@ public class DomainObjectFactory
         Map<String, String> parametersMap;
         Link link;
 
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(PageResource.class));
+        if (useVersion) {
+            fullUri =
+                String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                    .getUriPatternForResourceClass(PageVersionResource.class));
+        } else {
+            fullUri =
+                String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                    .getUriPatternForResourceClass(PageResource.class));
+        }
 
         parametersMap = new HashMap<String, String>();
         parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
@@ -463,10 +470,15 @@ public class DomainObjectFactory
         link.setRel(Relations.PAGE);
         attachment.addLink(link);
 
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(AttachmentResource.class));
-
+        if (useVersion) {
+            fullUri =
+                String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                    .getUriPatternForResourceClass(AttachmentAtPageVersionResource.class));
+        } else {
+            fullUri =
+                String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                    .getUriPatternForResourceClass(AttachmentResource.class));
+        }
         parametersMap = new HashMap<String, String>();
         parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
         parametersMap.put(Constants.SPACE_NAME_PARAMETER, xwikiAttachment.getDocument().getSpace());

@@ -546,14 +546,13 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 }
 
 .xImporterClipboardTabEditor {
-  width: 440px;
+  width: 100%;
   height: 260px;
   border: solid 1px #000000;
 }
 
 .xImporterImportButton {
   width: 60px;
-  margin-left: 250px;
 }
 
 .xImporterCancelButton {

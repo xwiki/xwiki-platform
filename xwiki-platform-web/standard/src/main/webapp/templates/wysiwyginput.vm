@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<link type="text/css" rel="stylesheet" href="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/RichTextArea.css"/>
-<link type="text/css" rel="stylesheet" href="${xwiki.getSkinFile("style.css")}"/>
+<link type="text/css" rel="stylesheet" href="$xwiki.getSkinFile("js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg/RichTextArea.css")"/>
+<link type="text/css" rel="stylesheet" href="$xwiki.getSkinFile("style.css")"/>
 </head>
 ## We don't use directly $tdoc.content because we could loose changes made by the 
 ## user before switching from wiki editor to wysiwyg or before saving when a 

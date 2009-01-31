@@ -25,7 +25,7 @@
 ##
 ## We should find a better way of including the JavaScript code of the editor!
 ##
-<script type="text/javascript" src="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js")"></script>
 ##
 ## Get the WYSIWYG input map in order to add the the data for this request.
 ## This map is needed to keep user changes while switching editors and after server-side exceptions.
@@ -89,6 +89,12 @@ $xwiki.getTextArea($tdoc.content)
 ##
 <script type="text/javascript">
 //<![CDATA[
+    // Global configuration.
+    var Wysiwyg = {
+      xwikiservice: '${request.contextPath}/XWikiService',
+      wysiwygServiceURL: '${request.contextPath}/WysiwygService'
+    };
+    // Instance configuration.
     var Wysiwyg0 = {
       hookId: 'content',
       inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",

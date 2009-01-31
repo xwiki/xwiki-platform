@@ -189,6 +189,7 @@
             <value>com.xpn.xwiki.wysiwyg.Wysiwyg</value>
           </compileTargets>
           <runTarget>com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.html</runTarget>
+          <output>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg/gwt</output>
           <logLevel>WARN</logLevel><!-- ERROR, WARN, INFO, TRACE, DEBUG, SPAM, ALL -->
           <style>OBF</style><!-- OBF[USCATED], PRETTY, DETAILED -->
           <noServer>false</noServer>

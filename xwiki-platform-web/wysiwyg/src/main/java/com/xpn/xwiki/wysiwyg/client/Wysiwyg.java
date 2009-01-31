@@ -36,6 +36,7 @@ import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditor;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorDebugger;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorFactory;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.util.internal.DefaultConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
@@ -162,6 +163,27 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
             return new DefaultConfig(dictionary);
         } catch (MissingResourceException e) {
             return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}<br/>
+     * NOTE: We overwrite this method in order to be able to control the URL of the XWikiService.
+     * 
+     * @see XWikiGWTDefaultApp#getParam(String, String)
+     */
+    public String getParam(String key, String defaultValue)
+    {
+        // First look for meta gwt:property.
+        String value = getProperty(key);
+        if (!StringUtils.isEmpty(value)) {
+            return value;
+        }
+        // Then look in the global configuration object.
+        try {
+            return Dictionary.getDictionary(getName()).get(key);
+        } catch (MissingResourceException e) {
+            return defaultValue;
         }
     }
 }

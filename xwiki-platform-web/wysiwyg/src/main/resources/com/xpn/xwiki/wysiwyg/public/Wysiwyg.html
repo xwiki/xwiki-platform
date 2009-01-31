@@ -15,6 +15,12 @@
   </form>
   <!------- Code for creating a WYSIWYG instance ------->
   <script language="javascript">
+    // Global configuration.
+    var Wysiwyg = {
+      xwikiservice: '/xwiki/XWikiService',
+      wysiwygServiceURL: '/xwiki/WysiwygService'
+    };
+    // Instance configuration.
     var Wysiwyg0 = {
       hookId: 'content',
       debug: true

@@ -21,8 +21,10 @@ package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.Dictionary;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
@@ -60,11 +62,16 @@ public interface WysiwygService extends RemoteService
         public static synchronized WysiwygServiceAsync getInstance()
         {
             if (instance == null) {
-                String moduleBaseURL = GWT.getModuleBaseURL();
-                String baseURL = moduleBaseURL.substring(0, moduleBaseURL.indexOf(GWT.getModuleName()));
+                String serviceURL;
+                try {
+                    // Look in the global configuration object.
+                    serviceURL = Dictionary.getDictionary("Wysiwyg").get("wysiwygServiceURL");
+                } catch (MissingResourceException e) {
+                    serviceURL = "/WysiwygService";
+                }
 
                 instance = (WysiwygServiceAsync) GWT.create(WysiwygService.class);
-                ((ServiceDefTarget) instance).setServiceEntryPoint(baseURL + "WysiwygService");
+                ((ServiceDefTarget) instance).setServiceEntryPoint(serviceURL);
 
                 // We cache the service calls.
                 instance = new WysiwygServiceAsyncCacheProxy(instance);
@@ -106,8 +113,8 @@ public interface WysiwygService extends RemoteService
 
     /**
      * Imports an office document attached to a wiki page into XHTML/1.0. The resulting xhtml content will be returned
-     * from this method while if there are non-textual content in the original office document, they will be attached
-     * to the wiki page identified by pageName. Note that this method does not alter the content of the wiki page
+     * from this method while if there are non-textual content in the original office document, they will be attached to
+     * the wiki page identified by pageName. Note that this method does not alter the content of the wiki page
      * identified by pageName.
      * 
      * @param pageName the wiki page into which the office document is attached.
@@ -118,7 +125,7 @@ public interface WysiwygService extends RemoteService
      */
     String officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams)
         throws XWikiGWTException;
-    
+
     /**
      * @param syncedRevision The changes to this editor's content, since the last update.
      * @param pageName The page being edited.

@@ -36,7 +36,16 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-
+        
+        // Embedded documents
+        suite.addTestsFromResource("embeddeddoc/embeddeddoc1", false);
+        suite.addTestsFromResource("embeddeddoc/embeddeddoc2", false);
+        suite.addTestsFromResource("embeddeddoc/embeddeddoc3", false);
+        suite.addTestsFromResource("embeddeddoc/embeddeddoc4", false);
+        suite.addTestsFromResource("embeddeddoc/embeddeddoc5", false);
+        suite.addTestsFromResource("embeddeddoc/embeddeddoc6", false);
+        suite.addTestsFromResource("embeddeddoc/embeddeddoc7", false);
+        
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);
         suite.addTestsFromResource("bold/bold2", false);

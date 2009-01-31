@@ -22,8 +22,7 @@ package org.xwiki.rendering.internal.renderer.printer;
 import java.util.regex.Pattern;
 
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxEscapeHandler;
-import org.xwiki.rendering.internal.renderer.state.BlockStateListener;
-import org.xwiki.rendering.internal.renderer.state.TextOnNewLineStateListener;
+import org.xwiki.rendering.internal.renderer.state.XWikiSyntaxState;
 import org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
@@ -37,55 +36,37 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
 {
+    private XWikiSyntaxState state;
+
     private XWikiSyntaxEscapeHandler escapeHandler;
 
     private boolean escapeLastChar;
 
     private Pattern escapeFirstIfMatching;
 
-    private BlockStateListener blockListener;
-
-    private TextOnNewLineStateListener textListener;
-
-    public XWikiSyntaxEscapeWikiPrinter(WikiPrinter printer)
-    {
-        this(printer, null, null);
-    }
-
-    public XWikiSyntaxEscapeWikiPrinter(WikiPrinter printer, BlockStateListener blockListener, 
-        TextOnNewLineStateListener textListener)
+    public XWikiSyntaxEscapeWikiPrinter(WikiPrinter printer, XWikiSyntaxState state)
     {
         super(printer);
+
         this.escapeHandler = new XWikiSyntaxEscapeHandler();
-        this.blockListener = blockListener;
-        this.textListener = textListener;
+
+        this.state = state;
     }
 
-    public void setBlockListener(BlockStateListener blockListener)
+    @Override
+    public void flush()
     {
-        this.blockListener = blockListener;
-    }
-
-    public void setTextListener(TextOnNewLineStateListener textListener)
-    {
-        this.textListener = textListener;
-    }
-
-    public BlockStateListener getBlockListener()
-    {
-        return this.blockListener;
-    }
-
-    public TextOnNewLineStateListener getTextListener()
-    {
-        return this.textListener;
+        this.escapeHandler.escape(getBuffer(), this.state, this.escapeLastChar, this.escapeFirstIfMatching);
+        this.escapeLastChar = false;
+        this.escapeFirstIfMatching = null;
+        super.flush();
     }
 
     public void printBeginBold()
     {
-        boolean isOnNewLine = getTextListener().isTextOnNewLine() && getBuffer().length() == 0;
+        boolean isOnNewLine = this.state.getTextOnNewLineStateListener().isTextOnNewLine() && getBuffer().length() == 0;
 
-        super.print("**");
+        print("**");
 
         if (isOnNewLine) {
             this.escapeFirstIfMatching = XWikiSyntaxEscapeHandler.SPACE_PATTERN;
@@ -100,12 +81,12 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
             this.escapeLastChar = true;
         }
 
-        super.print("//");
+        print("//");
     }
 
     public void printEndItalic()
     {
-        super.print("//");
+        print("//");
     }
 
     public void printInlineMacro(String xwikiSyntaxText)
@@ -116,16 +97,6 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
             this.escapeLastChar = true;
         }
 
-        super.print(xwikiSyntaxText);
-    }
-
-    @Override
-    public void flush()
-    {
-        this.escapeHandler.escape(getBuffer(), getBlockListener(), getTextListener(), this.escapeLastChar, 
-            this.escapeFirstIfMatching);
-        this.escapeLastChar = false;
-        this.escapeFirstIfMatching = null;
-        super.flush();
+        print(xwikiSyntaxText);
     }
 }

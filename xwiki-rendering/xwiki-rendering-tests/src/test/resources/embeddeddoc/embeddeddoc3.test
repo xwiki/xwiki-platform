@@ -1,0 +1,33 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+before (((
+inside ))) after
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [before]
+endParagraph
+beginDocument
+beginParagraph
+onWord [inside]
+endParagraph
+endDocument
+beginParagraph
+onWord [after]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p>before</p><div class="document"><p>inside</p></div><p>after</p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+before
+
+(((inside)))
+
+after

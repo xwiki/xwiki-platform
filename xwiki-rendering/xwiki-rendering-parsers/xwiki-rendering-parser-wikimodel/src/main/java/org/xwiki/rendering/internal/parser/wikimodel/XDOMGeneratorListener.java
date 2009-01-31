@@ -23,12 +23,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
-import java.util.Collections;
 
 import org.wikimodel.wem.IWemConstants;
 import org.wikimodel.wem.IWemListener;
@@ -37,12 +37,43 @@ import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
 import org.wikimodel.wem.WikiStyle;
-import org.xwiki.rendering.block.*;
+import org.xwiki.rendering.block.AbstractBlock;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.BulletedListBlock;
+import org.xwiki.rendering.block.DefinitionDescriptionBlock;
+import org.xwiki.rendering.block.DefinitionListBlock;
+import org.xwiki.rendering.block.DefinitionTermBlock;
+import org.xwiki.rendering.block.EmptyLinesBlock;
+import org.xwiki.rendering.block.ErrorBlock;
+import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.HorizontalLineBlock;
+import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.block.ListBLock;
+import org.xwiki.rendering.block.ListItemBlock;
+import org.xwiki.rendering.block.MacroInlineBlock;
+import org.xwiki.rendering.block.MacroStandaloneBlock;
+import org.xwiki.rendering.block.NewLineBlock;
+import org.xwiki.rendering.block.NumberedListBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.QuotationBlock;
+import org.xwiki.rendering.block.QuotationLineBlock;
+import org.xwiki.rendering.block.SectionBlock;
+import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.SpecialSymbolBlock;
+import org.xwiki.rendering.block.TableBlock;
+import org.xwiki.rendering.block.TableCellBlock;
+import org.xwiki.rendering.block.TableHeadCellBlock;
+import org.xwiki.rendering.block.TableRowBlock;
+import org.xwiki.rendering.block.VerbatimInlineBlock;
+import org.xwiki.rendering.block.VerbatimStandaloneBlock;
+import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
-import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -61,9 +92,9 @@ public class XDOMGeneratorListener implements IWemListener
     private final MarkerBlock marker = new MarkerBlock();
 
     private Parser parser;
-    
+
     private LinkParser linkParser;
-    
+
     private ImageParser imageParser;
 
     private class MarkerBlock extends AbstractBlock
@@ -84,7 +115,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public XDOM getXDOM()
     {
-        return new XDOM(generateListFromStack());
+        return (XDOM) generateListFromStack().get(0);
     }
 
     /**
@@ -114,7 +145,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginDocument()
     {
-        // Don't do anything since there's no notion of Document block in XWiki rendering.
+        this.stack.push(this.marker);
     }
 
     /**
@@ -202,17 +233,18 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endDocument()
     {
-        // Don't do anything since there's no notion of Document block in XWiki rendering.
+        this.stack.push(new XDOM(generateListFromStack()));
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#endFormat(WikiFormat)
      */
     public void endFormat(WikiFormat format)
     {
         List<WikiStyle> styles = format.getStyles();
-        if ((styles.size() > 0) || (format.getParams().size() > 0))  {
+        if ((styles.size() > 0) || (format.getParams().size() > 0)) {
 
             // Generate nested FormatBlock blocks since XWiki uses nested Format blocks whereas Wikimodel doesn't.
             FormatBlock block;
@@ -226,7 +258,7 @@ public class XDOMGeneratorListener implements IWemListener
             if (format.getParams().size() > 0) {
                 block.setParameters(convertParameters(new WikiParameters(format.getParams())));
             }
-            
+
             if (styles.size() > 1) {
                 ListIterator<WikiStyle> it = styles.listIterator(styles.size() - 1);
                 while (it.hasPrevious()) {
@@ -239,25 +271,24 @@ public class XDOMGeneratorListener implements IWemListener
             Block previous = this.stack.peek();
             if (FormatBlock.class.isAssignableFrom(previous.getClass())
                 && (((FormatBlock) previous).getFormat() == block.getFormat())
-                && (((FormatBlock) previous).getParameters().equals(block.getParameters())))
-            {
+                && (((FormatBlock) previous).getParameters().equals(block.getParameters()))) {
                 previous.addChildren(block.getChildren());
             } else {
                 this.stack.push(block);
             }
 
         } else {
-            // WikiModel generate begin/endFormat events even for simple text with no style so we need to remove our 
+            // WikiModel generate begin/endFormat events even for simple text with no style so we need to remove our
             // marker.
             for (Block block : generateListFromStack()) {
                 this.stack.push(block);
             }
         }
     }
-    
+
     public void endHeader(int level, WikiParameters params)
     {
-        this.stack.push(new SectionBlock(generateListFromStack(), SectionLevel.parseInt(level), 
+        this.stack.push(new SectionBlock(generateListFromStack(), SectionLevel.parseInt(level),
             convertParameters(params)));
     }
 
@@ -347,9 +378,9 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void onEscape(String str)
     {
-        // The WikiModel XWiki parser has been modified not to generate any onEscape event so do nothing here. 
-        // This is because we believe that WikiModel should not have an escape event since it's the 
-        // responsibility of Renderers to perform escaping as required. 
+        // The WikiModel XWiki parser has been modified not to generate any onEscape event so do nothing here.
+        // This is because we believe that WikiModel should not have an escape event since it's the
+        // responsibility of Renderers to perform escaping as required.
     }
 
     public void onExtensionBlock(String extensionName, WikiParameters params)
@@ -421,12 +452,12 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * Called when WikiModel finds an reference such as a URI located directly in the text (free-standing URI), 
-     * as opposed to a link inside wiki link syntax delimiters.
+     * Called when WikiModel finds an reference such as a URI located directly in the text (free-standing URI), as
+     * opposed to a link inside wiki link syntax delimiters.
      */
     public void onReference(String reference)
     {
-        onReference(reference, null, true, Collections.<String, String>emptyMap());
+        onReference(reference, null, true, Collections.<String, String> emptyMap());
     }
 
     /**
@@ -436,7 +467,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onReference(WikiReference reference)
     {
-        onReference(reference.getLink(), reference.getLabel(), false, convertParameters(reference.getParameters())); 
+        onReference(reference.getLink(), reference.getLabel(), false, convertParameters(reference.getParameters()));
     }
 
     private void onReference(String reference, String label, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -450,16 +481,16 @@ public class XDOMGeneratorListener implements IWemListener
             // If the link failed to be constructed do nothing since parseLink will have wrapped it in an Error Block
             if (link != null) {
                 // Verify if we have an image or a link. An image is identified by an "image:" uri
-                // The reason we get this event is because WikiModel handles links and images in the same manner. 
+                // The reason we get this event is because WikiModel handles links and images in the same manner.
                 resultBlock = createImageBlock(link, isFreeStandingURI, parameters);
                 if (resultBlock == null) {
-                    resultBlock = createLinkBlock(link, label, isFreeStandingURI, parameters); 
+                    resultBlock = createLinkBlock(link, label, isFreeStandingURI, parameters);
                 }
                 this.stack.push(resultBlock);
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -467,8 +498,8 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onSpace(String spaces)
     {
-        // We want one space event per space. 
-        for (int i = 0; i < spaces.length(); i++) { 
+        // We want one space event per space.
+        for (int i = 0; i < spaces.length(); i++) {
             this.stack.push(SpaceBlock.SPACE_BLOCK);
         }
     }
@@ -480,7 +511,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onSpecialSymbol(String symbol)
     {
-        for (int i = 0; i < symbol.length(); i++) { 
+        for (int i = 0; i < symbol.length(); i++) {
             this.stack.push(new SpecialSymbolBlock(symbol.charAt(i)));
         }
     }
@@ -547,9 +578,9 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onImage(WikiReference ref)
     {
-        
+
     }
-    
+
     /**
      * Convert Wikimodel parameters to XWiki parameters format.
      * 
@@ -588,7 +619,7 @@ public class XDOMGeneratorListener implements IWemListener
         }
         return result;
     }
-    
+
     private Link parseLink(String reference)
     {
         Link link;
@@ -598,8 +629,8 @@ public class XDOMGeneratorListener implements IWemListener
             // Wrap the error in an ErrorBLock
             StringWriter writer = new StringWriter();
             e.printStackTrace(new PrintWriter(writer));
-            ErrorBlock block = 
-                new ErrorBlock(Collections.<Block>emptyList(), "Invalid Link", writer.getBuffer().toString());
+            ErrorBlock block =
+                new ErrorBlock(Collections.<Block> emptyList(), "Invalid Link", writer.getBuffer().toString());
             this.stack.push(block);
             link = null;
         }
@@ -617,26 +648,26 @@ public class XDOMGeneratorListener implements IWemListener
         Block resultBlock = null;
 
         // Verify if we have an image or a link. An image is identified by an "image:" uri
-        // The reason we get this event is because WikiModel handles links and images in the same manner. 
+        // The reason we get this event is because WikiModel handles links and images in the same manner.
         if ((link.getType() == LinkType.URI) && (link.getReference().startsWith("image:"))) {
             String imageLocation = link.getReference().substring("image:".length());
             resultBlock = new ImageBlock(this.imageParser.parse(imageLocation), isFreeStandingURI, parameters);
         }
-        
+
         return resultBlock;
     }
-    
+
     private Block createLinkBlock(Link link, String label, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         Block resultBlock;
-        
+
         if (isFreeStandingURI) {
-            resultBlock = new LinkBlock(Collections.<Block>emptyList(), link, true);
+            resultBlock = new LinkBlock(Collections.<Block> emptyList(), link, true);
         } else {
-        
-            // TODO: Remove the need to parse the label passed by WikiModel when it implements support for wiki syntax 
+
+            // TODO: Remove the need to parse the label passed by WikiModel when it implements support for wiki syntax
             // in links. See http://code.google.com/p/wikimodel/issues/detail?id=87
-            List<Block> linkedBlocks = Collections.<Block>emptyList();
+            List<Block> linkedBlocks = Collections.<Block> emptyList();
             if ((label != null) && (label.length() > 0)) {
                 try {
                     // TODO: Use an inline parser. See http://jira.xwiki.org/jira/browse/XWIKI-2748
@@ -646,10 +677,10 @@ public class XDOMGeneratorListener implements IWemListener
                     // TODO: Handle errors
                 }
             }
-            
-            resultBlock = new LinkBlock(linkedBlocks, link, false, parameters); 
+
+            resultBlock = new LinkBlock(linkedBlocks, link, false, parameters);
         }
-        
-        return resultBlock; 
+
+        return resultBlock;
     }
 }

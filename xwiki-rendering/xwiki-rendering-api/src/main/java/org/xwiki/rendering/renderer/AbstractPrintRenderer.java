@@ -21,6 +21,7 @@ package org.xwiki.rendering.renderer;
 
 import java.util.Stack;
 
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
@@ -33,9 +34,19 @@ public abstract class AbstractPrintRenderer extends AbstractRenderer implements 
 {
     private Stack<WikiPrinter> printers = new Stack<WikiPrinter>();
 
-    public AbstractPrintRenderer(WikiPrinter printer)
+    public AbstractPrintRenderer(WikiPrinter printer, Listener stateListener)
     {
+        super(stateListener);
+
         this.pushPrinter(printer);
+    }
+
+    /**
+     * @return the main printer.
+     */
+    public WikiPrinter getMainPrinter()
+    {
+        return this.printers.firstElement();
     }
 
     /**

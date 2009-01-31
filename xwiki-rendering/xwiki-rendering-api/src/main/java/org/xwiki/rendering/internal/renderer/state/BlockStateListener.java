@@ -37,6 +37,10 @@ import org.xwiki.rendering.listener.xml.XMLNode;
  */
 public class BlockStateListener implements Listener
 {
+    private int documentDepth;
+
+    private int inlineDepth = 0;
+
     private boolean isInParagraph;
 
     private boolean isInSection;
@@ -47,13 +51,35 @@ public class BlockStateListener implements Listener
 
     private boolean isInTableCell;
 
-    private boolean isInDefinitionList;
+    private int definitionListDepth = 0;
 
-    private boolean isInList;
+    private int listDepth;
 
-    private boolean isInQuotation;
+    private int listItemDepth;
+
+    private int quotationDepth = 0;
 
     private boolean isInQuotationLine;
+
+    public void setDocumentDepth(int documentDepth)
+    {
+        this.documentDepth = documentDepth;
+    }
+
+    public int getDocumentDepth()
+    {
+        return this.documentDepth;
+    }
+
+    public boolean isInDocument()
+    {
+        return this.documentDepth > 0;
+    }
+
+    public boolean isInLine()
+    {
+        return this.inlineDepth > 0;
+    }
 
     public boolean isInParagraph()
     {
@@ -77,19 +103,24 @@ public class BlockStateListener implements Listener
 
     public boolean isInDefinitionList()
     {
-        return this.isInDefinitionList;
+        return this.definitionListDepth > 0;
     }
 
     public boolean isInList()
     {
-        return this.isInList;
+        return this.listDepth > 0;
+    }
+
+    public boolean isInListItem()
+    {
+        return this.listItemDepth > 0;
     }
 
     public boolean isInLink()
     {
         return this.linkDepth > 0;
     }
-    
+
     public int getLinkDepth()
     {
         return this.linkDepth;
@@ -97,7 +128,12 @@ public class BlockStateListener implements Listener
 
     public boolean isInQuotation()
     {
-        return this.isInQuotation;
+        return this.quotationDepth > 0;
+    }
+
+    public int getQuotationDepth()
+    {
+        return this.quotationDepth;
     }
 
     public boolean isInQuotationLine()
@@ -105,24 +141,31 @@ public class BlockStateListener implements Listener
         return this.isInQuotationLine;
     }
 
+    public int getDefinitionListDepth()
+    {
+        return this.definitionListDepth;
+    }
+
+    // Events
+
     public void beginDefinitionDescription()
     {
-        // Nothing to do
+        ++inlineDepth;
     }
 
     public void beginDefinitionList()
     {
-        this.isInDefinitionList = true;
+        ++this.definitionListDepth;
     }
 
     public void beginDefinitionTerm()
     {
-        // Nothing to do
+        ++inlineDepth;
     }
 
     public void beginDocument()
     {
-        // Nothing to do
+        ++this.documentDepth;
     }
 
     public void beginError(String message, String description)
@@ -142,12 +185,13 @@ public class BlockStateListener implements Listener
 
     public void beginList(ListType listType, Map<String, String> parameters)
     {
-        this.isInList = true;
+        ++this.listDepth;
     }
 
     public void beginListItem()
     {
-        // Nothing to do
+        ++this.listItemDepth;
+        ++this.inlineDepth;
     }
 
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
@@ -158,21 +202,24 @@ public class BlockStateListener implements Listener
     public void beginParagraph(Map<String, String> parameters)
     {
         this.isInParagraph = true;
+        ++this.inlineDepth;
     }
 
     public void beginQuotation(Map<String, String> parameters)
     {
-        this.isInQuotation = true;
+        ++this.quotationDepth;
     }
 
     public void beginQuotationLine()
     {
         this.isInQuotationLine = true;
+        ++this.inlineDepth;
     }
 
     public void beginSection(SectionLevel level, Map<String, String> parameters)
     {
         this.isInSection = true;
+        ++this.inlineDepth;
     }
 
     public void beginTable(Map<String, String> parameters)
@@ -183,11 +230,13 @@ public class BlockStateListener implements Listener
     public void beginTableCell(Map<String, String> parameters)
     {
         this.isInTableCell = true;
+        ++this.inlineDepth;
     }
 
     public void beginTableHeadCell(Map<String, String> parameters)
     {
         this.isInTableCell = true;
+        ++this.inlineDepth;
     }
 
     public void beginTableRow(Map<String, String> parameters)
@@ -202,23 +251,22 @@ public class BlockStateListener implements Listener
 
     public void endDefinitionDescription()
     {
-        // Nothing to do
-
+        --this.inlineDepth;
     }
 
     public void endDefinitionList()
     {
-        this.isInDefinitionList = false;
+        --this.definitionListDepth;
     }
 
     public void endDefinitionTerm()
     {
-        // Nothing to do
+        --this.inlineDepth;
     }
 
     public void endDocument()
     {
-        // Nothing to do
+        --this.documentDepth;
     }
 
     public void endError(String message, String description)
@@ -238,12 +286,13 @@ public class BlockStateListener implements Listener
 
     public void endList(ListType listType, Map<String, String> parameters)
     {
-        this.isInList = false;
+        --this.listDepth;
     }
 
     public void endListItem()
     {
-        // Nothing to do
+        --this.listItemDepth;
+        --this.inlineDepth;
     }
 
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
@@ -254,21 +303,24 @@ public class BlockStateListener implements Listener
     public void endParagraph(Map<String, String> parameters)
     {
         this.isInParagraph = false;
+        --this.inlineDepth;
     }
 
     public void endQuotation(Map<String, String> parameters)
     {
-        this.isInQuotation = false;
+        --this.quotationDepth;
     }
 
     public void endQuotationLine()
     {
         this.isInQuotationLine = false;
+        --this.inlineDepth;
     }
 
     public void endSection(SectionLevel level, Map<String, String> parameters)
     {
         this.isInSection = false;
+        --this.inlineDepth;
     }
 
     public void endTable(Map<String, String> parameters)
@@ -279,11 +331,13 @@ public class BlockStateListener implements Listener
     public void endTableCell(Map<String, String> parameters)
     {
         this.isInTableCell = false;
+        --this.inlineDepth;
     }
 
     public void endTableHeadCell(Map<String, String> parameters)
     {
         this.isInTableCell = false;
+        --this.inlineDepth;
     }
 
     public void endTableRow(Map<String, String> parameters)

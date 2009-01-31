@@ -1,0 +1,78 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+| This is a table: | (((* item one
+* item two
+** subitem 1
+** subitem 2
+* item three)))
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginTable
+beginTableRow
+beginTableCell
+onSpace
+onWord [This]
+onSpace
+onWord [is]
+onSpace
+onWord [a]
+onSpace
+onWord [table]
+onSpecialSymbol [:]
+onSpace
+endTableCell
+beginTableCell
+beginDocument
+beginList [BULLETED]
+beginListItem
+onWord [item]
+onSpace
+onWord [one]
+endListItem
+beginListItem
+onWord [item]
+onSpace
+onWord [two]
+beginList [BULLETED]
+beginListItem
+onWord [subitem]
+onSpace
+onWord [1]
+endListItem
+beginListItem
+onWord [subitem]
+onSpace
+onWord [2]
+endListItem
+endList [BULLETED]
+endListItem
+beginListItem
+onWord [item]
+onSpace
+onWord [three]
+endListItem
+endList [BULLETED]
+endDocument
+endTableCell
+endTableRow
+endTable
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<table><tr><td>&nbsp;This is a table:&nbsp;</td><td><div class="document"><ul><li>item one</li><li>item two<ul><li>subitem 1</li><li>subitem 2</li></ul></li><li>item three</li></ul></div></td></tr></table>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+| This is a table: |(((* item one
+* item two
+** subitem 1
+** subitem 2
+* item three)))
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<table><tr><td>&nbsp;This is a table:&nbsp;</td><td><div class="document"><ul><li>item one</li><li>item two<ul><li>subitem 1</li><li>subitem 2</li></ul></li><li>item three</li></ul></div></td></tr></table>

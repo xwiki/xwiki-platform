@@ -1,0 +1,37 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+before ((( opened and not closed
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [before]
+endParagraph
+beginDocument
+beginParagraph
+onWord [opened]
+onSpace
+onWord [and]
+onSpace
+onWord [not]
+onSpace
+onWord [closed]
+endParagraph
+endDocument
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p>before</p><div class="document"><p>opened and not closed</p></div>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+before
+
+(((opened and not closed)))
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<p>before</p><div class="document"><p>opened and not closed</p></div>

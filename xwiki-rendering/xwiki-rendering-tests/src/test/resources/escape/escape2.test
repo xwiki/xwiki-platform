@@ -11,6 +11,7 @@
 ~^~^nosuper~^~^
 ~,~,nosub~,~,
 ~{~{~{notverbatim}}}
+~(~(~(noembeddeddoc~)~)~)
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -65,12 +66,20 @@ onWord [notverbatim]
 onSpecialSymbol [}]
 onSpecialSymbol [}]
 onSpecialSymbol [}]
+onNewLine
+onSpecialSymbol [(]
+onSpecialSymbol [(]
+onSpecialSymbol [(]
+onWord [noembeddeddoc]
+onSpecialSymbol [)]
+onSpecialSymbol [)]
+onSpecialSymbol [)]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>**notbold**<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>{{{notverbatim}}}</p>
+<p>**notbold**<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>{{{notverbatim}}}<br/>(((noembeddeddoc)))</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -82,7 +91,8 @@ endDocument
 ~^~^nosuper~^~^
 ~,~,nosub~,~,
 ~{~{~{notverbatim}}}
+~(~(~(noembeddeddoc~)~)~)
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>**notbold**<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>{{{notverbatim}}}</p></html>
+<p>**notbold**<br/>##nomono##<br/>//noitalic//<br/>--notrike--<br/>__nounderscore__<br/>^^nosuper^^<br/>,,nosub,,<br/>{{{notverbatim}}}<br/>(((noembeddeddoc)))</p>

@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import org.xwiki.rendering.internal.renderer.state.BlockStateListener;
 import org.xwiki.rendering.internal.renderer.state.TextOnNewLineStateListener;
+import org.xwiki.rendering.internal.renderer.state.XWikiSyntaxState;
 
 /**
  * Escape characters that would be confused for XWiki wiki syntax if they were not escaped.
@@ -44,16 +45,19 @@ public class XWikiSyntaxEscapeHandler
 
     private static final String ESCAPE_CHAR = "~";
 
-    public void escape(StringBuffer accumulatedBuffer, BlockStateListener blockListener, 
-        TextOnNewLineStateListener textListener, boolean escapeLastChar, Pattern escapeFirstIfMatching)
+    public void escape(StringBuffer accumulatedBuffer, XWikiSyntaxState state, boolean escapeLastChar,
+        Pattern escapeFirstIfMatching)
     {
+        BlockStateListener blockStateListener = state.getBlockStateListener();
+        TextOnNewLineStateListener textOnNewLineStateListener = state.getTextOnNewLineStateListener();
+
         // Escape tilde symbol (i.e. the escape character).
         // Note: This needs to be the first replacement since other replacements below also use the tilde symbol
         replaceAll(accumulatedBuffer, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
 
         // When in a paragraph we need to escape symbols that are at beginning of lines and that could be confused
         // with list items or sections.
-        if (blockListener.isInParagraph() && textListener.isTextOnNewLine()) {
+        if (blockStateListener.isInParagraph() && textOnNewLineStateListener.isTextOnNewLine()) {
 
             // Look for list pattern at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(LIST_PATTERN, accumulatedBuffer);
@@ -61,8 +65,8 @@ public class XWikiSyntaxEscapeHandler
             // Look for section pattern at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(SECTION_PATTERN, accumulatedBuffer);
         }
-        
-        if (blockListener.isInTable()) {
+
+        if (blockStateListener.isInTable()) {
             replaceAll(accumulatedBuffer, "|", "~|");
             replaceAll(accumulatedBuffer, "!!", "~!!");
         }
@@ -73,12 +77,12 @@ public class XWikiSyntaxEscapeHandler
 
         // When in a section we need to escape "=" symbols since otherwise they would be confused for end of section
         // characters.
-        if (blockListener.isInSection()) {
+        if (blockStateListener.isInSection()) {
             replaceAll(accumulatedBuffer, "=", ESCAPE_CHAR + "=");
         }
 
         // Escape "[[" if not in a link.
-        if (!blockListener.isInLink()) {
+        if (!blockStateListener.isInLink()) {
             replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
         }
 
@@ -87,6 +91,10 @@ public class XWikiSyntaxEscapeHandler
 
         // Escape "{{"
         replaceAll(accumulatedBuffer, "{{", ESCAPE_CHAR + "{" + ESCAPE_CHAR + "{");
+
+        // Escape embedded document
+        replaceAll(accumulatedBuffer, "(((", ESCAPE_CHAR + "(" + ESCAPE_CHAR + "(" + ESCAPE_CHAR + "(");
+        replaceAll(accumulatedBuffer, ")))", ESCAPE_CHAR + ")" + ESCAPE_CHAR + ")" + ESCAPE_CHAR + ")");
 
         // Escape reserved keywords
         Matcher matcher = DOUBLE_CHARS_PATTERN.matcher(accumulatedBuffer.toString());
@@ -102,7 +110,7 @@ public class XWikiSyntaxEscapeHandler
         escapeURI(accumulatedBuffer, "image:");
         escapeURI(accumulatedBuffer, "attach:");
         escapeURI(accumulatedBuffer, "mailto:");
-        
+
         // Escape last character if we're told to do so. This is to handle cases such as:
         // - onWord("hello:") followed by onFormat(ITALIC) which would lead to "hello://" if the ":" wasn't escaped
         // - onWord("{") followed by onMacro() which would lead to "{{{" if the "{" wasn't escaped

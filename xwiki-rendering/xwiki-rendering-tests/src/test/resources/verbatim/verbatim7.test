@@ -23,6 +23,6 @@ endDocument
 (% param="value" %)
 (% param2="value2" %){{{abc}}}
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
 <p param="value"><span param2="value2"><tt class="wikimodel-verbatim">abc</tt></span></p>

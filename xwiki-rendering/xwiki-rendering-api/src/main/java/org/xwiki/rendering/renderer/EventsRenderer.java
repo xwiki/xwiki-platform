@@ -22,18 +22,18 @@ package org.xwiki.rendering.renderer;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+import org.xwiki.rendering.internal.renderer.state.BlockStateListener;
 import org.xwiki.rendering.listener.DocumentImage;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ImageType;
-import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.ListType;
+import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Print names of events. Useful for debugging and tracing in general. Note that this class is not located in the test
@@ -46,9 +46,18 @@ public class EventsRenderer extends AbstractPrintRenderer
 {
     public EventsRenderer(WikiPrinter printer)
     {
-        super(printer);
+        super(printer, new BlockStateListener());
     }
 
+    // State
+    
+    public BlockStateListener getState()
+    {
+        return (BlockStateListener) getStateListener();
+    }
+
+    // Events
+    
     /**
      * {@inheritDoc}
      * 
@@ -58,6 +67,8 @@ public class EventsRenderer extends AbstractPrintRenderer
     public void beginDocument()
     {
         getPrinter().println("beginDocument");
+
+        super.beginDocument();
     }
 
     /**
@@ -68,13 +79,20 @@ public class EventsRenderer extends AbstractPrintRenderer
     @Override
     public void endDocument()
     {
-        getPrinter().print("endDocument");
+        super.endDocument();
+
+        if (getState().isInDocument()) {
+            getPrinter().println("endDocument");
+        } else {
+            getPrinter().print("endDocument");
+        }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#beginFormat(Format, Map)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginFormat(org.xwiki.rendering.listener.Format,
+     *      java.util.Map)
      */
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
@@ -85,7 +103,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#endFormat(Format, Map)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endFormat(org.xwiki.rendering.listener.Format, java.util.Map)
      */
     @Override
     public void endFormat(Format format, Map<String, String> parameters)
@@ -336,7 +354,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine(Map)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onHorizontalLine(java.util.Map)
      */
     @Override
     public void onHorizontalLine(Map<String, String> parameters)
@@ -347,7 +365,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onEmptyLines(int)
      */
     @Override
     public void onEmptyLines(int count)
@@ -358,7 +376,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onVerbatimInline(java.lang.String)
      */
     @Override
     public void onVerbatimInline(String protectedString)
@@ -369,7 +387,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onVerbatimStandalone(java.lang.String, java.util.Map)
      */
     @Override
     public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
@@ -380,7 +398,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginDefinitionList()
      */
     @Override
     public void beginDefinitionList()
@@ -391,7 +409,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endDefinitionList()
      */
     @Override
     public void endDefinitionList()
@@ -402,7 +420,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginDefinitionTerm()
      */
     @Override
     public void beginDefinitionTerm()
@@ -413,7 +431,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginDefinitionDescription()
      */
     @Override
     public void beginDefinitionDescription()
@@ -424,7 +442,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endDefinitionTerm()
      */
     @Override
     public void endDefinitionTerm()
@@ -435,7 +453,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endDefinitionDescription()
      */
     @Override
     public void endDefinitionDescription()
@@ -446,7 +464,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginQuotation(java.util.Map)
      */
     @Override
     public void beginQuotation(Map<String, String> parameters)
@@ -457,7 +475,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endQuotation(java.util.Map)
      */
     @Override
     public void endQuotation(Map<String, String> parameters)
@@ -468,7 +486,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginQuotationLine()
      */
     @Override
     public void beginQuotationLine()
@@ -479,7 +497,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endQuotationLine()
      */
     @Override
     public void endQuotationLine()
@@ -578,8 +596,8 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
-     * @since 1.7M2
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onImage(org.xwiki.rendering.listener.Image, boolean,
+     *      java.util.Map)
      */
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -601,8 +619,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
-     * @since 1.7M3
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginError(java.lang.String, java.lang.String)
      */
     @Override
     public void beginError(String message, String description)
@@ -613,8 +630,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endError(String, String)
-     * @since 1.7M3
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endError(java.lang.String, java.lang.String)
      */
     @Override
     public void endError(String message, String description)

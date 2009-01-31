@@ -25,6 +25,7 @@ import java.util.Map;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
+import org.xwiki.rendering.internal.renderer.state.BlockStateListener;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
@@ -53,6 +54,8 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
  */
 public class XHTMLRenderer extends AbstractPrintRenderer
 {
+    private static final String[][] DOCUMENT_DIV_ATTRIBUTES = new String[][] {{"class", "document"}};
+
     /**
      * A temporary service offering methods manipulating XWiki Documents that are needed to output the correct XHTML.
      * For example this is used to verify if a document exists when computing the HREF attribute for a link. It's
@@ -60,8 +63,6 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * bridge allows us to be independent of the XWiki Core module, thus preventing a cyclic dependency.
      */
     private DocumentAccessBridge documentAccessBridge;
-
-    private RenderingConfiguration configuration;
 
     private XHTMLLinkRenderer linkRenderer;
 
@@ -88,15 +89,24 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public XHTMLRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
         RenderingConfiguration configuration, AttachmentParser attachmentParser)
     {
-        super(printer);
+        super(printer, new BlockStateListener());
 
         this.documentAccessBridge = documentAccessBridge;
         this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, configuration, attachmentParser);
         this.macroRenderer = new XHTMLMacroRenderer();
-        this.configuration = configuration;
         this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
         this.imageRenderer = new XWikiSyntaxImageRenderer();
+        this.idGenerator = new XHTMLIdGenerator();
     }
+
+    // State
+
+    public BlockStateListener getState()
+    {
+        return (BlockStateListener) getStateListener();
+    }
+
+    // Printer
 
     /**
      * {@inheritDoc}
@@ -133,16 +143,21 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         return this.xhtmlWikiPrinter;
     }
 
+    // Events
+
     /**
      * {@inheritDoc}
      * 
      * @see Renderer#beginDocument()
      */
+    @Override
     public void beginDocument()
     {
-        // Use a new generator for each document being processed since the id generator is stateful and
-        // remembers the generated ids.
-        this.idGenerator = new XHTMLIdGenerator();
+        if (getState().isInDocument()) {
+            getXHTMLWikiPrinter().printXMLStartElement("div", DOCUMENT_DIV_ATTRIBUTES);
+        }
+
+        super.beginDocument();
     }
 
     /**
@@ -150,9 +165,14 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see Renderer#endDocument()
      */
+    @Override
     public void endDocument()
     {
-        // Don't do anything
+        super.endDocument();
+
+        if (getState().isInDocument()) {
+            getXHTMLWikiPrinter().printXMLEndElement("div");
+        }
     }
 
     /**
@@ -160,6 +180,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see Renderer#beginFormat(Format, Map)
      */
+    @Override
     public void beginFormat(Format format, Map<String, String> parameters)
     {
         switch (format) {
@@ -195,6 +216,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see Renderer#endFormat(Format, Map)
      */
+    @Override
     public void endFormat(Format format, Map<String, String> parameters)
     {
         if (!parameters.isEmpty()) {
@@ -230,6 +252,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see Renderer#beginParagraph(java.util.Map)
      */
+    @Override
     public void beginParagraph(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLStartElement("p", parameters);
@@ -240,6 +263,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see Renderer#endParagraph(java.util.Map)
      */
+    @Override
     public void endParagraph(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("p");
@@ -250,6 +274,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see Renderer#onNewLine()
      */
+    @Override
     public void onNewLine()
     {
         getXHTMLWikiPrinter().printXMLElement("br");
@@ -260,6 +285,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see Renderer#beginLink(Link, boolean, Map)
      */
+    @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.linkRenderer.beginRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, parameters);
@@ -271,6 +297,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see Renderer#endLink(Link, boolean, Map)
      */
+    @Override
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         MonitoringWikiPrinter printer = (MonitoringWikiPrinter) getPrinter();
@@ -283,6 +310,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onInlineMacro(String, java.util.Map, String)
      */
+    @Override
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
     {
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
@@ -295,6 +323,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onStandaloneMacro(String, java.util.Map, String)
      */
+    @Override
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
@@ -307,6 +336,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#beginSection(SectionLevel, Map)
      */
+    @Override
     public void beginSection(SectionLevel level, Map<String, String> parameters)
     {
         // Don't output anything yet since we need the section title to generate the unique XHTML id attribute.
@@ -336,6 +366,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#endSection(SectionLevel, Map)
      */
+    @Override
     public void endSection(SectionLevel level, Map<String, String> parameters)
     {
         String sectionTitle = this.sectionTitlePrinter.toString();
@@ -353,6 +384,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onWord(String)
      */
+    @Override
     public void onWord(String word)
     {
         getXHTMLWikiPrinter().printXML(word);
@@ -363,6 +395,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onSpace()
      */
+    @Override
     public void onSpace()
     {
         // The XHTML printer will decide whether to print a normal space or a &nbsp;
@@ -374,6 +407,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onSpecialSymbol(String)
      */
+    @Override
     public void onSpecialSymbol(char symbol)
     {
         getXHTMLWikiPrinter().printXML("" + symbol);
@@ -384,6 +418,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#beginList(org.xwiki.rendering.listener.ListType, java.util.Map)
      */
+    @Override
     public void beginList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
@@ -398,6 +433,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#beginListItem()
      */
+    @Override
     public void beginListItem()
     {
         getXHTMLWikiPrinter().printXMLStartElement("li");
@@ -408,6 +444,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map)
      */
+    @Override
     public void endList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
@@ -422,6 +459,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#endListItem()
      */
+    @Override
     public void endListItem()
     {
         getXHTMLWikiPrinter().printXMLEndElement("li");
@@ -432,6 +470,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#beginXMLNode(XMLNode)
      */
+    @Override
     public void beginXMLNode(XMLNode node)
     {
         switch (node.getNodeType()) {
@@ -454,6 +493,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#endXMLNode(XMLNode)
      */
+    @Override
     public void endXMLNode(XMLNode node)
     {
         switch (node.getNodeType()) {
@@ -472,6 +512,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#beginMacroMarker(String, java.util.Map, String)
      */
+    @Override
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
@@ -484,6 +525,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#endMacroMarker(String, java.util.Map, String)
      */
+    @Override
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
@@ -496,6 +538,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onId(String)
      */
+    @Override
     public void onId(String name)
     {
         // Note: We're using <a><a/> and not <a/> since some browsers do not support the <a/> syntax (FF3)
@@ -509,6 +552,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine(Map)
      */
+    @Override
     public void onHorizontalLine(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLElement("hr", parameters);
@@ -519,6 +563,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onVerbatimInline(String)
      */
+    @Override
     public void onVerbatimInline(String protectedString)
     {
         // Note: We generate a tt element rather than a pre element since pre elements cannot be located inside
@@ -536,6 +581,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onVerbatimStandalone(String, Map)
      */
+    @Override
     public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLStartElement("pre", parameters);
@@ -548,6 +594,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.renderer.Renderer#onEmptyLines(int)
      */
+    @Override
     public void onEmptyLines(int count)
     {
         // We need to use a special tag for empty lines since in XHTML the BR tag cannot be used outside of content
@@ -565,6 +612,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
      */
+    @Override
     public void beginDefinitionList()
     {
         getXHTMLWikiPrinter().printXMLStartElement("dl");
@@ -575,6 +623,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
      */
+    @Override
     public void endDefinitionList()
     {
         getXHTMLWikiPrinter().printXMLEndElement("dl");
@@ -585,6 +634,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
      */
+    @Override
     public void beginDefinitionTerm()
     {
         getXHTMLWikiPrinter().printXMLStartElement("dt");
@@ -595,6 +645,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
      */
+    @Override
     public void beginDefinitionDescription()
     {
         getXHTMLWikiPrinter().printXMLStartElement("dd");
@@ -605,6 +656,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
      */
+    @Override
     public void endDefinitionTerm()
     {
         getXHTMLWikiPrinter().printXMLEndElement("dt");
@@ -615,6 +667,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
      */
+    @Override
     public void endDefinitionDescription()
     {
         getXHTMLWikiPrinter().printXMLEndElement("dd");
@@ -625,6 +678,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
      */
+    @Override
     public void beginQuotation(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLStartElement("blockquote", parameters);
@@ -635,6 +689,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
      */
+    @Override
     public void endQuotation(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("blockquote");
@@ -645,6 +700,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
      */
+    @Override
     public void beginQuotationLine()
     {
         // Nothing to do
@@ -655,6 +711,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#endQuotationLine()
      */
+    @Override
     public void endQuotationLine()
     {
         // Nothing to do
@@ -665,6 +722,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#beginTable(java.util.Map)
      */
+    @Override
     public void beginTable(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLStartElement("table", parameters);
@@ -675,6 +733,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#beginTableRow(java.util.Map)
      */
+    @Override
     public void beginTableRow(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLStartElement("tr", parameters);
@@ -685,6 +744,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#beginTableCell(java.util.Map)
      */
+    @Override
     public void beginTableCell(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLStartElement("td", parameters);
@@ -695,6 +755,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#beginTableHeadCell(java.util.Map)
      */
+    @Override
     public void beginTableHeadCell(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLStartElement("th", parameters);
@@ -705,6 +766,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#endTable(java.util.Map)
      */
+    @Override
     public void endTable(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("table");
@@ -715,6 +777,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#endTableRow(java.util.Map)
      */
+    @Override
     public void endTableRow(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("tr");
@@ -725,6 +788,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#endTableCell(java.util.Map)
      */
+    @Override
     public void endTableCell(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("td");
@@ -735,6 +799,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * 
      * @see org.xwiki.rendering.listener.Listener#endTableHeadCell(java.util.Map)
      */
+    @Override
     public void endTableHeadCell(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("th");
@@ -744,8 +809,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
-     * @since 1.7M2
      */
+    @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // First we need to compute the image URL.
@@ -793,8 +858,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
-     * @since 1.7M3
      */
+    @Override
     public void beginError(String message, String description)
     {
         getXHTMLWikiPrinter().printXMLStartElement("span", new String[][] {{"class", "xwikirenderingerror"}});
@@ -806,8 +871,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#endError(String, String)
-     * @since 1.7M3
      */
+    @Override
     public void endError(String message, String description)
     {
         getXHTMLWikiPrinter().printXMLEndElement("span");

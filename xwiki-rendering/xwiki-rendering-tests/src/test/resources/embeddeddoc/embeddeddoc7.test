@@ -1,0 +1,45 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+before ((( one ((( two ((( three
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [before]
+endParagraph
+beginDocument
+beginParagraph
+onWord [one]
+endParagraph
+beginDocument
+beginParagraph
+onWord [two]
+endParagraph
+beginDocument
+beginParagraph
+onWord [three]
+endParagraph
+endDocument
+endDocument
+endDocument
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p>before</p><div class="document"><p>one</p><div class="document"><p>two</p><div class="document"><p>three</p></div></div></div>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+before
+
+(((one
+
+(((two
+
+(((three)))))))))
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<p>before</p><div class="document"><p>one</p><div class="document"><p>two</p><div class="document"><p>three</p></div></div></div>

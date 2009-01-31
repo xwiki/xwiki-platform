@@ -19,9 +19,10 @@
  */
 package org.xwiki.rendering.renderer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
@@ -31,24 +32,18 @@ import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
- * Common renderer implementation that all Renderers who need State information should extend. Renderers extending this
- * class <b>must</b> make sure to call this class methods in all events so that the registered listeners are called.
+ * A chained implementation of Listener. Contains a list of provided Listener called one by one for each event.
  * 
  * @version $Id$
- * @since 1.7
+ * @since 1.8M1
  */
-public abstract class AbstractRenderer extends AbstractLogEnabled implements Renderer
+public class ChainedListener implements Listener
 {
-    private Listener stateListener;
+    private List<Listener> stateListeners = new ArrayList<Listener>();
 
-    public AbstractRenderer(Listener stateListener)
+    public void addStateListener(Listener stateListener)
     {
-        this.stateListener = stateListener;
-    }
-
-    public Listener getStateListener()
-    {
-        return this.stateListener;
+        this.stateListeners.add(stateListener);
     }
 
     /**
@@ -58,7 +53,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginDefinitionDescription()
     {
-        this.stateListener.beginDefinitionDescription();
+        for (Listener listener : this.stateListeners) {
+            listener.beginDefinitionDescription();
+        }
     }
 
     /**
@@ -68,7 +65,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginDefinitionList()
     {
-        this.stateListener.beginDefinitionList();
+        for (Listener listener : this.stateListeners) {
+            listener.beginDefinitionList();
+        }
     }
 
     /**
@@ -78,7 +77,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginDefinitionTerm()
     {
-        this.stateListener.beginDefinitionTerm();
+        for (Listener listener : this.stateListeners) {
+            listener.beginDefinitionTerm();
+        }
     }
 
     /**
@@ -88,7 +89,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginDocument()
     {
-        this.stateListener.beginDocument();
+        for (Listener listener : this.stateListeners) {
+            listener.beginDocument();
+        }
     }
 
     /**
@@ -98,7 +101,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginError(String message, String description)
     {
-        this.stateListener.beginError(message, description);
+        for (Listener listener : this.stateListeners) {
+            listener.beginError(message, description);
+        }
     }
 
     /**
@@ -108,7 +113,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginFormat(Format format, Map<String, String> parameters)
     {
-        this.stateListener.beginFormat(format, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginFormat(format, parameters);
+        }
     }
 
     /**
@@ -118,7 +125,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.stateListener.beginLink(link, isFreeStandingURI, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginLink(link, isFreeStandingURI, parameters);
+        }
     }
 
     /**
@@ -128,7 +137,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginList(ListType listType, Map<String, String> parameters)
     {
-        this.stateListener.beginList(listType, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginList(listType, parameters);
+        }
     }
 
     /**
@@ -138,7 +149,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginListItem()
     {
-        this.stateListener.beginListItem();
+        for (Listener listener : this.stateListeners) {
+            listener.beginListItem();
+        }
     }
 
     /**
@@ -148,7 +161,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        this.stateListener.beginMacroMarker(name, parameters, content);
+        for (Listener listener : this.stateListeners) {
+            listener.beginMacroMarker(name, parameters, content);
+        }
     }
 
     /**
@@ -158,7 +173,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginParagraph(Map<String, String> parameters)
     {
-        this.stateListener.beginParagraph(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginParagraph(parameters);
+        }
     }
 
     /**
@@ -168,7 +185,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginQuotation(Map<String, String> parameters)
     {
-        this.stateListener.beginQuotation(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginQuotation(parameters);
+        }
     }
 
     /**
@@ -178,7 +197,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginQuotationLine()
     {
-        this.stateListener.beginQuotationLine();
+        for (Listener listener : this.stateListeners) {
+            listener.beginQuotationLine();
+        }
     }
 
     /**
@@ -188,7 +209,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginSection(SectionLevel level, Map<String, String> parameters)
     {
-        this.stateListener.beginSection(level, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginSection(level, parameters);
+        }
     }
 
     /**
@@ -198,7 +221,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginTable(Map<String, String> parameters)
     {
-        this.stateListener.beginTable(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginTable(parameters);
+        }
     }
 
     /**
@@ -208,7 +233,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginTableCell(Map<String, String> parameters)
     {
-        this.stateListener.beginTableCell(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginTableCell(parameters);
+        }
     }
 
     /**
@@ -218,7 +245,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginTableHeadCell(Map<String, String> parameters)
     {
-        this.stateListener.beginTableHeadCell(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginTableHeadCell(parameters);
+        }
     }
 
     /**
@@ -228,7 +257,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginTableRow(Map<String, String> parameters)
     {
-        this.stateListener.beginTableRow(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.beginTableRow(parameters);
+        }
     }
 
     /**
@@ -238,7 +269,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void beginXMLNode(XMLNode node)
     {
-        this.stateListener.beginXMLNode(node);
+        for (Listener listener : this.stateListeners) {
+            listener.beginXMLNode(node);
+        }
     }
 
     /**
@@ -248,7 +281,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endDefinitionDescription()
     {
-        this.stateListener.endDefinitionDescription();
+        for (Listener listener : this.stateListeners) {
+            listener.endDefinitionDescription();
+        }
     }
 
     /**
@@ -258,7 +293,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endDefinitionList()
     {
-        this.stateListener.endDefinitionList();
+        for (Listener listener : this.stateListeners) {
+            listener.endDefinitionList();
+        }
     }
 
     /**
@@ -268,7 +305,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endDefinitionTerm()
     {
-        this.stateListener.endDefinitionTerm();
+        for (Listener listener : this.stateListeners) {
+            listener.endDefinitionTerm();
+        }
     }
 
     /**
@@ -278,7 +317,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endDocument()
     {
-        this.stateListener.endDocument();
+        for (Listener listener : this.stateListeners) {
+            listener.endDocument();
+        }
     }
 
     /**
@@ -288,7 +329,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endError(String message, String description)
     {
-        this.stateListener.endError(message, description);
+        for (Listener listener : this.stateListeners) {
+            listener.endError(message, description);
+        }
     }
 
     /**
@@ -298,7 +341,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endFormat(Format format, Map<String, String> parameters)
     {
-        this.stateListener.endFormat(format, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endFormat(format, parameters);
+        }
     }
 
     /**
@@ -308,7 +353,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.stateListener.endLink(link, isFreeStandingURI, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endLink(link, isFreeStandingURI, parameters);
+        }
     }
 
     /**
@@ -318,7 +365,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endList(ListType listType, Map<String, String> parameters)
     {
-        this.stateListener.endList(listType, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endList(listType, parameters);
+        }
     }
 
     /**
@@ -328,7 +377,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endListItem()
     {
-        this.stateListener.endListItem();
+        for (Listener listener : this.stateListeners) {
+            listener.endListItem();
+        }
     }
 
     /**
@@ -338,7 +389,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        this.stateListener.endMacroMarker(name, parameters, content);
+        for (Listener listener : this.stateListeners) {
+            listener.endMacroMarker(name, parameters, content);
+        }
     }
 
     /**
@@ -348,7 +401,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endParagraph(Map<String, String> parameters)
     {
-        this.stateListener.endParagraph(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endParagraph(parameters);
+        }
     }
 
     /**
@@ -358,7 +413,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endQuotation(Map<String, String> parameters)
     {
-        this.stateListener.endQuotation(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endQuotation(parameters);
+        }
     }
 
     /**
@@ -368,7 +425,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endQuotationLine()
     {
-        this.stateListener.endQuotationLine();
+        for (Listener listener : this.stateListeners) {
+            listener.endQuotationLine();
+        }
     }
 
     /**
@@ -378,7 +437,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endSection(SectionLevel level, Map<String, String> parameters)
     {
-        this.stateListener.endSection(level, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endSection(level, parameters);
+        }
     }
 
     /**
@@ -388,7 +449,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endTable(Map<String, String> parameters)
     {
-        this.stateListener.endTable(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endTable(parameters);
+        }
     }
 
     /**
@@ -398,7 +461,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endTableCell(Map<String, String> parameters)
     {
-        this.stateListener.endTableCell(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endTableCell(parameters);
+        }
     }
 
     /**
@@ -408,7 +473,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endTableHeadCell(Map<String, String> parameters)
     {
-        this.stateListener.endTableHeadCell(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endTableHeadCell(parameters);
+        }
     }
 
     /**
@@ -418,7 +485,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endTableRow(Map<String, String> parameters)
     {
-        this.stateListener.endTableRow(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.endTableRow(parameters);
+        }
     }
 
     /**
@@ -428,7 +497,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void endXMLNode(XMLNode node)
     {
-        this.stateListener.endXMLNode(node);
+        for (Listener listener : this.stateListeners) {
+            listener.endXMLNode(node);
+        }
     }
 
     /**
@@ -438,7 +509,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onEmptyLines(int count)
     {
-        this.stateListener.onEmptyLines(count);
+        for (Listener listener : this.stateListeners) {
+            listener.onEmptyLines(count);
+        }
     }
 
     /**
@@ -448,7 +521,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onHorizontalLine(Map<String, String> parameters)
     {
-        this.stateListener.onHorizontalLine(parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.onHorizontalLine(parameters);
+        }
     }
 
     /**
@@ -458,7 +533,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onId(String name)
     {
-        this.stateListener.onId(name);
+        for (Listener listener : this.stateListeners) {
+            listener.onId(name);
+        }
     }
 
     /**
@@ -468,7 +545,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.stateListener.onImage(image, isFreeStandingURI, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.onImage(image, isFreeStandingURI, parameters);
+        }
     }
 
     /**
@@ -478,7 +557,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
     {
-        this.stateListener.onInlineMacro(name, parameters, content);
+        for (Listener listener : this.stateListeners) {
+            listener.onInlineMacro(name, parameters, content);
+        }
     }
 
     /**
@@ -488,7 +569,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onNewLine()
     {
-        this.stateListener.onNewLine();
+        for (Listener listener : this.stateListeners) {
+            listener.onNewLine();
+        }
     }
 
     /**
@@ -498,7 +581,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onSpace()
     {
-        this.stateListener.onSpace();
+        for (Listener listener : this.stateListeners) {
+            listener.onSpace();
+        }
     }
 
     /**
@@ -508,7 +593,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onSpecialSymbol(char symbol)
     {
-        this.stateListener.onSpecialSymbol(symbol);
+        for (Listener listener : this.stateListeners) {
+            listener.onSpecialSymbol(symbol);
+        }
     }
 
     /**
@@ -518,7 +605,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
-        this.stateListener.onStandaloneMacro(name, parameters, content);
+        for (Listener listener : this.stateListeners) {
+            listener.onStandaloneMacro(name, parameters, content);
+        }
     }
 
     /**
@@ -528,7 +617,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onVerbatimInline(String protectedString)
     {
-        this.stateListener.onVerbatimInline(protectedString);
+        for (Listener listener : this.stateListeners) {
+            listener.onVerbatimInline(protectedString);
+        }
     }
 
     /**
@@ -538,7 +629,9 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
-        this.stateListener.onVerbatimStandalone(protectedString, parameters);
+        for (Listener listener : this.stateListeners) {
+            listener.onVerbatimStandalone(protectedString, parameters);
+        }
     }
 
     /**
@@ -548,6 +641,8 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
      */
     public void onWord(String word)
     {
-        this.stateListener.onWord(word);
+        for (Listener listener : this.stateListeners) {
+            listener.onWord(word);
+        }
     }
 }

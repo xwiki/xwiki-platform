@@ -21,7 +21,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>before</p><div class="document"><p>inside</p></div><p>after</p>
+<p>before</p><div class="xwiki-document"><p>inside</p></div><p>after</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -33,4 +33,4 @@ after
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p>before</p><div class="document"><p>inside</p></div><p>after</p>
+<p>before</p><div class="xwiki-document"><p>inside</p></div><p>after</p>

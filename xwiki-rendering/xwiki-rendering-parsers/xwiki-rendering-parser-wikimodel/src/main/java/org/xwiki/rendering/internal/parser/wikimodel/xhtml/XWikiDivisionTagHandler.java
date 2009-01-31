@@ -18,6 +18,6 @@ public class XWikiDivisionTagHandler extends DivisionTagHandler
     @Override
     protected String getDocumentClass()
     {
-        return "document";
+        return "xwiki-document";
     }
 }

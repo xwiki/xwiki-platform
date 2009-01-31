@@ -28,7 +28,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>before</p><div class="document"><p>one</p><div class="document"><p>two</p><div class="document"><p>three</p></div></div></div>
+<p>before</p><div class="xwiki-document"><p>one</p><div class="xwiki-document"><p>two</p><div class="xwiki-document"><p>three</p></div></div></div>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -42,4 +42,4 @@ before
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p>before</p><div class="document"><p>one</p><div class="document"><p>two</p><div class="document"><p>three</p></div></div></div>
+<p>before</p><div class="xwiki-document"><p>one</p><div class="xwiki-document"><p>two</p><div class="xwiki-document"><p>three</p></div></div></div>

@@ -54,7 +54,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
  */
 public class XHTMLRenderer extends AbstractPrintRenderer
 {
-    private static final String[][] DOCUMENT_DIV_ATTRIBUTES = new String[][] {{"class", "document"}};
+    private static final String[][] DOCUMENT_DIV_ATTRIBUTES = new String[][] {{"class", "xwiki-document"}};
 
     /**
      * A temporary service offering methods manipulating XWiki Documents that are needed to output the correct XHTML.

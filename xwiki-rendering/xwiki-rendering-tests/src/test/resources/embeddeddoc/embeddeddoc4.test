@@ -58,7 +58,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><td>&nbsp;Line One&nbsp;</td><td>&nbsp;First doc:<div class="document"><p>&nbsp;inside</p></div>after</td></tr><tr><td>Line Two&nbsp;</td><td>&nbsp;Second doc:<div class="document"><p>lkjlj</p></div>skdjg</td></tr></table>
+<table><tr><td>&nbsp;Line One&nbsp;</td><td>&nbsp;First doc:<div class="xwiki-document"><p>&nbsp;inside</p></div>after</td></tr><tr><td>Line Two&nbsp;</td><td>&nbsp;Second doc:<div class="xwiki-document"><p>lkjlj</p></div>skdjg</td></tr></table>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -67,4 +67,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><td>&nbsp;Line One&nbsp;</td><td>&nbsp;First doc:<div class="document"><p>&nbsp;inside</p></div>after</td></tr><tr><td>Line Two&nbsp;</td><td>&nbsp;Second doc:<div class="document"><p>lkjlj</p></div>skdjg</td></tr></table>
+<table><tr><td>&nbsp;Line One&nbsp;</td><td>&nbsp;First doc:<div class="xwiki-document"><p>&nbsp;inside</p></div>after</td></tr><tr><td>Line Two&nbsp;</td><td>&nbsp;Second doc:<div class="xwiki-document"><p>lkjlj</p></div>skdjg</td></tr></table>

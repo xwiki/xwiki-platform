@@ -37,12 +37,14 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Toc Macro");
 
-        suite.addTestsFromResource("macrotoc1", true);
+        /*suite.addTestsFromResource("macrotoc1", true);
         suite.addTestsFromResource("macrotoc2", true);
         suite.addTestsFromResource("macrotoc3", true);
         suite.addTestsFromResource("macrotoc4", true);
-        suite.addTestsFromResource("macrotoc5", true);
+        suite.addTestsFromResource("macrotoc5", true);*/
 
+        suite.addTestsFromResource("macrotoc4", true);
+        
         return new RenderingPlexusTestSetup(suite);
     }
 }

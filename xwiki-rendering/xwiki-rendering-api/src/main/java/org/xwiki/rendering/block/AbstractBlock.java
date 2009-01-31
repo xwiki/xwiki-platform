@@ -20,18 +20,18 @@
 package org.xwiki.rendering.block;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * Implementation for Block operations. All blocks should extend this class. Supports the notion of parameters
- * which can be added to a block (see {@link #setParameter(String, Object)} for more details).
+ * Implementation for Block operations. All blocks should extend this class. Supports the notion of parameters which can
+ * be added to a block (see {@link #setParameter(String, Object)} for more details).
  * 
  * @version $Id$
  * @since 1.5M2
@@ -70,7 +70,7 @@ public abstract class AbstractBlock implements Block
     {
         this.parameters.putAll(parameters);
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -194,14 +194,14 @@ public abstract class AbstractBlock implements Block
     }
 
     /**
-     * Set a parameter on the current block. A parameter is any semantic data associated with a block.
-     * It can be used for various purposes and provide additional information to the renderers/listeners.
-     * For example you can pass style information such as <code>style="color:red"</code> (in that example
-     * the name would be <code>style</code> and the value <code>"color:red"</code>) to indicate that the
-     * current block should be displayed in red.
-     * 
-     * <p>Note that there are currently no well-defined known parameter names and you'll need to check what
-     * the different renderers/listeners support to know what to use.</p>
+     * Set a parameter on the current block. A parameter is any semantic data associated with a block. It can be used
+     * for various purposes and provide additional information to the renderers/listeners. For example you can pass
+     * style information such as <code>style="color:red"</code> (in that example the name would be <code>style</code>
+     * and the value <code>"color:red"</code>) to indicate that the current block should be displayed in red.
+     * <p>
+     * Note that there are currently no well-defined known parameter names and you'll need to check what the different
+     * renderers/listeners support to know what to use.
+     * </p>
      * 
      * @param name the parameter's name
      * @param value the parameter's value
@@ -285,7 +285,7 @@ public abstract class AbstractBlock implements Block
 
         for (int i = index - 1; i >= 0; --i) {
             Block previousBlock = blocks.get(i);
-            if (previousBlock instanceof HeaderBlock) {
+            if (blockClass.isAssignableFrom(previousBlock.getClass())) {
                 return (T) previousBlock;
             }
         }
@@ -317,6 +317,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
+     * 
      * @see Object#clone()
      */
     @Override
@@ -330,7 +331,7 @@ public abstract class AbstractBlock implements Block
             throw new RuntimeException("Failed to clone object", e);
         }
         block.parameters = new LinkedHashMap<String, String>(getParameters());
-        // Clone all children blocks. Note that we cannot use an iterator since we're going to change the objects 
+        // Clone all children blocks. Note that we cannot use an iterator since we're going to change the objects
         // themselves. Using an iterator would lead to a ConcurrentModificationException
         Object[] objectArray = getChildren().toArray();
         block.childrenBlocks = new ArrayList<Block>();

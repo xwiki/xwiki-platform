@@ -84,7 +84,7 @@ public interface Block extends Cloneable
      * @param newBlocks the new blocks to replace the current block with
      */
     void replace(List<Block> newBlocks);
-    
+
     /**
      * Get the parent block. All blocks have a parent and the top level parent is the {@link XDOM} object.
      * 
@@ -126,7 +126,7 @@ public interface Block extends Cloneable
     <T extends Block> List<T> getChildrenByType(Class<T> blockClass, boolean recurse);
 
     /**
-     * Look forward to find a block which inherit or s provided type.
+     * Look forward to find a block which inherit or is provided type.
      * 
      * @param <T> the class of the Blocks to return
      * @param blockClass the block class to look for
@@ -135,9 +135,10 @@ public interface Block extends Cloneable
      * @since 1.6M1
      */
     <T extends Block> T getPreviousBlockByType(Class<T> blockClass, boolean recurse);
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see Object#clone()
      */
     Block clone();

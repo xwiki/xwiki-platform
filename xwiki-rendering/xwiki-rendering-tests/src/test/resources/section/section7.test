@@ -8,7 +8,8 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection [1]
+beginSection
+beginHeader [1]
 onWord [header]
 onNewLine
 onNewLine
@@ -17,7 +18,8 @@ onSpace
 onWord [in]
 onSpace
 onWord [header]
-endSection [1]
+endHeader [1]
+endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

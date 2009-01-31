@@ -43,7 +43,7 @@ public class BlockStateListener implements Listener
 
     private boolean isInParagraph;
 
-    private boolean isInSection;
+    private boolean isInHeader;
 
     private int linkDepth = 0;
 
@@ -86,9 +86,9 @@ public class BlockStateListener implements Listener
         return this.isInParagraph;
     }
 
-    public boolean isInSection()
+    public boolean isInHeader()
     {
-        return this.isInSection;
+        return this.isInHeader;
     }
 
     public boolean isInTable()
@@ -216,9 +216,14 @@ public class BlockStateListener implements Listener
         ++this.inlineDepth;
     }
 
+    public void beginSection(Map<String, String> parameters)
+    {
+        // Nothing to do
+    }
+
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        this.isInSection = true;
+        this.isInHeader = true;
         ++this.inlineDepth;
     }
 
@@ -317,9 +322,14 @@ public class BlockStateListener implements Listener
         --this.inlineDepth;
     }
 
+    public void endSection(Map<String, String> parameters)
+    {
+        // Nothing to do
+    }
+
     public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        this.isInSection = false;
+        this.isInHeader = false;
         --this.inlineDepth;
     }
 

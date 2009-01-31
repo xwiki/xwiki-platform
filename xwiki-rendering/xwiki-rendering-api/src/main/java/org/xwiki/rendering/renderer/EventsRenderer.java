@@ -50,14 +50,14 @@ public class EventsRenderer extends AbstractPrintRenderer
     }
 
     // State
-    
+
     public BlockStateListener getState()
     {
         return (BlockStateListener) getStateListener();
     }
 
     // Events
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -195,13 +195,35 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginSection(java.util.Map)
+     */
+    @Override
+    public void beginSection(Map<String, String> parameters)
+    {
+        getPrinter().println("beginSection" + serializeParameters(parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.AbstractRenderer#beginHeader(org.xwiki.rendering.listener.HeaderLevel,
      *      java.util.Map)
      */
     @Override
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        getPrinter().println("beginSection [" + level + "]" + serializeParameters(parameters));
+        getPrinter().println("beginHeader [" + level + "]" + serializeParameters(parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endSection(java.util.Map)
+     */
+    @Override
+    public void endSection(Map<String, String> parameters)
+    {
+        getPrinter().println("endSection" + serializeParameters(parameters));
     }
 
     /**
@@ -213,7 +235,7 @@ public class EventsRenderer extends AbstractPrintRenderer
     @Override
     public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        getPrinter().println("endSection [" + level + "]" + serializeParameters(parameters));
+        getPrinter().println("endHeader [" + level + "]" + serializeParameters(parameters));
     }
 
     /**

@@ -51,7 +51,7 @@ public class MacroStandaloneBlock extends AbstractMacroBlock
         // Don't do anything here since we want the Macro Transformer component to take in charge
         // Macro execution. This is because Macro execution is a complex process that involves:
         // * computing the order in which the macros should be evaluated. For example the TOC macro
-        //   should evaluate last since other macros can contribute section blocks.
+        //   should evaluate last since other macros can contribute headers/sections blocks.
         // * some macros need to modify blocks in the XDOM object
         // * macro execution is a multi-pass process
         // In essence the Macro Transformer will replace all MacroBlock blocks with other Blocks

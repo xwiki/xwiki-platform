@@ -184,6 +184,16 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.Listener#beginSection(java.util.Map)
+     */
+    public void beginSection(Map<String, String> parameters)
+    {
+        this.stateListener.beginSection(parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginHeader(org.xwiki.rendering.listener.HeaderLevel, java.util.Map)
      */
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
@@ -369,6 +379,16 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
     public void endQuotationLine()
     {
         this.stateListener.endQuotationLine();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endSection(java.util.Map)
+     */
+    public void endSection(Map<String, String> parameters)
+    {
+        this.stateListener.endSection(parameters);
     }
 
     /**

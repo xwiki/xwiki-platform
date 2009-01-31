@@ -223,7 +223,23 @@ public interface Listener
     /**
      * Start of a section.
      * 
-     * @param level the section level (1, 2, 3, etc).
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
+     * @see org.xwiki.rendering.listener.HeaderLevel
+     */
+    void beginSection(Map<String, String> parameters);
+
+    /**
+     * End of a section.
+     * 
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
+     * @see org.xwiki.rendering.listener.HeaderLevel
+     */
+    void endSection(Map<String, String> parameters);
+    
+    /**
+     * Start of a header.
+     * 
+     * @param level the header level (1, 2, 3, etc).
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see org.xwiki.rendering.listener.HeaderLevel
      */
@@ -232,7 +248,7 @@ public interface Listener
     /**
      * End of a header.
      * 
-     * @param level the section level (1, 2, 3, etc).
+     * @param level the header level (1, 2, 3, etc).
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see org.xwiki.rendering.listener.HeaderLevel
      */

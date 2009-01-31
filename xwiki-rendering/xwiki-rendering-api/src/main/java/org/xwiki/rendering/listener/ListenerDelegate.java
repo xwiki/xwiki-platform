@@ -58,6 +58,11 @@ public class ListenerDelegate implements Listener
         this.listener.beginParagraph(parameters);
     }
 
+    public void beginSection(Map<String, String> parameters)
+    {
+        this.listener.beginSection(parameters);
+    }
+
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
         this.listener.beginHeader(level, parameters);
@@ -101,6 +106,11 @@ public class ListenerDelegate implements Listener
     public void endParagraph(Map<String, String> parameters)
     {
         this.listener.endParagraph(parameters);
+    }
+
+    public void endSection(Map<String, String> parameters)
+    {
+        this.listener.endSection(parameters);
     }
 
     public void endHeader(HeaderLevel level, Map<String, String> parameters)
@@ -271,7 +281,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Listener#beginQuotation(java.util.Map)
      * @since 1.6M2
      */
@@ -282,7 +292,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Listener#endQuotation(java.util.Map)
      * @since 1.6M2
      */
@@ -293,7 +303,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
      * @since 1.6M2
      */
@@ -304,8 +314,8 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()    
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()
      * @since 1.6M2
      */
     public void endQuotationLine()
@@ -355,7 +365,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#onImage(Image, boolean, Map)
      * @since 1.7M2
      */
@@ -363,10 +373,10 @@ public class ListenerDelegate implements Listener
     {
         this.listener.onImage(image, isFreeStandingURI, parameters);
     }
-    
+
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
      * @since 1.7M3
      */
@@ -377,7 +387,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#endError(String, String)
      * @since 1.7M3
      */

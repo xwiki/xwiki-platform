@@ -10,9 +10,11 @@ beginDocument
 beginParagraph
 onWord [Paragraph]
 endParagraph
-beginSection [1]
+beginSection
+beginHeader [1]
 onWord [Header]
-endSection [1]
+endHeader [1]
+endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

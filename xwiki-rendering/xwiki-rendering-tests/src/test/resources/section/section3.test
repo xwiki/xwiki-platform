@@ -15,77 +15,107 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection [6]
+beginSection
+beginSection
+beginSection
+beginSection
+beginSection
+beginSection
+beginHeader [6]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [6]
-endSection [6]
-beginSection [1]
+endHeader [6]
+endSection
+endSection
+endSection
+endSection
+endSection
+endSection
+beginSection
+beginHeader [1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endSection [1]
-beginSection [1]
+endHeader [1]
+endSection
+beginSection
+beginHeader [1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endSection [1]
-beginSection [1]
+endHeader [1]
+endSection
+beginSection
+beginHeader [1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endSection [1]
-beginSection [1]
+endHeader [1]
+endSection
+beginSection
+beginHeader [1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endSection [1]
-beginSection [1]
+endHeader [1]
+endSection
+beginSection
+beginHeader [1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endSection [1]
-beginSection [1]
+endHeader [1]
+endSection
+beginSection
+beginHeader [1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endSection [1]
-beginSection [1]
+endHeader [1]
+endSection
+beginSection
+beginHeader [1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endSection [1]
+endHeader [1]
 beginParagraph
 onWord [some]
 onSpace
 onWord [text]
 endParagraph
-beginSection [1]
+endSection
+beginSection
+beginHeader [1]
 onWord [unclosed]
 onSpace
 onWord [header]
-endSection [1]
-beginSection [1]
+endHeader [1]
+endSection
+beginSection
+beginHeader [1]
 onWord [key]
 onSpecialSymbol [=]
 onWord [value]
-endSection [1]
+endHeader [1]
+endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

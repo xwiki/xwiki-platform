@@ -7,11 +7,13 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection [1]
+beginSection
+beginHeader [1]
 onWord [hello]
 onSpace
 beginMacroMarker [velocity] [] [world]
 onWord [world]
 endMacroMarker [velocity] [] [world]
-endSection [1]
+endHeader [1]
+endSection
 endDocument

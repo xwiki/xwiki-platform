@@ -39,7 +39,7 @@ public class XWikiSyntaxEscapeHandler
     private static final Pattern LIST_PATTERN =
         Pattern.compile("\\p{Blank}*((\\*+[:;]*)|([1*]+\\.[:;]*)|([:;]+))\\p{Blank}+");
 
-    private static final Pattern SECTION_PATTERN = Pattern.compile("\\p{Blank}*(=+)");
+    private static final Pattern HEADER_PATTERN = Pattern.compile("\\p{Blank}*(=+)");
 
     private static final Pattern DOUBLE_CHARS_PATTERN = Pattern.compile("\\/\\/|\\*\\*|__|--|\\^\\^|,,|##|\\\\\\\\");
 
@@ -56,14 +56,14 @@ public class XWikiSyntaxEscapeHandler
         replaceAll(accumulatedBuffer, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
 
         // When in a paragraph we need to escape symbols that are at beginning of lines and that could be confused
-        // with list items or sections.
+        // with list items or headers.
         if (blockStateListener.isInParagraph() && textOnNewLineStateListener.isTextOnNewLine()) {
 
             // Look for list pattern at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(LIST_PATTERN, accumulatedBuffer);
 
-            // Look for section pattern at beginning of line and escape the first character only (it's enough)
-            escapeFirstMatchedCharacter(SECTION_PATTERN, accumulatedBuffer);
+            // Look for header pattern at beginning of line and escape the first character only (it's enough)
+            escapeFirstMatchedCharacter(HEADER_PATTERN, accumulatedBuffer);
         }
 
         if (blockStateListener.isInTable()) {
@@ -75,9 +75,9 @@ public class XWikiSyntaxEscapeHandler
             escapeFirstMatchedCharacter(escapeFirstIfMatching, accumulatedBuffer);
         }
 
-        // When in a section we need to escape "=" symbols since otherwise they would be confused for end of section
+        // When in a header we need to escape "=" symbols since otherwise they would be confused for end of section
         // characters.
-        if (blockStateListener.isInSection()) {
+        if (blockStateListener.isInHeader()) {
             replaceAll(accumulatedBuffer, "=", ESCAPE_CHAR + "=");
         }
 

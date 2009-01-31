@@ -43,7 +43,7 @@ public class ConsecutiveNewLineStateListener implements Listener
     {
         return this.newLineCount;
     }
-    
+
     public void beginDefinitionDescription()
     {
         // Nothing to do
@@ -105,6 +105,11 @@ public class ConsecutiveNewLineStateListener implements Listener
     }
 
     public void beginQuotationLine()
+    {
+        // Nothing to do
+    }
+
+    public void beginSection(Map<String, String> parameters)
     {
         // Nothing to do
     }
@@ -202,6 +207,11 @@ public class ConsecutiveNewLineStateListener implements Listener
     public void endQuotationLine()
     {
         this.newLineCount = 0;
+    }
+
+    public void endSection(Map<String, String> parameters)
+    {
+        // Nothing to do
     }
 
     public void endHeader(HeaderLevel level, Map<String, String> parameters)

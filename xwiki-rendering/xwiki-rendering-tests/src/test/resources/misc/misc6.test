@@ -9,12 +9,16 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection [2]
+beginSection
+beginSection
+beginHeader [2]
 onWord [header]
-endSection [2]
+endHeader [2]
 beginParagraph
 onWord [paragraph]
 endParagraph
+endSection
+endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

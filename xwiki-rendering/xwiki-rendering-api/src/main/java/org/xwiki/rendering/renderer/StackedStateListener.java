@@ -196,6 +196,16 @@ public class StackedStateListener<L extends Listener> extends Stack<L> implement
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.Listener#beginSection(java.util.Map)
+     */
+    public void beginSection(Map<String, String> parameters)
+    {
+        peek().beginSection(parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginHeader(org.xwiki.rendering.listener.HeaderLevel, java.util.Map)
      */
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
@@ -383,6 +393,16 @@ public class StackedStateListener<L extends Listener> extends Stack<L> implement
     public void endQuotationLine()
     {
         peek().endQuotationLine();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endSection(java.util.Map)
+     */
+    public void endSection(Map<String, String> parameters)
+    {
+        peek().endSection(parameters);
     }
 
     /**

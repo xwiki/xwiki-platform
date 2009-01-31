@@ -8,9 +8,11 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection [1] [[param]=[value]]
+beginSection
+beginHeader [1] [[param]=[value]]
 onWord [header]
-endSection [1] [[param]=[value]]
+endHeader [1] [[param]=[value]]
+endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

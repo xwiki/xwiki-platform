@@ -10,10 +10,11 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
+beginSection
 onId [testid]
-beginSection [1]
+beginHeader [1]
 onWord [Title1]
-endSection [1]
+endHeader [1]
 beginMacroMarker [toc] [start=1|depth=6|numbered=false|scope=page] []
 beginList [BULLETED]
 beginListItem
@@ -52,14 +53,17 @@ endLink [Anchor = [testid]] [false]
 endListItem
 endList [BULLETED]
 endMacroMarker [toc] [start=1|depth=6|numbered=false|scope=page] []
+beginSection
 onId [testid]
-beginSection [2]
+beginHeader [2]
 onWord [Title1]
 onSpecialSymbol [.]
 onWord [1]
-endSection [2]
+endHeader [2]
+beginSection
+beginSection
 onId [testid]
-beginSection [4]
+beginHeader [4]
 onWord [Title1]
 onSpecialSymbol [.]
 onWord [1]
@@ -67,9 +71,15 @@ onSpecialSymbol [.]
 onWord [1]
 onSpecialSymbol [.]
 onWord [1]
-endSection [4]
+endHeader [4]
+endSection
+endSection
+endSection
+endSection
+beginSection
 onId [testid]
-beginSection [1]
+beginHeader [1]
 onWord [Title2]
-endSection [1]
+endHeader [1]
+endSection
 endDocument

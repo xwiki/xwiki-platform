@@ -298,10 +298,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         // If we're inside a table cell, a paragraph, a list or a section header then if we have already outputted
         // a new line before then this new line should be a line break in order not to break the table cell,
         // paragraph, list or section header.
-        if (getConsecutiveNewLineStateListener().getNewLineCount() > 1
-            && (getBlockStateListener().isInParagraph() || getBlockStateListener().isInListItem()
-                || getBlockStateListener().isInDefinitionList() || getBlockStateListener().isInSection()
-                || getBlockStateListener().isInTableCell() || getBlockStateListener().isInQuotationLine())) {
+        if (getConsecutiveNewLineStateListener().getNewLineCount() > 1 && getBlockStateListener().isInLine()) {
             print("\\\\");
         } else {
             print("\n");

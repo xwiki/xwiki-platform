@@ -1,78 +1,165 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-| This is a table: | (((* item one
-* item two
-** subitem 1
-** subitem 2
-* item three)))
+|=Table Header 1|=Table Header 2|=Table Header 3
+|Cell One|Cell Two (((
+= This is an embedded document
+
+The first paragraph of the embedded document
+
+* list item one
+* list item two
+  ** sub-item 1
+  ** sub-item 2
+))) | Cell Three
+
+The next paragraph in the top-level document
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginTable
 beginTableRow
-beginTableCell
+beginTableHeadCell
+onWord [Table]
 onSpace
+onWord [Header]
+onSpace
+onWord [1]
+endTableHeadCell
+beginTableHeadCell
+onWord [Table]
+onSpace
+onWord [Header]
+onSpace
+onWord [2]
+endTableHeadCell
+beginTableHeadCell
+onWord [Table]
+onSpace
+onWord [Header]
+onSpace
+onWord [3]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableCell
+onWord [Cell]
+onSpace
+onWord [One]
+endTableCell
+beginTableCell
+onWord [Cell]
+onSpace
+onWord [Two]
+beginDocument
+beginSection
+beginHeader [1]
 onWord [This]
 onSpace
 onWord [is]
 onSpace
-onWord [a]
+onWord [an]
 onSpace
-onWord [table]
-onSpecialSymbol [:]
+onWord [embedded]
 onSpace
-endTableCell
-beginTableCell
-beginDocument
+onWord [document]
+endHeader [1]
+beginParagraph
+onWord [The]
+onSpace
+onWord [first]
+onSpace
+onWord [paragraph]
+onSpace
+onWord [of]
+onSpace
+onWord [the]
+onSpace
+onWord [embedded]
+onSpace
+onWord [document]
+endParagraph
 beginList [BULLETED]
 beginListItem
+onWord [list]
+onSpace
 onWord [item]
 onSpace
 onWord [one]
 endListItem
 beginListItem
+onWord [list]
+onSpace
 onWord [item]
 onSpace
 onWord [two]
 beginList [BULLETED]
 beginListItem
-onWord [subitem]
+onWord [sub]
+onSpecialSymbol [-]
+onWord [item]
 onSpace
 onWord [1]
 endListItem
 beginListItem
-onWord [subitem]
+onWord [sub]
+onSpecialSymbol [-]
+onWord [item]
 onSpace
 onWord [2]
 endListItem
 endList [BULLETED]
 endListItem
-beginListItem
-onWord [item]
-onSpace
-onWord [three]
-endListItem
 endList [BULLETED]
+endSection
 endDocument
+endTableCell
+beginTableCell
+onSpace
+onWord [Cell]
+onSpace
+onWord [Three]
 endTableCell
 endTableRow
 endTable
+beginParagraph
+onWord [The]
+onSpace
+onWord [next]
+onSpace
+onWord [paragraph]
+onSpace
+onWord [in]
+onSpace
+onWord [the]
+onSpace
+onWord [top]
+onSpecialSymbol [-]
+onWord [level]
+onSpace
+onWord [document]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><td>&nbsp;This is a table:&nbsp;</td><td><div class="xwiki-document"><ul><li>item one</li><li>item two<ul><li>subitem 1</li><li>subitem 2</li></ul></li><li>item three</li></ul></div></td></tr></table>
+<table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div class="xwiki-document"><h1 id="HThisisanembeddeddocument"><span>This is an embedded document</span></h1><p>The first paragraph of the embedded document</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-| This is a table: |(((* item one
-* item two
-** subitem 1
-** subitem 2
-* item three)))
+|=Table Header 1|=Table Header 2|=Table Header 3
+|Cell One|Cell Two(((= This is an embedded document =
+
+The first paragraph of the embedded document
+
+* list item one
+* list item two
+** sub-item 1
+** sub-item 2)))| Cell Three
+
+The next paragraph in the top-level document
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><td>&nbsp;This is a table:&nbsp;</td><td><div class="xwiki-document"><ul><li>item one</li><li>item two<ul><li>subitem 1</li><li>subitem 2</li></ul></li><li>item three</li></ul></div></td></tr></table>
+<table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div class="xwiki-document"><h1 id="HThisisanembeddeddocument"><span>This is an embedded document</span></h1><p>The first paragraph of the embedded document</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>

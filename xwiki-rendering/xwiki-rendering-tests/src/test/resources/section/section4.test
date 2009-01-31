@@ -12,16 +12,19 @@ not header =
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection [1]
+beginSection
+beginHeader [1]
 onWord [header]
 onNewLine
 onWord [end]
 onSpace
 onWord [header]
-endSection [1]
-beginSection [1]
+endHeader [1]
+endSection
+beginSection
+beginHeader [1]
 onWord [header]
-endSection [1]
+endHeader [1]
 beginParagraph
 onWord [not]
 onSpace
@@ -29,6 +32,7 @@ onWord [header]
 onSpace
 onSpecialSymbol [=]
 endParagraph
+endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

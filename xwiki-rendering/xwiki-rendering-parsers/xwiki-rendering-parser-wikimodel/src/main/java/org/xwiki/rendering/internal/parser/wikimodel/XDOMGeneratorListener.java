@@ -59,6 +59,7 @@ import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.QuotationBlock;
 import org.xwiki.rendering.block.QuotationLineBlock;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.TableBlock;
@@ -96,6 +97,8 @@ public class XDOMGeneratorListener implements IWemListener
     private LinkParser linkParser;
 
     private ImageParser imageParser;
+
+    private int currentSectionLevel = 0;
 
     private class MarkerBlock extends AbstractBlock
     {
@@ -158,6 +161,16 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginHeader(int level, WikiParameters params)
     {
+        // Close sections
+        for (; this.currentSectionLevel >= level; --this.currentSectionLevel) {
+            this.stack.push(new SectionBlock(generateListFromStack()));
+        }
+
+        // Open sections
+        for (; this.currentSectionLevel < level; ++this.currentSectionLevel) {
+            this.stack.push(this.marker);
+        }
+
         this.stack.push(this.marker);
     }
 
@@ -233,6 +246,11 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endDocument()
     {
+        // Close sections
+        for (; this.currentSectionLevel > 0; --this.currentSectionLevel) {
+            this.stack.push(new SectionBlock(generateListFromStack()));
+        }
+
         this.stack.push(new XDOM(generateListFromStack()));
     }
 
@@ -288,8 +306,8 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endHeader(int level, WikiParameters params)
     {
-        this.stack.push(new HeaderBlock(generateListFromStack(), HeaderLevel.parseInt(level),
-            convertParameters(params)));
+        this.stack
+            .push(new HeaderBlock(generateListFromStack(), HeaderLevel.parseInt(level), convertParameters(params)));
     }
 
     public void endInfoBlock(char infoType, WikiParameters params)

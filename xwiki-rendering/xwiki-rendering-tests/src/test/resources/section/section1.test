@@ -11,48 +11,60 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection [1]
+beginSection
+beginHeader [1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endSection [1]
-beginSection [2]
+endHeader [1]
+beginSection
+beginHeader [2]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [2]
-endSection [2]
-beginSection [3]
+endHeader [2]
+beginSection
+beginHeader [3]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [3]
-endSection [3]
-beginSection [4]
+endHeader [3]
+beginSection
+beginHeader [4]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [4]
-endSection [4]
-beginSection [5]
+endHeader [4]
+beginSection
+beginHeader [5]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [5]
-endSection [5]
-beginSection [6]
+endHeader [5]
+beginSection
+beginHeader [6]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [6]
-endSection [6]
+endHeader [6]
+endSection
+endSection
+endSection
+endSection
+endSection
+endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

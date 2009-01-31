@@ -45,7 +45,7 @@ public class TextOnNewLineStateListener implements Listener
     {
         return this.isTextOnNewLine;
     }
-    
+
     public void beginDefinitionDescription()
     {
         this.isTextOnNewLine = false;
@@ -109,6 +109,11 @@ public class TextOnNewLineStateListener implements Listener
     public void beginQuotationLine()
     {
         this.isTextOnNewLine = false;
+    }
+
+    public void beginSection(Map<String, String> parameters)
+    {
+        // Nothing to do
     }
 
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
@@ -202,6 +207,11 @@ public class TextOnNewLineStateListener implements Listener
     }
 
     public void endQuotationLine()
+    {
+        // Nothing to do
+    }
+
+    public void endSection(Map<String, String> parameters)
     {
         // Nothing to do
     }

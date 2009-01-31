@@ -75,11 +75,11 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     private XWikiSyntaxImageRenderer imageRenderer;
 
     /**
-     * The temporary Printer used to redirect all outputs when computing the section title.
+     * The temporary Printer used to redirect all outputs when computing the header title.
      * 
      * @see #originalPrinter
      */
-    private WikiPrinter sectionTitlePrinter;
+    private WikiPrinter headerTitlePrinter;
 
     /**
      * @param printer the object to which to write the XHTML output to
@@ -339,19 +339,19 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        // Don't output anything yet since we need the section title to generate the unique XHTML id attribute.
-        // Thus we're doing the output in the endSection() event.
+        // Don't output anything yet since we need the header title to generate the unique XHTML id attribute.
+        // Thus we're doing the output in the #endHeader() event.
 
         // Redirect all output to our writer
-        this.sectionTitlePrinter = new DefaultWikiPrinter();
-        pushPrinter(this.sectionTitlePrinter);
+        this.headerTitlePrinter = new DefaultWikiPrinter();
+        pushPrinter(this.headerTitlePrinter);
     }
 
-    private void processBeginSection(HeaderLevel level, String sectionTitle, Map<String, String> parameters)
+    private void processBeginHeader(HeaderLevel level, String headerTitle, Map<String, String> parameters)
     {
         Map<String, String> attributes = new LinkedHashMap<String, String>();
 
-        attributes.put("id", this.idGenerator.generateUniqueId(sectionTitle));
+        attributes.put("id", this.idGenerator.generateUniqueId(headerTitle));
         attributes.putAll(parameters);
 
         int levelAsInt = level.getAsInt();
@@ -369,10 +369,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        String sectionTitle = this.sectionTitlePrinter.toString();
+        String headerTitle = this.headerTitlePrinter.toString();
         popPrinter();
-        processBeginSection(level, sectionTitle, parameters);
-        getPrinter().print(sectionTitle);
+        processBeginHeader(level, headerTitle, parameters);
+        getPrinter().print(headerTitle);
 
         int levelAsInt = level.getAsInt();
         getXHTMLWikiPrinter().printXMLEndElement("span");

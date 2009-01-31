@@ -10,17 +10,19 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection [1]
+beginSection
+beginHeader [1]
 onWord [inheader]
 onSpace
 onSpecialSymbol [=]
-endSection [1]
+endHeader [1]
 beginParagraph
 onSpecialSymbol [=]
 onSpecialSymbol [=]
 onSpace
 onWord [notheader]
 endParagraph
+endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

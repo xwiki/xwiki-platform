@@ -364,8 +364,8 @@ public class XDOMGeneratorSink implements Sink
 
     public void section1_()
     {
-        List<Block> sectionTitleBlocks = generateListFromStack();
-        this.stack.push(new HeaderBlock(sectionTitleBlocks, HeaderLevel.LEVEL1));
+        List<Block> headerTitleBlocks = generateListFromStack();
+        this.stack.push(new HeaderBlock(headerTitleBlocks, HeaderLevel.LEVEL1));
     }
 
     public void section2()

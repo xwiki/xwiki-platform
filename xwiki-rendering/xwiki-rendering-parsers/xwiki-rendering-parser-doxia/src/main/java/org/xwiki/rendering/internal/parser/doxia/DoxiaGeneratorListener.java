@@ -125,6 +125,11 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.paragraph();
     }
 
+    public void beginSection(Map<String, String> parameters)
+    {
+
+    }
+
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
         if (level == HeaderLevel.LEVEL1) {
@@ -181,6 +186,11 @@ public class DoxiaGeneratorListener implements Listener
     public void endParagraph(Map<String, String> parameters)
     {
         this.sink.paragraph_();
+    }
+
+    public void endSection(Map<String, String> parameters)
+    {
+
     }
 
     public void endHeader(HeaderLevel level, Map<String, String> parameters)
@@ -266,7 +276,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)
      */
     public void onEmptyLines(int count)
@@ -276,7 +286,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
      */
     public void onVerbatimInline(String protectedString)
@@ -288,7 +298,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
      */
     public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
@@ -299,7 +309,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
      * @since 1.6M2
      */
@@ -310,7 +320,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
      * @since 1.6M2
      */
@@ -321,7 +331,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
      * @since 1.6M2
      */
@@ -332,7 +342,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
      * @since 1.6M2
      */
@@ -343,7 +353,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
      * @since 1.6M2
      */
@@ -354,8 +364,8 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription() 
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
      * @since 1.6M2
      */
     public void endDefinitionDescription()
@@ -365,7 +375,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
      * @since 1.6M2
      */
@@ -376,7 +386,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
      * @since 1.6M2
      */
@@ -387,7 +397,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
      * @since 1.6M2
      */
@@ -398,15 +408,15 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()  
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()
      * @since 1.6M2
      */
     public void endQuotationLine()
     {
         // TODO: Doxia doesn't seem to have support for quotation... Find out what to do...
     }
-    
+
     public void beginTable(Map<String, String> parameters)
     {
         this.sink.table();
@@ -439,7 +449,7 @@ public class DoxiaGeneratorListener implements Listener
 
     public void endTableHeadCell(Map<String, String> parameters)
     {
-        this.sink.tableHeaderCell_();       
+        this.sink.tableHeaderCell_();
     }
 
     public void endTableRow(Map<String, String> parameters)
@@ -449,8 +459,8 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.listener.Listener#beginLink(Link, boolean, Map)  
+     * 
+     * @see org.xwiki.rendering.listener.Listener#beginLink(Link, boolean, Map)
      * @since 1.7M1
      */
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -460,8 +470,8 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.listener.Listener#endLink(Link, boolean, Map)  
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endLink(Link, boolean, Map)
      * @since 1.7M1
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -471,7 +481,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#onImage(Image, boolean, Map)
      * @since 1.7M2
      */
@@ -491,7 +501,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
      * @since 1.7M3
      */
@@ -502,7 +512,7 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.listener.Listener#endError(String, String)
      * @since 1.7M3
      */

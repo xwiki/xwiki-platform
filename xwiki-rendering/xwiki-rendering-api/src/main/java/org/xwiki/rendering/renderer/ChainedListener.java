@@ -205,6 +205,18 @@ public class ChainedListener implements Listener
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.Listener#beginSection(java.util.Map)
+     */
+    public void beginSection(Map<String, String> parameters)
+    {
+        for (Listener listener : this.stateListeners) {
+            listener.beginSection(parameters);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginHeader(org.xwiki.rendering.listener.HeaderLevel, java.util.Map)
      */
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
@@ -427,6 +439,18 @@ public class ChainedListener implements Listener
     {
         for (Listener listener : this.stateListeners) {
             listener.endQuotationLine();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endSection(java.util.Map)
+     */
+    public void endSection(Map<String, String> parameters)
+    {
+        for (Listener listener : this.stateListeners) {
+            listener.endSection(parameters);
         }
     }
 

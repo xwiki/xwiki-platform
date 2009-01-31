@@ -184,11 +184,11 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginSection(org.xwiki.rendering.listener.HeaderLevel, java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#beginHeader(org.xwiki.rendering.listener.HeaderLevel, java.util.Map)
      */
-    public void beginSection(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        this.stateListener.beginSection(level, parameters);
+        this.stateListener.beginHeader(level, parameters);
     }
 
     /**

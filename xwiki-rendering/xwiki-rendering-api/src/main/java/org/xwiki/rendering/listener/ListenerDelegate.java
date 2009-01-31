@@ -58,9 +58,9 @@ public class ListenerDelegate implements Listener
         this.listener.beginParagraph(parameters);
     }
 
-    public void beginSection(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        this.listener.beginSection(level, parameters);
+        this.listener.beginHeader(level, parameters);
     }
 
     /**

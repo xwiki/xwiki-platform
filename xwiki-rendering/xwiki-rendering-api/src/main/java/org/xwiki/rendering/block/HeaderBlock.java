@@ -52,7 +52,7 @@ public class HeaderBlock extends AbstractFatherBlock
 
     public void before(Listener listener)
     {
-        listener.beginSection(getLevel(), getParameters());
+        listener.beginHeader(getLevel(), getParameters());
     }
 
     public void after(Listener listener)

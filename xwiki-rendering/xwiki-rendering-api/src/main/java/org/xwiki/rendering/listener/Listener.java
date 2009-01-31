@@ -227,7 +227,7 @@ public interface Listener
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see org.xwiki.rendering.listener.HeaderLevel
      */
-    void beginSection(HeaderLevel level, Map<String, String> parameters);
+    void beginHeader(HeaderLevel level, Map<String, String> parameters);
 
     /**
      * End of a header.

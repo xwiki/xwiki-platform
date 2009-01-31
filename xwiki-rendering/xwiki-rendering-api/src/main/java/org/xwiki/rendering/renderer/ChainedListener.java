@@ -205,12 +205,12 @@ public class ChainedListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginSection(org.xwiki.rendering.listener.HeaderLevel, java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#beginHeader(org.xwiki.rendering.listener.HeaderLevel, java.util.Map)
      */
-    public void beginSection(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
         for (Listener listener : this.stateListeners) {
-            listener.beginSection(level, parameters);
+            listener.beginHeader(level, parameters);
         }
     }
 

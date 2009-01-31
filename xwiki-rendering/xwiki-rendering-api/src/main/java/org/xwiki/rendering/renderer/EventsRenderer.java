@@ -195,11 +195,11 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginSection(org.xwiki.rendering.listener.HeaderLevel,
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginHeader(org.xwiki.rendering.listener.HeaderLevel,
      *      java.util.Map)
      */
     @Override
-    public void beginSection(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
         getPrinter().println("beginSection [" + level + "]" + serializeParameters(parameters));
     }

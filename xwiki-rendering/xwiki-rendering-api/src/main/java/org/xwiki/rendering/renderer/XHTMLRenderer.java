@@ -334,10 +334,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginSection(HeaderLevel, Map)
+     * @see org.xwiki.rendering.renderer.Renderer#beginHeader(HeaderLevel, Map)
      */
     @Override
-    public void beginSection(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
         // Don't output anything yet since we need the section title to generate the unique XHTML id attribute.
         // Thus we're doing the output in the endSection() event.

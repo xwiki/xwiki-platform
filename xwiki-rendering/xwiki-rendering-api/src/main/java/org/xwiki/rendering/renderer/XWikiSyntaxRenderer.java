@@ -338,12 +338,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#beginSection(HeaderLevel, Map)
+     * @see PrintRenderer#beginHeader(HeaderLevel, Map)
      */
     @Override
-    public void beginSection(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        super.beginSection(level, parameters);
+        super.beginHeader(level, parameters);
 
         printNewLine();
         printParameters(parameters);

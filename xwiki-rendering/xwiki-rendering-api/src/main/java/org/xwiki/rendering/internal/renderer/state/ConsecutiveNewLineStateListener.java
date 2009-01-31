@@ -109,7 +109,7 @@ public class ConsecutiveNewLineStateListener implements Listener
         // Nothing to do
     }
 
-    public void beginSection(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
         // Nothing to do
     }

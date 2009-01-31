@@ -125,7 +125,7 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.paragraph();
     }
 
-    public void beginSection(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
         if (level == HeaderLevel.LEVEL1) {
             this.sink.section1();

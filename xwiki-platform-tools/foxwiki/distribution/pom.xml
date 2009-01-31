@@ -47,17 +47,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-2</version>
         <configuration>
+          <!-- Don't attach the zip to the project since we don't want to install/deploy it. It's only temporary and
+               it's renamed to an XPI file by the AntRun plugin below. -->
+          <attach>false</attach>
           <descriptors>
             <descriptor>src/assemble/distribution.xml</descriptor>
           </descriptors>
-          <finalName>foxwiki-distribution-${pom.version}</finalName>
-          <!-- 
-              This will generate a warning with maven-assembly-plugin 2.2-beta2 version.
-              Once 2.2-beta3 is out, we need to upgrade into that version.
-            -->
-          <appendAssemblyId>false</appendAssemblyId>
         </configuration>
         <executions>
           <execution>
@@ -75,7 +71,7 @@
             <phase>package</phase>
             <configuration>
               <tasks>
-                <move file="target/foxwiki-distribution-${pom.version}.zip" tofile="target/foxwiki-distribution-${pom.version}.xpi"/>
+                <move file="${project.build.directory}/${pom.artifactId}-${pom.version}.zip" tofile="${project.build.directory}/${pom.artifactId}-${pom.version}.xpi"/>
               </tasks>
             </configuration>
             <goals>
@@ -87,7 +83,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.1</version>
         <executions>
           <execution>
             <id>attach-artifacts</id>
@@ -98,7 +93,7 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>target/foxwiki-distribution-${pom.version}.xpi</file>
+                  <file>${project.build.directory}/${pom.artifactId}-${pom.version}.xpi</file>
                   <type>xpi</type>
                 </artifact>
               </artifacts>

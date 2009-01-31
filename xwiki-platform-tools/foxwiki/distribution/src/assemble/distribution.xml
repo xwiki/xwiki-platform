@@ -21,7 +21,6 @@
 -->
 
 <assembly>
-  <id>distribution</id> 
   <formats>
     <format>zip</format>
   </formats>
@@ -48,7 +47,8 @@
   </fileSets>
   <dependencySets>
     <dependencySet>
-      <useProjectArtifact>false</useProjectArtifact>
+      <!-- Uncomment when we move to version 2.2 beta 3 of the Assembly plugin since it's not supported in 2.2 beta 1 (and not needed) -->
+      <!--useProjectArtifact>false</useProjectArtifact-->
       <outputDirectory>/chrome</outputDirectory>
     </dependencySet>
   </dependencySets>

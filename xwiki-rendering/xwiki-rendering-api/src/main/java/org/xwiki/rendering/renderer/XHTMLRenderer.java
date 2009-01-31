@@ -35,7 +35,7 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
@@ -334,10 +334,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginSection(SectionLevel, Map)
+     * @see org.xwiki.rendering.renderer.Renderer#beginSection(HeaderLevel, Map)
      */
     @Override
-    public void beginSection(SectionLevel level, Map<String, String> parameters)
+    public void beginSection(HeaderLevel level, Map<String, String> parameters)
     {
         // Don't output anything yet since we need the section title to generate the unique XHTML id attribute.
         // Thus we're doing the output in the endSection() event.
@@ -347,7 +347,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         pushPrinter(this.sectionTitlePrinter);
     }
 
-    private void processBeginSection(SectionLevel level, String sectionTitle, Map<String, String> parameters)
+    private void processBeginSection(HeaderLevel level, String sectionTitle, Map<String, String> parameters)
     {
         Map<String, String> attributes = new LinkedHashMap<String, String>();
 
@@ -364,10 +364,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endHeader(SectionLevel, Map)
+     * @see org.xwiki.rendering.renderer.Renderer#endHeader(HeaderLevel, Map)
      */
     @Override
-    public void endHeader(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
         String sectionTitle = this.sectionTitlePrinter.toString();
         popPrinter();

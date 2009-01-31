@@ -30,7 +30,7 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -195,11 +195,11 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginSection(org.xwiki.rendering.listener.SectionLevel,
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#beginSection(org.xwiki.rendering.listener.HeaderLevel,
      *      java.util.Map)
      */
     @Override
-    public void beginSection(SectionLevel level, Map<String, String> parameters)
+    public void beginSection(HeaderLevel level, Map<String, String> parameters)
     {
         getPrinter().println("beginSection [" + level + "]" + serializeParameters(parameters));
     }
@@ -207,11 +207,11 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractRenderer#endHeader(org.xwiki.rendering.listener.SectionLevel,
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endHeader(org.xwiki.rendering.listener.HeaderLevel,
      *      java.util.Map)
      */
     @Override
-    public void endHeader(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
         getPrinter().println("endSection [" + level + "]" + serializeParameters(parameters));
     }

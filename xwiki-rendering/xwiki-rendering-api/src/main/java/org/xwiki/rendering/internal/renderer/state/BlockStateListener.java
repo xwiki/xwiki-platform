@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
@@ -216,7 +216,7 @@ public class BlockStateListener implements Listener
         ++this.inlineDepth;
     }
 
-    public void beginSection(SectionLevel level, Map<String, String> parameters)
+    public void beginSection(HeaderLevel level, Map<String, String> parameters)
     {
         this.isInSection = true;
         ++this.inlineDepth;
@@ -317,7 +317,7 @@ public class BlockStateListener implements Listener
         --this.inlineDepth;
     }
 
-    public void endHeader(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
         this.isInSection = false;
         --this.inlineDepth;

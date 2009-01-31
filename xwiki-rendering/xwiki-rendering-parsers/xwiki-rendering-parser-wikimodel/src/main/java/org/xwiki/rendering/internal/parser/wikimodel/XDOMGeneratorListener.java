@@ -73,7 +73,7 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -288,7 +288,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endHeader(int level, WikiParameters params)
     {
-        this.stack.push(new HeaderBlock(generateListFromStack(), SectionLevel.parseInt(level),
+        this.stack.push(new HeaderBlock(generateListFromStack(), HeaderLevel.parseInt(level),
             convertParameters(params)));
     }
 

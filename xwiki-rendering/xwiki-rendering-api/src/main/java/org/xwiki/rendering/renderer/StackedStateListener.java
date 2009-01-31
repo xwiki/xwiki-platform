@@ -27,7 +27,7 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
@@ -196,9 +196,9 @@ public class StackedStateListener<L extends Listener> extends Stack<L> implement
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginSection(org.xwiki.rendering.listener.SectionLevel, java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#beginSection(org.xwiki.rendering.listener.HeaderLevel, java.util.Map)
      */
-    public void beginSection(SectionLevel level, Map<String, String> parameters)
+    public void beginSection(HeaderLevel level, Map<String, String> parameters)
     {
         peek().beginSection(level, parameters);
     }
@@ -388,9 +388,9 @@ public class StackedStateListener<L extends Listener> extends Stack<L> implement
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endHeader(org.xwiki.rendering.listener.SectionLevel, java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#endHeader(org.xwiki.rendering.listener.HeaderLevel, java.util.Map)
      */
-    public void endHeader(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
         peek().endHeader(level, parameters);
     }

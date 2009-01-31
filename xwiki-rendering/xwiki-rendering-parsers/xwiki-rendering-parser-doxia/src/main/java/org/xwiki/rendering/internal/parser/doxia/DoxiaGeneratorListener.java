@@ -28,7 +28,7 @@ import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.xml.XMLNode;
@@ -125,19 +125,19 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.paragraph();
     }
 
-    public void beginSection(SectionLevel level, Map<String, String> parameters)
+    public void beginSection(HeaderLevel level, Map<String, String> parameters)
     {
-        if (level == SectionLevel.LEVEL1) {
+        if (level == HeaderLevel.LEVEL1) {
             this.sink.section1();
-        } else if (level == SectionLevel.LEVEL2) {
+        } else if (level == HeaderLevel.LEVEL2) {
             this.sink.section2();
-        } else if (level == SectionLevel.LEVEL3) {
+        } else if (level == HeaderLevel.LEVEL3) {
             this.sink.section3();
-        } else if (level == SectionLevel.LEVEL4) {
+        } else if (level == HeaderLevel.LEVEL4) {
             this.sink.section4();
-        } else if (level == SectionLevel.LEVEL5) {
+        } else if (level == HeaderLevel.LEVEL5) {
             this.sink.section5();
-        } else if (level == SectionLevel.LEVEL6) {
+        } else if (level == HeaderLevel.LEVEL6) {
             // There's no level 6 in Doxia!
             this.sink.section5();
         }
@@ -183,19 +183,19 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.paragraph_();
     }
 
-    public void endHeader(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        if (level == SectionLevel.LEVEL1) {
+        if (level == HeaderLevel.LEVEL1) {
             this.sink.section1_();
-        } else if (level == SectionLevel.LEVEL2) {
+        } else if (level == HeaderLevel.LEVEL2) {
             this.sink.section2_();
-        } else if (level == SectionLevel.LEVEL3) {
+        } else if (level == HeaderLevel.LEVEL3) {
             this.sink.section3_();
-        } else if (level == SectionLevel.LEVEL4) {
+        } else if (level == HeaderLevel.LEVEL4) {
             this.sink.section4_();
-        } else if (level == SectionLevel.LEVEL5) {
+        } else if (level == HeaderLevel.LEVEL5) {
             this.sink.section5_();
-        } else if (level == SectionLevel.LEVEL6) {
+        } else if (level == HeaderLevel.LEVEL6) {
             // There's no level 6 in Doxia!
             this.sink.section5_();
         }

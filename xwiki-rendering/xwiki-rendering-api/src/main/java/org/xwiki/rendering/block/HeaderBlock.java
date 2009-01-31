@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 
 /**
  * @version $Id$
@@ -31,21 +31,21 @@ import org.xwiki.rendering.listener.SectionLevel;
  */
 public class HeaderBlock extends AbstractFatherBlock
 {
-    private SectionLevel level;
+    private HeaderLevel level;
 
-    public HeaderBlock(List<Block> childBlocks, SectionLevel level)
+    public HeaderBlock(List<Block> childBlocks, HeaderLevel level)
     {
         super(childBlocks);
         this.level = level;
     }
 
-    public HeaderBlock(List<Block> childBlocks, SectionLevel level, Map<String, String> parameters)
+    public HeaderBlock(List<Block> childBlocks, HeaderLevel level, Map<String, String> parameters)
     {
         super(childBlocks,  parameters);
         this.level = level;
     }
 
-    public SectionLevel getLevel()
+    public HeaderLevel getLevel()
     {
         return this.level;
     }

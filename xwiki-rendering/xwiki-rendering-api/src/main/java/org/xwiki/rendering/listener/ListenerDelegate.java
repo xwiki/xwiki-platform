@@ -58,7 +58,7 @@ public class ListenerDelegate implements Listener
         this.listener.beginParagraph(parameters);
     }
 
-    public void beginSection(SectionLevel level, Map<String, String> parameters)
+    public void beginSection(HeaderLevel level, Map<String, String> parameters)
     {
         this.listener.beginSection(level, parameters);
     }
@@ -103,7 +103,7 @@ public class ListenerDelegate implements Listener
         this.listener.endParagraph(parameters);
     }
 
-    public void endHeader(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
         this.listener.endHeader(level, parameters);
     }

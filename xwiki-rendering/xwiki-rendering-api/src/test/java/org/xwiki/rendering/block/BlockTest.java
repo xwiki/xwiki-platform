@@ -27,7 +27,7 @@ import java.util.List;
 import org.xwiki.rendering.listener.DefaultAttachement;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.xml.XMLElement;
 
 import junit.framework.TestCase;
@@ -44,10 +44,10 @@ public class BlockTest extends TestCase
     {
         ParagraphBlock pb1 =
             new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(Arrays
-                .asList(new Block[] {new WordBlock("title1")}), SectionLevel.LEVEL1)));
+                .asList(new Block[] {new WordBlock("title1")}), HeaderLevel.LEVEL1)));
         ParagraphBlock pb2 =
             new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(Arrays
-                .asList(new Block[] {new WordBlock("title2")}), SectionLevel.LEVEL2)));
+                .asList(new Block[] {new WordBlock("title2")}), HeaderLevel.LEVEL2)));
         ParagraphBlock pb3 = new ParagraphBlock(Arrays.asList(new Block[] {pb1, pb2}));
 
         List<HeaderBlock> results = pb1.getChildrenByType(HeaderBlock.class, true);

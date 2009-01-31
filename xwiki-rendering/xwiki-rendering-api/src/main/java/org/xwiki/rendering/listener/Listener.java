@@ -225,18 +225,18 @@ public interface Listener
      * 
      * @param level the section level (1, 2, 3, etc).
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
-     * @see org.xwiki.rendering.listener.SectionLevel
+     * @see org.xwiki.rendering.listener.HeaderLevel
      */
-    void beginSection(SectionLevel level, Map<String, String> parameters);
+    void beginSection(HeaderLevel level, Map<String, String> parameters);
 
     /**
      * End of a header.
      * 
      * @param level the section level (1, 2, 3, etc).
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
-     * @see org.xwiki.rendering.listener.SectionLevel
+     * @see org.xwiki.rendering.listener.HeaderLevel
      */
-    void endHeader(SectionLevel level, Map<String, String> parameters);
+    void endHeader(HeaderLevel level, Map<String, String> parameters);
 
     /**
      * Start of an XML node. We use this type of event whenever there's no other equivalent event. For example for a 

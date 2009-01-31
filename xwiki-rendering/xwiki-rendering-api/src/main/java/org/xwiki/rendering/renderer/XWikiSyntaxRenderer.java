@@ -35,7 +35,7 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.VoidWikiPrinter;
@@ -338,10 +338,10 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#beginSection(SectionLevel, Map)
+     * @see PrintRenderer#beginSection(HeaderLevel, Map)
      */
     @Override
-    public void beginSection(SectionLevel level, Map<String, String> parameters)
+    public void beginSection(HeaderLevel level, Map<String, String> parameters)
     {
         super.beginSection(level, parameters);
 
@@ -353,10 +353,10 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#endHeader(SectionLevel, Map)
+     * @see PrintRenderer#endHeader(HeaderLevel, Map)
      */
     @Override
-    public void endHeader(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
         print(" " + StringUtils.repeat("=", level.getAsInt()));
 

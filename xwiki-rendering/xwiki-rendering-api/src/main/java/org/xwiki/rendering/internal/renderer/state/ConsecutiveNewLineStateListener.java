@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
@@ -109,7 +109,7 @@ public class ConsecutiveNewLineStateListener implements Listener
         // Nothing to do
     }
 
-    public void beginSection(SectionLevel level, Map<String, String> parameters)
+    public void beginSection(HeaderLevel level, Map<String, String> parameters)
     {
         // Nothing to do
     }
@@ -204,7 +204,7 @@ public class ConsecutiveNewLineStateListener implements Listener
         this.newLineCount = 0;
     }
 
-    public void endHeader(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
         this.newLineCount = 0;
     }

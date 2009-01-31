@@ -41,7 +41,7 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.HorizontalLineBlock;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.parser.LinkParser;
 
@@ -365,7 +365,7 @@ public class XDOMGeneratorSink implements Sink
     public void section1_()
     {
         List<Block> sectionTitleBlocks = generateListFromStack();
-        this.stack.push(new HeaderBlock(sectionTitleBlocks, SectionLevel.LEVEL1));
+        this.stack.push(new HeaderBlock(sectionTitleBlocks, HeaderLevel.LEVEL1));
     }
 
     public void section2()

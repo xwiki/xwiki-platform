@@ -206,7 +206,7 @@ public class TextOnNewLineStateListener implements Listener
         // Nothing to do
     }
 
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
         this.isTextOnNewLine = false;
     }

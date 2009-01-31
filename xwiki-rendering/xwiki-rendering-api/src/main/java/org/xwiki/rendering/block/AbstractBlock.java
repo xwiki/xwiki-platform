@@ -285,7 +285,7 @@ public abstract class AbstractBlock implements Block
 
         for (int i = index - 1; i >= 0; --i) {
             Block previousBlock = blocks.get(i);
-            if (previousBlock instanceof SectionBlock) {
+            if (previousBlock instanceof HeaderBlock) {
                 return (T) previousBlock;
             }
         }

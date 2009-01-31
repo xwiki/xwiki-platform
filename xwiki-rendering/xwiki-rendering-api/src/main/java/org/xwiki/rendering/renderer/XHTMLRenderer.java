@@ -364,10 +364,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endSection(SectionLevel, Map)
+     * @see org.xwiki.rendering.renderer.Renderer#endHeader(SectionLevel, Map)
      */
     @Override
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
         String sectionTitle = this.sectionTitlePrinter.toString();
         popPrinter();

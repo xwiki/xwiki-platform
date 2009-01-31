@@ -30,7 +30,7 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ListBLock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
-import org.xwiki.rendering.block.SectionBlock;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.internal.util.EnumConverter;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -108,18 +108,18 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
         // Get the root block from scope parameter
 
         Block root;
-        SectionBlock rootSectionBlock = null;
+        HeaderBlock rootSectionBlock = null;
 
         if (parameters.getScope() == Scope.LOCAL && context.getCurrentMacroBlock() != null) {
             root = context.getCurrentMacroBlock().getParent();
-            rootSectionBlock = context.getCurrentMacroBlock().getPreviousBlockByType(SectionBlock.class, true);
+            rootSectionBlock = context.getCurrentMacroBlock().getPreviousBlockByType(HeaderBlock.class, true);
         } else {
             root = context.getXDOM();
         }
 
         // Get the list of sections in the scope
 
-        List<SectionBlock> sections = root.getChildrenByType(SectionBlock.class, true);
+        List<HeaderBlock> sections = root.getChildrenByType(HeaderBlock.class, true);
 
         if (!sections.isEmpty()) {
             // Construct table of content from sections list
@@ -151,15 +151,15 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
      * @param rootSectionBlock the section where the toc macro search for children sections.
      * @return the root block of generated block tree.
      */
-    private Block generateTree(List<SectionBlock> sections, int start, int depth, boolean numbered,
-        SectionBlock rootSectionBlock)
+    private Block generateTree(List<HeaderBlock> sections, int start, int depth, boolean numbered,
+        HeaderBlock rootSectionBlock)
     {
         int rootSectionLevel = rootSectionBlock != null ? rootSectionBlock.getLevel().getAsInt() : 0;
         boolean rootSectionFound = false;
 
         int currentLevel = 0;
         Block currentBlock = null;
-        for (SectionBlock sectionBlock : sections) {
+        for (HeaderBlock sectionBlock : sections) {
             int sectionLevel = sectionBlock.getLevel().getAsInt();
 
             if (rootSectionBlock != null) {
@@ -197,10 +197,10 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
     /**
      * Create a new toc list item based on section title.
      * 
-     * @param sectionBlock the {@link SectionBlock}.
+     * @param sectionBlock the {@link HeaderBlock}.
      * @return the new list item block.
      */
-    private ListItemBlock createTocEntry(SectionBlock sectionBlock)
+    private ListItemBlock createTocEntry(HeaderBlock sectionBlock)
     {
         IdBlock idBlock = newUniqueIdBlock();
         sectionBlock.getParent().insertChildBefore(idBlock, sectionBlock);

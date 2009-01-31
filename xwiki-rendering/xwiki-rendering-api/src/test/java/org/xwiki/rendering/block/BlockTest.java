@@ -43,17 +43,17 @@ public class BlockTest extends TestCase
     public void testGetBlocksByType()
     {
         ParagraphBlock pb1 =
-            new ParagraphBlock(Arrays.<Block> asList(new SectionBlock(Arrays
+            new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(Arrays
                 .asList(new Block[] {new WordBlock("title1")}), SectionLevel.LEVEL1)));
         ParagraphBlock pb2 =
-            new ParagraphBlock(Arrays.<Block> asList(new SectionBlock(Arrays
+            new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(Arrays
                 .asList(new Block[] {new WordBlock("title2")}), SectionLevel.LEVEL2)));
         ParagraphBlock pb3 = new ParagraphBlock(Arrays.asList(new Block[] {pb1, pb2}));
 
-        List<SectionBlock> results = pb1.getChildrenByType(SectionBlock.class, true);
+        List<HeaderBlock> results = pb1.getChildrenByType(HeaderBlock.class, true);
         assertEquals(1, results.size());
 
-        results = pb3.getChildrenByType(SectionBlock.class, true);
+        results = pb3.getChildrenByType(HeaderBlock.class, true);
         assertEquals(2, results.size());
     }
 

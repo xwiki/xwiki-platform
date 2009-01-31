@@ -353,14 +353,14 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#endSection(SectionLevel, Map)
+     * @see PrintRenderer#endHeader(SectionLevel, Map)
      */
     @Override
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
         print(" " + StringUtils.repeat("=", level.getAsInt()));
 
-        super.endSection(level, parameters);
+        super.endHeader(level, parameters);
     }
 
     /**

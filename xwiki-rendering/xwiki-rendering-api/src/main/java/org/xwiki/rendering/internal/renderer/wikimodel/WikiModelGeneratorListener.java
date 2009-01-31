@@ -179,7 +179,7 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endParagraph(createWikiParameters(parameters));
     }
 
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
         this.wikimodelListener.endHeader(level.getAsInt(), createWikiParameters(parameters));
     }

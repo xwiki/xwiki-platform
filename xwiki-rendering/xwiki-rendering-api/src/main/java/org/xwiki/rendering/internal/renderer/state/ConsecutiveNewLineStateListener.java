@@ -204,7 +204,7 @@ public class ConsecutiveNewLineStateListener implements Listener
         this.newLineCount = 0;
     }
 
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
         this.newLineCount = 0;
     }

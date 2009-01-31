@@ -433,12 +433,12 @@ public class ChainedListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endSection(org.xwiki.rendering.listener.SectionLevel, java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#endHeader(org.xwiki.rendering.listener.SectionLevel, java.util.Map)
      */
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
         for (Listener listener : this.stateListeners) {
-            listener.endSection(level, parameters);
+            listener.endHeader(level, parameters);
         }
     }
 

@@ -58,7 +58,7 @@ import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.QuotationBlock;
 import org.xwiki.rendering.block.QuotationLineBlock;
-import org.xwiki.rendering.block.SectionBlock;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.TableBlock;
@@ -288,7 +288,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endHeader(int level, WikiParameters params)
     {
-        this.stack.push(new SectionBlock(generateListFromStack(), SectionLevel.parseInt(level),
+        this.stack.push(new HeaderBlock(generateListFromStack(), SectionLevel.parseInt(level),
             convertParameters(params)));
     }
 

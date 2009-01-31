@@ -207,11 +207,11 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractRenderer#endSection(org.xwiki.rendering.listener.SectionLevel,
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#endHeader(org.xwiki.rendering.listener.SectionLevel,
      *      java.util.Map)
      */
     @Override
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
         getPrinter().println("endSection [" + level + "]" + serializeParameters(parameters));
     }

@@ -317,7 +317,7 @@ public class BlockStateListener implements Listener
         --this.inlineDepth;
     }
 
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
         this.isInSection = false;
         --this.inlineDepth;

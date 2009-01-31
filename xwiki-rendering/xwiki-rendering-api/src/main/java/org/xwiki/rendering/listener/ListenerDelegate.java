@@ -103,9 +103,9 @@ public class ListenerDelegate implements Listener
         this.listener.endParagraph(parameters);
     }
 
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
-        this.listener.endSection(level, parameters);
+        this.listener.endHeader(level, parameters);
     }
 
     /**

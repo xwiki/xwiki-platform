@@ -29,17 +29,17 @@ import org.xwiki.rendering.listener.SectionLevel;
  * @version $Id$
  * @since 1.5M2
  */
-public class SectionBlock extends AbstractFatherBlock
+public class HeaderBlock extends AbstractFatherBlock
 {
     private SectionLevel level;
 
-    public SectionBlock(List<Block> childBlocks, SectionLevel level)
+    public HeaderBlock(List<Block> childBlocks, SectionLevel level)
     {
         super(childBlocks);
         this.level = level;
     }
 
-    public SectionBlock(List<Block> childBlocks, SectionLevel level, Map<String, String> parameters)
+    public HeaderBlock(List<Block> childBlocks, SectionLevel level, Map<String, String> parameters)
     {
         super(childBlocks,  parameters);
         this.level = level;
@@ -57,6 +57,6 @@ public class SectionBlock extends AbstractFatherBlock
 
     public void after(Listener listener)
     {
-        listener.endSection(getLevel(), getParameters());
+        listener.endHeader(getLevel(), getParameters());
     }
 }

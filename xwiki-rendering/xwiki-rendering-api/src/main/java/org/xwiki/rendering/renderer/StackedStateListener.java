@@ -388,11 +388,11 @@ public class StackedStateListener<L extends Listener> extends Stack<L> implement
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endSection(org.xwiki.rendering.listener.SectionLevel, java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#endHeader(org.xwiki.rendering.listener.SectionLevel, java.util.Map)
      */
-    public void endSection(SectionLevel level, Map<String, String> parameters)
+    public void endHeader(SectionLevel level, Map<String, String> parameters)
     {
-        peek().endSection(level, parameters);
+        peek().endHeader(level, parameters);
     }
 
     /**

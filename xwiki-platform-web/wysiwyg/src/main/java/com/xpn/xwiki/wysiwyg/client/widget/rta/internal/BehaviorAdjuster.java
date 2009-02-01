@@ -158,7 +158,21 @@ public class BehaviorAdjuster implements LoadListener
      */
     protected void onKeyDown()
     {
-        // Nothing here by default. May be overridden by browser specific implementations.
+        Event event = getTextArea().getCurrentEvent();
+        if (event == null || event.isCancelled()) {
+            return;
+        }
+
+        switch (event.getKeyCode()) {
+            case KeyboardListener.KEY_DOWN:
+                onDownArrow();
+                break;
+            case KeyboardListener.KEY_UP:
+                onUpArrow();
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -509,22 +523,104 @@ public class BehaviorAdjuster implements LoadListener
     protected void onTabInTableCell(TableCellElement cell)
     {
         Node nextCell = getTextArea().getCurrentEvent().getShiftKey() ? cell.getPreviousCell() : cell.getNextCell();
-        if (nextCell != null) {
-            Selection selection = getTextArea().getDocument().getSelection();
-            Range range = selection.getRangeAt(0);
-
-            // Place the caret at the beginning of the next cell.
-            Node leaf = domUtils.getFirstLeaf(nextCell);
-            if (leaf == nextCell || leaf.getNodeType() == Node.TEXT_NODE) {
-                range.setStart(leaf, 0);
+        if (nextCell == null) {
+            if (getTextArea().getCurrentEvent().getShiftKey()) {
+                return;
             } else {
-                range.setStartBefore(leaf);
+                getTextArea().getCommandManager().execute(new Command("insertrowafter"));
+                nextCell = cell.getNextCell();
             }
-
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
         }
+
+        Selection selection = getTextArea().getDocument().getSelection();
+        Range range = selection.getRangeAt(0);
+
+        // Place the caret at the beginning of the next cell.
+        Node leaf = domUtils.getFirstLeaf(nextCell);
+        if (leaf == nextCell || leaf.getNodeType() == Node.TEXT_NODE) {
+            range.setStart(leaf, 0);
+        } else {
+            range.setStartBefore(leaf);
+        }
+
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    /**
+     * Overwrites the default rich text area behavior when the Down arrow key is being pressed.
+     */
+    protected void onDownArrow()
+    {
+        navigateOutsideTableCell(false);
+    }
+
+    /**
+     * Overwrites the default rich text area behavior when the Up arrow key is being pressed.
+     */
+    protected void onUpArrow()
+    {
+        navigateOutsideTableCell(true);
+    }
+
+    /**
+     * Inserts a paragraph before or after the table containing the selection.
+     * <p>
+     * We decided to use Ctrl+UpArrow for inserting a paragraph before a table and Ctrl+DownArrow for inserting a
+     * paragraph after a table. Here's the rationale:
+     * <ul>
+     * <li>We can't reliably detect if the user can place the caret before of after a table. Our playground is the DOM
+     * tree which we fully control but in the end the browser decides how to render each node. The table can have
+     * previous siblings or previous nodes in the DOM tree but they may not be rendered at all (as it happens with HTML
+     * garbage like empty elements) or not rendered before/after the table (as it happens with absolute positioned
+     * elements). So we have to insert the paragraph each time.</li>
+     * <li>We can't use the same key to insert a paragraph before and after the table because we can have a table with
+     * just one empty cell. So we can't rely on the Enter key.</li>
+     * <li>We can't use just the navigation keys because they would insert a paragraph before/after the table even when
+     * the user can navigate outside of the table.</li>
+     * </ul>
+     * We can replace the Ctrl with Alt. The idea is to use the Up/Down arrow keys with a modifier. They will work form
+     * any table cell.
+     * 
+     * @param before {@code true} to insert a paragraph before the table, {@code false} to insert a paragraph after the
+     *            table
+     */
+    protected void navigateOutsideTableCell(boolean before)
+    {
+        Event event = getTextArea().getCurrentEvent();
+        if (!event.getCtrlKey() || event.getAltKey() || event.getShiftKey() || event.getMetaKey()) {
+            return;
+        }
+
+        Selection selection = getTextArea().getDocument().getSelection();
+        if (selection.getRangeCount() == 0) {
+            return;
+        } else {
+            selection.collapseToStart();
+        }
+
+        Range range = selection.getRangeAt(0);
+        Node ancestor = domUtils.getFirstAncestor(range.getStartContainer(), "table");
+        if (ancestor == null) {
+            return;
+        }
+
+        event.xPreventDefault();
+
+        Document document = getTextArea().getDocument();
+        Node paragraph = document.xCreatePElement();
+        paragraph.appendChild(document.createTextNode(""));
+
+        if (before) {
+            ancestor.getParentNode().insertBefore(paragraph, ancestor);
+        } else {
+            domUtils.insertAfter(paragraph, ancestor);
+        }
+
+        range.selectNodeContents(paragraph.getFirstChild());
+        selection.removeAllRanges();
+        selection.addRange(range);
     }
 
     /**

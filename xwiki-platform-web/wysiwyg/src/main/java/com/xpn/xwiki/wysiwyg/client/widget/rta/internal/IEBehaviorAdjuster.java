@@ -61,11 +61,20 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
     protected void onKeyDown()
     {
         Event event = getTextArea().getCurrentEvent();
-        if (event.getKeyCode() == KeyboardListener.KEY_TAB) {
-            // IE moves the focus when Tab key is down and thus the key press event doesn't get fired. If we block the
-            // key down event then IE doesn't fire key press. We are forced to apply out custom behavior for tab key
-            // now, on key down, and not later, on key press.
-            onTab();
+        if (event == null || event.isCancelled()) {
+            return;
+        }
+
+        switch (event.getKeyCode()) {
+            case KeyboardListener.KEY_TAB:
+                // IE moves the focus when Tab key is down and thus the key press event doesn't get fired. If we block
+                // the key down event then IE doesn't fire key press. We are forced to apply out custom behavior for tab
+                // key now, on key down, and not later, on key press.
+                onTab();
+                break;
+            default:
+                super.onKeyDown();
+                break;
         }
     }
 

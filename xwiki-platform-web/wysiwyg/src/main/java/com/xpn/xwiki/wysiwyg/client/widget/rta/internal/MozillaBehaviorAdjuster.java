@@ -24,6 +24,7 @@ import com.google.gwt.dom.client.NodeList;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
+import com.xpn.xwiki.wysiwyg.client.dom.Event;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 
 /**
@@ -240,5 +241,24 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
                 br.removeAttribute(CLASS_NAME);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see BehaviorAdjuster#navigateOutsideTableCell(boolean)
+     */
+    protected void navigateOutsideTableCell(boolean before)
+    {
+        super.navigateOutsideTableCell(before);
+
+        Event event = getTextArea().getCurrentEvent();
+        if (!event.isCancelled()) {
+            return;
+        }
+
+        Document document = getTextArea().getDocument();
+        document.getSelection().getRangeAt(0).getStartContainer().getParentNode().appendChild(
+            document.xCreateBRElement());
     }
 }

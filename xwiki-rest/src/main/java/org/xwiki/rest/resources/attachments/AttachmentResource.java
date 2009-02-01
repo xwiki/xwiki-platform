@@ -1,17 +1,30 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.rest.resources.attachments;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 
-import org.restlet.Context;
-import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.OutputRepresentation;
-import org.restlet.resource.Representation;
 import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
 import org.xwiki.rest.Constants;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
@@ -51,13 +64,38 @@ public class AttachmentResource extends BaseAttachmentResource
             String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
             boolean existed = false;
 
-            if (doc.getAttachment(attachmentName) != null) {
+            XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+            XWikiAttachment xwikiAttachment = xwikiDocument.getAttachment(attachmentName);
+            if (xwikiAttachment == null) {
+                xwikiAttachment = new XWikiAttachment();
+                xwikiDocument.getAttachmentList().add(xwikiAttachment);
+            } else {
                 existed = true;
             }
 
-            doc.addAttachment(attachmentName, getRequest().getEntity().getStream());
+            byte[] buffer = new byte[8192];
+            InputStream is = getRequest().getEntity().getStream();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            while (true) {
+                int read = is.read(buffer);
+                bos.write(buffer, 0, read);
 
-            doc.save();
+                if (read < 8192) {
+                    break;
+                }
+            }
+
+            xwikiAttachment.setContent(bos.toByteArray());
+            xwikiAttachment.setAuthor(xwikiUser);
+            xwikiAttachment.setFilename(attachmentName);
+            xwikiAttachment.setDoc(xwikiDocument);
+
+            if (doc.hasAccessLevel("edit", xwikiUser)) {
+                xwikiDocument.saveAttachmentContent(xwikiAttachment, xwikiContext);
+            } else {
+                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+                return;
+            }
 
             if (existed) {
                 getResponse().setStatus(Status.SUCCESS_ACCEPTED);
@@ -69,7 +107,7 @@ public class AttachmentResource extends BaseAttachmentResource
              * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
              * external URL for an attachment
              */
-            XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+            /* XWikiDocument */xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
             String attachmentXWikiUrl =
                 xwikiDocument.getExternalAttachmentURL(attachmentName, "download", xwikiContext).toString();
 
@@ -118,6 +156,7 @@ public class AttachmentResource extends BaseAttachmentResource
             } else {
                 getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
             }
+
         } catch (Exception e) {
             getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
         }

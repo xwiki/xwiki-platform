@@ -40,6 +40,7 @@ import org.xwiki.rest.model.XWikiRoot;
 import org.xwiki.rest.resources.RootResource;
 import org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
+import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
 import org.xwiki.rest.resources.comments.CommentResource;
 import org.xwiki.rest.resources.comments.CommentVersionResource;
 import org.xwiki.rest.resources.comments.CommentsResource;
@@ -237,8 +238,8 @@ public class DomainObjectFactory
                 parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
                 parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
                 parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-                parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
-                    .getRCSVersion().at(1)));
+                parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0),
+                    doc.getRCSVersion().at(1)));
                 parametersMap.put(Constants.LANGUAGE_ID_PARAMETER, language);
                 link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
                 link.setRel(Relations.TRANSLATION);
@@ -291,7 +292,7 @@ public class DomainObjectFactory
             parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
             parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
             parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-            parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
+            parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
                 .getRCSVersion().at(1)));
             link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
             link.setRel(Relations.COMMENTS);
@@ -339,7 +340,7 @@ public class DomainObjectFactory
             parametersMap.put(Constants.SPACE_NAME_PARAMETER, spaceName);
             parametersMap.put(Constants.PAGE_NAME_PARAMETER, pageName);
             parametersMap.put(Constants.LANGUAGE_ID_PARAMETER, languageId);
-            parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", version, minorVersion));
+            parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", version, minorVersion));
             link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
             link.setRel(Relations.PAGE);
         } else {
@@ -350,7 +351,7 @@ public class DomainObjectFactory
             parametersMap.put(Constants.WIKI_NAME_PARAMETER, wikiName);
             parametersMap.put(Constants.SPACE_NAME_PARAMETER, spaceName);
             parametersMap.put(Constants.PAGE_NAME_PARAMETER, pageName);
-            parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", version, minorVersion));
+            parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", version, minorVersion));
             link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
             link.setRel(Relations.PAGE);
         }
@@ -403,7 +404,7 @@ public class DomainObjectFactory
         parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
         parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
         parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-        parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
+        parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
             .getRCSVersion().at(1)));
         link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
         link.setRel(Relations.PAGE);
@@ -422,7 +423,7 @@ public class DomainObjectFactory
         parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
         parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
         parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-        parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
+        parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
             .getRCSVersion().at(1)));
         parametersMap.put(Constants.COMMENT_ID_PARAMETER, String.format("%d", xwikiComment.getNumber()));
         link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
@@ -464,7 +465,7 @@ public class DomainObjectFactory
         parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
         parametersMap.put(Constants.SPACE_NAME_PARAMETER, xwikiAttachment.getDocument().getSpace());
         parametersMap.put(Constants.PAGE_NAME_PARAMETER, xwikiAttachment.getDocument().getName());
-        parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", xwikiAttachment.getDocument()
+        parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", xwikiAttachment.getDocument()
             .getRCSVersion().at(0), xwikiAttachment.getDocument().getRCSVersion().at(1)));
         link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
         link.setRel(Relations.PAGE);
@@ -483,9 +484,56 @@ public class DomainObjectFactory
         parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
         parametersMap.put(Constants.SPACE_NAME_PARAMETER, xwikiAttachment.getDocument().getSpace());
         parametersMap.put(Constants.PAGE_NAME_PARAMETER, xwikiAttachment.getDocument().getName());
-        parametersMap.put(Constants.VERSION_PARAMETER, String.format("%d.%d", xwikiAttachment.getDocument()
+        parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", xwikiAttachment.getDocument()
             .getRCSVersion().at(0), xwikiAttachment.getDocument().getRCSVersion().at(1)));
         parametersMap.put(Constants.ATTACHMENT_NAME_PARAMETER, attachment.getName());
+        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
+        link.setRel(Relations.ATTACHMENT_DATA);
+        attachment.addLink(link);
+
+        return attachment;
+    }
+
+    public static Attachment createAttachmentAtVersion(Request request,
+        XWikiResourceClassRegistry resourceClassRegistry, com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl)
+    {
+        Attachment attachment = new Attachment();
+
+        attachment.setName(xwikiAttachment.getFilename());
+        attachment.setSize(xwikiAttachment.getFilesize());
+        attachment.setVersion(xwikiAttachment.getVersion());
+        attachment.setPageVersion(xwikiAttachment.getDocument().getVersion());
+        attachment.setMimeType(xwikiAttachment.getMimeType());
+        attachment.setAuthor(xwikiAttachment.getAuthor());
+        attachment.setDate(xwikiAttachment.getDate().getTime());
+        attachment.setXWikiUrl(xwikiUrl);
+
+        String fullUri;
+        Map<String, String> parametersMap;
+        Link link;
+
+        fullUri =
+            String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                .getUriPatternForResourceClass(PageResource.class));
+
+        parametersMap = new HashMap<String, String>();
+        parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
+        parametersMap.put(Constants.SPACE_NAME_PARAMETER, xwikiAttachment.getDocument().getSpace());
+        parametersMap.put(Constants.PAGE_NAME_PARAMETER, xwikiAttachment.getDocument().getName());
+        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
+        link.setRel(Relations.PAGE);
+        attachment.addLink(link);
+
+        fullUri =
+            String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                .getUriPatternForResourceClass(AttachmentVersionResource.class));
+
+        parametersMap = new HashMap<String, String>();
+        parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
+        parametersMap.put(Constants.SPACE_NAME_PARAMETER, xwikiAttachment.getDocument().getSpace());
+        parametersMap.put(Constants.PAGE_NAME_PARAMETER, xwikiAttachment.getDocument().getName());
+        parametersMap.put(Constants.ATTACHMENT_NAME_PARAMETER, attachment.getName());
+        parametersMap.put(Constants.ATTACHMENT_VERSION_PARAMETER, xwikiAttachment.getVersion());
         link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
         link.setRel(Relations.ATTACHMENT_DATA);
         attachment.addLink(link);

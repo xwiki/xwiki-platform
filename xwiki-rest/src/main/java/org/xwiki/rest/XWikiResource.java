@@ -202,7 +202,7 @@ public class XWikiResource extends WadlResource
             String spaceName = (String) request.getAttributes().get(Constants.SPACE_NAME_PARAMETER);
             String pageName = (String) request.getAttributes().get(Constants.PAGE_NAME_PARAMETER);
             String language = (String) request.getAttributes().get(Constants.LANGUAGE_ID_PARAMETER);
-            String version = (String) request.getAttributes().get(Constants.VERSION_PARAMETER);
+            String version = (String) request.getAttributes().get(Constants.PAGE_VERSION_PARAMETER);
 
             String pageFullName = Utils.getPrefixedPageName(wikiName, spaceName, pageName);
 

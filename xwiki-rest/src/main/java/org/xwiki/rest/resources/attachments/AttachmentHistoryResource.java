@@ -19,24 +19,23 @@
  */
 package org.xwiki.rest.resources.attachments;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.OutputRepresentation;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.rest.Constants;
+import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.model.Attachments;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 
-public class BaseAttachmentResource extends XWikiResource
+public class AttachmentHistoryResource extends XWikiResource
 {
     @Override
     public void init(Context context, Request request, Response response)
@@ -54,7 +53,7 @@ public class BaseAttachmentResource extends XWikiResource
                 return null;
             }
 
-            Document doc = documentInfo.getDocument();
+            Document doc = documentInfo.getDocument();            
 
             String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
 
@@ -64,22 +63,29 @@ public class BaseAttachmentResource extends XWikiResource
                 getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
                 return null;
             }
+            
+            /*
+             * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
+             * external URL for an attachment
+             */
+            XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
 
-            return new OutputRepresentation(MediaType.valueOf(xwikiAttachment.getMimeType()))
-            {
-                @Override
-                public void write(OutputStream outputStream) throws IOException
-                {
-                    /* TODO: Maybe we should write the content N bytes at a time */
-                    try {
-                        outputStream.write(xwikiAttachment.getContent());
-                    } catch (XWikiException e) {
-                        getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                    } finally {
-                        outputStream.close();
-                    }
-                }
-            };
+            Attachments attachments = new Attachments();
+
+            Version[] versionList = xwikiAttachment.getVersions();
+            for (Version version : versionList) {
+                com.xpn.xwiki.api.Attachment xwikiAttachmentAtVersion =
+                    xwikiAttachment.getAttachmentRevision(version.toString());
+
+                String attachmentXWikiUrl =
+                    xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
+                        .toString();
+
+                attachments.addAttachment(DomainObjectFactory.createAttachmentAtVersion(getRequest(),
+                    resourceClassRegistry, xwikiAttachmentAtVersion, attachmentXWikiUrl));
+            }
+
+            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), attachments);
         } catch (Exception e) {
             e.printStackTrace();
             getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);

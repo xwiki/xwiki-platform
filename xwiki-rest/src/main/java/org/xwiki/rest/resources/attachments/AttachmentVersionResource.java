@@ -36,7 +36,7 @@ import org.xwiki.rest.XWikiResource;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
-public class BaseAttachmentResource extends XWikiResource
+public class AttachmentVersionResource extends XWikiResource
 {
     @Override
     public void init(Context context, Request request, Response response)
@@ -57,9 +57,19 @@ public class BaseAttachmentResource extends XWikiResource
             Document doc = documentInfo.getDocument();
 
             String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
+            String attachmentVersion = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_VERSION_PARAMETER);
 
-            final com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
+            com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
             if (xwikiAttachment == null) {
+                /* If the attachment doesn't exist send a not found header */
+                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+                return null;
+            }
+
+            /* Get the requested version */
+            final com.xpn.xwiki.api.Attachment xwikiAttachmentVersion =
+                xwikiAttachment.getAttachmentRevision(attachmentVersion);
+            if (xwikiAttachmentVersion == null) {
                 /* If the attachment doesn't exist send a not found header */
                 getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
                 return null;
@@ -72,7 +82,7 @@ public class BaseAttachmentResource extends XWikiResource
                 {
                     /* TODO: Maybe we should write the content N bytes at a time */
                     try {
-                        outputStream.write(xwikiAttachment.getContent());
+                        outputStream.write(xwikiAttachmentVersion.getContent());
                     } catch (XWikiException e) {
                         getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
                     } finally {

@@ -43,7 +43,9 @@ public class Constants
 
     public static final String COMMENT_ID_PARAMETER = "commentId";
 
-    public static final String VERSION_PARAMETER = "version";
+    public static final String PAGE_VERSION_PARAMETER = "version";
+
+    public static final String ATTACHMENT_VERSION_PARAMETER = "attachmentVersion";
 
     public static final String NUMBER_PARAMETER = "number";
 

@@ -1034,6 +1034,92 @@
 			representation is directly derived from the attachment and its media
 			type.
 		-->
+		
+		<!-- ************************************* -->
+		<!-- * AttachmentHistory resource * -->
+		<!-- ************************************* -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.attachments.AttachmentHistoryResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.resources.attachments.AttachmentHistoryResource
+			</implementation>
+			<requirements>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceClassRegistry
+					</role>
+				</requirement>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceRepresenter
+					</role>
+					<role-hint>
+						org.xwiki.rest.resources.attachments.AttachmentHistoryResource
+					</role-hint>
+					<field-name>descriptorToRepresenterMap
+					</field-name>
+				</requirement>
+			</requirements>
+			<configuration>
+				<uriPattern>
+					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for AttachmentsAtPageVersion resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.attachments.AttachmentHistoryResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
+		
+		<!-- ************************************ -->
+		<!-- * AttachmentVersion resource * -->
+		<!-- ************************************ -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.attachments.AttachmentVersionResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.resources.attachments.AttachmentVersionResource
+			</implementation>
+			<requirements>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceClassRegistry
+					</role>
+				</requirement>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceRepresenter
+					</role>
+					<role-hint>org.xwiki.rest.resources.attachments.AttachmentVersionResource
+					</role-hint>
+					<field-name>descriptorToRepresenterMap
+					</field-name>
+				</requirement>
+			</requirements>
+			<configuration>
+				<uriPattern>
+					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history/{attachmentVersion}
+				</uriPattern>
+			</configuration>
+		</component>
+		<!--
+			No representers for the attachment resource because the
+			representation is directly derived from the attachment and its media
+			type.
+		-->
 
 	</components>
 </component-set>

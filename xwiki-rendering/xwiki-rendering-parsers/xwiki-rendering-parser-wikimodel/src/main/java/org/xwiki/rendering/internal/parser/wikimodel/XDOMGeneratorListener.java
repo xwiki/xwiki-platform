@@ -98,7 +98,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     private ImageParser imageParser;
 
-    private int currentSectionLevel = 0;
+    private Stack<Integer> currentSectionLevel = new Stack<Integer>();
 
     private class MarkerBlock extends AbstractBlock
     {
@@ -149,6 +149,7 @@ public class XDOMGeneratorListener implements IWemListener
     public void beginDocument()
     {
         this.stack.push(this.marker);
+        this.currentSectionLevel.push(0);
     }
 
     /**
@@ -161,16 +162,21 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginHeader(int level, WikiParameters params)
     {
+        int sectionLevel = this.currentSectionLevel.peek();
+
         // Close sections
-        for (; this.currentSectionLevel >= level; --this.currentSectionLevel) {
+        for (; sectionLevel >= level; --sectionLevel) {
             this.stack.push(new SectionBlock(generateListFromStack()));
         }
 
         // Open sections
-        for (; this.currentSectionLevel < level; ++this.currentSectionLevel) {
+        for (; sectionLevel < level; ++sectionLevel) {
             this.stack.push(this.marker);
         }
 
+        this.currentSectionLevel.set(this.currentSectionLevel.size() - 1, sectionLevel);
+
+        // Push header
         this.stack.push(this.marker);
     }
 
@@ -247,10 +253,12 @@ public class XDOMGeneratorListener implements IWemListener
     public void endDocument()
     {
         // Close sections
-        for (; this.currentSectionLevel > 0; --this.currentSectionLevel) {
+        int sectionLevel = this.currentSectionLevel.peek();
+        for (; sectionLevel > 0; --sectionLevel) {
             this.stack.push(new SectionBlock(generateListFromStack()));
         }
 
+        this.currentSectionLevel.pop();
         this.stack.push(new XDOM(generateListFromStack()));
     }
 

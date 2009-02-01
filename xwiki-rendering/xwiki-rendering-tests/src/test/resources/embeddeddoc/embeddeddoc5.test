@@ -1,6 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
+= The top-level document
+
 |=Table Header 1|=Table Header 2|=Table Header 3
 |Cell One|Cell Two (((
 = This is an embedded document
@@ -18,6 +20,16 @@ The next paragraph in the top-level document
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
+beginSection
+beginHeader [1]
+onWord [The]
+onSpace
+onWord [top]
+onSpecialSymbol [-]
+onWord [level]
+onSpace
+onWord [document]
+endHeader [1]
 beginTable
 beginTableRow
 beginTableHeadCell
@@ -140,14 +152,17 @@ onWord [level]
 onSpace
 onWord [document]
 endParagraph
+endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div class="xwiki-document"><h1 id="HThisisanembeddeddocument"><span>This is an embedded document</span></h1><p>The first paragraph of the embedded document</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>
+<h1 id="HThetopleveldocument"><span>The top-level document</span></h1><table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div class="xwiki-document"><h1 id="HThisisanembeddeddocument"><span>This is an embedded document</span></h1><p>The first paragraph of the embedded document</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
+= The top-level document =
+
 |=Table Header 1|=Table Header 2|=Table Header 3
 |Cell One|Cell Two(((= This is an embedded document =
 
@@ -162,4 +177,4 @@ The next paragraph in the top-level document
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div class="xwiki-document"><h1 id="HThisisanembeddeddocument"><span>This is an embedded document</span></h1><p>The first paragraph of the embedded document</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>
+<h1 id="HThetopleveldocument"><span>The top-level document</span></h1><table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div class="xwiki-document"><h1 id="HThisisanembeddeddocument"><span>This is an embedded document</span></h1><p>The first paragraph of the embedded document</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>

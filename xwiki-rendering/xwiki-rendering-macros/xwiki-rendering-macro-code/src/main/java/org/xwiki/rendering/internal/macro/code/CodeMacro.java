@@ -59,17 +59,6 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.box.AbstractBoxMacro#getClassProperty()
-     */
-    @Override
-    protected String getClassProperty()
-    {
-        return "code";
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.internal.macro.box.DefaultBoxMacro#parseContent(org.xwiki.rendering.macro.box.BoxMacroParameters,
      *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */

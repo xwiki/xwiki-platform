@@ -1265,7 +1265,8 @@ $html
 {/pre}
 #end
 #**
- * Displays a list of documents.   
+ * Displays a list of documents.
+ * Only documents that the current user is allowed to view will be displayed.   
  * 
  * @param docNames list of document names.
  * @param displaySpaces true to group documents by space.
@@ -1274,9 +1275,11 @@ $html
 #macro(displayDocumentList $docNames $displaySpaces $blacklistedSpaces)
   #set($documentList = $util.getArrayList())
   #foreach($docName in $docNames)
-    #set($document = $xwiki.getDocument($docName).getTranslatedDocument())      
-    #if(!$blacklistedSpaces.contains($document.getSpace()))    
-      #set($discard = $documentList.add($document))
+    #if($xwiki.hasAccessLevel("view", $context.user, $docName))
+      #set($document = $xwiki.getDocument($docName).getTranslatedDocument())
+      #if(!$blacklistedSpaces.contains($document.getSpace()))    
+        #set($discard = $documentList.add($document))
+      #end
     #end
   #end
   #if($documentList.size() > 0)

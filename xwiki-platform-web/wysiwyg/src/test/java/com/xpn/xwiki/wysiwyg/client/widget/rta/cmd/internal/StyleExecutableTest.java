@@ -368,4 +368,46 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         assertFalse(executable.isExecuted(rta));
         assertEquals("xyz", rta.getHTML());
     }
+
+    /**
+     * Apply style when the selection spans two paragraphs.
+     */
+    public void testStyleCrossParagraphSelection()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+                doTestStyleCrossParagraphSelection();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Apply style when the selection spans two paragraphs.
+     */
+    private void doTestStyleCrossParagraphSelection()
+    {
+        String html = "<p>abc</p><p>xyz</p>";
+        rta.setHTML(html);
+
+        Range range = ((Document) rta.getDocument()).createRange();
+        range.setStart(getBody().getFirstChild().getFirstChild(), 2);
+        range.setEnd(getBody().getLastChild().getFirstChild(), 2);
+        select(range);
+
+        String selectedText = "cxy";
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+        assertFalse(executable.isExecuted(rta));
+        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.isExecuted(rta));
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+        assertTrue(executable.execute(rta, null));
+        assertFalse(executable.isExecuted(rta));
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+        assertEquals(html, clean(rta.getHTML()));
+    }
 }

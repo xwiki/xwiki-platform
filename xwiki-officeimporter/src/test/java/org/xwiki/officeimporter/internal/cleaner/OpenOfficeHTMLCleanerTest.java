@@ -171,20 +171,20 @@ public class OpenOfficeHTMLCleanerTest extends AbstractHTMLCleanerTest
      */
     public void testTableFiltering()
     {
-        // Paragraphs are not allowed inside cell items.
+        // Isolated paragraphs will be removed.
         String html = header + "<table><tr><td><p>Test</p></td></tr></table>" + footer;
         Document doc = cleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("td");
         Node cellContent = nodes.item(0).getFirstChild();
         assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
         assertEquals("Test", cellContent.getNodeValue());
-        // Line breaks are not allowed inside cell items.
+        // Complex table cells will be put inside embedded documents.
         html = header + "<table><tr><td><br/><p><br/>Test</p></td></tr></table>" + footer;
         doc = cleaner.clean(new StringReader(html));
         nodes = doc.getElementsByTagName("td");
         cellContent = nodes.item(0).getFirstChild();
-        assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
-        assertEquals("Test", cellContent.getNodeValue());
+        assertEquals("div", cellContent.getNodeName());
+        assertEquals("xwiki-document", ((Element)cellContent).getAttribute("class"));
         // Empty rows are not allowed.
         html = header + "<table><tbody><tr></tr></tbody></table>" + footer;
         doc = cleaner.clean(new StringReader(html));

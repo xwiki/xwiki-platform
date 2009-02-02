@@ -37,24 +37,34 @@ import org.xwiki.officeimporter.filter.common.ElementFilterCriterion;
 public class TableFilter extends AbstractHTMLFilter
 {
     /**
-     * Tags that need to be removed from cell items while preserving there children.
+     * If these tags are found within a cell item (td), cell's content will be considered as an embedded document.
      */
-    private static final String[] REPLACE_TAGS = new String[] {TAG_P};
-
-    /**
-     * Tags that need to be completely removed from cell items.
-     */
-    private static final String[] STRIP_TAGS = new String[] {TAG_BR};
+    private static final String[] FILTER_TAGS =
+        new String[] {TAG_P, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6, TAG_BR, TAG_UL, TAG_OL, TAG_IMG, TAG_TABLE};
 
     /**
      * {@inheritDoc}
      */
     public void filter(Document document)
     {
-        // Clean table cell items first.
-        List<Element> cells = filterDescendants(document.getDocumentElement(), TAG_TD);
-        for (Element cell : cells) {
-            cleanCell(cell);
+        // Remove isolated paragraphs inside cell items.
+        List<Element> tableCells = filterDescendants(document.getDocumentElement(), TAG_TD);
+        for (Element cell : tableCells) {
+            List<Element> paragraphs = filterChildren(cell, TAG_P);
+            if (paragraphs.size() == 1) {
+                replaceWithChildren(paragraphs.get(0));
+            }
+        }
+        // Filter resulting cell content.
+        tableCells = filterDescendants(document.getDocumentElement(), TAG_TD);
+        for (Element cell : tableCells) {
+            List<Element> dangerTags = filterDescendants(cell, FILTER_TAGS);
+            if (!dangerTags.isEmpty()) {
+                Element div = document.createElement("div");
+                div.setAttribute("class", "xwiki-document");
+                moveChildren(cell, div);
+                cell.appendChild(div);
+            }
         }
         // Strip off empty table rows. see http://jira.xwiki.org/jira/browse/XWIKI-3136.
         List<Element> emptyRows = filterDescendants(document.getDocumentElement(), TAG_TR, new ElementFilterCriterion()
@@ -72,24 +82,6 @@ public class TableFilter extends AbstractHTMLFilter
             if (hasAttribute(childCells, ATT_ROWSPAN, true)) {
                 stripAttribute(childCells, ATT_ROWSPAN);
             }
-        }
-    }
-
-    /**
-     * Cleans this particular table cell by stripping off / replacing those tags which are not yet supported inside
-     * table cell items in xwiki 2.0 syntax.
-     * 
-     * @param cell The {@link Element} representing a table cell.
-     */
-    private void cleanCell(Element cell)
-    {
-        for (String stripTagName : STRIP_TAGS) {
-            List<Element> stripTags = filterDescendants(cell, stripTagName);
-            stripElements(stripTags);
-        }
-        for (String replaceTagName : REPLACE_TAGS) {
-            List<Element> replaceTags = filterDescendants(cell, replaceTagName);
-            replaceWithChildren(replaceTags);
         }
     }
 }

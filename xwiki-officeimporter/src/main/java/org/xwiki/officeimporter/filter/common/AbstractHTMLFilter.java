@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xwiki.officeimporter.filter.HTMLFilter;
 
@@ -35,19 +36,64 @@ import org.xwiki.officeimporter.filter.HTMLFilter;
 public abstract class AbstractHTMLFilter implements HTMLFilter
 {
     /**
-     * xhtml 'rowspan' table attribute.
-     */
-    public static final String ATT_ROWSPAN = "rowspan";
-
-    /**
      * xhtml paragraph tag.
      */
     public static final String TAG_P = "p";
 
     /**
+     * xhtml h1 tag.
+     */
+    public static final String TAG_H1 = "h1";
+
+    /**
+     * xhtml h2 tag.
+     */
+    public static final String TAG_H2 = "h2";
+
+    /**
+     * xhtml h3 tag.
+     */
+    public static final String TAG_H3 = "h3";
+
+    /**
+     * xhtml h4 tag.
+     */
+    public static final String TAG_H4 = "h4";
+
+    /**
+     * xhtml h5 tag.
+     */
+    public static final String TAG_H5 = "h5";
+
+    /**
+     * xhtml h6 tag.
+     */
+    public static final String TAG_H6 = "h6";
+
+    /**
      * xhtml line break tag.
      */
     public static final String TAG_BR = "br";
+
+    /**
+     * xhtml unordered list tag.
+     */
+    public static final String TAG_UL = "ul";
+
+    /**
+     * xhtml ordered list tag.
+     */
+    public static final String TAG_OL = "ol";
+
+    /**
+     * xhtml image tag.
+     */
+    public static final String TAG_IMG = "img";
+
+    /**
+     * xhtml table tag.
+     */
+    public static final String TAG_TABLE = "table";
 
     /**
      * xhtml table row tag.
@@ -58,6 +104,31 @@ public abstract class AbstractHTMLFilter implements HTMLFilter
      * xhtml table data tag.
      */
     public static final String TAG_TD = "td";
+
+    /**
+     * xhtml 'rowspan' table attribute.
+     */
+    public static final String ATT_ROWSPAN = "rowspan";
+
+    /**
+     * Utility method for filtering an element's children with a tagName.
+     * 
+     * @param parent the parent {@link Element}.
+     * @param tagName expected tagName of the children elements.
+     * @return list of children elements with the provided tagName.
+     */
+    protected List<Element> filterChildren(Element parent, String tagName)
+    {
+        List<Element> result = new ArrayList<Element>();
+        Node current = parent.getFirstChild();
+        while (current != null) {
+            if (current.getNodeName().equals(tagName)) {
+                result.add((Element) current);
+            }
+            current = current.getNextSibling();
+        }
+        return result;
+    }
 
     /**
      * Utility method for filtering an element's descendants with a tagName.
@@ -193,5 +264,32 @@ public abstract class AbstractHTMLFilter implements HTMLFilter
         for (Element e : elements) {
             replaceWithChildren(e);
         }
+    }
+
+    /**
+     * Moves all child elements of the parent into destination element.
+     * 
+     * @param parent the parent {@link Element}.
+     * @param destination the destination {@link Element}.
+     */
+    protected void moveChildren(Element parent, Element destination)
+    {
+        NodeList children = parent.getChildNodes();
+        while (children.getLength() > 0) {
+            destination.appendChild(parent.removeChild(parent.getFirstChild()));
+        }
+    }
+
+    /**
+     * Utility method for checking if a node represents a comment or an empty text.
+     * 
+     * @param node the {@link Node}
+     * @return true if the node is either a comment node or a text node with whitespaces.
+     */
+    protected boolean isCommentOrEmptyTextNode(Node node)
+    {
+        return null != node
+            && (node.getNodeType() == Node.COMMENT_NODE || (node.getNodeType() == Node.TEXT_NODE && node
+                .getTextContent().trim().equals("")));
     }
 }

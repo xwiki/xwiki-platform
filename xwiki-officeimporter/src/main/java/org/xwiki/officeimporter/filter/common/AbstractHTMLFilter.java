@@ -60,13 +60,13 @@ public abstract class AbstractHTMLFilter implements HTMLFilter
     public static final String TAG_TD = "td";
 
     /**
-     * Utility method for filtering an element's children with a tagName.
+     * Utility method for filtering an element's descendants with a tagName.
      * 
      * @param parent the parent {@link Element}.
-     * @param tagName tagName of the children elements.
-     * @return list of elements with the provided tagName.
+     * @param tagName expected tagName of the descendant elements.
+     * @return list of descendant elements with the provided tagName.
      */
-    protected List<Element> filterChildren(Element parent, String tagName)
+    protected List<Element> filterDescendants(Element parent, String tagName)
     {
         List<Element> result = new ArrayList<Element>();
         NodeList nodes = parent.getElementsByTagName(tagName);
@@ -78,14 +78,34 @@ public abstract class AbstractHTMLFilter implements HTMLFilter
     }
 
     /**
-     * Utility method for filtering an element's children with a tagName and an {@link ElementFilterCriterion}.
+     * Utility method for filtering an element's descendants with an array of tagNames.
      * 
      * @param parent the parent {@link Element}.
-     * @param tagName tagName of the children elements.
-     * @param filter the {@link ElementFilterCriterion} used to select elements.
-     * @return list of elements with the provided tagName and matching the given criterion.
+     * @param tagNames an array of tagNames.
+     * @return list of descendants of the parent element having one of given tag names.
      */
-    protected List<Element> filterChildren(Element parent, String tagName, ElementFilterCriterion filter)
+    protected List<Element> filterDescendants(Element parent, String[] tagNames)
+    {
+        List<Element> result = new ArrayList<Element>();
+        for (String tagName : tagNames) {
+            NodeList nodes = parent.getElementsByTagName(tagName);
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Element element = (Element) nodes.item(i);
+                result.add(element);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Utility method for filtering an element's descendants with a tagName and an {@link ElementFilterCriterion}.
+     * 
+     * @param parent the parent {@link Element}.
+     * @param tagName expected tagName of the descendant elements.
+     * @param filter the {@link ElementFilterCriterion} used to select elements.
+     * @return list of descendant elements with the provided tagName and matching the given criterion.
+     */
+    protected List<Element> filterDescendants(Element parent, String tagName, ElementFilterCriterion filter)
     {
         List<Element> result = new ArrayList<Element>();
         NodeList nodes = parent.getElementsByTagName(tagName);
@@ -137,7 +157,7 @@ public abstract class AbstractHTMLFilter implements HTMLFilter
     }
 
     /**
-     * Strips off the specified attribute from all the elements present in the given list. 
+     * Strips off the specified attribute from all the elements present in the given list.
      * 
      * @param elements the list of elements.
      * @param attributeName name of the attribute.

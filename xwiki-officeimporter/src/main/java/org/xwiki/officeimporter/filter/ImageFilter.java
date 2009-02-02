@@ -73,7 +73,7 @@ public class ImageFilter extends AbstractHTMLFilter
      */
     public void filter(Document htmlDocument)
     {
-        List<Element> images = filterChildren(htmlDocument.getDocumentElement(), "img");
+        List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), "img");
         for (Element image : images) {
             String src = image.getAttribute("src");
             // TODO : We might have to verify that src is a file name. (a.k.a not a

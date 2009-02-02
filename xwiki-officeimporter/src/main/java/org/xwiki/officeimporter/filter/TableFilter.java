@@ -52,12 +52,12 @@ public class TableFilter extends AbstractHTMLFilter
     public void filter(Document document)
     {
         // Clean table cell items first.
-        List<Element> cells = filterChildren(document.getDocumentElement(), TAG_TD);
+        List<Element> cells = filterDescendants(document.getDocumentElement(), TAG_TD);
         for (Element cell : cells) {
             cleanCell(cell);
         }
         // Strip off empty table rows. see http://jira.xwiki.org/jira/browse/XWIKI-3136.
-        List<Element> emptyRows = filterChildren(document.getDocumentElement(), TAG_TR, new ElementFilterCriterion()
+        List<Element> emptyRows = filterDescendants(document.getDocumentElement(), TAG_TR, new ElementFilterCriterion()
         {
             public boolean isFiltered(Element element)
             {
@@ -66,9 +66,9 @@ public class TableFilter extends AbstractHTMLFilter
         });
         stripElements(emptyRows);
         // Remove problematic rowspan attributes.
-        List<Element> rows = filterChildren(document.getDocumentElement(), TAG_TR);
+        List<Element> rows = filterDescendants(document.getDocumentElement(), TAG_TR);
         for (Element row : rows) {
-            List<Element> childCells = filterChildren(row, TAG_TD);
+            List<Element> childCells = filterDescendants(row, TAG_TD);
             if (hasAttribute(childCells, ATT_ROWSPAN, true)) {
                 stripAttribute(childCells, ATT_ROWSPAN);
             }
@@ -84,11 +84,11 @@ public class TableFilter extends AbstractHTMLFilter
     private void cleanCell(Element cell)
     {
         for (String stripTagName : STRIP_TAGS) {
-            List<Element> stripTags = filterChildren(cell, stripTagName);
+            List<Element> stripTags = filterDescendants(cell, stripTagName);
             stripElements(stripTags);
         }
         for (String replaceTagName : REPLACE_TAGS) {
-            List<Element> replaceTags = filterChildren(cell, replaceTagName);
+            List<Element> replaceTags = filterDescendants(cell, replaceTagName);
             replaceWithChildren(replaceTags);
         }
     }

@@ -35,11 +35,11 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 public class ListSyntaxFilter extends AbstractFilter
 {
     private static final Pattern LISTYNTAX_PATTERN =
-        Pattern.compile("(^[\\p{Blank}]*+([-#*]++|[-1iIaAghHkKj]++\\.)[\\p{Blank}]++[^\r\n]++([ \t]*+[\r\n]++)*+)++",
+        Pattern.compile("(^[\\p{Blank}]*+([-#*]++|[-#*iIaA1ghHkKj]++\\.)[\\p{Blank}]++[^\r\n]++([ \t]*+[\r\n]++)*+)++",
             Pattern.MULTILINE);
 
     private static final Pattern LISTITEMSYNTAX_PATTERN =
-        Pattern.compile("^([\\p{Blank}]*+)([-#*]++|[-1iIaAghHkKj]++\\.)([\\p{Blank}]++[^\r\n]++)([ \t]*+[\r\n]++)*+",
+        Pattern.compile("^([\\p{Blank}]*+)([-#*]++|[-#*iIaA1ghHkKj]++\\.)([\\p{Blank}]++[^\r\n]++)([ \t]*+[\r\n]++)*+",
             Pattern.MULTILINE);
 
     public String filter(String content, FilterContext filterContext)

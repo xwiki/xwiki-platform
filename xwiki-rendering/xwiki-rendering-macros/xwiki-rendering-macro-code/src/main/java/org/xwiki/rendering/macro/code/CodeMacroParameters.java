@@ -40,6 +40,9 @@ public class CodeMacroParameters extends BoxMacroParameters
      */
     private String language;
 
+    /**
+     * Initialize code macro class.
+     */
     public CodeMacroParameters()
     {
         this.setCssClass("code");

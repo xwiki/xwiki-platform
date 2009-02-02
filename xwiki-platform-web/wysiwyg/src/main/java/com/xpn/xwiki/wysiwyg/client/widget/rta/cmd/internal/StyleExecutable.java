@@ -151,6 +151,7 @@ public class StyleExecutable extends AbstractExecutable
      */
     protected Range execute(Range range, boolean executed)
     {
+        Range styledRange = range;
         if (range.isCollapsed()) {
             switch (range.getStartContainer().getNodeType()) {
                 case Node.TEXT_NODE:
@@ -188,11 +189,13 @@ public class StyleExecutable extends AbstractExecutable
                 }
             }
             if (startContainer != null) {
-                range.setEnd(endContainer.getText(), endContainer.getEndIndex());
-                range.setStart(startContainer.getText(), startContainer.getStartIndex());
+                // We cannot reuse the given range because it may have been invalidated by the DOM mutations.
+                styledRange = ((Document) startContainer.getText().getOwnerDocument()).createRange();
+                styledRange.setStart(startContainer.getText(), startContainer.getStartIndex());
+                styledRange.setEnd(endContainer.getText(), endContainer.getEndIndex());
             }
         }
-        return range;
+        return styledRange;
     }
 
     /**

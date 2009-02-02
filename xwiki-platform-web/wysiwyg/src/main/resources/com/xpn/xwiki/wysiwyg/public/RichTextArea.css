@@ -31,6 +31,8 @@ body.main {
 .main h1 span, .main h2 span, .main h3 span, .main h4 span {
   border-bottom: 0 none;
   margin: 0;
+  /* IE behaves very strange when the span is displayed as block. */
+  display: inline;
 }
 
 .main h1, .main h2, .main h3, .main h4 {

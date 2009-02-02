@@ -49,7 +49,11 @@
 </object>
 <content>#set($interface = $xwiki.rightsmanager.defaultUi)
 ## display the new interface
-#if($interface == "new") 
+#if($interface == "new")
+$xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true)
+$xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css")
+$xwiki.jsfx.use("js/xwiki/table/livetable.js", true)
+$xwiki.ssfx.use("js/xwiki/table/livetable.css", true)
 &lt;div id="ajax-loader"&gt;$msg.get("ui.ajaxTable.loading")&lt;br /&gt;
   &lt;img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." /&gt;
 &lt;/div&gt;

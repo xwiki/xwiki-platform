@@ -41,6 +41,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("velocity/velocity1", false);
         suite.addTestsFromResource("velocity/velocity2", false);
         suite.addTestsFromResource("velocity/velocity3", false);
+        suite.addTestsFromResource("velocity/velocity4", false);
+        suite.addTestsFromResource("velocity/velocity5", false);
+        suite.addTestsFromResource("velocity/velocity6", false);
 
         // Velocity Macros
         suite.addTestsFromResource("macros/velocity/include1", false);
@@ -63,15 +66,15 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("link/link1", false);
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("section/section1", false);
-        
+
         // HTML
         suite.addTestsFromResource("html/html1", false);
         suite.addTestsFromResource("html/html2", false);
         suite.addTestsFromResource("html/html3", false);
-        
+
         // Cleaning
         suite.addTestsFromResource("cleaning/cleaning1", false);
-        
+
         return new RenderingPlexusTestSetup(suite);
     }
 }

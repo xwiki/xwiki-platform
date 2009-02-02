@@ -49,7 +49,9 @@ public class VelocityFilter extends AbstractFilter implements Composable
 
     public static final String VELOCITY_MACRO_SPATTERN = "\\#(\\w+)\\(([^)]*)\\)";
 
-    public static final String VELOCITY_VARIABLE_SPATTERN = "\\$\\{?\\p{Alpha}\\w*\\}?";
+    public static final String VELOCITY_VARIABLEMETHOD_SPATTERN = "\\.\\p{Alpha}\\w*(\\(.*\\))?";
+    
+    public static final String VELOCITY_VARIABLE_SPATTERN = "\\$\\{?\\p{Alpha}\\w*("+VELOCITY_VARIABLEMETHOD_SPATTERN+")*\\}?";
 
     public static final Pattern VELOCITY_PATTERN =
         Pattern.compile(VELOCITY_COMMENT_SPATTERN + "|" + VELOCITY_MACRO_SPATTERN + "|" + VELOCITY_VARIABLE_SPATTERN);

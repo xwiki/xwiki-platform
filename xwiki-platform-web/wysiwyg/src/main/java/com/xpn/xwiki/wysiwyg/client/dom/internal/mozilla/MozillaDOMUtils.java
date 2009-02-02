@@ -76,4 +76,44 @@ public class MozillaDOMUtils extends DOMUtils
     {
         element.setInnerHTML(html);
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#splitHTMLNode(Node, Node, int)
+     */
+    public Node splitHTMLNode(Node parent, Node descendant, int offset)
+    {
+        // Save the length of the descendant before the split to be able to detect where the split took place.
+        int length = getLength(descendant);
+
+        // Split the subtree rooted in the given parent.
+        Node nextLevelSibling = super.splitHTMLNode(parent, descendant, offset);
+
+        // See if the split took place.
+        if (nextLevelSibling != descendant) {
+            if (offset == 0) {
+                // The split took place at the beginning of the descendant. Ensure the first subtree is accessible.
+                // But first see if the first subtree has any leafs besides the descendant.
+                Node child = getChild(parent, descendant);
+                if (!isInline(child) && getFirstLeaf(child) == descendant) {
+                    Node refNode = getFarthestInlineAncestor(descendant);
+                    refNode = refNode == null ? child : refNode.getParentNode();
+                    refNode.appendChild(((Document) refNode.getOwnerDocument()).xCreateBRElement());
+                }
+            }
+            if (offset == length) {
+                // The split took place at the end of the descendant. Ensure the second subtree is accessible.
+                // But first see if the second subtree has any leafs besides the nextLevelSibling.
+                Node child = getChild(parent, nextLevelSibling);
+                if (!isInline(child) && getLastLeaf(child) == nextLevelSibling) {
+                    Node refNode = getFarthestInlineAncestor(nextLevelSibling);
+                    refNode = refNode == null ? child : refNode.getParentNode();
+                    refNode.appendChild(((Document) refNode.getOwnerDocument()).xCreateBRElement());
+                }
+            }
+        }
+
+        return nextLevelSibling;
+    }
 }

@@ -568,4 +568,37 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         container.getFirstChild().setNodeValue("");
         assertEquals(0, domUtils.getNormalizedChildCount(container));
     }
+
+    /**
+     * Unit test for {@link DOMUtils#splitHTMLNode(Node, Node, int)}.
+     * 
+     * @see XWIKI-3053: When a HR is inserted at the beginning of a paragraph an extra empty paragraph is generated
+     *      before that HR
+     */
+    public void testSplitHTMLNode()
+    {
+        container.setInnerHTML("<p><em>a</em>b</p>");
+        domUtils.splitHTMLNode(container, container.getFirstChild().getFirstChild().getFirstChild(), 0);
+        assertEquals("<p><em></em><br></p><p><em>a</em>b</p>", container.getInnerHTML());
+
+        container.setInnerHTML("<p><em>b</em>a</p>");
+        domUtils.splitHTMLNode(container, container.getFirstChild().getFirstChild().getFirstChild(), 1);
+        assertEquals("<p><em>b</em></p><p><em></em>a</p>", container.getInnerHTML());
+
+        container.setInnerHTML("<p><em>x</em>y</p>");
+        domUtils.splitHTMLNode(container, container.getFirstChild().getLastChild(), 1);
+        assertEquals("<p><em>x</em>y</p><p><br></p>", container.getInnerHTML());
+
+        container.setInnerHTML("<p><em>y</em>x</p>");
+        domUtils.splitHTMLNode(container, container.getFirstChild().getLastChild(), 0);
+        assertEquals("<p><em>y</em></p><p>x</p>", container.getInnerHTML());
+
+        container.setInnerHTML("<p><em>1</em>2</p>");
+        domUtils.splitHTMLNode(container.getFirstChild(), container.getFirstChild().getFirstChild(), 0);
+        assertEquals("<p><em></em><em>1</em>2</p>", container.getInnerHTML());
+
+        container.setInnerHTML("<p><em>2</em>1</p>");
+        domUtils.splitHTMLNode(container.getFirstChild(), container.getFirstChild().getFirstChild(), 1);
+        assertEquals("<p><em>2</em><em></em>1</p>", container.getInnerHTML());
+    }
 }

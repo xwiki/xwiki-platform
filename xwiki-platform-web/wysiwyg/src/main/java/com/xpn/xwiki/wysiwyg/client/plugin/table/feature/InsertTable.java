@@ -183,7 +183,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
         if (flowContainer == start) {
             DOMUtils.getInstance().insertAt(flowContainer, table, offset);
         } else {
-            DOMUtils.getInstance().splitNode(flowContainer, start, offset);
+            DOMUtils.getInstance().splitHTMLNode(flowContainer, start, offset);
             DOMUtils.getInstance().insertAfter(table, DOMUtils.getInstance().getChild(flowContainer, start));
         }
 

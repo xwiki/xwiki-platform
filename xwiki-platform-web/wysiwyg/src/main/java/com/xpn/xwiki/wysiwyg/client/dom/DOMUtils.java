@@ -774,6 +774,28 @@ public abstract class DOMUtils
     }
 
     /**
+     * Given a subtree specified by its root parent and one of the inner nodes, this method splits the subtree by the
+     * path from the given descendant (inner node) to the root parent. Additionally to what
+     * {@link #splitNode(Node, Node, int)}) does this method ensures that both subtrees are editable in design mode.
+     * This method is required because some browsers like Firefox prevent the user from placing the caret inside empty
+     * block elements such as paragraphs or headers. This empty block elements can be obtained by splitting at the
+     * beginning or at the end of such a block element.
+     * 
+     * @param parent the parent node of the subtree's root
+     * @param descendant an inner node within the specified subtree
+     * @param offset the offset within the given descendant. It can be either a character index or a child index
+     *            depending on the descendant node type.
+     * @return the node resulted from splitting the descendant
+     * @see #splitNode(Node, Node, int)
+     */
+    public Node splitHTMLNode(Node parent, Node descendant, int offset)
+    {
+        // By default we just do the split because browsers shouldn't require any further adjustments.
+        // Those who do require adjustments should overwrite this method.
+        return splitNode(parent, descendant, offset);
+    }
+
+    /**
      * @param node A DOM node.
      * @return true is the given node is an element that can have both in-line and block content.
      */

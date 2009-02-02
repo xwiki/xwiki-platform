@@ -66,7 +66,7 @@ public class InsertHRExecutable extends AbstractExecutable
             domUtils.insertAt(flowContainer, hr, offset);
             range.setEndAfter(hr);
         } else {
-            Node startNextLevelSibling = domUtils.splitNode(flowContainer, start, offset);
+            Node startNextLevelSibling = domUtils.splitHTMLNode(flowContainer, start, offset);
             domUtils.insertAfter(hr, domUtils.getChild(flowContainer, start));
             // We need to update the range after inserting the horizontal rule because otherwise the caret might jump
             // before it (this happens in IE for instance).

@@ -945,6 +945,7 @@ b.ts1{border-width: 0 2px}</code>
     ##-------------------------------------
     ## determine the displayed sections
     ##-------------------------------------
+    $xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")##
     $xwiki.jsx.use("XWiki.AdminSheet")##
     $xwiki.ssx.use("XWiki.AdminSheet")##
     #if($editor == "globaladmin")

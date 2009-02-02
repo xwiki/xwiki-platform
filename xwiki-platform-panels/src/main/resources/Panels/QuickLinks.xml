@@ -136,12 +136,10 @@
 </property>
 <property>
 <content>#panelheader('Quick Links')
-* [Home&gt;Main.WebHome]
-* [Index&gt;Main.AllDocs]
-* [What's New&gt;Main.Dashboard] &lt;a href="$xwiki.getURL("Main.RssFeeds")"&gt;&lt;img src="$xwiki.getSkinFile('icons/black-rss-mini3.png')" title="RSS Feeds" alt="RSS Feeds"/&gt;&lt;/a&gt;
+* [Wiki dashboard&gt;Main.WebHome]
+* [Documents index&gt;Main.AllDocs]
 * [Blog&gt;Blog.WebHome]
 * [Sandbox&gt;Sandbox.WebHome]
-* [Tags&gt;Main.Tags]
 #if ($xwiki.hasAdminRights())
 &lt;p style="font-size:0.75em;padding-left:8px;"&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;(Edit this panel)&lt;/a&gt;&lt;/p&gt;
 #end

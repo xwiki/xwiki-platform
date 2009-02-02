@@ -121,11 +121,10 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     {
         String imageParameter = parameters.getImage();
         String titleParameter = parameters.getTitle();
-        
+
         String classParameter = parameters.getCssClass();
-        String cssClass = StringUtils.isEmpty(classParameter)
-            ? getClassProperty()
-            : getClassProperty() + " " + classParameter;
+        String cssClass =
+            StringUtils.isEmpty(classParameter) ? getClassProperty() : getClassProperty() + " " + classParameter;
         Map<String, String> classParameterMap = Collections.singletonMap("class", cssClass);
 
         Block boxBlock;
@@ -136,15 +135,15 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
             boxBlock = spanBlock;
         } else {
             boxBlock = new XMLBlock(new XMLElement("div", classParameterMap));
-            
-            //we add the image, if there is one
+
+            // we add the image, if there is one
             if (!StringUtils.isEmpty(imageParameter)) {
                 Image image = new URLImage(imageParameter);
                 Block imageBlock = new ImageBlock(image, true);
                 boxBlock.addChild(imageBlock);
                 boxBlock.addChild(NewLineBlock.NEW_LINE_BLOCK);
             }
-            //we add the title, if there is one
+            // we add the title, if there is one
             if (!StringUtils.isEmpty(titleParameter)) {
                 Parser parser = getSyntaxParser(context);
                 List<Block> titleBlocks = parseTitle(parser, titleParameter);
@@ -165,29 +164,31 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
 
     /**
      * Renders the box's title.
+     * 
      * @param parser the appropriate syntax parser
      * @param titleParameter the title which is going to be parsed
      * @return the parsing result
      * @throws MacroExecutionException if the parsing fails
      */
-    private static List<Block> parseTitle(Parser parser, String titleParameter) throws MacroExecutionException {
+    private static List<Block> parseTitle(Parser parser, String titleParameter) throws MacroExecutionException
+    {
         try {
             List<Block> titleBlocks = parser.parse(new StringReader(titleParameter)).getChildren();
 
-            //we try to simplify a bit the generated XDOM tree
+            // we try to simplify a bit the generated XDOM tree
             if (titleBlocks.size() == 1) {
                 List<Block> children = titleBlocks.get(0).getChildren();
                 if (children.size() > 0) {
                     titleBlocks = children;
                 }
             }
-            
+
             return titleBlocks;
         } catch (ParseException e) {
             throw new MacroExecutionException(e.getMessage(), e);
         }
     }
-    
+
     /**
      * Remove the first and last new line of provided content.
      * 
@@ -251,7 +252,6 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         }
     }
 
-    
     /**
      * @return the name of the CSS class to use when rendering, in case no cssClass parameter is specified.
      */

@@ -38,15 +38,14 @@ public class BoxMacroParameters
      * Refer to {@link #getTitle()}.
      */
     private String title = StringUtils.EMPTY;
-    
+
     /**
      * Refer to {@link #getImage()}.
      */
     private String image = StringUtils.EMPTY;
-    
+
     /**
-     * @return the title to be displayed in the message box.
-     * Note that it can be specified using Wiki 2.0 syntax.
+     * @return the title to be displayed in the message box. Note that it can be specified using Wiki 2.0 syntax.
      */
     public String getTitle()
     {
@@ -63,8 +62,8 @@ public class BoxMacroParameters
     }
 
     /**
-     * @return the image to be displayed in the message box.
-     * It can be specified as attachment name or as an absolute URL.
+     * @return the image to be displayed in the message box. It can be specified as attachment name or as an absolute
+     *         URL.
      */
     public String getImage()
     {
@@ -81,9 +80,8 @@ public class BoxMacroParameters
     }
 
     /**
-     * @return an optional CSS sheet to be used when rendering this macro. 
-     * If no sheet is specified, the <code>BoxMacro.getClassProperty()</code> is used
-     * to provide a default one.
+     * @return an optional CSS sheet to be used when rendering this macro. If no sheet is specified, the
+     *         <code>BoxMacro.getClassProperty()</code> is used to provide a default one.
      */
     public String getCssClass()
     {

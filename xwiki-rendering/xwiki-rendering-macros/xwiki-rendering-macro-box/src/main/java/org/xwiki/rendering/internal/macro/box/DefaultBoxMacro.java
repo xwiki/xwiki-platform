@@ -45,7 +45,7 @@ public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMa
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Draw a box around provided content.";
-    
+
     /**
      * Create and initialize the descriptor of the macro.
      */

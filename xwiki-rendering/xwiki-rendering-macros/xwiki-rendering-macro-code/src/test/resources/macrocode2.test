@@ -14,7 +14,7 @@ beginMacroMarker [code] [language=java] [
 <b>bold</b>
 <i>italic</i>
 ]
-beginXMLNode [div] [class=code]
+beginXMLNode [div] [class=box code]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [<]
 endFormat: [NONE] [[style]=[color: #666666; ]]
@@ -46,7 +46,7 @@ onWord [i]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [>]
 endFormat: [NONE] [[style]=[color: #666666; ]]
-endXMLNode [div] [class=code]
+endXMLNode [div] [class=box code]
 endMacroMarker [code] [language=java] [
 <b>bold</b>
 <i>italic</i>

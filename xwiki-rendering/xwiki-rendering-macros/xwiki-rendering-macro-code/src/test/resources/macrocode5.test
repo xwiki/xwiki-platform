@@ -17,7 +17,7 @@ onWord [macro]
 onSpecialSymbol [:]
 onSpace
 beginMacroMarker [code] [language=html] [<b>bold</b><i>italic</i>]
-beginFormat: [NONE] [[class]=[code]]
+beginFormat: [NONE] [[class]=[box code]]
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [<b>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
@@ -29,7 +29,7 @@ onWord [italic]
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [</i>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-endFormat: [NONE] [[class]=[code]]
+endFormat: [NONE] [[class]=[box code]]
 endMacroMarker [code] [language=html] [<b>bold</b><i>italic</i>]
 endParagraph
 endDocument

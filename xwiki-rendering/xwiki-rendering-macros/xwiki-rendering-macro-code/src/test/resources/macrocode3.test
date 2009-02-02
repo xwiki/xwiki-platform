@@ -13,10 +13,10 @@ beginMacroMarker [code] [language=none] [
 <b>bold</b>
 <i>italic</i>
 ]
-beginXMLNode [div] [class=code]
+beginXMLNode [div] [class=box code]
 onVerbatimStandalone [<b>bold</b>
 <i>italic</i>]
-endXMLNode [div] [class=code]
+endXMLNode [div] [class=box code]
 endMacroMarker [code] [language=none] [
 <b>bold</b>
 <i>italic</i>

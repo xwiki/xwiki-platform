@@ -17,9 +17,9 @@ onWord [macro]
 onSpecialSymbol [:]
 onSpace
 beginMacroMarker [code] [language=none] [<b>bold</b><i>italic</i>]
-beginFormat: [NONE] [[class]=[code]]
+beginFormat: [NONE] [[class]=[box code]]
 onVerbatimInline [<b>bold</b><i>italic</i>]
-endFormat: [NONE] [[class]=[code]]
+endFormat: [NONE] [[class]=[box code]]
 endMacroMarker [code] [language=none] [<b>bold</b><i>italic</i>]
 endParagraph
 endDocument

@@ -171,6 +171,15 @@
     <!-- Wiki Syntaxes -->
     <component>
       <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
+      <role-hint>hr</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.HrFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <priority>800</priority>
+      </configuration>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
       <role-hint>list</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.xwiki10.ListSyntaxFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>

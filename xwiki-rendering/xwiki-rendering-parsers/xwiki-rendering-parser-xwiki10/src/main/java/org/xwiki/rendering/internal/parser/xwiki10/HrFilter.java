@@ -30,33 +30,36 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  * @version $Id$
  * @since 1.8M1
  */
-public class PreFilter extends AbstractFilter
+public class HrFilter extends AbstractFilter
 {
-    private static final Pattern PRE_PATTERN =
-        Pattern.compile("\\{pre\\}(.*?)\\{/pre\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern PRE_PATTERN = Pattern.compile("(?<=^| )----++(?=$| )");
 
     public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
+
+        String hr20 = filterContext.addProtectedContent("----");
 
         Matcher matcher = PRE_PATTERN.matcher(content);
         int currentIndex = 0;
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = content.substring(currentIndex, matcher.start());
 
+            if (currentIndex > 0) {
+                before = CleanUtil.setFirstNewLines(before, 2);
+            }
+
             // a standalone new line is not interpreted by XWiki 1.0 rendering
             result.append(CleanUtil.removeLastNewLines(before, 1, true));
 
-            result.append("{{{");
-            result.append(filterContext.addProtectedContent(CleanUtil.cleanSpacesAndNewLines(matcher.group(1)).trim()));
-            result.append("}}}");
+            result.append(hr20);
         }
 
         if (currentIndex == 0) {
             return content;
         }
 
-        result.append(content.substring(currentIndex));
+        result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
 
         return result.toString();
     }

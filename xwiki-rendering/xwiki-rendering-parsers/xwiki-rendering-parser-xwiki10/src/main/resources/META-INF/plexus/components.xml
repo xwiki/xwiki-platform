@@ -198,6 +198,15 @@
     </component>
     <component>
       <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
+      <role-hint>url</role-hint>
+      <implementation>org.xwiki.rendering.internal.parser.xwiki10.UrlFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <priority>1000</priority>
+      </configuration>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.parser.xwiki10.Filter</role>
       <role-hint>section</role-hint>
       <implementation>org.xwiki.rendering.internal.parser.xwiki10.SectionSyntaxFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>

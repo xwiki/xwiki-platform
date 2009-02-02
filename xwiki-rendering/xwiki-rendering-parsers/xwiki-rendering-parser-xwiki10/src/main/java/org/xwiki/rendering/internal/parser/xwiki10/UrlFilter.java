@@ -30,34 +30,32 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  * @version $Id$
  * @since 1.8M1
  */
-public class HrFilter extends AbstractFilter
+public class UrlFilter extends AbstractFilter
 {
-    private static final Pattern HR_PATTERN = Pattern.compile("(?<=^| )----++(?=$| )");
+    private static final Pattern URL_PATTERN =
+        Pattern
+            .compile("(?<![\"'=])((?:ht|f)tps?)://((?:%[\\p{Digit}A-Fa-f][\\p{Digit}A-Fa-f]|[-_.!~*';/?:@#&=+$,\\p{Alnum}])++)(?!['\">])");
 
     public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
 
-        String hr20 = filterContext.addProtectedContent("----");
-
-        Matcher matcher = HR_PATTERN.matcher(content);
+        Matcher matcher = URL_PATTERN.matcher(content);
         int currentIndex = 0;
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = content.substring(currentIndex, matcher.start());
 
-            if (currentIndex > 0) {
-                before = CleanUtil.setFirstNewLines(before, 2);
-            }
+            // a standalone new line is not interpreted by XWiki 1.0 rendering
+            result.append(CleanUtil.removeLastNewLines(before, 1, true));
 
-            result.append(before);
-            result.append(hr20);
+            result.append(filterContext.addProtectedContent(matcher.group(0), true));
         }
 
         if (currentIndex == 0) {
             return content;
         }
 
-        result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
+        result.append(content.substring(currentIndex));
 
         return result.toString();
     }

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-jodatime</artifactId>
   <name>XWiki Platform - Plugins - Joda Time</name>
-  <version>1.3</version>
+  <version>1.4-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Joda Time</description>
   <dependencies>
     <dependency>
@@ -46,10 +46,4 @@
       <version>1.6</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-jodatime-1.3</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-jodatime-1.3</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-jodatime-1.3</url>
-  </scm>
 </project>

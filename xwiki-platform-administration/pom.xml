@@ -27,11 +27,17 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>18</version>
   </parent>
   <artifactId>xwiki-application-administration</artifactId>
   <name>XWiki Platform - Applications - Administration</name>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.6</version>
   <packaging>xar</packaging>
   <description>Application for administrating wiki features like users, groups, rights etc.</description>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-administration-1.6</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-administration-1.6</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-administration-1.6</url>
+  </scm>
 </project>

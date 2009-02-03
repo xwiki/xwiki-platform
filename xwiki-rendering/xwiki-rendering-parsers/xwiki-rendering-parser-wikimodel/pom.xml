@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-rendering-parsers-parent</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8-milestone-2</version>
   </parent>
   <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
   <name>XWiki Platform - Core - Rendering - Parser - Wiki Model</name>

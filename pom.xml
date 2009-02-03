@@ -27,18 +27,18 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>20</version>
     <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-core-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
-  <version>1.8-SNAPSHOT</version>
+  <version>1.8-milestone-2</version>
   <description>XWiki Platform - Core - Parent POM</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.8-milestone-2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.8-milestone-2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.8-milestone-2</url>
   </scm>
   <dependencyManagement>
     <dependencies>
@@ -61,7 +61,7 @@
   </dependencies>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <platform.tool.test.version>1.15-SNAPSHOT</platform.tool.test.version>
+    <platform.tool.test.version>1.14</platform.tool.test.version>
   </properties>
   <modules>
     <module>xwiki-xmlrpc</module>

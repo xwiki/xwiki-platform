@@ -7,11 +7,13 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection [1]
+beginSection
+beginHeader [1]
 onWord [hello]
 onSpace
 beginMacroMarker [groovy] [] [print "world"]
 onWord [world]
 endMacroMarker [groovy] [] [print "world"]
-endSection [1]
+endHeader [1]
+endSection
 endDocument

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-rendering-parent</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8-milestone-2</version>
   </parent>
   <artifactId>xwiki-core-rendering-macros-parent</artifactId>
   <name>XWiki Platform - Core - Rendering - Macros - Parent POM</name>
@@ -78,7 +78,7 @@
     <module>xwiki-rendering-macro-html</module>
     <module>xwiki-rendering-macro-script</module>
     <module>xwiki-rendering-macro-velocity</module>
-    <!--module>xwiki-rendering-macro-groovy</module-->
+    <module>xwiki-rendering-macro-groovy</module>
     <module>xwiki-rendering-macro-box</module>
     <module>xwiki-rendering-macro-code</module>
   </modules>

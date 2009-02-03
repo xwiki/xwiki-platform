@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>20</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-web</artifactId>
@@ -42,10 +42,10 @@
     <!-- Used by gwt and wysiwyg modules -->
     <gwtVersion>1.5.3</gwtVersion>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <platform.tool.configuration.version>1.23</platform.tool.configuration.version>
-    <platform.core.version>1.8-milestone-2</platform.core.version>
-    <platform.skin.albatross.version>1.16</platform.skin.albatross.version>
-    <platform.skin.toucan.version>1.15</platform.skin.toucan.version>
+    <platform.tool.configuration.version>1.24-SNAPSHOT</platform.tool.configuration.version>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
+    <platform.skin.albatross.version>1.17-SNAPSHOT</platform.skin.albatross.version>
+    <platform.skin.toucan.version>1.16-SNAPSHOT</platform.skin.toucan.version>
   </properties>
   <profiles>
     <profile>

@@ -301,7 +301,7 @@ $xwiki.ssx.use("Main.Tags")
   &lt;form id="deleteForm" action="no-follow" method="post"&gt;
     &lt;input name="action" type="hidden" value="deleteTag" /&gt;
     &lt;input name="tag" type="hidden" value="$tag" /&gt;
-    &lt;input type="submit" value="$msg.get("xe.tag.deletetag", [$tag])" onclick="$('deleteForm').action='$doc.getURL("view")'; return true;" /&gt;
+    &lt;input type="submit" value="$msg.get("xe.tag.delete", [$tag])" onclick="$('deleteForm').action='$doc.getURL("view")'; return true;" /&gt;
   &lt;/form&gt;
 #elseif($action == "deleteTag")
   ##

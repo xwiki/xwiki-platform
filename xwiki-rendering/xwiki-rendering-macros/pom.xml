@@ -78,7 +78,7 @@
     <module>xwiki-rendering-macro-html</module>
     <module>xwiki-rendering-macro-script</module>
     <module>xwiki-rendering-macro-velocity</module>
-    <!--module>xwiki-rendering-macro-groovy</module-->
+    <module>xwiki-rendering-macro-groovy</module>
     <module>xwiki-rendering-macro-box</module>
     <module>xwiki-rendering-macro-code</module>
   </modules>

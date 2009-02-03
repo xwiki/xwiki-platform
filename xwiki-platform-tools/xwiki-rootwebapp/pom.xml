@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>15-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-rootwebapp</artifactId>
   <version>1.1-SNAPSHOT</version>

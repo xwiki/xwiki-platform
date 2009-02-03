@@ -27,11 +27,11 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>17-SNAPSHOT</version>
+    <version>18</version>
   </parent>
   <artifactId>xwiki-application-tag</artifactId>
   <name>XWiki Platform - Applications - Tag</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>xar</packaging>
   <description>Tag application for XWiki</description>
   <dependencies>
@@ -39,8 +39,14 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-tag</artifactId>
       <!-- We want to release the tag plugin and application together. Hence they should have the same version -->
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-tag-1.0</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-tag-1.0</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-tag-1.0</url>
+  </scm>
 </project>

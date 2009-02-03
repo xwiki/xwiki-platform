@@ -25,27 +25,27 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>20</version>
     <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-web</artifactId>
-  <version>1.8-SNAPSHOT</version>
+  <version>1.8-milestone-2</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-1.8-milestone-2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-1.8-milestone-2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-1.8-milestone-2</url>
   </scm>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
     <gwtVersion>1.5.3</gwtVersion>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <platform.tool.configuration.version>1.23-SNAPSHOT</platform.tool.configuration.version>
-    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
-    <platform.skin.albatross.version>1.16-SNAPSHOT</platform.skin.albatross.version>
-    <platform.skin.toucan.version>1.15-SNAPSHOT</platform.skin.toucan.version>
+    <platform.tool.configuration.version>1.23</platform.tool.configuration.version>
+    <platform.core.version>1.8-milestone-2</platform.core.version>
+    <platform.skin.albatross.version>1.16</platform.skin.albatross.version>
+    <platform.skin.toucan.version>1.15</platform.skin.toucan.version>
   </properties>
   <profiles>
     <profile>

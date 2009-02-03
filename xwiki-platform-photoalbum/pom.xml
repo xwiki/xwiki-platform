@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>18</version>
+    <version>19-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-application-photoalbum</artifactId>
   <name>XWiki Platform - Applications - Photo Album</name>

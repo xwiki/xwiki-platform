@@ -31,13 +31,7 @@
   </parent>
   <artifactId>xwiki-application-photoalbum</artifactId>
   <name>XWiki Platform - Applications - Photo Album</name>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Photo album application for XWiki</description>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-photoalbum-1.0</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-photoalbum-1.0</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-photoalbum-1.0</url>
-  </scm>
 </project>

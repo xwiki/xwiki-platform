@@ -237,7 +237,7 @@ $xwiki.ssx.use("XWiki.TagCloud")
           #set($classSet = true)      
         #end
       #end
-      &lt;li class="$liClass"&gt;&lt;a class="tag" href="$xwiki.getURL("Main.Tags", "view", "action=viewTag&amp;amp;tag=$tag")" title="$msg.get("xe.tagcloud.tag.tooltip", ["${tagCount.get($tag)}"])"&gt;$tag&lt;/a&gt;&lt;/li&gt;
+      &lt;li class="$liClass"&gt;&lt;a class="tag" href="$xwiki.getURL("Main.Tags", "view", "action=viewTag&amp;amp;tag=$tag")" title="$msg.get("xe.tag.tooltip", ["${tagCount.get($tag)}"])"&gt;$tag&lt;/a&gt;&lt;/li&gt;
     #end
   &lt;/ol&gt;
 #else

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-calendar</artifactId>
   <name>XWiki Platform - Plugins - Calendar</name>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Calendar</description>
   <dependencies>
     <dependency>
@@ -41,10 +41,4 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-calendar-1.0</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-calendar-1.0</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-calendar-1.0</url>
-  </scm>
 </project>

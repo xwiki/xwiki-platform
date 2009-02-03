@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-tag</artifactId>
   <name>XWiki Platform - Plugins - Tag</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <description>XWiki Platform - Plugins - Tag</description>
   <dependencies>
     <dependency>
@@ -54,4 +54,10 @@
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.0</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.0</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.0</url>
+  </scm>
 </project>

@@ -61,7 +61,6 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestInsertBetweenChildren();
                 finishTest();
             }
@@ -97,7 +96,6 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestInsertAfterLastChild();
                 finishTest();
             }
@@ -132,7 +130,6 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestInsertInTextNode();
                 finishTest();
             }
@@ -166,7 +163,6 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestReplaceCrossListItemSelection();
                 finishTest();
             }

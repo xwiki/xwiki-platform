@@ -41,7 +41,6 @@ public class HistoryTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestRestoreSelection();
                 finishTest();
             }
@@ -81,7 +80,6 @@ public class HistoryTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestRestoreSelectionEndingInAComment();
                 finishTest();
             }
@@ -124,7 +122,6 @@ public class HistoryTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestUndoInsideParagraph();
                 finishTest();
             }

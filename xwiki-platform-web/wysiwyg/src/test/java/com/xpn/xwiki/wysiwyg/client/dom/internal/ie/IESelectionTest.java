@@ -247,6 +247,7 @@ public class IESelectionTest extends AbstractWysiwygClientTest
         Range range = getRange("a<em>x</em>|<ins>y</ins>b");
         assertCollapsed(range);
         assertEquals(container, range.getStartContainer());
+        assertEquals(4, container.getChildNodes().getLength());
         assertEquals(2, range.getStartOffset());
     }
 
@@ -438,5 +439,17 @@ public class IESelectionTest extends AbstractWysiwygClientTest
         range.setStart(container.getFirstChild(), 1);
         range.setEnd(container.getLastChild().getFirstChild(), 2);
         assertEquals("b<em>cd</em>", range.toHTML().toLowerCase());
+    }
+
+    /**
+     * Tests if the caret is well detected when placed inside an empty top list item that has a nested sub list.
+     */
+    public void testDetectCaretInsideEmptyTopListItemWithSublist()
+    {
+        Range range = getRange("<ul><li>a</li></ul><ul><li>|<br/><ul><li>x</li></ul></li></ul>");
+        assertTrue(range.isCollapsed());
+        assertEquals(container.getLastChild().getFirstChild(), range.getStartContainer());
+        assertEquals(2, container.getLastChild().getFirstChild().getChildNodes().getLength());
+        assertEquals(0, range.getStartOffset());
     }
 }

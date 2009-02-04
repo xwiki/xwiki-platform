@@ -19,7 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
+import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.SourcesLoadEvents;
+import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
@@ -30,7 +33,7 @@ import com.xpn.xwiki.wysiwyg.client.dom.Selection;
  * 
  * @version $Id$
  */
-public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest
+public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implements LoadListener
 {
     /**
      * The number of milliseconds we delay the test finish. This delay is needed because in some browsers the rich text
@@ -60,8 +63,35 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest
 
         if (rta == null) {
             rta = new RichTextArea();
+            // Workaround till GWT provides a way to detect when the rich text area has finished loading.
+            if (rta.getBasicFormatter() != null && rta.getBasicFormatter() instanceof SourcesLoadEvents) {
+                ((SourcesLoadEvents) rta.getBasicFormatter()).addLoadListener(this);
+            }
         }
         RootPanel.get().add(rta);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see LoadListener#onLoad(Widget)
+     */
+    public void onLoad(Widget sender)
+    {
+        // We have to remove the default body border because it affects the range detection in IE.
+        rta.getElement().getStyle().setProperty("border", "1px solid gray");
+        rta.getDocument().getBody().getStyle().setProperty("borderStyle", "none");
+        rta.setFocus(true);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see LoadListener#onError(Widget)
+     */
+    public void onError(Widget sender)
+    {
+        // ignore
     }
 
     /**

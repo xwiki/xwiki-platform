@@ -68,7 +68,6 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestStyleWhenBodyIsEmpty();
                 finishTest();
             }
@@ -102,7 +101,6 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestStyleWhenCaretIsInsideText();
                 finishTest();
             }
@@ -142,7 +140,6 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestStyleWhenCaretIsBeforeText();
                 finishTest();
             }
@@ -181,7 +178,6 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestStyleWhenCaretIsAfterText();
                 finishTest();
             }
@@ -221,7 +217,6 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestStyleWhenCaretIsAfterImage();
                 finishTest();
             }
@@ -260,7 +255,6 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestStyleWhenCaretIsBeforeImage();
                 finishTest();
             }
@@ -300,7 +294,6 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestStyleWhenSelectionIsInsideText();
                 finishTest();
             }
@@ -341,7 +334,6 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestRemoveStyleWhenSelectionWrapsTheStyleElement();
                 finishTest();
             }
@@ -379,7 +371,6 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestStyleCrossParagraphSelection();
                 finishTest();
             }

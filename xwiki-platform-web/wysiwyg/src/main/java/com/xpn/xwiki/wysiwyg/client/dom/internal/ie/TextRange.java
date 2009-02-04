@@ -480,4 +480,41 @@ public final class TextRange extends NativeRange
     /*-{
         return this.expand(unit);
     }-*/;
+
+    /**
+     * Moves the start and end positions of this text range to the given point.
+     * <p>
+     * The coordinates of the point must be in pixels and be relative to the upper-left corner of the window. The
+     * resulting text range is empty, but you can expand and move the range using methods such as {@link #expand(Unit)}
+     * and {@link #moveEnd(Unit, int)}.
+     * 
+     * @param x integer that specifies the horizontal offset relative to the upper-left corner of the window, in pixels
+     * @param y integer that specifies the vertical offset relative to the upper-left corner of the window, in pixels
+     */
+    public native void moveToPoint(int x, int y)
+    /*-{
+        this.moveToPoint(x, y);
+    }-*/;
+
+    /**
+     * Retrieves the calculated left position of this range's start point relative to the layout or coordinate parent,
+     * as specified by the offsetParent property.
+     * 
+     * @return an integer that specifies the left position, in pixels
+     */
+    public native int getOffsetLeft()
+    /*-{
+        return this.offsetLeft;
+    }-*/;
+
+    /**
+     * Retrieves the calculated top position of this range's start point relative to the layout or coordinate parent, as
+     * specified by the offsetParent property.
+     * 
+     * @return an integer that specifies the top position, in pixels
+     */
+    public native int getOffsetTop()
+    /*-{
+        return this.offsetTop;
+    }-*/;
 }

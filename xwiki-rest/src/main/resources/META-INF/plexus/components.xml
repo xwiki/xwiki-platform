@@ -664,6 +664,55 @@
 				org.xwiki.rest.representers.XmlTextXStreamRepresenter
 			</implementation>
 		</component>
+		
+		<!--
+			*************************************************************************************************
+		-->
+
+		<!-- ***************** -->
+		<!-- * PageChildren resource * -->
+		<!-- ***************** -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.pages.PageChildrenResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>org.xwiki.rest.resources.pages.PageChildrenResource
+			</implementation>
+			<requirements>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceClassRegistry
+					</role>
+				</requirement>
+				<requirement>
+					<role>org.xwiki.rest.XWikiResourceRepresenter
+					</role>
+					<role-hint>org.xwiki.rest.resources.pages.PageChildrenResource
+					</role-hint>
+					<field-name>descriptorToRepresenterMap
+					</field-name>
+				</requirement>
+			</requirements>
+			<configuration>
+				<uriPattern>/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/children
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for Page resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.pages.PageChildrenResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
 
 		<!--
 			*************************************************************************************************

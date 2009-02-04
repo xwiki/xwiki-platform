@@ -53,7 +53,7 @@ public class AttachmentHistoryResource extends XWikiResource
                 return null;
             }
 
-            Document doc = documentInfo.getDocument();            
+            Document doc = documentInfo.getDocument();
 
             String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
 
@@ -63,7 +63,7 @@ public class AttachmentHistoryResource extends XWikiResource
                 getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
                 return null;
             }
-            
+
             /*
              * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
              * external URL for an attachment

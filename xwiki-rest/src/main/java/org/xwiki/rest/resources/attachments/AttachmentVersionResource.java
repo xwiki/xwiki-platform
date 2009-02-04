@@ -57,7 +57,8 @@ public class AttachmentVersionResource extends XWikiResource
             Document doc = documentInfo.getDocument();
 
             String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
-            String attachmentVersion = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_VERSION_PARAMETER);
+            String attachmentVersion =
+                (String) getRequest().getAttributes().get(Constants.ATTACHMENT_VERSION_PARAMETER);
 
             com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
             if (xwikiAttachment == null) {

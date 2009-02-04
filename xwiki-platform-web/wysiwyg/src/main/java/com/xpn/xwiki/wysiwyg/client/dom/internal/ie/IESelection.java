@@ -356,9 +356,9 @@ public class IESelection extends AbstractSelection
         int offset = 0;
         while (child != null) {
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                // This child must be an empty element like an image.
+                // Move the reference range before this child element.
+                moveTextRangeBeforeElement(refRange, (Element) child);
                 // Let's see if the boundary is before this child element.
-                refRange.moveToElementText((Element) child);
                 if (textRange.compareEndPoints(compareStart, refRange) <= 0) {
                     break;
                 }
@@ -388,6 +388,35 @@ public class IESelection extends AbstractSelection
         }
         return new RangeBoundary(container, offset);
     }
+
+    /**
+     * Moves the given text range before the specified element. As a result the following should be true:<br/> {@code
+     * textRange.getOffsetLeft() == element.getOffsetLeft() && textRange.getOffsetTop() == element.getOffsetTop()}
+     * 
+     * @param textRange the text range to be moved
+     * @param element the element before which the text range is moved
+     */
+    protected void moveTextRangeBeforeElement(TextRange textRange, Element element)
+    {
+        textRange.moveToElementText(element);
+        if (textRange.getOffsetLeft() != element.getOffsetLeft() || element.getOffsetTop() < textRange.getOffsetTop()
+            || element.getOffsetTop() > (textRange.getOffsetTop() + getFirstLineHeight(textRange))) {
+            // Sometimes moveToElementText has unexpected results. Let's try something different.
+            // This is not reliable (that's why we try moveToElementText at first).
+            textRange.moveToPoint(element.getOffsetLeft(), element.getOffsetTop());
+            // Don't bet on the result!
+        }
+    }
+
+    /**
+     * @param textRange a text range
+     * @return the height, in pixels, of the first line selected by the given text range
+     */
+    protected native int getFirstLineHeight(TextRange textRange)
+    /*-{
+        var firstLineRect = textRange.getClientRects()[0];
+        return firstLineRect.bottom - firstLineRect.top;
+    }-*/;
 
     /**
      * Computes the number of characters between the start of the left range to the specified boundary of the right

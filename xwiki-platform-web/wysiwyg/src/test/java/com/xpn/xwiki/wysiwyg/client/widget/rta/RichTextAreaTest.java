@@ -43,7 +43,6 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestSetHTML();
                 finishTest();
             }
@@ -73,7 +72,6 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestGetRangeFirstAndLastLeafWithEmptyBody();
                 finishTest();
             }
@@ -105,7 +103,6 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestGetRangeFirstAndLastLeafWithEmptyBody();
                 finishTest();
             }

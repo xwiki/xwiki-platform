@@ -63,7 +63,6 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestInsertAtCaret();
                 finishTest();
             }
@@ -99,7 +98,6 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestReplaceSelection();
                 finishTest();
             }
@@ -140,7 +138,6 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestEmptyDocument();
                 finishTest();
             }
@@ -170,7 +167,6 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestReplaceElementText();
                 finishTest();
             }
@@ -207,7 +203,6 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestReplaceCrossListItemSelection();
                 finishTest();
             }
@@ -245,7 +240,6 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestReplaceSelectedList();
                 finishTest();
             }
@@ -281,7 +275,6 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestInsertAndUndo();
                 finishTest();
             }

@@ -71,7 +71,6 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestInsertHeaderOnEmptyDocument();
                 finishTest();
             }
@@ -103,7 +102,6 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestInsertHeaderAroundCaret();
                 finishTest();
             }
@@ -150,7 +148,6 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestInsertHeaderAroundSelection();
                 finishTest();
             }
@@ -193,7 +190,6 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestRemoveParagraph();
                 finishTest();
             }
@@ -232,7 +228,6 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestChangeBlock();
                 finishTest();
             }
@@ -278,7 +273,6 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestDetectHeaderFromASpanWithDisplayBlock();
                 finishTest();
             }

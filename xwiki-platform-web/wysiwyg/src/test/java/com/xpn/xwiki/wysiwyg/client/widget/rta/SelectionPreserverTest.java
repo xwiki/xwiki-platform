@@ -62,7 +62,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestPlainTextSelectionWithoutModification();
                 finishTest();
             }
@@ -106,7 +105,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestPlainTextSelectionWithHTMLInsertion();
                 finishTest();
             }
@@ -150,7 +148,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestTextRangeSelectionWithHTMLInsertion();
                 finishTest();
             }
@@ -192,7 +189,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestReplaceElement();
                 finishTest();
             }
@@ -232,7 +228,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestEmptyDocumentWithoutAction();
                 finishTest();
             }
@@ -264,7 +259,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestEmptyDocumentWithAction();
                 finishTest();
             }
@@ -295,7 +289,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestPreserveImageSelection();
                 finishTest();
             }
@@ -336,7 +329,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestSelectTextNodeAndReplaceItWithEmptyString();
                 finishTest();
             }
@@ -371,7 +363,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestSelectTextNodeAndDeleteIt();
                 finishTest();
             }
@@ -407,7 +398,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestSelectImageAndDeleteIt();
                 finishTest();
             }
@@ -444,7 +434,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestSelectionAfterImageInsertion();
                 finishTest();
             }
@@ -486,7 +475,6 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                rta.setFocus(true);
                 doTestRangeBoundaryMarkersAreHidden();
                 finishTest();
             }

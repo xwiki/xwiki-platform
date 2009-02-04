@@ -241,4 +241,13 @@ public class Console
     public void groupEnd()
     {
     }
+
+    /**
+     * Adds a break point for the debugger. If a debugger is present then the execution should stop at this point and
+     * continue from here in debug mode.
+     */
+    public native void addBreakPoint()
+    /*-{
+        debugger;
+    }-*/;
 }

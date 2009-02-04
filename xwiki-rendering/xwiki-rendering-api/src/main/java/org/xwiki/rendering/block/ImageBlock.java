@@ -34,7 +34,7 @@ import org.xwiki.rendering.listener.Listener;
 public class ImageBlock extends AbstractBlock
 {
     private Image image;
-    
+
     /**
      * If true then the image is defined as a free standing URI directly in the text.
      */
@@ -42,12 +42,13 @@ public class ImageBlock extends AbstractBlock
 
     public ImageBlock(Image image, boolean isFreeStandingURI)
     {
-        this(image, isFreeStandingURI, Collections.<String, String>emptyMap());
+        this(image, isFreeStandingURI, Collections.<String, String> emptyMap());
     }
 
     public ImageBlock(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         super(parameters);
+
         this.image = image;
         this.isFreeStandingURI = isFreeStandingURI;
     }
@@ -69,9 +70,10 @@ public class ImageBlock extends AbstractBlock
     {
         listener.onImage(getImage(), isFreeStandingURI(), getParameters());
     }
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see Object#clone()
      */
     @Override

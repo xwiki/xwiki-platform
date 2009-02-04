@@ -184,6 +184,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image1", false);
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
+        suite.addTestsFromResource("image/image4", false);
         
         return new RenderingPlexusTestSetup(suite);
     }

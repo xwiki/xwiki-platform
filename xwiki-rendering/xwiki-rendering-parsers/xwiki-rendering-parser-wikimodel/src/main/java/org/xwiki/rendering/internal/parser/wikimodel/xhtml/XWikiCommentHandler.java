@@ -40,32 +40,33 @@ import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
- * Handle Link and Macro definitions in comments (we store links in a comment since otherwise there are situations
- * where it's not possible to reconstruct the original reference from the rendered HTML value and for macros it
- * wouldn't be possible at all to reconstruct the macro).
- *  
+ * Handle Link and Macro definitions in comments (we store links in a comment since otherwise there are situations where
+ * it's not possible to reconstruct the original reference from the rendered HTML value and for macros it wouldn't be
+ * possible at all to reconstruct the macro).
+ * 
  * @version $Id$
  * @since 1.7M1
  */
 public class XWikiCommentHandler extends CommentHandler
 {
     private Parser parser;
-    
+
     private LinkParser linkParser;
-    
+
     private ImageParser imageParser;
-    
+
     private PrintRendererFactory printRendererFactory;
-    
+
     private WikiReferenceParser referenceParser;
 
     /**
-     * We're using a stack so that we can have nested comment handling. For example when we have a link to an image
-     * we need nested comment support.
+     * We're using a stack so that we can have nested comment handling. For example when we have a link to an image we
+     * need nested comment support.
      */
     private Stack<String> commentContentStack = new Stack<String>();
-    
-    public XWikiCommentHandler(Parser parser, LinkParser linkParser, ImageParser imageParser, PrintRendererFactory printRendererFactory)
+
+    public XWikiCommentHandler(Parser parser, LinkParser linkParser, ImageParser imageParser,
+        PrintRendererFactory printRendererFactory)
     {
         this.parser = parser;
         this.linkParser = linkParser;
@@ -73,7 +74,7 @@ public class XWikiCommentHandler extends CommentHandler
         this.referenceParser = new XWikiReferenceParser();
         this.imageParser = imageParser;
     }
-    
+
     @Override
     public void onComment(String content, TagStack stack)
     {
@@ -92,7 +93,7 @@ public class XWikiCommentHandler extends CommentHandler
             super.onComment(content, stack);
         }
     }
-    
+
     private void handleLinkCommentStart(String content, TagStack stack)
     {
         XDOMGeneratorListener listener = new XDOMGeneratorListener(this.parser, this.linkParser, this.imageParser);
@@ -103,13 +104,13 @@ public class XWikiCommentHandler extends CommentHandler
 
     private void handleLinkCommentStop(String content, TagStack stack)
     {
-        DefaultWikiPrinter printer = new DefaultWikiPrinter();            
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
         // Since wikimodel does not support wiki syntax in link labels we need to pass the link label "as is" (as it
         // originally appears in the parsed source) and handle it specially in the
         // XDOMGeneratorListener.createLinkBlock(), with the parser passed as the first parameter in the
         // XDOMGeneratorListener constructor.
         // Since we cannot get this label as it originally appeared in the HTML source ( we are doing a SAX-like
-        // parsing), we should render the XDOM as HTML to get an HTML label. 
+        // parsing), we should render the XDOM as HTML to get an HTML label.
         // Since any syntax would do it, as long as this renderer matches the corresponding XDOMGeneratorListener
         // parser, we use an xwiki 2.0 renderer for it is less complex (no context needed to render xwiki 2.0, no url
         // resolution needed, no reference validity tests).
@@ -129,12 +130,12 @@ public class XWikiCommentHandler extends CommentHandler
         if (isFreeStandingLink) {
             stack.getScannerContext().onReference(linkComment);
         } else {
-            WikiReference wikiReference = this.referenceParser.parse(
-                (printer.toString().length() > 0 ? printer.toString() + ">>" : "") + linkComment
-                + (params.getSize() > 0 ? "||" + params.toString() : ""));
+            WikiReference wikiReference =
+                this.referenceParser.parse((printer.toString().length() > 0 ? printer.toString() + ">>" : "")
+                    + linkComment + (params.getSize() > 0 ? "||" + params.toString() : ""));
             stack.getScannerContext().onReference(wikiReference);
         }
-        
+
         stack.setStackParameter("xdomGeneratorListener", null);
         stack.setStackParameter("isInLink", false);
         stack.setStackParameter("isFreeStandingLink", false);
@@ -144,32 +145,34 @@ public class XWikiCommentHandler extends CommentHandler
     private void handleImageCommentStart(String content, TagStack stack)
     {
         stack.setStackParameter("isInImage", true);
-        this.commentContentStack.push(content.substring("startimage:".length()));  
+        this.commentContentStack.push(content.substring("startimage:".length()));
     }
-    
+
     private void handleImageCommentStop(String content, TagStack stack)
     {
         boolean isFreeStandingImage = (Boolean) stack.getStackParameter("isFreeStandingImage");
-        WikiParameters params = (WikiParameters) stack.getStackParameter("imageParameters");
+        WikiParameters parameters = (WikiParameters) stack.getStackParameter("imageParameters");
         String imageComment = this.commentContentStack.pop();
         Image image = this.imageParser.parse(imageComment);
-        
+
         if (isFreeStandingImage) {
-            stack.getScannerContext().onReference("image:" + imageComment);
+
+            stack.getScannerContext().onImage(imageComment);
         } else {
             // Remove the ALT attribute if the content has the same value as the original image location
             // This is because the XHTML renderer automatically adds an ALT attribute since it is mandatory
             // in the XHTML specifications.
-            WikiParameter altParameter = params.getParameter("alt"); 
-            if (altParameter != null && altParameter.getValue().equals(image.getName())) {
-                params = params.remove("alt");
+            WikiParameter alt = parameters.getParameter("alt");
+            if (alt != null && alt.getValue().equals(image.getName())) {
+                parameters = parameters.remove("alt");
+                alt = null;
             }
-            
-            WikiReference wikiReference = this.referenceParser.parse("image:" + imageComment
-                + (params.getSize() > 0 ? "||" + params.toString() : ""));
-            stack.getScannerContext().onReference(wikiReference);
+
+            WikiReference reference = new WikiReference(imageComment, null, parameters);
+
+            stack.getScannerContext().onImage(reference);
         }
-        
+
         stack.setStackParameter("isInImage", false);
         stack.setStackParameter("isFreeStandingImage", false);
         stack.setStackParameter("imageParameters", WikiParameters.EMPTY);

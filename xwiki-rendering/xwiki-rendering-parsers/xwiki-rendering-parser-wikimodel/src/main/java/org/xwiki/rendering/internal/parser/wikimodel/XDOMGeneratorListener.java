@@ -46,6 +46,7 @@ import org.xwiki.rendering.block.DefinitionTermBlock;
 import org.xwiki.rendering.block.EmptyLinesBlock;
 import org.xwiki.rendering.block.ErrorBlock;
 import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.HorizontalLineBlock;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -58,7 +59,6 @@ import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.QuotationBlock;
 import org.xwiki.rendering.block.QuotationLineBlock;
-import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
@@ -71,10 +71,10 @@ import org.xwiki.rendering.block.VerbatimStandaloneBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -520,6 +520,27 @@ public class XDOMGeneratorListener implements IWemListener
     /**
      * {@inheritDoc}
      * 
+     * @see org.wikimodel.wem.IWemListenerInline#onImage(java.lang.String)
+     */
+    public void onImage(String ref)
+    {
+        this.stack.push(new ImageBlock(this.imageParser.parse(ref), true));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListenerInline#onImage(org.wikimodel.wem.WikiReference)
+     */
+    public void onImage(WikiReference ref)
+    {
+        this.stack.push(new ImageBlock(this.imageParser.parse(ref.getLink()), false, convertParameters(ref
+            .getParameters())));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.wikimodel.wem.IWemListener#onSpace(String)
      */
     public void onSpace(String spaces)
@@ -595,16 +616,6 @@ public class XDOMGeneratorListener implements IWemListener
         }
         Collections.reverse(blocks);
         return blocks;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.wikimodel.wem.IWemListenerInline#onImage(org.wikimodel.wem.WikiReference)
-     */
-    public void onImage(WikiReference ref)
-    {
-
     }
 
     /**

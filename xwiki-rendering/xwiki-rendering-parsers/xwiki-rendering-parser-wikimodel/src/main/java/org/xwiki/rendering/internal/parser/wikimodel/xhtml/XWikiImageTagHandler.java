@@ -20,18 +20,20 @@
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
 import org.wikimodel.wem.WikiParameters;
-import org.wikimodel.wem.xhtml.handler.ReferenceTagHandler;
+import org.wikimodel.wem.WikiParameter;
+import org.wikimodel.wem.WikiReference;
+import org.wikimodel.wem.xhtml.handler.ImgTagHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext;
 
 /**
- * Handle IMG tag since we're putting the original image reference into XHTML comments so that we can reconstruct
- * the reference when moving back from XHTML to wiki syntax.
- *  
+ * Handle IMG tag since we're putting the original image reference into XHTML comments so that we can reconstruct the
+ * reference when moving back from XHTML to wiki syntax.
+ * 
  * @version $Id$
  * @since 1.7M2
  */
-public class XWikiImageTagHandler extends ReferenceTagHandler
+public class XWikiImageTagHandler extends ImgTagHandler
 {
     @Override
     public void initialize(TagStack stack)
@@ -40,22 +42,20 @@ public class XWikiImageTagHandler extends ReferenceTagHandler
         stack.setStackParameter("isFreeStandingImage", false);
         stack.setStackParameter("imageParameters", WikiParameters.EMPTY);
     }
-    
+
     @Override
     protected void begin(TagContext context)
     {
         boolean isInImage = (Boolean) context.getTagStack().getStackParameter("isInImage");
         if (isInImage) {
-            // Verify if it's a freestanding image uri and if so save the information so that we can get it in 
+            // Verify if it's a freestanding image uri and if so save the information so that we can get it in
             // XWikiCommentHandler.
             if (isFreeStandingReference(context)) {
                 context.getTagStack().setStackParameter("isFreeStandingImage", true);
             } else {
                 // Save the parameters set on the IMG element so that we can generate the correct image
-                // in the XWiki Comment handler. Note that we must exclude the src parameter.
-                WikiParameters params = context.getParams();
-                params = params.remove("src");
-                context.getTagStack().setStackParameter("imageParameters", params);
+                // in the XWiki Comment handler.
+                context.getTagStack().setStackParameter("imageParameters", context.getParams().remove("src"));
             }
         } else {
             super.begin(context);
@@ -67,7 +67,19 @@ public class XWikiImageTagHandler extends ReferenceTagHandler
     {
         boolean isInImage = (Boolean) context.getTagStack().getStackParameter("isInImage");
         if (!isInImage) {
-            super.end(context);
+            WikiParameter src = context.getParams().getParameter("src");
+
+            if (src != null) {
+                WikiParameters parameters = context.getParams().remove("src");
+
+                if (isFreeStandingReference(context)) {
+                    context.getScannerContext().onImage(src.getValue());
+                } else {
+                    WikiReference reference = new WikiReference(src.getValue(), null, parameters);
+
+                    context.getScannerContext().onImage(reference);
+                }
+            }
         }
     }
 }

@@ -1,0 +1,20 @@
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<img src="http://www.google.ro/intl/en_com/images/logo_plain.png" alt="bar" title="foo" />
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onImage: [http://www.google.ro/intl/en_com/images/logo_plain.png] [false] [[alt]=[bar][title]=[foo]]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p><!--startimage:http://www.google.ro/intl/en_com/images/logo_plain.png--><img src="http://www.google.ro/intl/en_com/images/logo_plain.png" alt="bar" title="foo"/><!--stopimage--></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+[[image:http://www.google.ro/intl/en_com/images/logo_plain.png||alt="bar" title="foo"]]

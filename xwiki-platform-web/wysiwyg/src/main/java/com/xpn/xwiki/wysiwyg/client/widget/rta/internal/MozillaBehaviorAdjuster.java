@@ -23,7 +23,6 @@ import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Event;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 
@@ -34,17 +33,6 @@ import com.xpn.xwiki.wysiwyg.client.dom.Range;
  */
 public class MozillaBehaviorAdjuster extends BehaviorAdjuster
 {
-    /**
-     * The CSS class name associated with BRs we have to add inside empty block elements to make them editable in
-     * Mozilla.
-     */
-    public static final String EMPTY_LINE = "emptyLine";
-
-    /**
-     * The class name attribute.
-     */
-    public static final String CLASS_NAME = "class";
-
     /**
      * {@inheritDoc}
      * 
@@ -83,24 +71,6 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
         } while (leaf != null && container == DOMUtils.getInstance().getNearestBlockContainer(leaf));
         // It seems there's no visible element on the new line. We should add one.
         DOMUtils.getInstance().insertAfter(getTextArea().getDocument().xCreateBRElement(), lastLeaf);
-    }
-
-    /**
-     * @param leaf A DOM node which has not children.
-     * @return true if the given leaf needs space on the screen in order to be rendered.
-     */
-    private boolean needsSpace(Node leaf)
-    {
-        switch (leaf.getNodeType()) {
-            case Node.TEXT_NODE:
-                return leaf.getNodeValue().length() > 0;
-            case Node.ELEMENT_NODE:
-                Element element = Element.as(leaf);
-                return BR.equalsIgnoreCase(element.getTagName()) || element.getOffsetHeight() > 0
-                    || element.getOffsetWidth() > 0;
-            default:
-                return false;
-        }
     }
 
     /**
@@ -167,78 +137,6 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
                 // The user cannot place the caret inside an empty paragraph in Firefox. The workaround to make an empty
                 // paragraph editable is to append a BR.
                 paragraph.appendChild(document.xCreateBRElement());
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BehaviorAdjuster#onBeforeBlur()
-     */
-    protected void onBeforeBlur()
-    {
-        super.onBeforeBlur();
-        // The edited content might be submitted so we have to mark the BRs that have been added to allow the user to
-        // edit the empty block elements. These BRs will be removed from rich text area's HTML output on the server
-        // side.
-        markUnwantedBRs();
-    }
-
-    /**
-     * Marks the BRs that generate empty lines. These BRs were added to overcome a Mozilla bug that prevents us from
-     * typing inside an empty block level element.
-     */
-    protected void markUnwantedBRs()
-    {
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
-        for (int i = 0; i < brs.getLength(); i++) {
-            Element br = brs.getItem(i).cast();
-            Node container = DOMUtils.getInstance().getNearestBlockContainer(br);
-            Node leaf = DOMUtils.getInstance().getNextLeaf(br);
-            boolean emptyLine = true;
-            // Look if there is any visible element on the new line, taking care to remain in the current block
-            // container.
-            while (leaf != null && container == DOMUtils.getInstance().getNearestBlockContainer(leaf)) {
-                if (needsSpace(leaf)) {
-                    emptyLine = false;
-                    break;
-                }
-                leaf = DOMUtils.getInstance().getNextLeaf(leaf);
-            }
-            if (emptyLine) {
-                br.setClassName(EMPTY_LINE);
-            } else {
-                br.removeAttribute(CLASS_NAME);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BehaviorAdjuster#onFocus()
-     */
-    protected void onFocus()
-    {
-        super.onFocus();
-        // It seems the edited content wasn't submitted so we have to unmark the unwanted BRs in order to avoid
-        // conflicts with the rich text area's history mechanism.
-        unmarkUnwantedBRs();
-    }
-
-    /**
-     * @see #markUnwantedBRs()
-     */
-    protected void unmarkUnwantedBRs()
-    {
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
-        for (int i = 0; i < brs.getLength(); i++) {
-            Element br = (Element) brs.getItem(i);
-            if (EMPTY_LINE.equals(br.getClassName())) {
-                br.removeAttribute(CLASS_NAME);
             }
         }
     }

@@ -69,6 +69,16 @@ public class BehaviorAdjuster implements LoadListener
     public static final String TH = "th";
 
     /**
+     * The CSS class name associated with BRs added at edit time to make items editable.
+     */
+    public static final String EMPTY_LINE = "emptyLine";
+
+    /**
+     * The class name attribute.
+     */
+    public static final String CLASS_NAME = "class";
+
+    /**
      * The rich text area whose behavior is being adjusted.
      */
     private RichTextArea textArea;
@@ -628,7 +638,10 @@ public class BehaviorAdjuster implements LoadListener
      */
     protected void onBeforeBlur()
     {
-        // Nothing here by default. May be overridden by browser specific implementations.
+        // The edited content might be submitted so we have to mark the BRs that have been added to allow the user to
+        // edit the empty block elements. These BRs will be removed from rich text area's HTML output on the server
+        // side.
+        markUnwantedBRs();
     }
 
     /**
@@ -636,7 +649,9 @@ public class BehaviorAdjuster implements LoadListener
      */
     protected void onFocus()
     {
-        // Nothing here by default. May be overridden by browser specific implementations.
+        // It seems the edited content wasn't submitted so we have to unmark the unwanted BRs in order to avoid
+        // conflicts with the rich text area's history mechanism.
+        unmarkUnwantedBRs();
     }
 
     /**
@@ -690,6 +705,69 @@ public class BehaviorAdjuster implements LoadListener
         // Replace the empty DIVs with paragraphs.
         for (Node div : emptyDivs) {
             div.getParentNode().replaceChild(document.xCreatePElement(), div);
+        }
+    }
+
+    /**
+     * @param leaf A DOM node which has not children.
+     * @return true if the given leaf needs space on the screen in order to be rendered.
+     */
+    protected boolean needsSpace(Node leaf)
+    {
+        switch (leaf.getNodeType()) {
+            case Node.TEXT_NODE:
+                return leaf.getNodeValue().length() > 0;
+            case Node.ELEMENT_NODE:
+                Element element = Element.as(leaf);
+                return BR.equalsIgnoreCase(element.getTagName()) || element.getOffsetHeight() > 0
+                    || element.getOffsetWidth() > 0;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Marks the BRs that generate empty lines. These BRs were added to overcome a Mozilla bug that prevents us from
+     * typing inside an empty block level element.
+     */
+    protected void markUnwantedBRs()
+    {
+        Document document = getTextArea().getDocument();
+        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
+        for (int i = 0; i < brs.getLength(); i++) {
+            Element br = brs.getItem(i).cast();
+            Node container = DOMUtils.getInstance().getNearestBlockContainer(br);
+            Node leaf = DOMUtils.getInstance().getNextLeaf(br);
+            boolean emptyLine = true;
+            // Look if there is any visible element on the new line, taking care to remain in the current block
+            // container.
+            while (leaf != null && container == DOMUtils.getInstance().getNearestBlockContainer(leaf)) {
+                if (needsSpace(leaf)) {
+                    emptyLine = false;
+                    break;
+                }
+                leaf = DOMUtils.getInstance().getNextLeaf(leaf);
+            }
+            if (emptyLine) {
+                br.setClassName(EMPTY_LINE);
+            } else {
+                br.removeAttribute(CLASS_NAME);
+            }
+        }
+    }
+
+    /**
+     * @see #markUnwantedBRs()
+     */
+    protected void unmarkUnwantedBRs()
+    {
+        Document document = getTextArea().getDocument();
+        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
+        for (int i = 0; i < brs.getLength(); i++) {
+            Element br = (Element) brs.getItem(i);
+            if (EMPTY_LINE.equals(br.getClassName())) {
+                br.removeAttribute(CLASS_NAME);
+            }
         }
     }
 }

@@ -63,6 +63,16 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
      * Selection preserver to store the selection before and after the dialog showing.
      */
     private SelectionPreserver selectionPreserver;
+    
+    /**
+     * Image medadata extractor, to handle the images metadata.
+     */
+    private ImageMetaDataExtractor metaDataExtractor;
+    
+    /**
+     * Behavior adjuster to handle the images correclty.
+     */
+    private ImageBehaviorAdjuster behaviorAdjuster; 
 
     /**
      * {@inheritDoc}
@@ -84,13 +94,16 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
             getTextArea().addClickListener(this);
             getUIExtensionList().add(toolBarExtension);
             selectionPreserver = new SelectionPreserver(textArea);
-            ImageMetaDataExtractor extractor = new ImageMetaDataExtractor();
+            // Create an image metadata extractor for this text area
+            metaDataExtractor = new ImageMetaDataExtractor();
             // do the initial extracting on the loaded document
-            extractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
+            metaDataExtractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
             getTextArea().getDocument().addInnerHTMLListener(new ImageMetaDataExtractor());
 
             // Create an image behavior adjuster for this text area
-            new ImageBehaviorAdjuster(getTextArea());
+            behaviorAdjuster = new ImageBehaviorAdjuster();
+            behaviorAdjuster.setTextArea(getTextArea());
+            getTextArea().addKeyboardListener(behaviorAdjuster);
         }
     }
 
@@ -109,9 +122,20 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
         imageDialog.removeFromParent();
         imageDialog = null;
 
-        toolBarExtension.clearFeatures();
-
-        getTextArea().removeClickListener(this);
+        if (toolBarExtension.getFeatures().length > 0) {        
+            toolBarExtension.clearFeatures();
+            getTextArea().removeClickListener(this);
+            // If a metadata extractor was created and setup, remove it
+            if (metaDataExtractor != null) {
+                getTextArea().getDocument().removeInnerHTMLListener(metaDataExtractor);
+                metaDataExtractor = null;
+            }
+            // If a behavior adjuster was created and setup, remove it
+            if (behaviorAdjuster != null) {
+                getTextArea().removeKeyboardListener(behaviorAdjuster);
+                behaviorAdjuster = null;
+            }
+        }
 
         super.destroy();
     }

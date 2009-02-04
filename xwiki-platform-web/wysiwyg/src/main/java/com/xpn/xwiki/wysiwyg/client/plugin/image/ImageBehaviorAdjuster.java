@@ -53,17 +53,6 @@ public class ImageBehaviorAdjuster implements KeyboardListener
     private RichTextArea textArea;
 
     /**
-     * Builds a behavior adjuster that operates for the passed rich text area.
-     * 
-     * @param textArea the target rich text area for this behavior adjuster.
-     */
-    public ImageBehaviorAdjuster(RichTextArea textArea)
-    {
-        this.textArea = textArea;
-        this.textArea.addKeyboardListener(this);
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see KeyboardListener#onKeyDown(Widget, char, int)
@@ -130,4 +119,12 @@ public class ImageBehaviorAdjuster implements KeyboardListener
             textArea.getCurrentEvent().xPreventDefault();
         }
     }
+
+    /**
+     * @param textArea the textArea to set
+     */
+    public void setTextArea(RichTextArea textArea)
+    {
+        this.textArea = textArea;
+    }    
 }

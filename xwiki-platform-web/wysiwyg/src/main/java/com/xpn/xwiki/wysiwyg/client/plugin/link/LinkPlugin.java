@@ -68,6 +68,11 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
      * The toolbar extension used to add the link buttons to the toolbar.
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+    
+    /**
+     * The link metadata extractor, to handle the link metadata.
+     */
+    private LinkMetaDataExtractor metaDataExtractor;
 
     /**
      * {@inheritDoc}
@@ -94,10 +99,11 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
             getTextArea().addClickListener(this);
             getUIExtensionList().add(toolBarExtension);
             selectionPreserver = new SelectionPreserver(textArea);
-            LinkMetaDataExtractor extractor = new LinkMetaDataExtractor();
+            // Initialize the metadata extractor, to handle link metadatas
+            metaDataExtractor = new LinkMetaDataExtractor();
             // do the initial extracting on the loaded document
-            extractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
-            getTextArea().getDocument().addInnerHTMLListener(extractor);
+            metaDataExtractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
+            getTextArea().getDocument().addInnerHTMLListener(metaDataExtractor);
         }
     }
 
@@ -130,6 +136,11 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().removeClickListener(this);
             toolBarExtension.clearFeatures();
+            // if a link metadata extractor has been created and setup, remove it
+            if (metaDataExtractor != null) {
+                getTextArea().getDocument().removeInnerHTMLListener(metaDataExtractor);
+                metaDataExtractor = null;
+            }
         }
         super.destroy();
     }

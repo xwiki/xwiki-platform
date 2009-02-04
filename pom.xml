@@ -42,7 +42,7 @@
   </scm>
   <dependencyManagement>
     <dependencies>
-      <!-- Standard dependencies used in several modules, essential for XWiki -->
+      <!-- Standard dependencies used in several modules -->
       <!-- Groovy engine -->
       <dependency>
         <groupId>com.sun.script</groupId>

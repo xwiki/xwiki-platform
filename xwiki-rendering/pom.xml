@@ -36,7 +36,7 @@
   <description>XWiki Platform - Core - Rendering - Parent POM</description>
   <dependencyManagement>
     <dependencies>
-      <!-- Standard dependencies used in several modules, essential for XWiki -->
+      <!-- Standard dependencies used in several modules -->
       <!-- Wiki Model -->
       <dependency>
         <groupId>org.wikimodel</groupId>

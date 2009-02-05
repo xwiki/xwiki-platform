@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
  * Removes or replaces the HTML elements that were added by the WYSIWYG editor only for internal reasons. The following
  * transformations are done:
  * <ul>
- * <li>Removes <code>&lt;br class="emptyLine"/&gt;</code></li>
+ * <li>Removes <code>&lt;br class="spacer"/&gt;</code></li>
  * <li>Converts <code>&lt;p&gt;&lt;/p&gt;</code> to &lt;div class="wikimodel-emptyline"&gt;&lt;/div&gt;</li>
  * </ul>
  * 
@@ -56,7 +56,7 @@ public class WysiwygCleaningFilter
         List<Element> emptyLineBRs = new ArrayList<Element>();
         for (int i = 0; i < brs.getLength(); i++) {
             Element br = (Element) brs.item(i);
-            if ("emptyLine".equals(br.getAttribute(CLASS))) {
+            if ("spacer".equals(br.getAttribute(CLASS))) {
                 emptyLineBRs.add(br);
             }
         }

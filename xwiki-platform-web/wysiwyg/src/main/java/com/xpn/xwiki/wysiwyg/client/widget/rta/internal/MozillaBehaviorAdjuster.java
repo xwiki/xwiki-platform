@@ -156,7 +156,7 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
         }
 
         Document document = getTextArea().getDocument();
-        document.getSelection().getRangeAt(0).getStartContainer().getParentNode().appendChild(
-            document.xCreateBRElement());
+        Node paragraph = document.getSelection().getRangeAt(0).getStartContainer().getParentNode();
+        paragraph.appendChild(document.xCreateBRElement());
     }
 }

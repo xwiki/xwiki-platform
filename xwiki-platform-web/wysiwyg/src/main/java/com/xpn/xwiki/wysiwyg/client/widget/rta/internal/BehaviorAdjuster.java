@@ -69,9 +69,16 @@ public class BehaviorAdjuster implements LoadListener
     public static final String TH = "th";
 
     /**
-     * The CSS class name associated with BRs added at edit time to make items editable.
+     * The CSS class name associated with BRs added at edit time to make items like empty block-level elements editable.
      */
-    public static final String EMPTY_LINE = "emptyLine";
+    public static final String SPACER = "spacer";
+
+    /**
+     * The CSS class name associated with BRs that are present in the rich text area's HTML input and which have to be
+     * kept even when they are placed at the end of a block-level element. We need to mark this initial BRs so they are
+     * not mistaken with the {@link #SPACER} BRs we add during the editing.
+     */
+    public static final String LINE_BREAK = "lineBreak";
 
     /**
      * The class name attribute.
@@ -79,14 +86,14 @@ public class BehaviorAdjuster implements LoadListener
     public static final String CLASS_NAME = "class";
 
     /**
+     * Collection of DOM utility methods.
+     */
+    protected DOMUtils domUtils = DOMUtils.getInstance();
+
+    /**
      * The rich text area whose behavior is being adjusted.
      */
     private RichTextArea textArea;
-
-    /**
-     * Collection of DOM utility methods.
-     */
-    private DOMUtils domUtils = DOMUtils.getInstance();
 
     /**
      * @return The rich text area whose behavior is being adjusted.
@@ -641,7 +648,7 @@ public class BehaviorAdjuster implements LoadListener
         // The edited content might be submitted so we have to mark the BRs that have been added to allow the user to
         // edit the empty block elements. These BRs will be removed from rich text area's HTML output on the server
         // side.
-        markUnwantedBRs();
+        markSpacers();
     }
 
     /**
@@ -651,7 +658,7 @@ public class BehaviorAdjuster implements LoadListener
     {
         // It seems the edited content wasn't submitted so we have to unmark the unwanted BRs in order to avoid
         // conflicts with the rich text area's history mechanism.
-        unmarkUnwantedBRs();
+        unMarkSpacers();
     }
 
     /**
@@ -672,6 +679,7 @@ public class BehaviorAdjuster implements LoadListener
     public void onLoad(Widget sender)
     {
         adjustDragDrop(textArea.getDocument());
+        markInitialLineBreaks();
         replaceEmptyDivsWithParagraphs();
     }
 
@@ -727,15 +735,19 @@ public class BehaviorAdjuster implements LoadListener
     }
 
     /**
-     * Marks the BRs that generate empty lines. These BRs were added to overcome a Mozilla bug that prevents us from
-     * typing inside an empty block level element.
+     * Marks the BRs that have been added as spacers during the editing. These BRs were added to overcome a Mozilla bug
+     * that prevents us from typing inside an empty block level element.
      */
-    protected void markUnwantedBRs()
+    protected void markSpacers()
     {
         Document document = getTextArea().getDocument();
         NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
         for (int i = 0; i < brs.getLength(); i++) {
             Element br = brs.getItem(i).cast();
+            // Ignore the BRs that have been there from the beginning.
+            if (LINE_BREAK.equals(br.getClassName())) {
+                continue;
+            }
             Node container = DOMUtils.getInstance().getNearestBlockContainer(br);
             Node leaf = DOMUtils.getInstance().getNextLeaf(br);
             boolean emptyLine = true;
@@ -749,7 +761,7 @@ public class BehaviorAdjuster implements LoadListener
                 leaf = DOMUtils.getInstance().getNextLeaf(leaf);
             }
             if (emptyLine) {
-                br.setClassName(EMPTY_LINE);
+                br.setClassName(SPACER);
             } else {
                 br.removeAttribute(CLASS_NAME);
             }
@@ -757,16 +769,32 @@ public class BehaviorAdjuster implements LoadListener
     }
 
     /**
-     * @see #markUnwantedBRs()
+     * @see #markSpacers()
      */
-    protected void unmarkUnwantedBRs()
+    protected void unMarkSpacers()
     {
         Document document = getTextArea().getDocument();
         NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
         for (int i = 0; i < brs.getLength(); i++) {
             Element br = (Element) brs.getItem(i);
-            if (EMPTY_LINE.equals(br.getClassName())) {
+            if (SPACER.equals(br.getClassName())) {
                 br.removeAttribute(CLASS_NAME);
+            }
+        }
+    }
+
+    /**
+     * Marks the initial line breaks so they are not mistaken as {@link #SPACER}.
+     */
+    protected void markInitialLineBreaks()
+    {
+        Document document = getTextArea().getDocument();
+        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
+        for (int i = 0; i < brs.getLength(); i++) {
+            Element br = (Element) brs.getItem(i);
+            // Skip the BRs added by the browser before the document was loaded.
+            if (!br.hasAttribute("_moz_dirty")) {
+                br.setClassName(LINE_BREAK);
             }
         }
     }

@@ -69,7 +69,7 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         print("**");
 
         if (isOnNewLine) {
-            this.escapeFirstIfMatching = XWikiSyntaxEscapeHandler.SPACE_PATTERN;
+            this.escapeFirstIfMatching = XWikiSyntaxEscapeHandler.STARLISTEND_PATTERN;
         }
     }
 

@@ -34,7 +34,7 @@ import org.xwiki.rendering.internal.renderer.state.XWikiSyntaxState;
  */
 public class XWikiSyntaxEscapeHandler
 {
-    public static final Pattern SPACE_PATTERN = Pattern.compile("([ \t])");
+    public static final Pattern STARLISTEND_PATTERN = Pattern.compile("(\\**([:;]*|1+\\.)?\\p{Blank})");
 
     private static final Pattern LIST_PATTERN =
         Pattern.compile("\\p{Blank}*((\\*+[:;]*)|([1*]+\\.[:;]*)|([:;]+))\\p{Blank}+");

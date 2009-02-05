@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.list;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,6 +28,7 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.list.exec.ListExecutable;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -55,6 +57,11 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
+     * List behaviour adjuster to manage valid lists correctly.
+     */
+    private ListBehaviorAdjuster behaviorAdjuster;
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractStatefulPlugin#init(Wysiwyg, RichTextArea, Config)
@@ -80,6 +87,19 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
             getTextArea().addKeyboardListener(this);
             getTextArea().getCommandManager().addCommandListener(this);
             getUIExtensionList().add(toolBarExtension);
+
+            // overwrite the default list command executables with the ListExecutable, to handle valid html lists
+            getTextArea().getCommandManager().registerCommand(Command.INSERT_ORDERED_LIST, new ListExecutable(true));
+            getTextArea().getCommandManager().registerCommand(Command.INSERT_UNORDERED_LIST, new ListExecutable(false));
+
+            // Initialize the behavior adjuster and set it up with this text area
+            behaviorAdjuster = (ListBehaviorAdjuster) GWT.create(ListBehaviorAdjuster.class);
+            behaviorAdjuster.setTextArea(getTextArea());
+            // handle all list item elements in the loaded document
+            behaviorAdjuster.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
+            // add key listener to the rta
+            getTextArea().addKeyboardListener(behaviorAdjuster);
+            getTextArea().getCommandManager().addCommandListener(behaviorAdjuster);
         }
     }
 
@@ -107,6 +127,12 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
             getTextArea().removeKeyboardListener(this);
             getTextArea().getCommandManager().removeCommandListener(this);
             toolBarExtension.clearFeatures();
+            // if a behaviorAdjuster was created and attached, remove it
+            if (behaviorAdjuster != null) {
+                getTextArea().removeKeyboardListener(behaviorAdjuster);
+                getTextArea().getCommandManager().removeCommandListener(behaviorAdjuster);
+                behaviorAdjuster = null;
+            }
         }
 
         super.destroy();

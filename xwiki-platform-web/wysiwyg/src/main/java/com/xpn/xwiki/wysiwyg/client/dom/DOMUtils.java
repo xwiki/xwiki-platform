@@ -146,6 +146,52 @@ public abstract class DOMUtils
     }
 
     /**
+     * @param range the range after which to look for a leaf
+     * @return the next leaf which is not touched by the specified range.
+     */
+    public Node getNextLeaf(Range range)
+    {
+        Node endContainer = range.getEndContainer();
+        if (endContainer.getNodeType() != Node.ELEMENT_NODE) {
+            // The node is either a text node or a comment node, return next leaf
+            return getNextLeaf(endContainer);
+        } else {
+            // the node is an element node, and the selection ends somewhere in between two child nodes. Check if it's
+            // at the end of it's parent and return the parent's next leaf or the first leaf of the next node otherwise
+            if (endContainer.hasChildNodes() && range.getEndOffset() < endContainer.getChildNodes().getLength()) {
+                // get the first leaf of the node after the end container
+                Node nodeAfter = endContainer.getChildNodes().getItem(range.getEndOffset());
+                return getFirstLeaf(nodeAfter);
+            } else {
+                return getNextLeaf(endContainer);
+            }
+        }
+    }
+
+    /**
+     * @param range the range before which to look for a leaf
+     * @return the previous leaf which is not touched by the specified range.
+     */
+    public Node getPreviousLeaf(Range range)
+    {
+        Node startContainer = range.getStartContainer();
+        if (startContainer.getNodeType() != Node.ELEMENT_NODE) {
+            return getPreviousLeaf(startContainer);
+        } else {
+            // the node is an element node and the selection begins somewhere in between two child nodes. Check if it's
+            // at the beginning of its parent and return the parent's previous leaf or the last leaf of the previous
+            // node otherwise.
+            if (startContainer.hasChildNodes() && range.getStartOffset() > 0) {
+                Node nodeBefore = startContainer.getChildNodes().getItem(range.getStartOffset() - 1);
+                return getLastLeaf(nodeBefore);
+            } else {
+                return getPreviousLeaf(startContainer);
+            }
+
+        }
+    }
+
+    /**
      * @param node the node from where to begin the search for the previous leaf.
      * @return the previous leaf node in a reverse deep-first search, considering we already looked in the subtree whose
      *         root is the given node.

@@ -205,6 +205,21 @@ public class Element extends com.google.gwt.dom.client.Element
     }
 
     /**
+     * Wraps the passed node and takes its place in its parent. In other words, it adds the passed element as a child of
+     * this element and replaces it in its parent.
+     * 
+     * @param node the node to wrap
+     */
+    public final void wrap(Node node)
+    {
+        if (node.getParentNode() == null || node.getParentNode().getNodeType() == Node.DOCUMENT_NODE) {
+            return;
+        }
+        node.getParentNode().replaceChild(this, node);
+        appendChild(node);
+    }
+
+    /**
      * @return the meta data associated with this element.
      */
     public final DocumentFragment getMetaData()

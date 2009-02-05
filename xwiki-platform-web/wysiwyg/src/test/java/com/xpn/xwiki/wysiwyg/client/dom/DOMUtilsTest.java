@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.SpanElement;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
 /**
@@ -567,6 +568,94 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
 
         container.getFirstChild().setNodeValue("");
         assertEquals(0, domUtils.getNormalizedChildCount(container));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getNextLeaf(Range)} for the cases when there is an empty strong element.
+     */
+    public void testGetNextLeafRangeEmptyElt()
+    {
+        container.setInnerHTML("our<span>xwiki<strong></strong></span><br />");
+        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+
+        Range range = null;
+        Node textElement = wrappingSpan.getFirstChild();
+        Element strongEmptyElement = (Element) wrappingSpan.getChildNodes().getItem(1);
+        Element brElement = (Element) wrappingSpan.getNextSibling();
+
+        // test that the empty strong element is found as next leaf of a selection xw|ik|i
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(textElement, 2);
+        range.setEnd(textElement, 4);
+        assertEquals(strongEmptyElement, domUtils.getNextLeaf(range));
+
+        // test that the empty strong element is found as next leaf of a selection placed in the wrapping span at
+        // position 1
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(wrappingSpan, 1);
+        range.setEnd(wrappingSpan, 1);
+        assertEquals(strongEmptyElement, domUtils.getNextLeaf(range));
+
+        // test that the br element is found as next leaf of a selection placed at the end of the wrapping span
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(wrappingSpan, 2);
+        range.setEnd(wrappingSpan, 2);
+        assertEquals(brElement, domUtils.getNextLeaf(range));
+
+        // test that the br element is found as next leaf of a selection placed inside the strong empty element
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(textElement, 4);
+        range.setEnd(strongEmptyElement, 0);
+        assertEquals(brElement, domUtils.getNextLeaf(range));
+    }
+
+    /**
+     * Unit tests for {@link DOMUtils#getNextLeaf(Range)} for the case when there is a wrapping element around the range
+     * and its next leaf.
+     */
+    public void testGetNextLeafRangeWrappingElt()
+    {
+        container.setInnerHTML("our<span>xwiki<strong>a</strong></span><br />");
+        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+        Element strongElement = (Element) wrappingSpan.getChildNodes().getItem(1);
+        Node insideTextNode = strongElement.getFirstChild();
+        Element brElement = (Element) wrappingSpan.getNextSibling();
+
+        Range range = null;
+
+        // test the br element is found as next leaf of a selection placed on the text inside the strong element
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(insideTextNode, 0);
+        range.setEnd(insideTextNode, 1);
+        assertEquals(brElement, domUtils.getNextLeaf(range));
+    }
+
+    /**
+     * Unit tests for {@link DOMUtils#getNextLeaf(Range)} for the case when the next leaf is a text and the range is
+     * inside a text.
+     */
+    public void testGetNextLeafRangeStrongInside()
+    {
+        container.setInnerHTML("our<span>xwiki<strong>r</strong>ox</span><br />");
+        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+        Element strongElement = (Element) wrappingSpan.getChildNodes().getItem(1);
+        Node insideTextNode = strongElement.getFirstChild();
+        Element brElement = (Element) wrappingSpan.getNextSibling();
+        Node oxText = wrappingSpan.getChildNodes().getItem(2);
+
+        Range range = null;
+
+        // test the "ox" text is found as next leaf of a selection placed on the text inside the strong element
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(insideTextNode, 0);
+        range.setEnd(insideTextNode, 1);
+        assertEquals(oxText, domUtils.getNextLeaf(range));
+
+        // test the br element is found as the next leaf of a selection placed inside the "ox" text
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(oxText, 0);
+        range.setEnd(oxText, 1);
+        assertEquals(brElement, domUtils.getNextLeaf(range));
     }
 
     /**

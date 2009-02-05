@@ -88,6 +88,18 @@
       <when-property-is name="user.agent" value="ie6"/>
     </any>
   </replace-with>
+  
+  <!-- List behavior adjuster -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.internal.IEListBehaviorAdjuster">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+    </any>
+  </replace-with>  
 
   <!-- Console -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.util.Console">

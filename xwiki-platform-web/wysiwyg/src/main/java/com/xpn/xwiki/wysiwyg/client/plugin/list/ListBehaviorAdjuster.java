@@ -107,18 +107,17 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
         for (int i = 0; i < listElements.getLength(); i++) {
             Element listElement = (Element) listElements.getItem(i);
             // check the parent of this list Element
-            if (listElement.getParentNode().getNodeType() == Node.ELEMENT_NODE
-                && (listElement.getParentNode().getNodeName().equalsIgnoreCase(ORDERED_LIST_TAG) || listElement
-                    .getParentNode().getNodeName().equalsIgnoreCase(UNORDERED_LIST_TAG))) {
+            if (listElement.getParentNode().getNodeName().equalsIgnoreCase(ORDERED_LIST_TAG) || listElement
+                    .getParentNode().getNodeName().equalsIgnoreCase(UNORDERED_LIST_TAG)) {
                 // wrap this element in a list item
-                Element wrappingListItem = ((Document) listElement.getOwnerDocument()).xCreateElement(LIST_ITEM_TAG);
+                Element wrappingListItem = ((Document) listElement.getOwnerDocument()).xCreateLIElement().cast();
                 wrappingListItem.wrap(listElement);
             }
-            // check if this element is the first element of a listItem, and the parent is a list item
-            if (listElement.getParentElement().getFirstChild() == listElement
-                && listElement.getParentNode().getNodeName().equalsIgnoreCase(LIST_ITEM_TAG)) {
+            // check if this element is the first element of a list item
+            if (listElement.getParentNode().getNodeName().equalsIgnoreCase(LIST_ITEM_TAG)
+                && listElement.getPreviousSibling() == null) {
                 // is first element
-                handleEmptyListItem((Element) listElement.getParentElement());
+                handleEmptyListItem((Element) listElement.getParentNode());
             }
         }
     }
@@ -167,7 +166,7 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
         if (nextLeaf == null) {
             // don't allow delete in the last list item in the document, because it could lead to deleting the list
             // item, depending on the browser.
-            getTextArea().getCurrentEvent().preventDefault();
+            getTextArea().getCurrentEvent().xPreventDefault();
             return;
         }
         // get first li ancestor of nextLeaf
@@ -181,7 +180,7 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
             if (nextLeaf == null) {
                 // if there is no other leaf after the placeholder, don't allow to delete the placeholder: this would
                 // lead to deleting the whole item, and if it's the last in the document, we don't want that.
-                getTextArea().getCurrentEvent().preventDefault();
+                getTextArea().getCurrentEvent().xPreventDefault();
                 return;
             }
             nextLeafAncestorLi = (Element) DOMUtils.getInstance().getFirstAncestor(nextLeaf, LIST_ITEM_TAG);
@@ -193,7 +192,7 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
 
         // execute the delete
         executeDelete(li, nextLeafAncestorLi, nextEmptyItemPlacehodlerLeaf, range);
-        getTextArea().getCurrentEvent().preventDefault();
+        getTextArea().getCurrentEvent().xPreventDefault();
     }
 
     /**
@@ -242,15 +241,15 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
         // setup the range before move, put it in a convenient place: if the leaf is an empty placeholder,
         // put it before the leaf, and set the placeholder as the skipped item to delete on move
         if (isEmptyListItemPlaceholder(previousLeaf)) {
-            range.setEnd(previousLeafAncestorLi, DOMUtils.getInstance().getNodeIndex(previousLeaf));
+            range.setEndBefore(previousLeaf);
             previousEmptyItemPlacehodlerLeaf = previousLeaf;
         } else {
-            range.setEnd(previousLeafAncestorLi, DOMUtils.getInstance().getNodeIndex(previousLeaf) + 1);
+            range.setEndAfter(previousLeaf);
         }
 
         // effectively execute the move
         executeDelete(previousLeafAncestorLi, li, previousEmptyItemPlacehodlerLeaf, range);
-        getTextArea().getCurrentEvent().preventDefault();
+        getTextArea().getCurrentEvent().xPreventDefault();
     }
 
     /**

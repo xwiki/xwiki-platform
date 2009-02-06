@@ -571,9 +571,10 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
     }
 
     /**
-     * Unit test for {@link DOMUtils#getNextLeaf(Range)} for the cases when there is an empty strong element.
+     * Unit test for {@link DOMUtils#getNextLeaf(Range)} for the cases when there is an empty element and it is either
+     * the next leaf or the selection is placed inside.
      */
-    public void testGetNextLeafRangeEmptyElt()
+    public void testGetNextLeafRangeAroundEmptyElement()
     {
         container.setInnerHTML("our<span>xwiki<strong></strong></span><br />");
         SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
@@ -602,7 +603,7 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         range.setEnd(wrappingSpan, 2);
         assertEquals(brElement, domUtils.getNextLeaf(range));
 
-        // test that the br element is found as next leaf of a selection placed inside the strong empty element
+        // test that the br element is found as next leaf of a selection that ends inside the strong empty element
         range = ((Document) container.getOwnerDocument()).createRange();
         range.setStart(textElement, 4);
         range.setEnd(strongEmptyElement, 0);
@@ -613,7 +614,7 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
      * Unit tests for {@link DOMUtils#getNextLeaf(Range)} for the case when there is a wrapping element around the range
      * and its next leaf.
      */
-    public void testGetNextLeafRangeWrappingElt()
+    public void testGetNextLeafRangeWhenSelectionIsInLastChild()
     {
         container.setInnerHTML("our<span>xwiki<strong>a</strong></span><br />");
         SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
@@ -634,14 +635,15 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
      * Unit tests for {@link DOMUtils#getNextLeaf(Range)} for the case when the next leaf is a text and the range is
      * inside a text.
      */
-    public void testGetNextLeafRangeStrongInside()
+    public void testGetNextLeafRangeWhenSelectionIsBeforeTextNode()
     {
-        container.setInnerHTML("our<span>xwiki<strong>r</strong>ox</span><br />");
+        container.setInnerHTML("our<span>xwiki<strong>r</strong>ox</span>");
         SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
         Element strongElement = (Element) wrappingSpan.getChildNodes().getItem(1);
         Node insideTextNode = strongElement.getFirstChild();
-        Element brElement = (Element) wrappingSpan.getNextSibling();
         Node oxText = wrappingSpan.getChildNodes().getItem(2);
+        Node ourText = container.getFirstChild();
+        Node xwikiText = wrappingSpan.getFirstChild();
 
         Range range = null;
 
@@ -651,11 +653,115 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         range.setEnd(insideTextNode, 1);
         assertEquals(oxText, domUtils.getNextLeaf(range));
 
-        // test the br element is found as the next leaf of a selection placed inside the "ox" text
+        // test that "ox" text is found as next leaf of a non-collapsed selection starting in the our text and ending
+        // inside the strong element
         range = ((Document) container.getOwnerDocument()).createRange();
-        range.setStart(oxText, 0);
-        range.setEnd(oxText, 1);
-        assertEquals(brElement, domUtils.getNextLeaf(range));
+        range.setStart(ourText, 1);
+        range.setEnd(insideTextNode, 1);
+        assertEquals(oxText, domUtils.getNextLeaf(range));
+
+        // test that the xwiki text is found as next leaf of a selection placed in the "our" text
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(ourText, 1);
+        range.setEnd(ourText, 2);
+        assertEquals(xwikiText, domUtils.getNextLeaf(range));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getPreviousLeaf(Range) for the cases when there is an empty element and it either
+     * is the previous leaf or the range is placed inside.
+     */
+    public void testGetPreviousLeafRangeAroundEmptyElement()
+    {
+        container.setInnerHTML("<br /><span><strong></strong>our</span>xwiki");
+        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+
+        Range range = null;
+        Node ourText = wrappingSpan.getChildNodes().getItem(1);
+        Element strongEmptyElement = (Element) wrappingSpan.getFirstChild();
+        Element brElement = (Element) wrappingSpan.getPreviousSibling();
+
+        // test that the empty strong element is found as previous leaf of a selection o|ur|
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(ourText, 1);
+        range.setEnd(ourText, 3);
+        assertEquals(strongEmptyElement, domUtils.getPreviousLeaf(range));
+
+        // test that the empty strong element is found as previous leaf of a selection placed in the wrapping span at
+        // position 1
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(wrappingSpan, 1);
+        range.setEnd(wrappingSpan, 1);
+        assertEquals(strongEmptyElement, domUtils.getPreviousLeaf(range));
+
+        // test that the br element is found as previous leaf of a selection placed at the beginning of the wrapping
+        // span
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(wrappingSpan, 0);
+        range.setEnd(wrappingSpan, 0);
+        assertEquals(brElement, domUtils.getPreviousLeaf(range));
+
+        // test that the br element is found as previous leaf of a selection that begins inside the strong empty element
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(strongEmptyElement, 0);
+        range.setEnd(ourText, 2);
+        assertEquals(brElement, domUtils.getPreviousLeaf(range));
+    }
+
+    /**
+     * Unit tests for {@link DOMUtils#getPreviousLeaf(Range)} for the case when there is a wrapping element around the
+     * range and its previous leaf.
+     */
+    public void testGetPreviousLeafRangeWhenSelectionIsInFirstChild()
+    {
+        container.setInnerHTML("<br /><span><strong>a</strong>our</span>xwiki");
+        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+        Element strongElement = (Element) wrappingSpan.getFirstChild();
+        Node insideTextNode = strongElement.getFirstChild();
+        Element brElement = (Element) wrappingSpan.getPreviousSibling();
+
+        Range range = null;
+
+        // test the br element is found as next leaf of a selection placed on the text inside the strong element
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(insideTextNode, 0);
+        range.setEnd(insideTextNode, 1);
+        assertEquals(brElement, domUtils.getPreviousLeaf(range));
+    }
+
+    /**
+     * Unit tests for {@link DOMUtils#getPreviousLeaf(Range)} for the case when the previous leaf is a text and the
+     * range is inside a text.
+     */
+    public void testGetPreviousLeafRangeWhenSelectionIsAfterTextNode()
+    {
+        container.setInnerHTML("<span>our<strong>x</strong>wiki</span>rox");
+        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(0);
+        Element strongElement = (Element) wrappingSpan.getChildNodes().getItem(1);
+        Node insideTextNode = strongElement.getFirstChild();
+        Node roxText = wrappingSpan.getNextSibling();
+        Node ourText = wrappingSpan.getFirstChild();
+        Node wikiText = strongElement.getNextSibling();
+
+        Range range = null;
+
+        // test the "our" text is found as previous leaf of a selection placed on the text inside the strong element
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(insideTextNode, 0);
+        range.setEnd(insideTextNode, 1);
+        assertEquals(ourText, domUtils.getPreviousLeaf(range));
+
+        // test that "our" text is found as next leaf of a non-collapsed selection starting inside the strong element
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(insideTextNode, 0);
+        range.setEnd(wikiText, 2);
+        assertEquals(ourText, domUtils.getPreviousLeaf(range));
+
+        // test that the wiki text is found as previous leaf of a selection placed "rox" text
+        range = ((Document) container.getOwnerDocument()).createRange();
+        range.setStart(roxText, 1);
+        range.setEnd(roxText, 2);
+        assertEquals(wikiText, domUtils.getPreviousLeaf(range));
     }
 
     /**

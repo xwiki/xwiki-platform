@@ -27,16 +27,24 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("wiki")
 public class Wiki extends LinkCollection
 {
+    private String id;
+
     private String name;
 
-    public Wiki(String name)
+    public Wiki(String id)
     {
-        this.name = name;
+        this.id = id;
+        this.name = id;
     }
 
     public String getName()
     {
         return name;
+    }
+
+    public String getId()
+    {
+        return id;
     }
 
 }

@@ -34,6 +34,7 @@ import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.Spaces;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 
 /**
  * @version $Id$
@@ -63,12 +64,18 @@ public class SpacesResource extends XWikiResource
             for (String spaceName : ri) {
                 List<String> docNames = xwikiApi.getSpaceDocsName(spaceName);
                 String home = String.format("%s.WebHome", spaceName);
+                String homeXWikiUrl = null;
                 if (!xwikiApi.exists(home)) {
                     home = null;
+                } else {
+                    Document doc = xwikiApi.getDocument(home);
+                    if (doc != null) {
+                        homeXWikiUrl = doc.getExternalURL("view");
+                    }
                 }
 
                 spaces.addSpace(DomainObjectFactory.createSpace(getRequest(), resourceClassRegistry, wiki, spaceName,
-                    home, docNames.size()));
+                    home, homeXWikiUrl, docNames.size()));
             }
 
             return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), spaces);

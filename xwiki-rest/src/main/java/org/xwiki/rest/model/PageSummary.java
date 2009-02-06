@@ -29,13 +29,15 @@ public class PageSummary extends LinkCollection
 {
     private String wiki;
 
-    private String id;
+    private String fullName;
 
-    private String fullId;
+    private String id;
 
     private String space;
 
     private String name;
+
+    private String xwikiUrl;
 
     private String title;
 
@@ -48,14 +50,14 @@ public class PageSummary extends LinkCollection
         translations = new Translations();
     }
 
-    public String getId()
+    public String getFullName()
     {
-        return id;
+        return fullName;
     }
 
-    public void setId(String id)
+    public void setFullName(String fullName)
     {
-        this.id = id;
+        this.fullName = fullName;
     }
 
     public String getSpace()
@@ -76,11 +78,6 @@ public class PageSummary extends LinkCollection
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public String getFullName()
-    {
-        return String.format("%s.%s", space, name);
     }
 
     public String getTitle()
@@ -123,13 +120,23 @@ public class PageSummary extends LinkCollection
         this.wiki = wiki;
     }
 
-    public String getFullId()
+    public String getId()
     {
-        return fullId;
+        return id;
     }
 
-    public void setFullId(String fullId)
+    public void setId(String fullId)
     {
-        this.fullId = fullId;
+        this.id = fullId;
+    }
+
+    public String getXWikiUrl()
+    {
+        return xwikiUrl;
+    }
+
+    public void setXWikiUrl(String xwikiUrl)
+    {
+        this.xwikiUrl = xwikiUrl;
     }
 }

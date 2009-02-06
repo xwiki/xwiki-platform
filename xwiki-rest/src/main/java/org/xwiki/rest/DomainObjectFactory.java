@@ -84,9 +84,9 @@ public class DomainObjectFactory
     }
 
     public static Space createSpace(Request request, XWikiResourceClassRegistry resourceClassRegistry, String wiki,
-        String spaceName, String home, int numberOfPages)
+        String spaceName, String home, String homeXWikiUrl, int numberOfPages)
     {
-        Space space = new Space(wiki, spaceName, home, numberOfPages);
+        Space space = new Space(wiki, spaceName, home, homeXWikiUrl, numberOfPages);
 
         String fullUri =
             String.format("%s%s", request.getRootRef(), resourceClassRegistry
@@ -108,11 +108,12 @@ public class DomainObjectFactory
             PageSummary pageSummary = new PageSummary();
 
             pageSummary.setWiki(doc.getWiki());
-            pageSummary.setId(doc.getFullName());
-            pageSummary.setFullId(doc.getPrefixedFullName());
+            pageSummary.setFullName(doc.getFullName());
+            pageSummary.setId(doc.getPrefixedFullName());
             pageSummary.setSpace(doc.getSpace());
             pageSummary.setName(doc.getName());
             pageSummary.setTitle(doc.getTitle());
+            pageSummary.setXWikiUrl(doc.getExternalURL("view"));
 
             Translations translations = pageSummary.getTranslations();
 
@@ -194,12 +195,13 @@ public class DomainObjectFactory
             Page page = new Page();
 
             page.setWiki(doc.getWiki());
-            page.setId(doc.getFullName());
-            page.setFullId(doc.getPrefixedFullName());
+            page.setFullName(doc.getFullName());
+            page.setId(doc.getPrefixedFullName());
             page.setSpace(doc.getSpace());
             page.setName(doc.getName());
             page.setTitle(doc.getTitle());
-            page.setVersion(doc.getRCSVersion().at(0));
+            page.setVersion(doc.getVersion());
+            page.setMajorVersion(doc.getRCSVersion().at(0));
             page.setMinorVersion(doc.getRCSVersion().at(1));
             page.setLanguage(doc.getLanguage());
             page.setXWikiUrl(doc.getExternalURL("view"));

@@ -47,16 +47,17 @@ public class XStreamFactory
 
         sorter.registerFieldOrder(XWikiRoot.class, new String[] {"version", "links"});
 
-        sorter.registerFieldOrder(Wiki.class, new String[] {"name", "links"});
+        sorter.registerFieldOrder(Wiki.class, new String[] {"id", "name", "links"});
 
-        sorter.registerFieldOrder(Space.class, new String[] {"wiki", "name", "home", "numberOfPages", "links"});
+        sorter.registerFieldOrder(Space.class, new String[] {"id", "wiki", "name", "home", "xwikiUrl", "numberOfPages",
+        "links"});
 
-        sorter.registerFieldOrder(PageSummary.class, new String[] {"fullId", "id", "wiki", "space", "name", "title",
-        "parent", "translations", "links"});
+        sorter.registerFieldOrder(PageSummary.class, new String[] {"id", "fullName", "wiki", "space", "name",
+        "xwikiUrl", "title", "parent", "translations", "links"});
 
-        sorter.registerFieldOrder(Page.class, new String[] {"fullId", "id", "wiki", "space", "name", "title", "parent",
-        "version", "minorVersion", "language", "xwikiUrl", "created", "creator", "modified", "modifier",
-        "translations", "content", "links"});
+        sorter.registerFieldOrder(Page.class, new String[] {"id", "fullName", "wiki", "space", "name", "title",
+        "parent", "version", "majorVersion", "minorVersion", "language", "xwikiUrl", "created", "creator", "modified",
+        "modifier", "translations", "content", "links"});
 
         sorter.registerFieldOrder(Comment.class, new String[] {"id", "author", "date", "highlight", "text", "links"});
 

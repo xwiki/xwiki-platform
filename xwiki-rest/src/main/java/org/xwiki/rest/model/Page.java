@@ -29,7 +29,9 @@ public class Page extends PageSummary
 {
     private String language;
 
-    private Integer version;
+    private String version;
+
+    private Integer majorVersion;
 
     private Integer minorVersion;
 
@@ -58,16 +60,6 @@ public class Page extends PageSummary
     public void setLanguage(String language)
     {
         this.language = language;
-    }
-
-    public Integer getVersion()
-    {
-        return version;
-    }
-
-    public void setVersion(Integer version)
-    {
-        this.version = version;
     }
 
     public Integer getMinorVersion()
@@ -138,5 +130,25 @@ public class Page extends PageSummary
     public void setContent(String content)
     {
         this.content = content;
+    }
+
+    public Integer getMajorVersion()
+    {
+        return majorVersion;
+    }
+
+    public void setMajorVersion(Integer majorVersion)
+    {
+        this.majorVersion = majorVersion;
+    }
+
+    public String getVersion()
+    {
+        return version;
+    }
+
+    public void setVersion(String version)
+    {
+        this.version = version;
     }
 }

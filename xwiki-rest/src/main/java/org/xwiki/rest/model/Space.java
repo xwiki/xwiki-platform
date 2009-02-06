@@ -27,19 +27,25 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("space")
 public class Space extends LinkCollection
 {
+    private String id;
+
     private String wiki;
 
     private String name;
 
     private String home;
 
+    private String xwikiUrl;
+
     private Integer numberOfPages;
 
-    public Space(String wiki, String name, String home, Integer numberOfPages)
+    public Space(String wiki, String name, String home, String xwikiUrl, Integer numberOfPages)
     {
+        this.id = String.format("%s:%s", wiki, name);
         this.wiki = wiki;
         this.name = name;
         this.home = home;
+        this.xwikiUrl = xwikiUrl;
         this.numberOfPages = numberOfPages;
     }
 
@@ -61,6 +67,16 @@ public class Space extends LinkCollection
     public String getWiki()
     {
         return wiki;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public String getXWikiUrl()
+    {
+        return xwikiUrl;
     }
 
 }

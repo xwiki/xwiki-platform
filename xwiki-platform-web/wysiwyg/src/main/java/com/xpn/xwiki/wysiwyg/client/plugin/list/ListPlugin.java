@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
@@ -96,7 +97,7 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
             behaviorAdjuster = (ListBehaviorAdjuster) GWT.create(ListBehaviorAdjuster.class);
             behaviorAdjuster.setTextArea(getTextArea());
             // handle all list item elements in the loaded document
-            behaviorAdjuster.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
+            behaviorAdjuster.onInnerHTMLChange(Element.as(getTextArea().getDocument().getBody()));
             // add key listener to the rta
             getTextArea().addKeyboardListener(behaviorAdjuster);
             getTextArea().getCommandManager().addCommandListener(behaviorAdjuster);

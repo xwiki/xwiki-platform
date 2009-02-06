@@ -86,7 +86,6 @@ public class LinkMetaDataExtractor implements InnerHTMLListener
 
         DocumentFragment metaFragment = ((Document) anchor.getOwnerDocument()).createDocumentFragment();
         // put the end comments in
-        previousSibling.getParentNode().removeChild(previousSibling);
         metaFragment.appendChild(previousSibling);
         // create the placeholder and replace the anchor
         Text placeholder = (Text) ((Document) anchor.getOwnerDocument()).createTextNode(Element.INNER_HTML_PLACEHOLDER);

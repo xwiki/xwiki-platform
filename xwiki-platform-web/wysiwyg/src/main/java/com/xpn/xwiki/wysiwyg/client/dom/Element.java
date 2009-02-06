@@ -211,8 +211,8 @@ public class Element extends com.google.gwt.dom.client.Element
      * @param node the node to wrap
      */
     public final void wrap(Node node)
-    {
-        if (node.getParentNode() == null || node.getParentNode().getNodeType() == Node.DOCUMENT_NODE) {
+    { 
+        if (node.getParentNode() == null) {
             return;
         }
         node.getParentNode().replaceChild(this, node);

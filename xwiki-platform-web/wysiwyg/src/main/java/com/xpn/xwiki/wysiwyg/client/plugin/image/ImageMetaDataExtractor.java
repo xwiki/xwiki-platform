@@ -74,11 +74,9 @@ public class ImageMetaDataExtractor implements InnerHTMLListener
         }
         // This is a valid image html fragment, transform this element in a metafragment element
         DocumentFragment metaFragment = ((Document) img.getOwnerDocument()).createDocumentFragment();
-        previousSibling.getParentNode().removeChild(previousSibling);
         metaFragment.appendChild(previousSibling);
         Text placeholder = (Text) ((Document) img.getOwnerDocument()).createTextNode(Element.INNER_HTML_PLACEHOLDER);
         metaFragment.appendChild(placeholder);
-        nextSibling.getParentNode().removeChild(nextSibling);
         metaFragment.appendChild(nextSibling);
         img.setMetaData(metaFragment);
     }

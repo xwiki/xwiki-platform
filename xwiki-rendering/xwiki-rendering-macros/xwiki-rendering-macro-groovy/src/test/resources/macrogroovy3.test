@@ -1,0 +1,12 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify groovy macro does not fail with null content
+.#-----------------------------------------------------
+{{groovy/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker [groovy] [] []
+endMacroMarker [groovy] [] []
+endDocument

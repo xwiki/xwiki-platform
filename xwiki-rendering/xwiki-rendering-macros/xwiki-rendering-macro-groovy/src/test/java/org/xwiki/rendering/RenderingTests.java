@@ -39,6 +39,7 @@ public class RenderingTests extends TestCase
 
         suite.addTestsFromResource("macrogroovy1", true);
         suite.addTestsFromResource("macrogroovy2", true);
+        suite.addTestsFromResource("macrogroovy3", true);
 
         return new ScriptRenderingPlexusTestSetup(suite);
     }

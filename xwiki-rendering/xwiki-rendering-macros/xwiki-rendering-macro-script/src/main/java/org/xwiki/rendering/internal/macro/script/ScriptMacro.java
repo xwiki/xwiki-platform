@@ -29,6 +29,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -111,6 +112,10 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
     protected String evaluate(ScriptMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        if (StringUtils.isEmpty(content)) {
+            return "";
+        }
+
         String engineName;
 
         // 1) resolve script engine name

@@ -30,6 +30,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
 /**
@@ -164,8 +165,8 @@ public interface WysiwygService extends RemoteService
     List<String> getPageNames(String wikiName, String spaceName);
 
     /**
-     * Creates a page url from the given parameters. None of them are mandatory, if one misses, it is replaced with a
-     * default value.
+     * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is
+     * replaced with a default value.
      * 
      * @param wikiName the name of the wiki to which to link
      * @param spaceName the name of the space of the page. If this parameter is missing, it is replaced with the space
@@ -174,9 +175,9 @@ public interface WysiwygService extends RemoteService
      * @param revision the value for the page revision to which to link to. If this is missing, the link is made to the
      *            latest revision, the default view action for the document.
      * @param anchor the name of the anchor type.
-     * @return the relative url to the resulted document.
+     * @return the data of the link to the document, containing link url and link reference information.
      */
-    String createPageURL(String wikiName, String spaceName, String pageName, String revision, String anchor);
+    LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor);
 
     /**
      * Returns all the image attachments from the referred page. It can either get all the pictures in a page or in a

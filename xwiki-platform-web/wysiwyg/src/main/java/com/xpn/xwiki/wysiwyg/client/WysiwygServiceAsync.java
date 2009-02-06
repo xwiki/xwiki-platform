@@ -25,6 +25,7 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
 /**
@@ -128,8 +129,8 @@ public interface WysiwygServiceAsync
     void getPageNames(String wikiName, String spaceName, AsyncCallback<List<String>> async);
 
     /**
-     * Creates a page url from the given parameters. None of them are mandatory, if one misses, it is replaced with a
-     * default value.
+     * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is
+     * replaced with a default value.
      * 
      * @param wikiName the name of the wiki to which to link
      * @param spaceName the name of the space of the page. If this parameter is missing, it is replaced with the space
@@ -140,8 +141,8 @@ public interface WysiwygServiceAsync
      * @param anchor the name of the anchor type.
      * @param async object used for asynchronous communication between server and client.
      */
-    void createPageURL(String wikiName, String spaceName, String pageName, String revision, String anchor,
-        AsyncCallback<String> async);
+    void getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor,
+        AsyncCallback<LinkConfig> async);
 
     /**
      * Returns all the image attachments from the page referred by its parameters. It can either get all the pictures in

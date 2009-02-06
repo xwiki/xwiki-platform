@@ -147,7 +147,7 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
                     scripContext.setWriter(stringWriter);
 
                     if (engine instanceof Compilable) {
-                        CompiledScript compiledScript = getCompiletScript(content, (Compilable) engine);
+                        CompiledScript compiledScript = getCompiledScript(content, (Compilable) engine);
 
                         compiledScript.eval(scripContext);
                     } else {
@@ -196,7 +196,7 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
      * @return the compiled version of the script.
      * @throws ScriptException failed to compile the script.
      */
-    protected CompiledScript getCompiletScript(String content, Compilable engine) throws ScriptException
+    protected CompiledScript getCompiledScript(String content, Compilable engine) throws ScriptException
     {
         // TODO: add caching
 

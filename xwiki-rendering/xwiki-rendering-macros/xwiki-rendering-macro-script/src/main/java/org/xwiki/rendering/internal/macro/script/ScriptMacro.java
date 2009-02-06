@@ -137,25 +137,24 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
             try {
                 ScriptEngineManager sem = new ScriptEngineManager();
                 ScriptEngine engine = sem.getEngineByName(engineName);
-
                 if (engine != null) {
-                    ScriptContext scripContext = this.scriptContextManager.getScriptContext();
+                    ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
 
                     StringWriter stringWriter = new StringWriter();
 
                     // set writer in script context
-                    scripContext.setWriter(stringWriter);
+                    scriptContext.setWriter(stringWriter);
 
                     if (engine instanceof Compilable) {
                         CompiledScript compiledScript = getCompiledScript(content, (Compilable) engine);
 
-                        compiledScript.eval(scripContext);
+                        compiledScript.eval(scriptContext);
                     } else {
-                        engine.eval(content, scripContext);
+                        engine.eval(content, scriptContext);
                     }
 
                     // remove writer script from context
-                    scripContext.setWriter(null);
+                    scriptContext.setWriter(null);
 
                     scriptResult = stringWriter.toString();
                 } else {

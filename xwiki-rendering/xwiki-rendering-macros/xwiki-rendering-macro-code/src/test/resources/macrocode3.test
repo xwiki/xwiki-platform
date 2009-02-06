@@ -9,7 +9,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [code] [language=none] [
+beginMacroMarkerStandalone [code] [language=none] [
 <b>bold</b>
 <i>italic</i>
 ]
@@ -17,7 +17,7 @@ beginXMLNode [div] [class=box code]
 onVerbatimStandalone [<b>bold</b>
 <i>italic</i>]
 endXMLNode [div] [class=box code]
-endMacroMarker [code] [language=none] [
+endMacroMarkerStandalone [code] [language=none] [
 <b>bold</b>
 <i>italic</i>
 ]

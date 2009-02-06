@@ -9,7 +9,7 @@ Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="s
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [code] [] [
+beginMacroMarkerStandalone [code] [] [
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
 ]
@@ -145,7 +145,7 @@ beginFormat: [NONE] [[style]=[color: #BC7A00; ]]
 onWord [}}]
 endFormat: [NONE] [[style]=[color: #BC7A00; ]]
 endXMLNode [div] [class=box code]
-endMacroMarker [code] [] [
+endMacroMarkerStandalone [code] [] [
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
 ]

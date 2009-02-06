@@ -11,9 +11,9 @@ beginSection
 beginHeader [1]
 onWord [hello]
 onSpace
-beginMacroMarker [groovy] [] [print "world"]
+beginMacroMarkerInline [groovy] [] [print "world"]
 onWord [world]
-endMacroMarker [groovy] [] [print "world"]
+endMacroMarkerInline [groovy] [] [print "world"]
 endHeader [1]
 endSection
 endDocument

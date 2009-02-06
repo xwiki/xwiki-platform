@@ -9,7 +9,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [box] [] [
+beginMacroMarkerStandalone [box] [] [
 * one
 * two
 ]
@@ -23,7 +23,7 @@ onWord [two]
 endListItem
 endList [BULLETED]
 endXMLNode [div] [class=box]
-endMacroMarker [box] [] [
+endMacroMarkerStandalone [box] [] [
 * one
 * two
 ]

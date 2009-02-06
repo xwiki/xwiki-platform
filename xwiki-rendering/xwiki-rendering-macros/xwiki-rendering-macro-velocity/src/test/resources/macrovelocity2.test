@@ -11,7 +11,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [velocity] [] [
+beginMacroMarkerStandalone [velocity] [] [
 #set ($list = ['one', 'two'])
 #foreach ($item in $list)
 * $item
@@ -25,7 +25,7 @@ beginListItem
 onWord [two]
 endListItem
 endList [BULLETED]
-endMacroMarker [velocity] [] [
+endMacroMarkerStandalone [velocity] [] [
 #set ($list = ['one', 'two'])
 #foreach ($item in $list)
 * $item

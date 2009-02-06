@@ -10,7 +10,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [code] [language=java] [
+beginMacroMarkerStandalone [code] [language=java] [
 <b>bold</b>
 <i>italic</i>
 ]
@@ -47,7 +47,7 @@ beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [>]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 endXMLNode [div] [class=box code]
-endMacroMarker [code] [language=java] [
+endMacroMarkerStandalone [code] [language=java] [
 <b>bold</b>
 <i>italic</i>
 ]

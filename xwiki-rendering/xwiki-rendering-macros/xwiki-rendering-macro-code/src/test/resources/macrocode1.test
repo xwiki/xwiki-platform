@@ -10,7 +10,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [code] [] [
+beginMacroMarkerStandalone [code] [] [
 <b>bold</b>
 <i>italic</i>
 ]
@@ -31,7 +31,7 @@ beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [</i>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 endXMLNode [div] [class=box code]
-endMacroMarker [code] [] [
+endMacroMarkerStandalone [code] [] [
 <b>bold</b>
 <i>italic</i>
 ]

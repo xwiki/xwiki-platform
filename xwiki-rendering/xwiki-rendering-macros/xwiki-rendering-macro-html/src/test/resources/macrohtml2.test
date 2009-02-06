@@ -14,7 +14,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [html] [] [
+beginMacroMarkerStandalone [html] [] [
 <table>
 <tr>
 <td>
@@ -36,7 +36,7 @@ endXMLNode [td]
 endXMLNode [tr]
 endXMLNode [tbody]
 endXMLNode [table]
-endMacroMarker [html] [] [
+endMacroMarkerStandalone [html] [] [
 <table>
 <tr>
 <td>

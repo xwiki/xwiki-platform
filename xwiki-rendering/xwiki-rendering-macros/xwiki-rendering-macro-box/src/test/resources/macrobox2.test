@@ -11,13 +11,13 @@ onWord [Some]
 onSpace
 onWord [inline]
 onSpace
-beginMacroMarker [box] [] [**box**]
+beginMacroMarkerInline [box] [] [**box**]
 beginFormat: [NONE] [[class]=[box]]
 beginFormat: [BOLD]
 onWord [box]
 endFormat: [BOLD]
 endFormat: [NONE] [[class]=[box]]
-endMacroMarker [box] [] [**box**]
+endMacroMarkerInline [box] [] [**box**]
 endParagraph
 endDocument
 .#-----------------------------------------------------

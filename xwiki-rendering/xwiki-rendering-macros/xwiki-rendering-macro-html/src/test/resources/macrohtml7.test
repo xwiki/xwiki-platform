@@ -15,7 +15,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [html] [wiki=false] [
+beginMacroMarkerStandalone [html] [wiki=false] [
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)
@@ -32,7 +32,7 @@ onWord [
    // ]
 endXMLNode [CDATA]
 endXMLNode [script] [type=text/javascript]
-endMacroMarker [html] [wiki=false] [
+endMacroMarkerStandalone [html] [wiki=false] [
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)

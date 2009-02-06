@@ -18,7 +18,7 @@ hello  world
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [html] [wiki=false] [
+beginMacroMarkerStandalone [html] [wiki=false] [
 <pre>
   newline
   newline
@@ -50,7 +50,7 @@ hello  world
    ]
 endXMLNode [CDATA]
 endXMLNode [p]
-endMacroMarker [html] [wiki=false] [
+endMacroMarkerStandalone [html] [wiki=false] [
 <pre>
   newline
   newline

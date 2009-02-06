@@ -6,6 +6,6 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [toc] [] []
-endMacroMarker [toc] [] []
+beginMacroMarkerStandalone [toc] [] []
+endMacroMarkerStandalone [toc] [] []
 endDocument

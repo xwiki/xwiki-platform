@@ -11,9 +11,9 @@ beginSection
 beginHeader [1]
 onWord [hello]
 onSpace
-beginMacroMarker [velocity] [] [world]
+beginMacroMarkerInline [velocity] [] [world]
 onWord [world]
-endMacroMarker [velocity] [] [world]
+endMacroMarkerInline [velocity] [] [world]
 endHeader [1]
 endSection
 endDocument

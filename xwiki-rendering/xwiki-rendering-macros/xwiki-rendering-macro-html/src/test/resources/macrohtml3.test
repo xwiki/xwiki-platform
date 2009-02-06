@@ -9,11 +9,11 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [html] [wiki=false] [
+beginMacroMarkerStandalone [html] [wiki=false] [
 **some escaped text**
 ]
 onWord [**some escaped text**]
-endMacroMarker [html] [wiki=false] [
+endMacroMarkerStandalone [html] [wiki=false] [
 **some escaped text**
 ]
 endDocument

@@ -11,7 +11,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [html] [] [
+beginMacroMarkerStandalone [html] [] [
 <!-- comment1 -->
 <p>hello</p>
 <!-- comment2 -->
@@ -23,7 +23,7 @@ onWord [hello]
 endXMLNode [p]
 beginXMLNode [ comment2 ]
 endXMLNode [ comment2 ]
-endMacroMarker [html] [] [
+endMacroMarkerStandalone [html] [] [
 <!-- comment1 -->
 <p>hello</p>
 <!-- comment2 -->

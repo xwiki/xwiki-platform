@@ -7,6 +7,6 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [groovy] [] []
-endMacroMarker [groovy] [] []
+beginMacroMarkerStandalone [groovy] [] []
+endMacroMarkerStandalone [groovy] [] []
 endDocument

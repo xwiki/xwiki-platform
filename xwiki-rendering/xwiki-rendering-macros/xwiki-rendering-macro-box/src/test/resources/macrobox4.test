@@ -7,9 +7,9 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [testbox] [] []
+beginMacroMarkerStandalone [testbox] [] []
 beginXMLNode [div] [class=box]
 onVerbatimStandalone []
 endXMLNode [div] [class=box]
-endMacroMarker [testbox] [] []
+endMacroMarkerStandalone [testbox] [] []
 endDocument

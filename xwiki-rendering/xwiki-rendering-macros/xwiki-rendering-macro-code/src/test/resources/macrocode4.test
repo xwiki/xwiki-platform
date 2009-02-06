@@ -33,7 +33,7 @@
 .expect|event/1.0
 .#----------------------------------------------------
 beginDocument
-beginMacroMarker [code] [language=javascript] [
+beginMacroMarkerStandalone [code] [language=javascript] [
 // getJSON function by Juriy Zaytsev 
 // http://github.com/kangax/protolicious/tree/master/get_json.js
 (function(){
@@ -485,7 +485,7 @@ onWord [}]
 onNewLine
 onWord [})();]
 endXMLNode [div] [class=box code]
-endMacroMarker [code] [language=javascript] [
+endMacroMarkerStandalone [code] [language=javascript] [
 // getJSON function by Juriy Zaytsev 
 // http://github.com/kangax/protolicious/tree/master/get_json.js
 (function(){

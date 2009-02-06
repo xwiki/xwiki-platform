@@ -15,7 +15,7 @@ onId [testid]
 beginHeader [1]
 onWord [Title1]
 endHeader [1]
-beginMacroMarker [toc] [start=1|depth=6|numbered=false|scope=page] []
+beginMacroMarkerStandalone [toc] [start=1|depth=6|numbered=false|scope=page] []
 beginList [BULLETED]
 beginListItem
 beginLink [Anchor = [testid]] [false]
@@ -52,7 +52,7 @@ onWord [Title2]
 endLink [Anchor = [testid]] [false]
 endListItem
 endList [BULLETED]
-endMacroMarker [toc] [start=1|depth=6|numbered=false|scope=page] []
+endMacroMarkerStandalone [toc] [start=1|depth=6|numbered=false|scope=page] []
 beginSection
 onId [testid]
 beginHeader [2]

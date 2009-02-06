@@ -9,13 +9,13 @@ content
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [testbox] [] [
+beginMacroMarkerStandalone [testbox] [] [
 content
 ]
 beginXMLNode [div] [class=box]
 onVerbatimStandalone [content]
 endXMLNode [div] [class=box]
-endMacroMarker [testbox] [] [
+endMacroMarkerStandalone [testbox] [] [
 content
 ]
 endDocument

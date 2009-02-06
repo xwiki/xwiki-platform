@@ -14,7 +14,7 @@ beginSection
 beginHeader [1]
 onWord [Title1]
 endHeader [1]
-beginMacroMarker [toc] [start=1|depth=6|numbered=true|scope=local] []
+beginMacroMarkerStandalone [toc] [start=1|depth=6|numbered=true|scope=local] []
 beginList [NUMBERED]
 beginList [NUMBERED]
 beginListItem
@@ -41,7 +41,7 @@ endList [NUMBERED]
 endList [NUMBERED]
 endList [NUMBERED]
 endList [NUMBERED]
-endMacroMarker [toc] [start=1|depth=6|numbered=true|scope=local] []
+endMacroMarkerStandalone [toc] [start=1|depth=6|numbered=true|scope=local] []
 beginSection
 onId [testid]
 beginHeader [2]

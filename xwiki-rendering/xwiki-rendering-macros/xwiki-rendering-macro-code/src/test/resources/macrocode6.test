@@ -16,10 +16,10 @@ onSpace
 onWord [macro]
 onSpecialSymbol [:]
 onSpace
-beginMacroMarker [code] [language=none] [<b>bold</b><i>italic</i>]
+beginMacroMarkerInline [code] [language=none] [<b>bold</b><i>italic</i>]
 beginFormat: [NONE] [[class]=[box code]]
 onVerbatimInline [<b>bold</b><i>italic</i>]
 endFormat: [NONE] [[class]=[box code]]
-endMacroMarker [code] [language=none] [<b>bold</b><i>italic</i>]
+endMacroMarkerInline [code] [language=none] [<b>bold</b><i>italic</i>]
 endParagraph
 endDocument

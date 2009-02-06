@@ -49,12 +49,12 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
     public void testIncludeMacroWithNewContext() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMacroMarker [velocity] [] [$myvar]\n"
+            + "beginMacroMarkerStandalone [velocity] [] [$myvar]\n"
             + "beginParagraph\n"
             + "onSpecialSymbol [$]\n"
             + "onWord [myvar]\n"
             + "endParagraph\n"
-            + "endMacroMarker [velocity] [] [$myvar]\n"
+            + "endMacroMarkerStandalone [velocity] [] [$myvar]\n"
             + "endDocument";
 
         // Since it's not in the same context, we verify that a Velocity variable set in the including page is not

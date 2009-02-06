@@ -11,7 +11,7 @@ list.each { item ->
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [script] [] [
+beginMacroMarkerStandalone [script] [] [
 def list = ["one", "two"]
 list.each { item ->
   println "* ${item}"
@@ -61,7 +61,7 @@ onSpecialSymbol ["]
 onNewLine
 onSpecialSymbol [}]
 endParagraph
-endMacroMarker [script] [] [
+endMacroMarkerStandalone [script] [] [
 def list = ["one", "two"]
 list.each { item ->
   println "* ${item}"

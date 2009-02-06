@@ -43,7 +43,7 @@ public class MacroMarkerBlock extends AbstractFatherBlock
      * The Macro content that we are preserving.
      */
     private String content;
-    
+
     /**
      * The macro is located in a inline content (like paragraph, etc.).
      */
@@ -51,14 +51,16 @@ public class MacroMarkerBlock extends AbstractFatherBlock
 
     public MacroMarkerBlock(String name, Map<String, String> parameters, List<Block> childBlocks, boolean isInline)
     {
-        this(name, parameters, null, childBlocks);
+        this(name, parameters, null, childBlocks, isInline);
     }
 
-    public MacroMarkerBlock(String name, Map<String, String> parameters, String content, List<Block> childBlocks)
+    public MacroMarkerBlock(String name, Map<String, String> parameters, String content, List<Block> childBlocks,
+        boolean isInline)
     {
         super(childBlocks, parameters);
         this.name = name;
         this.content = content;
+        this.isInline = isInline;
     }
 
     public String getName()
@@ -75,7 +77,7 @@ public class MacroMarkerBlock extends AbstractFatherBlock
     {
         return this.isInline;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -85,7 +87,7 @@ public class MacroMarkerBlock extends AbstractFatherBlock
     {
         listener.beginMacroMarker(getName(), getParameters(), getContent(), isInline());
     }
-    
+
     /**
      * {@inheritDoc}
      * 

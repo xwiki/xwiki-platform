@@ -56,9 +56,14 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         super(printer, new StackedStateListener<XWikiSyntaxState>(XWikiSyntaxState.class));
     }
 
+    public StackedStateListener<XWikiSyntaxState> getStackedState()
+    {
+        return (StackedStateListener<XWikiSyntaxState>) getStateListener();
+    }
+
     public XWikiSyntaxState getState()
     {
-        return ((StackedStateListener<XWikiSyntaxState>) getStateListener()).peek();
+        return getStackedState().peek();
     }
 
     private BlockStateListener getBlockStateListener()
@@ -308,28 +313,19 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#onInlineMacro(String, java.util.Map, String)
+     * @see PrintRenderer#onMacro(String, java.util.Map, String, boolean)
      */
     @Override
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        super.onInlineMacro(name, parameters, content);
+        super.onMacro(name, parameters, content, isInline);
 
-        getXWikiPrinter().printInlineMacro(getMacroPrinter().print(name, parameters, content));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PrintRenderer#onStandaloneMacro(String, java.util.Map, String)
-     */
-    @Override
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
-    {
-        super.onStandaloneMacro(name, parameters, content);
-
-        printNewLine();
-        print(getMacroPrinter().print(name, parameters, content));
+        if (!isInline) {
+            printNewLine();
+            print(getMacroPrinter().print(name, parameters, content));
+        } else {
+          getXWikiPrinter().printInlineMacro(getMacroPrinter().print(name, parameters, content));
+        }
     }
 
     /**
@@ -510,35 +506,37 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#beginMacroMarker(String, java.util.Map, String)
+     * @see PrintRenderer#beginMacroMarker(String, java.util.Map, String, boolean)
      */
     @Override
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        super.beginMacroMarker(name, parameters, content);
-
-        getState().setPreviousFormatParametersBeforeMacroMarker(getState().getPreviousFormatParameters());
+        super.beginMacroMarker(name, parameters, content, isInline);
 
         // When we encounter a macro marker we ignore all other blocks inside since we're going to use the macro
         // definition wrapped by the macro marker to construct the xwiki syntax.
+        getStackedState().push();
         pushPrinter(new XWikiSyntaxEscapeWikiPrinter(VoidWikiPrinter.VOIDWIKIPRINTER, getState()));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#endMacroMarker(String, java.util.Map, String)
+     * @see PrintRenderer#endMacroMarker(String, java.util.Map, String, boolean)
      */
     @Override
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         popPrinter();
+        getStackedState().pop();
 
-        getState().setPreviousFormatParameters(getState().getPreviousFormatParametersBeforeMacroMarker());
+        if (!isInline) {
+            printNewLine();
+        }
 
         print(getMacroPrinter().print(name, parameters, content));
 
-        super.endMacroMarker(name, parameters, content);
+        super.endMacroMarker(name, parameters, content, isInline);
     }
 
     /**

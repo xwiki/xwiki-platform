@@ -91,7 +91,7 @@ public class TextOnNewLineStateListener implements Listener
         this.isTextOnNewLine = false;
     }
 
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         this.isTextOnNewLine = false;
     }
@@ -191,7 +191,7 @@ public class TextOnNewLineStateListener implements Listener
         // Nothing to do
     }
 
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Nothing to do
     }
@@ -291,7 +291,7 @@ public class TextOnNewLineStateListener implements Listener
         // Nothing to do
     }
 
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         this.isTextOnNewLine = false;
     }

@@ -281,10 +281,11 @@ public interface Listener
      * @param name the macro name
      * @param parameters the macro parameters
      * @param content the macro content
-     * @see #onStandaloneMacro(String, java.util.Map, String)
+     * @param isInline TODO
+     * @see #onMacro(String, java.util.Map, String, boolean)
      * @see #onInlineMacro(String, java.util.Map, String)
      */
-    void beginMacroMarker(String name, Map<String, String> parameters, String content);
+    void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline);
 
     /**
      * End of marker containing a macro definition.
@@ -292,9 +293,10 @@ public interface Listener
      * @param name the macro name
      * @param parameters the macro parameters
      * @param content the macro content
-     * @see #beginMacroMarker(String, java.util.Map, String)
+     * @param isInline TODO
+     * @see #beginMacroMarker(String, java.util.Map, String, boolean)
      */
-    void endMacroMarker(String name, Map<String, String> parameters, String content);
+    void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline);
 
     /**
      * Start of a quotation. There are one or several quotation lines inside a quotation block.
@@ -349,25 +351,15 @@ public interface Listener
     void onNewLine();
 
     /**
-     * A {@link org.xwiki.rendering.macro.Macro} located inside another Block. For example a Macro inside a Paragraph
-     * Block.
-     * 
-     * @param name the macro name
-     * @param parameters the macro parameters
-     * @param content the macro content
-     * @since 1.6M2
-     */
-    void onInlineMacro(String name, Map<String, String> parameters, String content);
-
-    /**
      * A {@link org.xwiki.rendering.macro.Macro} by itself on a line (ie not inside another Block).
      * 
      * @param name the macro name
      * @param parameters the macro parameters
      * @param content the macro content
+     * @param isInline TODO
      * @since 1.6M2
      */
-    void onStandaloneMacro(String name, Map<String, String> parameters, String content);
+    void onMacro(String name, Map<String, String> parameters, String content, boolean isInline);
 
     /**
      * A word. Note that sentences ar broken into different events: word events, special symbols events, space events,

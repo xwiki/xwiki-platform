@@ -2,6 +2,8 @@
 .input|xwiki/2.0
 .# Same a macro1.test but this time the macro is executed.
 .#-----------------------------------------------------
+First paragraph.
+
 {{testsimplemacro}}
 Some **content**
 {{/testsimplemacro}}
@@ -9,31 +11,39 @@ Some **content**
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarker [testsimplemacro] [] [
+beginParagraph
+onWord [First]
+onSpace
+onWord [paragraph]
+onSpecialSymbol [.]
+endParagraph
+beginMacroMarkerStandalone [testsimplemacro] [] [
 Some **content**
 ]
 beginParagraph
-onWord [simplemacro0]
+onWord [simplemacro2]
 endParagraph
-endMacroMarker [testsimplemacro] [] [
+endMacroMarkerStandalone [testsimplemacro] [] [
 Some **content**
 ]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-||-|
+<p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|
 Some **content**
---><p>simplemacro0</p><!--stopmacro-->
+--><p>simplemacro2</p><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
+First paragraph.
+
 {{testsimplemacro}}
 Some **content**
 {{/testsimplemacro}}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><!--startmacro:testsimplemacro|-||-|
+<p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|
 Some **content**
---><p>simplemacro0</p><!--stopmacro--></html> 
+--><p>simplemacro2</p><!--stopmacro-->

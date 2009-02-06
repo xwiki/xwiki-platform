@@ -52,8 +52,7 @@ import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ListBLock;
 import org.xwiki.rendering.block.ListItemBlock;
-import org.xwiki.rendering.block.MacroInlineBlock;
-import org.xwiki.rendering.block.MacroStandaloneBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
@@ -454,7 +453,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onMacroBlock(String macroName, WikiParameters params, String content)
     {
-        this.stack.push(new MacroStandaloneBlock(macroName, convertParameters(params), content));
+        this.stack.push(new MacroBlock(macroName, convertParameters(params), content, false));
     }
 
     /**
@@ -462,7 +461,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onMacroInline(String macroName, WikiParameters params, String content)
     {
-        this.stack.push(new MacroInlineBlock(macroName, convertParameters(params), content));
+        this.stack.push(new MacroBlock(macroName, convertParameters(params), content, true));
     }
 
     /**

@@ -156,11 +156,12 @@ public class StackedStateListener<L extends Listener> extends Stack<L> implement
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginMacroMarker(java.lang.String, java.util.Map, java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#beginMacroMarker(java.lang.String, java.util.Map, java.lang.String,
+     *      boolean)
      */
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        peek().beginMacroMarker(name, parameters, content);
+        peek().beginMacroMarker(name, parameters, content, isInline);
     }
 
     /**
@@ -358,11 +359,12 @@ public class StackedStateListener<L extends Listener> extends Stack<L> implement
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endMacroMarker(java.lang.String, java.util.Map, java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#endMacroMarker(java.lang.String, java.util.Map, java.lang.String,
+     *      boolean)
      */
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        peek().endMacroMarker(name, parameters, content);
+        peek().endMacroMarker(name, parameters, content, isInline);
     }
 
     /**
@@ -508,16 +510,6 @@ public class StackedStateListener<L extends Listener> extends Stack<L> implement
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onInlineMacro(java.lang.String, java.util.Map, java.lang.String)
-     */
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
-    {
-        peek().onInlineMacro(name, parameters, content);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.listener.Listener#onNewLine()
      */
     public void onNewLine()
@@ -548,11 +540,11 @@ public class StackedStateListener<L extends Listener> extends Stack<L> implement
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onStandaloneMacro(java.lang.String, java.util.Map, java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#onMacro(java.lang.String, java.util.Map, java.lang.String, boolean)
      */
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        peek().onStandaloneMacro(name, parameters, content);
+        peek().onMacro(name, parameters, content, isInline);
     }
 
     /**

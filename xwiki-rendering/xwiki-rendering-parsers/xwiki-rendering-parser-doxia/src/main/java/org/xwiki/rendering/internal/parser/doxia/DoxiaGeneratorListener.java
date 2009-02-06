@@ -114,7 +114,7 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.listItem();
     }
 
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Don't do anything since Doxia doesn't have macro markers and anyway we shouldn't
         // do anything.
@@ -177,7 +177,7 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.listItem_();
     }
 
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Don't do anything since Doxia doesn't have macro markers and anyway we shouldn't
         // do anything.
@@ -221,13 +221,7 @@ public class DoxiaGeneratorListener implements Listener
         // TODO: Find out what to do...
     }
 
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
-    {
-        // Don't do anything since macros have already been transformed so this method
-        // should not be called.
-    }
-
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Don't do anything since macros have already been transformed so this method
         // should not be called.

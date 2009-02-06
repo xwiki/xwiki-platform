@@ -171,25 +171,13 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractRenderer#onInlineMacro(java.lang.String, java.util.Map,
-     *      java.lang.String)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onMacro(java.lang.String, java.util.Map, java.lang.String,
+     *      boolean)
      */
     @Override
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        printMacroData("onMacroInline", name, parameters, content);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.AbstractRenderer#onStandaloneMacro(java.lang.String, java.util.Map,
-     *      java.lang.String)
-     */
-    @Override
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
-    {
-        printMacroData("onMacroStandalone", name, parameters, content);
+        printMacroData("onMacro", name, parameters, content, isInline);
     }
 
     /**
@@ -342,24 +330,24 @@ public class EventsRenderer extends AbstractPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.renderer.AbstractRenderer#beginMacroMarker(java.lang.String, java.util.Map,
-     *      java.lang.String)
+     *      java.lang.String, boolean)
      */
     @Override
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        printMacroData("beginMacroMarker", name, parameters, content);
+        printMacroData("beginMacroMarker", name, parameters, content, isInline);
     }
 
     /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.renderer.AbstractRenderer#endMacroMarker(java.lang.String, java.util.Map,
-     *      java.lang.String)
+     *      java.lang.String, boolean)
      */
     @Override
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        printMacroData("endMacroMarker", name, parameters, content);
+        printMacroData("endMacroMarker", name, parameters, content, isInline);
     }
 
     /**
@@ -684,7 +672,8 @@ public class EventsRenderer extends AbstractPrintRenderer
         return printableStr;
     }
 
-    private void printMacroData(String eventName, String name, Map<String, String> parameters, String content)
+    private void printMacroData(String eventName, String name, Map<String, String> parameters, String content,
+        boolean isInline)
     {
         StringBuffer buffer = new StringBuffer();
         for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
@@ -694,7 +683,9 @@ public class EventsRenderer extends AbstractPrintRenderer
                 buffer.append("|");
             }
         }
-        getPrinter().println(eventName + " [" + name + "] [" + buffer.toString() + "] [" + content + "]");
+        getPrinter().println(
+            eventName + (isInline ? "Inline" : "Standalone") + " [" + name + "] [" + buffer.toString() + "] ["
+                + content + "]");
     }
 
     private String serializeParameters(Map<String, String> parameters)

@@ -144,11 +144,11 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginMacroMarker(java.lang.String, java.util.Map, java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#beginMacroMarker(java.lang.String, java.util.Map, java.lang.String, boolean)
      */
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        this.stateListener.beginMacroMarker(name, parameters, content);
+        this.stateListener.beginMacroMarker(name, parameters, content, isInline);
     }
 
     /**
@@ -344,11 +344,11 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endMacroMarker(java.lang.String, java.util.Map, java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#endMacroMarker(java.lang.String, java.util.Map, java.lang.String, boolean)
      */
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        this.stateListener.endMacroMarker(name, parameters, content);
+        this.stateListener.endMacroMarker(name, parameters, content, isInline);
     }
 
     /**
@@ -494,16 +494,6 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onInlineMacro(java.lang.String, java.util.Map, java.lang.String)
-     */
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
-    {
-        this.stateListener.onInlineMacro(name, parameters, content);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.listener.Listener#onNewLine()
      */
     public void onNewLine()
@@ -534,11 +524,11 @@ public abstract class AbstractRenderer extends AbstractLogEnabled implements Ren
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onStandaloneMacro(java.lang.String, java.util.Map, java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#onMacro(java.lang.String, java.util.Map, java.lang.String, boolean)
      */
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        this.stateListener.onStandaloneMacro(name, parameters, content);
+        this.stateListener.onMacro(name, parameters, content, isInline);
     }
 
     /**

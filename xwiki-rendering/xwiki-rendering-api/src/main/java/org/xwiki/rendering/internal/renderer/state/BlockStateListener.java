@@ -194,7 +194,7 @@ public class BlockStateListener implements Listener
         ++this.inlineDepth;
     }
 
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Nothing to do
     }
@@ -300,7 +300,7 @@ public class BlockStateListener implements Listener
         --this.inlineDepth;
     }
 
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Nothing to do
     }
@@ -400,7 +400,7 @@ public class BlockStateListener implements Listener
         // Nothing to do
     }
 
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Nothing to do
     }

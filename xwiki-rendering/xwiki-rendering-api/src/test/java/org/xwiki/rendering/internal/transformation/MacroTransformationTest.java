@@ -27,7 +27,7 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.MacroStandaloneBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -63,8 +63,8 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "endMacroMarker [testsimplemacro] [] [null]\n"
             + "endDocument";
 
-        XDOM dom = new XDOM(Arrays.asList((Block) new MacroStandaloneBlock("testsimplemacro",
-            Collections.<String, String>emptyMap())));
+        XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testsimplemacro",
+            Collections.<String, String>emptyMap(), false)));
         
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
@@ -86,8 +86,8 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "endMacroMarker [testnestedmacro] [] [null]\n"
             + "endDocument";
 
-        XDOM dom = new XDOM(Arrays.asList((Block) new MacroStandaloneBlock("testnestedmacro",
-            Collections.<String, String>emptyMap())));
+        XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testnestedmacro",
+            Collections.<String, String>emptyMap(), false)));
     
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
@@ -107,8 +107,8 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "endMacroMarker [testrecursivemacro] [] [null]\n"
             + "endDocument";
         
-        XDOM dom = new XDOM(Arrays.asList((Block) new MacroStandaloneBlock("testrecursivemacro",
-            Collections.<String, String>emptyMap())));
+        XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testrecursivemacro",
+            Collections.<String, String>emptyMap(), false)));
     
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
@@ -136,8 +136,8 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "endDocument";
 
         XDOM dom = new XDOM(Arrays.asList(
-            (Block) new MacroStandaloneBlock("testsimplemacro", Collections.<String, String>emptyMap()),
-            (Block) new MacroStandaloneBlock("testprioritymacro", Collections.<String, String>emptyMap())));
+            (Block) new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap(), false),
+            (Block) new MacroBlock("testprioritymacro", Collections.<String, String>emptyMap(), false)));
 
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 

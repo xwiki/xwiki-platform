@@ -48,9 +48,9 @@ public class ListenerDelegate implements Listener
         this.listener.beginListItem();
     }
 
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        this.listener.beginMacroMarker(name, parameters, content);
+        this.listener.beginMacroMarker(name, parameters, content, isInline);
     }
 
     public void beginParagraph(Map<String, String> parameters)
@@ -98,9 +98,9 @@ public class ListenerDelegate implements Listener
         this.listener.endListItem();
     }
 
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        this.listener.endMacroMarker(name, parameters, content);
+        this.listener.endMacroMarker(name, parameters, content, isInline);
     }
 
     public void endParagraph(Map<String, String> parameters)
@@ -138,14 +138,9 @@ public class ListenerDelegate implements Listener
         this.listener.endLink(link, isFreeStandingURI, parameters);
     }
 
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        this.listener.onStandaloneMacro(name, parameters, content);
-    }
-
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
-    {
-        this.listener.onInlineMacro(name, parameters, content);
+        this.listener.onMacro(name, parameters, content, isInline);
     }
 
     public void onNewLine()

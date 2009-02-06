@@ -132,7 +132,7 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.beginListItem();
     }
 
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Don't do anything since there's no notion of Macro marker in WikiModel and anyway
         // there's nothing to render for a marker...
@@ -173,7 +173,7 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endListItem();
     }
 
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Don't do anything since there's no notion of Macro marker in WikiModel and anyway
         // there's nothing to render for a marker...
@@ -216,13 +216,7 @@ public class WikiModelGeneratorListener implements Listener
         // See http://code.google.com/p/wikimodel/issues/detail?id=87
     }
 
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
-    {
-        // Don't do anything since macros have already been transformed so this method
-        // should not be called.
-    }
-
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Don't do anything since macros have already been transformed so this method
         // should not be called.

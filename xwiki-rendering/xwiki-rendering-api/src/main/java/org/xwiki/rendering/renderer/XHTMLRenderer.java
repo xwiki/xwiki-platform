@@ -308,23 +308,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onInlineMacro(String, java.util.Map, String)
+     * @see org.xwiki.rendering.renderer.Renderer#onMacro(String, java.util.Map, String, boolean)
      */
     @Override
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
-    {
-        // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
-        // so that the macro can be reconstructed when moving back from XHTML to XDOM.
-        this.macroRenderer.render(getXHTMLWikiPrinter(), name, parameters, content);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.Renderer#onStandaloneMacro(String, java.util.Map, String)
-     */
-    @Override
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
         // so that the macro can be reconstructed when moving back from XHTML to XDOM.
@@ -510,10 +497,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginMacroMarker(String, java.util.Map, String)
+     * @see org.xwiki.rendering.renderer.Renderer#beginMacroMarker(String, java.util.Map, String, boolean)
      */
     @Override
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
         // so that the macro can be reconstructed when moving back from XHTML to XDOM.
@@ -523,10 +510,10 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endMacroMarker(String, java.util.Map, String)
+     * @see org.xwiki.rendering.renderer.Renderer#endMacroMarker(String, java.util.Map, String, boolean)
      */
     @Override
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
         // so that the macro can be reconstructed when moving back from XHTML to XDOM.

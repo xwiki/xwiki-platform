@@ -157,12 +157,12 @@ public class ChainedListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginMacroMarker(java.lang.String, java.util.Map, java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#beginMacroMarker(java.lang.String, java.util.Map, java.lang.String, boolean)
      */
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         for (Listener listener : this.stateListeners) {
-            listener.beginMacroMarker(name, parameters, content);
+            listener.beginMacroMarker(name, parameters, content, isInline);
         }
     }
 
@@ -397,12 +397,12 @@ public class ChainedListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endMacroMarker(java.lang.String, java.util.Map, java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#endMacroMarker(java.lang.String, java.util.Map, java.lang.String, boolean)
      */
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         for (Listener listener : this.stateListeners) {
-            listener.endMacroMarker(name, parameters, content);
+            listener.endMacroMarker(name, parameters, content, isInline);
         }
     }
 
@@ -577,18 +577,6 @@ public class ChainedListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onInlineMacro(java.lang.String, java.util.Map, java.lang.String)
-     */
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
-    {
-        for (Listener listener : this.stateListeners) {
-            listener.onInlineMacro(name, parameters, content);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.listener.Listener#onNewLine()
      */
     public void onNewLine()
@@ -625,12 +613,12 @@ public class ChainedListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onStandaloneMacro(java.lang.String, java.util.Map, java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#onMacro(java.lang.String, java.util.Map, java.lang.String, boolean)
      */
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         for (Listener listener : this.stateListeners) {
-            listener.onStandaloneMacro(name, parameters, content);
+            listener.onMacro(name, parameters, content, isInline);
         }
     }
 

@@ -75,8 +75,6 @@ public class XWikiSyntaxState extends ChainedListener
 
     private Map<String, String> previousFormatParameters;
 
-    private Map<String, String> previousFormatParametersBeforeMacroMarker;
-
     public XWikiSyntaxState()
     {
         this.macroPrinter = new XWikiMacroPrinter();
@@ -240,17 +238,6 @@ public class XWikiSyntaxState extends ChainedListener
     public Map<String, String> getPreviousFormatParameters()
     {
         return previousFormatParameters;
-    }
-
-    public void setPreviousFormatParametersBeforeMacroMarker(
-        Map<String, String> previousFormatParametersBeforeMacroMarker)
-    {
-        this.previousFormatParametersBeforeMacroMarker = previousFormatParametersBeforeMacroMarker;
-    }
-
-    public Map<String, String> getPreviousFormatParametersBeforeMacroMarker()
-    {
-        return previousFormatParametersBeforeMacroMarker;
     }
 
     // Events

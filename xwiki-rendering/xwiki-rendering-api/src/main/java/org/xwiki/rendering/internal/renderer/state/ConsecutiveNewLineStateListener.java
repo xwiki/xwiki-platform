@@ -89,7 +89,7 @@ public class ConsecutiveNewLineStateListener implements Listener
         // Nothing to do
     }
 
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Nothing to do
     }
@@ -189,7 +189,7 @@ public class ConsecutiveNewLineStateListener implements Listener
         this.newLineCount = 0;
     }
 
-    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         this.newLineCount = 0;
     }
@@ -284,7 +284,7 @@ public class ConsecutiveNewLineStateListener implements Listener
         this.newLineCount = 0;
     }
 
-    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         this.newLineCount = 0;
     }

@@ -30,13 +30,51 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
- * Indicates block element for which we are inside.
+ * Indicates block element for which we are inside and previous blocks.
  * 
  * @version $Id$
  * @since 1.8M1
  */
 public class BlockStateListener implements Listener
 {
+    public enum Event
+    {
+        NONE,
+        DEFINITION_DESCRIPTION,
+        DEFINITION_TERM,
+        DEFINITION_LIST,
+        DOCUMENT,
+        ERROR,
+        FORMAT,
+        HEADER,
+        LINK,
+        LIST,
+        LIST_ITEM,
+        MACRO_MARKER,
+        PARAGRAPH,
+        QUOTATION,
+        QUOTATION_LINE,
+        SECTION,
+        TABLE,
+        TABLE_CELL,
+        TABLE_HEAD_CELL,
+        TABLE_ROW,
+        XML_NODE,
+        EMPTY_LINES,
+        HORIZONTAL_LINE,
+        ID,
+        IMAGE,
+        NEW_LINE,
+        SPACE,
+        SPECIAL_SYMBOL,
+        MACRO,
+        VERBATIM_INLINE,
+        VERBATIM_STANDALONE,
+        WORD
+    }
+    
+    private Event previousEvent = Event.NONE;
+    
     private int documentDepth;
 
     private int inlineDepth = 0;
@@ -61,6 +99,11 @@ public class BlockStateListener implements Listener
 
     private boolean isInQuotationLine;
 
+    public Event getPreviousEvent()
+    {
+        return this.previousEvent;
+    }
+    
     public void setDocumentDepth(int documentDepth)
     {
         this.documentDepth = documentDepth;
@@ -150,7 +193,7 @@ public class BlockStateListener implements Listener
 
     public void beginDefinitionDescription()
     {
-        ++inlineDepth;
+        ++this.inlineDepth;
     }
 
     public void beginDefinitionList()
@@ -160,7 +203,7 @@ public class BlockStateListener implements Listener
 
     public void beginDefinitionTerm()
     {
-        ++inlineDepth;
+        ++this.inlineDepth;
     }
 
     public void beginDocument()
@@ -257,166 +300,175 @@ public class BlockStateListener implements Listener
     public void endDefinitionDescription()
     {
         --this.inlineDepth;
+        this.previousEvent = Event.DEFINITION_DESCRIPTION;
     }
 
     public void endDefinitionList()
     {
         --this.definitionListDepth;
+        this.previousEvent = Event.DEFINITION_LIST;
     }
 
     public void endDefinitionTerm()
     {
         --this.inlineDepth;
+        this.previousEvent = Event.DEFINITION_TERM;
     }
 
     public void endDocument()
     {
         --this.documentDepth;
+        this.previousEvent = Event.DOCUMENT;
     }
 
     public void endError(String message, String description)
     {
-        // Nothing to do
+        this.previousEvent = Event.ERROR;
     }
 
     public void endFormat(Format format, Map<String, String> parameters)
     {
-        // Nothing to do
+        this.previousEvent = Event.FORMAT;
     }
 
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         --this.linkDepth;
+        this.previousEvent = Event.LINK;
     }
 
     public void endList(ListType listType, Map<String, String> parameters)
     {
         --this.listDepth;
+        this.previousEvent = Event.LIST;
     }
 
     public void endListItem()
     {
         --this.listItemDepth;
         --this.inlineDepth;
+        this.previousEvent = Event.LIST_ITEM;
     }
 
     public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        // Nothing to do
+        this.previousEvent = Event.MACRO_MARKER;
     }
 
     public void endParagraph(Map<String, String> parameters)
     {
         this.isInParagraph = false;
         --this.inlineDepth;
+        this.previousEvent = Event.PARAGRAPH;
     }
 
     public void endQuotation(Map<String, String> parameters)
     {
         --this.quotationDepth;
+        this.previousEvent = Event.QUOTATION;
     }
 
     public void endQuotationLine()
     {
         this.isInQuotationLine = false;
         --this.inlineDepth;
+        this.previousEvent = Event.QUOTATION_LINE;
     }
 
     public void endSection(Map<String, String> parameters)
     {
-        // Nothing to do
+        this.previousEvent = Event.SECTION;
     }
 
     public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
         this.isInHeader = false;
         --this.inlineDepth;
+        this.previousEvent = Event.HEADER;
     }
 
     public void endTable(Map<String, String> parameters)
     {
         this.isInTable = false;
+        this.previousEvent = Event.TABLE;
     }
 
     public void endTableCell(Map<String, String> parameters)
     {
         this.isInTableCell = false;
         --this.inlineDepth;
+        this.previousEvent = Event.TABLE_CELL;
     }
 
     public void endTableHeadCell(Map<String, String> parameters)
     {
         this.isInTableCell = false;
         --this.inlineDepth;
+        this.previousEvent = Event.TABLE_HEAD_CELL;
     }
 
     public void endTableRow(Map<String, String> parameters)
     {
-        // Nothing to do
+        this.previousEvent = Event.TABLE_ROW;
     }
 
     public void endXMLNode(XMLNode node)
     {
-        // Nothing to do
+        this.previousEvent = Event.XML_NODE;
     }
 
     public void onEmptyLines(int count)
     {
-        // Nothing to do
+        this.previousEvent = Event.EMPTY_LINES;
     }
 
     public void onHorizontalLine(Map<String, String> parameters)
     {
-        // Nothing to do
+        this.previousEvent = Event.HORIZONTAL_LINE;
     }
 
     public void onId(String name)
     {
-        // Nothing to do
+        this.previousEvent = Event.ID;
     }
 
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        // Nothing to do
-    }
-
-    public void onInlineMacro(String name, Map<String, String> parameters, String content)
-    {
-        // Nothing to do
+        this.previousEvent = Event.IMAGE;
     }
 
     public void onNewLine()
     {
-        // Nothing to do
+        this.previousEvent = Event.NEW_LINE;
     }
 
     public void onSpace()
     {
-        // Nothing to do
+        this.previousEvent = Event.SPACE;
     }
 
     public void onSpecialSymbol(char symbol)
     {
-        // Nothing to do
-    }
-
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
-    {
-        // Nothing to do
+        this.previousEvent = Event.SPECIAL_SYMBOL;
     }
 
     public void onVerbatimInline(String protectedString)
     {
-        // Nothing to do
+        this.previousEvent = Event.VERBATIM_INLINE;
     }
 
     public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
-        // Nothing to do
+        this.previousEvent = Event.VERBATIM_STANDALONE;
     }
 
     public void onWord(String word)
     {
-        // Nothing to do
+        this.previousEvent = Event.WORD;
+    }
+
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    {
+        this.previousEvent = Event.MACRO;
     }
 }

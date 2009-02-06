@@ -3,11 +3,9 @@
 .#-----------------------------------------------------
 paragraph
 >line1
-line1bis
 >>line2
 >>>line3
 >>line4
-
 paragraph
 .#-----------------------------------------------------
 .expect|event/1.0
@@ -19,8 +17,6 @@ endParagraph
 beginQuotation
 beginQuotationLine
 onWord [line1]
-onNewLine
-onWord [line1bis]
 beginQuotation
 beginQuotationLine
 onWord [line2]
@@ -43,14 +39,13 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>paragraph</p><blockquote>line1<br/>line1bis<blockquote>line2<blockquote>line3</blockquote>line4</blockquote></blockquote><p>paragraph</p>
+<p>paragraph</p><blockquote>line1<blockquote>line2<blockquote>line3</blockquote><br/>line4</blockquote></blockquote><p>paragraph</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 paragraph
 
 >line1
-line1bis
 >>line2
 >>>line3
 >>line4
@@ -59,4 +54,4 @@ paragraph
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>paragraph</p><blockquote>line1<br/>line1bis<blockquote>line2<blockquote>line3</blockquote>line4</blockquote></blockquote><p>paragraph</p></html>
+<html><p>paragraph</p><blockquote>line1<blockquote>line2<blockquote>line3</blockquote><br/>line4</blockquote></blockquote><p>paragraph</p></html>

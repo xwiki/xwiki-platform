@@ -26,6 +26,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.internal.renderer.state.BlockStateListener;
+import org.xwiki.rendering.internal.renderer.state.BlockStateListener.Event;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
@@ -183,6 +184,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
     {
+        super.beginFormat(format, parameters);
+        
         switch (format) {
             case BOLD:
                 getXHTMLWikiPrinter().printXMLStartElement("strong");
@@ -245,6 +248,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
                 getXHTMLWikiPrinter().printXMLEndElement("tt");
                 break;
         }
+        
+        super.endFormat(format, parameters);
     }
 
     /**
@@ -255,6 +260,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginParagraph(Map<String, String> parameters)
     {
+        super.beginParagraph(parameters);
+        
         getXHTMLWikiPrinter().printXMLStartElement("p", parameters);
     }
 
@@ -267,6 +274,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endParagraph(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("p");
+        
+        super.endParagraph(parameters);
     }
 
     /**
@@ -277,6 +286,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onNewLine()
     {
+        super.onNewLine();
+        
         getXHTMLWikiPrinter().printXMLElement("br");
     }
 
@@ -288,6 +299,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
+        super.beginLink(link, isFreeStandingURI, parameters);
+        
         this.linkRenderer.beginRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, parameters);
         pushPrinter(new MonitoringWikiPrinter(getPrinter()));
     }
@@ -303,6 +316,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         MonitoringWikiPrinter printer = (MonitoringWikiPrinter) getPrinter();
         popPrinter();
         this.linkRenderer.endRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, !printer.hasContentBeenPrinted());
+        
+        super.endLink(link, isFreeStandingURI, parameters);
     }
 
     /**
@@ -313,6 +328,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
+        super.onMacro(name, parameters, content, isInline);
+        
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
         // so that the macro can be reconstructed when moving back from XHTML to XDOM.
         this.macroRenderer.render(getXHTMLWikiPrinter(), name, parameters, content);
@@ -326,6 +343,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
+        super.beginHeader(level, parameters);
+        
         // Don't output anything yet since we need the header title to generate the unique XHTML id attribute.
         // Thus we're doing the output in the #endHeader() event.
 
@@ -364,6 +383,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         int levelAsInt = level.getAsInt();
         getXHTMLWikiPrinter().printXMLEndElement("span");
         getXHTMLWikiPrinter().printXMLEndElement("h" + levelAsInt);
+        
+        super.endHeader(level, parameters);
     }
 
     /**
@@ -374,6 +395,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onWord(String word)
     {
+        super.onWord(word);
+        
         getXHTMLWikiPrinter().printXML(word);
     }
 
@@ -385,6 +408,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onSpace()
     {
+        super.onSpace();
+        
         // The XHTML printer will decide whether to print a normal space or a &nbsp;
         getXHTMLWikiPrinter().printSpace();
     }
@@ -397,6 +422,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onSpecialSymbol(char symbol)
     {
+        super.onSpecialSymbol(symbol);
+        
         getXHTMLWikiPrinter().printXML("" + symbol);
     }
 
@@ -408,6 +435,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginList(ListType listType, Map<String, String> parameters)
     {
+        super.beginList(listType, parameters);
+        
         if (listType == ListType.BULLETED) {
             getXHTMLWikiPrinter().printXMLStartElement("ul", parameters);
         } else {
@@ -423,6 +452,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginListItem()
     {
+        super.beginListItem();
+        
         getXHTMLWikiPrinter().printXMLStartElement("li");
     }
 
@@ -439,6 +470,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         } else {
             getXHTMLWikiPrinter().printXMLEndElement("ol");
         }
+        
+        super.endList(listType, parameters);
     }
 
     /**
@@ -450,6 +483,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endListItem()
     {
         getXHTMLWikiPrinter().printXMLEndElement("li");
+        
+        super.endListItem();
     }
 
     /**
@@ -460,6 +495,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginXMLNode(XMLNode node)
     {
+        super.beginXMLNode(node);
+        
         switch (node.getNodeType()) {
             case CDATA:
                 getXHTMLWikiPrinter().printXMLStartCData();
@@ -492,6 +529,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
                 getXHTMLWikiPrinter().printXMLEndElement(element.getName());
                 break;
         }
+        
+        super.endXMLNode(node);
     }
 
     /**
@@ -502,6 +541,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
+        super.beginMacroMarker(name, parameters, content, isInline);
+        
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
         // so that the macro can be reconstructed when moving back from XHTML to XDOM.
         this.macroRenderer.beginRender(getXHTMLWikiPrinter(), name, parameters, content);
@@ -518,6 +559,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
         // so that the macro can be reconstructed when moving back from XHTML to XDOM.
         this.macroRenderer.endRender(getXHTMLWikiPrinter());
+        
+        super.endMacroMarker(name, parameters, content, isInline);
     }
 
     /**
@@ -528,6 +571,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onId(String name)
     {
+        super.onId(name);
+        
         // Note: We're using <a><a/> and not <a/> since some browsers do not support the <a/> syntax (FF3)
         // when the content type is set to HTML instead of XHTML.
         getXHTMLWikiPrinter().printXMLStartElement("a", new String[][] { {"id", name}, {"name", name}});
@@ -542,6 +587,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onHorizontalLine(Map<String, String> parameters)
     {
+        super.onHorizontalLine(parameters);
+        
         getXHTMLWikiPrinter().printXMLElement("hr", parameters);
     }
 
@@ -553,6 +600,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onVerbatimInline(String protectedString)
     {
+        super.onVerbatimInline(protectedString);
+        
         // Note: We generate a tt element rather than a pre element since pre elements cannot be located inside
         // paragraphs for example. There also no tag in XHTML that has a semantic of preserving inline content so
         // tt is the closed to pre for inline.
@@ -571,6 +620,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
     {
+        super.onVerbatimStandalone(protectedString, parameters);
+        
         getXHTMLWikiPrinter().printXMLStartElement("pre", parameters);
         getXHTMLWikiPrinter().printXML(protectedString);
         getXHTMLWikiPrinter().printXMLEndElement("pre");
@@ -584,6 +635,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onEmptyLines(int count)
     {
+        super.onEmptyLines(count);
+        
         // We need to use a special tag for empty lines since in XHTML the BR tag cannot be used outside of content
         // tags.
         // Note: We're using <div><div/> and not <div/> since some browsers do not support the <div/> syntax (FF3)
@@ -602,6 +655,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginDefinitionList()
     {
+        super.beginDefinitionList();
+        
         getXHTMLWikiPrinter().printXMLStartElement("dl");
     }
 
@@ -614,6 +669,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endDefinitionList()
     {
         getXHTMLWikiPrinter().printXMLEndElement("dl");
+        
+        super.endDefinitionList();
     }
 
     /**
@@ -624,6 +681,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginDefinitionTerm()
     {
+        super.beginDefinitionTerm();
+        
         getXHTMLWikiPrinter().printXMLStartElement("dt");
     }
 
@@ -635,6 +694,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginDefinitionDescription()
     {
+        super.beginDefinitionDescription();
+        
         getXHTMLWikiPrinter().printXMLStartElement("dd");
     }
 
@@ -647,6 +708,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endDefinitionTerm()
     {
         getXHTMLWikiPrinter().printXMLEndElement("dt");
+        
+        super.endDefinitionTerm();
     }
 
     /**
@@ -658,6 +721,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endDefinitionDescription()
     {
         getXHTMLWikiPrinter().printXMLEndElement("dd");
+        
+        super.endDefinitionDescription();
     }
 
     /**
@@ -668,6 +733,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginQuotation(Map<String, String> parameters)
     {
+        super.beginQuotation(parameters);
+
         getXHTMLWikiPrinter().printXMLStartElement("blockquote", parameters);
     }
 
@@ -680,6 +747,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endQuotation(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("blockquote");
+
+        super.endQuotation(parameters);
     }
 
     /**
@@ -690,7 +759,13 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginQuotationLine()
     {
-        // Nothing to do
+        super.beginQuotationLine();
+        
+        // Send a new line if the previous event was endQuotationLine since we need to separate each quotation line
+        // or they'll printed next to each other and not on a new line each.
+        if (getState().isInQuotation() && getState().getPreviousEvent() == Event.QUOTATION_LINE) {
+            onNewLine();
+        }
     }
 
     /**
@@ -701,7 +776,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void endQuotationLine()
     {
-        // Nothing to do
+        super.endQuotationLine();
     }
 
     /**
@@ -712,6 +787,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginTable(Map<String, String> parameters)
     {
+        super.beginTable(parameters);
+        
         getXHTMLWikiPrinter().printXMLStartElement("table", parameters);
     }
 
@@ -723,6 +800,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginTableRow(Map<String, String> parameters)
     {
+        super.beginTableRow(parameters);
+        
         getXHTMLWikiPrinter().printXMLStartElement("tr", parameters);
     }
 
@@ -734,6 +813,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginTableCell(Map<String, String> parameters)
     {
+        super.beginTableCell(parameters);
+        
         getXHTMLWikiPrinter().printXMLStartElement("td", parameters);
     }
 
@@ -745,6 +826,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginTableHeadCell(Map<String, String> parameters)
     {
+        super.beginTableHeadCell(parameters);
+        
         getXHTMLWikiPrinter().printXMLStartElement("th", parameters);
     }
 
@@ -757,6 +840,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endTable(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("table");
+        
+        super.endTable(parameters);
     }
 
     /**
@@ -768,6 +853,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endTableRow(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("tr");
+        
+        super.endTableRow(parameters);
     }
 
     /**
@@ -779,6 +866,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endTableCell(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("td");
+        
+        super.endTableCell(parameters);
     }
 
     /**
@@ -790,6 +879,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endTableHeadCell(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("th");
+        
+        super.endTableHeadCell(parameters);
     }
 
     /**
@@ -800,6 +891,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
+        super.onImage(image, isFreeStandingURI, parameters);
+        
         // First we need to compute the image URL.
         String imageURL;
         if (image.getType() == ImageType.DOCUMENT) {
@@ -849,6 +942,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     @Override
     public void beginError(String message, String description)
     {
+        super.beginError(message, description);
+        
         getXHTMLWikiPrinter().printXMLStartElement("span", new String[][] {{"class", "xwikirenderingerror"}});
         getXHTMLWikiPrinter().printXML(message);
         getXHTMLWikiPrinter().printXMLComment("errordescription:" + description);
@@ -863,5 +958,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endError(String message, String description)
     {
         getXHTMLWikiPrinter().printXMLEndElement("span");
+        
+        super.endError(message, description);
     }
 }

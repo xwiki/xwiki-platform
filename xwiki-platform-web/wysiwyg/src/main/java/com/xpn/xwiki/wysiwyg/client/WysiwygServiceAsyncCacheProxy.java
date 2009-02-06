@@ -24,6 +24,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
 /**
@@ -175,12 +176,12 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#createPageURL(String, String, String, String, String, AsyncCallback)
+     * @see WysiwygServiceAsync#getPageLink(String, String, String, String, String, AsyncCallback)
      */
-    public void createPageURL(String wikiName, String spaceName, String pageName, String revision, String anchor,
-        AsyncCallback<String> async)
+    public void getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor,
+        AsyncCallback<LinkConfig> async)
     {
-        service.createPageURL(wikiName, spaceName, pageName, revision, anchor, async);
+        service.getPageLink(wikiName, spaceName, pageName, revision, anchor, async);
     }
 
     /**

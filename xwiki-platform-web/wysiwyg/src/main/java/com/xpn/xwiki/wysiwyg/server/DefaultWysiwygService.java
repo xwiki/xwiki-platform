@@ -41,6 +41,7 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
@@ -273,15 +274,16 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#createPageURL(String, String, String, String, String)
+     * @see WysiwygService#getPageLink(String, String, String, String, String)
      */
-    public String createPageURL(String wikiName, String spaceName, String pageName, String revision, String anchor)
+    public LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor)
     {
         XWikiContext context = getXWikiContext();
         String database = context.getDatabase();
         String newPageName = pageName;
         String newSpaceName = spaceName;
         String pageURL = null;
+        LinkConfig linkConfig = new LinkConfig();        
         try {
             if (wikiName != null) {
                 context.setDatabase(wikiName);
@@ -302,11 +304,15 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             }
 
             // clear the page and space name, to make sure we link to the right page
-            newPageName = context.getWiki().clearName(newPageName, context);
-            newSpaceName = context.getWiki().clearName(newSpaceName, context);
+            newPageName = clearXWikiName(newPageName);
+            newSpaceName = clearXWikiName(newSpaceName);
 
             XWikiDocument requestedDocument = context.getWiki().getDocument(newSpaceName + "." + newPageName, context);
             pageURL = requestedDocument.getURL("view", context);
+            linkConfig.setUrl(pageURL);
+            linkConfig.setPage(requestedDocument.getName());
+            linkConfig.setSpace(requestedDocument.getSpace());
+            linkConfig.setWiki(wikiName);
             // if we have revision, get document with revision, otherwise get simple document
             if (revision != null && revision.length() > 0) {
                 requestedDocument = context.getWiki().getDocument(newSpaceName + "." + newPageName, context);
@@ -322,7 +328,23 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                 getXWikiContext().setDatabase(database);
             }
         }
-        return pageURL;
+        
+        return linkConfig;
+    }
+
+    /**
+     * Clears forbidden characters out of the passed name, in a way which is consistent with the algorithm used in the
+     * create page panel. <br />
+     * FIXME: this function needs to be deleted when there will be a function to do this operation in a consistent
+     * manner across the whole xwiki, and all calls to this function should be replaced with calls to that function.
+     * 
+     * @param name the name to clear from forbidden characters and transform in a xwiki name.
+     * @return the cleared up xwiki name, ready to be used as a page or space name.
+     */
+    private String clearXWikiName(String name)
+    {
+        // replace all / with .
+        return name.replace('/', '.');
     }
 
     /**

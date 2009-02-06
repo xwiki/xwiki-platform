@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
  * Generates html link blocks for all types of links.
@@ -77,18 +78,18 @@ public final class LinkGenerator
     public String getNewPageLink(final String label, final String wikiName, final String spaceName,
         final String pageName, final AsyncCallback<String> async)
     {
-        WysiwygService.Singleton.getInstance().createPageURL(wikiName, spaceName, pageName, null, null,
-            new AsyncCallback<String>()
+        WysiwygService.Singleton.getInstance().getPageLink(wikiName, spaceName, pageName, null, null,
+            new AsyncCallback<LinkConfig>()
             {
                 public void onFailure(Throwable arg0)
                 {
                     async.onFailure(arg0);
                 }
 
-                public void onSuccess(String result)
+                public void onSuccess(LinkConfig result)
                 {
                     String link =
-                        createLinkHTML(getWikiPageReference(result, wikiName), "wikicreatelink", result, label);
+                        createLinkHTML(getWikiPageReference(result), "wikicreatelink", result.getUrl(), label);
                     async.onSuccess(link);
                 }
             });
@@ -110,8 +111,8 @@ public final class LinkGenerator
     public String getExistingPageLink(final String label, final String wikiName, final String spaceName,
         final String pageName, String revision, String anchor, final AsyncCallback<String> async)
     {
-        WysiwygService.Singleton.getInstance().createPageURL(wikiName, spaceName, pageName, revision, anchor,
-            new AsyncCallback<String>()
+        WysiwygService.Singleton.getInstance().getPageLink(wikiName, spaceName, pageName, revision, anchor,
+            new AsyncCallback<LinkConfig>()
             {
                 public void onFailure(Throwable arg0)
                 {
@@ -119,9 +120,9 @@ public final class LinkGenerator
                     async.onFailure(arg0);
                 }
 
-                public void onSuccess(String result)
+                public void onSuccess(LinkConfig result)
                 {
-                    String link = createLinkHTML(getWikiPageReference(result, wikiName), "wikilink", result, label);
+                    String link = createLinkHTML(getWikiPageReference(result), "wikilink", result.getUrl(), label);
                     async.onSuccess(link);
                 }
             });
@@ -129,14 +130,14 @@ public final class LinkGenerator
     }
 
     /**
-     * Builds the reference of a wiki link, from the URL of the page as returned by the server.
+     * Builds the reference of a wiki link, from the link data as returned by the server.
      * 
-     * @param url the URL of the page, as returned by the server
-     * @param wikiName the wiki name in which the page is located. Can be <code>null</code> if this is not a multiwiki.
-     * @return the wiki page reference, parsed from the returned url
+     * @param config the link data, as returned by the server
+     * @return the wiki page reference, created from the returned data
      */
-    private String getWikiPageReference(String url, String wikiName)
+    private String getWikiPageReference(LinkConfig config)
     {
+        String url = config.getUrl();
         int paramsIndex = url.indexOf('?');
         int hashIndex = url.indexOf('#');
         // If the hash index is to the left of the qm index or the qm index is negative, copy from hash
@@ -144,28 +145,12 @@ public final class LinkGenerator
             paramsIndex = hashIndex;
         }
         String params = "";
-        String strippedUrl = url;
         if (paramsIndex > 0) {
             params = url.substring(paramsIndex);
-            strippedUrl = url.substring(0, paramsIndex);
-        }
-        // get the page name and the space name to build the reference
-        String pageName = "";
-        int lastIndexOf = strippedUrl.lastIndexOf('/');
-        pageName = strippedUrl.substring(lastIndexOf + 1).trim();
-        if (pageName.length() == 0) {
-            pageName = "WebHome";
-        }
-        strippedUrl = lastIndexOf > 0 ? strippedUrl.substring(0, lastIndexOf) : "";
-        lastIndexOf = strippedUrl.lastIndexOf('/');
-        String spaceName = strippedUrl.substring(lastIndexOf + 1).trim();
-        if (spaceName.length() == 0) {
-            // default space. This shouldn't happen, though, since the server should return complete urls
-            spaceName = "Main";
         }
 
-        return ((wikiName != null && wikiName.length() > 0) ? wikiName + ":" : "") + spaceName + "." + pageName
-            + params;
+        return (!StringUtils.isEmpty(config.getWiki()) ? config.getWiki() + ":" : "") + config.getSpace() + "."
+            + config.getPage() + params;
     }
 
     /**

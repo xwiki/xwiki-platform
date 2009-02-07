@@ -4,13 +4,13 @@
 	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
   <query name="getSpaceDocsName">
-    select distinct doc.name from XWikiDocument doc where doc.space=:space and (doc.hidden &lt;&gt; 1 or doc.hidden is null)
+    select distinct doc.name from XWikiDocument doc where doc.space=:space and (doc.hidden &lt;&gt; true or doc.hidden is null)
   </query>
   <query name="getSpaces">
     select distinct doc.space from XWikiDocument doc
   </query>
   <query name="getAllDocuments">
-    select doc.fullName from XWikiDocument as doc where (doc.hidden &lt;&gt; 1 or doc.hidden is null)
+    select doc.fullName from XWikiDocument as doc where (doc.hidden &lt;&gt; true or doc.hidden is null)
   </query>
   <query name="listGroupsForUser">
     select doc.fullName from XWikiDocument as doc, BaseObject as obj, StringProperty as prop

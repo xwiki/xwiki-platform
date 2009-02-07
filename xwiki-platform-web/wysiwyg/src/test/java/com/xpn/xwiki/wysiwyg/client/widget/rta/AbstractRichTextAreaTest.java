@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SourcesLoadEvents;
@@ -81,7 +82,15 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implemen
         // We have to remove the default body border because it affects the range detection in IE.
         rta.getElement().getStyle().setProperty("border", "1px solid gray");
         rta.getDocument().getBody().getStyle().setProperty("borderStyle", "none");
-        rta.setFocus(true);
+        // http://wiki.codetalks.org/wiki/index.php/Docs/Keyboard_navigable_JS_widgets
+        // #Use_setTimeout_with_element.focus.28.29_to_set_focus
+        (new Timer()
+        {
+            public void run()
+            {
+                rta.setFocus(true);
+            }
+        }).schedule(1);
     }
 
     /**

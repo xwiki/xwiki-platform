@@ -43,10 +43,10 @@ onWord [Some]
 onSpace
 beginXMLNode [span]
 onWord [text]
+onSpace
 endXMLNode [span]
 beginXMLNode [comment]
 endXMLNode [comment]
-onSpace
 onWord [another]
 onSpace
 beginXMLNode [CDATA]

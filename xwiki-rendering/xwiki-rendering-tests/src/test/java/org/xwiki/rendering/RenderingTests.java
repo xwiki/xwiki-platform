@@ -36,7 +36,7 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-        
+
         // Embedded documents
         suite.addTestsFromResource("embeddeddoc/embeddeddoc1", false);
         suite.addTestsFromResource("embeddeddoc/embeddeddoc2", false);
@@ -45,7 +45,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("embeddeddoc/embeddeddoc5", false);
         suite.addTestsFromResource("embeddeddoc/embeddeddoc6", false);
         suite.addTestsFromResource("embeddeddoc/embeddeddoc7", false);
-        
+
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);
         suite.addTestsFromResource("bold/bold2", false);
@@ -87,7 +87,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("verbatim/verbatim5", false);
         suite.addTestsFromResource("verbatim/verbatim6", false);
         suite.addTestsFromResource("verbatim/verbatim7", false);
-        
+
         // Tables
         suite.addTestsFromResource("table/table1", false);
         suite.addTestsFromResource("table/table2", false);
@@ -154,7 +154,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("section/section6", false);
         suite.addTestsFromResource("section/section7", false);
         suite.addTestsFromResource("section/section8", false);
-        
+
         // Other
         suite.addTestsFromResource("escape/escape1", false);
         suite.addTestsFromResource("escape/escape2", false);
@@ -190,7 +190,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
         suite.addTestsFromResource("image/image4", false);
-        
+
         return new RenderingPlexusTestSetup(suite);
     }
 }

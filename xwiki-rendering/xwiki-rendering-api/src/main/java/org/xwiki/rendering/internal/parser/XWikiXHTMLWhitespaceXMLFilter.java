@@ -72,7 +72,7 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
                 // Make sure we clean head/trail white spaces
                 trimLeadingWhiteSpaces();
                 trimTrailingWhiteSpaces();
-                sendCharacters();
+                sendContent();
             }
         }
         super.endCDATA();

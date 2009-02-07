@@ -39,11 +39,11 @@ endXMLNode [pre]
 beginXMLNode [p]
 onWord [Some ]
 beginXMLNode [span]
-onWord [text]
+onWord [text ]
 endXMLNode [span]
 beginXMLNode [comment]
 endXMLNode [comment]
-onWord [ another ]
+onWord [another ]
 beginXMLNode [CDATA]
 onWord [
 hello  world

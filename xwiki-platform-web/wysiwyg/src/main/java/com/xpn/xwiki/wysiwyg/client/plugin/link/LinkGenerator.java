@@ -81,9 +81,9 @@ public final class LinkGenerator
         WysiwygService.Singleton.getInstance().getPageLink(wikiName, spaceName, pageName, null, null,
             new AsyncCallback<LinkConfig>()
             {
-                public void onFailure(Throwable arg0)
+                public void onFailure(Throwable t)
                 {
-                    async.onFailure(arg0);
+                    async.onFailure(t);
                 }
 
                 public void onSuccess(LinkConfig result)
@@ -114,10 +114,10 @@ public final class LinkGenerator
         WysiwygService.Singleton.getInstance().getPageLink(wikiName, spaceName, pageName, revision, anchor,
             new AsyncCallback<LinkConfig>()
             {
-                public void onFailure(Throwable arg0)
+                public void onFailure(Throwable t)
                 {
                     // pass it further
-                    async.onFailure(arg0);
+                    async.onFailure(t);
                 }
 
                 public void onSuccess(LinkConfig result)

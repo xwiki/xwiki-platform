@@ -378,7 +378,7 @@ public abstract class XWikiAction extends Action
         // Add the form to the context
         context.setForm((XWikiForm) form);
 
-        // Initialize the Container component which is the new of transporting the Context in the new
+        // Initialize the Container component which is the new way of transporting the Context in the new
         // component architecture.
         initializeContainerComponent(context);
 

@@ -9,7 +9,6 @@
 <!--                                                                 -->
 <!-- =============================================================== -->
 
-
 <Configure id="Server" class="org.mortbay.jetty.Server">
 
     <!-- =========================================================== -->
@@ -31,8 +30,6 @@
       </New>
       -->
     </Set>
-
-
 
     <!-- =========================================================== -->
     <!-- Set connectors                                              -->
@@ -119,17 +116,21 @@
     <!-- in the $JETTY_HOME/contexts directory                       -->
     <!--                                                             -->
     <!-- =========================================================== -->
-    <!--
+
+    <!-- XWiki Note: We're using the Context Deployer instead of the Webapp Deployer
+         because we need to ensure that the javax.script.* package( JSR 223) is 
+         considered as System classes (see http://docs.codehaus.org/display/JETTY/Classloading).
+         This is needed since the JDK 1.6 provides the JSR223 JAR and if we don't
+         do this then Jetty tries to use our version and there's some Class cast exception
+         that happens. -->
     <Call name="addLifeCycle">
       <Arg>
         <New class="org.mortbay.jetty.deployer.ContextDeployer">
           <Set name="contexts"><Ref id="Contexts"/></Set>
           <Set name="configurationDir"><SystemProperty name="jetty.home" default="."/>/contexts</Set>
-          <Set name="scanInterval">5</Set>
         </New>
       </Arg>
     </Call>
-    -->
     
     <!-- =========================================================== -->
     <!-- Configure the webapp deployer.                              -->
@@ -144,6 +145,7 @@
     <!-- Normally only one type of deployer need be used.            -->
     <!--                                                             -->
     <!-- =========================================================== -->
+    <!--
     <Call name="addLifeCycle">
       <Arg>
         <New class="org.mortbay.jetty.deployer.WebAppDeployer">
@@ -156,6 +158,7 @@
         </New>
       </Arg>
     </Call>
+    -->
 
     <!-- =========================================================== -->
     <!-- Configure Authentication Realms                             -->

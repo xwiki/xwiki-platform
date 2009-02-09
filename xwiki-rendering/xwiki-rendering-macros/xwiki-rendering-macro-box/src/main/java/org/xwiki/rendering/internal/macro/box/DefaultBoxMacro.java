@@ -82,7 +82,7 @@ public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMa
 
         try {
             List<Block> blocks = parser.parse(new StringReader(content)).getChildren();
-            if (context.isInlined()) {
+            if (context.isInline()) {
                 ParserUtils parseUtils = new ParserUtils();
                 parseUtils.removeTopLevelParagraph(blocks);
             }

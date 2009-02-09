@@ -120,7 +120,7 @@ public class MacroTransformation extends AbstractTransformation
 
         // 2) Verify if we're in macro inline mode and if the macro supports it. If not, send an error.
         if (macroHolder.macroBlock.isInline()) {
-            context.setInlined(true);
+            context.setInline(true);
             if (!macroHolder.macro.supportsInlineMode()) {
                 // The macro doesn't support inline mode, raise a warning but continue.
                 // The macro will not be executed and it'll be up to the renderers to decide how to display the error.

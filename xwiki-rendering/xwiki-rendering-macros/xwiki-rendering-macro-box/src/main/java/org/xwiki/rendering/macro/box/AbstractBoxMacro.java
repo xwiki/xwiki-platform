@@ -128,7 +128,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         Map<String, String> classParameterMap = Collections.singletonMap("class", cssClass);
 
         Block boxBlock;
-        if (context.isInlined()) {
+        if (context.isInline()) {
             List<Block> contentBlocks = parseContent(parameters, content, context);
             FormatBlock spanBlock = new FormatBlock(contentBlocks, Format.NONE);
             spanBlock.setParameters(classParameterMap);

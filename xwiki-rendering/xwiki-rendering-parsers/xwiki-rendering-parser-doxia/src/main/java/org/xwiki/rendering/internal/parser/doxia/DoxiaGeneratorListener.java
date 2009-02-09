@@ -293,9 +293,9 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, Map, boolean)
      */
-    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
         // TODO: Handle parameters
         onVerbatimInline(protectedString);

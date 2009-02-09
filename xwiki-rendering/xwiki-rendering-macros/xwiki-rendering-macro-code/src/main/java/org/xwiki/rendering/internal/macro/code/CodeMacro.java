@@ -25,8 +25,7 @@ import java.util.List;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.VerbatimInlineBlock;
-import org.xwiki.rendering.block.VerbatimStandaloneBlock;
+import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
@@ -69,11 +68,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         List<Block> result;
         try {
             if (CodeMacroParameters.LANGUAGE_NONE.equalsIgnoreCase(parameters.getLanguage())) {
-                if (context.isInlined()) {
-                    result = Collections.<Block> singletonList(new VerbatimInlineBlock(content));
-                } else {
-                    result = Collections.<Block> singletonList(new VerbatimStandaloneBlock(content));
-                }
+                result = Collections.<Block> singletonList(new VerbatimBlock(content, context.isInline()));
             } else {
                 result = highlight(parameters, content);
             }

@@ -191,21 +191,11 @@ public class ListenerDelegate implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, Map, boolean)
      */
-    public void onVerbatimInline(String protectedString)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
-        this.listener.onVerbatimInline(protectedString);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
-     */
-    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
-    {
-        this.listener.onVerbatimStandalone(protectedString, parameters);
+        this.listener.onVerbatim(protectedString, parameters, isInline);
     }
 
     /**

@@ -296,12 +296,7 @@ public class TextOnNewLineStateListener implements Listener
         this.isTextOnNewLine = false;
     }
 
-    public void onVerbatimInline(String protectedString)
-    {
-        this.isTextOnNewLine = false;
-    }
-
-    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
         this.isTextOnNewLine = false;
     }

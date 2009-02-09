@@ -271,21 +271,15 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, Map, boolean)
      */
-    public void onVerbatimInline(String protectedString)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
-        this.wikimodelListener.onVerbatimInline(protectedString);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String, Map)
-     */
-    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
-    {
-        this.wikimodelListener.onVerbatimBlock(protectedString, createWikiParameters(parameters));
+        if (isInline) {
+            this.wikimodelListener.onVerbatimInline(protectedString);
+        } else {
+            this.wikimodelListener.onVerbatimBlock(protectedString, createWikiParameters(parameters));
+        }
     }
 
     /**

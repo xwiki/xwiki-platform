@@ -324,7 +324,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             printNewLine();
             print(getMacroPrinter().print(name, parameters, content));
         } else {
-          getXWikiPrinter().printInlineMacro(getMacroPrinter().print(name, parameters, content));
+            getXWikiPrinter().printInlineMacro(getMacroPrinter().print(name, parameters, content));
         }
     }
 
@@ -570,29 +570,18 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onVerbatimInline(String)
+     * @see org.xwiki.rendering.renderer.Renderer#onVerbatim(String, Map, boolean)
      */
     @Override
-    public void onVerbatimInline(String protectedString)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
-        super.onVerbatimInline(protectedString);
+        super.onVerbatim(protectedString, parameters, isInline);
 
-        print("{{{" + protectedString + "}}}");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.Renderer#onVerbatimStandalone(String, Map)
-     */
-    @Override
-    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
-    {
-        super.onVerbatimStandalone(protectedString, parameters);
-
-        printNewLine();
+        if (!isInline) {
+            printNewLine();
+        }
         printParameters(parameters);
-        onVerbatimInline(protectedString);
+        print("{{{" + protectedString + "}}}");
     }
 
     /**

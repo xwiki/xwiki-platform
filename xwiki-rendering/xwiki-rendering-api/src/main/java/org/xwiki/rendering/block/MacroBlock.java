@@ -26,8 +26,8 @@ import java.util.Map;
 /**
  * Represents a Macro (standalone or inline) defined in a page.
  * 
- * @version $Id$
- * @since 1.6M2
+ * @version $Id: MacroBlock.java 16357 2009-02-06 16:41:42Z tmortagne $
+ * @since 1.8M2
  */
 public class MacroBlock extends AbstractBlock
 {

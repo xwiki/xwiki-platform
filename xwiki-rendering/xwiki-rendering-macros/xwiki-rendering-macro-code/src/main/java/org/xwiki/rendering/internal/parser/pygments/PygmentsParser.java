@@ -37,7 +37,7 @@ import org.python.util.PythonInterpreter;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.VerbatimInlineBlock;
+import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.parser.AbstractHighlightParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Syntax;
@@ -184,7 +184,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
                 getLogger().debug("no lexer found");
             }
 
-            return Collections.<Block> singletonList(new VerbatimInlineBlock(code));
+            return Collections.<Block> singletonList(new VerbatimBlock(code, true));
         }
 
         interpreter.exec(MessageFormat.format("{0} = XDOMFormatter({1})", PY_FORMATTER_VARNAME, PY_LISTENER_VARNAME));

@@ -625,24 +625,12 @@ public class ChainedListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(java.lang.String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatim(java.lang.String, java.util.Map, boolean)
      */
-    public void onVerbatimInline(String protectedString)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
         for (Listener listener : this.stateListeners) {
-            listener.onVerbatimInline(protectedString);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(java.lang.String, java.util.Map)
-     */
-    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
-    {
-        for (Listener listener : this.stateListeners) {
-            listener.onVerbatimStandalone(protectedString, parameters);
+            listener.onVerbatim(protectedString, parameters, isInline);
         }
     }
 

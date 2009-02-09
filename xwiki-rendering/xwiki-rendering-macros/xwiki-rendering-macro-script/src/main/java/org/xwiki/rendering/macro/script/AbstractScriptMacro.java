@@ -92,7 +92,7 @@ public abstract class AbstractScriptMacro<P> extends AbstractMacro<P> implements
 
         // 3) If in inline mode remove any top level paragraph
         result = parsedDom.getChildren();
-        if (context.isInlined()) {
+        if (context.isInline()) {
             this.parserUtils.removeTopLevelParagraph(result);
         }
 

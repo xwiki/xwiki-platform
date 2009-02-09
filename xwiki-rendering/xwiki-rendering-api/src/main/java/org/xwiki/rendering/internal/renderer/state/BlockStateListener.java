@@ -452,12 +452,7 @@ public class BlockStateListener implements Listener
         this.previousEvent = Event.SPECIAL_SYMBOL;
     }
 
-    public void onVerbatimInline(String protectedString)
-    {
-        this.previousEvent = Event.VERBATIM_INLINE;
-    }
-
-    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
         this.previousEvent = Event.VERBATIM_STANDALONE;
     }

@@ -65,8 +65,7 @@ import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.TableCellBlock;
 import org.xwiki.rendering.block.TableHeadCellBlock;
 import org.xwiki.rendering.block.TableRowBlock;
-import org.xwiki.rendering.block.VerbatimInlineBlock;
-import org.xwiki.rendering.block.VerbatimStandaloneBlock;
+import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Format;
@@ -579,7 +578,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onVerbatimBlock(String protectedString, WikiParameters params)
     {
-        this.stack.push(new VerbatimStandaloneBlock(protectedString, convertParameters(params)));
+        this.stack.push(new VerbatimBlock(protectedString, convertParameters(params), false));
     }
 
     /**
@@ -589,7 +588,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onVerbatimInline(String protectedString)
     {
-        this.stack.push(new VerbatimInlineBlock(protectedString));
+        this.stack.push(new VerbatimBlock(protectedString, true));
     }
 
     /**

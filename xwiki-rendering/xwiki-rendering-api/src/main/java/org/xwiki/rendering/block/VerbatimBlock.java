@@ -19,16 +19,59 @@
  */
 package org.xwiki.rendering.block;
 
+import java.util.Map;
+
+import org.xwiki.rendering.listener.Listener;
+
 /**
- * See {@link EscapeBlock} for the difference between a verbatim block and an escape block.
- *
+ * A Verbatim block.
+ * 
  * @version $Id$
- * @since 1.6M2
+ * @since 1.8M2
  */
-public interface VerbatimBlock extends Block
+public class VerbatimBlock extends AbstractBlock
 {
+    /**
+     * The string to protect from rendering.
+     */
+    private String protectedString;
+
+    boolean isInline;
+
+    public VerbatimBlock(String protectedString, boolean isInline)
+    {
+        this.protectedString = protectedString;
+        this.isInline = isInline;
+    }
+
+    public VerbatimBlock(String protectedString, Map<String, String> parameters, boolean isInline)
+    {
+        super(parameters);
+
+        this.protectedString = protectedString;
+        this.isInline = isInline;
+    }
+
     /**
      * @return the string to protect from rendering
      */
-    String getProtectedString();
+    public String getProtectedString()
+    {
+        return this.protectedString;
+    }
+
+    public boolean isInline()
+    {
+        return isInline;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.AbstractVerbatimBlock#traverse(org.xwiki.rendering.listener.Listener)
+     */
+    public void traverse(Listener listener)
+    {
+        listener.onVerbatim(getProtectedString(), getParameters(), isInline());
+    }
 }

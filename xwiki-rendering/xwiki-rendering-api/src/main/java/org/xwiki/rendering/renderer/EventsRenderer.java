@@ -386,23 +386,14 @@ public class EventsRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractRenderer#onVerbatimInline(java.lang.String)
+     * @see org.xwiki.rendering.renderer.AbstractRenderer#onVerbatim(java.lang.String, java.util.Map, boolean)
      */
     @Override
-    public void onVerbatimInline(String protectedString)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
-        getPrinter().println("onVerbatimInline [" + protectedString + "]");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.AbstractRenderer#onVerbatimStandalone(java.lang.String, java.util.Map)
-     */
-    @Override
-    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
-    {
-        getPrinter().println("onVerbatimStandalone [" + protectedString + "]" + serializeParameters(parameters));
+        getPrinter().println(
+            "onVerbatim" + (isInline ? "Inline" : "Standalone") + " [" + protectedString + "]"
+                + serializeParameters(parameters));
     }
 
     /**

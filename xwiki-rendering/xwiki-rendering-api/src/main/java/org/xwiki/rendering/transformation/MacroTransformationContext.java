@@ -45,7 +45,7 @@ public class MacroTransformationContext
     /**
      * Whether the macro is called in inline mode or not.
      */
-    private boolean isInlined;
+    private boolean isInline;
 
     /**
      * See {@link #getMacroTransformation()}.
@@ -90,19 +90,19 @@ public class MacroTransformationContext
     }
 
     /**
-     * @param isInlined if true then the macro is called in inline mode
+     * @param isInline if true then the macro is called in inline mode
      */
-    public void setInlined(boolean isInlined)
+    public void setInline(boolean isInline)
     {
-        this.isInlined = isInlined;
+        this.isInline = isInline;
     }
 
     /**
      * @return true if the macro is called in inline mode (ie inside a paragraph, a list item, etc)
      */
-    public boolean isInlined()
+    public boolean isInline()
     {
-        return this.isInlined;
+        return this.isInline;
     }
 
     /**

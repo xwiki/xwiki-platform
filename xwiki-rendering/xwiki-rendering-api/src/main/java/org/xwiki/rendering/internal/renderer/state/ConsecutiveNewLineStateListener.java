@@ -289,12 +289,7 @@ public class ConsecutiveNewLineStateListener implements Listener
         this.newLineCount = 0;
     }
 
-    public void onVerbatimInline(String protectedString)
-    {
-        this.newLineCount = 0;
-    }
-
-    public void onVerbatimStandalone(String protectedString, Map<String, String> parameters)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
         this.newLineCount = 0;
     }

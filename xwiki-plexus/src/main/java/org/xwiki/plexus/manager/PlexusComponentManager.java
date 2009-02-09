@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
@@ -174,11 +174,12 @@ public class PlexusComponentManager implements ComponentManager
 
         Collection<ComponentDependency> componentDependencies = componentDescriptor.getComponentDependencies();
         if (!componentConfiguration.isEmpty()) {
-            ComponentSetDescriptor csd = new ComponentSetDescriptor();
             for (ComponentDependency dependency : componentDependencies) {
-                csd.addComponentDescriptor(createPlexusComponentDescriptor(dependency));
+                ComponentRequirement requirement = new ComponentRequirement();
+                requirement.setRole(dependency.getRole());
+                requirement.setRoleHint(dependency.getRoleHint());
+                pcd.addRequirement(requirement);
             }
-            pcd.setComponentSetDescriptor(csd);
         }
 
         return pcd;

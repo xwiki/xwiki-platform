@@ -67,4 +67,15 @@ public class XDOM extends AbstractFatherBlock
     {
         listener.endDocument();
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.AbstractBlock#clone()
+     */
+    @Override
+    public XDOM clone()
+    {
+        return (XDOM) super.clone();
+    }
 }

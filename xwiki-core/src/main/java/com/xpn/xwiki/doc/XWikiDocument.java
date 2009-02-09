@@ -72,6 +72,7 @@ import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -270,6 +271,10 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private XWikiDocument originalDocument;
 
+    private XDOM xdom;
+
+    private XDOM clonedxdom;
+
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return context.getWiki().getStore();
@@ -460,6 +465,10 @@ public class XWikiDocument implements DocumentModelBridge
             setWikiNode(null);
         }
         this.content = content;
+
+        // invalidate parsed xdom
+        this.xdom = null;
+        this.clonedxdom = null;
     }
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
@@ -492,7 +501,7 @@ public class XWikiDocument implements DocumentModelBridge
             if (syntaxId.equalsIgnoreCase("xwiki/1.0")) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
-                result = performSyntaxConversion(text, getSyntaxId(), "xhtml/1.0");
+                result = performSyntaxConversion(getXDOM(), getSyntaxId(), "xhtml/1.0");
             }
         } catch (XWikiException e) {
             // Failed to render for some reason. This method should normally throw an exception but this
@@ -2797,12 +2806,13 @@ public class XWikiDocument implements DocumentModelBridge
     {
         return getStore(context).loadLinks(getId(), context, true);
     }
-    
-    public List<String> getChildren(XWikiContext context) throws XWikiException 
+
+    public List<String> getChildren(XWikiContext context) throws XWikiException
     {
-        String hql ="select doc.fullName from XWikiDocument doc " +
-        		"where doc.parent='" + getFullName() + "' order by doc.fullName";
-        return context.getWiki().search(hql, context);       
+        String hql =
+            "select doc.fullName from XWikiDocument doc " + "where doc.parent='" + getFullName()
+                + "' order by doc.fullName";
+        return context.getWiki().search(hql, context);
     }
 
     public void renameProperties(String className, Map fieldsToRename)
@@ -4667,6 +4677,23 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @return the XDOM conrrexponding to the document's string content.
+     */
+    public XDOM getXDOM()
+    {
+        if (this.xdom == null) {
+            try {
+                this.xdom = parseContent(getContent());
+                this.clonedxdom = this.xdom.clone();
+            } catch (ParseException e) {
+                log.error("Failed to parse document content to XDOM", e);
+            }
+        }
+
+        return this.clonedxdom;
+    }
+
+    /**
      * Convert the passed content from the passed syntax to the passed new syntax.
      * 
      * @param content the content to convert
@@ -4678,22 +4705,52 @@ public class XWikiDocument implements DocumentModelBridge
     private String performSyntaxConversion(String content, String currentSyntaxId, String targetSyntaxId)
         throws XWikiException
     {
-        WikiPrinter printer;
         try {
-            TransformationManager transformations =
-                (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, currentSyntaxId);
             XDOM dom = parser.parse(new StringReader(content));
+
+            return performSyntaxConversion(dom, currentSyntaxId, targetSyntaxId);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to convert document to syntax [" + targetSyntaxId + "]", e);
+        }
+    }
+
+    /**
+     * Convert the passed content from the passed syntax to the passed new syntax.
+     * 
+     * @param content the XDOM content to convert, the XDOM can be modified suring the transformation
+     * @param currentSyntaxId the syntax of the current content to convert
+     * @param targetSyntaxId the new syntax after the conversion
+     * @return the converted content in the new syntax
+     * @throws XWikiException if an exception occurred during the conversion process
+     */
+    private String performSyntaxConversion(XDOM content, String currentSyntaxId, String targetSyntaxId)
+        throws XWikiException
+    {
+        WikiPrinter printer;
+        try {
+            // Transform XDOM
+            TransformationManager transformations =
+                (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
             SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
-            transformations.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
+            transformations.performTransformations(content, syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
+
+            // Render XDOM
             PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
             printer = new DefaultWikiPrinter();
-            dom.traverse(factory.createRenderer(syntaxFactory.createSyntaxFromIdString(targetSyntaxId), printer));
+            content.traverse(factory.createRenderer(syntaxFactory.createSyntaxFromIdString(targetSyntaxId), printer));
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to convert document to syntax [" + targetSyntaxId + "]", e);
         }
 
         return printer.toString();
+    }
+
+    private XDOM parseContent(String content) throws ParseException
+    {
+        Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
+        return parser.parse(new StringReader(content));
     }
 }

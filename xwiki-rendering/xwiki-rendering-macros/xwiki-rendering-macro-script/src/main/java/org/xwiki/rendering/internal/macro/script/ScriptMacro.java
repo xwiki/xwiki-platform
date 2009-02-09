@@ -135,7 +135,7 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
         if (engineName != null) {
             // 2) execute script
             try {
-                ScriptEngineManager sem = new ScriptEngineManager(this.getClass().getClassLoader());
+                ScriptEngineManager sem = new ScriptEngineManager();
                 ScriptEngine engine = sem.getEngineByName(engineName);
                 if (engine != null) {
                     ScriptContext scriptContext = this.scriptContextManager.getScriptContext();

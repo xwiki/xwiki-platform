@@ -35,7 +35,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,8 +72,10 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
@@ -129,6 +133,8 @@ public class XWikiDocument implements DocumentModelBridge
     private static final Pattern HTML_TAG_PATTERN =
         Pattern.compile("</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|"
             + "font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>");
+
+    private static final String XWIKI10_SYNTAXID = "xwiki/1.0";
 
     private String title;
 
@@ -407,7 +413,7 @@ public class XWikiDocument implements DocumentModelBridge
         this.attachmentList = new ArrayList<XWikiAttachment>();
         this.customClass = "";
         this.comment = "";
-        this.syntaxId = "xwiki/1.0";
+        this.syntaxId = XWIKI10_SYNTAXID;
 
         // Note: As there's no notion of an Empty document we don't set the original document
         // field. Thus getOriginalDocument() may return null.
@@ -475,7 +481,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         String renderedContent;
         // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-        if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+        if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
             renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
         } else {
             renderedContent = performSyntaxConversion(getContent(), getSyntaxId(), "xhtml/1.0");
@@ -498,7 +504,7 @@ public class XWikiDocument implements DocumentModelBridge
             backupContext(backup, context);
             setAsContextDoc(context);
             // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-            if (syntaxId.equalsIgnoreCase("xwiki/1.0")) {
+            if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
                 result = performSyntaxConversion(getXDOM(), getSyntaxId(), "xhtml/1.0");
@@ -523,7 +529,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public String getRenderedContent(String text, XWikiContext context)
     {
-        return getRenderedContent(text, "xwiki/1.0", context);
+        return getRenderedContent(text, XWIKI10_SYNTAXID, context);
     }
 
     public String getEscapedContent(XWikiContext context) throws XWikiException
@@ -1527,7 +1533,7 @@ public class XWikiDocument implements DocumentModelBridge
                 // This mode is deprecated for the new rendering and should also be removed for the old rendering
                 // since the way to implement this now is to choose the type of rendering to do in the class itself.
                 // Thus for the new renderinfg we simply make this mode work like the "view" mode.
-                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append(getRenderedContent(fcontent, getSyntaxId(), context));
                 } else {
                     result.append(fcontent);
@@ -1537,34 +1543,34 @@ public class XWikiDocument implements DocumentModelBridge
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{pre}");
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{/pre}");
                 }
             } else if (type.equals("hidden")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{pre}");
                 }
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
-                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{/pre}");
                 }
             } else if (type.equals("search")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{pre}");
                 }
                 prefix = obj.getxWikiClass(context).getName() + "_";
                 pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
-                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{/pre}");
                 }
             } else {
@@ -2620,7 +2626,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         String syntaxId = getElement(docel, "syntaxId");
         if ((syntaxId == null) || (syntaxId.length() == 0)) {
-            setSyntaxId("xwiki/1.0");
+            setSyntaxId(XWIKI10_SYNTAXID);
         } else {
             setSyntaxId(syntaxId);
         }
@@ -2859,7 +2865,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public List<String> getIncludedPages(XWikiContext context)
     {
-        if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+        if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
             return getIncludedPagesForXWiki10Syntax(context);
         } else {
             // Find all include macros listed on the page
@@ -2918,7 +2924,7 @@ public class XWikiDocument implements DocumentModelBridge
         return context.getWiki().getIncludedMacros(getSpace(), getContent(), context);
     }
 
-    public List<String> getLinkedPages(XWikiContext context)
+    private List<String> getLinkedPages10(XWikiContext context)
     {
         try {
             String pattern = "\\[(.*?)\\]";
@@ -2983,6 +2989,29 @@ public class XWikiDocument implements DocumentModelBridge
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<String> getLinkedPages(XWikiContext context)
+    {
+        List<String> pageNames;
+
+        if (getSyntaxId().equals(XWIKI10_SYNTAXID)) {
+            pageNames = getLinkedPages10(context);
+        } else {
+            XDOM dom = getXDOM();
+
+            List<LinkBlock> linkBlocks = dom.getChildrenByType(LinkBlock.class, true);
+            Set<String> set = new LinkedHashSet<String>(linkBlocks.size());
+            for (LinkBlock linkBlock : linkBlocks) {
+                org.xwiki.rendering.listener.Link link = linkBlock.getLink();
+                if (link.getType() == LinkType.DOCUMENT) {
+                    set.add(link.getReference());
+                }
+            }
+            pageNames = new ArrayList<String>(set);
+        }
+
+        return pageNames;
     }
 
     public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context)
@@ -3286,6 +3315,7 @@ public class XWikiDocument implements DocumentModelBridge
             setSpace(fullname.substring(i0 + 1, i1));
             setName(fullname.substring(i1 + 1));
         } else {
+            setDatabase(context.getDatabase());
             if (i1 == -1) {
                 try {
                     setSpace(context.getDoc().getSpace());
@@ -3947,7 +3977,7 @@ public class XWikiDocument implements DocumentModelBridge
         String result;
 
         if ((this.syntaxId == null) || (this.syntaxId.length() == 0)) {
-            result = "xwiki/1.0";
+            result = XWIKI10_SYNTAXID;
         } else {
             result = this.syntaxId;
         }

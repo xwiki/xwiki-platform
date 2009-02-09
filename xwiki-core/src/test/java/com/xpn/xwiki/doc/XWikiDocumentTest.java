@@ -19,32 +19,30 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link XWikiDocument}.
  * 
  * @version $Id$
  */
-public class XWikiDocumentTest extends MockObjectTestCase
+public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private XWikiContext context;
-
     private XWikiDocument document;
 
     private Mock mockXWiki;
@@ -54,10 +52,12 @@ public class XWikiDocumentTest extends MockObjectTestCase
     private Mock mockXWikiVersioningStore;
 
     @Override
-    protected void setUp()
+    protected void setUp() throws Exception
     {
-        this.context = new XWikiContext();
+        super.setUp();
+
         this.document = new XWikiDocument("Space", "Page");
+        this.document.setSyntaxId("xwiki/1.0");
 
         this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("Param").will(returnValue(null));
@@ -70,14 +70,14 @@ public class XWikiDocumentTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
 
-        this.context.setWiki((XWiki) this.mockXWiki.proxy());
+        getContext().setWiki((XWiki) this.mockXWiki.proxy());
     }
-
+    
     public void testGetDisplayTitleWhenNoTitleAndNoContent()
     {
         this.document.setContent("Some content");
 
-        assertEquals("Page", this.document.getDisplayTitle(this.context));
+        assertEquals("Page", this.document.getDisplayTitle(getContext()));
     }
 
     public void testGetDisplayWhenTitleExists()
@@ -87,7 +87,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         this.mockXWikiRenderingEngine.expects(once()).method("interpretText").with(eq("Title"), ANYTHING, ANYTHING)
             .will(returnValue("Title"));
 
-        assertEquals("Title", this.document.getDisplayTitle(this.context));
+        assertEquals("Title", this.document.getDisplayTitle(getContext()));
     }
 
     public void testGetDisplayWhenNoTitleButSectionExists()
@@ -96,7 +96,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         this.mockXWikiRenderingEngine.expects(once()).method("interpretText").with(eq("Title"), ANYTHING, ANYTHING)
             .will(returnValue("Title"));
 
-        assertEquals("Title", this.document.getDisplayTitle(this.context));
+        assertEquals("Title", this.document.getDisplayTitle(getContext()));
     }
 
     public void testMinorMajorVersions()
@@ -124,7 +124,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
     {
         String author = "Albatross";
         this.document.setAuthor(author);
-        XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", this.context);
+        XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
         assertTrue(author.equals(copy.getAuthor()));
     }
@@ -133,7 +133,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
     {
         String creator = "Condor";
         this.document.setCreator(creator);
-        XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", this.context);
+        XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
         assertTrue(creator.equals(copy.getCreator()));
     }
@@ -142,7 +142,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
     {
         Date sourceCreationDate = this.document.getCreationDate();
         Thread.sleep(1000);
-        XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", this.context);
+        XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
         assertTrue(copy.getCreationDate().equals(sourceCreationDate));
     }
@@ -159,7 +159,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         // Simple test
         this.document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
             + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSplitSectionsAccordingToTitle();
+        sections = this.document.getSections();
         assertEquals(3, sections.size());
         assertEquals("Section 1", sections.get(0).getSectionTitle());
         assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
@@ -172,7 +172,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         // Test comments don't break the section editing
         this.document.setContent("1 Section 1\n" + "Content of first section\n" + "## 1.1 Subsection 2\n"
             + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSplitSectionsAccordingToTitle();
+        sections = this.document.getSections();
         assertEquals(2, sections.size());
         assertEquals("Section 1", sections.get(0).getSectionTitle());
         assertEquals("1", sections.get(1).getSectionLevel());
@@ -181,7 +181,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         // Test spaces are ignored
         this.document.setContent("1 Section 1\n" + "Content of first section\n" + "   1.1    Subsection 2  \n"
             + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSplitSectionsAccordingToTitle();
+        sections = this.document.getSections();
         assertEquals(3, sections.size());
         assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
         assertEquals("1.1", sections.get(1).getSectionLevel());
@@ -189,7 +189,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         this.document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1.1 Lower subsection\n"
             + "This content is not important\n" + "   1.1    Subsection 2  \n" + "Content of second section\n"
             + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSplitSectionsAccordingToTitle();
+        sections = this.document.getSections();
         assertEquals(3, sections.size());
         assertEquals("Section 1", sections.get(0).getSectionTitle());
         assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
@@ -198,7 +198,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         this.document
             .setContent("\n\n1 Section 1\n\n\n" + "Content of first section\n\n\n" + "   1.1    Subsection 2  \n\n"
                 + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSplitSectionsAccordingToTitle();
+        sections = this.document.getSections();
         assertEquals(3, sections.size());
         assertEquals(2, sections.get(0).getSectionIndex());
         assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
@@ -215,7 +215,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
             + "Content of second section\n" + "1 Section 3\n" + "Modified content of section 3", content);
         this.document.setContent(content);
-        sections = this.document.getSplitSectionsAccordingToTitle();
+        sections = this.document.getSections();
         assertEquals(3, sections.size());
         assertEquals("Section 1", sections.get(0).getSectionTitle());
         assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
@@ -240,7 +240,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
     {
         XWikiDocument doc = new XWikiDocument("test", "document");
         this.mockXWiki.stubs().method("getClass").will(returnValue(new BaseClass()));
-        BaseObject object = BaseClass.newCustomClassInstance("XWiki.XWikiUsers", this.context);
+        BaseObject object = BaseClass.newCustomClassInstance("XWiki.XWikiUsers", getContext());
         doc.addObject("XWiki.XWikiUsers", object);
         assertEquals("XWikiDocument.addObject does not set the object's name", doc.getFullName(), object.getName());
     }
@@ -256,18 +256,18 @@ public class XWikiDocumentTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("getClass").will(returnValue(tagClass));
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("iso-8859-1"));
 
-        BaseObject object = BaseClass.newCustomClassInstance(classname, this.context);
+        BaseObject object = BaseClass.newCustomClassInstance(classname, getContext());
         doc.addObject(classname, object);
 
-        object = BaseClass.newCustomClassInstance(classname, this.context);
+        object = BaseClass.newCustomClassInstance(classname, getContext());
         doc.addObject(classname, object);
 
-        object = BaseClass.newCustomClassInstance(classname, this.context);
+        object = BaseClass.newCustomClassInstance(classname, getContext());
         doc.addObject(classname, object);
 
         doc.getObjects(classname).set(1, null);
 
-        String docXML = doc.toXML(this.context);
+        String docXML = doc.toXML(getContext());
         XWikiDocument docFromXML = new XWikiDocument();
         docFromXML.fromXML(docXML);
 
@@ -286,5 +286,28 @@ public class XWikiDocumentTest extends MockObjectTestCase
                 assertTrue(objects.get(i).getNumber() == objectsFromXML.get(i).getNumber());
             }
         }
+    }
+
+    public void testGetLinkedPages10()
+    {
+        this.mockXWiki.stubs().method("exists").will(returnValue(true));
+
+        this.document
+            .setContent("[TargetPage][TargetLabel>TargetPage][TargetSpace.TargetPage][TargetLabel>TargetSpace.TargetPage?param=value#anchor][http://externallink][mailto:mailto]");
+
+        List<String> linkedPages = this.document.getLinkedPages(getContext());
+
+        assertEquals(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage", "TargetSpace.TargetPage", "Space.TargetPage"), linkedPages);
+    }
+
+    public void testGetLinkedPages()
+    {
+        this.document
+            .setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]][[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]");
+        this.document.setSyntaxId("xwiki/2.0");
+
+        List<String> linkedPages = this.document.getLinkedPages(getContext());
+
+        assertEquals(Arrays.asList("TargetPage", "TargetSpace.TargetPage"), linkedPages);
     }
 }

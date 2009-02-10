@@ -94,12 +94,12 @@ $xwiki.getTextArea($tdoc.content)
       inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",
 #if($request.sync)
       syncPage: '$doc.fullName',
-      plugins: 'separator text valign list indent undo format symbol link image table sync',
+      plugins: 'separator text valign list indent undo format symbol link image table macro sync',
  #if($request.reset=="1")
       syncReset: 1,
  #end
 #else
-      plugins: 'separator text valign list indent undo format symbol link image table',
+      plugins: 'separator text valign list indent undo format symbol link image table macro',
 #end 
       syntax: "$doc.syntaxId",
       toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | image | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol',

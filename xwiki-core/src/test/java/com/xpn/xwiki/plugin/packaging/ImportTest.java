@@ -34,7 +34,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.jmock.core.stub.VoidStub;
@@ -49,13 +48,12 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
-public class ImportTest extends MockObjectTestCase
+public class ImportTest extends AbstractBridgedXWikiComponentTestCase
 {
     private Package pack;
-
-    private XWikiContext context;
 
     private XWiki xwiki;
 
@@ -69,19 +67,26 @@ public class ImportTest extends MockObjectTestCase
 
     private Map docs = new HashMap();
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
+     */
+    @Override
     protected void setUp() throws Exception
     {
+        super.setUp();
+
         this.pack = new Package();
-        this.context = new XWikiContext();
         this.xwiki = new XWiki();
-        this.context.setWiki(this.xwiki);
+        getContext().setWiki(this.xwiki);
         this.xwiki.setConfig(new XWikiConfig());
         this.xwiki.setNotificationManager(new XWikiNotificationManager());
 
         // mock a store that would also handle translations
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
-            this.context});
+            getContext()});
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
@@ -153,12 +158,12 @@ public class ImportTest extends MockObjectTestCase
         this.mockXWikiStore.stubs().method("injectCustomMapping").will(returnValue(false));
 
         this.mockRecycleBinStore =
-            mock(XWikiHibernateRecycleBinStore.class, new Class[] {XWikiContext.class}, new Object[] {this.context});
+            mock(XWikiHibernateRecycleBinStore.class, new Class[] {XWikiContext.class}, new Object[] {getContext()});
         this.mockRecycleBinStore.stubs().method("saveToRecycleBin").will(VoidStub.INSTANCE);
 
         this.mockXWikiVersioningStore =
             mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
-            this.xwiki, this.context});
+            this.xwiki, getContext()});
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
         this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
 
@@ -188,24 +193,24 @@ public class ImportTest extends MockObjectTestCase
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();
         // import and install this document
-        this.pack.Import(zipFile, this.context);
-        this.pack.install(this.context);
+        this.pack.Import(zipFile, getContext());
+        this.pack.install(getContext());
 
         // check if it is there
-        XWikiDocument foundDocument = this.xwiki.getDocument("Test.DocImport", this.context);
+        XWikiDocument foundDocument = this.xwiki.getDocument("Test.DocImport", getContext());
         assertFalse(foundDocument.isNew());
 
-        XWikiDocument nonExistingDocument = this.xwiki.getDocument("Test.DocImportNonexisting", this.context);
+        XWikiDocument nonExistingDocument = this.xwiki.getDocument("Test.DocImportNonexisting", getContext());
         assertTrue(nonExistingDocument.isNew());
 
-        XWikiDocument foundTranslationDocument = foundDocument.getTranslatedDocument("fr", this.context);
+        XWikiDocument foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
         assertSame(foundDocument, foundTranslationDocument);
 
         XWikiDocument doc1Translation = new XWikiDocument("Test", "DocImport");
         doc1Translation.setLanguage("fr");
         doc1Translation.setDefaultLanguage("en");
-        this.xwiki.saveDocument(doc1Translation, this.context);
-        foundTranslationDocument = foundDocument.getTranslatedDocument("fr", this.context);
+        this.xwiki.saveDocument(doc1Translation, getContext());
+        foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
         assertNotSame(foundDocument, foundTranslationDocument);
     }
 
@@ -224,11 +229,11 @@ public class ImportTest extends MockObjectTestCase
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();
         // import and install this document
-        this.pack.Import(zipFile, this.context);
-        this.pack.install(this.context);
+        this.pack.Import(zipFile, getContext());
+        this.pack.install(getContext());
 
         // check if it is there
-        XWikiDocument foundDocument = this.xwiki.getDocument("Test.DocImportOverwrite", this.context);
+        XWikiDocument foundDocument = this.xwiki.getDocument("Test.DocImportOverwrite", getContext());
         assertFalse(foundDocument.isNew());
 
         // create the overwriting document
@@ -241,11 +246,11 @@ public class ImportTest extends MockObjectTestCase
         // use a new packager because we need to clean-up import data (files list, doucument data)
         this.pack = new Package();
         // import and install
-        this.pack.Import(zipFile, this.context);
-        this.pack.install(this.context);
+        this.pack.Import(zipFile, getContext());
+        this.pack.install(getContext());
 
         // check if the document is there
-        XWikiDocument foundOverwritingDoc = this.xwiki.getDocument("Test.DocImportOverwrite", this.context);
+        XWikiDocument foundOverwritingDoc = this.xwiki.getDocument("Test.DocImportOverwrite", getContext());
         assertFalse(foundOverwritingDoc.isNew());
         assertEquals(foundOverwritingDoc.getContent(), newContent);
     }
@@ -272,24 +277,24 @@ public class ImportTest extends MockObjectTestCase
 
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();
-        this.pack.Import(zipFile, this.context);
-        this.pack.install(this.context);
-        XWikiDocument foundDocument = this.xwiki.getDocument("Test.DocTranslation", this.context);
+        this.pack.Import(zipFile, getContext());
+        this.pack.install(getContext());
+        XWikiDocument foundDocument = this.xwiki.getDocument("Test.DocTranslation", getContext());
         assertFalse(foundDocument.isNew());
         // get the translation
-        XWikiDocument translationDoc = foundDocument.getTranslatedDocument("fr", this.context);
+        XWikiDocument translationDoc = foundDocument.getTranslatedDocument("fr", getContext());
         assertFalse(translationDoc.isNew());
 
         // use a new packager because we need to clean-up import data (files list, doucument data)
         this.pack = new Package();
         // import again and do the same tests
-        this.pack.Import(zipFile, this.context);
-        this.pack.install(this.context);
-        foundDocument = this.xwiki.getDocument("Test.DocTranslation", this.context);
+        this.pack.Import(zipFile, getContext());
+        this.pack.install(getContext());
+        foundDocument = this.xwiki.getDocument("Test.DocTranslation", getContext());
         // might not be the best method to test the document is in the store though...
         assertFalse(foundDocument.isNew());
         // get the translation
-        translationDoc = foundDocument.getTranslatedDocument("fr", this.context);
+        translationDoc = foundDocument.getTranslatedDocument("fr", getContext());
         assertFalse(translationDoc.isNew());
     }
 
@@ -350,7 +355,7 @@ public class ImportTest extends MockObjectTestCase
             }
             ZipEntry zipe = new ZipEntry(zipEntryName);
             zos.putNextEntry(zipe);
-            String xmlCode = docs[i].toXML(false, false, false, false, context);
+            String xmlCode = docs[i].toXML(false, false, false, false, getContext());
             zos.write(getEncodedByteArray(xmlCode, encodings[i]));
         }
         zos.closeEntry();

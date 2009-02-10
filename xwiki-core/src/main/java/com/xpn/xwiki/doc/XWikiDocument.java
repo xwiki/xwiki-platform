@@ -3315,7 +3315,9 @@ public class XWikiDocument implements DocumentModelBridge
             setSpace(fullname.substring(i0 + 1, i1));
             setName(fullname.substring(i1 + 1));
         } else {
-            setDatabase(context.getDatabase());
+            if (context != null) {
+                setDatabase(context.getDatabase());
+            }
             if (i1 == -1) {
                 try {
                     setSpace(context.getDoc().getSpace());

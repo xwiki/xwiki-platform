@@ -89,6 +89,11 @@ public class Style extends com.google.gwt.dom.client.Style
         public static final String BLOCK = "block";
 
         /**
+         * The element will not be displayed.
+         */
+        public static final String NONE = "none";
+
+        /**
          * This is a utility class so it has a private constructor.
          */
         private Display()

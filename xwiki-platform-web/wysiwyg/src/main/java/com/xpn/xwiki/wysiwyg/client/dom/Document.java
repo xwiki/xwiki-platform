@@ -23,6 +23,7 @@ import java.util.Iterator;
 
 import com.google.gwt.dom.client.BRElement;
 import com.google.gwt.dom.client.BaseElement;
+import com.google.gwt.dom.client.ButtonElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HRElement;
 import com.google.gwt.dom.client.ImageElement;
@@ -172,6 +173,16 @@ public class Document extends com.google.gwt.dom.client.Document
     public final LIElement xCreateLIElement()
     {
         return xCreateElement("li").cast();
+    }
+
+    /**
+     * Creates a &lt;button&gt; element.
+     * 
+     * @return the newly create element.
+     */
+    public final ButtonElement xCreateButtonElement()
+    {
+        return xCreateElement("button").cast();
     }
 
     /**

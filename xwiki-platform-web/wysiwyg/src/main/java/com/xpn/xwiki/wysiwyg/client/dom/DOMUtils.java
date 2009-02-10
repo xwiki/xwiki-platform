@@ -1178,4 +1178,36 @@ public abstract class DOMUtils
                 throw new IllegalArgumentException(UNSUPPORTED_NODE_TYPE);
         }
     }
+
+    /**
+     * @param range a DOM range
+     * @return the node that follows after the end point of the given range, in a depth-first pre-order search
+     */
+    public Node getNextNode(Range range)
+    {
+        Node node = range.getEndContainer();
+        if (node.hasChildNodes() && range.getEndOffset() < node.getChildNodes().getLength()) {
+            return node.getChildNodes().getItem(range.getEndOffset());
+        }
+        while (node != null && node.getNextSibling() == null) {
+            node = node.getParentNode();
+        }
+        return node == null ? null : node.getNextSibling();
+    }
+
+    /**
+     * @param range a DOM range
+     * @return the node that precedes the start point of the given range, in a depth-first pre-order search
+     */
+    public Node getPreviousNode(Range range)
+    {
+        Node node = range.getStartContainer();
+        if (node.hasChildNodes() && range.getStartOffset() > 0) {
+            return node.getChildNodes().getItem(range.getStartOffset() - 1);
+        }
+        while (node != null && node.getPreviousSibling() == null) {
+            node = node.getParentNode();
+        }
+        return node == null ? null : node.getPreviousSibling();
+    }
 }

@@ -43,3 +43,28 @@ body.main {
 .main h1 {
   margin: 25px 0 20px 0;
 }
+
+.main .macro {
+  border: 1px dashed #CCCCCC;
+  background-color: transparent;
+  font-size: 100%;
+  text-align: left;
+  padding: 1px;
+  /* Prevent resizing */
+  width: auto !important;
+  height: auto !important;
+}
+
+.main .macro-selected {
+  background-color: #E8F2FE;
+}
+
+.main .macro .macro-placeholder {
+  background-image: url(macro.gif);
+  background-position: left center;
+  background-repeat: no-repeat;
+  color: gray;
+  font-size: 87.5%;
+  font-style: italic;
+  padding-left: 20px;
+}

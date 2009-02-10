@@ -136,6 +136,9 @@ public class BehaviorAdjuster implements LoadListener
             case Event.ONBLUR:
                 onBeforeBlur();
                 break;
+            case Event.ONMOUSEDOWN:
+                onBeforeMouseDown();
+                break;
             default:
                 break;
         }
@@ -204,6 +207,12 @@ public class BehaviorAdjuster implements LoadListener
                 break;
             case KeyboardListener.KEY_TAB:
                 onTab();
+                break;
+            case KeyboardListener.KEY_DELETE:
+                onDelete();
+                break;
+            case KeyboardListener.KEY_BACKSPACE:
+                onBackSpace();
                 break;
             default:
                 break;
@@ -638,6 +647,30 @@ public class BehaviorAdjuster implements LoadListener
         range.selectNodeContents(paragraph.getFirstChild());
         selection.removeAllRanges();
         selection.addRange(range);
+    }
+
+    /**
+     * Overwrites the default rich text area behavior when the Delete key is being pressed.
+     */
+    protected void onDelete()
+    {
+        // Nothing here by default. May be overridden by browser specific implementations.
+    }
+
+    /**
+     * Overwrites the default rich text area behavior when the BackSpace key is being pressed.
+     */
+    protected void onBackSpace()
+    {
+        // Nothing here by default. May be overridden by browser specific implementations.
+    }
+
+    /**
+     * Overwrites the default rich text area behavior when the user holds the mouse down inside.
+     */
+    protected void onBeforeMouseDown()
+    {
+        // Nothing here by default. May be overridden by browser specific implementations.
     }
 
     /**

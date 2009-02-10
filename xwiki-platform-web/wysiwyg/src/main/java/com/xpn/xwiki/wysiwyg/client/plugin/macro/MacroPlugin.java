@@ -61,6 +61,16 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
     private MenuBar editMenu;
 
     /**
+     * Hides macro meta data and displays macro output in a read only text box.
+     */
+    private MacroDisplayer displayer;
+
+    /**
+     * Controls the currently selected macros.
+     */
+    private MacroSelector selector;
+
+    /**
      * User interface extension for the editor tool bar.
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
@@ -83,6 +93,9 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
         insertButton.setTitle(Strings.INSTANCE.macro());
         toolBarExtension.addFeature(MacroPluginFactory.getInstance().getPluginName(), insertButton);
 
+        displayer = new MacroDisplayer(getTextArea());
+        selector = new MacroSelector(displayer);
+
         insertMenu = new MenuBar(true);
         insertMenu.addItem("Browse Macros...", (com.google.gwt.user.client.Command) null);
         insertMenu.addSeparator();
@@ -97,8 +110,8 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
         macroMenu = new MenuItem("Macro", insertMenu);
         menuExtension.addFeature(MacroPluginFactory.getInstance().getPluginName(), macroMenu);
 
-        getUIExtensionList().add(menuExtension);
-        getUIExtensionList().add(toolBarExtension);
+        // getUIExtensionList().add(menuExtension);
+        // getUIExtensionList().add(toolBarExtension);
     }
 
     /**
@@ -111,6 +124,12 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
         insertButton.removeFromParent();
         insertButton.removeClickListener(this);
         insertButton = null;
+
+        selector.destroy();
+        selector = null;
+
+        displayer.destroy();
+        displayer = null;
 
         insertMenu.clearItems();
         insertMenu = null;

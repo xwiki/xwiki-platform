@@ -81,6 +81,11 @@ public class IESelection extends AbstractSelection
     }
 
     /**
+     * The list of elements supporting control selection.
+     */
+    private static final String[] SELECTABLE_ELEMENTS = new String[] {"img", "button"};
+
+    /**
      * The underlying native selection object provided by the browser.
      */
     private final NativeSelection nativeSelection;
@@ -150,7 +155,7 @@ public class IESelection extends AbstractSelection
             && range.getStartOffset() == range.getEndOffset() - 1) {
             Node selectedNode = range.getStartContainer().getChildNodes().getItem(range.getStartOffset());
             // Test if the selected node supports control selection.
-            if ("img".equalsIgnoreCase(selectedNode.getNodeName())) {
+            if (supportsControlSelection(selectedNode)) {
                 ControlRange controlRange = ControlRange.newInstance(nativeSelection.getOwnerDocument());
                 controlRange.add((Element) selectedNode);
                 controlRange.select();
@@ -160,6 +165,20 @@ public class IESelection extends AbstractSelection
 
         // Otherwise use text selection.
         addTextRange(adjustRangeAndDOM(range));
+    }
+
+    /**
+     * @param node a DOM node
+     * @return {@code true} if the given node supports control selection, {@code false} otherwise
+     */
+    private boolean supportsControlSelection(Node node)
+    {
+        for (int i = 0; i < SELECTABLE_ELEMENTS.length; i++) {
+            if (SELECTABLE_ELEMENTS[i].equalsIgnoreCase(node.getNodeName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

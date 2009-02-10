@@ -19,12 +19,17 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Event;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.dom.Selection;
+import com.xpn.xwiki.wysiwyg.client.dom.Style;
 
 /**
  * Adjusts the behavior of the rich text area in Mozilla based browsers, like Firefox.
@@ -33,6 +38,11 @@ import com.xpn.xwiki.wysiwyg.client.dom.Range;
  */
 public class MozillaBehaviorAdjuster extends BehaviorAdjuster
 {
+    /**
+     * Button element node name.
+     */
+    private static final String BUTTON = "button";
+
     /**
      * {@inheritDoc}
      * 
@@ -158,5 +168,111 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
         Document document = getTextArea().getDocument();
         Node paragraph = document.getSelection().getRangeAt(0).getStartContainer().getParentNode();
         paragraph.appendChild(document.xCreateBRElement());
+    }
+
+    /**
+     * {@inheritDoc}<br/>
+     * NOTE: Fixes the issue with delete before a button element.
+     * 
+     * @see BehaviorAdjuster#onDelete()
+     */
+    protected void onDelete()
+    {
+        Selection selection = getTextArea().getDocument().getSelection();
+        if (selection.isCollapsed()) {
+            Range range = selection.getRangeAt(0);
+            // See if the caret is between nodes.
+            if (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE
+                || range.getStartOffset() == domUtils.getLength(range.getStartContainer())) {
+                Node leaf = domUtils.getNextNode(range);
+                // See if the caret is before a button element.
+                if (leaf != null && BUTTON.equalsIgnoreCase(leaf.getNodeName())) {
+                    // Pressing delete before a button element places the caret inside that element. We have to avoid
+                    // this Mozilla bug. Let's prevent the default delete behavior and manually remove the button.
+                    getTextArea().getCurrentEvent().xPreventDefault();
+                    leaf.getParentNode().removeChild(leaf);
+                    return;
+                }
+            }
+        }
+        super.onDelete();
+    }
+
+    /**
+     * {@inheritDoc}<br/>
+     * NOTE: Fixes the issue with backspace after a button element.
+     * 
+     * @see BehaviorAdjuster#onBackSpace()
+     */
+    protected void onBackSpace()
+    {
+        Selection selection = getTextArea().getDocument().getSelection();
+        if (selection.isCollapsed()) {
+            Range range = selection.getRangeAt(0);
+            // See if the caret is between nodes.
+            if (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE || range.getStartOffset() == 0) {
+                Node leaf = domUtils.getPreviousNode(range);
+                // See if the caret is after a button element.
+                if (leaf != null && BUTTON.equalsIgnoreCase(leaf.getNodeName())) {
+                    // Pressing backspace after a button element places the caret inside that element. We have to avoid
+                    // this Mozilla bug. Let's prevent the default backspace behavior and manually remove the button.
+                    getTextArea().getCurrentEvent().xPreventDefault();
+                    leaf.getParentNode().removeChild(leaf);
+                    return;
+                }
+            }
+        }
+        super.onBackSpace();
+    }
+
+    /**
+     * {@inheritDoc}<br/>
+     * NOTE: Fixes the issue with button elements not being selected on mouse down.
+     * 
+     * @see BehaviorAdjuster#onBeforeMouseDown()
+     */
+    protected void onBeforeMouseDown()
+    {
+        super.onBeforeMouseDown();
+
+        Event event = getTextArea().getCurrentEvent();
+        Node target = event.getTarget();
+        // A button should be selected on mouse down.
+        if (BUTTON.equalsIgnoreCase(target.getNodeName())) {
+            Range range = getTextArea().getDocument().createRange();
+            range.selectNode(target);
+            Selection selection = getTextArea().getDocument().getSelection();
+            if (!event.getCtrlKey()) {
+                selection.removeAllRanges();
+            }
+            selection.addRange(range);
+            refreshSelection();
+        }
+    }
+
+    /**
+     * Repaints the edit area in Gecko-based browsers. This method removes ghost resize handlers and other trailing
+     * graphics.
+     */
+    protected void refreshSelection()
+    {
+        // Backup current ranges.
+        List<Range> ranges = new ArrayList<Range>();
+        Document document = getTextArea().getDocument();
+        Selection selection = document.getSelection();
+        for (int i = 0; i < selection.getRangeCount(); i++) {
+            ranges.add(selection.getRangeAt(i));
+        }
+
+        // Refresh selection.
+        document.getBody().getStyle().setProperty(Style.DISPLAY, Style.Display.NONE);
+        document.execCommand("selectall", null);
+        selection.removeAllRanges();
+        document.getBody().getStyle().setProperty(Style.DISPLAY, Style.Display.BLOCK);
+
+        // Restore the ranges.
+        for (int i = 0; i < ranges.size(); i++) {
+            selection.addRange(ranges.get(i));
+        }
     }
 }

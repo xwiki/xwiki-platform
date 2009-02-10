@@ -31,6 +31,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.justify.JustifyPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.list.ListPluginFactory;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.separator.SeparatorPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.symbol.SymbolPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncPluginFactory;
@@ -96,6 +97,7 @@ public final class WysiwygEditorFactory
         pfm.addPluginFactory(TablePluginFactory.getInstance());
         pfm.addPluginFactory(ImagePluginFactory.getInstance());
         pfm.addPluginFactory(ImporterPluginFactory.getInstance());
+        pfm.addPluginFactory(MacroPluginFactory.getInstance());
         // add additional PluginFactory for other plug-ins
     }
 

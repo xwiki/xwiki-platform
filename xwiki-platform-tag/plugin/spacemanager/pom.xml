@@ -39,7 +39,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.6.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -51,20 +51,20 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-mailsender</artifactId>
-      <version>1.4-SNAPSHOT</version>
+      <version>1.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.6.2</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>
-      <version>1.12-SNAPSHOT</version>
+      <version>1.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>

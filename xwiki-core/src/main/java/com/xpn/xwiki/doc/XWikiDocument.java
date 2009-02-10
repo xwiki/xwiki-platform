@@ -32,12 +32,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -2803,125 +2800,72 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
+    /**
+     * @deprecated use {@link #getBackLinkedPages(XWikiContext)} instead
+     */
+    @Deprecated
     public List<String> getBacklinks(XWikiContext context) throws XWikiException
+    {
+        return getBackLinkedPages(context);
+    }
+
+    /**
+     * Get the wiki pages pointing to this page.
+     * <p>
+     * Theses links are stored to the database when documents are saved. You can use "backlinks" in XWikiPreferences or
+     * "xwiki.backlinks" in xwiki.cfg file to enable links storage in the database.
+     * 
+     * @param context the XWiki context.
+     * @return the found wiki pages names.
+     * @throws XWikiException error when getting pages names from database.
+     */
+    public List<String> getBackLinkedPages(XWikiContext context) throws XWikiException
     {
         return getStore(context).loadBacklinks(getFullName(), context, true);
     }
 
+    /**
+     * @deprecated use {@link #getWikiLinkedPages(XWikiContext)} instead
+     */
+    @Deprecated
     public List<XWikiLink> getLinks(XWikiContext context) throws XWikiException
     {
-        return getStore(context).loadLinks(getId(), context, true);
+        return getWikiLinkedPages(context);
     }
 
-    public List<String> getChildren(XWikiContext context) throws XWikiException
+    /**
+     * <ul>
+     * <li>1.0 content: get the links associated to document from database. This is stored when the document is saved.
+     * You can use "backlinks" in XWikiPreferences or "xwiki.backlinks" in xwiki.cfg file to enable links storage in the
+     * database.</li>
+     * <li>Other content: call {@link #getLinkedPages(XWikiContext)} and generate the List</li>.
+     * </ul>
+     * 
+     * @param context the XWiki context
+     * @return the found wiki links.
+     * @throws XWikiException error when getting links from database when 1.0 content.
+     */
+    public List<XWikiLink> getWikiLinkedPages(XWikiContext context) throws XWikiException
     {
-        String hql =
-            "select doc.fullName from XWikiDocument doc " + "where doc.parent='" + getFullName()
-                + "' order by doc.fullName";
-        return context.getWiki().search(hql, context);
-    }
+        List<XWikiLink> links;
 
-    public void renameProperties(String className, Map fieldsToRename)
-    {
-        Vector<BaseObject> objects = getObjects(className);
-        if (objects == null) {
-            return;
-        }
-        for (BaseObject bobject : objects) {
-            if (bobject == null) {
-                continue;
-            }
-            for (Iterator renameit = fieldsToRename.keySet().iterator(); renameit.hasNext();) {
-                String origname = (String) renameit.next();
-                String newname = (String) fieldsToRename.get(origname);
-                BaseProperty origprop = (BaseProperty) bobject.safeget(origname);
-                if (origprop != null) {
-                    BaseProperty prop = (BaseProperty) origprop.clone();
-                    bobject.removeField(origname);
-                    prop.setName(newname);
-                    bobject.addField(newname, prop);
-                }
-            }
-        }
-        setContentDirty(true);
-    }
-
-    public void addObjectsToRemove(BaseObject object)
-    {
-        getObjectsToRemove().add(object);
-        setContentDirty(true);
-    }
-
-    public ArrayList<BaseObject> getObjectsToRemove()
-    {
-        return this.objectsToRemove;
-    }
-
-    public void setObjectsToRemove(ArrayList<BaseObject> objectsToRemove)
-    {
-        this.objectsToRemove = objectsToRemove;
-        setContentDirty(true);
-    }
-
-    public List<String> getIncludedPages(XWikiContext context)
-    {
-        if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
-            return getIncludedPagesForXWiki10Syntax(context);
+        if (getSyntaxId().equals(XWIKI10_SYNTAXID)) {
+            links = getStore(context).loadLinks(getId(), context, true);
         } else {
-            // Find all include macros listed on the page
-            XDOM dom;
-            try {
-                Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
-                dom = parser.parse(new StringReader(getContent()));
-            } catch (Exception e) {
-                log.error("Failed to find included pages for [" + getFullName() + "]", e);
-                return Collections.emptyList();
-            }
+            List<String> linkedPages = getLinkedPages(context);
+            links = new ArrayList<XWikiLink>(linkedPages.size());
+            for (String linkedPage : linkedPages) {
+                XWikiLink wikiLink = new XWikiLink();
 
-            List<String> result = new ArrayList<String>();
-            for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class, true)) {
-                if (macroBlock.getName().equalsIgnoreCase("include")) {
-                    String documentName = macroBlock.getParameters().get("document");
-                    if (documentName.indexOf(".") == -1) {
-                        documentName = getSpace() + "." + documentName;
-                    }
-                    result.add(documentName);
-                }
-            }
+                wikiLink.setDocId(getId());
+                wikiLink.setFullName(getFullName());
+                wikiLink.setLink(linkedPage);
 
-            return result;
+                links.add(wikiLink);
+            }
         }
-    }
 
-    private List<String> getIncludedPagesForXWiki10Syntax(XWikiContext context)
-    {
-        try {
-            String pattern = "#include(Topic|InContext|Form|Macros|parseGroovyFromPage)\\([\"'](.*?)[\"']\\)";
-            List<String> list = context.getUtil().getUniqueMatches(getContent(), pattern, 2);
-            for (int i = 0; i < list.size(); i++) {
-                try {
-                    String name = list.get(i);
-                    if (name.indexOf(".") == -1) {
-                        list.set(i, getSpace() + "." + name);
-                    }
-                } catch (Exception e) {
-                    // This should never happen
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            return list;
-        } catch (Exception e) {
-            // This should never happen
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public List<String> getIncludedMacros(XWikiContext context)
-    {
-        return context.getWiki().getIncludedMacros(getSpace(), getContent(), context);
+        return links;
     }
 
     private List<String> getLinkedPages10(XWikiContext context)
@@ -2991,6 +2935,12 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
+    /**
+     * Extract all the static wiki links (pointing to wiki page) from this document's content.
+     * 
+     * @param context the XWiki context.
+     * @return all the found wiki links.
+     */
     public List<String> getLinkedPages(XWikiContext context)
     {
         List<String> pageNames;
@@ -3001,17 +2951,120 @@ public class XWikiDocument implements DocumentModelBridge
             XDOM dom = getXDOM();
 
             List<LinkBlock> linkBlocks = dom.getChildrenByType(LinkBlock.class, true);
-            Set<String> set = new LinkedHashSet<String>(linkBlocks.size());
+            pageNames = new ArrayList<String>(linkBlocks.size());
             for (LinkBlock linkBlock : linkBlocks) {
                 org.xwiki.rendering.listener.Link link = linkBlock.getLink();
                 if (link.getType() == LinkType.DOCUMENT) {
-                    set.add(link.getReference());
+                    pageNames.add(link.getReference());
                 }
             }
-            pageNames = new ArrayList<String>(set);
         }
 
         return pageNames;
+    }
+
+    public List<String> getChildren(XWikiContext context) throws XWikiException
+    {
+        String hql =
+            "select doc.fullName from XWikiDocument doc " + "where doc.parent='" + getFullName()
+                + "' order by doc.fullName";
+        return context.getWiki().search(hql, context);
+    }
+
+    public void renameProperties(String className, Map fieldsToRename)
+    {
+        Vector<BaseObject> objects = getObjects(className);
+        if (objects == null) {
+            return;
+        }
+        for (BaseObject bobject : objects) {
+            if (bobject == null) {
+                continue;
+            }
+            for (Iterator renameit = fieldsToRename.keySet().iterator(); renameit.hasNext();) {
+                String origname = (String) renameit.next();
+                String newname = (String) fieldsToRename.get(origname);
+                BaseProperty origprop = (BaseProperty) bobject.safeget(origname);
+                if (origprop != null) {
+                    BaseProperty prop = (BaseProperty) origprop.clone();
+                    bobject.removeField(origname);
+                    prop.setName(newname);
+                    bobject.addField(newname, prop);
+                }
+            }
+        }
+        setContentDirty(true);
+    }
+
+    public void addObjectsToRemove(BaseObject object)
+    {
+        getObjectsToRemove().add(object);
+        setContentDirty(true);
+    }
+
+    public ArrayList<BaseObject> getObjectsToRemove()
+    {
+        return this.objectsToRemove;
+    }
+
+    public void setObjectsToRemove(ArrayList<BaseObject> objectsToRemove)
+    {
+        this.objectsToRemove = objectsToRemove;
+        setContentDirty(true);
+    }
+
+    public List<String> getIncludedPages(XWikiContext context)
+    {
+        if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+            return getIncludedPagesForXWiki10Syntax(context);
+        } else {
+            // Find all include macros listed on the page
+            XDOM dom = getXDOM();
+
+            List<String> result = new ArrayList<String>();
+            for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class, true)) {
+                if (macroBlock.getName().equalsIgnoreCase("include")) {
+                    String documentName = macroBlock.getParameters().get("document");
+                    if (documentName.indexOf(".") == -1) {
+                        documentName = getSpace() + "." + documentName;
+                    }
+                    result.add(documentName);
+                }
+            }
+
+            return result;
+        }
+    }
+
+    private List<String> getIncludedPagesForXWiki10Syntax(XWikiContext context)
+    {
+        try {
+            String pattern = "#include(Topic|InContext|Form|Macros|parseGroovyFromPage)\\([\"'](.*?)[\"']\\)";
+            List<String> list = context.getUtil().getUniqueMatches(getContent(), pattern, 2);
+            for (int i = 0; i < list.size(); i++) {
+                try {
+                    String name = list.get(i);
+                    if (name.indexOf(".") == -1) {
+                        list.set(i, getSpace() + "." + name);
+                    }
+                } catch (Exception e) {
+                    // This should never happen
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            return list;
+        } catch (Exception e) {
+            // This should never happen
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<String> getIncludedMacros(XWikiContext context)
+    {
+        return context.getWiki().getIncludedMacros(getSpace(), getContent(), context);
     }
 
     public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context)
@@ -3718,7 +3771,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void rename(String newDocumentName, XWikiContext context) throws XWikiException
     {
-        rename(newDocumentName, getBacklinks(context), context);
+        rename(newDocumentName, getBackLinkedPages(context), context);
     }
 
     /**
@@ -4738,8 +4791,7 @@ public class XWikiDocument implements DocumentModelBridge
         throws XWikiException
     {
         try {
-            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, currentSyntaxId);
-            XDOM dom = parser.parse(new StringReader(content));
+            XDOM dom = parseContent(content, currentSyntaxId);
 
             return performSyntaxConversion(dom, currentSyntaxId, targetSyntaxId);
         } catch (Exception e) {
@@ -4782,7 +4834,12 @@ public class XWikiDocument implements DocumentModelBridge
 
     private XDOM parseContent(String content) throws ParseException
     {
-        Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
+        return parseContent(getSyntaxId(), content);
+    }
+
+    private XDOM parseContent(String syntaxId, String content) throws ParseException
+    {
+        Parser parser = (Parser) Utils.getComponent(Parser.ROLE, syntaxId);
         return parser.parse(new StringReader(content));
     }
 }

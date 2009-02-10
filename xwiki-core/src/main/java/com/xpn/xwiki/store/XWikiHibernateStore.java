@@ -1837,45 +1837,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // necessary to blank links from doc
             context.remove("links");
 
-            // call to RenderEngine and converting the list of links into a list of backlinks
-            // Note: We need to set the passed document as the current document as the "wiki"
-            // renderer uses context.getDoc().getSpace() to find out the space name if no
-            // space is specified in the link. A better implementation would be to pass
-            // explicitely the current space to the render() method.
-            List links;
-            XWikiDocument originalDocument = context.getDoc();
-            context.setDoc(doc);
-            try {
-                // Create new clean context to avoid wiki manager plugin requests in same session
-                XWikiContext renderContext = (XWikiContext) context.clone();
-                setSession(null, renderContext);
-                setTransaction(null, renderContext);
-
-                XWikiRenderer renderer = renderContext.getWiki().getRenderingEngine().getRenderer("wiki");
-                renderer.render(doc.getContent(), doc, doc, renderContext);
-                links = (List) renderContext.get("links");
-            } catch (Exception e) {
-                // If the rendering fails lets forget backlinks without errors
-                links = Collections.EMPTY_LIST;
-            } finally {
-                if (originalDocument != null) {
-                    context.setDoc(originalDocument);
+            if (doc.getSyntaxId().equals("xwiki/1.0")) {
+                saveLinks10(doc, context, session);
+            } else {
+                // When not in 1.0 content get WikiLinks directly from XDOM
+                List<XWikiLink> links = doc.getWikiLinkedPages(context);
+                for (XWikiLink wikiLink : links) {
+                    session.save(wikiLink);
                 }
-            }
-
-            if (links != null) {
-                for (int i = 0; i < links.size(); i++) {
-                    // XWikiLink is the object declared in the Hibernate mapping
-                    XWikiLink link = new XWikiLink();
-                    link.setDocId(doc.getId());
-                    link.setLink((String) links.get(i));
-                    link.setFullName(doc.getFullName());
-                    session.save(link);
-                }
-            }
-
-            if (bTransaction) {
-                endTransaction(context, true);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -1886,6 +1855,47 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
+            }
+        }
+    }
+
+    private void saveLinks10(XWikiDocument doc, XWikiContext context, Session session) throws XWikiException
+    {
+        // call to RenderEngine and converting the list of links into a list of backlinks
+        // Note: We need to set the passed document as the current document as the "wiki"
+        // renderer uses context.getDoc().getSpace() to find out the space name if no
+        // space is specified in the link. A better implementation would be to pass
+        // explicitely the current space to the render() method.
+        XWikiDocument originalDocument = context.getDoc();
+        context.setDoc(doc);
+        List<String> links;
+        try {
+            // Create new clean context to avoid wiki manager plugin requests in same session
+            XWikiContext renderContext = (XWikiContext) context.clone();
+            setSession(null, renderContext);
+            setTransaction(null, renderContext);
+
+            XWikiRenderer renderer = renderContext.getWiki().getRenderingEngine().getRenderer("wiki");
+            renderer.render(doc.getContent(), doc, doc, renderContext);
+            links = (List<String>) renderContext.get("links");
+        } catch (Exception e) {
+            // If the rendering fails lets forget backlinks without errors
+            links = Collections.emptyList();
+        } finally {
+            if (originalDocument != null) {
+                context.setDoc(originalDocument);
+            }
+        }
+
+        if (links != null) {
+            for (String reference : links) {
+                // XWikiLink is the object declared in the Hibernate mapping
+                XWikiLink link = new XWikiLink();
+                link.setDocId(doc.getId());
+                link.setFullName(doc.getFullName());
+                link.setLink(reference);
+
+                session.save(link);
             }
         }
     }

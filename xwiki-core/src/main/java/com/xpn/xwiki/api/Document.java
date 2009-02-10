@@ -1495,12 +1495,12 @@ public class Document extends Api
 
     public List<String> getBacklinks() throws XWikiException
     {
-        return this.doc.getBacklinks(getXWikiContext());
+        return this.doc.getBackLinkedPages(getXWikiContext());
     }
 
     public List<XWikiLink> getLinks() throws XWikiException
     {
-        return this.doc.getLinks(getXWikiContext());
+        return this.doc.getWikiLinkedPages(getXWikiContext());
     }
     
     /**

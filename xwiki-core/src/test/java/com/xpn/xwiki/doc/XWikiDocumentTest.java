@@ -72,7 +72,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
     }
-    
+
     public void testGetDisplayTitleWhenNoTitleAndNoContent()
     {
         this.document.setContent("Some content");
@@ -297,7 +297,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());
 
-        assertEquals(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage", "TargetSpace.TargetPage", "Space.TargetPage"), linkedPages);
+        assertEquals(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage", "TargetSpace.TargetPage",
+            "Space.TargetPage"), linkedPages);
     }
 
     public void testGetLinkedPages()
@@ -308,6 +309,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());
 
-        assertEquals(Arrays.asList("TargetPage", "TargetSpace.TargetPage"), linkedPages);
+        assertEquals(Arrays.asList("TargetPage", "TargetPage", "TargetSpace.TargetPage", "TargetSpace.TargetPage"),
+            linkedPages);
     }
 }

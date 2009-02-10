@@ -56,6 +56,7 @@ public abstract class AbstractSyntaxTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("useDefaultAction").will(returnValue(true));
         this.mockXWiki.stubs().method("getDefaultWeb").will(returnValue("Main"));
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
+        this.mockXWiki.stubs().method("getServletPath").will(returnValue("bin/"));
 
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 

@@ -51,7 +51,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-mailsender</artifactId>
-      <version>1.4-SNAPSHOT</version>
+      <version>1.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

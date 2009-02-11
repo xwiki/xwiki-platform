@@ -409,8 +409,7 @@ public class IESelection extends AbstractSelection
     }
 
     /**
-     * Moves the given text range before the specified element. As a result the following should be true:<br/> {@code
-     * textRange.getOffsetLeft() == element.getOffsetLeft() && textRange.getOffsetTop() == element.getOffsetTop()}
+     * Moves the given text range before the specified element.
      * 
      * @param textRange the text range to be moved
      * @param element the element before which the text range is moved
@@ -420,12 +419,8 @@ public class IESelection extends AbstractSelection
         textRange.moveToElementText(element);
         // Sometimes moveToElementText has unexpected results. Let's test if textRange starts before element and if not
         // then try something different.
-        int left = element.getAbsoluteLeft();
-        int top = element.getAbsoluteTop();
-        // NOTE: The left and top offsets of a text range include the border width of the body element. The left and top
-        // offsets of an element don't. We cannot compute reliably the border width because it can be expressed using
-        // values like "medium" or "thin" which are browser dependent. So the following test is evaluated correctly if
-        // the body element has no border.
+        int left = getLeft(element);
+        int top = getTop(element);
         if (textRange.getOffsetLeft() != left || top < textRange.getOffsetTop()
             || top > (textRange.getOffsetTop() + getFirstLineHeight(textRange))) {
             // This can fail moving the text range before the element too (that's why we tried moveToElementText first).
@@ -433,6 +428,40 @@ public class IESelection extends AbstractSelection
             // Don't bet on the result!
         }
     }
+
+    /**
+     * NOTE: For a {@code strong} element that starts in the middle of a line and spans multiple lines this method
+     * returns the distance in pixels from its first character (provided it starts with text) to the left boundary of
+     * the parent window. This is important since the bounding rectangle of the {@code strong} element can have the
+     * width of the parent window so the distance from the left side of this bounding rectangle to the left boundary of
+     * the parent window could be 0.
+     * 
+     * @param element a DOM element
+     * @return the distance, in pixels, from the given element's start point to the left boundary of the parent window
+     */
+    protected native int getLeft(Element element)
+    /*-{
+        var left = -element.ownerDocument.documentElement.scrollLeft;
+        while (element) {
+            left += element.offsetLeft + element.clientLeft - element.scrollLeft;
+            element = element.offsetParent;
+        }
+        return left;
+    }-*/;
+
+    /**
+     * @param element a DOM element
+     * @return the distance, in pixels, from the given element's start point to the top boundary of the parent window
+     */
+    protected native int getTop(Element element)
+    /*-{
+        var top = -element.ownerDocument.documentElement.scrollTop;
+        while (element) {
+            top += element.offsetTop + element.clientTop - element.scrollTop;
+            element = element.offsetParent;
+        }
+        return top;
+    }-*/;
 
     /**
      * @param textRange a text range

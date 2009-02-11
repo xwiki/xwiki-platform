@@ -100,4 +100,28 @@ public class ElementTest extends AbstractWysiwygClientTest
         DOMUtils.getInstance().insertAt(container, contents, 2);
         assertEquals("ab<em>c</em>" + html + "<ins></ins>ij", container.getInnerHTML().toLowerCase());
     }
+
+    /**
+     * Unit test for {@link Element#xGetString()} on block-level elements to see if the white spaces added by some
+     * browsers to format the HTML are removed.
+     */
+    public void testXGetStringOnBlockLevelElements()
+    {
+        String html = "<h1>header</h1><p>paragraph</p><ul><li>list</li></ul>";
+        Element element = Document.get().createDivElement().cast();
+        element.xSetInnerHTML(html);
+        assertEquals("<div>" + html + "</div>", element.xGetString().toLowerCase());
+    }
+
+    /**
+     * Unit test for {@link Element#xGetString()} to see if white spaces inside comment nodes are kept.
+     */
+    public void testXGetStringPreservesWhiteSpacesInCommentNodes()
+    {
+        Document document = (Document) Document.get();
+        Element element = document.createDivElement().cast();
+        String text = "\na \n b\t\n\tc";
+        element.appendChild(document.createComment(text));
+        assertEquals("<div><!--" + text + "--></div>", element.xGetString().toLowerCase());
+    }
 }

@@ -4791,7 +4791,7 @@ public class XWikiDocument implements DocumentModelBridge
         throws XWikiException
     {
         try {
-            XDOM dom = parseContent(content, currentSyntaxId);
+            XDOM dom = parseContent(currentSyntaxId, content);
 
             return performSyntaxConversion(dom, currentSyntaxId, targetSyntaxId);
         } catch (Exception e) {

@@ -418,11 +418,18 @@ public class IESelection extends AbstractSelection
     protected void moveTextRangeBeforeElement(TextRange textRange, Element element)
     {
         textRange.moveToElementText(element);
-        if (textRange.getOffsetLeft() != element.getOffsetLeft() || element.getOffsetTop() < textRange.getOffsetTop()
-            || element.getOffsetTop() > (textRange.getOffsetTop() + getFirstLineHeight(textRange))) {
-            // Sometimes moveToElementText has unexpected results. Let's try something different.
-            // This is not reliable (that's why we try moveToElementText at first).
-            textRange.moveToPoint(element.getOffsetLeft(), element.getOffsetTop());
+        // Sometimes moveToElementText has unexpected results. Let's test if textRange starts before element and if not
+        // then try something different.
+        int left = element.getAbsoluteLeft();
+        int top = element.getAbsoluteTop();
+        // NOTE: The left and top offsets of a text range include the border width of the body element. The left and top
+        // offsets of an element don't. We cannot compute reliably the border width because it can be expressed using
+        // values like "medium" or "thin" which are browser dependent. So the following test is evaluated correctly if
+        // the body element has no border.
+        if (textRange.getOffsetLeft() != left || top < textRange.getOffsetTop()
+            || top > (textRange.getOffsetTop() + getFirstLineHeight(textRange))) {
+            // This can fail moving the text range before the element too (that's why we tried moveToElementText first).
+            textRange.moveToPoint(left, top);
             // Don't bet on the result!
         }
     }

@@ -796,4 +796,64 @@ public class DOMUtilsTest extends AbstractWysiwygClientTest
         domUtils.splitHTMLNode(container.getFirstChild(), container.getFirstChild().getFirstChild(), 1);
         assertEquals("<p><em>2</em><em></em>1</p>", container.getInnerHTML());
     }
+
+    /**
+     * Unit test for {@link DOMUtils#getNextNode(Range)}.
+     */
+    public void testGetRangeNextNode()
+    {
+        Range range = ((Document) container.getOwnerDocument()).createRange();
+
+        container.setInnerHTML("<del>deleted</del>");
+        range.setStart(container, 0);
+        range.collapse(true);
+        assertEquals(container.getFirstChild(), domUtils.getNextNode(range));
+
+        range.selectNode(container);
+        container.setInnerHTML("<em><ins></ins></em><del>deleted</del>");
+        range.selectNodeContents(container.getFirstChild().getFirstChild());
+        assertEquals(container.getLastChild(), domUtils.getNextNode(range));
+
+        range.selectNode(container);
+        container.setInnerHTML("<strong>x</strong>y");
+        range.setStart(container.getFirstChild(), 1);
+        range.collapse(true);
+        assertEquals(container.getLastChild(), domUtils.getNextNode(range));
+
+        Element element = (Element) container.cloneNode(false);
+        element.setInnerHTML(":)");
+        range.setStart(element.getFirstChild(), 1);
+        range.collapse(true);
+        assertNull(domUtils.getNextNode(range));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#getPreviousNode(Range)}.
+     */
+    public void testGetRangePreviousNode()
+    {
+        Range range = ((Document) container.getOwnerDocument()).createRange();
+
+        container.setInnerHTML("<ins>inserted</ins>");
+        range.setStart(container, 1);
+        range.collapse(true);
+        assertEquals(container.getLastChild(), domUtils.getPreviousNode(range));
+
+        range.selectNode(container);
+        container.setInnerHTML("<del>deleted</del><em><ins></ins></em>");
+        range.selectNodeContents(container.getLastChild().getFirstChild());
+        assertEquals(container.getFirstChild(), domUtils.getPreviousNode(range));
+
+        range.selectNode(container);
+        container.setInnerHTML("x<strong>y</strong>");
+        range.setStart(container.getLastChild(), 0);
+        range.collapse(true);
+        assertEquals(container.getFirstChild(), domUtils.getPreviousNode(range));
+
+        Element element = (Element) container.cloneNode(false);
+        element.setInnerHTML(":(");
+        range.setStart(element.getFirstChild(), 1);
+        range.collapse(true);
+        assertNull(domUtils.getPreviousNode(range));
+    }
 }

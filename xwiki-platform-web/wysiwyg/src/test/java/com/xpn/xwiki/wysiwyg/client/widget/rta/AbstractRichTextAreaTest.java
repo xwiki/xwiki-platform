@@ -79,9 +79,6 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implemen
      */
     public void onLoad(Widget sender)
     {
-        // We have to remove the default body border because it affects the range detection in IE.
-        rta.getElement().getStyle().setProperty("border", "1px solid gray");
-        rta.getDocument().getBody().getStyle().setProperty("borderStyle", "none");
         // http://wiki.codetalks.org/wiki/index.php/Docs/Keyboard_navigable_JS_widgets
         // #Use_setTimeout_with_element.focus.28.29_to_set_focus
         (new Timer()

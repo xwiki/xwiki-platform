@@ -109,7 +109,7 @@ public class Element extends com.google.gwt.dom.client.Element
     public final String xGetInnerHTML()
     {
         if (getFirstChildElement() == null) {
-            return unformat(getInnerHTML());
+            return getInnerHTML();
         } else {
             Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
             StringBuffer innerHTML = new StringBuffer();
@@ -124,7 +124,7 @@ public class Element extends com.google.gwt.dom.client.Element
                 }
                 child = child.getNextSibling();
             } while (child != null);
-            return unformat(innerHTML.toString());
+            return innerHTML.toString();
         }
     }
 
@@ -150,29 +150,17 @@ public class Element extends com.google.gwt.dom.client.Element
         } else {
             outerHTML = getString();
         }
+        // Some browsers, including IE, format the HTML returned by innerHTML and outerHTML properties by adding new
+        // lines or tabs. We have to remove leading and trailing white spaces from the outerHTML because when we reset
+        // the innerHTML or outerHTML properties these white spaces can generate additional text nodes which can, for
+        // instance, mess up the History mechanism.
+        outerHTML = outerHTML.trim();
         if (metaDataHTML != null) {
             // Put the meta data attribute back
             setAttribute(META_DATA_ATTR, metaDataHTML);
             outerHTML = metaDataHTML.replace(INNER_HTML_PLACEHOLDER, outerHTML);
         }
-        return unformat(outerHTML);
-    }
-
-    /**
-     * Removes the formatting added by some browsers, including IE, to the HTML returned by innerHTML and outerHTML
-     * properties. Some browsers, like iE, format the HTML fragment returned by innerHTML and outerHTML properties using
-     * new lines.
-     * <p>
-     * We have to remove this formatting because when we reset the innerHTML or outerHTML properties the new lines can
-     * generate additional text nodes which can, for instance, mess up the History mechanism.
-     * 
-     * @param html The HTML fragment whose formatting should be removed.
-     * @return The given HTML without the new lines or tabs.
-     * @see XWIKI-3047 Undo fails in IE when called inside a paragraph
-     */
-    private static String unformat(String html)
-    {
-        return html.replaceAll("[\r\n\t]+", "");
+        return outerHTML;
     }
 
     /**
@@ -211,7 +199,7 @@ public class Element extends com.google.gwt.dom.client.Element
      * @param node the node to wrap
      */
     public final void wrap(Node node)
-    { 
+    {
         if (node.getParentNode() == null) {
             return;
         }

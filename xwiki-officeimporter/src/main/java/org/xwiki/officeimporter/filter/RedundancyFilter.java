@@ -19,9 +19,13 @@
  */
 package org.xwiki.officeimporter.filter;
 
+import java.util.List;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.officeimporter.filter.common.AbstractHTMLFilter;
 
 /**
  * This filter is used to remove those tags that doesn't play any role with the representation of
@@ -32,7 +36,7 @@ import org.w3c.dom.NodeList;
  * @version $Id$
  * @since 1.8M1
  */
-public class RedundancyFilter implements HTMLFilter
+public class RedundancyFilter extends AbstractHTMLFilter
 {
     /**
      * List of those tags which will be filtered if no attributes are present.
@@ -45,17 +49,18 @@ public class RedundancyFilter implements HTMLFilter
     private static final String[] CONTENT_FILTERED_TAGS =
         new String[] {"em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr",
         "acronym", "address", "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
-
+    
     /**
      * {@inheritDoc}
      */
     public void filter(Document document)
     {
         for (String key : ATTRIBUTES_FILTERED_TAGS) {
-            filterNodesWithZeroAttributes(document.getElementsByTagName(key));
+            filterNodesWithZeroAttributes(filterDescendants(document.getDocumentElement(), key));
+            
         }
         for (String key : CONTENT_FILTERED_TAGS) {
-            filterNodesWithEmptyTextContent(document.getElementsByTagName(key));
+            filterNodesWithEmptyTextContent(filterDescendants(document.getDocumentElement(), key));
         }
     }
 
@@ -63,19 +68,17 @@ public class RedundancyFilter implements HTMLFilter
      * Scan the given list of elements and strip those elements that doesn't have any attributes
      * set. The children elements of such elements will be moved one level up.
      * 
-     * @param elements List of elements to be examined.
+     * @param textElements List of elements to be examined.
      */
-    private void filterNodesWithZeroAttributes(NodeList elements)
+    private void filterNodesWithZeroAttributes(List<Element> textElements)
     {
-        for (int i = 0; i < elements.getLength(); i++) {
-            Element element = (Element) elements.item(i);
-            if (!element.hasAttributes()) {
-                NodeList children = element.getChildNodes();
+        for (Element textElement : textElements) {
+            if (!textElement.hasAttributes()) {
+                NodeList children = textElement.getChildNodes();
                 while (children.getLength() > 0) {
-                    element.getParentNode().insertBefore(children.item(0), element);
+                    textElement.getParentNode().insertBefore(children.item(0), textElement);
                 }
-                element.getParentNode().removeChild(element);
-                i--;
+                textElement.getParentNode().removeChild(textElement);
             }
         }
     }
@@ -84,15 +87,17 @@ public class RedundancyFilter implements HTMLFilter
      * Scan the given list of elements and strip those elements that doesn't have any textual
      * content inside them.
      * 
-     * @param elements List of elements to be examined.
+     * @param textElements List of elements to be examined.
      */
-    private void filterNodesWithEmptyTextContent(NodeList elements)
+    private void filterNodesWithEmptyTextContent(List<Element> textElements)
     {
-        for (int i = 0; i < elements.getLength(); i++) {
-            Element element = (Element) elements.item(i);
-            if (element.getTextContent().trim().equals("")) {
-                element.getParentNode().removeChild(element);
-                i--;
+        for (Element textElement : textElements) {
+            Node parent = textElement.getParentNode();
+            String textContent = textElement.getTextContent();
+            if (textContent.equals("")) {
+                parent.removeChild(textElement);
+            } else if (textContent.trim().equals("")) {
+                textElement.setTextContent(textContent.replaceAll(" ", "&nbsp;"));
             }
         }
     }

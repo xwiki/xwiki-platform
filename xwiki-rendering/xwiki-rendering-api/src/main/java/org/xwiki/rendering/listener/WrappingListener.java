@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.xml.XMLNode;
 
-public class ListenerDelegate implements Listener
+public class WrappingListener implements Listener
 {
     private Listener listener;
 

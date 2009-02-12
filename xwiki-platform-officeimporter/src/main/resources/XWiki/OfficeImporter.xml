@@ -57,16 +57,16 @@
 </object>
 <content> 
 #if($isguest)
-  #error("Guests are not allowed to view the contents of this page.")  
+  #error($msg.get("xe.officeimporter.notallowed"))  
 #else
-  1 Office Importer
+  1 $msg.get("xe.officeimporter.import.title")
   &lt;form action='$xwiki.getURL("XWiki.OfficeImporterResults","view")' enctype="multipart/form-data" method="post"&gt;
-  {table}&lt;p&gt;Document&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
-  &lt;p&gt;Target Space&lt;/p&gt;|&lt;p&gt;&lt;input name="targetSpace" type="text"/&gt;&lt;/p&gt;
-  &lt;p&gt;Target Page&lt;/p&gt;|&lt;p&gt;&lt;input name="targetPage" type="text"/&gt;&lt;/p&gt;
-  &lt;p&gt;Options&lt;/p&gt;|&lt;p&gt;Style Filtering :&lt;/p&gt;&lt;p&gt;&lt;input name="filterStyles" type="radio" value="strict"/&gt;Strict (No styles, content only)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="moderate" checked="checked"/&gt;Moderate (Keep alignments)&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="none"/&gt;None (Keep all styles)&lt;/p&gt;
+  {table}&lt;p&gt;$msg.get("xe.officeimporter.import.document")&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
+  &lt;p&gt;$msg.get("xe.officeimporter.import.targetspace")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetSpace" type="text"/&gt;&lt;/p&gt;
+  &lt;p&gt;$msg.get("xe.officeimporter.import.targetpage")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetPage" type="text"/&gt;&lt;/p&gt;
+  &lt;p&gt;$msg.get("xe.officeimporter.import.options")&lt;/p&gt;|&lt;p&gt;$msg.get("xe.officeimporter.import.filtering")&lt;/p&gt;&lt;p&gt;&lt;input name="filterStyles" type="radio" value="strict"/&gt;$msg.get("xe.officeimporter.import.strict")&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="moderate" checked="checked"/&gt;$msg.get("xe.officeimporter.import.moderate")&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="none"/&gt;$msg.get("xe.officeimporter.import.none")&lt;/p&gt;
   {table}
-  &lt;p&gt;&lt;input type="submit" value="Import"/&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;input type="submit" value="$msg.get("xe.officeimporter.import.import")"/&gt;&lt;/p&gt;
   &lt;/form&gt;
 #end
 </content>

@@ -1,0 +1,12 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{testrssmacro feed="http://some.feed.com"/}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:testrssmacro|-|feed="http://some.feed.com"|-|--><div class="box rssfeed"><!--startimage:http://www.w3schools.com/images/logo.gif--><img src="http://www.w3schools.com/images/logo.gif" class="wikimodel-freestanding" alt="http://www.w3schools.com/images/logo.gif"/><!--stopimage--><br/><p class="rsschanneltitle"><!--startwikilink:http://liftoff.msfc.nasa.gov/--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://liftoff.msfc.nasa.gov/">Lift Off News</a></span><!--stopwikilink--></p><p class="rssitemtitle"><!--startwikilink:http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp">Star City</a></span><!--stopwikilink--></p><p class="rssitemdescription">How do Americans get ready to work with Russians aboard the International Space Station?</p><p class="rssitemtitle"><!--startwikilink:http://liftoff.msfc.nasa.gov/--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://liftoff.msfc.nasa.gov/">Space Exploration</a></span><!--stopwikilink--></p><p class="rssitemdescription">Sky watchers in Europe, Asia, and parts of Alaska and Canada.</p></div><!--stopmacro-->
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+{{testrssmacro feed="http://some.feed.com"/}}

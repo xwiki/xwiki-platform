@@ -19,7 +19,10 @@
  */
 package org.xwiki.rendering.macro.box;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.descriptor.ParameterDescription;
 
 /**
@@ -43,6 +46,29 @@ public class BoxMacroParameters
      * Refer to {@link #getImage()}.
      */
     private String image = StringUtils.EMPTY;
+
+    /**
+     * @return the title to be displayed in the message box. Note that it can be specified using Wiki 2.0 syntax.
+     */
+    private List< ? extends Block> blockTitle;
+
+    /**
+     * Optionally, the title can contain a list of Blocks, for more flexibility, instead of storing only ordinary text.
+     * 
+     * @return the title represented as a list of Blocks
+     */
+    public List< ? extends Block> getBlockTitle()
+    {
+        return blockTitle;
+    }
+
+    /**
+     * @param blockTitle - refer to {@link #getBlockTitle()}
+     */
+    public void setBlockTitle(List< ? extends Block> blockTitle)
+    {
+        this.blockTitle = blockTitle;
+    }
 
     /**
      * @return the title to be displayed in the message box. Note that it can be specified using Wiki 2.0 syntax.

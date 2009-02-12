@@ -121,6 +121,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     {
         String imageParameter = parameters.getImage();
         String titleParameter = parameters.getTitle();
+        List< ? extends Block> titleBlockList = parameters.getBlockTitle();
 
         String classParameter = parameters.getCssClass();
         String cssClass =
@@ -148,6 +149,9 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
                 Parser parser = getSyntaxParser(context);
                 List<Block> titleBlocks = parseTitle(parser, titleParameter);
                 boxBlock.addChildren(titleBlocks);
+            }
+            if (titleBlockList != null) {
+                boxBlock.addChildren(titleBlockList);
             }
             // We remove the first leading and trailing new line in non inline mode to have a better readability
             // {{box}}

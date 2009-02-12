@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>xwiki-core-rendering-macros-parent</artifactId>
+    <groupId>org.xwiki.platform</groupId>
+    <version>1.8-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.xwiki.platform</groupId>
+  <artifactId>xwiki-core-rendering-macro-rss</artifactId>
+  <name>XWiki Platform - Core - Rendering - Macro - RSS Reader</name>
+  <version>1.8-SNAPSHOT</version>
+  <description>XWiki Platform - Core - Rendering - Macro - RSS Reader</description>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/RenderingTests.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+      <version>0.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-box</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -30,6 +30,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.ext.wadl.WadlResource;
 import org.restlet.resource.Variant;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Composable;
 import org.xwiki.rest.representers.NullRepresenter;
 
 import com.xpn.xwiki.XWikiContext;
@@ -39,16 +42,16 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
-public class XWikiResource extends WadlResource
+public class XWikiResource extends WadlResource implements Composable
 {
-    /* This is injected by the component manager and contains all the registered representers */
+    /* All the registered representers */
     private Map<String, XWikiResourceRepresenter> descriptorToRepresenterMap;
 
     /*
-     * This is injected by the component manager. Since resources are dynamically discovered and added, and since
-     * Restlet doesn't provide a way for retrieving the URI template associated to a resource class, we used this
-     * additional registry in order to keep track of it. This registry is necessary in order to discover which URI
-     * template is associated to a resource when making links in representations.
+     * Since resources are dynamically discovered and added, and since Restlet doesn't provide a way for retrieving the
+     * URI template associated to a resource class, we used this additional registry in order to keep track of it. This
+     * registry is necessary in order to discover which URI template is associated to a resource when making links in
+     * representations.
      */
     protected XWikiResourceClassRegistry resourceClassRegistry;
 
@@ -251,14 +254,27 @@ public class XWikiResource extends WadlResource
             }
 
             /* If the doc is locked then return */
-            if (doc.getLocked()) {
-                response.setStatus(Status.CLIENT_ERROR_LOCKED);
-                return null;
+            if (failIfLocked) {
+                if (doc.getLocked()) {
+                    response.setStatus(Status.CLIENT_ERROR_LOCKED);
+                    return null;
+                }
             }
 
             return new DocumentInfo(doc, !existed);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public void compose(ComponentManager componentManager)
+    {
+        try {
+            resourceClassRegistry =
+                (XWikiResourceClassRegistry) componentManager.lookup(XWikiResourceClassRegistry.class.getName());
+            descriptorToRepresenterMap = componentManager.lookupMap(XWikiResourceRepresenter.class.getName());
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Unable to initialize the resource.");
         }
     }
 

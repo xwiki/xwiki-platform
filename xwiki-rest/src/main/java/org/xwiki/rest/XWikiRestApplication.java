@@ -27,6 +27,7 @@ import org.restlet.Restlet;
 import org.restlet.Router;
 import org.restlet.ext.wadl.WadlApplication;
 import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.rest.resources.BrowserAuthenticationResource;
@@ -41,7 +42,6 @@ public class XWikiRestApplication extends WadlApplication implements Composable
     /* Injected by the component manager. */
     private ComponentManager componentManager;
 
-    /* Injected by the component manager. This map contains all the components that have XWikiResource role. */
     private Map<String, XWikiResource> classNameToResourceMap;
 
     public XWikiRestApplication()
@@ -126,6 +126,23 @@ public class XWikiRestApplication extends WadlApplication implements Composable
     public void compose(ComponentManager componentManager)
     {
         this.componentManager = componentManager;
+        try {
+            /* Initialize the mapping that contains the resource class names and their implementations */
+            classNameToResourceMap = componentManager.lookupMap(XWikiResource.class.getName());
+
+            /* Check for the consistency of components.xml */
+            for (String className : classNameToResourceMap.keySet()) {
+                XWikiResource resource = classNameToResourceMap.get(className);
+                if (!resource.getClass().getName().equals(className)) {
+                    getLogger().log(
+                        Level.WARNING,
+                        String.format("Mismatch in resource declaration. Role hint: %s, implementation: %s", className,
+                            resource.getClass().getName()));
+                }
+            }
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Unable to lookup resource map", e);
+        }
     }
 
     public ComponentManager getComponentManager()

@@ -40,15 +40,7 @@
 			<implementation>org.xwiki.rest.XWikiRestApplication
 			</implementation>
 			<role-hint>default</role-hint>
-			<instantiation-strategy>singleton</instantiation-strategy>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResource
-					</role>
-					<field-name>classNameToResourceMap
-					</field-name>
-				</requirement>
-			</requirements>
+			<instantiation-strategy>singleton</instantiation-strategy>		
 		</component>
 
 		<!--
@@ -71,20 +63,6 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.xwiki.rest.resources.RootResource
 			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.RootResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
 			<configuration>
 				<uriPattern>/</uriPattern>
 			</configuration>
@@ -128,21 +106,7 @@
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.xwiki.rest.resources.wikis.WikisResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.wikis.WikisResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>/wikis</uriPattern>
 			</configuration>
@@ -175,21 +139,7 @@
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.xwiki.rest.resources.spaces.SpacesResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.spaces.SpacesResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>/wikis/{wikiName}/spaces
 				</uriPattern>
@@ -224,21 +174,7 @@
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.xwiki.rest.resources.spaces.SpaceResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.spaces.SpaceResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>/wikis/{wikiName}/spaces/{spaceName}
 				</uriPattern>
@@ -273,21 +209,7 @@
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.xwiki.rest.resources.pages.PagesResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.pages.PagesResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>/wikis/{wikiName}/spaces/{spaceName}/pages
 				</uriPattern>
@@ -322,21 +244,7 @@
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.xwiki.rest.resources.pages.PageResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.pages.PageResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}
 				</uriPattern>
@@ -371,21 +279,7 @@
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.xwiki.rest.resources.pages.PageVersionResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.pages.PageVersionResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}
@@ -422,21 +316,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.pages.PageTranslationsResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.pages.PageTranslationsResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations
@@ -473,21 +353,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.pages.PageTranslationResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.pages.PageTranslationResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations/{languageId}
@@ -525,22 +391,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.pages.PageTranslationVersionResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>
-						org.xwiki.rest.resources.pages.PageTranslationVersionResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations/{languageId}/history/{version}
@@ -576,21 +427,7 @@
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.xwiki.rest.resources.pages.PageHistoryResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.pages.PageHistoryResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history
@@ -628,22 +465,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.pages.PageTranslationHistoryResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>
-						org.xwiki.rest.resources.pages.PageTranslationHistoryResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations/{languageId}/history
@@ -679,21 +501,7 @@
 			</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.xwiki.rest.resources.pages.PageChildrenResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.pages.PageChildrenResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/children
 				</uriPattern>
@@ -729,21 +537,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.comments.CommentsResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.comments.CommentsResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/comments
@@ -776,21 +570,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.comments.CommentResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.comments.CommentResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/comments/{commentId}
@@ -823,22 +603,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.comments.CommentsVersionResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>
-						org.xwiki.rest.resources.comments.CommentsVersionResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/comments
@@ -871,22 +636,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.comments.CommentVersionResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>
-						org.xwiki.rest.resources.comments.CommentVersionResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/comments/{commentId}
@@ -923,22 +673,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.attachments.AttachmentsResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>
-						org.xwiki.rest.resources.attachments.AttachmentsResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments
@@ -971,21 +706,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.attachments.AttachmentResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.attachments.AttachmentResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}
@@ -1009,22 +730,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>
-						org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/attachments
@@ -1057,21 +763,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>	
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/attachments/{attachmentName}
@@ -1095,22 +787,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.attachments.AttachmentHistoryResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>
-						org.xwiki.rest.resources.attachments.AttachmentHistoryResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history
@@ -1143,21 +820,7 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>
 				org.xwiki.rest.resources.attachments.AttachmentVersionResource
-			</implementation>
-			<requirements>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceClassRegistry
-					</role>
-				</requirement>
-				<requirement>
-					<role>org.xwiki.rest.XWikiResourceRepresenter
-					</role>
-					<role-hint>org.xwiki.rest.resources.attachments.AttachmentVersionResource
-					</role-hint>
-					<field-name>descriptorToRepresenterMap
-					</field-name>
-				</requirement>
-			</requirements>
+			</implementation>			
 			<configuration>
 				<uriPattern>
 					/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history/{attachmentVersion}

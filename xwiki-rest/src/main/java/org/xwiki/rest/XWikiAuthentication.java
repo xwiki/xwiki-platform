@@ -77,7 +77,7 @@ public class XWikiAuthentication extends Guard
         try {
             if (identifier.equals("Guest")) {
                 xwikiContext.setUser("XWiki.XWikiGuest");
-                getLogger().log(Level.INFO, String.format("Authenticated as '%s'.", identifier));
+                getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));
 
                 getContext().getAttributes().put(Constants.XWIKI_USER, "XWiki.XWikiGuest");
 
@@ -88,7 +88,7 @@ public class XWikiAuthentication extends Guard
                 String xwikiUser = String.format("XWiki.%s", identifier);
 
                 xwikiContext.setUser(xwikiUser);
-                getLogger().log(Level.INFO, String.format("Authenticated as '%s'.", identifier));
+                getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));
 
                 getContext().getAttributes().put(Constants.XWIKI_USER, xwikiUser);
 
@@ -98,7 +98,7 @@ public class XWikiAuthentication extends Guard
             e.printStackTrace();
         }
 
-        getLogger().log(Level.INFO, String.format("Cannot authenticate '%s'.", identifier));
+        getLogger().log(Level.WARNING, String.format("Cannot authenticate '%s'.", identifier));
 
         return false;
     }

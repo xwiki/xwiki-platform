@@ -108,7 +108,7 @@ public class XWikiResource extends WadlResource implements Composable
 
             if (descriptor.startsWith(this.getClass().getName())) {
                 getLogger().log(
-                    Level.INFO,
+                    Level.FINE,
                     String.format("Registering '%s' representer for resource %s", representer.getMediaType(), this
                         .getClass().getName()));
                 getVariants().add(new Variant(representer.getMediaType()));
@@ -147,7 +147,7 @@ public class XWikiResource extends WadlResource implements Composable
          * Put a reference to the resource in the request attributes so that the cleanup filter will be able to retrieve
          * and release it
          */
-        getLogger().log(Level.INFO, String.format("Instantiated and initialized resource %s", this));
+        getLogger().log(Level.FINE, String.format("Instantiated and initialized resource %s", this));
         request.getAttributes().put(Constants.RESOURCE_COMPONENT, this);
 
         /* Initialize relevant XWiki variables */

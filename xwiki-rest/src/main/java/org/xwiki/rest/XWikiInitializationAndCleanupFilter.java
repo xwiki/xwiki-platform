@@ -102,13 +102,13 @@ public class XWikiInitializationAndCleanupFilter extends Filter
                 cleanupComponents();
             }
 
-            getLogger().log(Level.INFO, "Error while initializing XWiki context.");
+            getLogger().log(Level.SEVERE, "Error while initializing XWiki context.");
 
             /* In case of exception do not relay the request to components behind this filter. */
             return Filter.STOP;
         }
 
-        getLogger().log(Level.INFO, "XWiki context initialized.");
+        getLogger().log(Level.FINE, "XWiki context initialized.");
 
         return Filter.CONTINUE;
     }
@@ -120,7 +120,7 @@ public class XWikiInitializationAndCleanupFilter extends Filter
 
         XWikiContext xwikiContext = (XWikiContext) getContext().getAttributes().get(Constants.XWIKI_CONTEXT);
         if (xwikiContext != null) {
-            getLogger().log(Level.INFO, "XWiki context cleaned up.");
+            getLogger().log(Level.FINE, "XWiki context cleaned up.");
             cleanupComponents();
         }
 

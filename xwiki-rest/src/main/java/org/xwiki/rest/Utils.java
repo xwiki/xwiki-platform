@@ -46,7 +46,7 @@ public class Utils
         Resource resource = (Resource) request.getAttributes().get(Constants.RESOURCE_COMPONENT);
         if (resource != null) {
             try {
-                logger.log(Level.INFO, String.format("Releasing %s", resource));
+                logger.log(Level.FINE, String.format("Releasing %s", resource));
                 componentManager.release(resource);
             } catch (ComponentLifecycleException e) {
                 e.printStackTrace();

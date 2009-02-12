@@ -72,7 +72,7 @@ public class XWikiRestletServlet extends ServerServlet
                 initParam = enum1.nextElement();
                 applicationContext.getParameters().add(initParam, getServletContext().getInitParameter(initParam));
             }
-
+            
         } catch (ComponentLookupException e) {
             e.printStackTrace();
         }

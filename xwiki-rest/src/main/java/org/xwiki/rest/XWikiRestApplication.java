@@ -83,7 +83,7 @@ public class XWikiRestApplication extends WadlApplication implements Composable
 
             if (uriPattern != null) {
                 getLogger().log(
-                    Level.INFO,
+                    Level.FINE,
                     String.format("Attaching resource %s to URI pattern '%s'", resource.getClass().getName(),
                         uriPattern));
 

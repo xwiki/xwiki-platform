@@ -17,36 +17,7 @@
 	-->
 
 <component-set>
-	<components>
-
-		<!-- *************************** -->
-		<!-- * Resource class registry * -->
-		<!-- *************************** -->
-		<component>
-			<role>org.xwiki.rest.XWikiResourceClassRegistry
-			</role>
-			<role-hint>default</role-hint>
-			<implementation>org.xwiki.rest.XWikiResourceClassRegistry
-			</implementation>
-			<instantiation-strategy>singleton</instantiation-strategy>
-		</component>
-
-		<!-- *********************** -->
-		<!-- * Restlet application * -->
-		<!-- *********************** -->
-		<component>
-			<role>org.xwiki.rest.XWikiRestApplication
-			</role>
-			<implementation>org.xwiki.rest.XWikiRestApplication
-			</implementation>
-			<role-hint>default</role-hint>
-			<instantiation-strategy>singleton</instantiation-strategy>		
-		</component>
-
-		<!--
-			**************************************************************************************************
-		-->
-
+	<components>		
 		<!-- ***************** -->
 		<!-- * Root resource * -->
 		<!-- ***************** -->

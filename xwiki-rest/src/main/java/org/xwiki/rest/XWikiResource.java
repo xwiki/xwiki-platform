@@ -155,6 +155,8 @@ public class XWikiResource extends WadlResource implements Composable
         xwiki = (com.xpn.xwiki.XWiki) context.getAttributes().get(Constants.XWIKI);
         xwikiApi = (com.xpn.xwiki.api.XWiki) context.getAttributes().get(Constants.XWIKI_API);
         xwikiUser = (String) context.getAttributes().get(Constants.XWIKI_USER);
+        resourceClassRegistry =
+            (XWikiResourceClassRegistry) context.getAttributes().get(Constants.RESOURCE_CLASS_REGISTRY);
     }
 
     protected XWikiResourceRepresenter getRepresenterFor(Variant variant)
@@ -270,8 +272,6 @@ public class XWikiResource extends WadlResource implements Composable
     public void compose(ComponentManager componentManager)
     {
         try {
-            resourceClassRegistry =
-                (XWikiResourceClassRegistry) componentManager.lookup(XWikiResourceClassRegistry.class.getName());
             descriptorToRepresenterMap = componentManager.lookupMap(XWikiResourceRepresenter.class.getName());
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Unable to initialize the resource.");

@@ -23,6 +23,8 @@ public class Constants
 {
     public static final String RESOURCE_COMPONENT = "__resource_component";
 
+    public static final String RESOURCE_CLASS_REGISTRY = "__resource_registry";
+
     /* Id for relevant XWiki objects stored in context attributes */
     public static String XWIKI_CONTEXT = "xwiki_context";
 

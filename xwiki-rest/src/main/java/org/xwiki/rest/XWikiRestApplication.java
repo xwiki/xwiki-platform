@@ -29,7 +29,6 @@ import org.restlet.ext.wadl.WadlApplication;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.rest.resources.BrowserAuthenticationResource;
 
 /**
@@ -37,16 +36,14 @@ import org.xwiki.rest.resources.BrowserAuthenticationResource;
  * 
  * @version $Id$
  */
-public class XWikiRestApplication extends WadlApplication implements Composable
+public class XWikiRestApplication extends WadlApplication
 {
-    /* Injected by the component manager. */
     private ComponentManager componentManager;
 
-    private Map<String, XWikiResource> classNameToResourceMap;
-
-    public XWikiRestApplication()
+    public XWikiRestApplication(ComponentManager componentManager)
     {
         super();
+        this.componentManager = componentManager;
     }
 
     /**
@@ -67,6 +64,18 @@ public class XWikiRestApplication extends WadlApplication implements Composable
     @Override
     public Restlet createRoot()
     {
+        /*
+         * This map will contain all the XWiki resources declared in the components.xml file (keys) and their
+         * implementations (values)
+         */
+        Map<String, XWikiResource> resourceNameToResourceClassMap = null;
+        try {
+            resourceNameToResourceClassMap = componentManager.lookupMap(XWikiResource.class.getName());
+        } catch (ComponentLookupException e) {
+            getLogger().log(Level.SEVERE, "Cannot retrieve the map for discovering XWiki resources", e);
+            return null;
+        }
+
         getTunnelService().setEnabled(true);
         /* We cannot activate the extension tunnel service because otherwise attachments will not be correctly handled */
         getTunnelService().setExtensionsTunnel(false);
@@ -76,9 +85,15 @@ public class XWikiRestApplication extends WadlApplication implements Composable
         /* Attach an empty resource in order to allow plain browser to introduce authentication credentials. */
         router.attach(BrowserAuthenticationResource.URI_PATTERN, BrowserAuthenticationResource.class);
 
+        /*
+         * This map will be put in the context so that it can be used in order to associate resource classes with the
+         * URI template they were attached to.
+         */
+        XWikiResourceClassRegistry resourceClassRegistry = new XWikiResourceClassRegistry();
+
         /* Register all the resource components */
-        for (String className : classNameToResourceMap.keySet()) {
-            XWikiResource resource = classNameToResourceMap.get(className);
+        for (String resourceName : resourceNameToResourceClassMap.keySet()) {
+            XWikiResource resource = resourceNameToResourceClassMap.get(resourceName);
             String uriPattern = resource.getUriPattern();
 
             if (uriPattern != null) {
@@ -88,6 +103,8 @@ public class XWikiRestApplication extends WadlApplication implements Composable
                         uriPattern));
 
                 router.attach(uriPattern, resource.getClass());
+
+                resourceClassRegistry.registerResourceClass(resource.getClass(), uriPattern);
             } else {
                 getLogger().log(
                     Level.WARNING,
@@ -106,6 +123,8 @@ public class XWikiRestApplication extends WadlApplication implements Composable
             }
         }
 
+        getContext().getAttributes().put(Constants.RESOURCE_CLASS_REGISTRY, resourceClassRegistry);
+
         /*
          * Add a filter before the main router for setting and cleaning up the XWiki context. The contract is that if a
          * request reaches one of the Restlet components, then the Restlet context attributes will contains properly
@@ -121,28 +140,6 @@ public class XWikiRestApplication extends WadlApplication implements Composable
         setStatusService(new XWikiStatusService(this));
 
         return initializationAndCleanupFilter;
-    }
-
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-        try {
-            /* Initialize the mapping that contains the resource class names and their implementations */
-            classNameToResourceMap = componentManager.lookupMap(XWikiResource.class.getName());
-
-            /* Check for the consistency of components.xml */
-            for (String className : classNameToResourceMap.keySet()) {
-                XWikiResource resource = classNameToResourceMap.get(className);
-                if (!resource.getClass().getName().equals(className)) {
-                    getLogger().log(
-                        Level.WARNING,
-                        String.format("Mismatch in resource declaration. Role hint: %s, implementation: %s", className,
-                            resource.getClass().getName()));
-                }
-            }
-        } catch (ComponentLookupException e) {
-            throw new RuntimeException("Unable to lookup resource map", e);
-        }
     }
 
     public ComponentManager getComponentManager()

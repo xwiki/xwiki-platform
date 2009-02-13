@@ -40,10 +40,12 @@ public class SpaceResource extends XWikiResource
     @Override
     public Representation represent(Variant variant)
     {
+        String database = xwikiContext.getDatabase();
+        
         try {
+            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);            
             String spaceName = (String) getRequest().getAttributes().get(Constants.SPACE_NAME_PARAMETER);
-
-            xwiki.setDatabase("xwiki");
+            xwikiContext.setDatabase(wiki);            
 
             List<String> docNames = xwikiApi.getSpaceDocsName(spaceName);
             String home = String.format("%s.WebHome", spaceName);
@@ -58,8 +60,6 @@ public class SpaceResource extends XWikiResource
                 }
             }
 
-            String wiki = "xwiki";
-
             Space space =
                 DomainObjectFactory.createSpace(getRequest(), resourceClassRegistry, wiki, spaceName, home,
                     homeXWikiUrl, docNames.size());
@@ -69,7 +69,7 @@ public class SpaceResource extends XWikiResource
             e.printStackTrace();
             getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
         } finally {
-            xwiki.setDatabase("xwiki");
+            xwiki.setDatabase(database);
         }
 
         return null;

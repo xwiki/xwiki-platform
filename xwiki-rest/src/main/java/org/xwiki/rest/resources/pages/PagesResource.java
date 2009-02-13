@@ -44,8 +44,12 @@ public class PagesResource extends XWikiResource
     @Override
     public Representation represent(Variant variant)
     {
+        String database = xwikiContext.getDatabase();
+
         try {
+            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);
             String spaceName = (String) getRequest().getAttributes().get(Constants.SPACE_NAME_PARAMETER);
+            xwikiContext.setDatabase(wiki);
 
             Pages pages = new Pages();
             List<String> pageNames = xwikiApi.getSpaceDocsName(spaceName);
@@ -78,6 +82,8 @@ public class PagesResource extends XWikiResource
         } catch (XWikiException e) {
             e.printStackTrace();
             getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+        } finally {
+            xwikiContext.setDatabase(database);
         }
 
         return null;

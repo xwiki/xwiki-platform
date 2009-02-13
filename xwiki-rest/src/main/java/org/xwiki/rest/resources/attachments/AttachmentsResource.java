@@ -71,7 +71,7 @@ public class AttachmentsResource extends XWikiResource
                         .toString();
 
                 attachments.addAttachment(DomainObjectFactory.createAttachment(getRequest(), resourceClassRegistry,
-                    xwikiAttachment, attachmentXWikiUrl, false));
+                    doc, xwikiAttachment, attachmentXWikiUrl, false));
             }
 
             return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), attachments);

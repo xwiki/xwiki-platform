@@ -27,6 +27,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("attachment")
 public class Attachment extends LinkCollection
 {
+    private String id;
+    
     private String name;
 
     private Integer size;
@@ -121,5 +123,15 @@ public class Attachment extends LinkCollection
     public void setPageVersion(String pageVersion)
     {
         this.pageVersion = pageVersion;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
     }
 }

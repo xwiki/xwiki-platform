@@ -303,8 +303,8 @@ public class DomainObjectFactory
                 link.setRel(Relations.COMMENTS);
                 page.addLink(link);
             }
-            
-            if(!doc.getAttachmentList().isEmpty()) {
+
+            if (!doc.getAttachmentList().isEmpty()) {
                 if (useVersion) {
                     fullUri =
                         String.format("%s%s", request.getRootRef(), resourceClassRegistry
@@ -461,10 +461,11 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachment(Request request, XWikiResourceClassRegistry resourceClassRegistry,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl, boolean useVersion)
+        Document doc, com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl, boolean useVersion)
     {
         Attachment attachment = new Attachment();
 
+        attachment.setId(String.format("%s@%s", doc.getPrefixedFullName(), xwikiAttachment.getFilename()));
         attachment.setName(xwikiAttachment.getFilename());
         attachment.setSize(xwikiAttachment.getFilesize());
         attachment.setVersion(xwikiAttachment.getVersion());

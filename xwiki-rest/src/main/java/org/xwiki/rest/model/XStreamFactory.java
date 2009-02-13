@@ -61,7 +61,7 @@ public class XStreamFactory
 
         sorter.registerFieldOrder(Comment.class, new String[] {"id", "author", "date", "highlight", "text", "links"});
 
-        sorter.registerFieldOrder(Attachment.class, new String[] {"name", "size", "version", "pageVersion", "mimeType",
+        sorter.registerFieldOrder(Attachment.class, new String[] {"id", "name", "size", "version", "pageVersion", "mimeType",
         "author", "date", "xwikiUrl", "links"});
 
         XStream xstream = new XStream(new Sun14ReflectionProvider(new FieldDictionary(sorter)), new DomDriver());

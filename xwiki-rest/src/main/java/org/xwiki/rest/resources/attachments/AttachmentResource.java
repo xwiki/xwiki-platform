@@ -113,7 +113,7 @@ public class AttachmentResource extends BaseAttachmentResource
 
             getResponse().setEntity(
                 new StringRepresentation(Utils.toXml(DomainObjectFactory.createAttachment(getRequest(),
-                    resourceClassRegistry, doc.getAttachment(attachmentName), attachmentXWikiUrl, false))));
+                    resourceClassRegistry, doc, doc.getAttachment(attachmentName), attachmentXWikiUrl, false))));
 
         } catch (XWikiException e) {
             if (e.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {

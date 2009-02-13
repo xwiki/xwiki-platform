@@ -33,8 +33,10 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
+import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.StackableChainingListener;
+import org.xwiki.rendering.listener.chaining.LookaheadChainingListener.Event;
 import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
@@ -313,13 +315,23 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void onNewLine()
     {
-        // If we're inside a table cell, a paragraph, a list or a section header then if we have already outputted
+        // - If we're inside a table cell, a paragraph, a list or a section header then if we have already outputted
         // a new line before then this new line should be a line break in order not to break the table cell,
         // paragraph, list or section header.
-        if (getXWikiSyntaxListenerChain().getConsecutiveNewLineStateChainingListener().getNewLineCount() > 1 
-            && getXWikiSyntaxListenerChain().getBlockStateChainingListener().isInLine())
-        {
-            print("\\\\");
+
+        // - If the new line is the last element of the paragraph, list or section header then it should be a line break
+        // as otherwise it'll be considered as an empty line event next time the generated syntax is read by the XWiki
+        // parser.
+
+        if (getXWikiSyntaxListenerChain().getBlockStateChainingListener().isInLine()) {
+            if (getXWikiSyntaxListenerChain().getConsecutiveNewLineStateChainingListener().getNewLineCount() > 1) { 
+                print("\\\\");
+            } else if (getXWikiSyntaxListenerChain().getLookaheadChainingListener().getNextEvent().eventType.isInlineEnd())
+            {
+                print("\\\\");
+            } else {
+                print("\n");
+            }
         } else {
             print("\n");
         }

@@ -56,6 +56,12 @@ public enum EventType
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.endParagraph((Map<String, String>) eventParameters[0]);
         }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            return true;
+        }
     },
     BEGIN_DEFINITION_LIST {
         void fireEvent(Listener listener, Object[] eventParameters) {
@@ -76,6 +82,12 @@ public enum EventType
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.endDefinitionTerm();
         }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            return true;
+        }
     },
     BEGIN_DEFINITION_DESCRIPTION {
         void fireEvent(Listener listener, Object[] eventParameters) {
@@ -85,6 +97,12 @@ public enum EventType
     END_DEFINITION_DESCRIPTION {
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.endDefinitionDescription();
+        }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            return true;
         }
     },
     BEGIN_ERROR {
@@ -146,6 +164,12 @@ public enum EventType
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.endListItem();
         }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            return true;
+        }
     },
     BEGIN_MACRO_MARKER {
         void fireEvent(Listener listener, Object[] eventParameters) {
@@ -178,6 +202,12 @@ public enum EventType
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.endQuotationLine(); 
         }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            return true;
+        }
     },
     BEGIN_SECTION {
         void fireEvent(Listener listener, Object[] eventParameters) {
@@ -208,6 +238,12 @@ public enum EventType
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.endTableCell((Map<String, String>) eventParameters[0]); 
         }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            return true;
+        }
     },
     BEGIN_TABLE_HEAD_CELL {
         void fireEvent(Listener listener, Object[] eventParameters) {
@@ -217,6 +253,12 @@ public enum EventType
     END_TABLE_HEAD_CELL {
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.endTableHeadCell((Map<String, String>) eventParameters[0]); 
+        }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            return true;
         }
     },
     BEGIN_TABLE_ROW {
@@ -293,5 +335,10 @@ public enum EventType
         }
     };
    
-    abstract void fireEvent(Listener listener, Object[] eventParameters); 
+    abstract void fireEvent(Listener listener, Object[] eventParameters);
+    
+    public boolean isInlineEnd()
+    {
+        return false;
+    }
 }

@@ -39,6 +39,7 @@ import org.xwiki.rest.model.Translations;
 import org.xwiki.rest.model.XWikiRoot;
 import org.xwiki.rest.resources.RootResource;
 import org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource;
+import org.xwiki.rest.resources.attachments.AttachmentHistoryResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
@@ -47,6 +48,7 @@ import org.xwiki.rest.resources.comments.CommentResource;
 import org.xwiki.rest.resources.comments.CommentVersionResource;
 import org.xwiki.rest.resources.comments.CommentsResource;
 import org.xwiki.rest.resources.comments.CommentsVersionResource;
+import org.xwiki.rest.resources.pages.PageHistoryResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.rest.resources.pages.PageTranslationVersionResource;
@@ -263,6 +265,17 @@ public class DomainObjectFactory
             parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
             link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
             link.setRel(Relations.SPACE);
+            page.addLink(link);
+            
+            fullUri =
+                String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                    .getUriPatternForResourceClass(PageHistoryResource.class));
+            parametersMap = new HashMap<String, String>();
+            parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
+            parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
+            parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
+            link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
+            link.setRel(Relations.HISTORY);
             page.addLink(link);
 
             String parent = doc.getParent();
@@ -517,6 +530,13 @@ public class DomainObjectFactory
         parametersMap.put(Constants.ATTACHMENT_NAME_PARAMETER, attachment.getName());
         link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
         link.setRel(Relations.ATTACHMENT_DATA);
+        attachment.addLink(link);
+        
+        fullUri =
+            String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                .getUriPatternForResourceClass(AttachmentHistoryResource.class));
+        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
+        link.setRel(Relations.HISTORY);
         attachment.addLink(link);
 
         return attachment;

@@ -41,8 +41,12 @@ public class LinkCollection
         links.add(link);
     }
 
-    public List<Link> getLinks()
+    public List<Link> getLinks()   
     {
+        if(links == null) {
+            return new ArrayList<Link>();
+        }
+        
         return links;
     }
 

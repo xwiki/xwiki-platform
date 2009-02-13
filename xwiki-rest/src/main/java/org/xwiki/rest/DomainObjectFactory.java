@@ -41,6 +41,8 @@ import org.xwiki.rest.resources.RootResource;
 import org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
+import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
+import org.xwiki.rest.resources.attachments.AttachmentsResource;
 import org.xwiki.rest.resources.comments.CommentResource;
 import org.xwiki.rest.resources.comments.CommentVersionResource;
 import org.xwiki.rest.resources.comments.CommentsResource;
@@ -281,24 +283,47 @@ public class DomainObjectFactory
                 page.addLink(link);
             }
 
-            if (useVersion) {
-                fullUri =
-                    String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(CommentsVersionResource.class));
-            } else {
-                fullUri =
-                    String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(CommentsResource.class));
+            if (!doc.getComments().isEmpty()) {
+                if (useVersion) {
+                    fullUri =
+                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                            .getUriPatternForResourceClass(CommentsVersionResource.class));
+                } else {
+                    fullUri =
+                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                            .getUriPatternForResourceClass(CommentsResource.class));
+                }
+                parametersMap = new HashMap<String, String>();
+                parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
+                parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
+                parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
+                parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0),
+                    doc.getRCSVersion().at(1)));
+                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
+                link.setRel(Relations.COMMENTS);
+                page.addLink(link);
             }
-            parametersMap = new HashMap<String, String>();
-            parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-            parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-            parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-            parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
-                .getRCSVersion().at(1)));
-            link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-            link.setRel(Relations.COMMENTS);
-            page.addLink(link);
+            
+            if(!doc.getAttachmentList().isEmpty()) {
+                if (useVersion) {
+                    fullUri =
+                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                            .getUriPatternForResourceClass(AttachmentsAtPageVersionResource.class));
+                } else {
+                    fullUri =
+                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
+                            .getUriPatternForResourceClass(AttachmentsResource.class));
+                }
+                parametersMap = new HashMap<String, String>();
+                parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
+                parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
+                parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
+                parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0),
+                    doc.getRCSVersion().at(1)));
+                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
+                link.setRel(Relations.ATTACHMENTS);
+                page.addLink(link);
+            }
 
             return page;
         } catch (Exception e) {

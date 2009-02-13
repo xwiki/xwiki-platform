@@ -33,6 +33,8 @@ import com.xpn.xwiki.wysiwyg.client.dom.StyleTest;
 import com.xpn.xwiki.wysiwyg.client.dom.TextTest;
 import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.IESelectionTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.indent.IndentExecutableTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.indent.OutdentExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtensionTest;
@@ -84,6 +86,9 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(FocusWidgetUIExtensionTest.class);
         suite.addTestSuite(ImageMetaDataExtractorTest.class);
         suite.addTestSuite(LinkMetaDataExtractorTest.class);
+
+        suite.addTestSuite(IndentExecutableTest.class);
+        suite.addTestSuite(OutdentExecutableTest.class);
 
         // syntax
         suite.addTestSuite(DefaultSyntaxValidatorManagerTest.class);

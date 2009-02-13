@@ -75,12 +75,16 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
             ol = new ToggleButton(Images.INSTANCE.ol().createImage(), this);
             ol.setTitle(Strings.INSTANCE.ol());
             toolBarExtension.addFeature("orderedlist", ol);
+            // overwrite default executable with the ListExecutable, to handle valid html lists
+            getTextArea().getCommandManager().registerCommand(Command.INSERT_ORDERED_LIST, new ListExecutable(true));
         }
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_UNORDERED_LIST)) {
             ul = new ToggleButton(Images.INSTANCE.ul().createImage(), this);
             ul.setTitle(Strings.INSTANCE.ul());
             toolBarExtension.addFeature("unorderedlist", ul);
+            // overwrite the default list command executables with the ListExecutable, to handle valid html lists
+            getTextArea().getCommandManager().registerCommand(Command.INSERT_UNORDERED_LIST, new ListExecutable(false));
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
@@ -88,10 +92,6 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
             getTextArea().addKeyboardListener(this);
             getTextArea().getCommandManager().addCommandListener(this);
             getUIExtensionList().add(toolBarExtension);
-
-            // overwrite the default list command executables with the ListExecutable, to handle valid html lists
-            getTextArea().getCommandManager().registerCommand(Command.INSERT_ORDERED_LIST, new ListExecutable(true));
-            getTextArea().getCommandManager().registerCommand(Command.INSERT_UNORDERED_LIST, new ListExecutable(false));
 
             // Initialize the behavior adjuster and set it up with this text area
             behaviorAdjuster = (ListBehaviorAdjuster) GWT.create(ListBehaviorAdjuster.class);

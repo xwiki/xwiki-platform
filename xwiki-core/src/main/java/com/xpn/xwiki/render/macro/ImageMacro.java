@@ -159,7 +159,7 @@ public class ImageMacro extends BaseLocaleMacro
         str.append("<img src=\"");
 
         String url;
-        if (img.indexOf("tp://") != -1) {
+        if (img.indexOf("://") != -1) {
             url = img;
         } else {
             url = doc.getAttachmentURL(img, "download", downloadParams, xcontext);

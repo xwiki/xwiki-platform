@@ -85,10 +85,17 @@
     #set($targetPage=$request.targetPage)
   #end  
 
+  ## Check style filter settings 
+  #if($request.filterStyles)
+    #set($filterStyles=$request.filterStyles)
+  #else
+    #set($filterStyles="none")
+  #end
+
   ## Import
   #if($fileName &amp;&amp; $targetSpace &amp;&amp; $targetPage)    
     #set($fileContent=$fileUpload.getFileItemData("filePath"))
-    #set($options={"filterStyles":${request.filterStyles}})
+    #set($options={"filterStyles":${filterStyles}})
     #set($targetDocument="${targetSpace}.${targetPage}")
     #set($result=$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options))
     #if($result)

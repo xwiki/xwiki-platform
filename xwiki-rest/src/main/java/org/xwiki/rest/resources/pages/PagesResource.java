@@ -21,6 +21,7 @@ package org.xwiki.rest.resources.pages;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.restlet.data.Form;
 import org.restlet.data.Status;
@@ -60,6 +61,16 @@ public class PagesResource extends XWikiResource
                 new RangeIterable<String>(pageNames, Utils.parseInt(queryForm.getFirstValue(Constants.START_PARAMETER),
                     0), Utils.parseInt(queryForm.getFirstValue(Constants.NUMBER_PARAMETER), -1));
 
+            String parentFilterParameter = queryForm.getFirstValue(Constants.PARENT_FILTER_PARAMETER);
+            Pattern parentFilter = null;
+            if (parentFilterParameter != null) {
+                if (parentFilterParameter.equals("null")) {
+                    parentFilter = Pattern.compile("");
+                } else {
+                    parentFilter = Pattern.compile(parentFilterParameter);
+                }
+            }
+
             for (String pageName : ri) {
                 String pageFullName = String.format("%s.%s", spaceName, pageName);
 
@@ -72,8 +83,22 @@ public class PagesResource extends XWikiResource
 
                     /* We only add pages we have the right to access */
                     if (doc != null) {
-                        pages.addPageSummary(DomainObjectFactory.createPageSummary(getRequest(), resourceClassRegistry,
-                            doc));
+
+                        boolean add = true;
+
+                        if (parentFilter != null) {
+                            String parent = doc.getParent();
+                            if (parent == null) {
+                                parent = "";
+                            }
+
+                            add = parentFilter.matcher(doc.getParent()).matches();
+                        }
+
+                        if (add) {
+                            pages.addPageSummary(DomainObjectFactory.createPageSummary(getRequest(),
+                                resourceClassRegistry, doc));
+                        }
                     }
                 }
             }

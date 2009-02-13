@@ -70,6 +70,15 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("superscript/superscript1", false);
         suite.addTestsFromResource("subscript/subscript1", false);
         suite.addTestsFromResource("monospace/monospace1", false);
+        suite.addTestsFromResource("verbatim/verbatim1", false);
+        suite.addTestsFromResource("verbatim/verbatim2", false);
+        suite.addTestsFromResource("verbatim/verbatim3", false);
+        suite.addTestsFromResource("verbatim/verbatim4", false);
+        suite.addTestsFromResource("verbatim/verbatim5", false);
+        suite.addTestsFromResource("verbatim/verbatim6", false);
+        suite.addTestsFromResource("verbatim/verbatim7", false);
+        
+        // Paragraphs
         suite.addTestsFromResource("paragraph/paragraph1", false);
         suite.addTestsFromResource("paragraph/paragraph2", false);
         suite.addTestsFromResource("paragraph/paragraph3", false);
@@ -80,13 +89,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("paragraph/paragraph8", false);
         suite.addTestsFromResource("paragraph/paragraph9", false);
         suite.addTestsFromResource("paragraph/paragraph10", false);
-        suite.addTestsFromResource("verbatim/verbatim1", false);
-        suite.addTestsFromResource("verbatim/verbatim2", false);
-        suite.addTestsFromResource("verbatim/verbatim3", false);
-        suite.addTestsFromResource("verbatim/verbatim4", false);
-        suite.addTestsFromResource("verbatim/verbatim5", false);
-        suite.addTestsFromResource("verbatim/verbatim6", false);
-        suite.addTestsFromResource("verbatim/verbatim7", false);
 
         // Tables
         suite.addTestsFromResource("table/table1", false);
@@ -105,6 +107,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macro7", true);
         suite.addTestsFromResource("macros/macro8", true);
         suite.addTestsFromResource("macros/macro9", true);
+        suite.addTestsFromResource("macros/macro10", true);
 
         // Links
         suite.addTestsFromResource("link/links1", false);

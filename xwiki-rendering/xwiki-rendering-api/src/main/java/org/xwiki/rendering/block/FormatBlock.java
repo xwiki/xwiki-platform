@@ -22,7 +22,9 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Listener;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a text formatting block (bold, italic, etc).
@@ -43,10 +45,14 @@ public class FormatBlock extends AbstractFatherBlock
      */
     public FormatBlock(List<Block> childrenBlocks, Format format)
     {
-        super(childrenBlocks);
-        this.format = format;
+        this(childrenBlocks, format, Collections.<String, String> emptyMap());
     }
 
+    public FormatBlock(List<Block> childrenBlocks, Format format, Map<String, String> parameters)
+    {
+        super(childrenBlocks, parameters);
+        this.format = format;
+    }
     /**
      * @return the formatting to apply to the children blocks
      */

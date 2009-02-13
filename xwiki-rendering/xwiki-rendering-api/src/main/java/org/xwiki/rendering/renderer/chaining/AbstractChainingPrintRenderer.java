@@ -17,27 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.renderer.chaining;
 
 import java.util.Stack;
 
-import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.chaining.AbstractChainingListener;
+import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
- * Common methods for all {@link org.xwiki.rendering.renderer.PrintRenderer} implementations.
- * 
  * @version $Id$
- * @since 1.6M2
+ * @since 1.8RC1
  */
-public abstract class AbstractPrintRenderer extends AbstractRenderer implements PrintRenderer
+public abstract class AbstractChainingPrintRenderer extends AbstractChainingListener implements PrintRenderer
 {
     private Stack<WikiPrinter> printers = new Stack<WikiPrinter>();
-
-    public AbstractPrintRenderer(WikiPrinter printer, Listener stateListener)
+    
+    public AbstractChainingPrintRenderer(WikiPrinter printer, ListenerChain listenerChain)
     {
-        super(stateListener);
-
+        super(listenerChain);
         this.pushPrinter(printer);
     }
 

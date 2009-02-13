@@ -22,9 +22,9 @@ package org.xwiki.rendering.internal.renderer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.xwiki.rendering.internal.renderer.state.BlockStateListener;
-import org.xwiki.rendering.internal.renderer.state.TextOnNewLineStateListener;
-import org.xwiki.rendering.internal.renderer.state.XWikiSyntaxState;
+import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
+import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
+import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
 /**
  * Escape characters that would be confused for XWiki wiki syntax if they were not escaped.
@@ -45,11 +45,11 @@ public class XWikiSyntaxEscapeHandler
 
     private static final String ESCAPE_CHAR = "~";
 
-    public void escape(StringBuffer accumulatedBuffer, XWikiSyntaxState state, boolean escapeLastChar,
+    public void escape(StringBuffer accumulatedBuffer, XWikiSyntaxListenerChain listenerChain, boolean escapeLastChar,
         Pattern escapeFirstIfMatching)
     {
-        BlockStateListener blockStateListener = state.getBlockStateListener();
-        TextOnNewLineStateListener textOnNewLineStateListener = state.getTextOnNewLineStateListener();
+        BlockStateChainingListener blockStateListener = listenerChain.getBlockStateChainingListener();
+        TextOnNewLineStateChainingListener textStateListener = listenerChain.getTextOnNewLineStateChainingListener();
 
         // Escape tilde symbol (i.e. the escape character).
         // Note: This needs to be the first replacement since other replacements below also use the tilde symbol
@@ -57,7 +57,7 @@ public class XWikiSyntaxEscapeHandler
 
         // When in a paragraph we need to escape symbols that are at beginning of lines and that could be confused
         // with list items or headers.
-        if (blockStateListener.isInParagraph() && textOnNewLineStateListener.isTextOnNewLine()) {
+        if (blockStateListener.isInParagraph() && textStateListener.isTextOnNewLine()) {
 
             // Look for list pattern at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(LIST_PATTERN, accumulatedBuffer);

@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.renderer.printer;
 import java.util.regex.Pattern;
 
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxEscapeHandler;
-import org.xwiki.rendering.internal.renderer.state.XWikiSyntaxState;
+import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 import org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
@@ -36,7 +36,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
 {
-    private XWikiSyntaxState state;
+    private XWikiSyntaxListenerChain listenerChain;
 
     private XWikiSyntaxEscapeHandler escapeHandler;
 
@@ -44,27 +44,29 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
 
     private Pattern escapeFirstIfMatching;
 
-    public XWikiSyntaxEscapeWikiPrinter(WikiPrinter printer, XWikiSyntaxState state)
+    public XWikiSyntaxEscapeWikiPrinter(WikiPrinter printer, XWikiSyntaxListenerChain listenerChain)
     {
         super(printer);
 
         this.escapeHandler = new XWikiSyntaxEscapeHandler();
 
-        this.state = state;
+        this.listenerChain = listenerChain;
     }
 
     @Override
     public void flush()
     {
-        this.escapeHandler.escape(getBuffer(), this.state, this.escapeLastChar, this.escapeFirstIfMatching);
+        if (getBuffer().length() > 0) {
+            this.escapeHandler.escape(getBuffer(), this.listenerChain, this.escapeLastChar, this.escapeFirstIfMatching);
+            super.flush();
+        }
         this.escapeLastChar = false;
         this.escapeFirstIfMatching = null;
-        super.flush();
     }
 
     public void printBeginBold()
     {
-        boolean isOnNewLine = this.state.getTextOnNewLineStateListener().isTextOnNewLine() && getBuffer().length() == 0;
+        boolean isOnNewLine = this.listenerChain.getTextOnNewLineStateChainingListener().isTextOnNewLine() && getBuffer().length() == 0;
 
         print("**");
 

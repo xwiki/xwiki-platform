@@ -17,25 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer.state;
+package org.xwiki.rendering.listener.chaining;
 
 import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
  * Indicates block element for which we are inside and previous blocks.
  * 
  * @version $Id$
- * @since 1.8M1
+ * @since 1.8RC1
  */
-public class BlockStateListener implements Listener
+public class BlockStateChainingListener extends AbstractChainingListener implements StackableChainingListener
 {
     public enum Event
     {
@@ -75,8 +74,6 @@ public class BlockStateListener implements Listener
     
     private Event previousEvent = Event.NONE;
     
-    private int documentDepth;
-
     private int inlineDepth = 0;
 
     private boolean isInParagraph;
@@ -98,27 +95,26 @@ public class BlockStateListener implements Listener
     private int quotationDepth = 0;
 
     private boolean isInQuotationLine;
+    
+    public BlockStateChainingListener(ListenerChain listenerChain)
+    {
+        super(listenerChain);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see StackableChainingListener#createChainingListenerInstance()
+     */
+    public StackableChainingListener createChainingListenerInstance()
+    {
+        return new BlockStateChainingListener(getListenerChain());
+    }
 
     public Event getPreviousEvent()
     {
         return this.previousEvent;
     }
     
-    public void setDocumentDepth(int documentDepth)
-    {
-        this.documentDepth = documentDepth;
-    }
-
-    public int getDocumentDepth()
-    {
-        return this.documentDepth;
-    }
-
-    public boolean isInDocument()
-    {
-        return this.documentDepth > 0;
-    }
-
     public boolean isInLine()
     {
         return this.inlineDepth > 0;
@@ -154,6 +150,11 @@ public class BlockStateListener implements Listener
         return this.listDepth > 0;
     }
 
+    public int getListDepth()
+    {
+        return this.listDepth;
+    }
+    
     public boolean isInListItem()
     {
         return this.listItemDepth > 0;
@@ -194,157 +195,143 @@ public class BlockStateListener implements Listener
     public void beginDefinitionDescription()
     {
         ++this.inlineDepth;
+        super.beginDefinitionDescription();
     }
 
     public void beginDefinitionList()
     {
         ++this.definitionListDepth;
+        super.beginDefinitionList();
     }
 
     public void beginDefinitionTerm()
     {
         ++this.inlineDepth;
-    }
-
-    public void beginDocument()
-    {
-        ++this.documentDepth;
-    }
-
-    public void beginError(String message, String description)
-    {
-        // Nothing to do
-    }
-
-    public void beginFormat(Format format, Map<String, String> parameters)
-    {
-        // Nothing to do
+        super.beginDefinitionTerm();
     }
 
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         ++this.linkDepth;
+        super.beginLink(link, isFreeStandingURI, parameters);
     }
 
     public void beginList(ListType listType, Map<String, String> parameters)
     {
         ++this.listDepth;
+        super.beginList(listType, parameters);
     }
 
     public void beginListItem()
     {
         ++this.listItemDepth;
         ++this.inlineDepth;
-    }
-
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
-    {
-        // Nothing to do
+        super.beginListItem();
     }
 
     public void beginParagraph(Map<String, String> parameters)
     {
         this.isInParagraph = true;
         ++this.inlineDepth;
+        super.beginParagraph(parameters);
     }
 
     public void beginQuotation(Map<String, String> parameters)
     {
         ++this.quotationDepth;
+        super.beginQuotation(parameters);
     }
 
     public void beginQuotationLine()
     {
         this.isInQuotationLine = true;
         ++this.inlineDepth;
-    }
-
-    public void beginSection(Map<String, String> parameters)
-    {
-        // Nothing to do
+        super.beginQuotationLine();
     }
 
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
         this.isInHeader = true;
         ++this.inlineDepth;
+        super.beginHeader(level, parameters);
     }
 
     public void beginTable(Map<String, String> parameters)
     {
         this.isInTable = true;
+        super.beginTable(parameters);
     }
 
     public void beginTableCell(Map<String, String> parameters)
     {
         this.isInTableCell = true;
         ++this.inlineDepth;
+        super.beginTableCell(parameters);
     }
 
     public void beginTableHeadCell(Map<String, String> parameters)
     {
         this.isInTableCell = true;
         ++this.inlineDepth;
-    }
-
-    public void beginTableRow(Map<String, String> parameters)
-    {
-        // Nothing to do
-    }
-
-    public void beginXMLNode(XMLNode node)
-    {
-        // Nothing to do
+        super.beginTableHeadCell(parameters);
     }
 
     public void endDefinitionDescription()
     {
+        super.endDefinitionDescription();
         --this.inlineDepth;
         this.previousEvent = Event.DEFINITION_DESCRIPTION;
     }
 
     public void endDefinitionList()
     {
+        super.endDefinitionList();
         --this.definitionListDepth;
         this.previousEvent = Event.DEFINITION_LIST;
     }
 
     public void endDefinitionTerm()
     {
+        super.endDefinitionTerm();
         --this.inlineDepth;
         this.previousEvent = Event.DEFINITION_TERM;
     }
 
     public void endDocument()
     {
-        --this.documentDepth;
         this.previousEvent = Event.DOCUMENT;
+        super.endDocument();
     }
 
     public void endError(String message, String description)
     {
+        super.endError(message, description);
         this.previousEvent = Event.ERROR;
     }
 
     public void endFormat(Format format, Map<String, String> parameters)
     {
+        super.endFormat(format, parameters);
         this.previousEvent = Event.FORMAT;
     }
 
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
+        super.endLink(link, isFreeStandingURI, parameters);
         --this.linkDepth;
         this.previousEvent = Event.LINK;
     }
 
     public void endList(ListType listType, Map<String, String> parameters)
     {
+        super.endList(listType, parameters);
         --this.listDepth;
         this.previousEvent = Event.LIST;
     }
 
     public void endListItem()
     {
+        super.endListItem();
         --this.listItemDepth;
         --this.inlineDepth;
         this.previousEvent = Event.LIST_ITEM;
@@ -352,11 +339,13 @@ public class BlockStateListener implements Listener
 
     public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
+        super.endMacroMarker(name, parameters, content, isInline);
         this.previousEvent = Event.MACRO_MARKER;
     }
 
     public void endParagraph(Map<String, String> parameters)
     {
+        super.endParagraph(parameters);
         this.isInParagraph = false;
         --this.inlineDepth;
         this.previousEvent = Event.PARAGRAPH;
@@ -364,12 +353,14 @@ public class BlockStateListener implements Listener
 
     public void endQuotation(Map<String, String> parameters)
     {
+        super.endQuotation(parameters);
         --this.quotationDepth;
         this.previousEvent = Event.QUOTATION;
     }
 
     public void endQuotationLine()
     {
+        super.endQuotationLine();
         this.isInQuotationLine = false;
         --this.inlineDepth;
         this.previousEvent = Event.QUOTATION_LINE;
@@ -377,11 +368,13 @@ public class BlockStateListener implements Listener
 
     public void endSection(Map<String, String> parameters)
     {
+        super.endSection(parameters);
         this.previousEvent = Event.SECTION;
     }
 
     public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
+        super.endHeader(level, parameters);
         this.isInHeader = false;
         --this.inlineDepth;
         this.previousEvent = Event.HEADER;
@@ -389,12 +382,14 @@ public class BlockStateListener implements Listener
 
     public void endTable(Map<String, String> parameters)
     {
+        super.endTable(parameters);
         this.isInTable = false;
         this.previousEvent = Event.TABLE;
     }
 
     public void endTableCell(Map<String, String> parameters)
     {
+        super.endTableCell(parameters);
         this.isInTableCell = false;
         --this.inlineDepth;
         this.previousEvent = Event.TABLE_CELL;
@@ -402,6 +397,7 @@ public class BlockStateListener implements Listener
 
     public void endTableHeadCell(Map<String, String> parameters)
     {
+        super.endTableHeadCell(parameters);
         this.isInTableCell = false;
         --this.inlineDepth;
         this.previousEvent = Event.TABLE_HEAD_CELL;
@@ -409,61 +405,73 @@ public class BlockStateListener implements Listener
 
     public void endTableRow(Map<String, String> parameters)
     {
+        super.endTableRow(parameters);
         this.previousEvent = Event.TABLE_ROW;
     }
 
     public void endXMLNode(XMLNode node)
     {
+        super.endXMLNode(node);
         this.previousEvent = Event.XML_NODE;
     }
 
     public void onEmptyLines(int count)
     {
         this.previousEvent = Event.EMPTY_LINES;
+        super.onEmptyLines(count);
     }
 
     public void onHorizontalLine(Map<String, String> parameters)
     {
         this.previousEvent = Event.HORIZONTAL_LINE;
+        super.onHorizontalLine(parameters);
     }
 
     public void onId(String name)
     {
         this.previousEvent = Event.ID;
+        super.onId(name);
     }
 
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.previousEvent = Event.IMAGE;
+        super.onImage(image, isFreeStandingURI, parameters);
     }
 
     public void onNewLine()
     {
         this.previousEvent = Event.NEW_LINE;
+        super.onNewLine();
     }
 
     public void onSpace()
     {
         this.previousEvent = Event.SPACE;
+        super.onSpace();
     }
 
     public void onSpecialSymbol(char symbol)
     {
         this.previousEvent = Event.SPECIAL_SYMBOL;
+        super.onSpecialSymbol(symbol);
     }
 
     public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
         this.previousEvent = Event.VERBATIM_STANDALONE;
+        super.onVerbatim(protectedString, parameters, isInline);
     }
 
     public void onWord(String word)
     {
         this.previousEvent = Event.WORD;
+        super.onWord(word);
     }
 
     public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         this.previousEvent = Event.MACRO;
-    }
+        super.onMacro(name, parameters, content, isInline);
+    }    
 }

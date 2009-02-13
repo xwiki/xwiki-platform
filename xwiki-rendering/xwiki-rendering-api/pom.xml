@@ -130,6 +130,12 @@
         <configuration>
           <includes>
             **/Listener.java
+            **/listener/chaining/AbstractChainingListener.java
+            **/listener/chaining/ChainingListener.java
+            **/listener/chaining/StackableChainingListener.java
+            **/renderer/XWikiSyntaxRenderer.java
+            **/renderer/EventsRenderer.java
+            **/renderer/XHTMLRenderer.java
             **/block/Block.java
             **/block/FatherBlock.java
             **/block/AbstractFatherBlock.java

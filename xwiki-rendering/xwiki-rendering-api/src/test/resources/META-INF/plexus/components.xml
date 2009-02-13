@@ -59,5 +59,11 @@
       <implementation>org.xwiki.rendering.internal.transformation.TestFailingMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>testformatmacro</role-hint>
+      <implementation>org.xwiki.rendering.internal.transformation.TestFormatMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
   </components>
 </component-set>

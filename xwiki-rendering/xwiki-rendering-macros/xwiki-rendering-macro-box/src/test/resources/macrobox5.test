@@ -3,6 +3,23 @@
 .#-----------------------------------------------------
 {{box title="[[XWiki>>http://www.xwiki.org]]" cssClass="myCLASS" image="http://l.yimg.com/i/i/fr/tr/usa4.jpg"}}alabala{{/box}}
 .#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [box] [title=[[XWiki>>http://www.xwiki.org]]|cssClass=myCLASS|image=http://l.yimg.com/i/i/fr/tr/usa4.jpg] [alabala]
+beginXMLNode [div] [class=box myCLASS]
+onImage: [http://l.yimg.com/i/i/fr/tr/usa4.jpg] [true]
+onNewLine
+beginLink [Reference = [http://www.xwiki.org]] [false]
+onWord [XWiki]
+endLink [Reference = [http://www.xwiki.org]] [false]
+beginParagraph
+onWord [alabala]
+endParagraph
+endXMLNode [div] [class=box myCLASS]
+endMacroMarkerStandalone [box] [title=[[XWiki>>http://www.xwiki.org]]|cssClass=myCLASS|image=http://l.yimg.com/i/i/fr/tr/usa4.jpg] [alabala]
+endDocument
+.#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
 <!--startmacro:box|-|title="[[XWiki>>http://www.xwiki.org]]" cssClass="myCLASS" image="http://l.yimg.com/i/i/fr/tr/usa4.jpg"|-|alabala--><div class="box myCLASS"><!--startimage:http://l.yimg.com/i/i/fr/tr/usa4.jpg--><img src="http://l.yimg.com/i/i/fr/tr/usa4.jpg" class="wikimodel-freestanding" alt="http://l.yimg.com/i/i/fr/tr/usa4.jpg"/><!--stopimage--><br/><!--startwikilink:http://www.xwiki.org--><span class="wikiexternallink"><a href="http://www.xwiki.org">XWiki</a></span><!--stopwikilink--><p>alabala</p></div><!--stopmacro-->

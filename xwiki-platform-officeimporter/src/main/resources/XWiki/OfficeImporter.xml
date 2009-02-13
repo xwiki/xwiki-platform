@@ -64,7 +64,7 @@
   {table}&lt;p&gt;$msg.get("xe.officeimporter.import.document")&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
   &lt;p&gt;$msg.get("xe.officeimporter.import.targetspace")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetSpace" type="text"/&gt;&lt;/p&gt;
   &lt;p&gt;$msg.get("xe.officeimporter.import.targetpage")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetPage" type="text"/&gt;&lt;/p&gt;
-  &lt;p&gt;$msg.get("xe.officeimporter.import.options")&lt;/p&gt;|&lt;p&gt;$msg.get("xe.officeimporter.import.filtering")&lt;/p&gt;&lt;p&gt;&lt;input name="filterStyles" type="radio" value="strict"/&gt;$msg.get("xe.officeimporter.import.strict")&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="moderate" checked="checked"/&gt;$msg.get("xe.officeimporter.import.moderate")&lt;br/&gt;&lt;input name="filterStyles" type="radio" value="none"/&gt;$msg.get("xe.officeimporter.import.none")&lt;/p&gt;
+  &lt;p&gt;$msg.get("xe.officeimporter.import.options")&lt;/p&gt;|&lt;p&gt;&lt;input name="filterStyles" type="checkbox" value="strict"/&gt;$msg.get("xe.officeimporter.import.filtering")&lt;/p&gt;
   {table}
   &lt;p&gt;&lt;input type="submit" value="$msg.get("xe.officeimporter.import.import")"/&gt;&lt;/p&gt;
   &lt;/form&gt;

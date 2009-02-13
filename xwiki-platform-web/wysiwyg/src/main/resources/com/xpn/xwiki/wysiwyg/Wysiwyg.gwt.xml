@@ -99,7 +99,15 @@
     <any>
       <when-property-is name="user.agent" value="ie6"/>
     </any>
-  </replace-with>  
+  </replace-with>
+  
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8"/>
+      <when-property-is name="user.agent" value="gecko"/>    
+    </any>
+  </replace-with>
 
   <!-- Console -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.util.Console">

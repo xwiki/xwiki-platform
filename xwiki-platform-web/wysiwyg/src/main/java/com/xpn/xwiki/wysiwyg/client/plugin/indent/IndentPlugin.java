@@ -25,6 +25,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.indent.exec.IndentExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.indent.exec.OutdentExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -67,12 +69,14 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
             indent = new PushButton(Images.INSTANCE.indent().createImage(), this);
             indent.setTitle(Strings.INSTANCE.indent());
             toolBarExtension.addFeature("indent", indent);
+            getTextArea().getCommandManager().registerCommand(Command.INDENT, new IndentExecutable());
         }
 
         if (getTextArea().getCommandManager().isSupported(Command.OUTDENT)) {
             outdent = new PushButton(Images.INSTANCE.outdent().createImage(), this);
             outdent.setTitle(Strings.INSTANCE.outdent());
             toolBarExtension.addFeature("outdent", outdent);
+            getTextArea().getCommandManager().registerCommand(Command.OUTDENT, new OutdentExecutable());
         }
 
         if (toolBarExtension.getFeatures().length > 0) {

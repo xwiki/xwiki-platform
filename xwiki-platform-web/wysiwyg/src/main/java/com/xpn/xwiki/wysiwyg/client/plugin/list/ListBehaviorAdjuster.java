@@ -243,6 +243,9 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
         if (isEmptyListItemPlaceholder(previousLeaf)) {
             range.setEndBefore(previousLeaf);
             previousEmptyItemPlacehodlerLeaf = previousLeaf;
+        } else if (previousLeaf.getNodeName().equalsIgnoreCase(LIST_ITEM_TAG)) {
+            // if the previousLeaf is an empty list item (<li />)
+            range.setEnd(previousLeafAncestorLi, 0);
         } else {
             range.setEndAfter(previousLeaf);
         }
@@ -410,7 +413,7 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
     public void onCommand(CommandManager sender, Command command, String param)
     {
         // clean up the lists in the document on the delete command
-        if (command == Command.DELETE) {
+        if (command == Command.DELETE || command == Command.INDENT || command == Command.OUTDENT) {
             cleanUp(getTextArea().getDocument().getDocumentElement());
         }
     }

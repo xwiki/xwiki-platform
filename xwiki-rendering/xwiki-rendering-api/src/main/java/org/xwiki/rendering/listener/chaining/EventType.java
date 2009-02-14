@@ -67,6 +67,14 @@ public enum EventType
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.beginDefinitionList();
         }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            // This is because for nested definition lists, the event after a definition list item content is a new 
+            // definition list
+            return true;
+        }
     },
     END_DEFINITION_LIST {
         void fireEvent(Listener listener, Object[] eventParameters) {
@@ -149,6 +157,13 @@ public enum EventType
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.beginList((ListType) eventParameters[0], (Map<String, String>) eventParameters[1]);
         }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            // This is because for nested lists, the event after list item content is a new list
+            return true;
+        }
     },
     END_LIST {
         void fireEvent(Listener listener, Object[] eventParameters) {
@@ -186,6 +201,13 @@ public enum EventType
     BEGIN_QUOTATION {
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.beginQuotation((Map<String, String>) eventParameters[0]); 
+        }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            // This is because for nested quotations, the event after a quotation line is a new quotation
+            return true;
         }
     },
     END_QUOTATION {

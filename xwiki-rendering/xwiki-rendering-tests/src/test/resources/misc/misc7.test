@@ -8,6 +8,10 @@ paragraph1\\
 
 * list\\
 
+* \\
+** \\
+*** test
+
 ; title1\\
 : definition1\\
 
@@ -35,6 +39,21 @@ beginList [BULLETED]
 beginListItem
 onWord [list]
 onNewLine
+endListItem
+endList [BULLETED]
+beginList [BULLETED]
+beginListItem
+onNewLine
+beginList [BULLETED]
+beginListItem
+onNewLine
+beginList [BULLETED]
+beginListItem
+onWord [test]
+endListItem
+endList [BULLETED]
+endListItem
+endList [BULLETED]
 endListItem
 endList [BULLETED]
 beginDefinitionList
@@ -86,6 +105,10 @@ paragraph1\\
  =
 
 * list\\
+
+* \\
+** \\
+*** test
 
 ; title1\\
 : definition1\\

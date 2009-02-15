@@ -171,6 +171,36 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
     }
 
     /**
+     * Looks for a button element in the specified direction relative to the caret position and deletes it if found.
+     * 
+     * @param left specifies where to look for the button, relative to the caret position. Pass {@code true} to look on
+     *            the left side of the caret or {@code false} to look on the right side.
+     * @return {@code true} if a button has been deleted, {@code false} otherwise
+     */
+    protected boolean deleteButton(boolean left)
+    {
+        Selection selection = getTextArea().getDocument().getSelection();
+        if (selection.isCollapsed()) {
+            Range range = selection.getRangeAt(0);
+            int border = left ? 0 : domUtils.getLength(range.getStartContainer());
+            // See if the caret is between nodes.
+            if (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE || range.getStartOffset() == border) {
+                // See if the caret is before or after a button element.
+                Node leaf = left ? domUtils.getPreviousNode(range) : domUtils.getNextNode(range);
+                if (leaf != null && BUTTON.equalsIgnoreCase(leaf.getNodeName())) {
+                    // Pressing delete before or backspace after a button element places the caret inside that element.
+                    // We have to avoid this Mozilla bug. Let's prevent the default delete behavior and manually remove
+                    // the button.
+                    getTextArea().getCurrentEvent().xPreventDefault();
+                    leaf.getParentNode().removeChild(leaf);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * {@inheritDoc}<br/>
      * NOTE: Fixes the issue with delete before a button element.
      * 
@@ -178,24 +208,9 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
      */
     protected void onDelete()
     {
-        Selection selection = getTextArea().getDocument().getSelection();
-        if (selection.isCollapsed()) {
-            Range range = selection.getRangeAt(0);
-            // See if the caret is between nodes.
-            if (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE
-                || range.getStartOffset() == domUtils.getLength(range.getStartContainer())) {
-                Node leaf = domUtils.getNextNode(range);
-                // See if the caret is before a button element.
-                if (leaf != null && BUTTON.equalsIgnoreCase(leaf.getNodeName())) {
-                    // Pressing delete before a button element places the caret inside that element. We have to avoid
-                    // this Mozilla bug. Let's prevent the default delete behavior and manually remove the button.
-                    getTextArea().getCurrentEvent().xPreventDefault();
-                    leaf.getParentNode().removeChild(leaf);
-                    return;
-                }
-            }
+        if (!deleteButton(false)) {
+            super.onDelete();
         }
-        super.onDelete();
     }
 
     /**
@@ -206,23 +221,9 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
      */
     protected void onBackSpace()
     {
-        Selection selection = getTextArea().getDocument().getSelection();
-        if (selection.isCollapsed()) {
-            Range range = selection.getRangeAt(0);
-            // See if the caret is between nodes.
-            if (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE || range.getStartOffset() == 0) {
-                Node leaf = domUtils.getPreviousNode(range);
-                // See if the caret is after a button element.
-                if (leaf != null && BUTTON.equalsIgnoreCase(leaf.getNodeName())) {
-                    // Pressing backspace after a button element places the caret inside that element. We have to avoid
-                    // this Mozilla bug. Let's prevent the default backspace behavior and manually remove the button.
-                    getTextArea().getCurrentEvent().xPreventDefault();
-                    leaf.getParentNode().removeChild(leaf);
-                    return;
-                }
-            }
+        if (!deleteButton(true)) {
+            super.onBackSpace();
         }
-        super.onBackSpace();
     }
 
     /**

@@ -47,12 +47,16 @@ public class Constants
 
     public static final String PAGE_VERSION_PARAMETER = "version";
 
+    public static final String CLASS_NAME_PARAMETER = "className";
+
+    public static final String OBJECT_NUMBER_PARAMETER = "objectNumber";
+
     public static final String ATTACHMENT_VERSION_PARAMETER = "attachmentVersion";
 
     public static final String NUMBER_PARAMETER = "number";
 
     public static final String START_PARAMETER = "start";
-    
+
     public static final String PARENT_FILTER_PARAMETER = "parent";
 
     public static final String ATTACHMENT_NAME_PARAMETER = "attachmentName";

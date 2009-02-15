@@ -69,8 +69,8 @@ public class AttachmentsAtPageVersionResource extends AttachmentsResource
                     xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
                         .toString();
 
-                attachments.addAttachment(DomainObjectFactory.createAttachment(getRequest(), resourceClassRegistry, doc,
-                    xwikiAttachment, attachmentXWikiUrl, true));
+                attachments.addAttachment(DomainObjectFactory.createAttachment(getRequest(), resourceClassRegistry,
+                    doc, xwikiAttachment, attachmentXWikiUrl, true));
             }
 
             return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), attachments);

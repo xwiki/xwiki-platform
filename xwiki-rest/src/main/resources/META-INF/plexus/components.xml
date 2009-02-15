@@ -803,6 +803,165 @@
 			representation is directly derived from the attachment and its media
 			type.
 		-->
+		
+		<!--
+			*************************************************************************************************
+		-->
+
+		<!-- ****************** -->
+		<!-- * Objects resource * -->
+		<!-- ****************** -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.objects.ObjectsResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>org.xwiki.rest.resources.objects.ObjectsResource
+			</implementation>			
+			<configuration>
+				<uriPattern>/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for Objects resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.objects.ObjectsResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
+		
+		<!-- ****************** -->
+		<!-- * ObjectsForClassName resource * -->
+		<!-- ****************** -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.objects.ObjectsForClassNameResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>org.xwiki.rest.resources.objects.ObjectsForClassNameResource
+			</implementation>			
+			<configuration>
+				<uriPattern>/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for Objects resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.objects.ObjectsForClassNameResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
+
+        <!-- ****************** -->
+		<!-- * Object resource * -->
+		<!-- ****************** -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.objects.ObjectResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>org.xwiki.rest.resources.objects.ObjectResource
+			</implementation>			
+			<configuration>
+				<uriPattern>/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}/{objectNumber}
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for Object resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.objects.ObjectResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
+
+		<!-- ****************** -->
+		<!-- * Classes resource * -->
+		<!-- ****************** -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.classes.ClassesResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>org.xwiki.rest.resources.classes.ClassesResource
+			</implementation>			
+			<configuration>
+				<uriPattern>/wikis/{wikiName}/classes
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for Classes resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.classes.ClassesResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
+
+		<!-- ****************** -->
+		<!-- * Class resource * -->
+		<!-- ****************** -->
+		<component>
+			<role>org.xwiki.rest.XWikiResource
+			</role>
+			<role-hint>org.xwiki.rest.resources.classes.ClassResource
+			</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>org.xwiki.rest.resources.classes.ClassResource
+			</implementation>			
+			<configuration>
+				<uriPattern>/wikis/{wikiName}/classes/{className}
+				</uriPattern>
+			</configuration>
+		</component>
+
+		<!-- *** Representers for Class resource *** -->
+
+		<component>
+			<role>org.xwiki.rest.XWikiResourceRepresenter
+			</role>
+			<role-hint>
+				org.xwiki.rest.resources.classes.ClassResource:text/xml
+			</role-hint>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<implementation>
+				org.xwiki.rest.representers.XmlTextXStreamRepresenter
+			</implementation>
+		</component>
 
 	</components>
 </component-set>

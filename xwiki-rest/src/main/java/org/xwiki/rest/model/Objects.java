@@ -22,60 +22,31 @@ package org.xwiki.rest.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  * @version $Id$
  */
-public class LinkCollection
+@XStreamAlias("objects")
+public class Objects extends LinkCollection
 {
     @XStreamImplicit
-    private List<Link> links;
+    private List<ObjectSummary> objectSummaries;
 
-    public void addLink(Link link)
+    public Objects()
     {
-        if (links == null) {
-            links = new ArrayList<Link>();
-        }
-
-        links.add(link);
+        objectSummaries = new ArrayList<ObjectSummary>();
     }
 
-    public List<Link> getLinks()
+    public List<ObjectSummary> getObjectSummaryList()
     {
-        if (links == null) {
-            return new ArrayList<Link>();
-        }
-
-        return links;
+        return objectSummaries;
     }
 
-    public List<Link> getLinksByRelation(String rel)
+    public void addObjectSummary(ObjectSummary objectSummary)
     {
-        List<Link> result = new ArrayList<Link>();
-
-        if (links != null) {
-            for (Link link : links) {
-                if (rel.equals(link.getRel())) {
-                    result.add(link);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public Link getFirstLinkByRelation(String rel)
-    {
-        if (links != null) {
-            for (Link link : links) {
-                if (rel.equals(link.getRel())) {
-                    return link;
-                }
-            }
-        }
-
-        return null;
+        objectSummaries.add(objectSummary);
     }
 
 }

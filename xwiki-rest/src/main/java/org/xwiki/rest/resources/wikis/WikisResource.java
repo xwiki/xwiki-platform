@@ -33,6 +33,7 @@ import org.xwiki.rest.model.Link;
 import org.xwiki.rest.model.Relations;
 import org.xwiki.rest.model.Wiki;
 import org.xwiki.rest.model.Wikis;
+import org.xwiki.rest.resources.classes.ClassesResource;
 import org.xwiki.rest.resources.spaces.SpacesResource;
 
 import com.xpn.xwiki.XWikiException;
@@ -64,6 +65,15 @@ public class WikisResource extends XWikiResource
                 parametersMap.put(Constants.WIKI_NAME_PARAMETER, databaseName);
                 Link link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
                 link.setRel(Relations.SPACES);
+                wiki.addLink(link);
+
+                fullUri =
+                    String.format("%s%s", getRequest().getRootRef(), resourceClassRegistry
+                        .getUriPatternForResourceClass(ClassesResource.class));
+                parametersMap = new HashMap<String, String>();
+                parametersMap.put(Constants.WIKI_NAME_PARAMETER, databaseName);
+                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
+                link.setRel(Relations.CLASSES);
                 wiki.addLink(link);
 
                 wikis.addWiki(wiki);

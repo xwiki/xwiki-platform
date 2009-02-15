@@ -28,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class Attachment extends LinkCollection
 {
     private String id;
-    
+
     private String name;
 
     private Integer size;

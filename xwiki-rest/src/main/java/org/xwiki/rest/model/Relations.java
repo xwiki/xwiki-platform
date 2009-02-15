@@ -49,4 +49,8 @@ public class Relations
     public static final String ATTACHMENT_DATA = "http://www.xwiki.org/rel/attachmentData";
 
     public static final String HISTORY = "http://www.xwiki.org/rel/history";
+
+    public static final String OBJECTS = "http://www.xwiki.org/rel/objects";
+
+    public static final String CLASSES = "http://www.xwiki.org/rel/classes";
 }

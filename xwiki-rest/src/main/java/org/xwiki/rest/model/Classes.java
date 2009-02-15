@@ -22,60 +22,31 @@ package org.xwiki.rest.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  * @version $Id$
  */
-public class LinkCollection
+@XStreamAlias("classes")
+public class Classes extends LinkCollection
 {
     @XStreamImplicit
-    private List<Link> links;
+    private List<Class> classList;
 
-    public void addLink(Link link)
+    public Classes()
     {
-        if (links == null) {
-            links = new ArrayList<Link>();
-        }
-
-        links.add(link);
+        classList = new ArrayList<Class>();
     }
 
-    public List<Link> getLinks()
+    public List<Class> getClassList()
     {
-        if (links == null) {
-            return new ArrayList<Link>();
-        }
-
-        return links;
+        return classList;
     }
 
-    public List<Link> getLinksByRelation(String rel)
+    public void addClass(Class aClass)
     {
-        List<Link> result = new ArrayList<Link>();
-
-        if (links != null) {
-            for (Link link : links) {
-                if (rel.equals(link.getRel())) {
-                    result.add(link);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public Link getFirstLinkByRelation(String rel)
-    {
-        if (links != null) {
-            for (Link link : links) {
-                if (rel.equals(link.getRel())) {
-                    return link;
-                }
-            }
-        }
-
-        return null;
+        classList.add(aClass);
     }
 
 }

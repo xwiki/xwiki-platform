@@ -41,11 +41,11 @@ public class SpaceResource extends XWikiResource
     public Representation represent(Variant variant)
     {
         String database = xwikiContext.getDatabase();
-        
+
         try {
-            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);            
+            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);
             String spaceName = (String) getRequest().getAttributes().get(Constants.SPACE_NAME_PARAMETER);
-            xwikiContext.setDatabase(wiki);            
+            xwikiContext.setDatabase(wiki);
 
             List<String> docNames = xwikiApi.getSpaceDocsName(spaceName);
             String home = String.format("%s.WebHome", spaceName);

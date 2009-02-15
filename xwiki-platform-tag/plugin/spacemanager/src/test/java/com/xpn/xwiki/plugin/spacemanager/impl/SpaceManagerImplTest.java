@@ -28,6 +28,8 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -66,6 +68,8 @@ public class SpaceManagerImplTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockXWikiVersioningStore;
 
     private Mock mockGroupService;
+    
+    private Mock mockQueryManager;
 
     private Map docs = new HashMap();
 
@@ -107,10 +111,28 @@ public class SpaceManagerImplTest extends AbstractBridgedXWikiComponentTestCase
         xwiki.setPluginManager(new XWikiPluginManager());
         xwiki.getPluginManager().addPlugin("rightsmanager",RightsManagerPlugin.class.getName(),context);
 
+        this.mockQueryManager = mock(QueryManager.class);
+        
+        Mock mockNamedQuery = mock(Query.class);
+        mockNamedQuery.stubs().method("bindValue").will(returnValue((Query)mockNamedQuery.proxy()));
+        mockNamedQuery.stubs().method("execute").will(returnValue(new ArrayList()));
+        
+        this.mockQueryManager.stubs().method("getNamedQuery").will(returnValue((Query) mockNamedQuery.proxy()));
+        
+        Mock mockCreatedQuery = mock(Query.class);
+        mockCreatedQuery.stubs().method("bindValue").will(returnValue((Query)mockCreatedQuery.proxy()));
+        mockCreatedQuery.stubs().method("execute").will(returnValue(spaces));
+        mockCreatedQuery.stubs().method("setOffset");
+        mockCreatedQuery.stubs().method("setLimit");
+        
+        this.mockQueryManager.stubs().method("createQuery").will(returnValue((Query) mockCreatedQuery.proxy()));
+        
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
                 new Object[] {this.xwiki, this.context});
         this.mockXWikiStore.expects(once()).method("executeWrite");
+        this.mockXWikiStore.stubs().method("getQueryManager").will(
+        		returnValue((QueryManager) this.mockQueryManager.proxy()));
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
@@ -198,7 +220,8 @@ public class SpaceManagerImplTest extends AbstractBridgedXWikiComponentTestCase
      * Tests the correct functioning of createSpace() and getSpace() methods
      */
     public void testCreateGetSpace() throws SpaceManagerException
-    {
+    {        
+     	
         this.spaceManager.createSpace(displayTitle, context);
 
         Space space = this.spaceManager.getSpace(spaceName, context);
@@ -206,9 +229,6 @@ public class SpaceManagerImplTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Space name is incorrect", spaceName, space.getSpaceName());
         assertEquals("Space title is incorrect", displayTitle, space.getDisplayTitle());
         assertFalse("Space should not be marked deleted", space.isDeleted());
-
-        List l = (List) this.spaceManager.getMembers(spaceName, context);
-        assertEquals(l.get(0), context.getUser());
     }
 
     /**
@@ -321,50 +341,6 @@ public class SpaceManagerImplTest extends AbstractBridgedXWikiComponentTestCase
 
         this.spaceManager.deleteSpace(sn3, context);
         assertEquals(list2, this.spaceManager.getSpaces(0, 100, context));
-    }
-
-    public void testAddMember() throws SpaceManagerException
-    {
-        this.spaceManager.createSpace(displayTitle, context);
-        Space s1 = this.spaceManager.getSpace(spaceName, context);
-        this.spaceManager.addMember(s1.getSpaceName(), "XWiki.cristi", context);
-        List l = (List) this.spaceManager.getMembers(s1.getSpaceName(), context);
-        assertEquals("XWiki.cristi", l.get(1));
-
-        List newusers = new ArrayList();
-        newusers.add("XWiki.testuser1");
-        newusers.add("XWiki.testuser2");
-        this.spaceManager.addMembers(s1.getSpaceName(), newusers, context);
-
-        List testlist = new ArrayList();
-        testlist.add("XWiki.NotAdmin");
-        testlist.add("XWiki.cristi");
-        testlist.add("XWiki.testuser1");
-        testlist.add("XWiki.testuser2");
-        l = (List) this.spaceManager.getMembers(s1.getSpaceName(), context);
-        assertEquals(testlist, l);
-    }
-
-    public void testAddAdmin() throws SpaceManagerException
-    {
-        this.spaceManager.createSpace(displayTitle, context);
-        Space s1 = this.spaceManager.getSpace(spaceName, context);
-        this.spaceManager.addAdmin(s1.getSpaceName(), "XWiki.cristi", context);
-        List l = (List) this.spaceManager.getAdmins(s1.getSpaceName(), context);
-        assertEquals("XWiki.cristi", l.get(1));
-
-        List newusers = new ArrayList();
-        newusers.add("XWiki.testuser1");
-        newusers.add("XWiki.testuser2");
-        this.spaceManager.addAdmins(s1.getSpaceName(), newusers, context);
-
-        List testlist = new ArrayList();
-        testlist.add("XWiki.NotAdmin");
-        testlist.add("XWiki.cristi");
-        testlist.add("XWiki.testuser1");
-        testlist.add("XWiki.testuser2");
-        l = (List) this.spaceManager.getAdmins(s1.getSpaceName(), context);
-        assertEquals(testlist, l);
     }
 
     public void testSubSpaceRights() throws SpaceManagerException, XWikiException

@@ -9,6 +9,8 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -40,6 +42,8 @@ public class SpaceImplTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockXWikiStore;
 
     private Mock mockXWikiVersioningStore;
+    
+    private Mock mockQueryManager;
 
     private Map docs = new HashMap();
 
@@ -70,10 +74,20 @@ public class SpaceImplTest extends AbstractBridgedXWikiComponentTestCase
         xwiki.setPluginManager(new XWikiPluginManager());
         xwiki.getPluginManager().addPlugin("rightsmanager",RightsManagerPlugin.class.getName(),context);
         
+        this.mockQueryManager = mock(QueryManager.class);
+        
+        Mock mockQuery = mock(Query.class);
+        mockQuery.stubs().method("bindValue").will(returnValue((Query)mockQuery.proxy()));
+        mockQuery.stubs().method("execute").will(returnValue(new ArrayList()));
+        
+        this.mockQueryManager.stubs().method("getNamedQuery").will(returnValue((Query) mockQuery.proxy()));
+        
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
                 new Object[] {this.xwiki, this.context});
         this.mockXWikiStore.expects(once()).method("executeWrite");
+        this.mockXWikiStore.stubs().method("getQueryManager").will(
+        		returnValue((QueryManager) this.mockQueryManager.proxy()));
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {

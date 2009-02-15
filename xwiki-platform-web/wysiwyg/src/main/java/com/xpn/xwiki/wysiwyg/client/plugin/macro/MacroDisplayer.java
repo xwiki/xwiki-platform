@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
@@ -156,6 +157,9 @@ public class MacroDisplayer implements InnerHTMLListener
         // For browsers that support the contentEditable attribute.
         container.setAttribute("contentEditable", "false");
 
+        // Left caret blocker: prevents the caret from getting inside the macro in Firefox.
+        container.appendChild(createCaretBlocker());
+
         MacroCall call = new MacroCall(start.getNodeValue());
         container.setTitle(call.getName() + " macro");
         // Use a place holder when the macro is collapsed or when it is empty.
@@ -170,6 +174,8 @@ public class MacroDisplayer implements InnerHTMLListener
         output.appendChild(domUtils.extractNodeContents(start.getParentNode(), startIndex + 1, endIndex));
 
         container.appendChild(output);
+        // Right caret blocker: prevent the caret from getting inside the macro in Firefox.
+        container.appendChild(createCaretBlocker());
         domUtils.insertAt(start.getParentNode(), container, startIndex);
 
         // Expand the macro by default.
@@ -213,6 +219,21 @@ public class MacroDisplayer implements InnerHTMLListener
         DocumentFragment output = document.createDocumentFragment();
         output.appendChild(placeHolder);
         return output;
+    }
+
+    /**
+     * Creates a DOM node that can be inserted at the beginning or at the end of a macro container to prevent the caret
+     * from getting inside. Mozilla allows the caret to get inside a button in some situations like for instance when we
+     * delete the last character before the button. The returned node can be used to fix this bug.
+     * 
+     * @return the newly created caret blocker
+     */
+    private Node createCaretBlocker()
+    {
+        ImageElement img = textArea.getDocument().xCreateImageElement();
+        img.setWidth(0);
+        img.setHeight(0);
+        return img;
     }
 
     /**
@@ -270,11 +291,11 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public void setCollapsed(Element container, boolean collapsed)
     {
-        Element output = (Element) container.getLastChild();
+        Element output = (Element) container.getLastChild().getPreviousSibling();
         boolean collapse = collapsed || !output.hasChildNodes();
         output.getStyle().setProperty(Style.DISPLAY, collapse ? Display.NONE : Display.BLOCK);
 
-        Element placeHolder = (Element) container.getFirstChild();
+        Element placeHolder = (Element) container.getFirstChild().getNextSibling();
         placeHolder.getStyle().setProperty(Style.DISPLAY, collapse ? Display.INLINE : Display.NONE);
     }
 
@@ -284,7 +305,7 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public boolean isCollapsed(Element container)
     {
-        Element output = (Element) container.getLastChild();
+        Element output = (Element) container.getLastChild().getPreviousSibling();
         return Display.NONE.equals(output.getStyle().getProperty(Style.DISPLAY));
     }
 

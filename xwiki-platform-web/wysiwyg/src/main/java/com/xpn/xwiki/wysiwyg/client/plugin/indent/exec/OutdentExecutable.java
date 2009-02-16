@@ -20,12 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
  * Outdent executable to handle valid XHTML lists outdent, semantically: when a list item is outdented, all its subitems
@@ -33,23 +31,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
  * 
  * @version $Id$
  */
-public class OutdentExecutable extends AbstractExecutable
+public class OutdentExecutable extends AbstractListExecutable
 {
-    /**
-     * List item element name.
-     */
-    protected static final String LIST_ITEM_TAG = "li";
-
-    /**
-     * Unordered list element name.
-     */
-    protected static final String UNORDERED_LIST_TAG = "ul";
-
-    /**
-     * Ordered list element name.
-     */
-    protected static final String ORDERED_LIST_TAG = "ol";
-
     /**
      * Line break tag, to help manage empty list items after outdenting sublists.
      */
@@ -58,7 +41,7 @@ public class OutdentExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#execute(RichTextArea, String)
+     * @see AbstractListExecutable#execute(RichTextArea, String)
      */
     public boolean execute(RichTextArea rta, String param)
     {
@@ -99,17 +82,14 @@ public class OutdentExecutable extends AbstractExecutable
     {
         // split the sublist in which this item is into 2 lists: one to stay in this parent, the other under outdented
         // list item
-        Element newList =
-            (Element) DOMUtils.getInstance().splitNode(parentList, DOMUtils.getInstance().getNodeIndex(listItem) + 1);
+        Element newList = (Element) domUtils.splitNode(parentList, domUtils.getNodeIndex(listItem) + 1);
         // and pull it out of its parent
         parentListItem.removeChild(newList);
         // put the newList as a sublist of the current item: append its elements to the list on the last position there,
         // if any, or append it all as a child to the item.
         Node lastChild = listItem.getLastChild();
-        if (newList.getChildNodes().getLength() != 0) {
-            if (lastChild != null
-                && (lastChild.getNodeName().equalsIgnoreCase(ORDERED_LIST_TAG) || lastChild.getNodeName()
-                    .equalsIgnoreCase(UNORDERED_LIST_TAG))) {
+        if (newList.hasChildNodes()) {
+            if (isList(lastChild)) {
                 // append all items in the list to this item
                 for (int i = 0; i < newList.getChildNodes().getLength(); i++) {
                     lastChild.appendChild(newList.getChildNodes().getItem(i));
@@ -120,9 +100,9 @@ public class OutdentExecutable extends AbstractExecutable
             }
         }
         // move the list item as a next sibling of the parent list item
-        DOMUtils.getInstance().insertAfter(listItem, parentListItem);
+        domUtils.insertAfter(listItem, parentListItem);
         // check if the list in the parent needs to be removed because it is left empty
-        if (parentList.getChildNodes().getLength() == 0) {
+        if (!parentList.hasChildNodes()) {
             // remove it from its parent
             // remove the line break first, if any, and then the sublist
             if (parentList.getPreviousSibling().getNodeName().equalsIgnoreCase(LINE_BREAK_TAG)) {
@@ -142,20 +122,18 @@ public class OutdentExecutable extends AbstractExecutable
     protected void outdentFirstLevelItem(Element listItem, Element parentList)
     {
         // split the list in two, using the listItem as separator
-        Element newList =
-            (Element) DOMUtils.getInstance().splitNode(parentList, DOMUtils.getInstance().getNodeIndex(listItem) + 1);
+        Element newList = (Element) domUtils.splitNode(parentList, domUtils.getNodeIndex(listItem) + 1);
         // remove the separator
         parentList.removeChild(listItem);
         // extract the list item and insert it after the parentList
         DocumentFragment extractedListItem = listItem.extractContents();
-        DOMUtils.getInstance().insertAfter(extractedListItem, parentList);
+        domUtils.insertAfter(extractedListItem, parentList);
         // remove the parentList and/or the newList if they are empty
-        if (parentList.getChildNodes().getLength() == 0) {
+        if (!parentList.hasChildNodes()) {
             parentList.getParentNode().removeChild(parentList);
         }
-        
-        if (newList.getChildNodes().getLength() == 0) {
-            newList.getParentNode().getNodeName();
+
+        if (!newList.hasChildNodes()) {
             newList.getParentNode().removeChild(newList);
         }
     }
@@ -163,10 +141,13 @@ public class OutdentExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#isEnabled(RichTextArea)
+     * @see AbstractListExecutable#isEnabled(RichTextArea)
      */
     public boolean isEnabled(RichTextArea rta)
     {
+        if (!super.isEnabled(rta)) {
+            return false;
+        }
         // find parent list item
         Element listItem = getListItem(rta);
         if (listItem == null) {
@@ -178,15 +159,5 @@ public class OutdentExecutable extends AbstractExecutable
             return false;
         }
         return true;
-    }
-
-    /**
-     * @param rta the {@link RichTextArea} for which the selection is checked
-     * @return the list item in which the selection is positioned currently, or null if no such thing exists.
-     */
-    protected Element getListItem(RichTextArea rta)
-    {
-        Range range = rta.getDocument().getSelection().getRangeAt(0);
-        return (Element) DOMUtils.getInstance().getFirstAncestor(range.getCommonAncestorContainer(), LIST_ITEM_TAG);
     }
 }

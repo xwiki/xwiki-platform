@@ -145,11 +145,11 @@ public class InsertImageExecutable extends InsertHTMLExecutable
         String widthName = "width";
         String heightName = "height";
         String widthValue = img.getStyle().getProperty(widthName);
-        if (widthValue != null && widthValue.trim().length() != 0) {
+        if (!StringUtils.isEmpty(widthValue)) {
             config.setWidth(widthValue);
         }
         String heightValue = img.getStyle().getProperty(heightName);
-        if (heightValue != null && heightValue.trim().length() != 0) {
+        if (!StringUtils.isEmpty(heightValue)) {
             config.setHeight(heightValue);
         }
         String altAttr = img.xGetAttribute("alt");

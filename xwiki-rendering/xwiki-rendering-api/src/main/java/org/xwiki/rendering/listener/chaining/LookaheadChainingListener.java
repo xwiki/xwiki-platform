@@ -98,12 +98,6 @@ public class LookaheadChainingListener extends AbstractChainingListener
         flush();
     }
 
-    public void beginError(String message, String description)
-    {
-        saveEvent(EventType.BEGIN_ERROR, message, description);
-        firePreviousEvent();
-    }
-
     public void beginFormat(Format format, Map<String, String> parameters)
     {
         saveEvent(EventType.BEGIN_FORMAT, format, parameters);
@@ -216,12 +210,6 @@ public class LookaheadChainingListener extends AbstractChainingListener
     {
         saveEvent(EventType.END_DOCUMENT);
         flush();
-    }
-
-    public void endError(String message, String description)
-    {
-        saveEvent(EventType.END_ERROR, message, description);
-        firePreviousEvent();
     }
 
     public void endFormat(Format format, Map<String, String> parameters)

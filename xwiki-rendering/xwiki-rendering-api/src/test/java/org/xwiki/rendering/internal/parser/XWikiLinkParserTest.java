@@ -30,7 +30,7 @@ import org.xwiki.rendering.parser.LinkParser;
  */
 public class XWikiLinkParserTest extends TestCase
 {
-    public void testParseLinks() throws Exception
+    public void testParseLinks()
     {
         LinkParser parser = new XWikiLinkParser();
 

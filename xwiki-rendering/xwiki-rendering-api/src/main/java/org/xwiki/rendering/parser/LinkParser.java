@@ -31,5 +31,5 @@ import org.xwiki.rendering.listener.Link;
  */
 public interface LinkParser
 {
-    Link parse(String rawLink) throws ParseException;
+    Link parse(String rawLink);
 }

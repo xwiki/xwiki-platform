@@ -21,7 +21,6 @@ package org.xwiki.rendering.internal.parser;
 
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.parser.ParseException;
 
 /**
  * Since we need to have wiki syntax-specific link parsers, this generic parser allows at least to the reference
@@ -37,7 +36,7 @@ public class GenericLinkParser implements LinkParser
      * {@inheritDoc}
      * @see LinkParser#parse(String)
      */
-    public Link parse(String rawLink) throws ParseException
+    public Link parse(String rawLink)
     {
         Link link = new Link();
         link.setReference(rawLink);

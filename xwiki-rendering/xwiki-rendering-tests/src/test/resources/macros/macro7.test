@@ -11,9 +11,13 @@ beginDocument
 beginParagraph
 onWord [Unknown]
 onSpace
-beginError: [Unknown macro: unknown] [The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.]
-onMacroInline [unknown] [] []
-endError: [Unknown macro: unknown] [The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.]
+beginMacroMarkerInline [unknown] [] []
+beginXMLNode [span] [class=xwikirenderingerror]
+onWord [Unknown macro: unknown]
+beginXMLNode [errordescription:The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.]
+endXMLNode [errordescription:The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.]
+endXMLNode [span] [class=xwikirenderingerror]
+endMacroMarkerInline [unknown] [] []
 onSpace
 onWord [macro]
 endParagraph
@@ -21,7 +25,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Unknown <span class="xwikirenderingerror">Unknown macro: unknown<!--errordescription:The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.--><!--startmacro:unknown|-||-|--><!--stopmacro--></span> macro</p>
+<p>Unknown <!--startmacro:unknown|-||-|--><span class="xwikirenderingerror">Unknown macro: unknown<!--errordescription:The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.--></span><!--stopmacro--> macro</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -29,4 +33,4 @@ Unknown {{unknown/}} macro
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Unknown <span class="xwikirenderingerror">Unknown macro: unknown<!--errordescription:The "unknown" macro is not in the list of registered macros. Try checking the spelling or contact your administrator.--><!--startmacro:unknown|-||-|--><!--stopmacro--></span> macro</p></html>
+<html><p>Unknown <!--startmacro:unknown|-||-|--><span class="xwikirenderingerror">Unknown macro: unknown<!--errordescription:The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.--></span><!--stopmacro--> macro</p></html>

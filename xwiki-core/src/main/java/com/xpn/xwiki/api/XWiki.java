@@ -1544,13 +1544,13 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in any mode The URL is generated differently depending on the
-     * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
-     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
-     * is important to always use the URL functions to generate URL and never hardcode URLs
+     * API to retrieve the URL of an a Wiki Document in any mode. The URL is generated differently depending on the
+     * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
+     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment). It
+     * is important to always use the URL functions to generate URL and never hardcode URLs.
      * 
-     * @param fullname page name which includes the attached file
-     * @param action mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible.
+     * @param fullname the page name which includes the attached file
+     * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible.
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
      */
@@ -1561,14 +1561,14 @@ public class XWiki extends Api
 
     /**
      * API to retrieve the URL of an a Wiki Document in any mode, optionally adding a query string The URL is generated
-     * differently depending on the environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
-     * implementing a new XWikiURLFactory object The query string will be modified to be added in the way the
-     * environement needs it It is important to not add the query string parameter manually after a URL Some
-     * environements will not accept this (like the Portlet environement)
+     * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
+     * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
+     * environment needs it. It is important to not add the query string parameter manually after a URL. Some
+     * environments will not accept this (like the Portlet environement).
      * 
-     * @param fullname page name which includes the attached file
-     * @param action mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible.
-     * @param querystring Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding.
+     * @param fullname the page name which includes the attached file
+     * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
+     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
      */
@@ -1577,6 +1577,25 @@ public class XWiki extends Api
         return this.xwiki.getURL(fullname, action, querystring, getXWikiContext());
     }
 
+    /**
+     * API to retrieve the URL of an a Wiki Document in any mode, optionally adding an anchor. The URL is generated
+     * differently depending on the environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
+     * implementing a new XWikiURLFactory object. The anchor will be modified to be added in the way the
+     * environment needs it. It is important to not add the anchor parameter manually after a URL. Some
+     * environments will not accept this (like the Portlet environement).
+     * 
+     * @param fullname the page name which includes the attached file
+     * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
+     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @param anchor the anchor that points at a location within the passed document name
+     * @return a URL as a string pointing to the wiki document in view mode
+     * @throws XWikiException if the URL could not be generated properly
+     */
+    public String getURL(String fullname, String action, String querystring, String anchor) throws XWikiException
+    {
+        return this.xwiki.getURL(fullname, action, querystring, anchor, getXWikiContext());
+    }
+    
     /**
      * Privileged API to access an eXo Platform service from the Wiki Engine
      * 

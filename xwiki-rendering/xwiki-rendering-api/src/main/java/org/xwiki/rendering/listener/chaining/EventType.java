@@ -113,16 +113,6 @@ public enum EventType
             return true;
         }
     },
-    BEGIN_ERROR {
-        void fireEvent(Listener listener, Object[] eventParameters) {
-            listener.beginError((String) eventParameters[0], (String) eventParameters[1]);
-        }
-    },
-    END_ERROR {
-        void fireEvent(Listener listener, Object[] eventParameters) {
-            listener.endError((String) eventParameters[0], (String) eventParameters[1]);
-        }
-    },
     BEGIN_FORMAT {
         void fireEvent(Listener listener, Object[] eventParameters) {
             listener.beginFormat((Format) eventParameters[0], (Map<String, String>) eventParameters[1]);

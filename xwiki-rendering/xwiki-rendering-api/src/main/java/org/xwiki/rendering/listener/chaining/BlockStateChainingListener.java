@@ -43,7 +43,6 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         DEFINITION_TERM,
         DEFINITION_LIST,
         DOCUMENT,
-        ERROR,
         FORMAT,
         HEADER,
         LINK,
@@ -301,12 +300,6 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     {
         this.previousEvent = Event.DOCUMENT;
         super.endDocument();
-    }
-
-    public void endError(String message, String description)
-    {
-        super.endError(message, description);
-        this.previousEvent = Event.ERROR;
     }
 
     public void endFormat(Format format, Map<String, String> parameters)

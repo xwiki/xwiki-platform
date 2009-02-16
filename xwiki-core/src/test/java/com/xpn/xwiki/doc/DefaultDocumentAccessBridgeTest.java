@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.doc;
 
-import java.net.URL;
-
 import org.jmock.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 
@@ -54,23 +52,12 @@ public class DefaultDocumentAccessBridgeTest extends AbstractBridgedXWikiCompone
         this.documentAccessBridge = (DocumentAccessBridge) getComponentManager().lookup(DocumentAccessBridge.ROLE);
     }
 
-    public void testGetUrlWithOnlyAnchor() throws Exception
+    public void testGetUrlEmptyDocument()
     {
         getContext().setDoc(new XWikiDocument("Space", "Page"));
-        this.mockURLFactory.stubs().method("createURL").will(returnValue(new URL("http://127.0.0.1/xwiki/bn/view/Space/Page#id")));
-        this.mockURLFactory.stubs().method("getURL").will(returnValue("/xwiki/bn/view/Space/Page#id"));
+        this.mockXWiki.stubs().method("getURL").will(returnValue("/xwiki/bin/view/Main/WebHome"));
 
-        assertEquals("/xwiki/bn/view/Space/Page#id", this.documentAccessBridge.getURL("", "view", "", "id"));
-        assertEquals("/xwiki/bn/view/Space/Page#id", this.documentAccessBridge.getURL(null, "view", "", "id"));
-    }
-    
-    public void testGetUrlEmptyDocumentWithoutAnchor() throws Exception
-    {
-        this.mockXWiki.stubs().method("getDocument").will(returnValue(new XWikiDocument()));
-        this.mockURLFactory.stubs().method("createURL").will(returnValue(new URL("http://127.0.0.1/xwiki/bn/view/Main/WebHome")));
-        this.mockURLFactory.stubs().method("getURL").will(returnValue("/xwiki/bn/view/Main/WebHome"));
-
-        assertEquals("/xwiki/bn/view/Main/WebHome", this.documentAccessBridge.getURL("", "view", "", ""));
-        assertEquals("/xwiki/bn/view/Main/WebHome", this.documentAccessBridge.getURL(null, "view", "", ""));
+        assertEquals("/xwiki/bin/view/Main/WebHome", this.documentAccessBridge.getURL("", "view", "", ""));
+        assertEquals("/xwiki/bin/view/Main/WebHome", this.documentAccessBridge.getURL(null, "view", "", ""));
     }
 }

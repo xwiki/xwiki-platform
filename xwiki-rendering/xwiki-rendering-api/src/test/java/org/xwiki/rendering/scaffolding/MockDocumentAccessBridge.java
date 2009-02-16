@@ -85,7 +85,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#exists(String)
      */
-    public boolean exists(String documentName) throws Exception
+    public boolean exists(String documentName)
     {
         return documentName.equals("Space.ExistingPage");
     }
@@ -95,7 +95,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getURL(String, String, String, String)
      */
-    public String getURL(String documentName, String action, String queryString, String anchor) throws Exception
+    public String getURL(String documentName, String action, String queryString, String anchor)
     {
         String result = "/xwiki/bin/view/" + (documentName == null ? "currentdoc" : documentName.replace(".", "/"));
         if (anchor != null) {
@@ -112,7 +112,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getAttachmentURL(String, String)
      */
-    public String getAttachmentURL(String documentName, String attachmentName) throws Exception
+    public String getAttachmentURL(String documentName, String attachmentName)
     {
         return "/xwiki/bin/download/" + (documentName == null ? "currentdoc" : documentName.replace(".", "/")) + "/"
             + attachmentName;

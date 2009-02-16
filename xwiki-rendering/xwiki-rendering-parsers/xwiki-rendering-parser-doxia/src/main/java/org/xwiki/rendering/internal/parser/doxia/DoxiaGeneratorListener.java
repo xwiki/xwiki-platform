@@ -496,21 +496,10 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
+     * @see org.xwiki.rendering.listener.Listener#onError(String, String)
      * @since 1.7M3
      */
-    public void beginError(String message, String description)
-    {
-        // Nothing to do since Doxia doesn't support the notion of Error events.
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#endError(String, String)
-     * @since 1.7M3
-     */
-    public void endError(String message, String description)
+    public void onError(String message, String description)
     {
         // Nothing to do since Doxia doesn't support the notion of Error events.
     }

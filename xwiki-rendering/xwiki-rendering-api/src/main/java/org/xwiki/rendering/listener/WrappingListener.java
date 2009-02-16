@@ -358,26 +358,4 @@ public class WrappingListener implements Listener
     {
         this.listener.onImage(image, isFreeStandingURI, parameters);
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
-     * @since 1.7M3
-     */
-    public void beginError(String message, String description)
-    {
-        this.listener.beginError(message, description);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#endError(String, String)
-     * @since 1.7M3
-     */
-    public void endError(String message, String description)
-    {
-        this.listener.endError(message, description);
-    }
 }

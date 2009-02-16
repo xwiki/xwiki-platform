@@ -107,12 +107,8 @@ public class StringClass extends PropertyClass
         if(isPicker()) {
         	input.addAttribute("autocomplete", "off");
         	String path = "";
-        	try {
-           	 	XWiki xwiki = context.getWiki();
-           	 	path = xwiki.getURL("Main.WebHome", "view", context);
-        	} catch(XWikiException e) {
-        		e.printStackTrace();
-        	  }
+       	 	XWiki xwiki = context.getWiki();
+       	 	path = xwiki.getURL("Main.WebHome", "view", context);
         	
         	String classname = this.getObject().getName();
        	 	String fieldname = this.getName();

@@ -83,12 +83,6 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
         super.beginDocument();
     }
 
-    public void beginError(String message, String description)
-    {
-        this.isTextOnNewLine = false;
-        super.beginError(message, description);
-    }
-
     public void beginFormat(Format format, Map<String, String> parameters)
     {
         // This is an exception and a bit of a hack. The reason we're calling super before

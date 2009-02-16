@@ -60,25 +60,6 @@ public class XHTMLLinkRenderer
     public void beginRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI,
         Map<String, String> parameters)
     {
-        try {
-            beginRenderLinkInternal(printer, link, isFreeStandingURI, parameters);
-        } catch (Exception e) {
-            // TODO: Handle error
-        }
-    }
-
-    public void endRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI, boolean generateLinkContent)
-    {
-        try {
-            endRenderLinkInternal(printer, link, isFreeStandingURI, generateLinkContent);
-        } catch (Exception e) {
-            // TODO: Handle error
-        }
-    }
-
-    private void beginRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI,
-        Map<String, String> parameters) throws Exception
-    {
         // Add an XML comment as a placeholder so that the XHTML parser can find the document name.
         // Otherwise it would be too difficult to transform a URL into a document name especially since
         // a link can refer to an external URL.
@@ -134,8 +115,8 @@ public class XHTMLLinkRenderer
         }
     }
 
-    public void endRenderLinkInternal(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI,
-        boolean generateLinkContent) throws Exception
+    public void endRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI,
+        boolean generateLinkContent)
     {
         // If there was no link content then generate it based on the passed reference
         if (generateLinkContent) {

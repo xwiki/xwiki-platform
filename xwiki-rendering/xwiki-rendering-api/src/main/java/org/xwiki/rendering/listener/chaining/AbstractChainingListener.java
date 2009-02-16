@@ -109,18 +109,6 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
-     * @see ChainingListener#beginError(String, String)
-     */
-    public void beginError(String message, String description)
-    {
-        ChainingListener next = getListenerChain().getNextListener(getClass());
-        if (next != null) {
-            next.beginError(message, description);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
      * @see ChainingListener#beginFormat(Format, Map)
      */
     public void beginFormat(Format format, Map<String, String> parameters)
@@ -344,18 +332,6 @@ public abstract class AbstractChainingListener implements ChainingListener
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
             next.endDocument();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see ChainingListener#endError(String, String)
-     */
-    public void endError(String message, String description)
-    {
-        ChainingListener next = getListenerChain().getNextListener(getClass());
-        if (next != null) {
-            next.endError(message, description);
         }
     }
 

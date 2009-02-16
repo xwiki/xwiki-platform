@@ -222,11 +222,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         SyndFeed outputFeed = new SyndFeedImpl();
         if (context.getDoc() != null) {
             outputFeed.setTitle(context.getDoc().getFullName());
-            try {
-                outputFeed.setUri(context.getWiki().getURL(context.getDoc().getFullName(), "view", context));
-            } catch (XWikiException e) {
-                e.printStackTrace();
-            }
+            outputFeed.setUri(context.getWiki().getURL(context.getDoc().getFullName(), "view", context));
             outputFeed.setAuthor(context.getDoc().getAuthor());
         } else {
             outputFeed.setTitle("XWiki Feeds");

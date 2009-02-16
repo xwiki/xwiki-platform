@@ -27,8 +27,6 @@ import com.xpn.xwiki.XWiki;
 
 import java.util.List;
 import java.util.Map;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
 
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -80,12 +78,8 @@ public class StaticListClass extends ListClass {
             if(isPicker()) {
             	input.addAttribute("autocomplete", "off");
             	String path = "";
-            	try {
-               	 	XWiki xwiki = context.getWiki();
-               	 	path = xwiki.getURL("Main.WebHome", "view", context);
-            	} catch(XWikiException e) {
-            		e.printStackTrace();
-            	}
+           	 	XWiki xwiki = context.getWiki();
+           	 	path = xwiki.getURL("Main.WebHome", "view", context);
             	
             	String classname = this.getObject().getName();
            	 	String fieldname = this.getName();

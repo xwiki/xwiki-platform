@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.parser;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.parser.ParseException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -79,7 +78,7 @@ public class XWikiLinkParser implements LinkParser
 
     private static final List<String> URI_PREFIXES = Arrays.asList("mailto", "image", "attach");
     
-    public Link parse(String rawLink) throws ParseException
+    public Link parse(String rawLink)
     {
         StringBuffer content = new StringBuffer(rawLink.trim());
 
@@ -106,22 +105,18 @@ public class XWikiLinkParser implements LinkParser
             }
 
             link.setQueryString(parseElementAfterString(content, "?"));
-        }
 
-        link.setAnchor(parseElementAfterString(content, "#"));
+            link.setAnchor(parseElementAfterString(content, "#"));
 
-        // What remains in the content buffer is the page name or the interwiki reference if any.
-        // If the content is empty then it means no page was specified. This is allowed and in that
-        // case when the link is rendered it'll be pointing to WebHome.
+            // What remains in the content buffer is the page name or the interwiki reference if any.
+            // If the content is empty then it means no page was specified. This is allowed and in that
+            // case it'll be the renderer deciding what to print.
 
-        // TODO: Check for invalid characters in a page
+            // TODO: Check for invalid characters in a page
 
-        if (link.getReference() == null) {
             link.setReference(content.toString());
-        } else if (content.length() > 0) {
-            throw new ParseException("Invalid link format [" + rawLink + "]");
         }
-
+        
         return link;
     }
 

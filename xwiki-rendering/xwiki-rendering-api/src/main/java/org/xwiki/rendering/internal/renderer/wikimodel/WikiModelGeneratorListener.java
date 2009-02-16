@@ -448,26 +448,4 @@ public class WikiModelGeneratorListener implements Listener
 
         return new WikiParameters(wikiParams);
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
-     * @since 1.7M3
-     */
-    public void beginError(String message, String description)
-    {
-        // Nothing to do since WikiModel doesn't support the notion of Error events.
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#endError(String, String)
-     * @since 1.7M3
-     */
-    public void endError(String message, String description)
-    {
-        // Nothing to do since WikiModel doesn't support the notion of Error events.
-    }
 }

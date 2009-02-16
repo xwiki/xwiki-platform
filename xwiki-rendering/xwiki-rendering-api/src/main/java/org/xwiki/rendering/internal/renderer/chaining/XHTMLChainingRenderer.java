@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.renderer.chaining;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -796,14 +798,8 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
         String imageURL;
         if (image.getType() == ImageType.DOCUMENT) {
             DocumentImage documentImage = (DocumentImage) image;
-            try {
-                imageURL =
-                    this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), documentImage
-                        .getAttachmentName());
-            } catch (Exception e) {
-                // TODO: Handle exceptions in a better manner
-                throw new RuntimeException("Failed to get attachment URL for [" + image + "]", e);
-            }
+            imageURL = this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), 
+                documentImage.getAttachmentName());
         } else {
             URLImage urlImage = (URLImage) image;
             imageURL = urlImage.getURL();
@@ -832,28 +828,4 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
         getXHTMLWikiPrinter().printXMLElement("img", attributes);
         getXHTMLWikiPrinter().printXMLComment("stopimage");
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#beginError(String, String)
-     */
-    @Override
-    public void beginError(String message, String description)
-    {
-        getXHTMLWikiPrinter().printXMLStartElement("span", new String[][] {{"class", "xwikirenderingerror"}});
-        getXHTMLWikiPrinter().printXML(message);
-        getXHTMLWikiPrinter().printXMLComment("errordescription:" + description);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#endError(String, String)
-     */
-    @Override
-    public void endError(String message, String description)
-    {
-        getXHTMLWikiPrinter().printXMLEndElement("span");
-    }    
 }

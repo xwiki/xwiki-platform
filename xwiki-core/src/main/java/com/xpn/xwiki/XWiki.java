@@ -4359,15 +4359,25 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return contextPath;
     }
 
-    public String getURL(String fullname, String action, XWikiContext context) throws XWikiException
+    public String getURL(String fullname, String action, String queryString, String anchor, XWikiContext context)
     {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(fullname, context);
 
         URL url =
-            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, null, null, doc.getDatabase(),
+            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, queryString, anchor, doc.getDatabase(),
                 context);
         return context.getURLFactory().getURL(url, context);
+    }
+
+    public String getURL(String fullname, String action, String querystring, XWikiContext context)
+    {
+        return getURL(fullname, action, querystring, null, context);
+    }
+
+    public String getURL(String fullname, String action, XWikiContext context)
+    {
+        return getURL(fullname, action, null, null, context);
     }
 
     public String getExternalURL(String fullname, String action, XWikiContext context) throws XWikiException
@@ -4391,18 +4401,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             context.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), action, querystring, null,
                 doc.getDatabase(), context);
         return url.toString();
-    }
-
-    public String getURL(String fullname, String action, String querystring, XWikiContext context)
-        throws XWikiException
-    {
-        XWikiDocument doc = new XWikiDocument();
-        doc.setFullName(fullname, context);
-
-        URL url =
-            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, querystring, null,
-                doc.getDatabase(), context);
-        return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentURL(String fullname, String filename, XWikiContext context) throws XWikiException

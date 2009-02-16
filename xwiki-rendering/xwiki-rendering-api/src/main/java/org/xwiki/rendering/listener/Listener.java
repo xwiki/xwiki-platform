@@ -426,24 +426,4 @@ public interface Listener
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
     void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters);
-
-    /**
-     * Start a block section that contains an error (for example when a macro fails to execute, is not found, or has
-     * some invalid parameters).
-     * 
-     * @param message the brief message explaining the error
-     * @param description the detailed description of the error
-     * @since 1.7M3
-     */
-    void beginError(String message, String description);
-
-    /**
-     * End of the block section containing an error.
-     * 
-     * @param message the brief message explaining the error
-     * @param description the detailed description of the error
-     * @see #beginError(String)
-     * @since 1.7M3
-     */
-    void endError(String message, String description);
 }

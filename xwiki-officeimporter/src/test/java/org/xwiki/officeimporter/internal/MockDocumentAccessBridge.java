@@ -53,7 +53,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#exists(String)
      */
-    public boolean exists(String documentName) throws Exception
+    public boolean exists(String documentName)
     {
         throw new RuntimeException("Not implemented");
     }
@@ -74,7 +74,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getAttachmentURL(String, String)
      */
-    public String getAttachmentURL(String documentName, String attachmentName) throws Exception
+    public String getAttachmentURL(String documentName, String attachmentName)
     {
         // Just to make sure that the bridge was invoked.
         return "/bridge/" + attachmentName;
@@ -178,7 +178,6 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#getURL(String, String, String, String)
      */
     public String getURL(String documentName, String action, String queryString, String anchor)
-        throws Exception
     {
         throw new RuntimeException("Not implemented");
     }

@@ -614,28 +614,6 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginError(java.lang.String, java.lang.String)
-     */
-    @Override
-    public void beginError(String message, String description)
-    {
-        getPrinter().println("beginError: [" + message + "] [" + description + "]");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endError(java.lang.String, java.lang.String)
-     */
-    @Override
-    public void endError(String message, String description)
-    {
-        getPrinter().println("endError: [" + message + "] [" + description + "]");
-    }
-
     public String getEscaped(String str)
     {
         String printableStr;

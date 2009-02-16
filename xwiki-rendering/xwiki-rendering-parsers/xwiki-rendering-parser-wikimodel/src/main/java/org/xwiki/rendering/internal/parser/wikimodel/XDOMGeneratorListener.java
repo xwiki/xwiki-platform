@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,7 +42,6 @@ import org.xwiki.rendering.block.DefinitionDescriptionBlock;
 import org.xwiki.rendering.block.DefinitionListBlock;
 import org.xwiki.rendering.block.DefinitionTermBlock;
 import org.xwiki.rendering.block.EmptyLinesBlock;
-import org.xwiki.rendering.block.ErrorBlock;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.HorizontalLineBlock;
@@ -500,7 +497,7 @@ public class XDOMGeneratorListener implements IWemListener
         // TODO: Generate some output log
         if (this.linkParser != null) {
             Block resultBlock;
-            Link link = parseLink(reference);
+            Link link = this.linkParser.parse(reference);
 
             // If the link failed to be constructed do nothing since parseLink will have wrapped it in an Error Block
             if (link != null) {
@@ -653,23 +650,6 @@ public class XDOMGeneratorListener implements IWemListener
             result = Format.NONE;
         }
         return result;
-    }
-
-    private Link parseLink(String reference)
-    {
-        Link link;
-        try {
-            link = this.linkParser.parse(reference);
-        } catch (ParseException e) {
-            // Wrap the error in an ErrorBLock
-            StringWriter writer = new StringWriter();
-            e.printStackTrace(new PrintWriter(writer));
-            ErrorBlock block =
-                new ErrorBlock(Collections.<Block> emptyList(), "Invalid Link", writer.getBuffer().toString());
-            this.stack.push(block);
-            link = null;
-        }
-        return link;
     }
 
     /**

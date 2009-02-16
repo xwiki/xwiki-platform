@@ -38,9 +38,8 @@ public interface DocumentAccessBridge
      * 
      * @param documentName The name of the document to check.
      * @return <code>true</code> if the document already exists, <code>false</code> otherwise.
-     * @throws Exception If the storage cannot be accessed or the document name is invalid.
      */
-    boolean exists(String documentName) throws Exception;
+    boolean exists(String documentName);
 
     /**
      * Updates the target document with the new content provided. If the target document does not
@@ -196,10 +195,8 @@ public interface DocumentAccessBridge
      * @return A <code>String</code> representation of the URL, starting with the path segment of
      *         the URL (without protocol, host and port), for example
      *         <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
-     * @throws Exception If the document cannot be accessed.
      */
-    String getURL(String documentName, String action, String queryString, String anchor)
-        throws Exception;
+    String getURL(String documentName, String action, String queryString, String anchor);
 
     /**
      * Retrieves the internal (without the hostname) URL that can be used to access an attachment.
@@ -208,9 +205,8 @@ public interface DocumentAccessBridge
      *            "wiki:Space.Page")
      * @param attachmentName the attachment name (eg "my.png")
      * @return the attachment URL
-     * @throws Exception If the document or the attachment cannot be accessed
      */
-    String getAttachmentURL(String documentName, String attachmentName) throws Exception;
+    String getAttachmentURL(String documentName, String attachmentName);
 
     /**
      * @param documentName the name of the document to access.

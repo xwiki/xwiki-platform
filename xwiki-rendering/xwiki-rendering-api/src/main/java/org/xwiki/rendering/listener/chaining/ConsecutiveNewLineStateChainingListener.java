@@ -81,12 +81,6 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
         super.endDocument();
     }
 
-    public void endError(String message, String description)
-    {
-        this.newLineCount = 0;
-        super.endError(message, description);
-    }
-
     public void endFormat(Format format, Map<String, String> parameters)
     {
         this.newLineCount = 0;

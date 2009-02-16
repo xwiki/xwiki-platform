@@ -35,7 +35,6 @@ import org.apache.ecs.xhtml.input;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
@@ -481,12 +480,8 @@ public class DBListClass extends ListClass
             if (isPicker()) {
                 input.addAttribute("autocomplete", "off");
                 String path = "";
-                try {
-                    XWiki xwiki = context.getWiki();
-                    path = xwiki.getURL("Main.WebHome", "view", context);
-                } catch (XWikiException e) {
-                    e.printStackTrace();
-                }
+                XWiki xwiki = context.getWiki();
+                path = xwiki.getURL("Main.WebHome", "view", context);
                 String classname = this.getObject().getName();
                 String fieldname = this.getName();
                 String hibquery = this.getSql();

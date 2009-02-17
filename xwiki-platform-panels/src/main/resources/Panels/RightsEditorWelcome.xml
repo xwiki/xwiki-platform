@@ -97,9 +97,9 @@
 </property>
 <property>
 <content>#largepanelheader($msg.get("welcome"))
-&lt;div&gt;Welcome to the rights editor.&lt;/div&gt;
-&lt;div&gt;Rights applied to a document replace rights applied to a space and rights applied to the whole wiki.&lt;/div&gt;
-&lt;div&gt;&lt;strong&gt;Warning&lt;/strong&gt;: Without any authentication forcing and any rights specified a Wiki is public for viewing and editing by default.&lt;/div&gt;
+&lt;div&gt;$msg.get("xe.panels.rights.welcome")&lt;/div&gt;
+&lt;div&gt;$msg.get("xe.panels.rights.explanation")&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;$msg.get("xe.panels.rights.warning")&lt;/strong&gt; $msg.get("xe.panels.rights.noauthentication")&lt;/div&gt;
 #if($xwiki.rightsmanager.defaultUi == "stable")
 &lt;form id="objectadd" method="post" action="$doc.getURL("objectadd")" onsubmit="cancelCancelEdit()"&gt;
 &lt;div class="centered padded"&gt;

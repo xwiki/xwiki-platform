@@ -7,7 +7,14 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>XWiki.SchedulerJobClass</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1108467450000</creationDate>
+<date>1166183159000</date>
+<contentUpdateDate>1169801141000</contentUpdateDate>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -48,19 +55,19 @@
 </property>
 </object>
 <content>#if($doc.getObject('XWiki.SchedulerJobClass'))
-*Job name :*
+*$msg.get("xe.scheduler.job.name")*
 
 $!doc.display('jobName')
 
-*Job description :*
+*$msg.get("xe.scheduler.job.description")*
 
 $!doc.display('jobDescription')
 
-*Job cron expression :*
+*$msg.get("xe.scheduler.job.expression")*
 
 $!doc.display('cron')
 
-*Job script :*
+*$msg.get("xe.scheduler.job.script")*
 
 #if($context.action=="inline")
 $!doc.display('script')
@@ -72,7 +79,7 @@ $codevar.toLowerCase()
 #end
 
 #if($context.action=="inline")
-#info("The script is the code that will be executed when the job will be triggered by the scheduler. It should be written in the groovy language. XWiki api is available through the *xwiki* et *context* pre-defined variables.")
+#info($msg.get("xe.scheduler.job.scriptexplanation"))
 
 #info("Below some example of valid cron expression, from the [official quartz scheduler documentation>http://www.opensymphony.com/quartz/api/org/quartz/CronExpression.html>_blank]:
 {table}
@@ -84,9 +91,9 @@ Cron expression|Meaning
 {table}
 ")
 #elseif($context.action=="view")
-[Back to the job list&gt;Scheduler.WebHome]
+[$msg.get("xe.scheduler.job.backtolist")&gt;Scheduler.WebHome]
 #end
 #else
- #warning("This sheet must be applied to a document that holds a scheduler job object.")
+ #warning($msg.get("xe.scheduler.job.object"))
 #end</content>
 </xwikidoc>

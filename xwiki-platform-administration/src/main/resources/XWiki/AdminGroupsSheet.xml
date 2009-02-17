@@ -14,7 +14,7 @@
 <creationDate>1211800831000</creationDate>
 <date>1214048145000</date>
 <contentUpdateDate>1214048145000</contentUpdateDate>
-<version>1.1</version>
+<version>5.1</version>
 <title>AdminGroupsSheet</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -84,8 +84,8 @@
   #set($mainwk = true) 
 #end
 &lt;div id="xwikieditcontent"&gt;
-  &lt;div id="ajax-loader"&gt;$msg.get("xe.admin.groups.loading")&lt;br /&gt;
-    &lt;img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$msg.get("xe.admin.groups.loading")" title="$msg.get("xe.admin.groups.loading")" /&gt;
+  &lt;div id="ajax-loader"&gt;Loading...&lt;br /&gt;
+    &lt;img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." /&gt;
   &lt;/div&gt;
   &lt;table id="groupstable" class="livetable"&gt;
     &lt;tr&gt;&lt;td colspan="3" id="showLimits"&gt;&lt;/td&gt;&lt;/tr&gt;
@@ -93,7 +93,7 @@
           &lt;table class="display" cellpadding="3"&gt;
            &lt;thead class="theader"&gt;
               &lt;tr&gt;
-                  &lt;td&gt;$msg.get("xe.admin.groups.groupname")&lt;/td&gt;&lt;td&gt;$msg.get("xe.admin.groups.members")&lt;/td&gt;&lt;td&gt;$msg.get("xe.admin.groups.manage")&lt;/td&gt;
+                  &lt;td&gt;Group Name&lt;/td&gt;&lt;td&gt;Members&lt;/td&gt;&lt;td&gt;Manage&lt;/td&gt;
               &lt;/tr&gt;
               &lt;tr id="table-filters"&gt;
                   &lt;td&gt;&lt;input name="name" type="text" class="filter"/&gt;&lt;/td&gt;
@@ -101,9 +101,9 @@
                   &lt;td&gt;
                     #if(!$mainwk) 
                       &lt;select name="wiki" class="filter"&gt;
-                        &lt;option value="local" selected="selected"&gt;$msg.get("xe.admin.groups.local")&lt;/option&gt;
-                        &lt;option value="global"&gt;$msg.get("xe.admin.groups.global")&lt;/option&gt;
-                        &lt;option value="both"&gt;$msg.get("xe.admin.groups.both")&lt;/option&gt;
+                        &lt;option value="local" selected="selected"&gt;Local&lt;/option&gt;
+                        &lt;option value="global"&gt;Global&lt;/option&gt;
+                        &lt;option value="both"&gt;Both&lt;/option&gt;
                       &lt;/select&gt;
                     #else 
                       &lt;input type="hidden" value="local" name="wiki" /&gt; 

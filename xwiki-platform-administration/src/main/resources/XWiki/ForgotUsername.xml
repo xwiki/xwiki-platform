@@ -249,29 +249,29 @@
 </object>
 <content>#set($email = "$!request.get('e')")
 #if($email == '')
-1 $msg.get("xe.admin.passwordreset.forgotusername")
+1 Forgot your username?
 
-$msg.get("xe.admin.passwordreset.enteremail")
+Please enter the email address you provided when creating your account.
   &lt;form method="post" action=""&gt;
-  &lt;div&gt;$msg.get("xe.admin.passwordreset.email")&lt;input type="text" name="e"/&gt; &lt;input type="submit" value="$msg.get("xe.admin.passwordreset.retrieve")"/&gt;&lt;/div&gt;
+  &lt;div&gt;Email: &lt;input type="text" name="e"/&gt; &lt;input type="submit" value="Retrieve username"/&gt;&lt;/div&gt;
   &lt;/form&gt;
 #else
   #set($results = $xwiki.searchDocuments(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and prop.value = '$email'"))
   #if($results.size() == 0)
-    $msg.get("xe.admin.passwordreset.noaccountregistered")
+    No account is registered using this email address.
 
-    [&amp;laquo; $msg.get("xe.admin.passwordreset.differentaddress")&gt;$doc.fullName] | &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;raquo;&lt;/a&gt;
+    [&amp;laquo; Try a different email address&gt;$doc.fullName] | &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;Login &amp;raquo;&lt;/a&gt;
   #elseif($results.size() == 1)
-    $msg.get("xe.admin.passwordreset.usernameis") *${xwiki.getDocument($results.get(0)).name}*
+    Your username is: *${xwiki.getDocument($results.get(0)).name}*
 
-    &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;raquo;&lt;/a&gt;
+    &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;Login &amp;raquo;&lt;/a&gt;
   #else
-    $msg.get("xe.admin.passwordreset.multipleusernames")
+    The following usernames are registered with this email address:
     #foreach($item in $results)
       * *${xwiki.getDocument($item).name}*
     #end
 
-    &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;raquo;&lt;/a&gt;
+    &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;Login &amp;raquo;&lt;/a&gt;
   #end
 #end
 </content></xwikidoc>

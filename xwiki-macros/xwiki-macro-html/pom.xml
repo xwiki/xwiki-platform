@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-macros-parent</artifactId>
-    <version>1.7.2</version>
+    <version>1.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-macro-html</artifactId>
   <name>XWiki Platform - Core - Macro - Html</name>

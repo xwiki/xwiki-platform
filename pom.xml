@@ -33,7 +33,7 @@
   <artifactId>xwiki-core-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
-  <version>1.7.2</version>
+  <version>1.7-SNAPSHOT</version>
   <description>XWiki Platform - Core - Parent POM</description>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-1.7.2</connection>

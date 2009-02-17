@@ -27,7 +27,7 @@
 #includeMacros("Blog.CategoriesCode")
 #getEntryObject($doc $entryObj)
 #if("$!entryObj" == '')
-  #warning("This is not a blog post!")
+  #warning($msg.get("xe.blog.sheet.notpost"))
 #elseif($context.action != 'inline')
   ## View mode
   #isPublished($entryObj $isPublished)
@@ -36,13 +36,13 @@
   #displayBlog([$doc.fullName] 'single' false)
 #else
   &lt;dl&gt;
-  &lt;dt&gt;Title:&lt;/dt&gt;
+  &lt;dt&gt;$msg.get("xe.blog.sheet.title")&lt;/dt&gt;
   &lt;dd&gt;$doc.display("title", "edit", $entryObj)&lt;/dd&gt;
-  &lt;dt&gt;Content:&lt;/dt&gt;
+  &lt;dt&gt;$msg.get("xe.blog.sheet.content")&lt;/dt&gt;
   &lt;dd&gt;$doc.display("content", "edit", $entryObj)&lt;/dd&gt;
-  &lt;dt&gt;Summary (optional):&lt;/dt&gt;
+  &lt;dt&gt;$msg.get("xe.blog.sheet.summary")&lt;/dt&gt;
   &lt;dd&gt;$doc.display("extract", "edit", $entryObj)&lt;/dd&gt;
-  &lt;dt&gt;Category:&lt;/dt&gt;
+  &lt;dt&gt;$msg.get("xe.blog.sheet.category")&lt;/dt&gt;
   &lt;dd&gt;
   #getCategoriesHierarchy('' $tree)
   &lt;div id="blog_category_container"&gt;
@@ -54,8 +54,10 @@
   #isPublished($entryObj $isPublished)
   #if($isPublished)
     #if($doc.creator == $context.user)
-      #publishMessageBox("This article was published on ${doc.display('publishDate', 'view', $entryObj)}")
-      #hideMessageBox("Hide article $doc.display('hidden', 'edit', $entryObj)")
+      #set(${publicationDate} = ${doc.display('publishDate', 'view', $entryObj)})
+      #publishMessageBox($msg.get("xe.blog.sheet.publicationdate", [${publicationDate}]))
+      #set($hideArticle = ${doc.display('hidden', 'edit', $entryObj)})
+      #hideMessageBox($msg.get("xe.blog.sheet.hidearticle", [${hideArticle}]))
     #end
   #else
     #set($defaultDate = $xwiki.getDocument($blogPostTemplate).getObject($blogPostClassname).getProperty('publishDate').value.time)
@@ -63,7 +65,7 @@
       ## The publish date was not set, force it to be the creation date
       $entryObj.set('publishDate', $doc.creationDate)
     #end
-    #publishMessageBox("This article is not published yet. &lt;label&gt;*Publish ${doc.display('published', 'edit', $entryObj)}*&lt;/label&gt;\\&lt;label&gt;Set the publication date to: ${doc.display('publishDate', 'edit', $entryObj)}&lt;/label&gt;")
+    #publishMessageBox("$msg.get('xe.blog.sheet.notpublished') &lt;label&gt;*$msg.get('xe.blog.sheet.publish') ${doc.display('published', 'edit', $entryObj)}*&lt;/label&gt;\\&lt;label&gt;$msg.get('xe.blog.sheet.setdate') ${doc.display('publishDate', 'edit', $entryObj)}&lt;/label&gt;")
   #end
   #set($newtitle = $request.title)
   #if($newtitle)

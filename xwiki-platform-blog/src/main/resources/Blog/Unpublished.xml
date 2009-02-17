@@ -25,7 +25,7 @@
 <hidden>false</hidden>
 <content>#includeMacros("Blog.BlogCode")
 
-1 Unpublished articles
+1 $msg.get("xe.blog.unpublished.entries")
 
 #getBlogEntriesBaseQuery($query)
 #getUnpublishedBlogEntries($xwiki.getDocument('Blog.WebHome') $query $entries)

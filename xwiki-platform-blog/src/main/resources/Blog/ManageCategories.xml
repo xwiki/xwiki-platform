@@ -26,9 +26,9 @@
 <content>#set($space = "$!request.space")
 #includeMacros("Blog.CategoriesCode")
 
-1 Manage blog categories
+1 $msg.get("xe.blog.categories.manage")
 
-1.1 Existing categories
+1.1 $msg.get("xe.blog.categories.existingcategories")
 #if ("$!request.action" == "delete")
   #foreach($item in $request.getParameterValues("${blogPostClassname}__category"))
     #deleteCategory($item)
@@ -44,11 +44,11 @@
 #getCategoriesHierarchy("" $tree)
 #displayCategoriesHierarchy($tree 'selectable')
   &lt;input type="hidden" name="manage" value="true"/&gt;
-  &lt;input type="submit" name="delete" value="Delete selected categories"/&gt;
+  &lt;input type="submit" name="delete" value="$msg.get("xe.blog.categories.deleteselected")"/&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 
-1.1 Add a category
+1.1 $msg.get("xe.blog.categories.addcategory")
 
 #showCreateCategoryBox($tree)</content>
 </xwikidoc>

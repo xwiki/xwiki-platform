@@ -97,7 +97,7 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader($msg.get("xe.statistics.spaces.mostedited"))
+<content>#panelheader('Most Edited Spaces')
 #if($xwiki.statsService.enabled)
 #set($scope=$xwiki.criteriaService.scopeFactory.ALL_SPACES)
 #set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)

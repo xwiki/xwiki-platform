@@ -54,7 +54,7 @@
 <tags/>
 </property>
 </object>
-<content>1 $msg.get("xe.statistics.document")
+<content>1 Document Statistics
 
 #if($xwiki.statsService.enabled)
 #displayPanelLayout(2 ["Stats.MostViewedPages", "Stats.MostEditedPages", "Stats.MostViewedSpaces", "Stats.MostEditedSpaces"])

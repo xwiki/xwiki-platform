@@ -54,7 +54,7 @@
 <tags/>
 </property>
 </object>
-<content>1 $msg.get("xe.statistics.referrerstats")
+<content>1 Referrer Statistics
 
 #if($xwiki.statsService.enabled)
 #displayPanelLayout(2 ["Stats.BestReferrers", "Stats.MostReferredPages"])

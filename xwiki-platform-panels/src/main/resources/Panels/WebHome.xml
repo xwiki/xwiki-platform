@@ -14,19 +14,19 @@
 <creationDate>1153566866000</creationDate>
 <date>1166177445000</date>
 <contentUpdateDate>1169801141000</contentUpdateDate>
-<version>1.1</version>
+<version>1.84</version>
 <title>Panels</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<content>1 $msg.get("xe.panels")
+<content>1 Panels
 
 #if($hasAdmin)
-1.1 $msg.get("xe.panels.create")
+1.1 Create new panels
 #includeTopic("Panels.CreatePanel")
 #end
 
-1.1 $msg.get("xe.panels.viewer")
+1.1 Viewer panels
 
 #set ($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate' order by doc.name")
 #set($searchResults = $xwiki.searchDocuments($sql))
@@ -37,9 +37,9 @@
 #end
 #end
 
-#if($hasAdmin) &lt;div class="plainmessage"&gt;&lt;img src="$xwiki.getSkinFile("icons/wiz.png")" alt=""/&gt; $msg.get("xe.panels.customize") [$msg.get("panelwizard.panelwizard")&gt;Panels.PanelWizard].&lt;/div&gt; #end
+#if($hasAdmin) &lt;div class="plainmessage"&gt;&lt;img src="$xwiki.getSkinFile("icons/wiz.png")" alt=""/&gt; You can customize the side column(s)  using the [Panel Wizard&gt;Panels.PanelWizard].&lt;/div&gt; #end
 
-1.1 $msg.get("xe.panels.editor")
+1.1 Editor panels
 #foreach ($item in $searchResults)
 #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
 #if($obj.type == 'edit')

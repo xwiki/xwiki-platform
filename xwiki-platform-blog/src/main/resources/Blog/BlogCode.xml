@@ -76,10 +76,10 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       $blogDoc.display('description')
     #end
   #elseif($doc.fullName == $blogSheet)
-    1 Blog sheet
-    This sheet should be used to display blog documents.
+    1 $msg.get("xe.blog.code.blogsheet")
+    $msg.get("xe.blog.code.sheetexplanation")
   #else
-    #warning('This is not a blog document!')
+    #warning($msg.get("xe.blog.code.notblog")
   #end
 #end
 ##
@@ -444,9 +444,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #displayEntryTitle($entryDoc $entryObj)
   #if($doc.fullName == $entryDoc.fullName)
     #if(!$isPublished)
-      #warning('This blog post is not published yet.')
+      #warning($msg.get("xe.blog.code.published"))
     #elseif($isHidden)
-      #warning('This blog post is hidden.')
+      #warning($msg.get("xe.blog.code.hidden"))
     #end
   #end
   #displayEntryContent($entryDoc $entryObj $onlyExtract)
@@ -513,7 +513,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayPublishButton $entryDoc $entryObj)
   #isPublished($entryObj $isPublished)
   #if(!$isPublished &amp;&amp; $entryDoc.creator == $context.user &amp;&amp; $xwiki.hasAccessLevel("edit", $context.user, $entryDoc.fullName))
-    &lt;a href="$blogPublisher.getURL('view', "entryName=${util.encodeURI($entryDoc.fullName)}&amp;amp;xredirect=${util.encodeURI($thisURL)}")" title="This blog post is not published yet. Publish it"&gt;#toolImage('publish.png' 'publish ')&lt;/a&gt;##
+    &lt;a href="$blogPublisher.getURL('view', "entryName=${util.encodeURI($entryDoc.fullName)}&amp;amp;xredirect=${util.encodeURI($thisURL)}")" title="$msg.get("xe.blog.code.notpublished")"&gt;#toolImage('publish.png' 'publish ')&lt;/a&gt;##
   #end
 #end
 ##
@@ -531,9 +531,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   ## Only published articles can be hidden. Unpublished articles are considered already hidden.
   #if($isPublished &amp;&amp; $entryDoc.creator == $context.user &amp;&amp; $xwiki.hasAccessLevel('edit', $context.user, $entryDoc.fullName))
     #if ($isHidden)
-      &lt;a class="blog-tool-show" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;amp;comment=Made%20entry%20visible&amp;amp;xredirect=${util.encodeURI($thisURL)}")" title="This blog post is not visible to other users. Make it visible"&gt;#toolImage('show.png', 'show ')&lt;/a&gt;##
+      &lt;a class="blog-tool-show" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;amp;comment=$get.msg("xe.blog.code.madevisible")&amp;amp;xredirect=${util.encodeURI($thisURL)}")" title="$msg.get("xe.blog.code.makevisible")"&gt;#toolImage('show.png', 'show ')&lt;/a&gt;##
     #else
-      &lt;a class="blog-tool-hide" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;amp;comment=Hidden%20entry&amp;amp;xredirect=${util.encodeURI($thisURL)}")" title="Hide this blog post from other users"&gt;#toolImage('hide.png' 'hide ')&lt;/a&gt;##
+      &lt;a class="blog-tool-hide" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;amp;comment=$get.msg("xe.blog.code.hid")&amp;amp;xredirect=${util.encodeURI($thisURL)}")" title="$msg.get("xe.blog.code.hide")"&gt;#toolImage('hide.png' 'hide ')&lt;/a&gt;##
     #end
   #end
 #end
@@ -548,7 +548,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(displayEditButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel("edit", $context.user, $entryDoc.fullName))
-    &lt;a href="$entryDoc.getURL('inline')" title="Edit this blog post"&gt;#toolImage('edit.png' 'edit ')&lt;/a&gt;##
+    &lt;a href="$entryDoc.getURL('inline')" title="$msg.get("xe.blog.code.editpost")"&gt;#toolImage('edit.png' 'edit ')&lt;/a&gt;##
   #end
 #end
 ##
@@ -563,7 +563,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(displayDeleteButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel("delete", $context.user, $entryDoc.fullName))
-    &lt;a href="$entryDoc.getURL('delete')" title="Delete this blog post"&gt;#toolImage('delete.png' 'delete ')&lt;/a&gt;##
+    &lt;a href="$entryDoc.getURL('delete')" title="$msg.get("xe.blog.code.deletepost")"&gt;#toolImage('delete.png' 'delete ')&lt;/a&gt;##
   #end
 #end
 ##
@@ -629,7 +629,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 *    #end
 ## *###
   #else
-    #set($entryContent = "${entryContent} &lt;a href='${entryDoc.getURL()}' title='Read the full entry'&gt;...&lt;/a&gt;")
+    #set($entryContent = "${entryContent} &lt;a href='${entryDoc.getURL()}' title='$msg.get("xe.blog.code.readpost")'&gt;...&lt;/a&gt;")
   #end
 #end
 ##
@@ -645,9 +645,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   &lt;div class="entry-footer"&gt;
   #isPublished($entryObj $isPublished)
   #if($isPublished)
-    Posted by ##
+    $get.msg("xe.blog.code.postedby") ##
   #else
-    Created by ##
+    $get.msg("xe.blog.code.createdby") ##
   #end
   &lt;address class="author vcard"&gt;#userfn($entryDoc.creator)&lt;/address&gt; ##
   #getEntryDate($entryDoc $entryObj $entryDate)
@@ -656,11 +656,11 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   ## Since the publish date and update date are not set at the exact same time, there could be a small difference that
   ## we assume cannot be more than 3 seconds.
   #if($entryDoc.date.time - $entryDate.time &gt; 3000)
-    | Modified by &lt;address class="author vcard"&gt;#userfn($entryDoc.author)&lt;/address&gt; ##
+    | $msg.get("xe.blog.code.modifiedby") &lt;address class="author vcard"&gt;#userfn($entryDoc.author)&lt;/address&gt; ##
     at &lt;abbr class="updated" title="#formatdateISO($entryDoc.date)"&gt;$xwiki.formatDate($entryDoc.date, "MMM dd, yyyy HH:mm")&lt;/abbr&gt; ##
   #end
-  | &lt;a href="$entryDoc.getURL('view', '#Comments')"&gt;$entryDoc.comments.size() Comment(s)&lt;/a&gt; ##
-  | &lt;a href="$entryDoc.getURL('view')" rel="bookmark"&gt;Permalink&lt;/a&gt;
+  | &lt;a href="$entryDoc.getURL('view', '#Comments')"&gt;$entryDoc.comments.size() $msg.get("xe.blog.code.comments")&lt;/a&gt; ##
+  | &lt;a href="$entryDoc.getURL('view')" rel="bookmark"&gt;$msg.get("xe.blog.code.permalink")&lt;/a&gt;
   &lt;/div&gt; ## entry-footer
 #end
 ##
@@ -681,7 +681,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #set($categoryDoc = $!xwiki.getDocument($category))
 #if(!$categoryDoc.isNew() &amp;&amp; $categoryDoc.getObject(${blogCategoryClassname}))
 #if($first)
- in
+ $msg.get("xe.blog.code.in")
 #set($first = false)
 #else, #end## if first
 &lt;a rel="tag" href="$xwiki.getURL(${category})"&gt;$!xwiki.getDocument($category).getObject($blogCategoryClassname).getProperty('name').value&lt;/a&gt;##
@@ -705,19 +705,19 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     &lt;div class="pagingLinks"&gt;
     #getRequestedWeek($weekDate)
     $weekDate.addWeeks(-1)##
-    &lt;span class="prevPage"&gt;*[&amp;laquo; Previous week&gt;$doc.name?year=$weekDate.weekyear&amp;amp;week=$weekDate.weekOfWeekyear]*&lt;/span&gt;
+    &lt;span class="prevPage"&gt;*[&amp;laquo; $msg.get("xe.blog.code.previousweek")&gt;$doc.name?year=$weekDate.weekyear&amp;amp;week=$weekDate.weekOfWeekyear]*&lt;/span&gt;
     #sep()
     $weekDate.addWeeks(2)## 2 because we already subtracted 1 above
-    &lt;span class=" nextPage"&gt;*[Next week &amp;raquo;&gt;$doc.name?year=$weekDate.weekyear&amp;amp;week=$weekDate.weekOfWeekyear]*&lt;/span&gt;
+    &lt;span class=" nextPage"&gt;*[$msg.get("xe.blog.code.nextweek") &amp;raquo;&gt;$doc.name?year=$weekDate.weekyear&amp;amp;week=$weekDate.weekOfWeekyear]*&lt;/span&gt;
     &lt;/div&gt;
   #elseif($displayType == 'monthly')
     &lt;div class="pagingLinks"&gt;
     #getRequestedMonth($monthDate)
     $monthDate.addMonths(-1)##
-    &lt;span class="prevPage"&gt;*[&amp;laquo; Previous month&gt;$doc.name?year=$monthDate.year&amp;amp;month=$monthDate.monthOfYear]*&lt;/span&gt;
+    &lt;span class="prevPage"&gt;*[&amp;laquo; $msg.get("xe.blog.code.previousmonth")&gt;$doc.name?year=$monthDate.year&amp;amp;month=$monthDate.monthOfYear]*&lt;/span&gt;
     #sep()
     $monthDate.addMonths(2)## 2 because we already subtracted 1 above
-    &lt;span class=" nextPage"&gt;*[Next month &amp;raquo;&gt;$doc.name?year=$monthDate.year&amp;amp;month=$monthDate.monthOfYear]*&lt;/span&gt;
+    &lt;span class=" nextPage"&gt;*[$msg.get("xe.blog.code.nextmonth") &amp;raquo;&gt;$doc.name?year=$monthDate.year&amp;amp;month=$monthDate.monthOfYear]*&lt;/span&gt;
     &lt;/div&gt;
   #elseif($displayType == 'all')
   #else
@@ -734,15 +734,15 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       &lt;div class="pagingLinks"&gt;
       #if ($currentPageNumber &lt; $totalPages)
         #set($currentPageNumber = $currentPageNumber + 1)
-        &lt;span class="prevPage"&gt;*[&amp;laquo; Older posts&gt;$doc.name?page=${currentPageNumber}&amp;amp;ipp=${itemsPerPage}$queryString]*&lt;/span&gt;
         #set($currentPageNumber = $currentPageNumber - 1)
+        &lt;span class="prevPage"&gt;*[&amp;laquo; $msg.get("xe.blog.code.olderposts")&gt;$doc.name?page=${currentPageNumber}&amp;amp;ipp=${itemsPerPage}$queryString]*&lt;/span&gt;
       #end
       #if ($currentPageNumber &gt; 1)
         #if ($currentPageNumber &lt; $totalPages)
           #sep()
         #end
         #set($currentPageNumber = $currentPageNumber - 1)
-        &lt;span class="nextPage"&gt;*[Newer posts &amp;raquo;&gt;$doc.name?page=${currentPageNumber}&amp;amp;ipp=${itemsPerPage}$queryString]*&lt;/span&gt;
+        &lt;span class="nextPage"&gt;*[$msg.get("xe.blog.code.newerposts") &amp;raquo;&gt;$doc.name?page=${currentPageNumber}&amp;amp;ipp=${itemsPerPage}$queryString]*&lt;/span&gt;
         #set($currentPageNumber = $currentPageNumber + 1)
       #end
       &lt;span class="clear"&gt;&lt;/span&gt;

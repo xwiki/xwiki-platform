@@ -276,15 +276,15 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
   &lt;form action="" method="post"&gt;
   &lt;div class='create-category'&gt;
     &lt;input type="hidden" name="action" value="create"/&gt;
-    &lt;label&gt;New category: &lt;input type="text" name="newCategoryName"&gt;&lt;/input&gt;&lt;/label&gt;
-    &lt;label&gt;Parent:
+    &lt;label&gt;$msg.get("xe.blog.categories.new") &lt;input type="text" name="newCategoryName"&gt;&lt;/input&gt;&lt;/label&gt;
+    &lt;label&gt;$msg.get("xe.blog.categories.parent")
       &lt;select name="newCategoryParent" id="blog_category_selectBox"&gt;
-        &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt;
+        &lt;option value="${defaultCategoryParent}" selected="selected"&gt;$msg.get("xe.blog.categories.none")&lt;/option&gt;
         $!processedCategories.clear()##
         #displayCategoriesHierarchy($tree 'option')
       &lt;/select&gt;
     &lt;/label&gt;
-    &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="button" value="Add" id="blog_AddCategoryButton"&gt;&lt;/input&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="button" value="$msg.get("xe.blog.categories.add")" id="blog_AddCategoryButton"&gt;&lt;/input&gt;&lt;/span&gt;
   &lt;/div&gt;
   &lt;/form&gt;
 #end
@@ -324,7 +324,7 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
     #if($xwiki.hasAccessLevel('edit', $context.user, $item))
       #set($blogEntryDoc = $xwiki.getDocument($item))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
-      $blogEntryDoc.save('Remove deleted category')
+      $blogEntryDoc.save('$msg.get("xe.blog.categories.remove")')
     #end
   #end
   $categoryDoc.delete()

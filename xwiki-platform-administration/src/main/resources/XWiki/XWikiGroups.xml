@@ -14,7 +14,7 @@
 <creationDate>1106311618000</creationDate>
 <date>1177088856000</date>
 <contentUpdateDate>1177088856000</contentUpdateDate>
-<version>1.0</version>
+<version>1.9</version>
 <title>Groups</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -73,22 +73,22 @@
 #if($request.create)
 $response.sendRedirect($xwiki.getURL("XWiki.${request.getParameter('name')}", "inline", "parent=XWiki.XWikiGroups&amp;template=XWiki.XWikiGroupTemplate"))
 #else
-1 $msg.get("xe.admin.groups.create")
+1 Create a new group:
 
 &lt;form action="$doc.getURL("view", "create=1&amp;amp;xpage=plain")" method="post"&gt;
 &lt;div&gt;
 &lt;input type="text" name="name" value="" /&gt;
-&lt;input type="submit" value="$msg.get("xe.admin.groups.creategroup")" /&gt;
+&lt;input type="submit" value="Create Group" /&gt;
 &lt;/div&gt;
 &lt;/form&gt;
-1 $msg.get("xe.admin.groups.currentgroups")
+1 Current XWiki Groups
 
 #set ($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiGroups'")
 #foreach ($item in $xwiki.searchDocuments($sql))
    * [$item]
 #end
 
-1 $msg.get("xe.admin.groups.administration")
+1 Admin
 
    * [XWikiGroupTemplate]
    * [XWikiGroupSheet]

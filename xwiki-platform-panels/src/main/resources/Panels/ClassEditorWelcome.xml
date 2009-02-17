@@ -14,7 +14,7 @@
 <creationDate>1154086211000</creationDate>
 <date>1166177444000</date>
 <contentUpdateDate>1169801141000</contentUpdateDate>
-<version>1.1</version>
+<version>1.25</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -100,13 +100,13 @@
 </property>
 <property>
 <content>#largepanelheader($msg.get("classEditorIntro"))
-&lt;p&gt;$msg.get("xe.panels.classedit.youare") &lt;strong&gt;${doc.fullName}&lt;/strong&gt;. $msg.get("xe.panels.classedit.chooseproperty")&lt;/p&gt;
+&lt;p&gt;You are editing &lt;strong&gt;${doc.fullName}&lt;/strong&gt;. Choose a property to edit or add a property to the class.&lt;/p&gt;
 &lt;div&gt;
 #set($rsvc= $xwiki.xWiki.getRightService())
 &lt;form id="changeclass" method="post" action="$doc.getURL("redirect")"&gt;
 &lt;div class="centered"&gt;
 &lt;select id="classname" name="xredirect" size="1"&gt;
-&lt;option value="-"&gt;$msg.get("xe.panels.classedit.editother")&lt;/option&gt;
+&lt;option value="-"&gt;Edit another class&lt;/option&gt;
 #foreach ($classname in $xwiki.classList)
 #if($!xwiki.hasAccessLevel("edit", $classname))
 #set($classdoc = $xwiki.getDocument($classname))
@@ -123,7 +123,7 @@ function gotoclass(dest) {
 }
 &lt;/script&gt;
 &lt;input class="button" type="submit" value="$msg.get("changeclass")" onclick="return gotoclass(this.form.classname.value)" /&gt;&lt;/div&gt;
-##&lt;div&gt;$msg.get("xe.panels.classedit.unsavedchanges")&lt;/div&gt;
+##&lt;div&gt;(unsaved changes will be lost)&lt;/div&gt;
 &lt;/form&gt;
 &lt;/div&gt;
 #panelfooter()</content>

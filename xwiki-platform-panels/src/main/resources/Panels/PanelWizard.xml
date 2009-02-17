@@ -14,7 +14,7 @@
 <creationDate>1157375356000</creationDate>
 <date>1213087920000</date>
 <contentUpdateDate>1213087920000</contentUpdateDate>
-<version>1.1</version>
+<version>2.1</version>
 <title>Panel Wizard</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -279,9 +279,9 @@
   &lt;/div&gt; ## xwikieditcontent
   &lt;div id="panelwizardbuttons" class="floatcontainer"&gt;
     &lt;span class="xwikibuttonlink"&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;a href="#" onclick="save(); return false;"&gt;$msg.get("xe.panels.wizard.savenew")&lt;/a&gt;&lt;/span&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL("view")" onclick="revert(); return false;"&gt;$msg.get("xe.panels.wizard.revert")&lt;/a&gt;&lt;/span&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL("Panels.WebHome")"&gt;$msg.get("xe.panels.wizard.homepage")&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a href="#" onclick="save(); return false;"&gt;Save the new layout&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL("view")" onclick="revert(); return false;"&gt;Revert&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL("Panels.WebHome")"&gt;Go to Panels home page&lt;/a&gt;&lt;/span&gt;
     &lt;/span&gt;
   &lt;/div&gt;
 #else

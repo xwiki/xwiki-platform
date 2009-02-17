@@ -135,13 +135,13 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader($msg.get("xe.panels.quicklinks"))
-* [$msg.get("xe.panels.quicklinks.dashboard")&gt;Main.WebHome]
-* [$msg.get("xe.panels.quicklinks.index")&gt;Main.AllDocs]
-* [$msg.get("xe.panels.quicklinks.blog")&gt;Blog.WebHome]
-* [$msg.get("xe.panels.quicklinks.sandbox")&gt;Sandbox.WebHome]
+<content>#panelheader('Quick Links')
+* [Wiki Dashboard&gt;Main.WebHome]
+* [Document Index&gt;Main.AllDocs]
+* [Blog&gt;Blog.WebHome]
+* [Sandbox&gt;Sandbox.WebHome]
 #if ($xwiki.hasAdminRights())
-&lt;p style="font-size:0.75em;padding-left:8px;"&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;
+&lt;p style="font-size:0.75em;padding-left:8px;"&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;(Edit this panel)&lt;/a&gt;&lt;/p&gt;
 #end
 #panelfooter()</content>
 </property>

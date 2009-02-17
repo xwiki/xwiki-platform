@@ -54,26 +54,23 @@
 <tags/>
 </property>
 </object>
-<content>1 $msg.get("xe.statistics")
+<content>1 Statistics
 
 #if($xwiki.statsService.enabled)
 #set($chartWidth = 380)
 #displayPanelLayout(2 ["Stats.MostViewedPages", "Stats.MostActiveContributors", "Stats.CurrentMonthActivity", "Stats.MostReferredPages"])
-$msg.get("xe.statistics.more")
-* [$msg.get("xe.statistics.document")&gt;Stats.Document]
-* [$msg.get("xe.statistics.visit")&gt;Stats.Visit]
-* [$msg.get("xe.statistics.activity")&gt;Stats.Activity]
-* [$msg.get("xe.statistics.referrer")&gt;Stats.Referrer]
+#info("For more statistics see [Document Statistics&gt;Stats.Document], [Visit Statistics&gt;Stats.Visit], [Activity Statistics&gt;Stats.Activity] and [Referrer Statistics&gt;Stats.Referrer].")
 #else
-#warning($msg.get("xe.statistics.module.disabled"))
+#warning("
+The statistics module is disabled by default for improved performances. It can be globally activated by setting the value of *&lt;tt&gt;xwiki.stats&lt;/tt&gt;* to *&lt;tt&gt;1&lt;/tt&gt;* in the *&lt;tt&gt;xwiki.cfg&lt;/tt&gt;* configuration file. For more details, see [xwiki.org&gt;http://www.xwiki.org].
 
-$msg.get("xe.statistics.module.settingvalue") *&lt;tt&gt;xwiki.stats&lt;/tt&gt;* $msg.get("xe.statistics.to") *&lt;tt&gt;1&lt;/tt&gt;* $msg.get("xe.statistics.inthe") *&lt;tt&gt;xwiki.cfg&lt;/tt&gt;* $msg.get("xe.statistics.moredetails") [xwiki.org&gt;http://www.xwiki.org].
+Activating the statistics module makes the following information available to you:
 
-$msg.get("xe.statistics.module.activating")
-
-* $msg.get("xe.statistics.pages.mostedited")
-* $msg.get("xe.statistics.contributors.mostactive")
-* $msg.get("xe.statistics.pages.mostreferred")
-* $msg.get("xe.statistics.module.muchmore")
+* Most edited pages
+* Most active users
+* Current month activity
+* Most referred pages
+* and much more!
+")
 #end</content>
 </xwikidoc>

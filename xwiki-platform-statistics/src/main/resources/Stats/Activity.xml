@@ -54,7 +54,7 @@
 <tags/>
 </property>
 </object>
-<content>1 $msg.get("xe.statistics.activity")
+<content>1 Activity Statistics
 
 #if($xwiki.statsService.enabled)
 #set($chartWidth = 380)

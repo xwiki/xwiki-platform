@@ -97,7 +97,7 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader($msg.get("xe.statistics.contributors.leastactive"))
+<content>#panelheader('Least Active Contributors')
 #if($xwiki.statsService.enabled)
 #set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)
 #set($interval=$xwiki.criteriaService.rangeFactory.createTailRange(5))

@@ -98,39 +98,39 @@
 </property>
 <property>
 <content>&lt;div id="xwikirightstipspanel"&gt;
-#largepanelheader("Rights editor tips")
+#largepanelheader($msg.get("xe.panels.rights.tips"))
 &lt;div id="xwikirightstips"&gt;
   &lt;div id="xwikitipspublic"&gt;
-    &lt;div id="xwikitipspublicHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Public wiki&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikitipspublicHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;$msg.get("xe.panels.rights.publicwiki")&lt;/h6&gt;&lt;/div&gt;
     &lt;div id="xwikitipspublicContent" class="accordionTabContentBox"&gt;
-To open a Wiki for editing by the public:
+$msg.get("xe.panels.rights.openwiki")
 
-* Groups: XWiki.XWikiAllGroup, xwiki:XWiki.XWikiAllGroup
-* Users: XWiki.XWikiGuest
-* Access Levels: "view, edit" for a public Wiki for viewing and editing.
-* Allow/Deny: Allow
+* $msg.get("xe.panels.rights.opengroups")
+* $msg.get("xe.panels.rights.openusers")
+* $msg.get("xe.panels.rights.openaccess")
+* $msg.get("xe.panels.rights.openallow")
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div id="xwikitipsregistered" class="accordion"&gt;
-    &lt;div id="xwikitipsregisteredHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Authenticate on view/edit&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikitipsregisteredHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;$msg.get("xe.panels.rights.authenticate")&lt;/h6&gt;&lt;/div&gt;
     &lt;div id="xwikitipsregisteredContent" class="accordionTabContentBox"&gt;
-To protect a Wiki or Space by allowing only logged-in users using an account created on your Wiki use:
+$msg.get("xe.panels.rights.protectedwiki")
 
-* Groups: XWiki.XWikiAllGroup
-* Users: 
-* Access Levels: "edit" for a private wiki for editing, "view, edit" for a private Wiki for viewing and editing.
-* Allow/Deny: Allow
+* $msg.get("xe.panels.rights.protectedgroups")
+* $msg.get("xe.panels.rights.protectedusers") 
+* $msg.get("xe.panels.rights.protectedaccess")
+* $msg.get("xe.panels.rights.protectedallow")
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div id="xwikitipsbanned"&gt;
-    &lt;div id="xwikitipsbannedHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Banned users&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikitipsbannedHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;$msg.get("xe.panels.rights.banned")&lt;/h6&gt;&lt;/div&gt;
     &lt;div id="xwikitipsbannedContent" class="accordionTabContentBox"&gt;
-To protect a Wiki or Space by disallowing banned users to edit documents use:
+$msg.get("xe.panels.rights.bannedgroup")
 
-* Groups: XWiki.XWikiBannedGroup
-* Users: 
-* Access Levels: "edit"
-* Allow/Deny: Deny
+* $msg.get("xe.panels.rights.banedgroups")
+* $msg.get("xe.panels.rights.bannedusers")
+* $msg.get("xe.panels.rights.bannedaccess")
+* $msg.get("xe.panels.rights.banneddeny")
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;

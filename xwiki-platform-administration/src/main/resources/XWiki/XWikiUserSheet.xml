@@ -14,7 +14,7 @@
 <creationDate>1106308018000</creationDate>
 <date>1228221302000</date>
 <contentUpdateDate>1228221302000</contentUpdateDate>
-<version>3.1</version>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -58,8 +58,8 @@
 </object>
 <content>#set($obj = $doc.getObject("XWiki.XWikiUsers"))
 #if(!$obj)
-  1 User Sheet
-  This stylesheet must be applied on a document containing a XWiki.XWikiUsers object.
+  1 $msg.get("xe.admin.users.sheet")
+     $msg.get("xe.admin.users.applyonusers")
 #else
 
   #if($context.action=="view")
@@ -113,7 +113,7 @@
       #end
     #end
   #end
-  ## Please do not insert extra empty lines here (as it the validity of the rendered xhtml)
+  ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
   &lt;dl id="xwikiuserprofile"&gt;
     &lt;dt class="label"&gt;&lt;label&gt;$msg.get("platform.core.profile.firstname"):&lt;/label&gt;&lt;/dt&gt;
     &lt;dd#if($context.action=="view") class="given-name"#end&gt;$doc.display("first_name", $obj)&lt;/dd&gt;

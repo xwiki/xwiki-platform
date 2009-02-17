@@ -7,6 +7,8 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>XWiki.XWikiGroups</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
 <title></title>
 <template></template>
@@ -55,7 +57,7 @@ $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css")
 $xwiki.jsfx.use("js/xwiki/table/livetable.js", true)
 $xwiki.ssfx.use("js/xwiki/table/livetable.css", true)
 &lt;div id="ajax-loader"&gt;$msg.get("ui.ajaxTable.loading")&lt;br /&gt;
-  &lt;img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." /&gt;
+  &lt;img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$get.msg("xe.admin.groups.loading")" title="$get.msg("xe.admin.groups.loading")" /&gt;
 &lt;/div&gt;
 &lt;div id="showLimits"&gt;&lt;/div&gt;
 &lt;table id="memberstable" cellspacing="0"&gt;
@@ -206,14 +208,14 @@ window.changeWiki = function(obj)
 #warning($msg.get("userdeletioncannotbecanceled"))
 #set($redirect = $xwiki.getRequestURL())
 {table}
-&lt;span class="floatleft"&gt;Members&lt;/span&gt; &lt;a id="adduser" href="$doc.getURL("objectadd","classname=XWiki.XWikiGroups&amp;amp;xredirect=$redirect")" title="$msg.get("addusertogroup")"&gt;&lt;span class="hidden"&gt;($msg.get("add"))&lt;/span&gt;&lt;/a&gt; | 
+&lt;span class="floatleft"&gt;$msg.get("xe.admin.groups.members")&lt;/span&gt; &lt;a id="adduser" href="$doc.getURL("objectadd","classname=XWiki.XWikiGroups&amp;amp;xredirect=$redirect")" title="$msg.get("addusertogroup")"&gt;&lt;span class="hidden"&gt;($msg.get("add"))&lt;/span&gt;&lt;/a&gt; | 
 #foreach($obj in $objects)
 $doc.display("member", $obj) | &lt;a class="deletelink" href="$doc.getURL("objectremove", "classname=XWiki.XWikiGroups&amp;amp;classid=${obj.number}&amp;amp;xredirect=${doc.getURL('inline')}")" title="$msg.get("removethisuserfromgroup")"&gt;$msg.get("delete")&lt;/a&gt;
 #end ##foreach
 {table}
 #else ## inline
 {table}
-&lt;span class="floatleft"&gt;Members&lt;/span&gt; #if($hasedit)&lt;a id="modifygroup" href="$doc.getURL("inline")"&gt;&lt;span class="hidden"&gt;($msg.get("edit"))&lt;/span&gt;&lt;/a&gt;
+&lt;span class="floatleft"&gt;$msg.get("xe.admin.groups.members")&lt;/span&gt; #if($hasedit)&lt;a id="modifygroup" href="$doc.getURL("inline")"&gt;&lt;span class="hidden"&gt;($msg.get("edit"))&lt;/span&gt;&lt;/a&gt;
 #else
 #end
 #foreach($obj in $objects)

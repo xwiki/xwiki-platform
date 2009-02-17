@@ -105,17 +105,17 @@
 #set($query = "$!{query} and isPublished.value = 0")
 #set($unpublishedEntries = $xwiki.searchDocuments("${query} order by publishDate.value desc", 5, 0))
 #if($unpublishedEntries.size() &gt; 0 || $showEmptyPanels)
-  #panelheader($msg.get("xe.blog.unpublished.entries"))
+  #panelheader("Unpublished Posts")
   #foreach($entryDoc in $xwiki.wrapDocs($unpublishedEntries))
     #getEntryObject($entryDoc $entryObj)
     * [$!{entryDoc.display('title', 'view', $entryObj)}&gt;$!{entryDoc.fullName}]
   #end
-  [$msg.get("xe.blog.unpublished.viewall") ($xwiki.countDocuments($query))&gt;Blog.Unpublished]
+  [View all ($xwiki.countDocuments($query))&gt;Blog.Unpublished]
   #panelfooter()
 #end</content>
 </property>
 <property>
-<description>Shows the most recent unpublished blog entries.</description>
+<description>Shosw the most recent unpublished blog entries.</description>
 </property>
 <property>
 <name>Blog.UnpublishedPanel</name>

@@ -135,7 +135,7 @@
 <itemsPerPage>10</itemsPerPage>
 </property>
 <property>
-<title>Blog</title>
+<title>The Wiki blog</title>
 </property>
 </object>
 <content>#includeForm("Blog.BlogSheet")</content>

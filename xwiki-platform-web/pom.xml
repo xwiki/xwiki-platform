@@ -29,21 +29,21 @@
     <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-web</artifactId>
-  <version>1.7-SNAPSHOT</version>
+  <version>1.7.2</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-1.7</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-1.7</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-1.7</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-1.7.2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-1.7.2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-1.7.2</url>
   </scm>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
     <gwtVersion>1.5.3</gwtVersion>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.21</platform.tool.configuration.version>
-    <platform.core.version>1.7.1</platform.core.version>
+    <platform.core.version>1.7.2</platform.core.version>
     <platform.skin.albatross.version>1.15</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.14</platform.skin.toucan.version>
   </properties>

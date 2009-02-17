@@ -7,14 +7,7 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Main.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1108467450000</creationDate>
-<date>1166183159000</date>
-<contentUpdateDate>1169801141000</contentUpdateDate>
-<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -153,9 +146,8 @@
   #set($ok=$scheduler.scheduleJob($jobObj))
   #if($ok==false) 
    #error("$context.get('error')")
-  #else
-   #set($jobName = "$jobObj.get('jobName')")
-   #info("$get.msg('xe.scheduler.jobscheduled', [$jobName]) *$scheduler.getNextFireTime($jobObj)*")
+  #else 
+   #info("Job ~~$jobObj.get('jobName')~~ *scheduled*. Next fire time : *$scheduler.getNextFireTime($jobObj)*")
   #end
  #elseif($request.do=="pause")
   ##
@@ -165,7 +157,7 @@
   #if($ok==false) 
    #error("$context.get('error')")
   #else
-   #info("Job ~~$jobObj.get('jobName')~~ *$get.msg('xe.scheduler.paused')*.")
+   #info("Job ~~$jobObj.get('jobName')~~ *paused*.")
   #end
  #elseif($request.do=="resume")
   ##
@@ -175,7 +167,7 @@
   #if($ok==false) 
    #error("$context.get('error')")
   #else
-   #info("Job ~~$jobObj.get('jobName')~~ $get.msg('xe.scheduler.resumed') *$scheduler.getNextFireTime($jobObj)*")
+   #info("Job ~~$jobObj.get('jobName')~~ *resumed*. Next fire time : *$scheduler.getNextFireTime($jobObj)*")
   #end
  #elseif($request.do=="unschedule")
   ##
@@ -185,7 +177,7 @@
   #if($ok==false)
    #error("$context.get('error')")
   #else
-   #info("Job ~~$jobObj.get('jobName')~~ *$get.msg('xe.scheduler.unscheduled')*")
+   #info("Job ~~$jobObj.get('jobName')~~ *unscheduled*")
   #end
  #elseif($request.do=="delete")
   ##
@@ -207,17 +199,17 @@
   #end
  #end
 #end
-1 $get.msg('xe.scheduler')
+1 Job Scheduler
 
-$msg.get('xe.scheduler.welcome')
+Welcome to the Job scheduler. This application allows you to create administration scripts that can be triggered periodically.
 
-1.1 $msg.get('xe.scheduler.jobs.list')
+1.1 List of existing jobs
 ##
 ## Retrieve all scheduler jobs living in this space
 ## Display their name, status, possible next fire time, and avaible actions
 ##
 {table}
-$msg.get('xe.scheduler.jobs.name') | $msg.get('xe.scheduler.jobs.status') | $msg.get('xe.scheduler.jobs.next') | $msg.get('xe.scheduler.jobs.actions')
+Job Name|Job Status|Next fire time|Actions
 #set($hql = ", BaseObject as job where doc.space='Scheduler' and job.name=doc.fullName and job.className='XWiki.SchedulerJobClass' ")
 #foreach($docName in $xwiki.searchDocuments($hql))
  #set($actions = $util.hashMap) ## get a hash to store action urls
@@ -235,7 +227,7 @@ $msg.get('xe.scheduler.jobs.name') | $msg.get('xe.scheduler.jobs.status') | $msg
    #set( $ok = $!actions.put("unschedule",$doc.getURL("view","do=unschedule&amp;amp;which=${jobHolder.fullName}")) )
   #end
   #set($ok = $!actions.put("delete",$doc.getURL("view","do=delete&amp;amp;which=${jobHolder.fullName}")) )
-$job.get("jobName")|$status|$firetime| *$msg.get('xe.scheduler.jobs.infos')* : [view&gt;$jobHolder.fullName] #if($jobHolder.hasAccessLevel("programming")) &lt;a href="${jobHolder.getURL('inline')}"&gt;$msg.get("edit")&lt;/a&gt; #end *$msg.get("job")* : #foreach($action in $actions.keySet()) &lt;a href="${actions.get($action)}"&gt;$action&lt;/a&gt; #end
+$job.get("jobName")|$status|$firetime| *Infos* : [view&gt;$jobHolder.fullName] #if($jobHolder.hasAccessLevel("programming")) &lt;a href="${jobHolder.getURL('inline')}"&gt;edit&lt;/a&gt; #end *Job* : #foreach($action in $actions.keySet()) &lt;a href="${actions.get($action)}"&gt;$action&lt;/a&gt; #end
 
 #end
 {table}
@@ -247,12 +239,12 @@ $job.get("jobName")|$status|$firetime| *$msg.get('xe.scheduler.jobs.infos')* : [
 ## However, this page should stay accessibles to admins, that can manipulate existing jobs :
 ## scheduler, pause, etc.
 ##
-1.1 $msg.get('xe.scheduler.jobs.create')
+1.1 Create a new job
 ##
 ## Form to create a new Job
 ##
  
-#info($msg.get('xe.scheduler.jobs.explaincreate'))
+#info("Enter here the name of the page that will hold your job. The job will be created in the current Scheduler space.")
 
 &lt;form action="" id="newdoc"&gt;
 &lt;div&gt;
@@ -262,11 +254,11 @@ $job.get("jobName")|$status|$firetime| *$msg.get('xe.scheduler.jobs.infos')* : [
 &lt;input type="hidden" name="webname" value="Scheduler"/&gt;
 &lt;input type="hidden" name="name" value=""/&gt;
 &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
-&lt;input type="text" name="title" value="$msg.get('xe.scheduler.jobs.pagename')" size="30"/&gt;
-&lt;input type="button" value="$msg.get('xe.scheduler.jobs.add')" onclick='if (updateName(this.form.title,this.form.name)) { action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }' /&gt;
+&lt;input type="text" name="title" value="Job page name" size="30"/&gt;
+&lt;input type="button" value="Add" onclick='if (updateName(this.form.title,this.form.name)) { action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }' /&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 #else
- #warning($msg.get('xe.scheduler.jobs.warning'))
+ #warning("Job creation is reserved for programmers. It seems you do not have programming access right allowed on the Scheduler space.")
 #end</content>
 </xwikidoc>

@@ -14,7 +14,7 @@
 <creationDate>1231841324000</creationDate>
 <date>1231841652000</date>
 <contentUpdateDate>1231841652000</contentUpdateDate>
-<version>1.1</version>
+<version>3.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -104,13 +104,13 @@
     try {
       editor = new ActiveXObject("SharePoint.OpenDocuments");
     } catch (err) {
-      window.alert("$msg.get('xe.webdav.initialize.activex')");
+      window.alert("Could not initialize a required ActiveX object.");
       return;
     }
     if (editor) {
       editor.EditDocument(davURL);
     } else {
-      window.alert("$msg.get('xe.webdav.initialize.error')");
+      window.alert("Error while initializing the share point editor.");
       return;
     }
   } else if (window.InstallTrigger) {		
@@ -123,15 +123,15 @@
       evt.initEvent("FoXWikiDomEvent", true, false);
       element.dispatchEvent(evt);
       if (element.getAttribute("foxwiki") == "false") {
-        if (window.confirm("$msg.get('xe.webdav.install.foxwiki')")) {
+        if (window.confirm("A Firefox extension is required to perform this action, install it ?")) {
 	  InstallTrigger.install( {"FoXWiki" :"https://addons.mozilla.org/en-US/firefox/downloads/file/39674/foxwiki-1.0b-fx.xpi"});
 	}
       }
     } else {
-      alert("$msg.get('xe.webdav.error')");
+      alert("Unexpected Error");
     }			
   } else {
-    window.alert("$msg.get('xe.webdav.sorry')");
+    window.alert("Sorry, to use this feature you need either Firefox or Internet Explorer.");
   }
 }</code>
 </property>
@@ -179,5 +179,5 @@
 <tags/>
 </property>
 </object>
-<content>#info($msg.get('xe.webdav.info'))</content>
+<content>#info("This is a hosting page for webdav related functions.")</content>
 </xwikidoc>

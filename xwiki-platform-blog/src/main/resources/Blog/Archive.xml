@@ -64,14 +64,14 @@
       #end
     #end
   #else
-    #info($msg.get("xe.blog.archive.noarticle"))
+    #info("No articles yet...")
   #end
 #end
 ##
 ##
 ##
 #macro(displayBlogYearArchive $blogDoc $year)
-  1 $msg.get("xe.blog.archive.postsyear", [$year])
+  1 Blog posts for $year
   #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = '${blogDoc.space}' or doc.parent = '${blogDoc.fullName}')")
   #set($query = "${query} and year(publishDate.value) = $year")
@@ -89,12 +89,13 @@
           #getEntryObject($entryDoc $entryObj)
           #isPublished($entryObj $isPublished)
           #isHidden($entryObj $isHidden)
-          * &lt;a href="$entryDoc.getURL()"&gt;$entryDoc.display('title', 'view', $entryObj)&lt;/a&gt;#if(!$isPublished) $msg.get("xe.blog.archive.unpublished")#elseif($isHidden) $msg.get("xe.blog.archive.hidden")#end
+          * &lt;a href="$entryDoc.getURL()"&gt;$entryDoc.display('title', 'view', $entryObj)&lt;/a&gt;#if(!$isPublished) (unpublished)#elseif($isHidden) (hidden)#end
+
         #end
       #end
     #end
   #else
-    #info($msg.get("xe.blog.archive.noarticlesyear"))
+    #info("No articles in this year...")
   #end
 #end
 ##
@@ -105,7 +106,7 @@
   #set($tempDate = $xwiki.jodatime.mutableDateTime)
   $tempDate.setYear($util.parseInt($year))##
   $tempDate.setMonthOfYear($util.parseInt($month))##
-  1 $msg.get("xe.blog.archive.postsfor") $dateFormatter.print($tempDate)
+  1 Blog posts for $dateFormatter.print($tempDate)
   #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = '${blogDoc.space}' or doc.parent = '${blogDoc.fullName}')")
   #set($query = "${query} and year(publishDate.value) = $year and month(publishDate.value) = $month")
@@ -116,7 +117,7 @@
       #displayEntry($entryDoc $entryObj true)
     #end
   #else
-    #info($msg.get("xe.blog.archive.noarticlesmonth"))
+    #info("No articles in this month...")
   #end
 #end
 ##

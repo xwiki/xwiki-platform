@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-macros-parent</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.7.2</version>
   </parent>
   <artifactId>xwiki-core-macro-toc</artifactId>
   <name>XWiki Platform - Core - Macro - Toc</name>

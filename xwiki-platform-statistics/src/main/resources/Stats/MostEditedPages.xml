@@ -97,7 +97,7 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader("Most Edited Pages")
+<content>#panelheader($msg.get("xe.statistics.pages.mostedited"))
 #if($xwiki.statsService.enabled)
 #set($scope=$xwiki.criteriaService.scopeFactory.ALL_PAGES)
 #set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)

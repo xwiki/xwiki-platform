@@ -97,7 +97,7 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader('Most Referred Pages')
+<content>#panelheader($msg.get("xe.statistics.pages.mostreferred"))
 #if($xwiki.statsService.enabled)
 #set($scope=$xwiki.criteriaService.scopeFactory.ALL_PAGES)
 #set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)

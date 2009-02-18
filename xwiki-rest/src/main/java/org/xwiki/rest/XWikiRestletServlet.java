@@ -20,10 +20,11 @@
 package org.xwiki.rest;
 
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.restlet.Application;
 import org.restlet.Context;
-import org.xwiki.component.manager.ComponentManager;
 
 import com.noelios.restlet.ext.servlet.ServerServlet;
 import com.noelios.restlet.ext.servlet.ServletContextAdapter;
@@ -35,15 +36,50 @@ public class XWikiRestletServlet extends ServerServlet
 {
     private static final long serialVersionUID = -8292963474366330847L;
 
+    private static final String RESOURCES_PARAMETER = "resources";
+
+    private static final String PROVIDERS_PARAMETER = "providers";
+
     @Override
     protected Application createApplication(Context context)
     {
-        ComponentManager componentManager =
-            (ComponentManager) getServletContext().getAttribute(
-                org.xwiki.component.manager.ComponentManager.class.getName());
+        Set<Class< ? >> jaxRsClasses = new HashSet<Class< ? >>();
 
-        XWikiRestApplication restApplication = new XWikiRestApplication(componentManager);
+        String resourcesParameter = getInitParameter(RESOURCES_PARAMETER);
+        if (resourcesParameter != null) {
+            String[] resourceClassNames = resourcesParameter.split(";");
+            for (String resourceClassName : resourceClassNames) {
+                try {
+                    resourceClassName = resourceClassName.trim();
+                    Class< ? > resourceClass = this.getClass().getClassLoader().loadClass(resourceClassName);
+                    jaxRsClasses.add(resourceClass);
+                    System.out.format("  Added resource %s\n", resourceClassName);
+                } catch (ClassNotFoundException e) {
+                    System.out.format("Cannot load class %s\n", resourceClassName);
+                }
+            }
+        }
 
+        String providersParameter = getInitParameter(PROVIDERS_PARAMETER);
+        if (providersParameter != null) {
+            String[] providerClassNames = providersParameter.split(";");
+            for (String providerClassName : providerClassNames) {
+                try {
+                    providerClassName = providerClassName.trim();
+                    Class< ? > providerClass = this.getClass().getClassLoader().loadClass(providerClassName);
+                    jaxRsClasses.add(providerClass);
+                    System.out.format("  Added provider %s\n", providerClassName);
+                } catch (ClassNotFoundException e) {
+                    System.out.format("Cannot load class %s\n", providerClassName);
+                }
+            }
+        }
+
+        XWikiApplication xwikiJaxRsApplicationConfig = new XWikiApplication(jaxRsClasses);
+        XWikiJaxRsApplication restApplication = new XWikiJaxRsApplication();
+        restApplication.add(xwikiJaxRsApplicationConfig);
+
+        /* This is taken from superclass implementation in order to mimic initialization */
         restApplication.setName(getServletConfig().getServletName());
         restApplication.setContext(new ServletContextAdapter(this, context));
         restApplication.getContext().setLogger(restApplication.getClass().getName());
@@ -68,4 +104,5 @@ public class XWikiRestletServlet extends ServerServlet
 
         return restApplication;
     }
+
 }

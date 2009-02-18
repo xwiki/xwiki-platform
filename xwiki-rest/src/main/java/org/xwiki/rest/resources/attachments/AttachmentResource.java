@@ -19,147 +19,130 @@
  */
 package org.xwiki.rest.resources.attachments;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
-import org.restlet.data.Status;
-import org.restlet.resource.StringRepresentation;
-import org.xwiki.rest.Constants;
 import org.xwiki.rest.DomainObjectFactory;
-import org.xwiki.rest.Utils;
+import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.model.jaxb.Attachment;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class AttachmentResource extends BaseAttachmentResource
+/**
+ * @version $Id$
+ */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}")
+public class AttachmentResource extends XWikiResource
 {
-    @Override
-    public boolean allowPut()
+    public AttachmentResource(@Context UriInfo uriInfo)
     {
-        return true;
+        super(uriInfo);
     }
 
-    @Override
-    public boolean allowDelete()
+    @GET
+    public Response getAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("attachmentName") String attachmentName)
+        throws XWikiException
     {
-        return true;
-    }
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+        Document doc = documentInfo.getDocument();
 
-    @Override
-    public void handlePut()
-    {
-        try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), false, true);
-            if (documentInfo == null) {
-                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                return;
-
-            }
-
-            Document doc = documentInfo.getDocument();
-
-            String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
-            boolean existed = false;
-
-            XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-            XWikiAttachment xwikiAttachment = xwikiDocument.getAttachment(attachmentName);
-            if (xwikiAttachment == null) {
-                xwikiAttachment = new XWikiAttachment();
-                xwikiDocument.getAttachmentList().add(xwikiAttachment);
-            } else {
-                existed = true;
-            }
-
-            byte[] buffer = new byte[8192];
-            InputStream is = getRequest().getEntity().getStream();
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            while (true) {
-                int read = is.read(buffer);
-                bos.write(buffer, 0, read);
-
-                if (read < 8192) {
-                    break;
-                }
-            }
-
-            xwikiAttachment.setContent(bos.toByteArray());
-            xwikiAttachment.setAuthor(xwikiUser);
-            xwikiAttachment.setFilename(attachmentName);
-            xwikiAttachment.setDoc(xwikiDocument);
-
-            if (doc.hasAccessLevel("edit", xwikiUser)) {
-                xwikiDocument.saveAttachmentContent(xwikiAttachment, xwikiContext);
-            } else {
-                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                return;
-            }
-
-            if (existed) {
-                getResponse().setStatus(Status.SUCCESS_ACCEPTED);
-            } else {
-                getResponse().setStatus(Status.SUCCESS_CREATED);
-            }
-
-            /*
-             * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
-             * external URL for an attachment
-             */
-            /* XWikiDocument */xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-            String attachmentXWikiUrl =
-                xwikiDocument.getExternalAttachmentURL(attachmentName, "download", xwikiContext).toString();
-
-            getResponse().setEntity(
-                new StringRepresentation(Utils.toXml(DomainObjectFactory.createAttachment(getRequest(),
-                    resourceClassRegistry, doc, doc.getAttachment(attachmentName), attachmentXWikiUrl, false))));
-
-        } catch (XWikiException e) {
-            if (e.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-            } else {
-                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+        final com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
+        if (xwikiAttachment == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
         }
+
+        return Response.ok().type(xwikiAttachment.getMimeType()).entity(xwikiAttachment.getContent()).build();
     }
 
-    @Override
-    public void handleDelete()
+    @PUT
+    public Response putAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("attachmentName") String attachmentName, byte[] content)
+        throws XWikiException
     {
-        try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, true);
-            if (documentInfo == null) {
-                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                return;
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
 
-            }
+        Document doc = documentInfo.getDocument();
 
-            Document doc = documentInfo.getDocument();
-
-            String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
-
-            com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
-            if (xwikiAttachment == null) {
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                return;
-            }
-
-            XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-            XWikiAttachment baseXWikiAttachment = xwikiDocument.getAttachment(attachmentName);
-            if (doc.hasAccessLevel("edit", xwikiUser)) {
-                xwikiDocument.deleteAttachment(baseXWikiAttachment, xwikiContext);
-                getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
-            } else {
-                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-            }
-
-        } catch (Exception e) {
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+        if (!doc.hasAccessLevel("edit", xwikiUser)) {
+            throw new WebApplicationException(Status.UNAUTHORIZED);
         }
+
+        boolean existed = false;
+
+        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiAttachment xwikiAttachment = xwikiDocument.getAttachment(attachmentName);
+        if (xwikiAttachment == null) {
+            xwikiAttachment = new XWikiAttachment();
+            xwikiDocument.getAttachmentList().add(xwikiAttachment);
+        } else {
+            existed = true;
+        }
+
+        xwikiAttachment.setContent(content);
+        xwikiAttachment.setAuthor(xwikiUser);
+        xwikiAttachment.setFilename(attachmentName);
+        xwikiAttachment.setDoc(xwikiDocument);
+
+        xwikiDocument.saveAttachmentContent(xwikiAttachment, xwikiContext);
+
+        doc.save();
+
+        /*
+         * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
+         * external URL for an attachment
+         */
+        xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        String attachmentXWikiUrl =
+            xwikiDocument.getExternalAttachmentURL(attachmentName, "download", xwikiContext).toString();
+
+        Attachment attachment =
+            DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(
+                doc, xwikiAttachment, xwikiContext), attachmentXWikiUrl);
+
+        if (existed) {
+            return Response.status(Status.ACCEPTED).entity(attachment).build();
+        } else {
+            return Response.created(uriInfo.getAbsolutePath()).entity(attachment).build();
+        }
+
+    }
+
+    @DELETE
+    public void deleteAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("attachmentName") String attachmentName)
+        throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
+
+        Document doc = documentInfo.getDocument();
+
+        if (!doc.hasAccessLevel("edit", xwikiUser)) {
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        }
+
+        com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
+        if (xwikiAttachment == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiAttachment baseXWikiAttachment = xwikiDocument.getAttachment(attachmentName);
+
+        xwikiDocument.deleteAttachment(baseXWikiAttachment, xwikiContext);
+
+        doc.save();
     }
 
 }

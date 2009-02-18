@@ -21,62 +21,53 @@ package org.xwiki.rest.resources.comments;
 
 import java.util.Vector;
 
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Comment;
+import org.xwiki.rest.model.jaxb.Comment;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
+/**
+ * @version $Id$
+ */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/comments/{id}")
 public class CommentResource extends XWikiResource
 {
-    @Override
-    public Representation represent(Variant variant)
+    public CommentResource(@Context UriInfo uriInfo)
     {
-        try {
-            String commentIdString = (String) getRequest().getAttributes().get(Constants.COMMENT_ID_PARAMETER);
-            int commentId;
+        super(uriInfo);
+    }
 
-            try {
-                commentId = Integer.parseInt(commentIdString);
-            } catch (NumberFormatException e) {
-                getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                return null;
+    @GET
+    public Comment getComment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("id") Integer id,
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
+        throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+
+        Document doc = documentInfo.getDocument();
+
+        Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
+
+        for (com.xpn.xwiki.api.Object xwikiComment : xwikiComments) {
+            if (id.equals(xwikiComment.getNumber())) {
+                return DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment);
             }
-
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
-            if (documentInfo == null) {
-                return null;
-            }
-
-            Document doc = documentInfo.getDocument();
-
-            Comment comment = null;
-
-            Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
-            for (com.xpn.xwiki.api.Object xwikiComment : xwikiComments) {
-                if (xwikiComment.getNumber() == commentId) {
-                    comment =
-                        DomainObjectFactory
-                            .createComment(getRequest(), resourceClassRegistry, doc, xwikiComment, false);
-                    break;
-                }
-            }
-
-            if (comment == null) {
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                return null;
-            }
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), comment);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
         }
 
-        return null;
+        throw new WebApplicationException(Status.NOT_FOUND);
     }
+
 }

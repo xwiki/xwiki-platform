@@ -27,11 +27,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.restlet.Context;
 import org.restlet.Filter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
@@ -52,24 +50,10 @@ import com.xpn.xwiki.web.XWikiServletResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
- * This is a filter that setups the XWiki context before servicing a request and cleans things up after the request has
- * been serviced.
- * 
  * @version $Id$
  */
-public class XWikiInitializationAndCleanupFilter extends Filter
+public class XWikiSetupCleanupFilter extends Filter
 {
-    private ComponentManager componentManager;
-
-    public XWikiInitializationAndCleanupFilter(ComponentManager componentManager, Context context)
-    {
-        super(context);
-        this.componentManager = componentManager;
-    }
-
-    /**
-     * Initialize the XWiki context and put relevant objects in the Restlet context attributes.
-     */
     @Override
     protected int beforeHandle(Request request, Response response)
     {
@@ -91,20 +75,22 @@ public class XWikiInitializationAndCleanupFilter extends Filter
 
             com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(xwiki, xwikiContext);
 
+            String xwikiUser = "XWiki.XWikiGuest";
+            xwikiContext.setUser(xwikiUser);
+
             /* XWiki platform objects are stocked in the Restlet context so all Restlet components can retrieve them. */
             Map<String, Object> attributes = getContext().getAttributes();
             attributes.put(Constants.XWIKI_CONTEXT, xwikiContext);
             attributes.put(Constants.XWIKI, xwiki);
             attributes.put(Constants.XWIKI_API, xwikiApi);
+            attributes.put(Constants.XWIKI_USER, xwikiUser);
         } catch (Exception e) {
-            e.printStackTrace();
             if (xwikiContext != null) {
                 cleanupComponents();
             }
 
-            getLogger().log(Level.SEVERE, "Error while initializing XWiki context.");
+            getLogger().log(Level.SEVERE, "Cannot initialize XWiki context.", e);
 
-            /* In case of exception do not relay the request to components behind this filter. */
             return Filter.STOP;
         }
 
@@ -116,15 +102,47 @@ public class XWikiInitializationAndCleanupFilter extends Filter
     @Override
     protected void afterHandle(Request request, Response response)
     {
-        Utils.cleanupResource(request, componentManager, getLogger());
-
         XWikiContext xwikiContext = (XWikiContext) getContext().getAttributes().get(Constants.XWIKI_CONTEXT);
         if (xwikiContext != null) {
             getLogger().log(Level.FINE, "XWiki context cleaned up.");
             cleanupComponents();
         }
 
-        super.afterHandle(request, response);
+        Map<String, Object> attributes = getContext().getAttributes();
+        attributes.remove(Constants.XWIKI_CONTEXT);
+        attributes.remove(Constants.XWIKI);
+        attributes.remove(Constants.XWIKI_API);
+        attributes.remove(Constants.XWIKI_USER);
+
+        /* Avoid that empty entities make the engine forward the response creation to the XWiki servlet. */
+        if (!response.getEntity().isAvailable()) {
+            response.setEntity(null);
+        }
+    }
+
+    private void initializeContainerComponent(XWikiContext context) throws ServletException
+    {
+        ServletContainerInitializer containerInitializer =
+            (ServletContainerInitializer) com.xpn.xwiki.web.Utils.getComponent(ServletContainerInitializer.ROLE);
+
+        try {
+            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
+            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
+            containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
+        } catch (ServletContainerException e) {
+            throw new ServletException("Failed to initialize request/response or session", e);
+        }
+    }
+
+    private void cleanupComponents()
+    {
+        Container container = (Container) com.xpn.xwiki.web.Utils.getComponent(Container.ROLE);
+        Execution execution = (Execution) com.xpn.xwiki.web.Utils.getComponent(Execution.ROLE);
+
+        container.removeRequest();
+        container.removeResponse();
+        container.removeSession();
+        execution.removeContext();
     }
 
     /**
@@ -162,39 +180,4 @@ public class XWikiInitializationAndCleanupFilter extends Filter
         }
         return null;
     }
-
-    private void initializeContainerComponent(XWikiContext context) throws ServletException
-    {
-        // Initialize the Container fields (request, response, session).
-        // Note that this is a bridge between the old core and the component
-        // architecture.
-        // In the new component architecture we use ThreadLocal to transport the
-        // request,
-        // response and session to components which require them.
-        ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) com.xpn.xwiki.web.Utils.getComponent(ServletContainerInitializer.ROLE);
-
-        try {
-            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
-            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
-            containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
-        } catch (ServletContainerException e) {
-            throw new ServletException("Failed to initialize request/response or session", e);
-        }
-    }
-
-    private void cleanupComponents()
-    {
-        Container container = (Container) com.xpn.xwiki.web.Utils.getComponent(Container.ROLE);
-        Execution execution = (Execution) com.xpn.xwiki.web.Utils.getComponent(Execution.ROLE);
-
-        // We must ensure we clean the ThreadLocal variables located in the
-        // Container and Execution
-        // components as otherwise we will have a potential memory leak.
-        container.removeRequest();
-        container.removeResponse();
-        container.removeSession();
-        execution.removeContext();
-    }
-
 }

@@ -11,23 +11,24 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Class;
+import org.xwiki.rest.model.jaxb.Property;
 
 import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/classes/{className}")
-public class ClassResource extends XWikiResource
+@Path("/wikis/{wikiName}/classes/{className}/properties/{propertyName}")
+public class ClassPropertyResource extends XWikiResource
 {
 
-    public ClassResource(@Context UriInfo uriInfo)
+    public ClassPropertyResource(@Context UriInfo uriInfo)
     {
         super(uriInfo);
     }
 
     @GET
-    public Class getClass(@PathParam("wikiName") String wikiName, @PathParam("className") String className)
+    public Property getClassProperty(@PathParam("wikiName") String wikiName, @PathParam("className") String className, @PathParam("propertyName") String propertyName)
         throws XWikiException
     {
 
@@ -41,7 +42,16 @@ public class ClassResource extends XWikiResource
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
                         
-            return DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass);
+            Class clazz = DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass);
+            
+            for (Property property : clazz.getProperties()) {
+                if (property.getName().equals(propertyName)) {
+                    return property;
+                }
+            }
+
+            throw new WebApplicationException(Status.NOT_FOUND);            
+            
         } finally {
             xwiki.setDatabase(database);
         }

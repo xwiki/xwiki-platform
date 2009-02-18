@@ -33,17 +33,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-/**
- * This guard performs an authentication using the HTTP_BASIC method against XWiki. If no Authorization header is
- * provided then Guest is assumed. In order to make plain browser capable of authenticate themselves a special URI is
- * used. If this URI is get, then a challenge is sent back to the browser giving the user the chance to type a username
- * and a password.
- * 
- * @version $Id$
- */
 public class XWikiAuthentication extends Guard
 {
-
     public XWikiAuthentication(Context context) throws IllegalArgumentException
     {
         super(context, ChallengeScheme.HTTP_BASIC, "XWiki");
@@ -52,7 +43,7 @@ public class XWikiAuthentication extends Guard
     @Override
     public int authenticate(Request request)
     {
-        if (request.getResourceRef().getPath().endsWith(BrowserAuthenticationResource.URI_PATTERN)) {
+         if (request.getResourceRef().getPath().endsWith(BrowserAuthenticationResource.URI_PATTERN)) {
             return super.authenticate(request);
         }
 
@@ -60,8 +51,8 @@ public class XWikiAuthentication extends Guard
 
         Form queryParameters = request.getResourceRef().getQueryAsForm();
         if (queryParameters.getValues("login") == null) {
-            if (headers.getValues(HttpConstants.HEADER_AUTHORIZATION) == null) {
-                headers.add(HttpConstants.HEADER_AUTHORIZATION, "Basic R3Vlc3Q6");
+            if (headers.getValues(HttpConstants.HEADER_AUTHORIZATION) == null) {                
+                return 1;
             }
         }
 
@@ -74,32 +65,43 @@ public class XWikiAuthentication extends Guard
         XWikiContext xwikiContext = (XWikiContext) getContext().getAttributes().get(Constants.XWIKI_CONTEXT);
         XWiki xwiki = (XWiki) getContext().getAttributes().get(Constants.XWIKI);
 
-        try {
-            if (identifier.equals("Guest")) {
-                xwikiContext.setUser("XWiki.XWikiGuest");
-                getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));
-
-                getContext().getAttributes().put(Constants.XWIKI_USER, "XWiki.XWikiGuest");
-
-                return true;
-            }
-
+        try {            
             if (xwiki.getAuthService().authenticate(identifier, new String(secret), xwikiContext) != null) {
                 String xwikiUser = String.format("XWiki.%s", identifier);
 
                 xwikiContext.setUser(xwikiUser);
-                getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));
-
+                getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));                
+                
                 getContext().getAttributes().put(Constants.XWIKI_USER, xwikiUser);
 
                 return true;
             }
         } catch (XWikiException e) {
-            e.printStackTrace();
+            getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
         }
 
-        getLogger().log(Level.WARNING, String.format("Cannot authenticate '%s'.", identifier));
-
+        getLogger().log(Level.WARNING, String.format("Cannot authenticate '%s'.", identifier));        
+        
         return false;
     }
+
 }
+/*
+ * implements ContainerRequestFilter { public ContainerRequest filter(ContainerRequest request) { XWikiContext
+ * xwikiContext = (XWikiContext) request.getProperties().get(Constants.XWIKI_CONTEXT); com.xpn.xwiki.XWiki xwiki =
+ * (XWiki) request.getProperties().get(Constants.XWIKI); if ((xwikiContext == null) || (xwiki == null)) { throw new
+ * AuthenticationException("XWiki context not initialized."); } String authorizationHeader =
+ * request.getHeaderValue(ContainerRequest.AUTHORIZATION); if (authorizationHeader == null) { return request; } if
+ * (!authorizationHeader.startsWith("Basic")) { throw new
+ * AuthenticationException("Only Basic authentication is supported."); } authorizationHeader =
+ * authorizationHeader.substring("Basic ".length()); String[] values = new
+ * String(Base64.decodeBase64(authorizationHeader.getBytes())).split(":"); if (values.length < 2) { throw new
+ * AuthenticationException("Invalid syntax for username and password."); } String username = values[0]; String password
+ * = values[1]; if ((username == null) || (password == null)) { throw new
+ * AuthenticationException("Missing username or password."); } if(username.equalsIgnoreCase("guest")) { return request;
+ * } try { if (xwiki.getAuthService().authenticate(username, password, xwikiContext) != null) { String xwikiUser =
+ * String.format("XWiki.%s", username); xwikiContext.setUser(xwikiUser);
+ * request.getProperties().put(Constants.XWIKI_USER, xwikiUser); return request; } } catch (XWikiException e) { throw
+ * new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR); } throw new
+ * AuthenticationException(String.format("Unable to authenticate user %s", username)); } }
+ */

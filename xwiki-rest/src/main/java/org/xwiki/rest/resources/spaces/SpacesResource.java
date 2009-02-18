@@ -22,16 +22,19 @@ package org.xwiki.rest.resources.spaces;
 import java.util.Collections;
 import java.util.List;
 
-import org.restlet.data.Form;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Spaces;
+import org.xwiki.rest.model.jaxb.Spaces;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -39,53 +42,49 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Path("/wikis/{wikiName}/spaces")
 public class SpacesResource extends XWikiResource
 {
-    @Override
-    public Representation represent(Variant variant)
+    public SpacesResource(@Context UriInfo uriInfo)
+    {
+        super(uriInfo);
+    }
+
+    @GET
+    public Spaces getSpaces(@PathParam("wikiName") String wikiName,
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
+        throws XWikiException
     {
         String database = xwikiContext.getDatabase();
 
-        try {
-            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);
-            xwikiContext.setDatabase(wiki);
+        Spaces spaces = objectFactory.createSpaces();
 
-            Spaces spaces = new Spaces();
+        /* This try is just needed for executing the finally clause. */
+        try {
+            xwikiContext.setDatabase(wikiName);
 
             List<String> spaceNames = xwikiApi.getSpaces();
             Collections.sort(spaceNames);
 
-            Form queryForm = getRequest().getResourceRef().getQueryAsForm();
-            RangeIterable<String> ri =
-                new RangeIterable<String>(spaceNames, Utils.parseInt(
-                    queryForm.getFirstValue(Constants.START_PARAMETER), 0), Utils.parseInt(queryForm
-                    .getFirstValue(Constants.NUMBER_PARAMETER), -1));
+            RangeIterable<String> ri = new RangeIterable<String>(spaceNames, start, number);
 
             for (String spaceName : ri) {
                 List<String> docNames = xwikiApi.getSpaceDocsName(spaceName);
-                String home = String.format("%s.WebHome", spaceName);
-                String homeXWikiUrl = null;
-                if (!xwikiApi.exists(home)) {
-                    home = null;
-                } else {
-                    Document doc = xwikiApi.getDocument(home);
-                    if (doc != null) {
-                        homeXWikiUrl = doc.getExternalURL("view");
-                    }
+
+                String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
+                Document home = null;
+                
+                if (xwikiApi.exists(homeId)) {
+                    home = xwikiApi.getDocument(homeId);
                 }
 
-                spaces.addSpace(DomainObjectFactory.createSpace(getRequest(), resourceClassRegistry, wiki, spaceName,
-                    home, homeXWikiUrl, docNames.size()));
+                spaces.getSpaces().add(DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home,
+                    docNames.size()));
             }
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), spaces);
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
         } finally {
             xwikiContext.setDatabase(database);
         }
 
-        return null;
+        return spaces;
     }
 }

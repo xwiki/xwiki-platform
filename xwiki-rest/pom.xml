@@ -14,7 +14,8 @@
 		Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA * 02110-1301
 		USA, or see the FSF site: http://www.fsf.org. *
 	-->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.xpn.xwiki.platform</groupId>
@@ -27,51 +28,98 @@
 	<description>Service for accessing XWiki through a RESTful API</description>
 	<dependencies>
 		<dependency>
-			<groupId>org.restlet</groupId>
-			<artifactId>org.restlet</artifactId>
-			<version>1.1.1</version>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.restlet</groupId>
-			<artifactId>org.restlet.ext.wadl</artifactId>
-			<version>1.1.1</version>
-		</dependency>		
+			<artifactId>org.restlet</artifactId>
+			<version>1.1.2</version>
+		</dependency>
 		<dependency>
-			<groupId>com.noelios.restlet</groupId>
-			<artifactId>com.noelios.restlet.ext.httpclient</artifactId>
-			<version>1.1.1</version>
+			<groupId>org.restlet</groupId>
+			<artifactId>org.restlet.ext.jaxrs</artifactId>
+			<version>1.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.noelios.restlet</groupId>
 			<artifactId>com.noelios.restlet.ext.servlet</artifactId>
-			<version>1.1.1</version>
+			<version>1.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.xpn.xwiki.platform</groupId>
 			<artifactId>xwiki-core</artifactId>
-			<version>${pom.version}</version>			
+			<version>${pom.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.xwiki.platform</groupId>
 			<artifactId>xwiki-core-component</artifactId>
-			<version>${pom.version}</version>			
+			<version>${pom.version}</version>
 		</dependency>		
 		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>1.3.1</version>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.1</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>		
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.1.10</version>
+		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.6.3</version>
+				<configuration>
+					<extension>true</extension>
+					<args>
+						<arg>-Xfluent-api</arg>
+					</args>
+					<schemaDirectory>src/main/resources</schemaDirectory>
+					<generateDirectory>${basedir}/src/main/java</generateDirectory>
+					<generatePackage>org.xwiki.rest.model.jaxb</generatePackage>
+					<verbose>true</verbose>
+					<removeOldOutput>false</removeOldOutput>
+					<plugins>
+						<plugin>
+							<groupId>net.java.dev.jaxb2-commons</groupId>
+							<artifactId>jaxb-fluent-api</artifactId>
+							<version>2.1.8</version>
+						</plugin>
+					</plugins>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<repositories>
-		<repository>  
-			<id>maven-restlet</id>  
-			<name>Public online Restlet repository</name>  
-			<url>http://maven.restlet.org</url>  
+		<repository>
+			<id>maven-restlet</id>
+			<name>Public online Restlet repository</name>
+			<url>http://maven.restlet.org</url>
+		</repository>
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/2/</url>			
 		</repository>
 	</repositories>
 </project>

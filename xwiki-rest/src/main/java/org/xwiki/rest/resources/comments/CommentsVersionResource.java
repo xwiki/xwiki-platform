@@ -21,58 +21,53 @@ package org.xwiki.rest.resources.comments;
 
 import java.util.Vector;
 
-import org.restlet.data.Form;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
-import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Comments;
+import org.xwiki.rest.model.jaxb.Comments;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
 /**
  * @version $Id$
  */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/comments")
 public class CommentsVersionResource extends XWikiResource
 {
-
-    @Override
-    public Representation represent(Variant variant)
+    public CommentsVersionResource(@Context UriInfo uriInfo)
     {
-        try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
-            if (documentInfo == null) {
-                return null;
-            }
-
-            Document doc = documentInfo.getDocument();
-
-            Comments comments = new Comments();
-
-            Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
-
-            Form queryForm = getRequest().getResourceRef().getQueryAsForm();
-            RangeIterable<com.xpn.xwiki.api.Object> ri =
-                new RangeIterable<com.xpn.xwiki.api.Object>(xwikiComments, Utils.parseInt(queryForm
-                    .getFirstValue(Constants.START_PARAMETER), 0), Utils.parseInt(queryForm
-                    .getFirstValue(Constants.NUMBER_PARAMETER), -1));
-
-            for (com.xpn.xwiki.api.Object xwikiComment : ri) {
-                comments.addComment(DomainObjectFactory.createComment(getRequest(), resourceClassRegistry, doc,
-                    xwikiComment, true));
-            }
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), comments);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-        }
-
-        return null;
+        super(uriInfo);
     }
 
+    @GET
+    public Comments getCommentsVersion(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("version") String version, @QueryParam("start") @DefaultValue("0") Integer start,
+        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, version, true, false);
+
+        Document doc = documentInfo.getDocument();
+
+        Comments comments = objectFactory.createComments();
+
+        Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
+
+        RangeIterable<com.xpn.xwiki.api.Object> ri =
+            new RangeIterable<com.xpn.xwiki.api.Object>(xwikiComments, start, number);
+
+        for (com.xpn.xwiki.api.Object xwikiComment : ri) {
+            comments.getComments().add(DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(),  doc, xwikiComment));
+        }
+
+        return comments;
+    }
 }

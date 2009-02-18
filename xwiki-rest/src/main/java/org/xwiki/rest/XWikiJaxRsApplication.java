@@ -17,35 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.model;
+package org.xwiki.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import org.restlet.Restlet;
+import org.restlet.Router;
+import org.restlet.ext.jaxrs.JaxRsApplication;
+import org.xwiki.rest.resources.BrowserAuthenticationResource;
 
 /**
  * @version $Id$
  */
-@XStreamAlias("spaces")
-public class Spaces extends LinkCollection
+public class XWikiJaxRsApplication extends JaxRsApplication
 {
-    @XStreamImplicit
-    private List<Space> spaceList;
-
-    public Spaces()
+    @Override
+    public Restlet createRoot()
     {
-        spaceList = new ArrayList<Space>();
+        XWikiSetupCleanupFilter setupCleanupFilter = new XWikiSetupCleanupFilter();
+        XWikiAuthentication xwikiAuthentication = new XWikiAuthentication(getContext());
+
+        Router router = new Router();
+        router.attach(BrowserAuthenticationResource.URI_PATTERN, BrowserAuthenticationResource.class);
+        Restlet root = super.createRoot();
+        router.attach(root);
+        setupCleanupFilter.setNext(xwikiAuthentication);
+        xwikiAuthentication.setNext(super.createRoot());
+
+        return setupCleanupFilter;
     }
 
-    public void addSpace(Space space)
-    {
-        spaceList.add(space);
-    }
-
-    public List<Space> getSpaceList()
-    {
-        return spaceList;
-    }
 }

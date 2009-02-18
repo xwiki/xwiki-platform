@@ -19,78 +19,84 @@
  */
 package org.xwiki.rest.resources.attachments;
 
-import org.restlet.Context;
-import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.rest.Constants;
-import org.xwiki.rest.DomainObjectFactory;
-import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Attachments;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
+
+import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.RangeIterable;
+import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.model.jaxb.Attachments;
+
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * @version $Id$
+ */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history")
 public class AttachmentHistoryResource extends XWikiResource
 {
-    @Override
-    public void init(Context context, Request request, Response response)
+    public AttachmentHistoryResource(@Context UriInfo uriInfo)
     {
-        super.init(context, request, response);
-        getVariants().add(new Variant(MediaType.ALL));
+        super(uriInfo);
     }
 
-    @Override
-    public Representation represent(Variant variant)
+    @GET
+    public Attachments getAttachmentHistory(@PathParam("wikiName") String wikiName,
+        @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
+        @PathParam("attachmentName") String attachmentName, @QueryParam("start") @DefaultValue("0") Integer start,
+        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
     {
-        try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
-            if (documentInfo == null) {
-                return null;
-            }
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+        
+        Document doc = documentInfo.getDocument();
 
-            Document doc = documentInfo.getDocument();
-
-            String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
-
-            final com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
-            if (xwikiAttachment == null) {
-                /* If the attachment doesn't exist send a not found header */
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                return null;
-            }
-
-            /*
-             * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
-             * external URL for an attachment
-             */
-            XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-
-            Attachments attachments = new Attachments();
-
-            Version[] versionList = xwikiAttachment.getVersions();
-            for (Version version : versionList) {
-                com.xpn.xwiki.api.Attachment xwikiAttachmentAtVersion =
-                    xwikiAttachment.getAttachmentRevision(version.toString());
-
-                String attachmentXWikiUrl =
-                    xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
-                        .toString();
-
-                attachments.addAttachment(DomainObjectFactory.createAttachmentAtVersion(getRequest(),
-                    resourceClassRegistry, xwikiAttachmentAtVersion, attachmentXWikiUrl));
-            }
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), attachments);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+        final com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
+        if (xwikiAttachment == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        return null;
+        /*
+         * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
+         * external URL for an attachment
+         */
+        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+
+        Attachments attachments = new Attachments();
+
+        Version[] versions = xwikiAttachment.getVersions();
+        List<Version> versionList = new ArrayList<Version>();
+        for(Version version : versions) {
+            versionList.add(version);
+        }
+        
+        RangeIterable<Version> ri = new RangeIterable<Version>(versionList, start, number);
+        
+        for (Version version : ri) {
+            com.xpn.xwiki.api.Attachment xwikiAttachmentAtVersion =
+                xwikiAttachment.getAttachmentRevision(version.toString());
+
+            String attachmentXWikiUrl =
+                xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
+                    .toString();
+
+            attachments.getAttachments().add(DomainObjectFactory.createAttachmentAtVersion(objectFactory, uriInfo.getBaseUri(),
+                xwikiAttachmentAtVersion, attachmentXWikiUrl));
+        }
+
+        return attachments;
     }
+
 }

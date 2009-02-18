@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.resources.objects;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -32,8 +31,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.Property;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -42,24 +41,25 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}/{objectNumber}")
-public class ObjectResource extends XWikiResource
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}/{objectNumber}/properties/{propertyName}")
+public class ObjectPropertyResource extends XWikiResource
 {
 
-    public ObjectResource(@Context UriInfo uriInfo)
+    public ObjectPropertyResource(@Context UriInfo uriInfo)
     {
         super(uriInfo);
     }
-    
+
     @GET
-    public Object getObject(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+    public Property getObjectProperty(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("className") String className,
-        @PathParam("objectNumber") Integer objectNumber) throws XWikiException
+        @PathParam("objectNumber") Integer objectNumber, @PathParam("propertyName") String propertyName)
+        throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
         Document doc = documentInfo.getDocument();
-        
+
         XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
 
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
@@ -67,19 +67,28 @@ public class ObjectResource extends XWikiResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject);
+        Object object =
+            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject);
+
+        for (Property property : object.getProperties()) {
+            if (property.getName().equals(propertyName)) {
+                return property;
+            }
+        }
+
+        throw new WebApplicationException(Status.NOT_FOUND);
     }
 
     @PUT
-    public Response updateObject(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
-        @PathParam("pageName") String pageName, @PathParam("className") String className,
-        @PathParam("objectNumber") Integer objectNumber, Object object) throws XWikiException
+    public Response updateObjectProperty(@PathParam("wikiName") String wikiName,
+        @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
+        @PathParam("className") String className, @PathParam("objectNumber") Integer objectNumber,
+        @PathParam("propertyName") String propertyName, Property property) throws XWikiException
     {
-
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
         Document doc = documentInfo.getDocument();
-        
+
         if (!doc.hasAccessLevel("edit", xwikiUser)) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
@@ -91,42 +100,21 @@ public class ObjectResource extends XWikiResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        for (Property property : object.getProperties()) {
-            baseObject.set(property.getName(), property.getValue(), xwikiContext);
-        }
+        baseObject.set(propertyName, property.getValue(), xwikiContext);
 
         doc.save();
 
         baseObject = xwikiDocument.getObject(className, objectNumber);
+        Object object =
+            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject);
 
-        return Response.status(Status.ACCEPTED).entity(
-            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject))
-            .build();
-    }
-    
-    @DELETE
-    public void deleteObject(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
-        @PathParam("pageName") String pageName, @PathParam("className") String className,
-        @PathParam("objectNumber") Integer objectNumber) throws XWikiException
-    {
-        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
-
-        Document doc = documentInfo.getDocument();
-        
-        if (!doc.hasAccessLevel("edit", xwikiUser)) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
+        for (Property p : object.getProperties()) {
+            if (p.getName().equals(propertyName)) {
+                return Response.status(Status.ACCEPTED).entity(p).build();
+            }
         }
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-
-        com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
-        if (baseObject == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
-        
-        xwikiDocument.removeObject(baseObject);
-        
-        doc.save();     
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
 }

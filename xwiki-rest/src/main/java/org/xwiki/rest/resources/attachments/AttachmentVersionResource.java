@@ -19,83 +19,52 @@
  */
 package org.xwiki.rest.resources.attachments;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
-import org.restlet.Context;
-import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.data.Status;
-import org.restlet.resource.OutputRepresentation;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
 import org.xwiki.rest.XWikiResource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
+/**
+ * @version $Id$
+ */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history/{attachmentVersion}")
 public class AttachmentVersionResource extends XWikiResource
 {
-    @Override
-    public void init(Context context, Request request, Response response)
+    public AttachmentVersionResource(@Context UriInfo uriInfo)
     {
-        super.init(context, request, response);
-        getVariants().add(new Variant(MediaType.ALL));
+        super(uriInfo);
     }
 
-    @Override
-    public Representation represent(Variant variant)
+    @GET
+    public Response getAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("attachmentName") String attachmentName,
+        @PathParam("attachmentVersion") String attachmentVersion) throws XWikiException
     {
-        try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
-            if (documentInfo == null) {
-                return null;
-            }
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+        Document doc = documentInfo.getDocument();
 
-            Document doc = documentInfo.getDocument();
-
-            String attachmentName = (String) getRequest().getAttributes().get(Constants.ATTACHMENT_NAME_PARAMETER);
-            String attachmentVersion =
-                (String) getRequest().getAttributes().get(Constants.ATTACHMENT_VERSION_PARAMETER);
-
-            com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
-            if (xwikiAttachment == null) {
-                /* If the attachment doesn't exist send a not found header */
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                return null;
-            }
-
-            /* Get the requested version */
-            final com.xpn.xwiki.api.Attachment xwikiAttachmentVersion =
-                xwikiAttachment.getAttachmentRevision(attachmentVersion);
-            if (xwikiAttachmentVersion == null) {
-                /* If the attachment doesn't exist send a not found header */
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                return null;
-            }
-
-            return new OutputRepresentation(MediaType.valueOf(xwikiAttachment.getMimeType()))
-            {
-                @Override
-                public void write(OutputStream outputStream) throws IOException
-                {
-                    /* TODO: Maybe we should write the content N bytes at a time */
-                    try {
-                        outputStream.write(xwikiAttachmentVersion.getContent());
-                    } catch (XWikiException e) {
-                        getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                    } finally {
-                        outputStream.close();
-                    }
-                }
-            };
-        } catch (Exception e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+        com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
+        if (xwikiAttachment == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        return null;
+        /* Get the requested version */
+        final com.xpn.xwiki.api.Attachment xwikiAttachmentVersion =
+            xwikiAttachment.getAttachmentRevision(attachmentVersion);
+        if (xwikiAttachmentVersion == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        return Response.ok().type(xwikiAttachment.getMimeType()).entity(xwikiAttachmentVersion.getContent()).build();
     }
+
 }

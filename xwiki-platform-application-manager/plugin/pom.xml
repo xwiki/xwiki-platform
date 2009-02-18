@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-application-manager</artifactId>
   <name>XWiki Platform - Plugins - Application Manager</name>
-  <version>1.6</version>
+  <version>1.7-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Application Manager</description>
   <properties>
     <platform.tool.verification.version>1.11</platform.tool.verification.version>
@@ -80,10 +80,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-application-manager-1.6</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-application-manager-1.6</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-application-manager-1.6</url>
-  </scm>
 </project>

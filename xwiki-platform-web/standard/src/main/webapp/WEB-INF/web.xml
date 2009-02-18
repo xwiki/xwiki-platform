@@ -9,14 +9,6 @@
   <display-name>xwiki</display-name>
   <description>XWiki Application</description>
   
-  <!-- RESTful API application class name -->
-  <context-param>
-    <param-name>org.restlet.application</param-name>
-    <param-value>
-	  org.xwiki.rest.XWikiRestApplication  
-	</param-value>
-  </context-param>  
-
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specificy
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
@@ -187,6 +179,49 @@
     <servlet-class>
       org.xwiki.rest.XWikiRestletServlet  
     </servlet-class>
+   		<init-param>
+			<param-name>resources</param-name>
+			<param-value>
+				org.xwiki.rest.resources.RootResource;
+				org.xwiki.rest.resources.wikis.WikisResource;
+				org.xwiki.rest.resources.spaces.SpacesResource;
+				org.xwiki.rest.resources.spaces.SpaceResource;
+				org.xwiki.rest.resources.pages.PagesResource;
+				org.xwiki.rest.resources.pages.PageChildrenResource;
+				org.xwiki.rest.resources.pages.PageHistoryResource;
+				org.xwiki.rest.resources.pages.PageResource;
+				org.xwiki.rest.resources.pages.PageTranslationHistoryResource;
+				org.xwiki.rest.resources.pages.PageTranslationResource;
+				org.xwiki.rest.resources.pages.PageTranslationsResource;
+				org.xwiki.rest.resources.pages.PageTranslationVersionResource;
+				org.xwiki.rest.resources.pages.PageVersionResource;
+				org.xwiki.rest.resources.comments.CommentResource;
+				org.xwiki.rest.resources.comments.CommentsResource;
+				org.xwiki.rest.resources.comments.CommentsVersionResource;
+				org.xwiki.rest.resources.comments.CommentVersionResource;
+				org.xwiki.rest.resources.attachments.AttachmentHistoryResource;
+				org.xwiki.rest.resources.attachments.AttachmentResource;
+				org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
+				org.xwiki.rest.resources.attachments.AttachmentsResource;
+				org.xwiki.rest.resources.attachments.AttachmentVersionResource;
+				org.xwiki.rest.resources.objects.ObjectsResource;
+				org.xwiki.rest.resources.objects.ObjectsForClassNameResource;
+				org.xwiki.rest.resources.objects.ObjectResource;
+				org.xwiki.rest.resources.objects.ObjectPropertiesResource;
+				org.xwiki.rest.resources.objects.ObjectPropertyResource;
+				org.xwiki.rest.resources.classes.ClassesResource;
+				org.xwiki.rest.resources.classes.ClassResource;
+				org.xwiki.rest.resources.classes.ClassPropertiesResource;
+				org.xwiki.rest.resources.classes.ClassPropertyResource;
+				org.xwiki.rest.resources.ModificationsResource;
+			</param-value>
+		</init-param>
+		<init-param>
+			<param-name>providers</param-name>
+			<param-value>
+				org.xwiki.rest.exceptions.XWikiExceptionMapper					
+			</param-value>
+		</init-param>   
   </servlet>
 
   <!-- RESTful API mapping -->

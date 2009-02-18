@@ -36,9 +36,9 @@
   <version>1.8-SNAPSHOT</version>
   <description>XWiki Platform - Core - Parent POM</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.8</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.8</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.8</url>
   </scm>
   <dependencyManagement>
     <dependencies>

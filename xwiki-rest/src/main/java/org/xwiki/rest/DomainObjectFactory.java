@@ -113,8 +113,9 @@ public class DomainObjectFactory
         classesLink.setHref(classesUri);
         classesLink.setRel(Relations.CLASSES);
         wiki.getLinks().add(classesLink);
-        
-        String modificationsUri = UriBuilder.fromUri(baseUri).path(ModificationsResource.class).build(wikiName).toString();
+
+        String modificationsUri =
+            UriBuilder.fromUri(baseUri).path(ModificationsResource.class).build(wikiName).toString();
         Link modificationsLink = objectFactory.createLink();
         modificationsLink.setHref(modificationsUri);
         modificationsLink.setRel(Relations.MODIFICATIONS);
@@ -706,7 +707,8 @@ public class DomainObjectFactory
         clazz.getLinks().add(classLink);
 
         String propertiesUri =
-            UriBuilder.fromUri(baseUri).path(ClassPropertiesResource.class).build(wikiName, xwikiClass.getName()).toString();
+            UriBuilder.fromUri(baseUri).path(ClassPropertiesResource.class).build(wikiName, xwikiClass.getName())
+                .toString();
         Link propertyLink = objectFactory.createLink();
         propertyLink.setHref(propertiesUri);
         propertyLink.setRel(Relations.PROPERTIES);

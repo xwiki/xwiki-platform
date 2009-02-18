@@ -43,7 +43,7 @@ public class XWikiAuthentication extends Guard
     @Override
     public int authenticate(Request request)
     {
-         if (request.getResourceRef().getPath().endsWith(BrowserAuthenticationResource.URI_PATTERN)) {
+        if (request.getResourceRef().getPath().endsWith(BrowserAuthenticationResource.URI_PATTERN)) {
             return super.authenticate(request);
         }
 
@@ -51,7 +51,7 @@ public class XWikiAuthentication extends Guard
 
         Form queryParameters = request.getResourceRef().getQueryAsForm();
         if (queryParameters.getValues("login") == null) {
-            if (headers.getValues(HttpConstants.HEADER_AUTHORIZATION) == null) {                
+            if (headers.getValues(HttpConstants.HEADER_AUTHORIZATION) == null) {
                 return 1;
             }
         }
@@ -65,13 +65,13 @@ public class XWikiAuthentication extends Guard
         XWikiContext xwikiContext = (XWikiContext) getContext().getAttributes().get(Constants.XWIKI_CONTEXT);
         XWiki xwiki = (XWiki) getContext().getAttributes().get(Constants.XWIKI);
 
-        try {            
+        try {
             if (xwiki.getAuthService().authenticate(identifier, new String(secret), xwikiContext) != null) {
                 String xwikiUser = String.format("XWiki.%s", identifier);
 
                 xwikiContext.setUser(xwikiUser);
-                getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));                
-                
+                getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));
+
                 getContext().getAttributes().put(Constants.XWIKI_USER, xwikiUser);
 
                 return true;
@@ -80,8 +80,8 @@ public class XWikiAuthentication extends Guard
             getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
         }
 
-        getLogger().log(Level.WARNING, String.format("Cannot authenticate '%s'.", identifier));        
-        
+        getLogger().log(Level.WARNING, String.format("Cannot authenticate '%s'.", identifier));
+
         return false;
     }
 

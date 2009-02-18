@@ -59,7 +59,7 @@ public class Relations
     public static final String CLASS = "http://www.xwiki.org/rel/class";
 
     public static final String PROPERTY = "http://www.xwiki.org/rel/property";
-    
+
     public static final String PROPERTIES = "http://www.xwiki.org/rel/properties";
 
     public static final String MODIFICATIONS = "http://www.xwiki.org/rel/modifications";

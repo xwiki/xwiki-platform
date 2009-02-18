@@ -49,7 +49,7 @@ public class XWikiResource
     protected UriInfo uriInfo;
 
     protected Logger logger;
-    
+
     protected ObjectFactory objectFactory;
 
     /**
@@ -99,7 +99,7 @@ public class XWikiResource
         this.uriInfo = uriInfo;
 
         logger = Logger.getLogger(this.getClass().getName());
-        
+
         objectFactory = new ObjectFactory();
 
         logger.log(Level.FINE, String.format("Resource %s initialized at %s. Serving user: '%s'\n", getClass()
@@ -138,7 +138,8 @@ public class XWikiResource
 
         if (failIfDoesntExist) {
             if (!existed) {
-                //throwWebApplicationException(Status.NOT_FOUND, String.format("Page %s doesn't exist.", pageFullName));
+                // throwWebApplicationException(Status.NOT_FOUND, String.format("Page %s doesn't exist.",
+                // pageFullName));
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
         }

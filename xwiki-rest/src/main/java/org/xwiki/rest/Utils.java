@@ -49,5 +49,5 @@ public class Utils
 
         return document.getPrefixedFullName();
     }
-    
+
 }

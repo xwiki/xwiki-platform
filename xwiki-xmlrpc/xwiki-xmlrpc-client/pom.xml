@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-xmlrpc-parent</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-xmlrpc-client</artifactId>
   <name>XWiki Platform - Core - XMLRPC client</name>

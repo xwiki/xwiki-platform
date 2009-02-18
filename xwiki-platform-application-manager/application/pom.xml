@@ -27,15 +27,15 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>18</version>
   </parent>
   <artifactId>xwiki-application-application-manager</artifactId>
   <name>XWiki Platform - Applications - Application Manager</name>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.6</version>
   <packaging>xar</packaging>
   <description>Manages creation and installation of XWiki Applications</description>
   <properties>
-    <platform.plugin.applicationmanager.version>1.6-SNAPSHOT</platform.plugin.applicationmanager.version>
+    <platform.plugin.applicationmanager.version>1.6</platform.plugin.applicationmanager.version>
   </properties>
   <dependencies>
     <dependency>
@@ -81,4 +81,10 @@
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-application-manager-1.6</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-application-manager-1.6</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-application-manager-1.6</url>
+  </scm>
 </project>

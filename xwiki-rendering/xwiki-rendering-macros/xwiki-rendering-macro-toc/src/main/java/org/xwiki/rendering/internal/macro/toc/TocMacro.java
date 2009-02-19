@@ -88,6 +88,8 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
     public List<Block> execute(TocMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        List<Block> result;
+
         // Example:
         // 1 Section1
         // 1 Section2
@@ -120,22 +122,24 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
 
         List<HeaderBlock> headers = root.getChildrenByType(HeaderBlock.class, true);
 
-        if (!headers.isEmpty()) {
-            // If the root block is a section, remove it's header block for the list of header blocks
-            if (root instanceof SectionBlock) {
-                Block block = root.getChildren().get(0);
+        // If the root block is a section, remove it's header block for the list of header blocks
+        if (root instanceof SectionBlock) {
+            Block block = root.getChildren().get(0);
 
-                if (block instanceof HeaderBlock) {
-                    headers.remove(block);
-                }
+            if (block instanceof HeaderBlock) {
+                headers.remove(block);
             }
-
-            // Construct table of content from sections list
-            return Arrays.asList(generateTree(headers, parameters.getStart(), parameters.getDepth(), parameters
-                .isNumbered()));
         }
 
-        return Collections.emptyList();
+        // Construct table of content from sections list
+        Block tocBlock = generateTree(headers, parameters.getStart(), parameters.getDepth(), parameters.isNumbered());
+        if (tocBlock != null) {
+            result = Arrays.asList(tocBlock);
+        } else {
+            result = Collections.emptyList();
+        }
+
+        return result;
     }
 
     /**
@@ -153,10 +157,11 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
      * @param start the "start" parameter value.
      * @param depth the "depth" parameter value.
      * @param numbered the "numbered" parameter value.
-     * @return the root block of generated block tree.
+     * @return the root block of generated block tree or null if no header was matching the specified parameters
      */
     private Block generateTree(List<HeaderBlock> headers, int start, int depth, boolean numbered)
     {
+        Block tocBlock = null;
         int currentLevel = 0;
         Block currentBlock = null;
         for (HeaderBlock headerBlock : headers) {
@@ -180,7 +185,11 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
             }
         }
 
-        return currentBlock.getRoot();
+        if (currentBlock != null) {
+            tocBlock = currentBlock.getRoot();
+        }
+
+        return tocBlock;
     }
 
     /**

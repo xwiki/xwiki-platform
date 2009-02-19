@@ -1,0 +1,19 @@
+.#----------------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify that no error happens when there's a header but that doesn't match the start parameter for the TOC
+.#----------------------------------------------------------------------------------------------------------
+{{toc/}}
+
+= header =
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [toc] [] []
+endMacroMarkerStandalone [toc] [] []
+beginSection
+beginHeader [1]
+onWord [header]
+endHeader [1]
+endSection
+endDocument

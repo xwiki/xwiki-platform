@@ -1,0 +1,12 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{useravatar username="XWiki.Admin" width="100" height="200"/}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:useravatar|-|username="XWiki.Admin" width="100" height="200"|-|--><!--startimage:XWiki.Admin@mockAvatar.png--><img src="/xwiki/bin/download/XWiki/Admin/mockAvatar.png" alt="Picture of Admin" title="Admin" width="100" height="200"/><!--stopimage--><!--stopmacro-->
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+{{useravatar username="XWiki.Admin" width="100" height="200"/}}

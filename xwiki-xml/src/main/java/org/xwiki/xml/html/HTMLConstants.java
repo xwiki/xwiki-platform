@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.xml.internal.html;
+package org.xwiki.xml.html;
 
 /**
  * HTML Constants used by the HTML Cleaner.
@@ -92,9 +92,99 @@ public interface HTMLConstants
      * HTML &lt;font&gt; tag name.
      */
     String FONT = "font";
+    
+    /**
+     * HTML &lt;h1&gt; tag name.
+     */
+    String H1 = "h1";
+
+    /**
+     * HTML &lt;h2&gt; tag name.
+     */
+    String H2 = "h2";
+
+    /**
+     * HTML &lt;h3&gt; tag name.
+     */
+    String H3 = "h3";
+
+    /**
+     * HTML &lt;h4&gt; tag name.
+     */
+    String H4 = "h4";
+
+    /**
+     * HTML &lt;h5&gt; tag name.
+     */
+    String H5 = "h5";
+
+    /**
+     * HTML &lt;h6&gt; tag name.
+     */
+    String H6 = "h6";
+    
+    /**
+     * HTML &lt;br&gt; tag name.
+     */
+    String BR = "br";
+
+    /**
+     * HTML &lt;ul&gt; tag name.
+     */
+    String UL = "ul";
+
+    /**
+     * HTML &lt;ol&gt; tag name.
+     */
+    String OL = "ol";
+    
+    /**
+     * HTML &lt;li&gt; tag name.
+     */
+    String LI = "li";
+
+    /**
+     * HTML &lt;img&gt; tag name.
+     */
+    String IMG = "img";
+
+    /**
+     * HTML &lt;table&gt; tag name.
+     */
+    String TABLE = "table";
+
+    /**
+     * HTML &lt;tr&gt; tag name.
+     */
+    String TR = "tr";
+
+    /**
+     * HTML &lt;td&gt; tag name.
+     */
+    String TD = "td";
 
     /**
      * HTML style attribute name.
      */
-    String STYLE_ATTRIBUTE = "style";
+    String ATTRIBUTE_STYLE = "style";
+    
+    /**
+     * HTML rowspan table attribute.
+     */
+    String ATTRIBUTE_ROWSPAN = "rowspan";
+    
+    /**
+     * HTML font color attribute.
+     */
+    String ATTRIBUTE_FONTCOLOR = "color";
+    
+    /**
+     * HTML font face attribute.
+     */
+    String ATTRIBUTE_FONTFACE = "face";
+    
+    /**
+     * HTML font size attribute.
+     */
+    String ATTRIBUTE_FONTSIZE = "size";
 }

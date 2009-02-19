@@ -17,28 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.xml.internal.html.filter;
+package org.xwiki.xml.html.filter;
 
-import org.jdom.DocType;
-import org.jdom.Document;
-import org.xwiki.xml.html.filter.CleaningFilter;
+import org.w3c.dom.Element;
 
 /**
- * Sets the Document DOCTYPE to XHTML 1.0 strict.
- *
+ * Interface for defining element selections. Element filters are useful when an operation needs to be performed on a
+ * selection of Elements depending on some criterion. In such cases, the operation will be performed only if the
+ * provided filter returns true for that particular Element.
+ * 
  * @version $Id$
- * @since 1.6RC1
+ * @since 1.8RC2
  */
-public class DocTypeCleaningFilter implements CleaningFilter
+public interface ElementFilterCriterion
 {
     /**
-     * {@inheritDoc}
-     * @see CleaningFilter#filter(org.jdom.Document)
+     * @param element the {@link Element} against which the criterion is applied.
+     * @return true if this particular element should be filtered.
      */
-    public void filter(Document document)
-    {
-        DocType docType = new DocType("html", "-//W3C//DTD XHTML 1.0 Strict//EN", 
-            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
-        document.setDocType(docType);
-    }
+    boolean isFiltered(Element element);
 }

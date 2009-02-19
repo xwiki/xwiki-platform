@@ -32,13 +32,15 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.JDomSerializer;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.TagTransformation;
-import org.jdom.Document;
+import org.jdom.DocType;
 import org.jdom.JDOMException;
 import org.jdom.output.DOMOutputter;
+import org.w3c.dom.Document;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.xml.html.HTMLCleaner;
-import org.xwiki.xml.html.filter.CleaningFilter;
+import org.xwiki.xml.html.HTMLConstants;
+import org.xwiki.xml.html.filter.HTMLFilter;
 
 /**
  * Default implementation for {@link org.xwiki.xml.html.HTMLCleaner} using the <a href="HTML Cleaner
@@ -50,10 +52,10 @@ import org.xwiki.xml.html.filter.CleaningFilter;
 public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
 {
     /**
-     * List of default cleaning filters to call when cleaning code with HTML Cleaner. This is for cases when there are
-     * no <a href="http://htmlcleaner.sourceforge.net/parameters.php">properties</a> defined in HTML Cleaner.
+     * List of default html filters to call when cleaning code with HTML Cleaner. This is for cases when there are no <a
+     * href="http://htmlcleaner.sourceforge.net/parameters.php">properties</a> defined in HTML Cleaner.
      */
-    private List<CleaningFilter> filters;
+    private List<HTMLFilter> filters;
 
     /**
      * {@inheritDoc}
@@ -81,19 +83,19 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      * 
      * @see org.xwiki.xml.html.HTMLCleaner#clean(String)
      */
-    public org.w3c.dom.Document clean(Reader originalHtmlContent)
-    {                
+    public Document clean(Reader originalHtmlContent)
+    {
         return clean(originalHtmlContent, getDefaultCleanerProperties(), getDefaultCleanerTransformations());
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * {@link DefaultHTMLCleaner} supports following cleaning parameters:<br/>
-     * 'namespacesAware' : if set to 'true' namespace information will be preserved during cleaning.<br/>
+     * {@link DefaultHTMLCleaner} supports following cleaning parameters:<br/> 'namespacesAware' : if set to 'true'
+     * namespace information will be preserved during cleaning.<br/>
      * </p>
      */
-    public org.w3c.dom.Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters)
+    public Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters)
     {
         CleanerProperties cleanerProperties = getDefaultCleanerProperties();
         String param = cleaningParameters.get(NAMESPACES_AWARE);
@@ -110,15 +112,15 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      * @param cleanerTransformations {@link CleanerTransformations} to be used when cleaning.
      * @return the cleaned html as a {@link org.w3c.dom.Document}.
      */
-    private org.w3c.dom.Document clean(Reader originalHtmlContent, CleanerProperties cleanerProperties,
-        CleanerTransformations cleanerTransformations) 
+    private Document clean(Reader originalHtmlContent, CleanerProperties cleanerProperties,
+        CleanerTransformations cleanerTransformations)
     {
-        org.w3c.dom.Document result;
+        Document result = null;
         // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise we would need
         // to synchronize this clean() method which would slow down the whole system by queuing up cleaning requests.
         // See http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=903699
         HtmlCleaner cleaner = new HtmlCleaner(cleanerProperties);
-        cleaner.setTransformations(cleanerTransformations);        
+        cleaner.setTransformations(cleanerTransformations);
         TagNode cleanedNode;
         try {
             cleanedNode = cleaner.clean(originalHtmlContent);
@@ -128,21 +130,31 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             throw new RuntimeException("Unhandled error when cleaning HTML", e);
         }
         // Fix cleaned node bug
-        fixCleanedNodeBug(cleanedNode);
-        Document document = new JDomSerializer(cleanerProperties, false).createJDom(cleanedNode);
-        // Perform other cleaning operation this time using the W3C Document interface.
-        for (CleaningFilter filter : this.filters) {
-            filter.filter(document);
-        }
+        fixCleanedNodeBug(cleanedNode);        
+        // Ideally following code should be enough. But htmlcleaner seems to omit the DocType declaration while
+        // serializing.
+        //      cleanedNode.setDocType(new DoctypeToken("html", "PUBLIC", "-//W3C//DTD XHTML 1.0 Strict//EN",
+        //          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"));
+        //      try {
+        //          result = new DomSerializer(cleanerProperties, false).createDOM(cleanedNode);
+        //      } catch(ParserConfigurationException ex) { }
+        // As a workaround, we have go through jdom so that we can set the DocType manually.
+        org.jdom.Document jdomDoc = null;
+        jdomDoc = new JDomSerializer(cleanerProperties, false).createJDom(cleanedNode);
+        jdomDoc.setDocType(new DocType("html", "-//W3C//DTD XHTML 1.0 Strict//EN", 
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"));
         try {
-            DOMOutputter outputter = new DOMOutputter();
-            result = outputter.output(document);
-        } catch (JDOMException e) {
-            throw new RuntimeException("Failed to convert JDOM Document to W3C Document", e);
+            result = new DOMOutputter().output(jdomDoc);
+        } catch (JDOMException ex) {
+            throw new RuntimeException("Error while transforming jdom document into w3c document", ex);
+        }        
+        // Finally apply filters.
+        for (HTMLFilter filter : filters) {
+            filter.filter(result);
         }
         return result;        
     }
-    
+
     /**
      * @return the default {@link CleanerProperties} to be used for cleaning.
      */
@@ -158,13 +170,13 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         //  ]]>
         //  </script>
         // Thus we need to turn off this feature.
-        defaultProperties.setUseCdataForScriptAndStyle(false);        
+        defaultProperties.setUseCdataForScriptAndStyle(false);
         return defaultProperties;
     }
-    
+
     /**
-     * @return the default cleaning transformations to perform on tags, in addition to the base transformations done
-     *         by HTML Cleaner
+     * @return the default cleaning transformations to perform on tags, in addition to the base transformations done by
+     *         HTML Cleaner
      */
     private CleanerTransformations getDefaultCleanerTransformations()
     {
@@ -186,12 +198,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         defaultTransformations.addTransformation(tt);
 
         tt = new TagTransformation(HTMLConstants.CENTER, HTMLConstants.P, false);
-        tt.addAttributeTransformation(HTMLConstants.STYLE_ATTRIBUTE, "text-align:center");
-        defaultTransformations.addTransformation(tt);
-
-        tt = new TagTransformation(HTMLConstants.FONT, HTMLConstants.SPAN, false);
-        tt.addAttributeTransformation(HTMLConstants.STYLE_ATTRIBUTE,
-            "color:${color};font-family=${face};font-size=${size}pt;");
+        tt.addAttributeTransformation(HTMLConstants.ATTRIBUTE_STYLE, "text-align:center");
         defaultTransformations.addTransformation(tt);
 
         return defaultTransformations;

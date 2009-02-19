@@ -26,9 +26,8 @@ import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.parser.ImageParser;
 
 /**
- * Since we need to have wiki syntax-specific image parsers, this generic parser allows at least to the reference
- * displayed when using syntaxes other than XWiki (which has its specific image parser, see {@link XWikiImageParser}),
- * while waiting for specialized image parsers to be written.
+ * Since we need to have wiki syntax-specific image parsers, this generic parser supports external images and
+ * images located in the attachment of the current page, while waiting for specialized image parsers to be written.
  * 
  * @version $Id$
  * @since 1.7M3

@@ -100,7 +100,8 @@
     #set($result=$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options))
     #if($result)
     #set($goBack = "[$msg.get('xe.officeimporter.results.goback')&gt;XWiki.OfficeImporter]")
-    #set($resultDocument = "*[$msg.get('xe.officeimporter.results.result')&gt;$targetSpace.$targetPage]*")  
+    #set($targetDocumentEscaped=$targetDocument.replaceAll(" ", "+"))
+    #set($resultDocument = "*[$msg.get('xe.officeimporter.results.result')&gt;$targetDocumentEscaped]*")  
       #info($msg.get("xe.officeimporter.results.success", [$resultDocument, $goBack]))
     #else
       #error($officeimporter.getMessage())

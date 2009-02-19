@@ -1,52 +1,68 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.rest.resources.classes;
 
-import java.util.Collections;
-import java.util.List;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
-import org.restlet.data.Form;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
 import org.xwiki.rest.DomainObjectFactory;
-import org.xwiki.rest.RangeIterable;
-import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Classes;
+import org.xwiki.rest.model.jaxb.Class;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Class;
-import com.xpn.xwiki.api.Document;
 
+/**
+ * @version $Id$
+ */
+@Path("/wikis/{wikiName}/classes/{className}")
 public class ClassResource extends XWikiResource
 {
-    @Override
-    public Representation represent(Variant variant)
+
+    public ClassResource(@Context UriInfo uriInfo)
     {
+        super(uriInfo);
+    }
+
+    @GET
+    public Class getClass(@PathParam("wikiName") String wikiName, @PathParam("className") String className)
+        throws XWikiException
+    {
+
         String database = xwikiContext.getDatabase();
 
         try {
-            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);
-            String className = (String) getRequest().getAttributes().get(Constants.CLASS_NAME_PARAMETER);
-            xwikiContext.setDatabase(wiki);
+            xwikiContext.setDatabase(wikiName);
 
-            Class xwikiClass = xwikiApi.getClass(className);
-            if (xwikiClass == null) {
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                return null;
+            com.xpn.xwiki.api.Class xwikiClass = xwikiApi.getClass(className);
+            if(xwikiClass == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
             }
-
-            org.xwiki.rest.model.Class theClass =
-                DomainObjectFactory.createSpace(getRequest(), resourceClassRegistry, wiki, xwikiClass);
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), theClass);
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+                        
+            return DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass);
         } finally {
             xwiki.setDatabase(database);
         }
-
-        return null;
     }
 }

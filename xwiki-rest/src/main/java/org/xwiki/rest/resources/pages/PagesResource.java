@@ -23,16 +23,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.restlet.data.Form;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Pages;
+import org.xwiki.rest.model.jaxb.Pages;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -40,50 +43,54 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages")
 public class PagesResource extends XWikiResource
 {
-    @Override
-    public Representation represent(Variant variant)
+    public PagesResource(@Context UriInfo uriInfo)
+    {
+        super(uriInfo);
+    }
+
+    @GET
+    public Pages getPages(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @QueryParam("start") @DefaultValue("0") Integer start,
+        @QueryParam("number") @DefaultValue("-1") Integer number, @QueryParam("parent") String parentFilterExpression)
+        throws XWikiException
     {
         String database = xwikiContext.getDatabase();
 
-        try {
-            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);
-            String spaceName = (String) getRequest().getAttributes().get(Constants.SPACE_NAME_PARAMETER);
-            xwikiContext.setDatabase(wiki);
+        Pages pages = objectFactory.createPages();
 
-            Pages pages = new Pages();
+        /* This try is just needed for executing the finally clause. Exceptions are actually re-thrown. */
+        try {
+            xwikiContext.setDatabase(wikiName);
+
             List<String> pageNames = xwikiApi.getSpaceDocsName(spaceName);
             Collections.sort(pageNames);
 
-            Form queryForm = getRequest().getResourceRef().getQueryAsForm();
-            RangeIterable<String> ri =
-                new RangeIterable<String>(pageNames, Utils.parseInt(queryForm.getFirstValue(Constants.START_PARAMETER),
-                    0), Utils.parseInt(queryForm.getFirstValue(Constants.NUMBER_PARAMETER), -1));
-
-            String parentFilterParameter = queryForm.getFirstValue(Constants.PARENT_FILTER_PARAMETER);
             Pattern parentFilter = null;
-            if (parentFilterParameter != null) {
-                if (parentFilterParameter.equals("null")) {
+            if (parentFilterExpression != null) {
+                if (parentFilterExpression.equals("null")) {
                     parentFilter = Pattern.compile("");
                 } else {
-                    parentFilter = Pattern.compile(parentFilterParameter);
+                    parentFilter = Pattern.compile(parentFilterExpression);
                 }
             }
 
+            RangeIterable<String> ri = new RangeIterable<String>(pageNames, start, number);
+
             for (String pageName : ri) {
-                String pageFullName = String.format("%s.%s", spaceName, pageName);
+                String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
 
                 if (!xwikiApi.exists(pageFullName)) {
-                    getLogger().warning(
-                        String.format("[Page '%s' appears to be in space '%s' but no information is available.]",
-                            pageName, spaceName));
+                    logger.warning(String
+                        .format("[Page '%s' appears to be in space '%s' but no information is available.]", pageName,
+                            spaceName));
                 } else {
                     Document doc = xwikiApi.getDocument(pageFullName);
 
                     /* We only add pages we have the right to access */
                     if (doc != null) {
-
                         boolean add = true;
 
                         if (parentFilter != null) {
@@ -96,21 +103,16 @@ public class PagesResource extends XWikiResource
                         }
 
                         if (add) {
-                            pages.addPageSummary(DomainObjectFactory.createPageSummary(getRequest(),
-                                resourceClassRegistry, doc));
+                            pages.getPageSummaries().add(
+                                DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc));
                         }
                     }
                 }
             }
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), pages);
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
         } finally {
             xwikiContext.setDatabase(database);
         }
 
-        return null;
+        return pages;
     }
 }

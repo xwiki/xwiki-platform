@@ -19,15 +19,19 @@
  */
 package org.xwiki.rest.resources.spaces;
 
+import java.util.Collections;
 import java.util.List;
 
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Space;
+import org.xwiki.rest.model.jaxb.Space;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -35,44 +39,39 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Path("/wikis/{wikiName}/spaces/{spaceName}")
 public class SpaceResource extends XWikiResource
 {
-    @Override
-    public Representation represent(Variant variant)
+    public SpaceResource(@Context UriInfo uriInfo)
+    {
+        super(uriInfo);
+    }
+
+    @GET
+    public Space getPage(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName)
+        throws XWikiException
     {
         String database = xwikiContext.getDatabase();
 
+        /* This try is just needed for executing the finally clause. */
         try {
-            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);
-            String spaceName = (String) getRequest().getAttributes().get(Constants.SPACE_NAME_PARAMETER);
-            xwikiContext.setDatabase(wiki);
+            xwikiContext.setDatabase(wikiName);
+
+            List<String> spaceNames = xwikiApi.getSpaces();
+            Collections.sort(spaceNames);
 
             List<String> docNames = xwikiApi.getSpaceDocsName(spaceName);
-            String home = String.format("%s.WebHome", spaceName);
-            String homeXWikiUrl = null;
+            String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
+            Document home = null;
 
-            if (!xwikiApi.exists(home)) {
-                home = null;
-            } else {
-                Document doc = xwikiApi.getDocument(home);
-                if (doc != null) {
-                    homeXWikiUrl = doc.getExternalURL("view");
-                }
+            if (xwikiApi.exists(homeId)) {
+                home = xwikiApi.getDocument(homeId);
             }
 
-            Space space =
-                DomainObjectFactory.createSpace(getRequest(), resourceClassRegistry, wiki, spaceName, home,
-                    homeXWikiUrl, docNames.size());
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), space);
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            return DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home,
+                docNames.size());
         } finally {
-            xwiki.setDatabase(database);
+            xwikiContext.setDatabase(database);
         }
-
-        return null;
     }
-
 }

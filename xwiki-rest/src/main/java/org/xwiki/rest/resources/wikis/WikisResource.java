@@ -19,73 +19,45 @@
  */
 package org.xwiki.rest.resources.wikis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
-import org.xwiki.rest.Utils;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
+import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Link;
-import org.xwiki.rest.model.Relations;
-import org.xwiki.rest.model.Wiki;
-import org.xwiki.rest.model.Wikis;
-import org.xwiki.rest.resources.classes.ClassesResource;
-import org.xwiki.rest.resources.spaces.SpacesResource;
+import org.xwiki.rest.model.jaxb.Wikis;
 
 import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
  */
+@Path("/wikis")
 public class WikisResource extends XWikiResource
 {
-    @Override
-    public Representation represent(Variant variant)
+    public WikisResource(@Context UriInfo uriInfo)
     {
-        try {
-            Wikis wikis = new Wikis();
+        super(uriInfo);
+    }
 
-            List<String> databaseNames = xwiki.getVirtualWikisDatabaseNames(xwikiContext);
+    @GET
+    public Wikis get() throws XWikiException
+    {
+        List<String> databaseNames = xwiki.getVirtualWikisDatabaseNames(xwikiContext);
 
-            if (databaseNames.isEmpty()) {
-                databaseNames.add("xwiki");
-            }
-
-            for (String databaseName : databaseNames) {
-                Wiki wiki = new Wiki(databaseName);
-
-                String fullUri =
-                    String.format("%s%s", getRequest().getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(SpacesResource.class));
-                Map<String, String> parametersMap = new HashMap<String, String>();
-                parametersMap.put(Constants.WIKI_NAME_PARAMETER, databaseName);
-                Link link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-                link.setRel(Relations.SPACES);
-                wiki.addLink(link);
-
-                fullUri =
-                    String.format("%s%s", getRequest().getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(ClassesResource.class));
-                parametersMap = new HashMap<String, String>();
-                parametersMap.put(Constants.WIKI_NAME_PARAMETER, databaseName);
-                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-                link.setRel(Relations.CLASSES);
-                wiki.addLink(link);
-
-                wikis.addWiki(wiki);
-            }
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), wikis);
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+        if (databaseNames.isEmpty()) {
+            databaseNames.add("xwiki");
         }
 
-        return null;
+        Wikis wikis = objectFactory.createWikis();
 
+        for (String databaseName : databaseNames) {
+            wikis.getWikis().add(DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), databaseName));
+        }
+
+        return wikis;
     }
 }

@@ -19,150 +19,98 @@
  */
 package org.xwiki.rest.resources.comments;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
-import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Comment;
-import org.xwiki.rest.model.Comments;
-import org.xwiki.rest.model.XStreamFactory;
+import org.xwiki.rest.model.jaxb.Comment;
+import org.xwiki.rest.model.jaxb.Comments;
 
-import com.thoughtworks.xstream.XStream;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
 /**
  * @version $Id$
  */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/comments")
 public class CommentsResource extends XWikiResource
 {
-
-    @Override
-    public Representation represent(Variant variant)
+    public CommentsResource(@Context UriInfo uriInfo)
     {
-        try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
-            if (documentInfo == null) {
-                return null;
-            }
+        super(uriInfo);
+    }
 
-            Document doc = documentInfo.getDocument();
+    @GET
+    public Comments getComments(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,
+        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
-            Comments comments = new Comments();
+        Document doc = documentInfo.getDocument();
 
-            Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
+        Comments comments = objectFactory.createComments();
 
-            Form queryForm = getRequest().getResourceRef().getQueryAsForm();
-            RangeIterable<com.xpn.xwiki.api.Object> ri =
-                new RangeIterable<com.xpn.xwiki.api.Object>(xwikiComments, Utils.parseInt(queryForm
-                    .getFirstValue(Constants.START_PARAMETER), 0), Utils.parseInt(queryForm
-                    .getFirstValue(Constants.NUMBER_PARAMETER), -1));
+        Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
 
-            for (com.xpn.xwiki.api.Object xwikiComment : ri) {
-                comments.addComment(DomainObjectFactory.createComment(getRequest(), resourceClassRegistry, doc,
-                    xwikiComment, false));
-            }
+        RangeIterable<com.xpn.xwiki.api.Object> ri =
+            new RangeIterable<com.xpn.xwiki.api.Object>(xwikiComments, start, number);
 
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), comments);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+        for (com.xpn.xwiki.api.Object xwikiComment : ri) {
+            comments.getComments().add(DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment));
+        }
+
+        return comments;
+    }
+
+    @POST
+    public Response postComment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, Comment comment) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
+
+        Document doc = documentInfo.getDocument();
+
+        int id = doc.createNewObject("XWiki.XWikiComments");
+        com.xpn.xwiki.api.Object commentObject = doc.getObject("XWiki.XWikiComments", id);
+        commentObject.set("author", xwikiUser);
+        commentObject.set("date", new Date());
+
+        boolean save = false;
+
+        if (comment.getHighlight() != null) {
+            commentObject.set("highlight", comment.getHighlight());
+            save = true;
+        }
+
+        if (comment.getText() != null) {
+            commentObject.set("comment", comment.getText());
+            save = true;
+        }
+
+        if (save) {
+            doc.save();
+
+            Comment createdComment = DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, commentObject);
+
+            return Response.created(
+                UriBuilder.fromUri(uriInfo.getBaseUri()).path(CommentResource.class).build(wikiName, spaceName, pageName, id))
+                .entity(createdComment).build();
         }
 
         return null;
     }
-
-    @Override
-    public boolean allowPost()
-    {
-        return true;
-    }
-
-    @Override
-    public void handlePost()
-    {
-        MediaType mediaType = getRequest().getEntity().getMediaType();
-
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, true);
-        if (documentInfo == null) {
-            return;
-        }
-
-        Document doc = documentInfo.getDocument();
-
-        try {
-            int id = doc.createNewObject("XWiki.XWikiComments");
-            com.xpn.xwiki.api.Object commentObject = doc.getObject("XWiki.XWikiComments", id);
-            commentObject.set("author", xwikiUser);
-            commentObject.set("date", new Date());
-
-            /* Process the entity */
-            if (MediaType.TEXT_PLAIN.equals(mediaType)) {
-                try {
-                    commentObject.set("comment", getRequest().getEntity().getText());
-
-                    doc.save();
-                } catch (IOException e) {
-                    getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                    return;
-                }
-            } else if (MediaType.APPLICATION_XML.equals(mediaType)) {
-                XStream xstream = XStreamFactory.getXStream();
-
-                Comment comment = null;
-
-                /* If we receive an XML that is not convertible to a Page object we reject it */
-                try {
-                    comment = (Comment) xstream.fromXML(getRequest().getEntity().getText());
-                } catch (Exception e) {
-                    getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
-                    return;
-                }
-
-                /* We will only save if something changes... */
-                boolean save = false;
-
-                if (comment.getHighlight() != null) {
-                    commentObject.set("highlight", comment.getHighlight());
-                    save = true;
-                }
-
-                if (comment.getText() != null) {
-                    commentObject.set("comment", comment.getText());
-                    save = true;
-                }
-
-                if (save) {
-                    doc.save();
-
-                    getResponse().setStatus(Status.SUCCESS_CREATED);
-
-                    /* Set the entity as being the new/updated document XML representation */
-                    getResponse().setEntity(
-                        new StringRepresentation(Utils.toXml(DomainObjectFactory.createComment(getRequest(),
-                            resourceClassRegistry, doc, commentObject, false)), MediaType.APPLICATION_XML));
-                }
-            }
-        } catch (XWikiException e) {
-            if (e.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-            } else {
-                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-            }
-
-            return;
-        }
-    }
-
 }

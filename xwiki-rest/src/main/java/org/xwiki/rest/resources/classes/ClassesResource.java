@@ -1,59 +1,81 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.rest.resources.classes;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.restlet.data.Form;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
-import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Classes;
-import org.xwiki.rest.model.Space;
+import org.xwiki.rest.model.jaxb.Classes;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 
-public class ClassesResource extends XWikiResource
+/**
+ * @version $Id$
+ */
+@Path("/wikis/{wikiName}/classes")
+public class ClassesResource extends XWikiResource /* extends XWikiResource */
 {
-    @Override
-    public Representation represent(Variant variant)
+
+    public ClassesResource(@Context UriInfo uriInfo)
     {
+        super(uriInfo);
+    }
+
+    @GET
+    public Classes getClasses(@PathParam("wikiName") String wikiName,
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
+        throws XWikiException
+    {
+
         String database = xwikiContext.getDatabase();
 
         try {
-            String wiki = (String) getRequest().getAttributes().get(Constants.WIKI_NAME_PARAMETER);
-            xwikiContext.setDatabase(wiki);
+            xwikiContext.setDatabase(wikiName);
 
             List<String> classNames = xwikiApi.getClassList();
             Collections.sort(classNames);
 
-            Form queryForm = getRequest().getResourceRef().getQueryAsForm();
-            RangeIterable<String> ri =
-                new RangeIterable<String>(classNames, Utils.parseInt(
-                    queryForm.getFirstValue(Constants.START_PARAMETER), 0), Utils.parseInt(queryForm
-                    .getFirstValue(Constants.NUMBER_PARAMETER), -1));
+            RangeIterable<String> ri = new RangeIterable<String>(classNames, start, number);
 
-            Classes classes = new Classes();
+            Classes classes = objectFactory.createClasses();
 
             for (String className : ri) {
                 com.xpn.xwiki.api.Class xwikiClass = xwikiApi.getClass(className);
-                classes
-                    .addClass(DomainObjectFactory.createSpace(getRequest(), resourceClassRegistry, wiki, xwikiClass));
+                classes.getClazzs().add(
+                    DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass));
             }
 
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), classes);
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            return classes;
         } finally {
             xwiki.setDatabase(database);
         }
-
-        return null;
     }
 }

@@ -19,12 +19,60 @@
  */
 package org.xwiki.rest.resources.pages;
 
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
+import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.model.jaxb.Page;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
+
 /**
  * @version $Id$
  */
-public class PageTranslationResource extends PageResource
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations/{language}")
+public class PageTranslationResource extends ModifiablePageResource
 {
-    /*
-     * This class is needed because we need to associate a resource component to each URI exposed in the API.
-     */
+    public PageTranslationResource(@Context UriInfo uriInfo)
+    {
+        super(uriInfo);
+    }
+
+    @GET
+    public Page getPageTranslation(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("language") String language) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, true, false);
+        
+        Document doc = documentInfo.getDocument();
+
+        return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false);
+    }
+
+    @PUT
+    public Response putPageTranslation(@PathParam("wikiName") String wikiName,
+        @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
+        @PathParam("language") String language, Page page) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, false, true);
+        
+        return putPage(documentInfo, page);
+    }
+
+    @DELETE
+    public void deletePageTranslation(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("language") String language) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, true, false);
+
+        deletePage(documentInfo);
+    }
+
 }

@@ -17,15 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources.comments;
+package org.xwiki.rest.resources.classes;
 
-import java.util.Vector;
-
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -33,41 +29,50 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.jaxb.Comment;
+import org.xwiki.rest.model.jaxb.Class;
+import org.xwiki.rest.model.jaxb.Property;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/comments/{id}")
-public class CommentResource extends XWikiResource
+@Path("/wikis/{wikiName}/classes/{className}/properties/{propertyName}")
+public class ClassPropertyResource extends XWikiResource
 {
-    public CommentResource(@Context UriInfo uriInfo)
+
+    public ClassPropertyResource(@Context UriInfo uriInfo)
     {
         super(uriInfo);
     }
 
     @GET
-    public Comment getComment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
-        @PathParam("pageName") String pageName, @PathParam("id") Integer id,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
+    public Property getClassProperty(@PathParam("wikiName") String wikiName, @PathParam("className") String className, @PathParam("propertyName") String propertyName)
         throws XWikiException
     {
-        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
-        Document doc = documentInfo.getDocument();
+        String database = xwikiContext.getDatabase();
 
-        Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
+        try {
+            xwikiContext.setDatabase(wikiName);
 
-        for (com.xpn.xwiki.api.Object xwikiComment : xwikiComments) {
-            if (id.equals(xwikiComment.getNumber())) {
-                return DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment);
+            com.xpn.xwiki.api.Class xwikiClass = xwikiApi.getClass(className);
+            if(xwikiClass == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
             }
+                        
+            Class clazz = DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass);
+            
+            for (Property property : clazz.getProperties()) {
+                if (property.getName().equals(propertyName)) {
+                    return property;
+                }
+            }
+
+            throw new WebApplicationException(Status.NOT_FOUND);            
+            
+        } finally {
+            xwiki.setDatabase(database);
         }
-
-        throw new WebApplicationException(Status.NOT_FOUND);
     }
-
 }

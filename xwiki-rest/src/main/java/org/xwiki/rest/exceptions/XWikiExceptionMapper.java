@@ -17,36 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.model;
+package org.xwiki.rest.exceptions;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
  */
-@XStreamAlias("classProperties")
-public class ClassProperties extends LinkCollection
+@Provider
+public class XWikiExceptionMapper implements ExceptionMapper<XWikiException>
 {
-    @XStreamImplicit
-    private List<ClassProperty> classProperties;
-
-    public ClassProperties()
-    {
-        classProperties = new ArrayList<ClassProperty>();
-    }
-
-    public List<ClassProperty> getClassProperties()
-    {
-        return classProperties;
-    }
-
-    public void addClassProperty(ClassProperty property)
-    {
-        classProperties.add(property);
+    public Response toResponse(XWikiException exception)
+    {        
+        if(exception.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
+            return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage()).type(MediaType.TEXT_PLAIN).build();
+        }
+        
+        return Response.serverError().entity(exception.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
 
 }

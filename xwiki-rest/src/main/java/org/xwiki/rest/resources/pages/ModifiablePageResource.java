@@ -19,154 +19,65 @@
  */
 package org.xwiki.rest.resources.pages;
 
-import java.io.IOException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
-import org.restlet.data.MediaType;
-import org.restlet.data.Status;
-import org.restlet.resource.StringRepresentation;
 import org.xwiki.rest.DomainObjectFactory;
-import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Page;
-import org.xwiki.rest.model.XStreamFactory;
+import org.xwiki.rest.model.jaxb.Page;
 
-import com.thoughtworks.xstream.XStream;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
 /**
- * Resource for a page (and its variants). This resource supports also modifications through PUT and DELETE methods.
- * 
  * @version $Id$
  */
-public abstract class ModifiablePageResource extends XWikiResource
+public class ModifiablePageResource extends XWikiResource
 {
-    @Override
-    public boolean allowPut()
+    public ModifiablePageResource(UriInfo uriInfo)
     {
-        return true;
+        super(uriInfo); 
     }
-
-    @Override
-    public boolean allowDelete()
-    {
-        return true;
-    }
-
-    @Override
-    public void handlePut()
-    {
-        MediaType mediaType = getRequest().getEntity().getMediaType();
-
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), false, true);
-        if (documentInfo == null) {
-            return;
-
-        }
-
+    
+    public Response putPage(DocumentInfo documentInfo, Page page) throws XWikiException {
         Document doc = documentInfo.getDocument();
 
-        /* Process the entity */
-        if (MediaType.TEXT_PLAIN.equals(mediaType)) {
-            try {
-                doc.setContent(getRequest().getEntity().getText());
-                doc.save();
-            } catch (IOException e) {
-                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                return;
-            } catch (XWikiException e) {
-                if (e.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                    getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                } else {
-                    getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                }
+        boolean save = false;
 
-                return;
-            }
-        } else if (MediaType.APPLICATION_XML.equals(mediaType)) {
-            XStream xstream = XStreamFactory.getXStream();
-
-            Page page = null;
-
-            /* If we receive an XML that is not convertible to a Page object we reject it */
-            try {
-                page = (Page) xstream.fromXML(getRequest().getEntity().getText());
-            } catch (Exception e) {
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
-                return;
-            }
-
-            /* We will only save if something changes... */
-            boolean save = false;
-
-            if (page.getContent() != null) {
-                doc.setContent(page.getContent());
-                save = true;
-            }
-
-            if (page.getParent() != null) {
-                if (!page.getParent().equals(doc.getParent())) {
-                    doc.setParent(page.getParent());
-                    save = true;
-                }
-            }
-
-            if (page.getTitle() != null) {
-                if (!page.getTitle().equals(doc.getTitle())) {
-                    doc.setTitle(page.getTitle());
-                    save = true;
-                }
-            }
-
-            if (save) {
-                try {
-                    doc.save();
-                } catch (XWikiException e) {
-                    if (e.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                        getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                    } else {
-                        getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                    }
-
-                    return;
-                }
-
-                /* Set the correct response code, depending whether the document existed or not */
-                if (documentInfo.isCreated()) {
-                    getResponse().setStatus(Status.SUCCESS_CREATED);
-                } else {
-                    getResponse().setStatus(Status.SUCCESS_ACCEPTED);
-                }
-
-                /* Set the entity as being the new/updated document XML representation */
-                getResponse().setEntity(
-                    new StringRepresentation(Utils.toXml(DomainObjectFactory.createPage(getRequest(),
-                        resourceClassRegistry, doc, false)), MediaType.APPLICATION_XML));
-            }
-        }
-    }
-
-    @Override
-    public void handleDelete()
-    {
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, true);
-        if (documentInfo == null) {
-            return;
+        if (page.getContent() != null) {
+            doc.setContent(page.getContent());
+            save = true;
         }
 
-        Document doc = documentInfo.getDocument();
+        if (page.getTitle() != null) {
+            doc.setTitle(page.getTitle());
+            save = true;
+        }
 
-        try {
-            doc.delete();
-        } catch (XWikiException e) {
-            if (e.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+        if (page.getParent() != null) {
+            doc.setParent(page.getParent());
+            save = true;
+        }
+
+        if (save) {
+            doc.save();
+
+            page = DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false);
+
+            if (documentInfo.isCreated()) {
+                return Response.created(uriInfo.getAbsolutePath()).entity(page).build();
             } else {
-                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+                return Response.status(Status.ACCEPTED).entity(page).build();
             }
-
-            return;
+        } else {
+            return Response.status(Status.NOT_MODIFIED).build();
         }
     }
+    
+    void deletePage(DocumentInfo documentInfo) throws XWikiException {
+        Document doc = documentInfo.getDocument();
 
+        doc.delete();
+    }
 }

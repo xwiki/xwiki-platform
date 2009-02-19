@@ -19,48 +19,25 @@
  */
 package org.xwiki.rest;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.restlet.Context;
-import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.data.Status;
-import org.restlet.ext.wadl.WadlResource;
-import org.restlet.resource.Variant;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
-import org.xwiki.rest.representers.NullRepresenter;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
+
+import org.xwiki.rest.model.jaxb.ObjectFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
  */
-public class XWikiResource extends WadlResource implements Composable
+public class XWikiResource
 {
-    /* All the registered representers */
-    private Map<String, XWikiResourceRepresenter> descriptorToRepresenterMap;
-
-    /*
-     * Since resources are dynamically discovered and added, and since Restlet doesn't provide a way for retrieving the
-     * URI template associated to a resource class, we used this additional registry in order to keep track of it. This
-     * registry is necessary in order to discover which URI template is associated to a resource when making links in
-     * representations.
-     */
-    protected XWikiResourceClassRegistry resourceClassRegistry;
-
-    /* This map contains only the the representers for the current resource, indexed by media type */
-    private Map<MediaType, XWikiResourceRepresenter> mediaTypeToRepresenterMap;
-
-    /* This is configured in components.xml */
-    private String uriPattern;
-
     protected XWikiContext xwikiContext;
 
     protected com.xpn.xwiki.XWiki xwiki;
@@ -68,6 +45,12 @@ public class XWikiResource extends WadlResource implements Composable
     protected com.xpn.xwiki.api.XWiki xwikiApi;
 
     protected String xwikiUser;
+
+    protected UriInfo uriInfo;
+
+    protected Logger logger;
+
+    protected ObjectFactory objectFactory;
 
     /**
      * A wrapper class for returning an XWiki document enriched with information about its status.
@@ -93,189 +76,116 @@ public class XWikiResource extends WadlResource implements Composable
         {
             return created;
         }
-
-    }
-
-    @Override
-    public void init(Context context, Request request, Response response)
-    {
-        super.init(context, request, response);
-
-        mediaTypeToRepresenterMap = new HashMap<MediaType, XWikiResourceRepresenter>();
-        getVariants().clear();
-        for (String descriptor : descriptorToRepresenterMap.keySet()) {
-            XWikiResourceRepresenter representer = descriptorToRepresenterMap.get(descriptor);
-
-            if (descriptor.startsWith(this.getClass().getName())) {
-                getLogger().log(
-                    Level.FINE,
-                    String.format("Registering '%s' representer for resource %s", representer.getMediaType(), this
-                        .getClass().getName()));
-                getVariants().add(new Variant(representer.getMediaType()));
-                mediaTypeToRepresenterMap.put(representer.getMediaType(), representer);
-
-                /*
-                 * This is a style check in order to see if the media type declared in the descriptor is equal to the
-                 * one exposed by the presenter. This check just issue a warning and can help the developer to maintain
-                 * components.xml consistent with the implementation.
-                 */
-                if (descriptor.indexOf(':') != -1) {
-                    String[] fields = descriptor.split(":", 2);
-                    if (!fields[1].equals(representer.getMediaType().getName())) {
-                        getLogger()
-                            .log(
-                                Level.WARNING,
-                                String
-                                    .format(
-                                        "Representer %s exposes the '%s' media type but is declared with the '%s' media type. Please update components.xml in order to make it consistent with respect to the implementation.",
-                                        representer.getClass().getName(), representer.getMediaType(), fields[1]));
-                    }
-                } else {
-                    getLogger()
-                        .log(
-                            Level.WARNING,
-                            String
-                                .format(
-                                    "Representer %s exposes the '%s' media type but doesn't declare any media type. Please update components.xml in order to make it consistent with respect to the implementation.",
-                                    representer.getClass().getName(), representer.getMediaType()));
-                }
-
-            }
-        }
-
-        /*
-         * Put a reference to the resource in the request attributes so that the cleanup filter will be able to retrieve
-         * and release it
-         */
-        getLogger().log(Level.FINE, String.format("Instantiated and initialized resource %s", this));
-        request.getAttributes().put(Constants.RESOURCE_COMPONENT, this);
-
-        /* Initialize relevant XWiki variables */
-        xwikiContext = (XWikiContext) context.getAttributes().get(Constants.XWIKI_CONTEXT);
-        xwiki = (com.xpn.xwiki.XWiki) context.getAttributes().get(Constants.XWIKI);
-        xwikiApi = (com.xpn.xwiki.api.XWiki) context.getAttributes().get(Constants.XWIKI_API);
-        xwikiUser = (String) context.getAttributes().get(Constants.XWIKI_USER);
-        resourceClassRegistry =
-            (XWikiResourceClassRegistry) context.getAttributes().get(Constants.RESOURCE_CLASS_REGISTRY);
-    }
-
-    protected XWikiResourceRepresenter getRepresenterFor(Variant variant)
-    {
-        XWikiResourceRepresenter representer = mediaTypeToRepresenterMap.get(variant.getMediaType());
-
-        if (representer != null) {
-            return representer;
-        } else {
-            /* Flow control should never reach this point. */
-            getLogger()
-                .log(
-                    Level.WARNING,
-                    String
-                        .format(
-                            "'%s' representer for resource %s doesn't exist. This should never happen. Returning a null representer.",
-                            variant.getMediaType(), this.getClass().getName()));
-            return new NullRepresenter();
-        }
-    }
-
-    public String getUriPattern()
-    {
-        return uriPattern;
     }
 
     /**
-     * <p>
-     * Returns a document based on the request. A DocumentInfo object is returned in order to provide additional
-     * information.
-     * </p>
-     * <p>
-     * If failIfDoesntExist is true, null is returned whenever the requested document does not exist
-     * </p>
-     * <p>
-     * If failIfDoesntExist is false then a DocumentInfo is returned. However the document field could be null if the
-     * user doesn't have the rights to access the document
-     * </p>
+     * Constructor. This constructor is needed because UriInfo injection in super classes doesn't seem to work. So
+     * provide a constructor for initializing the UriInfo from subclasses where it can be automatically injected through
+     * a @Context annotation.
      * 
-     * @param failIfDoesntExist
-     * @return A DocumentInfo containing the document or null if the document doesn't exist or an exception was thrown.
+     * @param uriInfo A UriInfo instance typically injected through the @Context annotation in subclasses.
      */
-    public DocumentInfo getDocumentFromRequest(Request request, Response response, boolean failIfDoesntExist,
-        boolean failIfLocked)
+    public XWikiResource(UriInfo uriInfo)
     {
-        try {
-            String wikiName = (String) request.getAttributes().get(Constants.WIKI_NAME_PARAMETER);
-            String spaceName = (String) request.getAttributes().get(Constants.SPACE_NAME_PARAMETER);
-            String pageName = (String) request.getAttributes().get(Constants.PAGE_NAME_PARAMETER);
-            String language = (String) request.getAttributes().get(Constants.LANGUAGE_ID_PARAMETER);
-            String version = (String) request.getAttributes().get(Constants.PAGE_VERSION_PARAMETER);
+        xwikiContext = (XWikiContext) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_CONTEXT);
+        xwiki = (com.xpn.xwiki.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI);
+        xwikiApi = (com.xpn.xwiki.api.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_API);
+        xwikiUser = (String) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_USER);
 
-            String pageFullName = Utils.getPrefixedPageName(wikiName, spaceName, pageName);
-
-            boolean existed = xwikiApi.exists(pageFullName);
-
-            if (failIfDoesntExist) {
-                if (!existed) {
-                    response.setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                    return null;
-                }
-            }
-
-            Document doc = xwikiApi.getDocument(pageFullName);
-
-            /* If doc is null, we don't have the rights to access the document */
-            if (doc == null) {
-                response.setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                return null;
-            }
-
-            if (language != null) {
-                doc = doc.getTranslatedDocument(language);
-
-                /*
-                 * If the language of the translated document is not the one we requested, then the requested
-                 * translation doesn't exist. new translated document by hand.
-                 */
-                if (!language.equals(doc.getLanguage())) {
-                    /* If we are here the requested translation doesn't exist */
-                    if (failIfDoesntExist) {
-                        response.setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                        return null;
-                    } else {
-                        XWikiDocument xwikiDocument = new XWikiDocument(spaceName, pageName);
-                        xwikiDocument.setLanguage(language);
-                        doc = new Document(xwikiDocument, xwikiContext);
-
-                        existed = false;
-                    }
-                }
-            }
-
-            /* Get a specific version if requested to */
-            if (version != null) {
-                doc = doc.getDocumentRevision(version);
-            }
-
-            /* If the doc is locked then return */
-            if (failIfLocked) {
-                if (doc.getLocked()) {
-                    response.setStatus(Status.CLIENT_ERROR_LOCKED);
-                    return null;
-                }
-            }
-
-            return new DocumentInfo(doc, !existed);
-        } catch (Exception e) {
-            return null;
+        if ((xwikiContext == null) || (xwiki == null) || (xwikiApi == null) || (xwikiUser == null)) {
+            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
+
+        this.uriInfo = uriInfo;
+
+        logger = Logger.getLogger(this.getClass().getName());
+
+        objectFactory = new ObjectFactory();
+
+        logger.log(Level.FINE, String.format("Resource %s initialized at %s. Serving user: '%s'\n", getClass()
+            .getName(), uriInfo.getAbsolutePath(), xwikiUser));
     }
 
-    public void compose(ComponentManager componentManager)
+    /**
+     * Retrieve a document. This method never returns null. If something goes wrong with respect to some precondition an
+     * exception is thrown.
+     * 
+     * @param wikiName The wiki name. Cannot be null.
+     * @param spaceName The space name. Cannot be null.
+     * @param pageName The page name. Cannot be null.
+     * @param language The language. Null for the default language.
+     * @param version The version. Null for the latest version.
+     * @param failIfDoesntExist True if an exception should be raised whenever the page doesn't exist.
+     * @param failIfLocked True if an exception should be raised whenever the page is locked.
+     * @return A DocumentInfo structure containing the actual document and additional information about it.
+     * @throws IllegalArgumentException If a parameter has an incorrect value (e.g. null)
+     * @throws XWikiException
+     * @throws WebApplicationException NOT_FOUND if failIfDoesntExist is true and the page doesn't exist.
+     *             PRECONDITION_FAILED if failIfLocked is true and the document is locked.
+     */
+    public DocumentInfo getDocumentInfo(String wikiName, String spaceName, String pageName, String language,
+        String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException
     {
-        try {
-            descriptorToRepresenterMap = componentManager.lookupMap(XWikiResourceRepresenter.class.getName());
-        } catch (ComponentLookupException e) {
-            throw new RuntimeException("Unable to initialize the resource.");
+        if ((wikiName == null) || (spaceName == null) || (pageName == null)) {
+            throw new IllegalArgumentException(String.format(
+                "wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)", wikiName,
+                spaceName, pageName));
         }
+
+        String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
+
+        boolean existed = xwikiApi.exists(pageFullName);
+
+        if (failIfDoesntExist) {
+            if (!existed) {
+                // throwWebApplicationException(Status.NOT_FOUND, String.format("Page %s doesn't exist.",
+                // pageFullName));
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+        }
+
+        Document doc = xwikiApi.getDocument(pageFullName);
+
+        /* If doc is null, we don't have the rights to access the document */
+        if (doc == null) {
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        }
+
+        if (language != null) {
+            doc = doc.getTranslatedDocument(language);
+
+            /*
+             * If the language of the translated document is not the one we requested, then the requested translation
+             * doesn't exist. new translated document by hand.
+             */
+            if (!language.equals(doc.getLanguage())) {
+                /* If we are here the requested translation doesn't exist */
+                if (failIfDoesntExist) {
+                    throw new WebApplicationException(Status.NOT_FOUND);
+                } else {
+                    XWikiDocument xwikiDocument = new XWikiDocument(spaceName, pageName);
+                    xwikiDocument.setDatabase(wikiName);
+                    xwikiDocument.setLanguage(language);
+                    doc = new Document(xwikiDocument, xwikiContext);
+
+                    existed = false;
+                }
+            }
+        }
+
+        /* Get a specific version if requested to */
+        if (version != null) {
+            doc = doc.getDocumentRevision(version);
+        }
+
+        /* Check if the doc is locked. */
+        if (failIfLocked) {
+            if (doc.getLocked()) {
+                throw new WebApplicationException(Status.PRECONDITION_FAILED);
+            }
+        }
+
+        return new DocumentInfo(doc, !existed);
     }
 
 }

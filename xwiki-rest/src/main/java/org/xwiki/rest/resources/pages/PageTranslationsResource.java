@@ -19,51 +19,40 @@
  */
 package org.xwiki.rest.resources.pages;
 
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Page;
+import org.xwiki.rest.model.jaxb.Translations;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
 /**
- * Resource for translations of a page.
- * 
  * @version $Id$
  */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations")
 public class PageTranslationsResource extends XWikiResource
 {
-    /**
-     * Get all the available translations for a page.
-     * 
-     * @param variant The variant.
-     * @return representation The XML containing the list of spaces.
-     */
-    @Override
-    public Representation represent(Variant variant)
+
+    public PageTranslationsResource(@Context UriInfo uriInfo)
     {
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
-        if (documentInfo == null) {
-            return null;
-        }
+        super(uriInfo);
+    }
 
+    @GET
+    public Translations getTranslations(@PathParam("wikiName") String wikiName,
+        @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+        
         Document doc = documentInfo.getDocument();
-
-        Page page = DomainObjectFactory.createPage(getRequest(), resourceClassRegistry, doc, false);
-        if (page == null) {
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-            return null;
-        }
-
-        /*
-         * Set the pageId attribute of the translations list. Normally this is not set because it is embedded in a page
-         * element so it's redundant.
-         */
-        page.getTranslations().setPageFullName(page.getFullName());
-
-        return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), page.getTranslations());
+        
+        return DomainObjectFactory.createTranslations(objectFactory, uriInfo.getBaseUri(), doc);                
     }
 
 }

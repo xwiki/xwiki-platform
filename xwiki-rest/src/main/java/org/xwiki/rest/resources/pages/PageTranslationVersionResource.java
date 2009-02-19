@@ -19,36 +19,39 @@
  */
 package org.xwiki.rest.resources.pages;
 
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Page;
+import org.xwiki.rest.model.jaxb.Page;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
 /**
  * @version $Id$
  */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations/{language}/history/{version}")
 public class PageTranslationVersionResource extends XWikiResource
 {
-    @Override
-    public Representation represent(Variant variant)
+    public PageTranslationVersionResource(@Context UriInfo uriInfo)
     {
-        DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
-        if (documentInfo == null) {
-            return null;
-        }
+        super(uriInfo);
+    }
 
+    @GET
+    public Page getPageTranslationVersion(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("language") String language,
+        @PathParam("version") String version) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, version, true, false);
+        
         Document doc = documentInfo.getDocument();
 
-        Page page = DomainObjectFactory.createPage(getRequest(), resourceClassRegistry, doc, true);
-        if (page == null) {
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-            return null;
-        }
-
-        return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), page);
+        return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false);
     }
 }

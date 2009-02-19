@@ -19,33 +19,26 @@
  */
 package org.xwiki.rest;
 
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.data.Status;
-import org.restlet.service.StatusService;
+import java.util.Set;
+
+import javax.ws.rs.core.Application;
 
 /**
- * A status service that is able to catch unhandled exceptions and correctly release the resource that was serving the
- * request.
- * 
  * @version $Id$
  */
-public class XWikiStatusService extends StatusService
+public class XWikiApplication extends Application
 {
-    private XWikiRestApplication application;
+    private Set<Class< ? >> jaxRsClasses;
 
-    public XWikiStatusService(XWikiRestApplication application)
+    public XWikiApplication(Set<Class< ? >> jaxRsClasses)
     {
-        super();
-        this.application = application;
+        this.jaxRsClasses = jaxRsClasses;
     }
 
     @Override
-    public Status getStatus(Throwable throwable, Request request, Response response)
+    public Set<Class< ? >> getClasses()
     {
-        Utils.cleanupResource(request, application.getComponentManager(), application.getLogger());
-
-        return super.getStatus(throwable, request, response);
+        return jaxRsClasses;
     }
 
 }

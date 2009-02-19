@@ -19,23 +19,18 @@
  */
 package org.xwiki.rest.resources.objects;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
-import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.jaxb.Objects;
+import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.Properties;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -44,47 +39,36 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}")
-public class ObjectsForClassNameResource extends XWikiResource
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}/{objectNumber}/properties")
+public class ObjectPropertiesResource extends XWikiResource
 {
 
-    public ObjectsForClassNameResource(@Context UriInfo uriInfo)
+    public ObjectPropertiesResource(@Context UriInfo uriInfo)
     {
         super(uriInfo);
     }
-
+    
     @GET
-    public Objects getObjects(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+    public Properties getObjectProperties(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("className") String className,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
-        throws XWikiException
+        @PathParam("objectNumber") Integer objectNumber) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
         Document doc = documentInfo.getDocument();
-
-        Objects objects = objectFactory.createObjects();
-
-        List<com.xpn.xwiki.objects.BaseObject> objectList = new ArrayList<com.xpn.xwiki.objects.BaseObject>();
-
+        
         XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
 
-        Map<String, Vector<com.xpn.xwiki.objects.BaseObject>> classToObjectsMap = xwikiDocument.getxWikiObjects();
-
-        Vector<com.xpn.xwiki.objects.BaseObject> xwikiObjects = classToObjectsMap.get(className);
-        for (com.xpn.xwiki.objects.BaseObject object : xwikiObjects) {
-            objectList.add(object);
+        com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
+        if (baseObject == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        RangeIterable<com.xpn.xwiki.objects.BaseObject> ri =
-            new RangeIterable<com.xpn.xwiki.objects.BaseObject>(objectList, start, number);
-
-        for (com.xpn.xwiki.objects.BaseObject object : ri) {
-            objects.getObjects().add(
-                DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, object));
-        }
-
-        return objects;
+        Object object = DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject);
+        
+        Properties properties = objectFactory.createProperties();
+        properties.getProperties().addAll(object.getProperties());
+        
+        return properties;
     }
-
 }

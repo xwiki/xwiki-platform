@@ -19,432 +19,482 @@
  */
 package org.xwiki.rest;
 
-import java.sql.Timestamp;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.xwiki.rest.model.Attachment;
-import org.xwiki.rest.model.Class;
-import org.xwiki.rest.model.ClassProperty;
-import org.xwiki.rest.model.Comment;
-import org.xwiki.rest.model.HistorySummary;
-import org.xwiki.rest.model.Link;
-import org.xwiki.rest.model.ObjectSummary;
-import org.xwiki.rest.model.Page;
-import org.xwiki.rest.model.PageSummary;
-import org.xwiki.rest.model.Properties;
-import org.xwiki.rest.model.Relations;
-import org.xwiki.rest.model.Space;
-import org.xwiki.rest.model.Translations;
-import org.xwiki.rest.model.XWikiRoot;
-import org.xwiki.rest.resources.RootResource;
-import org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource;
-import org.xwiki.rest.resources.attachments.AttachmentHistoryResource;
+import javax.ws.rs.core.UriBuilder;
+
+import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.rest.model.jaxb.Attachment;
+import org.xwiki.rest.model.jaxb.Attribute;
+import org.xwiki.rest.model.jaxb.Class;
+import org.xwiki.rest.model.jaxb.Comment;
+import org.xwiki.rest.model.jaxb.HistorySummary;
+import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.ObjectFactory;
+import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.rest.model.jaxb.PageSummary;
+import org.xwiki.rest.model.jaxb.Property;
+import org.xwiki.rest.model.jaxb.Space;
+import org.xwiki.rest.model.jaxb.Translation;
+import org.xwiki.rest.model.jaxb.Translations;
+import org.xwiki.rest.model.jaxb.Wiki;
+import org.xwiki.rest.model.jaxb.Xwiki;
+import org.xwiki.rest.resources.ModificationsResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
+import org.xwiki.rest.resources.classes.ClassPropertiesResource;
+import org.xwiki.rest.resources.classes.ClassPropertyResource;
 import org.xwiki.rest.resources.classes.ClassResource;
-import org.xwiki.rest.resources.comments.CommentResource;
-import org.xwiki.rest.resources.comments.CommentVersionResource;
+import org.xwiki.rest.resources.classes.ClassesResource;
 import org.xwiki.rest.resources.comments.CommentsResource;
 import org.xwiki.rest.resources.comments.CommentsVersionResource;
+import org.xwiki.rest.resources.objects.ObjectPropertiesResource;
+import org.xwiki.rest.resources.objects.ObjectPropertyResource;
 import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageHistoryResource;
 import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.rest.resources.pages.PageTranslationHistoryResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.rest.resources.pages.PageTranslationVersionResource;
 import org.xwiki.rest.resources.pages.PageVersionResource;
 import org.xwiki.rest.resources.pages.PagesResource;
 import org.xwiki.rest.resources.spaces.SpaceResource;
+import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.Property;
-import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
+import com.xpn.xwiki.api.PropertyClass;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.DateClass;
-import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * @version $Id$
  */
 public class DomainObjectFactory
 {
-    public static XWikiRoot createXWikiRoot(Request request, com.xpn.xwiki.api.XWiki xwikiApi,
-        XWikiResourceClassRegistry registry)
+    public static Xwiki createXWikiRoot(ObjectFactory objectFactory, URI baseUri, String version)
     {
-        XWikiRoot xwikiRoot = new XWikiRoot(xwikiApi.getVersion());
+        Xwiki xwiki = objectFactory.createXwiki().withVersion(version);
 
-        String fullUri =
-            String.format("%s%s", request.getRootRef(), registry.getUriPatternForResourceClass(WikisResource.class));
-        Link link = new Link(fullUri);
-        link.setRel(Relations.WIKIS);
-        xwikiRoot.addLink(link);
+        String wikisUri = UriBuilder.fromUri(baseUri).path(WikisResource.class).build().toString();
+        Link wikisLink = objectFactory.createLink();
+        wikisLink.setHref(wikisUri);
+        wikisLink.setRel(Relations.WIKIS);
+        xwiki.getLinks().add(wikisLink);
 
-        fullUri =
-            String.format("%s%s", request.getRootRef(), registry.getUriPatternForResourceClass(RootResource.class));
-        link = new Link(fullUri);
-        link.setRel(Relations.WADL);
-        link.setType(MediaType.APPLICATION_WADL_XML.toString());
-        xwikiRoot.addLink(link);
-
-        return xwikiRoot;
+        return xwiki;
     }
 
-    public static Space createSpace(Request request, XWikiResourceClassRegistry resourceClassRegistry, String wiki,
-        String spaceName, String home, String homeXWikiUrl, int numberOfPages)
+    public static Wiki createWiki(ObjectFactory objectFactory, URI baseUri, String wikiName)
     {
-        Space space = new Space(wiki, spaceName, home, homeXWikiUrl, numberOfPages);
+        Wiki wiki = objectFactory.createWiki().withId(wikiName).withName(wikiName);
 
-        String fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(PagesResource.class));
-        Map<String, String> parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, wiki);
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, spaceName);
-        Link link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.PAGES);
-        space.addLink(link);
+        String spacesUri = UriBuilder.fromUri(baseUri).path(SpacesResource.class).build(wikiName).toString();
+        Link spacesLink = objectFactory.createLink();
+        spacesLink.setHref(spacesUri);
+        spacesLink.setRel(Relations.SPACES);
+        wiki.getLinks().add(spacesLink);
+
+        String classesUri = UriBuilder.fromUri(baseUri).path(ClassesResource.class).build(wikiName).toString();
+        Link classesLink = objectFactory.createLink();
+        classesLink.setHref(classesUri);
+        classesLink.setRel(Relations.CLASSES);
+        wiki.getLinks().add(classesLink);
+
+        String modificationsUri =
+            UriBuilder.fromUri(baseUri).path(ModificationsResource.class).build(wikiName).toString();
+        Link modificationsLink = objectFactory.createLink();
+        modificationsLink.setHref(modificationsUri);
+        modificationsLink.setRel(Relations.MODIFICATIONS);
+        wiki.getLinks().add(modificationsLink);
+
+        return wiki;
+    }
+
+    public static Space createSpace(ObjectFactory objectFactory, URI baseUri, String wikiName, String spaceName,
+        Document home, int numberOfPages)
+    {
+        Space space = objectFactory.createSpace();
+        space.setId(String.format("%s:%s", wikiName, spaceName));
+        space.setWiki(wikiName);
+        space.setName(spaceName);
+        if (home != null) {
+            space.setHome(home.getPrefixedFullName());
+            space.setXwikiUrl(home.getExternalURL("view"));
+        }
+        space.setNumberOfPages(numberOfPages);
+
+        String pagesUri = UriBuilder.fromUri(baseUri).path(PagesResource.class).build(wikiName, spaceName).toString();
+        Link pagesLink = objectFactory.createLink();
+        pagesLink.setHref(pagesUri);
+        pagesLink.setRel(Relations.PAGES);
+        space.getLinks().add(pagesLink);
+
+        if (home != null) {
+            String homeUri =
+                UriBuilder.fromUri(baseUri).path(PageResource.class).build(wikiName, spaceName, home.getName())
+                    .toString();
+            Link homeLink = objectFactory.createLink();
+            homeLink.setHref(homeUri);
+            homeLink.setRel(Relations.HOME);
+            space.getLinks().add(homeLink);
+        }
 
         return space;
     }
 
-    public static PageSummary createPageSummary(Request request, XWikiResourceClassRegistry resourceClassRegistry,
-        Document doc)
+    public static Translations createTranslations(ObjectFactory objectFactory, URI baseUri, Document doc)
+        throws XWikiException
     {
-        try {
-            PageSummary pageSummary = new PageSummary();
+        Translations translations = objectFactory.createTranslations();
 
-            pageSummary.setWiki(doc.getWiki());
-            pageSummary.setFullName(doc.getFullName());
-            pageSummary.setId(doc.getPrefixedFullName());
-            pageSummary.setSpace(doc.getSpace());
-            pageSummary.setName(doc.getName());
-            pageSummary.setTitle(doc.getTitle());
-            pageSummary.setXWikiUrl(doc.getExternalURL("view"));
+        List<String> languages = doc.getTranslationList();
 
-            Translations translations = pageSummary.getTranslations();
+        if (!languages.isEmpty()) {
+            if (!doc.getDefaultLanguage().equals("")) {
+                translations.setDefault(doc.getDefaultLanguage());
 
-            List<String> languages = doc.getTranslationList();
+                Translation translation = objectFactory.createTranslation();
+                translation.setLanguage(doc.getDefaultLanguage());
 
-            if (!languages.isEmpty()) {
-                if (!doc.getDefaultLanguage().equals("")) {
-                    translations.setDefaultTranslation(doc.getDefaultLanguage());
-                }
+                /* Add the default page with the default translation explicitely */
+                String pageTranslationUri =
+                    UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(),
+                        doc.getName()).toString();
+                Link pageTranslationLink = objectFactory.createLink();
+                pageTranslationLink.setHref(pageTranslationUri);
+                pageTranslationLink.setRel(Relations.PAGE);
+                translation.getLinks().add(pageTranslationLink);
+
+                String historyUri =
+                    UriBuilder.fromUri(baseUri).path(PageHistoryResource.class).build(doc.getWiki(), doc.getSpace(),
+                        doc.getName()).toString();
+                Link historyLink = objectFactory.createLink();
+                historyLink.setHref(historyUri);
+                historyLink.setRel(Relations.HISTORY);
+                translation.getLinks().add(historyLink);
+
+                translations.getTranslations().add(translation);
             }
+        }
 
-            String fullUri;
-            Map<String, String> parametersMap;
-            Link link;
+        for (String language : languages) {
+            Translation translation = objectFactory.createTranslation();
+            translation.setLanguage(language);
 
-            for (String language : languages) {
-                fullUri =
-                    String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(PageTranslationResource.class));
-                parametersMap = new HashMap<String, String>();
-                parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-                parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-                parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-                parametersMap.put(Constants.LANGUAGE_ID_PARAMETER, language);
-                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-                link.setRel(Relations.TRANSLATION);
-                link.setHrefLang(language);
-                translations.addLink(link);
+            String pageTranslationUri =
+                UriBuilder.fromUri(baseUri).path(PageTranslationResource.class).build(doc.getWiki(), doc.getSpace(),
+                    doc.getName(), language).toString();
+            Link pageTranslationLink = objectFactory.createLink();
+            pageTranslationLink.setHref(pageTranslationUri);
+            pageTranslationLink.setRel(Relations.PAGE);
+            translation.getLinks().add(pageTranslationLink);
+
+            String historyUri =
+                UriBuilder.fromUri(baseUri).path(PageTranslationHistoryResource.class).build(doc.getWiki(),
+                    doc.getSpace(), doc.getName(), language).toString();
+            Link historyLink = objectFactory.createLink();
+            historyLink.setHref(historyUri);
+            historyLink.setRel(Relations.HISTORY);
+            translation.getLinks().add(historyLink);
+
+            translations.getTranslations().add(translation);
+        }
+
+        return translations;
+    }
+
+    /* This method is used to fill the "common part" of a Page and a PageSummary */
+    private static void fillPageSummary(PageSummary pageSummary, ObjectFactory objectFactory, URI baseUri, Document doc)
+        throws XWikiException
+    {
+        pageSummary.setWiki(doc.getWiki());
+        pageSummary.setFullName(doc.getFullName());
+        pageSummary.setId(doc.getPrefixedFullName());
+        pageSummary.setSpace(doc.getSpace());
+        pageSummary.setName(doc.getName());
+        pageSummary.setTitle(doc.getTitle());
+        pageSummary.setParent(doc.getParent());
+        pageSummary.setXwikiUrl(doc.getExternalURL("view"));
+        pageSummary.setTranslations(createTranslations(objectFactory, baseUri, doc));
+
+        String spaceUri =
+            UriBuilder.fromUri(baseUri).path(SpaceResource.class).build(doc.getWiki(), doc.getSpace()).toString();
+        Link spaceLink = objectFactory.createLink();
+        spaceLink.setHref(spaceUri);
+        spaceLink.setRel(Relations.SPACE);
+        pageSummary.getLinks().add(spaceLink);
+
+        if (doc.getParent() != null) {
+            /*
+             * This is ugly but the alternative would be to get the parent document and use the accessor methods for
+             * retrieving the information. But this could be expensive
+             */
+            String[] components = doc.getParent().split("\\.", 2);
+
+            /* We must obtain 2 components: spaceName.PageName */
+            if (components.length == 2) {
+                String parentUri =
+                    UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), components[0],
+                        components[1]).toString();
+                Link parentLink = objectFactory.createLink();
+                parentLink.setHref(parentUri);
+                parentLink.setRel(Relations.PARENT);
+                pageSummary.getLinks().add(parentLink);
             }
-
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(PageResource.class));
-            parametersMap = new HashMap<String, String>();
-            parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-            parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-            parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-            link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-            link.setRel(Relations.PAGE);
-            pageSummary.addLink(link);
-
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(SpaceResource.class));
-            parametersMap = new HashMap<String, String>();
-            parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-            parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-            link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-            link.setRel(Relations.SPACE);
-            pageSummary.addLink(link);
-
-            String parent = doc.getParent();
-            if (parent != null && parent.indexOf('.') != -1) {
-                pageSummary.setParent(doc.getParent());
-
-                String[] components = doc.getParent().split("\\.");
-                fullUri =
-                    String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(PageResource.class));
-                parametersMap = new HashMap<String, String>();
-                parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-                parametersMap.put(Constants.SPACE_NAME_PARAMETER, components[0]);
-                parametersMap.put(Constants.PAGE_NAME_PARAMETER, components[1]);
-                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-                link.setRel(Relations.PARENT);
-                pageSummary.addLink(link);
-            }
-
-            return pageSummary;
-        } catch (Exception e) {
-            return null;
         }
     }
 
-    public static Page createPage(Request request, XWikiResourceClassRegistry resourceClassRegistry, Document doc,
-        boolean useVersion)
+    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc)
+        throws XWikiException
     {
-        try {
-            Page page = new Page();
+        PageSummary pageSummary = objectFactory.createPageSummary();
+        fillPageSummary(pageSummary, objectFactory, baseUri, doc);
 
-            page.setWiki(doc.getWiki());
-            page.setFullName(doc.getFullName());
-            page.setId(doc.getPrefixedFullName());
-            page.setSpace(doc.getSpace());
-            page.setName(doc.getName());
-            page.setTitle(doc.getTitle());
-            page.setVersion(doc.getVersion());
-            page.setMajorVersion(doc.getRCSVersion().at(0));
-            page.setMinorVersion(doc.getRCSVersion().at(1));
-            page.setLanguage(doc.getLanguage());
-            page.setXWikiUrl(doc.getExternalURL("view"));
-            page.setCreator(doc.getCreator());
-            page.setCreated(doc.getCreationDate().getTime());
-            page.setModifier(doc.getContentAuthor());
-            page.setModified(doc.getContentUpdateDate().getTime());
-            page.setContent(doc.getContent());
+        String pageUri =
+            UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
+                .toString();
+        Link pageLink = objectFactory.createLink();
+        pageLink.setHref(pageUri);
+        pageLink.setRel(Relations.PAGE);
+        pageSummary.getLinks().add(pageLink);
 
-            Translations translations = page.getTranslations();
-
-            List<String> languages = doc.getTranslationList();
-
-            if (!languages.isEmpty()) {
-                if (!doc.getDefaultLanguage().equals("")) {
-                    translations.setDefaultTranslation(doc.getDefaultLanguage());
-                }
-            }
-
-            String fullUri;
-            Map<String, String> parametersMap;
-            Link link;
-
-            for (String language : languages) {
-                if (useVersion) {
-                    fullUri =
-                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                            .getUriPatternForResourceClass(PageTranslationVersionResource.class));
-                } else {
-                    fullUri =
-                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                            .getUriPatternForResourceClass(PageTranslationResource.class));
-                }
-
-                parametersMap = new HashMap<String, String>();
-                parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-                parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-                parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-                parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0),
-                    doc.getRCSVersion().at(1)));
-                parametersMap.put(Constants.LANGUAGE_ID_PARAMETER, language);
-                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-                link.setRel(Relations.TRANSLATION);
-                link.setHrefLang(language);
-                translations.addLink(link);
-            }
-
-            link = new Link(request.getResourceRef().getIdentifier());
-            link.setRel(Relations.SELF);
-            page.addLink(link);
-
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(SpaceResource.class));
-            parametersMap = new HashMap<String, String>();
-            parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-            parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-            link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-            link.setRel(Relations.SPACE);
-            page.addLink(link);
-
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(PageHistoryResource.class));
-            parametersMap = new HashMap<String, String>();
-            parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-            parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-            parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-            link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-            link.setRel(Relations.HISTORY);
-            page.addLink(link);
-
-            String parent = doc.getParent();
-            if (parent != null && parent.indexOf('.') != -1) {
-                page.setParent(doc.getParent());
-
-                String[] components = doc.getParent().split("\\.");
-
-                fullUri =
-                    String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(PageResource.class));
-                parametersMap = new HashMap<String, String>();
-                parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-                parametersMap.put(Constants.SPACE_NAME_PARAMETER, components[0]);
-                parametersMap.put(Constants.PAGE_NAME_PARAMETER, components[1]);
-                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-                link.setRel(Relations.PARENT);
-                page.addLink(link);
-            }
-
-            if (!doc.getComments().isEmpty()) {
-                if (useVersion) {
-                    fullUri =
-                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                            .getUriPatternForResourceClass(CommentsVersionResource.class));
-                } else {
-                    fullUri =
-                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                            .getUriPatternForResourceClass(CommentsResource.class));
-                }
-                parametersMap = new HashMap<String, String>();
-                parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-                parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-                parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-                parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0),
-                    doc.getRCSVersion().at(1)));
-                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-                link.setRel(Relations.COMMENTS);
-                page.addLink(link);
-            }
-
-            if (!doc.getAttachmentList().isEmpty()) {
-                if (useVersion) {
-                    fullUri =
-                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                            .getUriPatternForResourceClass(AttachmentsAtPageVersionResource.class));
-                } else {
-                    fullUri =
-                        String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                            .getUriPatternForResourceClass(AttachmentsResource.class));
-                }
-                parametersMap = new HashMap<String, String>();
-                parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-                parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-                parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-                parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0),
-                    doc.getRCSVersion().at(1)));
-                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-                link.setRel(Relations.ATTACHMENTS);
-                page.addLink(link);
-            }
-
-            if (!doc.getxWikiObjects().keySet().isEmpty()) {
-                fullUri =
-                    String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                        .getUriPatternForResourceClass(ObjectsResource.class));
-
-                parametersMap = new HashMap<String, String>();
-                parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-                parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-                parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-                link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-                link.setRel(Relations.OBJECTS);
-                page.addLink(link);
-            }
-
-            return page;
-        } catch (Exception e) {
-            return null;
-        }
+        return pageSummary;
     }
 
-    public static HistorySummary createHistorySummary(Request request,
-        XWikiResourceClassRegistry resourceClassRegistry, String wikiName, String languageId, Object[] fields)
+    public static Page createPage(ObjectFactory objectFactory, URI baseUri, URI self, Document doc, boolean useVersion)
+        throws XWikiException
     {
-        String pageId = (String) fields[0];
+        Page page = objectFactory.createPage();
+        fillPageSummary(page, objectFactory, baseUri, doc);
 
-        String[] components = pageId.split("\\.");
-        String spaceName = components[0];
-        String pageName = components[1];
+        page.setVersion(doc.getVersion());
+        page.setMajorVersion(doc.getRCSVersion().at(0));
+        page.setMinorVersion(doc.getRCSVersion().at(1));
+        page.setLanguage(doc.getLanguage());
+        page.setCreator(doc.getCreator());
 
-        XWikiRCSNodeId nodeId = (XWikiRCSNodeId) fields[1];
-        int version = nodeId.getVersion().at(0);
-        int minorVersion = nodeId.getVersion().at(1);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(doc.getCreationDate());
+        page.setCreated(calendar);
 
-        Timestamp timestamp = (Timestamp) fields[2];
-        String author = (String) fields[3];
+        page.setModifier(doc.getContentAuthor());
 
-        HistorySummary historySummary = new HistorySummary();
+        calendar = Calendar.getInstance();
+        calendar.setTime(doc.getContentUpdateDate());
+        page.setModified(calendar);
+
+        page.setContent(doc.getContent());
+
+        Link pageLink = objectFactory.createLink();
+        pageLink.setHref(self.toString());
+        pageLink.setRel(Relations.SELF);
+        page.getLinks().add(pageLink);
+
+        String historyUri =
+            UriBuilder.fromUri(baseUri).path(PageHistoryResource.class).build(doc.getWiki(), doc.getSpace(),
+                doc.getName()).toString();
+        Link historyLink = objectFactory.createLink();
+        historyLink.setHref(historyUri);
+        historyLink.setRel(Relations.HISTORY);
+        page.getLinks().add(historyLink);
+
+        com.xpn.xwiki.api.Class xwikiClass = doc.getxWikiClass();
+        if (xwikiClass != null) {
+            String classUri =
+                UriBuilder.fromUri(baseUri).path(ClassResource.class).build(doc.getWiki(), xwikiClass.getName())
+                    .toString();
+            Link classLink = objectFactory.createLink();
+            classLink.setHref(classUri);
+            classLink.setRel(Relations.CLASS);
+            page.getLinks().add(classLink);
+        }
+
+        if (!doc.getComments().isEmpty()) {
+            String commentsUri;
+            if (useVersion) {
+                commentsUri =
+                    UriBuilder.fromUri(baseUri).path(CommentsVersionResource.class).build(doc.getWiki(),
+                        doc.getSpace(), doc.getName(), doc.getVersion()).toString();
+            } else {
+                commentsUri =
+                    UriBuilder.fromUri(baseUri).path(CommentsResource.class).build(doc.getWiki(), doc.getSpace(),
+                        doc.getName()).toString();
+            }
+
+            Link commentsLink = objectFactory.createLink();
+            commentsLink.setHref(commentsUri);
+            commentsLink.setRel(Relations.COMMENTS);
+            page.getLinks().add(commentsLink);
+        }
+
+        if (!doc.getAttachmentList().isEmpty()) {
+            String attachmentsUri;
+            if (useVersion) {
+                attachmentsUri =
+                    UriBuilder.fromUri(baseUri).path(AttachmentsAtPageVersionResource.class).build(doc.getWiki(),
+                        doc.getSpace(), doc.getName(), doc.getVersion()).toString();
+            } else {
+                attachmentsUri =
+                    UriBuilder.fromUri(baseUri).path(AttachmentsResource.class).build(doc.getWiki(), doc.getSpace(),
+                        doc.getName()).toString();
+            }
+
+            Link attachmentsLink = objectFactory.createLink();
+            attachmentsLink.setHref(attachmentsUri);
+            attachmentsLink.setRel(Relations.ATTACHMENTS);
+            page.getLinks().add(attachmentsLink);
+        }
+
+        if (!doc.getxWikiObjects().keySet().isEmpty()) {
+            String objectsUri =
+                UriBuilder.fromUri(baseUri).path(ObjectsResource.class).build(doc.getWiki(), doc.getSpace(),
+                    doc.getName()).toString();
+            Link objectsLink = objectFactory.createLink();
+            objectsLink.setHref(objectsUri);
+            objectsLink.setRel(Relations.OBJECTS);
+            page.getLinks().add(objectsLink);
+        }
+
+        return page;
+    }
+
+    public static HistorySummary createHistorySummary(ObjectFactory objectFactory, URI baseUri, String wikiName,
+        String spaceName, String pageName, String language, Version version, String modifier, Date modified)
+    {
+        HistorySummary historySummary = objectFactory.createHistorySummary();
+
+        String pageId = Utils.getPageId(wikiName, spaceName, pageName);
+
         historySummary.setPageId(pageId);
-        historySummary.setModified(timestamp.getTime());
-        historySummary.setModifier(author);
-        historySummary.setVersion(version);
-        historySummary.setMinorVersion(minorVersion);
+        historySummary.setVersion(version.toString());
+        historySummary.setMajorVersion(version.at(0));
+        historySummary.setMinorVersion(version.at(1));
+        historySummary.setModifier(modifier);
+        historySummary.setLanguage(language);
 
-        String fullUri;
-        Map<String, String> parametersMap;
-        Link link;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(modified);
+        historySummary.setModified(calendar);
 
-        if (languageId != null) {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(PageTranslationVersionResource.class));
-            parametersMap = new HashMap<String, String>();
-            parametersMap.put(Constants.WIKI_NAME_PARAMETER, wikiName);
-            parametersMap.put(Constants.SPACE_NAME_PARAMETER, spaceName);
-            parametersMap.put(Constants.PAGE_NAME_PARAMETER, pageName);
-            parametersMap.put(Constants.LANGUAGE_ID_PARAMETER, languageId);
-            parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", version, minorVersion));
-            link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-            link.setRel(Relations.PAGE);
+        if (language == null) {
+            String pageUri =
+                UriBuilder.fromUri(baseUri).path(PageVersionResource.class).build(wikiName, spaceName, pageName,
+                    version).toString();
+            Link pageLink = objectFactory.createLink();
+            pageLink.setHref(pageUri);
+            pageLink.setRel(Relations.PAGE);
+            historySummary.getLinks().add(pageLink);
         } else {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(PageVersionResource.class));
-            parametersMap = new HashMap<String, String>();
-            parametersMap.put(Constants.WIKI_NAME_PARAMETER, wikiName);
-            parametersMap.put(Constants.SPACE_NAME_PARAMETER, spaceName);
-            parametersMap.put(Constants.PAGE_NAME_PARAMETER, pageName);
-            parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", version, minorVersion));
-            link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-            link.setRel(Relations.PAGE);
+            String pageUri =
+                UriBuilder.fromUri(baseUri).path(PageTranslationVersionResource.class).build(wikiName, spaceName,
+                    pageName, language, version).toString();
+            Link pageLink = objectFactory.createLink();
+            pageLink.setHref(pageUri);
+            pageLink.setRel(Relations.PAGE);
+            historySummary.getLinks().add(pageLink);
         }
-
-        historySummary.addLink(link);
 
         return historySummary;
     }
 
-    public static Comment createComment(Request request, XWikiResourceClassRegistry resourceClassRegistry,
-        Document doc, com.xpn.xwiki.api.Object xwikiComment, boolean useVersionInformation)
+    private static void fillAttachment(Attachment attachment, ObjectFactory objectFactory, URI baseUri,
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl)
     {
-        Comment comment = new Comment();
+        Document doc = xwikiAttachment.getDocument();
+
+        attachment.setName(xwikiAttachment.getFilename());
+        attachment.setSize(xwikiAttachment.getFilesize());
+        attachment.setVersion(xwikiAttachment.getVersion());
+        attachment.setPageId(doc.getPrefixedFullName());
+        attachment.setPageVersion(doc.getVersion());
+        attachment.setMimeType(xwikiAttachment.getMimeType());
+        attachment.setAuthor(xwikiAttachment.getAuthor());
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(xwikiAttachment.getDate());
+        attachment.setDate(calendar);
+
+        attachment.setXwikiUrl(xwikiUrl);
+
+        String pageUri =
+            UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
+                .toString();
+        Link pageLink = objectFactory.createLink();
+        pageLink.setHref(pageUri);
+        pageLink.setRel(Relations.PAGE);
+        attachment.getLinks().add(pageLink);
+    }
+
+    public static Attachment createAttachment(ObjectFactory objectFactory, URI baseUri,
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl)
+    {
+        Attachment attachment = objectFactory.createAttachment();
+
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiUrl);
+
+        Document doc = xwikiAttachment.getDocument();
+
+        String attachmentUri =
+            UriBuilder.fromUri(baseUri).path(AttachmentResource.class).build(doc.getWiki(), doc.getSpace(),
+                doc.getName(), xwikiAttachment.getFilename()).toString();
+        Link attachmentLink = objectFactory.createLink();
+        attachmentLink.setHref(attachmentUri);
+        attachmentLink.setRel(Relations.ATTACHMENT_DATA);
+        attachment.getLinks().add(attachmentLink);
+
+        return attachment;
+    }
+
+    public static Attachment createAttachmentAtVersion(ObjectFactory objectFactory, URI baseUri,
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl)
+    {
+        Attachment attachment = new Attachment();
+
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiUrl);
+
+        Document doc = xwikiAttachment.getDocument();
+
+        String attachmentUri =
+            UriBuilder.fromUri(baseUri).path(AttachmentVersionResource.class).build(doc.getWiki(), doc.getSpace(),
+                doc.getName(), xwikiAttachment.getFilename(), xwikiAttachment.getVersion()).toString();
+        Link attachmentLink = objectFactory.createLink();
+        attachmentLink.setHref(attachmentUri);
+        attachmentLink.setRel(Relations.ATTACHMENT_DATA);
+        attachment.getLinks().add(attachmentLink);
+
+        return attachment;
+    }
+
+    public static Comment createComment(ObjectFactory objectFactory, URI baseUri, Document doc,
+        com.xpn.xwiki.api.Object xwikiComment)
+    {
+        Comment comment = objectFactory.createComment();
         comment.setId(xwikiComment.getNumber());
 
-        Property property = xwikiComment.getProperty("author");
+        com.xpn.xwiki.api.Property property = xwikiComment.getProperty("author");
         if (property != null) {
             comment.setAuthor((String) property.getValue());
         }
 
         property = xwikiComment.getProperty("date");
         if (property != null) {
-            comment.setDate(((Date) property.getValue()).getTime());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime((Date) property.getValue());
+            comment.setDate(calendar);
         }
 
         property = xwikiComment.getProperty("highlight");
@@ -457,236 +507,35 @@ public class DomainObjectFactory
             comment.setText((String) property.getValue());
         }
 
-        String fullUri;
-        Map<String, String> parametersMap;
-        Link link;
-
-        if (useVersionInformation) {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(PageVersionResource.class));
-        } else {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(PageResource.class));
-        }
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-        parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
-            .getRCSVersion().at(1)));
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.PAGE);
-        comment.addLink(link);
-
-        if (useVersionInformation) {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(CommentVersionResource.class));
-        } else {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(CommentResource.class));
-        }
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-        parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", doc.getRCSVersion().at(0), doc
-            .getRCSVersion().at(1)));
-        parametersMap.put(Constants.COMMENT_ID_PARAMETER, String.format("%d", xwikiComment.getNumber()));
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.SELF);
-        comment.addLink(link);
+        String pageUri =
+            UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
+                .toString();
+        Link pageLink = objectFactory.createLink();
+        pageLink.setHref(pageUri);
+        pageLink.setRel(Relations.PAGE);
+        comment.getLinks().add(pageLink);
 
         return comment;
     }
 
-    public static Attachment createAttachment(Request request, XWikiResourceClassRegistry resourceClassRegistry,
-        Document doc, com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl, boolean useVersion)
-    {
-        Attachment attachment = new Attachment();
-
-        attachment.setId(String.format("%s@%s", doc.getPrefixedFullName(), xwikiAttachment.getFilename()));
-        attachment.setName(xwikiAttachment.getFilename());
-        attachment.setSize(xwikiAttachment.getFilesize());
-        attachment.setVersion(xwikiAttachment.getVersion());
-        attachment.setPageVersion(xwikiAttachment.getDocument().getVersion());
-        attachment.setMimeType(xwikiAttachment.getMimeType());
-        attachment.setAuthor(xwikiAttachment.getAuthor());
-        attachment.setDate(xwikiAttachment.getDate().getTime());
-        attachment.setXWikiUrl(xwikiUrl);
-
-        String fullUri;
-        Map<String, String> parametersMap;
-        Link link;
-
-        if (useVersion) {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(PageVersionResource.class));
-        } else {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(PageResource.class));
-        }
-
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, xwikiAttachment.getDocument().getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, xwikiAttachment.getDocument().getName());
-        parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", xwikiAttachment.getDocument()
-            .getRCSVersion().at(0), xwikiAttachment.getDocument().getRCSVersion().at(1)));
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.PAGE);
-        attachment.addLink(link);
-
-        if (useVersion) {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(AttachmentAtPageVersionResource.class));
-        } else {
-            fullUri =
-                String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                    .getUriPatternForResourceClass(AttachmentResource.class));
-        }
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, xwikiAttachment.getDocument().getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, xwikiAttachment.getDocument().getName());
-        parametersMap.put(Constants.PAGE_VERSION_PARAMETER, String.format("%d.%d", xwikiAttachment.getDocument()
-            .getRCSVersion().at(0), xwikiAttachment.getDocument().getRCSVersion().at(1)));
-        parametersMap.put(Constants.ATTACHMENT_NAME_PARAMETER, attachment.getName());
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.ATTACHMENT_DATA);
-        attachment.addLink(link);
-
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(AttachmentHistoryResource.class));
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.HISTORY);
-        attachment.addLink(link);
-
-        return attachment;
-    }
-
-    public static Attachment createAttachmentAtVersion(Request request,
-        XWikiResourceClassRegistry resourceClassRegistry, com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl)
-    {
-        Attachment attachment = new Attachment();
-
-        attachment.setName(xwikiAttachment.getFilename());
-        attachment.setSize(xwikiAttachment.getFilesize());
-        attachment.setVersion(xwikiAttachment.getVersion());
-        attachment.setPageVersion(xwikiAttachment.getDocument().getVersion());
-        attachment.setMimeType(xwikiAttachment.getMimeType());
-        attachment.setAuthor(xwikiAttachment.getAuthor());
-        attachment.setDate(xwikiAttachment.getDate().getTime());
-        attachment.setXWikiUrl(xwikiUrl);
-
-        String fullUri;
-        Map<String, String> parametersMap;
-        Link link;
-
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(PageResource.class));
-
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, xwikiAttachment.getDocument().getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, xwikiAttachment.getDocument().getName());
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.PAGE);
-        attachment.addLink(link);
-
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(AttachmentVersionResource.class));
-
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, xwikiAttachment.getDocument().getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, xwikiAttachment.getDocument().getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, xwikiAttachment.getDocument().getName());
-        parametersMap.put(Constants.ATTACHMENT_NAME_PARAMETER, attachment.getName());
-        parametersMap.put(Constants.ATTACHMENT_VERSION_PARAMETER, xwikiAttachment.getVersion());
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.ATTACHMENT_DATA);
-        attachment.addLink(link);
-
-        return attachment;
-    }
-
-    public static ObjectSummary createObjectSummary(Request request, XWikiResourceClassRegistry resourceClassRegistry,
-        Document doc, com.xpn.xwiki.api.Object xwikiObject)
-    {
-        ObjectSummary objectSummary = new ObjectSummary();
-
-        objectSummary.setId(String.format("%s:%s", doc.getPrefixedFullName(), xwikiObject.getGuid()));
-        objectSummary.setGuid(xwikiObject.getGuid());
-        objectSummary.setClassName(xwikiObject.getxWikiClass().getName());
-        objectSummary.setNumber(xwikiObject.getNumber());
-        objectSummary.setPageId(doc.getPrefixedFullName());
-        objectSummary.setPrettyName(xwikiObject.getPrettyName());
-
-        Properties properties = objectSummary.getPropertyList();
-
-        for (Object propertyNameObject : xwikiObject.getPropertyNames()) {
-            String propertyName = (String) propertyNameObject;
-            Object propertyValue = xwikiObject.getProperty(propertyName).getValue();
-
-            org.xwiki.rest.model.Property property = new org.xwiki.rest.model.Property();
-            property.setName(propertyName);
-
-            if (propertyValue != null) {
-                property.setValue(propertyValue.toString());
-            } else {
-                property.setValue("");
-            }
-
-            properties.addProperty(property);
-        }
-
-        String fullUri;
-        Map<String, String> parametersMap;
-        Link link;
-
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(PageResource.class));
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.PAGE);
-        objectSummary.addLink(link);
-
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(ObjectResource.class));
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-        parametersMap.put(Constants.CLASS_NAME_PARAMETER, xwikiObject.getxWikiClass().getName());
-        parametersMap.put(Constants.OBJECT_NUMBER_PARAMETER, String.format("%d", xwikiObject.getNumber()));
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.SELF);
-        objectSummary.addLink(link);
-
-        return objectSummary;
-    }
-
+    /**
+     * Return the class property containing all the property for a given filed of a class (e.g., separators, dateFormat,
+     * etc).
+     * 
+     * @param xwikiContext
+     * @param baseObject
+     * @param propertyName
+     * @return
+     * @throws XWikiException
+     */
     private static com.xpn.xwiki.objects.classes.PropertyClass getPropertyType(XWikiContext xwikiContext,
-        BaseObject object, String propertyName) throws XWikiException
+        BaseObject baseObject, String propertyName) throws XWikiException
     {
-        BaseClass c = object.getxWikiClass(xwikiContext);
+        BaseClass baseClass = baseObject.getxWikiClass(xwikiContext);
 
-        for (Object o : c.getProperties()) {
-            com.xpn.xwiki.objects.classes.PropertyClass propertyClass = (com.xpn.xwiki.objects.classes.PropertyClass) o;
+        for (java.lang.Object propertyClassObject : baseClass.getProperties()) {
+            com.xpn.xwiki.objects.classes.PropertyClass propertyClass =
+                (com.xpn.xwiki.objects.classes.PropertyClass) propertyClassObject;
             if (propertyClass.getName().equals(propertyName)) {
                 return propertyClass;
             }
@@ -695,133 +544,176 @@ public class DomainObjectFactory
         return null;
     }
 
-    public static ObjectSummary createObjectSummary2(Request request, XWikiResourceClassRegistry resourceClassRegistry,
-        XWikiContext xwikiContext, Document doc, BaseObject xwikiObject) throws XWikiException
+    /**
+     * Returns a list of relevant attributes to be added to an object property for a given property class.
+     * 
+     * @param objectFactory
+     * @param xwikiContext
+     * @param xwikiPropertyClass
+     * @return
+     */
+    private static List<Attribute> getAttributesFor(ObjectFactory objectFactory, XWikiContext xwikiContext,
+        com.xpn.xwiki.objects.classes.PropertyClass xwikiPropertyClass)
     {
-        ObjectSummary objectSummary = new ObjectSummary();
+        List<Attribute> attributes = new ArrayList<Attribute>();
 
-        objectSummary.setId(String.format("%s:%s", doc.getPrefixedFullName(), xwikiObject.getGuid()));
-        objectSummary.setGuid(xwikiObject.getGuid());
-        objectSummary.setClassName(xwikiObject.getClassName());
-        objectSummary.setNumber(xwikiObject.getNumber());
-        objectSummary.setPageId(doc.getPrefixedFullName());
-        objectSummary.setPrettyName(xwikiObject.getPrettyName());
+        if (xwikiPropertyClass instanceof com.xpn.xwiki.objects.classes.ListClass) {
+            com.xpn.xwiki.objects.classes.ListClass listProperty =
+                (com.xpn.xwiki.objects.classes.ListClass) xwikiPropertyClass;
 
-        Properties properties = objectSummary.getPropertyList();
+            Formatter f = new Formatter();
 
-        for (String propertyName : xwikiObject.getPropertyNames()) {
-            PropertyInterface xwikiProperty = xwikiObject.get(propertyName);
-            PropertyClass xwikiPropertyType = getPropertyType(xwikiContext, xwikiObject, propertyName);
+            List allowedValueList = listProperty.getList(xwikiContext);
 
-            org.xwiki.rest.model.Property property = new org.xwiki.rest.model.Property();
-
-            if (xwikiPropertyType instanceof com.xpn.xwiki.objects.classes.ListClass) {
-                com.xpn.xwiki.objects.classes.ListClass listProperty = (ListClass) xwikiPropertyType;
-
-                Formatter f = new Formatter();
-                List allowedValueList = listProperty.getList(xwikiContext);
-                if (!allowedValueList.isEmpty()) {
-                    for (int i = 0; i < allowedValueList.size(); i++) {
-                        if (i != allowedValueList.size() - 1) {
-                            f.format("%s,", allowedValueList.get(i).toString());
-                        } else {
-                            f.format("%s", allowedValueList.get(i).toString());
-                        }
+            if (!allowedValueList.isEmpty()) {
+                for (int i = 0; i < allowedValueList.size(); i++) {
+                    if (i != allowedValueList.size() - 1) {
+                        f.format("%s,", allowedValueList.get(i).toString());
+                    } else {
+                        f.format("%s", allowedValueList.get(i).toString());
                     }
-
-                    property.setAllowedValues(f.toString());
                 }
 
-                property.setSeparators(listProperty.getSeparators());
+                Attribute attribute = objectFactory.createAttribute();
+                attribute.setName("values");
+                attribute.setValue(f.toString());
+
+                attributes.add(attribute);
             }
 
-            if (xwikiPropertyType instanceof com.xpn.xwiki.objects.classes.DateClass) {
-                com.xpn.xwiki.objects.classes.DateClass dateProperty = (DateClass) xwikiPropertyType;
+            Attribute attribute = objectFactory.createAttribute();
+            attribute.setName("separators");
+            attribute.setValue(listProperty.getSeparators());
 
-                property.setDateFormat(dateProperty.getDateFormat());
-            }
-
-            property.setType(xwikiPropertyType.getClassType());
-            property.setName(propertyName);
-            property.setValue(xwikiProperty.toFormString());
-            properties.addProperty(property);
+            attributes.add(attribute);
         }
 
-        String fullUri;
-        Map<String, String> parametersMap;
-        Link link;
+        if (xwikiPropertyClass instanceof com.xpn.xwiki.objects.classes.DateClass) {
+            com.xpn.xwiki.objects.classes.DateClass dateProperty =
+                (com.xpn.xwiki.objects.classes.DateClass) xwikiPropertyClass;
 
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(PageResource.class));
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.PAGE);
-        objectSummary.addLink(link);
+            Attribute attribute = objectFactory.createAttribute();
+            attribute.setName("dateFormat");
+            attribute.setValue(dateProperty.getDateFormat());
 
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(ObjectResource.class));
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, doc.getWiki());
-        parametersMap.put(Constants.SPACE_NAME_PARAMETER, doc.getSpace());
-        parametersMap.put(Constants.PAGE_NAME_PARAMETER, doc.getName());
-        parametersMap.put(Constants.CLASS_NAME_PARAMETER, xwikiObject.getClassName());
-        parametersMap.put(Constants.OBJECT_NUMBER_PARAMETER, String.format("%d", xwikiObject.getNumber()));
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.SELF);
-        objectSummary.addLink(link);
+            attributes.add(attribute);
+        }
 
-        return objectSummary;
+        return attributes;
     }
 
-    public static Class createSpace(Request request, XWikiResourceClassRegistry resourceClassRegistry, String wiki,
-        com.xpn.xwiki.api.Class xwikiClass)
+    public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
+        Document doc, BaseObject xwikiObject) throws XWikiException
     {
-        org.xwiki.rest.model.Class theClass = new org.xwiki.rest.model.Class();
-        theClass.setClassName(xwikiClass.getName());
+        Object object = objectFactory.createObject();
 
-        for (Object o : xwikiClass.getProperties()) {
-            com.xpn.xwiki.api.PropertyClass xwikiClassProperty = (com.xpn.xwiki.api.PropertyClass) o;
+        object.setId(String.format("%s:%s", doc.getPrefixedFullName(), xwikiObject.getGuid()));
+        object.setGuid(xwikiObject.getGuid());
+        object.setClassName(xwikiObject.getClassName());
+        object.setNumber(xwikiObject.getNumber());
+        object.setPageId(doc.getPrefixedFullName());
+        object.setName(xwikiObject.getPrettyName());
 
-            ClassProperty classProperty = new ClassProperty();
-            classProperty.setName(xwikiClassProperty.getName());
-            classProperty.setType(xwikiClassProperty.getClassType());
+        for (java.lang.Object xwikiPropertyObject : xwikiObject.getProperties()) {
+            BaseProperty xwikiProperty = (BaseProperty) xwikiPropertyObject;
 
-            for (Object xcp : xwikiClassProperty.getProperties()) {
-                com.xpn.xwiki.api.Property xwikiProperty = (com.xpn.xwiki.api.Property) xcp;
-                Object value = xwikiProperty.getValue();
+            com.xpn.xwiki.objects.classes.PropertyClass xwikiPropertyClass =
+                getPropertyType(xwikiContext, xwikiObject, xwikiProperty.getName());
+            PropertyInterface value = xwikiObject.get(xwikiProperty.getName());
 
-                org.xwiki.rest.model.Property property = new org.xwiki.rest.model.Property();
-                property.setName(xwikiProperty.getName());
-                if (value != null) {
-                    property.setValue(value.toString());
-                } else {
-                    property.setValue("");
-                }
-                classProperty.getPropertyList().getProperties().add(property);
-            }
+            Property property = objectFactory.createProperty();
+            property.setName(xwikiProperty.getName());
+            property.setType(xwikiProperty.getClassType());
+            property.setValue(value.toFormString());
+            property.getAttributes().addAll(getAttributesFor(objectFactory, xwikiContext, xwikiPropertyClass));
 
-            theClass.getClassPropertyList().getClassProperties().add(classProperty);
+            String propertyUri =
+                UriBuilder.fromUri(baseUri).path(ObjectPropertyResource.class).build(doc.getWiki(), doc.getSpace(),
+                    doc.getName(), xwikiObject.getClassName(), xwikiObject.getNumber(), xwikiProperty.getName())
+                    .toString();
+            Link propertyLink = objectFactory.createLink();
+            propertyLink.setHref(propertyUri);
+            propertyLink.setRel(Relations.PROPERTY);
+            property.getLinks().add(propertyLink);
+
+            object.getProperties().add(property);
         }
 
-        String fullUri;
-        Map<String, String> parametersMap;
-        Link link;
+        String objectUri =
+            UriBuilder.fromUri(baseUri).path(ObjectResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName(),
+                xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
+        Link objectLink = objectFactory.createLink();
+        objectLink.setHref(objectUri);
+        objectLink.setRel(Relations.SELF);
+        object.getLinks().add(objectLink);
 
-        fullUri =
-            String.format("%s%s", request.getRootRef(), resourceClassRegistry
-                .getUriPatternForResourceClass(ClassResource.class));
-        parametersMap = new HashMap<String, String>();
-        parametersMap.put(Constants.WIKI_NAME_PARAMETER, wiki);
-        parametersMap.put(Constants.CLASS_NAME_PARAMETER, xwikiClass.getName());
-        link = new Link(Utils.formatUriTemplate(fullUri, parametersMap));
-        link.setRel(Relations.SELF);
-        theClass.addLink(link);
+        String propertiesUri =
+            UriBuilder.fromUri(baseUri).path(ObjectPropertiesResource.class).build(doc.getWiki(), doc.getSpace(),
+                doc.getName(), xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
+        Link propertyLink = objectFactory.createLink();
+        propertyLink.setHref(propertiesUri);
+        propertyLink.setRel(Relations.PROPERTIES);
+        object.getLinks().add(propertyLink);
 
-        return theClass;
+        return object;
+    }
+
+    public static Class createClass(ObjectFactory objectFactory, URI baseUri, String wikiName,
+        com.xpn.xwiki.api.Class xwikiClass)
+    {
+        Class clazz = objectFactory.createClass();
+        clazz.setId(xwikiClass.getName());
+        clazz.setName(xwikiClass.getName());
+
+        for (java.lang.Object xwikiPropertyClassObject : xwikiClass.getProperties()) {
+            PropertyClass xwikiPropertyClass = (PropertyClass) xwikiPropertyClassObject;
+
+            Property property = objectFactory.createProperty();
+            property.setName(xwikiPropertyClass.getName());
+            property.setType(xwikiPropertyClass.getxWikiClass().getName());
+
+            for (java.lang.Object xwikiPropertyObject : xwikiPropertyClass.getProperties()) {
+                com.xpn.xwiki.api.Property xwikiProperty = (com.xpn.xwiki.api.Property) xwikiPropertyObject;
+                java.lang.Object value = xwikiProperty.getValue();
+
+                Attribute attribute = objectFactory.createAttribute();
+                attribute.setName(xwikiProperty.getName());
+
+                if (value != null) {
+                    attribute.setValue(value.toString());
+                } else {
+                    attribute.setValue("");
+                }
+
+                property.getAttributes().add(attribute);
+            }
+
+            String propertyUri =
+                UriBuilder.fromUri(baseUri).path(ClassPropertyResource.class).build(wikiName, xwikiClass.getName(),
+                    xwikiPropertyClass.getName()).toString();
+            Link propertyLink = objectFactory.createLink();
+            propertyLink.setHref(propertyUri);
+            propertyLink.setRel(Relations.PROPERTY);
+            property.getLinks().add(propertyLink);
+
+            clazz.getProperties().add(property);
+        }
+
+        String classUri =
+            UriBuilder.fromUri(baseUri).path(ClassResource.class).build(wikiName, xwikiClass.getName()).toString();
+        Link classLink = objectFactory.createLink();
+        classLink.setHref(classUri);
+        classLink.setRel(Relations.SELF);
+        clazz.getLinks().add(classLink);
+
+        String propertiesUri =
+            UriBuilder.fromUri(baseUri).path(ClassPropertiesResource.class).build(wikiName, xwikiClass.getName())
+                .toString();
+        Link propertyLink = objectFactory.createLink();
+        propertyLink.setHref(propertiesUri);
+        propertyLink.setRel(Relations.PROPERTIES);
+        clazz.getLinks().add(propertyLink);
+
+        return clazz;
     }
 }

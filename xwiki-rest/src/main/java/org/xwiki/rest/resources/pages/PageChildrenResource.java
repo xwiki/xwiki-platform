@@ -22,16 +22,19 @@ package org.xwiki.rest.resources.pages;
 import java.util.Collections;
 import java.util.List;
 
-import org.restlet.data.Form;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Pages;
+import org.xwiki.rest.model.jaxb.Pages;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -39,49 +42,48 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/children")
 public class PageChildrenResource extends XWikiResource
 {
-    @Override
-    public Representation represent(Variant variant)
+    public PageChildrenResource(@Context UriInfo uriInfo)
     {
-        try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
-            if (documentInfo == null) {
-                return null;
-            }
+        super(uriInfo);
+    }
 
-            Document doc = documentInfo.getDocument();
+    @GET
+    public Pages getPageChildren(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,
+        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+        
+        Document doc = documentInfo.getDocument();
 
-            Pages pages = new Pages();
-            List<String> pageNames = doc.getChildren();
-            Collections.sort(pageNames);
+        Pages pages = objectFactory.createPages();
 
-            Form queryForm = getRequest().getResourceRef().getQueryAsForm();
-            RangeIterable<String> ri =
-                new RangeIterable<String>(pageNames, Utils.parseInt(queryForm.getFirstValue(Constants.START_PARAMETER),
-                    0), Utils.parseInt(queryForm.getFirstValue(Constants.NUMBER_PARAMETER), -1));
+        List<String> childPageFullNames = doc.getChildren();
+        Collections.sort(childPageFullNames);
 
-            for (String pageName : ri) {
-                if (!xwikiApi.exists(pageName)) {
-                    getLogger().warning(
-                        String.format("[Page '%s' appears to exist but no information is available.]", pageName));
-                } else {
-                    Document childDoc = xwikiApi.getDocument(pageName);
+        RangeIterable<String> ri = new RangeIterable<String>(childPageFullNames, start, number);
 
-                    /* We only add pages we have the right to access */
-                    if (childDoc != null) {
-                        pages.addPageSummary(DomainObjectFactory.createPageSummary(getRequest(), resourceClassRegistry,
-                            childDoc));
-                    }
+        for (String childPageFullName : ri) {
+            String pageId = Utils.getPageId(wikiName, childPageFullName);
+
+            if (!xwikiApi.exists(pageId)) {
+                logger.warning(String.format(
+                    "[Page '%s' appears to be in space '%s' but no information is available.]", pageName, spaceName));
+            } else {
+                Document childDoc = xwikiApi.getDocument(pageId);
+
+                /* We only add pages we have the right to access */
+                if (childDoc != null) {
+                    pages.getPageSummaries().add(
+                        DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), childDoc));
                 }
             }
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), pages);
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
         }
 
-        return null;
+        return pages;
     }
+
 }

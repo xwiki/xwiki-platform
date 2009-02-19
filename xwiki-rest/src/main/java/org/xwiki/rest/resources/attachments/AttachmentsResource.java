@@ -21,65 +21,66 @@ package org.xwiki.rest.resources.attachments;
 
 import java.util.List;
 
-import org.restlet.data.Form;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
-import org.xwiki.rest.Constants;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
-import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.Attachments;
+import org.xwiki.rest.model.jaxb.Attachments;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * @version $Id$
+ */
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments")
 public class AttachmentsResource extends XWikiResource
 {
-    @Override
-    public Representation represent(Variant variant)
+    public AttachmentsResource(@Context UriInfo uriInfo)
     {
-        try {
-            DocumentInfo documentInfo = getDocumentFromRequest(getRequest(), getResponse(), true, false);
-            if (documentInfo == null) {
-                getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-                return null;
-            }
+        super(uriInfo);
+    }
 
-            Document doc = documentInfo.getDocument();
+    @GET
+    public Attachments getAttachments(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,
+        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
+    {
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+        Document doc = documentInfo.getDocument();
 
-            List<com.xpn.xwiki.api.Attachment> xwikiAttachments = doc.getAttachmentList();
+        Attachments attachments = objectFactory.createAttachments();
 
-            Form queryForm = getRequest().getResourceRef().getQueryAsForm();
-            RangeIterable<com.xpn.xwiki.api.Attachment> ri =
-                new RangeIterable<com.xpn.xwiki.api.Attachment>(xwikiAttachments, Utils.parseInt(queryForm
-                    .getFirstValue(Constants.START_PARAMETER), 0), Utils.parseInt(queryForm
-                    .getFirstValue(Constants.NUMBER_PARAMETER), -1));
+        List<com.xpn.xwiki.api.Attachment> xwikiAttachments = doc.getAttachmentList();
 
-            /*
-             * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
-             * external URL for an attachment
-             */
-            XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        RangeIterable<com.xpn.xwiki.api.Attachment> ri =
+            new RangeIterable<com.xpn.xwiki.api.Attachment>(xwikiAttachments, start, number);
 
-            Attachments attachments = new Attachments();
+        /*
+         * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
+         * external URL for an attachment
+         */
+        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
 
-            for (com.xpn.xwiki.api.Attachment xwikiAttachment : ri) {
-                String attachmentXWikiUrl =
-                    xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
-                        .toString();
+        for (com.xpn.xwiki.api.Attachment xwikiAttachment : ri) {
+            String attachmentXWikiUrl =
+                xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
+                    .toString();
 
-                attachments.addAttachment(DomainObjectFactory.createAttachment(getRequest(), resourceClassRegistry,
-                    doc, xwikiAttachment, attachmentXWikiUrl, false));
-            }
-
-            return getRepresenterFor(variant).represent(getContext(), getRequest(), getResponse(), attachments);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            attachments.getAttachments().add(
+                DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), xwikiAttachment,
+                    attachmentXWikiUrl));
         }
 
-        return null;
+        return attachments;
     }
+
 }

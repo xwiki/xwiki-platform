@@ -30,7 +30,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
  * @version $Id: $
  * @since 18RC2
  */
-public class UserAvatarMockDocumentAccessBridge implements DocumentAccessBridge
+public class MockDocumentAccessBridge implements DocumentAccessBridge
 {
     /**
      * Create and return a descriptor for this component.
@@ -43,7 +43,7 @@ public class UserAvatarMockDocumentAccessBridge implements DocumentAccessBridge
 
         componentDescriptor.setRole(DocumentAccessBridge.ROLE);
         componentDescriptor.setRoleHint("default");
-        componentDescriptor.setImplementation(UserAvatarMockDocumentAccessBridge.class.getName());
+        componentDescriptor.setImplementation(MockDocumentAccessBridge.class.getName());
 
         return componentDescriptor;
     }

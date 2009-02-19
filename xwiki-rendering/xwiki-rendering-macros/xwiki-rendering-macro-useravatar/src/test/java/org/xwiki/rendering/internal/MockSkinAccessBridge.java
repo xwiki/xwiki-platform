@@ -24,13 +24,13 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 
 /**
- * Mock {@link XWikiAccessBridge} implementation used for testing, since we don't want to pull any dependency on the
+ * Mock {@link SkinAccessBridge} implementation used for testing, since we don't want to pull any dependency on the
  * Model/Skin/etc for the Rendering module's unit tests.
  * 
  * @version $Id: $
  * @since 1.8RC2
  */
-public class UserAvatarMockSkinAccessBridge implements SkinAccessBridge
+public class MockSkinAccessBridge implements SkinAccessBridge
 {
     /**
      * Create and return a descriptor for this component.
@@ -43,7 +43,7 @@ public class UserAvatarMockSkinAccessBridge implements SkinAccessBridge
 
         componentDescriptor.setRole(SkinAccessBridge.ROLE);
         componentDescriptor.setRoleHint("default");
-        componentDescriptor.setImplementation(UserAvatarMockSkinAccessBridge.class.getName());
+        componentDescriptor.setImplementation(MockSkinAccessBridge.class.getName());
 
         return componentDescriptor;
     }

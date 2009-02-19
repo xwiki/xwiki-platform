@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.scaffolding;
 
-import org.xwiki.rendering.internal.UserAvatarMockDocumentAccessBridge;
-import org.xwiki.rendering.internal.UserAvatarMockSkinAccessBridge;
+import org.xwiki.rendering.internal.MockDocumentAccessBridge;
+import org.xwiki.rendering.internal.MockSkinAccessBridge;
 import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
 
 import junit.framework.TestSuite;
@@ -41,7 +41,7 @@ public class UserAvatarRenderingPlexusTestSetup extends RenderingPlexusTestSetup
     {
         super.setUp();
 
-        getComponentManager().registerComponentDescriptor(UserAvatarMockDocumentAccessBridge.getComponentDescriptor());
-        getComponentManager().registerComponentDescriptor(UserAvatarMockSkinAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponentDescriptor(MockSkinAccessBridge.getComponentDescriptor());
     }
 }

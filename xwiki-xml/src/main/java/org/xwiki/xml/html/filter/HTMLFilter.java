@@ -19,26 +19,25 @@
  */
 package org.xwiki.xml.html.filter;
 
-import org.jdom.Document;
+import org.w3c.dom.Document;
 
 /**
- * Clean some XML node after HTML Cleaner has been executed. This is because HTML Cleaner has some gaps and does't
- * convert HTML to XHTML so we need to perform extra cleaning.
+ * Defines an interface for filters that will filter HTML documents.
  * 
- * @version $Id: $
- * @since 1.6M1
+ * @version $Id$
+ * @since 1.8RC2
  */
-public interface CleaningFilter
+public interface HTMLFilter
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    String ROLE = CleaningFilter.class.getName();
+    String ROLE = HTMLFilter.class.getName();
     
     /**
-     * Filters the passed XML document to generate valid and clean XHTML.
-     *
-     * @param document the document to clean
+     * Performs cleaning of the html code stored in {@link Document}.
+     * 
+     * @param document The {@link Document} with html code
      */
     void filter(Document document);
 }

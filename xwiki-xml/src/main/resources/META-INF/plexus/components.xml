@@ -26,15 +26,15 @@
   <components>
     <!-- HTML Filters -->
     <component>
-      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role>org.xwiki.xml.html.filter.CleaningFilter</role>
       <role-hint>list</role-hint>
-      <implementation>org.xwiki.xml.internal.html.filter.ListFilter</implementation>
+      <implementation>org.xwiki.xml.internal.html.filter.ListCleaningFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>    
     <component>
-      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role>org.xwiki.xml.html.filter.CleaningFilter</role>
       <role-hint>font</role-hint>
-      <implementation>org.xwiki.xml.internal.html.filter.FontFilter</implementation>
+      <implementation>org.xwiki.xml.internal.html.filter.FontCleaningFilter</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <!-- Default HTML Cleaner -->    
@@ -46,12 +46,12 @@
       <!-- Inject the default HTMLFilter components into the 'filters' list -->
       <requirements>
         <requirement>
-          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role>org.xwiki.xml.html.filter.CleaningFilter</role>
           <role-hint>list</role-hint>
           <field-name>filters</field-name>
         </requirement>
         <requirement>
-          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role>org.xwiki.xml.html.filter.CleaningFilter</role>
           <role-hint>font</role-hint>
           <field-name>filters</field-name>
         </requirement>                

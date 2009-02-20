@@ -27,12 +27,12 @@ import org.w3c.dom.Document;
  * @version $Id$
  * @since 1.8RC2
  */
-public interface HTMLFilter
+public interface CleaningFilter
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    String ROLE = HTMLFilter.class.getName();
+    String ROLE = CleaningFilter.class.getName();
     
     /**
      * Performs cleaning of the html code stored in {@link Document}.

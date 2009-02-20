@@ -24,7 +24,7 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xwiki.xml.html.filter.AbstractHTMLFilter;
+import org.xwiki.xml.html.filter.AbstractCleaningFilter;
 import org.xwiki.xml.html.filter.ElementFilterCriterion;
 
 /**
@@ -54,7 +54,7 @@ import org.xwiki.xml.html.filter.ElementFilterCriterion;
  * @version $Id: $
  * @since 1.6M1
  */
-public class ListFilter extends AbstractHTMLFilter
+public class ListCleaningFilter extends AbstractCleaningFilter
 {
 
     /**

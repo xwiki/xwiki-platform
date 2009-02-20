@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xwiki.xml.html.filter.AbstractHTMLFilter;
+import org.xwiki.xml.html.filter.AbstractCleaningFilter;
 
 /**
  * Replaces invalid &lt;font&gt; tags with equivalent &lt;span&gt; tags using inline css rules.
@@ -31,7 +31,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * @version $Id$
  * @since 1.8RC2
  */
-public class FontFilter extends AbstractHTMLFilter
+public class FontCleaningFilter extends AbstractCleaningFilter
 {
     /**
      * {@inheritDoc}

@@ -28,12 +28,12 @@ import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.HTMLConstants;
 
 /**
- * Abstract implementation of {@link HTMLFilter} providing utility methods for various common w3c dom operations.
+ * Abstract implementation of {@link CleaningFilter} providing utility methods for various common w3c dom operations.
  * 
  * @version $Id$
  * @since 1.8M2
  */
-public abstract class AbstractHTMLFilter implements HTMLFilter, HTMLConstants
+public abstract class AbstractCleaningFilter implements CleaningFilter, HTMLConstants
 {
     /**
      * Utility method for filtering an element's children with a tagName.

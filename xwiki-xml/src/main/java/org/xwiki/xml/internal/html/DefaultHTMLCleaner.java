@@ -40,7 +40,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLConstants;
-import org.xwiki.xml.html.filter.HTMLFilter;
+import org.xwiki.xml.html.filter.CleaningFilter;
 
 /**
  * Default implementation for {@link org.xwiki.xml.html.HTMLCleaner} using the <a href="HTML Cleaner
@@ -55,7 +55,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      * List of default html filters to call when cleaning code with HTML Cleaner. This is for cases when there are no <a
      * href="http://htmlcleaner.sourceforge.net/parameters.php">properties</a> defined in HTML Cleaner.
      */
-    private List<HTMLFilter> filters;
+    private List<CleaningFilter> filters;
 
     /**
      * {@inheritDoc}
@@ -149,7 +149,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             throw new RuntimeException("Error while transforming jdom document into w3c document", ex);
         }        
         // Finally apply filters.
-        for (HTMLFilter filter : filters) {
+        for (CleaningFilter filter : filters) {
             filter.filter(result);
         }
         return result;        

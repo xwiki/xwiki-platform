@@ -56,7 +56,7 @@
             <td><a href="javascript:void()" title="$msg.get("choosethispackage")" onclick="selectPackage('$doc.space', '$doc.name', '$attach.filename'); return false;">#packName($attach.filename)</a></td>
             <td>$xwiki.getLocalUserName($attach.author)</td>
             <td><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></td>
-            <td>$!xwiki.formatDate($attach.date, "dd/MM/yyyy")</td>
+            <td>$!xwiki.formatDate($attach.date)</td>
             <td>$attach.filesize</td>
             #if($hasedit || $hasadmin)
 			  #set($attachurl = $doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=$!{redirect}").replaceAll("&", "&amp;"))

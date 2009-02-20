@@ -52,7 +52,7 @@ ${Msz}Mb
           <span class="version"><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></span>
           <div class="meta">
           <span class="publisher">$msg.get("PostedBy"): <span>$xwiki.getLocalUserName($attach.author)</span></span>
-          <span class="date">$msg.get("on") $!xwiki.formatDate($attach.date, "dd/MM/yyyy")</span>
+          <span class="date">$msg.get("on") $!xwiki.formatDate($attach.date)</span>
           <span class="size">(#dynamicsize($attach.filesize))</span>
           </div>
         </div>

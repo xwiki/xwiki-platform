@@ -14,7 +14,7 @@
 <creationDate>1158309261000</creationDate>
 <date>1180529512000</date>
 <contentUpdateDate>1180529512000</contentUpdateDate>
-<version>1.10</version>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -137,7 +137,7 @@
 <property>
 <content>#set($blinks = $doc.getBacklinks())
 #if($blinks.size()&gt;0 || $showEmptyPanels)
-#panelheader('Backlinks')
+#panelheader($msg.get("docextra.backlinks"))
 #set($first = true)
 #foreach($docname in $blinks)
 #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())

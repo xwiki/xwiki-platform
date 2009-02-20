@@ -106,7 +106,7 @@
 <category>Information</category>
 </property>
 <property>
-<content>#largepanelheader("XWiki Syntax Help")
+<content>#largepanelheader($msg.get("xe.panels.syntax.help"))
 #set ($syntaxDoc = $xwiki.getDocument("XWiki.XWikiSyntax"))
 #if ($syntaxDoc.isNew())
   #set ($url = "http://platform.xwiki.org/xwiki/bin/view/Main/XWikiSyntax?xpage=print")

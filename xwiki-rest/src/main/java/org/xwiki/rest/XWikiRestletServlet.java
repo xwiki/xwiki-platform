@@ -22,6 +22,8 @@ package org.xwiki.rest;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.restlet.Application;
 import org.restlet.Context;
@@ -40,6 +42,8 @@ public class XWikiRestletServlet extends ServerServlet
 
     private static final String PROVIDERS_PARAMETER = "providers";
 
+    private static final Logger logger = Logger.getLogger(XWikiRestletServlet.class.getName());
+
     @Override
     protected Application createApplication(Context context)
     {
@@ -53,9 +57,10 @@ public class XWikiRestletServlet extends ServerServlet
                     resourceClassName = resourceClassName.trim();
                     Class< ? > resourceClass = this.getClass().getClassLoader().loadClass(resourceClassName);
                     jaxRsClasses.add(resourceClass);
-                    System.out.format("  Added resource %s\n", resourceClassName);
+
+                    logger.log(Level.INFO, String.format("Added resource %s", resourceClassName));
                 } catch (ClassNotFoundException e) {
-                    System.out.format("Cannot load class %s\n", resourceClassName);
+                    logger.log(Level.WARNING, String.format("Cannot load class %s", resourceClassName));
                 }
             }
         }
@@ -68,9 +73,10 @@ public class XWikiRestletServlet extends ServerServlet
                     providerClassName = providerClassName.trim();
                     Class< ? > providerClass = this.getClass().getClassLoader().loadClass(providerClassName);
                     jaxRsClasses.add(providerClass);
-                    System.out.format("  Added provider %s\n", providerClassName);
+
+                    logger.log(Level.INFO, String.format("Added provider %s", providerClassName));
                 } catch (ClassNotFoundException e) {
-                    System.out.format("Cannot load class %s\n", providerClassName);
+                    logger.log(Level.WARNING, String.format("Cannot load class %s", providerClassName));
                 }
             }
         }

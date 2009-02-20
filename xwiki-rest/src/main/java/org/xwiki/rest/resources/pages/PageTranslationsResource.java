@@ -49,10 +49,10 @@ public class PageTranslationsResource extends XWikiResource
         @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
-        
+
         Document doc = documentInfo.getDocument();
-        
-        return DomainObjectFactory.createTranslations(objectFactory, uriInfo.getBaseUri(), doc);                
+
+        return DomainObjectFactory.createTranslations(objectFactory, uriInfo.getBaseUri(), doc);
     }
 
 }

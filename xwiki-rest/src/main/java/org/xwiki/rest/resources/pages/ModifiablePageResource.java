@@ -37,10 +37,11 @@ public class ModifiablePageResource extends XWikiResource
 {
     public ModifiablePageResource(UriInfo uriInfo)
     {
-        super(uriInfo); 
+        super(uriInfo);
     }
-    
-    public Response putPage(DocumentInfo documentInfo, Page page) throws XWikiException {
+
+    public Response putPage(DocumentInfo documentInfo, Page page) throws XWikiException
+    {
         Document doc = documentInfo.getDocument();
 
         boolean save = false;
@@ -63,7 +64,9 @@ public class ModifiablePageResource extends XWikiResource
         if (save) {
             doc.save();
 
-            page = DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false);
+            page =
+                DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
+                    false);
 
             if (documentInfo.isCreated()) {
                 return Response.created(uriInfo.getAbsolutePath()).entity(page).build();
@@ -74,8 +77,9 @@ public class ModifiablePageResource extends XWikiResource
             return Response.status(Status.NOT_MODIFIED).build();
         }
     }
-    
-    void deletePage(DocumentInfo documentInfo) throws XWikiException {
+
+    void deletePage(DocumentInfo documentInfo) throws XWikiException
+    {
         Document doc = documentInfo.getDocument();
 
         doc.delete();

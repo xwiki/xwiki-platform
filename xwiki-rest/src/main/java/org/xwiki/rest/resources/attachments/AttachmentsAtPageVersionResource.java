@@ -50,10 +50,10 @@ public class AttachmentsAtPageVersionResource extends XWikiResource
     }
 
     @GET
-    public Attachments getAttachmentsAtPageVersion(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
-        @PathParam("pageName") String pageName, @PathParam("version") String version,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
-        throws XWikiException
+    public Attachments getAttachmentsAtPageVersion(@PathParam("wikiName") String wikiName,
+        @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
+        @PathParam("version") String version, @QueryParam("start") @DefaultValue("0") Integer start,
+        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, version, true, false);
 

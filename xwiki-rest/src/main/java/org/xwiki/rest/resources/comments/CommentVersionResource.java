@@ -66,7 +66,7 @@ public class CommentVersionResource extends XWikiResource
                 return DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment);
             }
         }
-        
+
         throw new WebApplicationException(Status.NOT_FOUND);
     }
 }

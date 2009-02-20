@@ -33,7 +33,7 @@ import org.xwiki.rest.model.jaxb.Xwiki;
  */
 @Path("/")
 public class RootResource extends XWikiResource
-{    
+{
     public RootResource(@Context UriInfo uriInfo)
     {
         super(uriInfo);
@@ -41,7 +41,7 @@ public class RootResource extends XWikiResource
 
     @GET
     public Xwiki getRoot()
-    {        
+    {
         return DomainObjectFactory.createXWikiRoot(objectFactory, uriInfo.getBaseUri(), "1.8-SNAPSHOT");
     }
 }

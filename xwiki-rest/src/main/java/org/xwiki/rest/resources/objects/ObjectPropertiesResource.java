@@ -47,16 +47,17 @@ public class ObjectPropertiesResource extends XWikiResource
     {
         super(uriInfo);
     }
-    
+
     @GET
-    public Properties getObjectProperties(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
-        @PathParam("pageName") String pageName, @PathParam("className") String className,
-        @PathParam("objectNumber") Integer objectNumber) throws XWikiException
+    public Properties getObjectProperties(@PathParam("wikiName") String wikiName,
+        @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
+        @PathParam("className") String className, @PathParam("objectNumber") Integer objectNumber)
+        throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
         Document doc = documentInfo.getDocument();
-        
+
         XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
 
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
@@ -64,11 +65,12 @@ public class ObjectPropertiesResource extends XWikiResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        Object object = DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject);
-        
+        Object object =
+            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject);
+
         Properties properties = objectFactory.createProperties();
         properties.getProperties().addAll(object.getProperties());
-        
+
         return properties;
     }
 }

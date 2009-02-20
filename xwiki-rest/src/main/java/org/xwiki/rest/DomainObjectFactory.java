@@ -20,7 +20,6 @@
 package org.xwiki.rest;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
@@ -37,6 +36,7 @@ import org.xwiki.rest.model.jaxb.HistorySummary;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
+import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Property;
@@ -77,8 +77,8 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.PropertyClass;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
  * @version $Id$
@@ -518,118 +518,97 @@ public class DomainObjectFactory
         return comment;
     }
 
-    /**
-     * Return the class property containing all the property for a given filed of a class (e.g., separators, dateFormat,
-     * etc).
-     * 
-     * @param xwikiContext
-     * @param baseObject
-     * @param propertyName
-     * @return
-     * @throws XWikiException
-     */
-    private static com.xpn.xwiki.objects.classes.PropertyClass getPropertyType(XWikiContext xwikiContext,
-        BaseObject baseObject, String propertyName) throws XWikiException
+    private static void fillObjectSummary(ObjectSummary objectSummary, ObjectFactory objectFactory, URI baseUri,
+        Document doc, BaseObject xwikiObject) throws XWikiException
     {
-        BaseClass baseClass = baseObject.getxWikiClass(xwikiContext);
+        objectSummary.setId(String.format("%s:%s", doc.getPrefixedFullName(), xwikiObject.getGuid()));
+        objectSummary.setGuid(xwikiObject.getGuid());
+        objectSummary.setPageId(doc.getPrefixedFullName());
+        objectSummary.setWiki(doc.getWiki());
+        objectSummary.setSpace(doc.getSpace());
+        objectSummary.setPageName(doc.getName());
+        objectSummary.setClassName(xwikiObject.getClassName());
+        objectSummary.setNumber(xwikiObject.getNumber());
 
-        for (java.lang.Object propertyClassObject : baseClass.getProperties()) {
-            com.xpn.xwiki.objects.classes.PropertyClass propertyClass =
-                (com.xpn.xwiki.objects.classes.PropertyClass) propertyClassObject;
-            if (propertyClass.getName().equals(propertyName)) {
-                return propertyClass;
-            }
+        String[] propertyNames = xwikiObject.getPropertyNames();
+        if (propertyNames.length > 0) {
+            objectSummary.setHeadline(xwikiObject.get(propertyNames[0]).toFormString());
         }
 
-        return null;
     }
 
-    /**
-     * Returns a list of relevant attributes to be added to an object property for a given property class.
-     * 
-     * @param objectFactory
-     * @param xwikiContext
-     * @param xwikiPropertyClass
-     * @return
-     */
-    private static List<Attribute> getAttributesFor(ObjectFactory objectFactory, XWikiContext xwikiContext,
-        com.xpn.xwiki.objects.classes.PropertyClass xwikiPropertyClass)
+    public static ObjectSummary createObjectSummary(ObjectFactory objectFactory, URI baseUri,
+        XWikiContext xwikiContext, Document doc, BaseObject xwikiObject) throws XWikiException
     {
-        List<Attribute> attributes = new ArrayList<Attribute>();
+        ObjectSummary objectSummary = objectFactory.createObjectSummary();
+        fillObjectSummary(objectSummary, objectFactory, baseUri, doc, xwikiObject);
 
-        if (xwikiPropertyClass instanceof com.xpn.xwiki.objects.classes.ListClass) {
-            com.xpn.xwiki.objects.classes.ListClass listProperty =
-                (com.xpn.xwiki.objects.classes.ListClass) xwikiPropertyClass;
+        String objectUri =
+            UriBuilder.fromUri(baseUri).path(ObjectResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName(),
+                xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
+        Link objectLink = objectFactory.createLink();
+        objectLink.setHref(objectUri);
+        objectLink.setRel(Relations.OBJECT);
+        objectSummary.getLinks().add(objectLink);
 
-            Formatter f = new Formatter();
-
-            List allowedValueList = listProperty.getList(xwikiContext);
-
-            if (!allowedValueList.isEmpty()) {
-                for (int i = 0; i < allowedValueList.size(); i++) {
-                    if (i != allowedValueList.size() - 1) {
-                        f.format("%s,", allowedValueList.get(i).toString());
-                    } else {
-                        f.format("%s", allowedValueList.get(i).toString());
-                    }
-                }
-
-                Attribute attribute = objectFactory.createAttribute();
-                attribute.setName("values");
-                attribute.setValue(f.toString());
-
-                attributes.add(attribute);
-            }
-
-            Attribute attribute = objectFactory.createAttribute();
-            attribute.setName("separators");
-            attribute.setValue(listProperty.getSeparators());
-
-            attributes.add(attribute);
-        }
-
-        if (xwikiPropertyClass instanceof com.xpn.xwiki.objects.classes.DateClass) {
-            com.xpn.xwiki.objects.classes.DateClass dateProperty =
-                (com.xpn.xwiki.objects.classes.DateClass) xwikiPropertyClass;
-
-            Attribute attribute = objectFactory.createAttribute();
-            attribute.setName("dateFormat");
-            attribute.setValue(dateProperty.getDateFormat());
-
-            attributes.add(attribute);
-        }
-
-        return attributes;
+        return objectSummary;
     }
 
     public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
         Document doc, BaseObject xwikiObject) throws XWikiException
     {
         Object object = objectFactory.createObject();
+        fillObjectSummary(object, objectFactory, baseUri, doc, xwikiObject);
 
-        object.setId(String.format("%s:%s", doc.getPrefixedFullName(), xwikiObject.getGuid()));
-        object.setGuid(xwikiObject.getGuid());
-        object.setClassName(xwikiObject.getClassName());
-        object.setNumber(xwikiObject.getNumber());
-        object.setPageId(doc.getPrefixedFullName());
-        object.setName(xwikiObject.getPrettyName());
+        BaseClass xwikiClass = xwikiObject.getxWikiClass(xwikiContext);
 
-        for (java.lang.Object xwikiPropertyObject : xwikiObject.getProperties()) {
-            BaseProperty xwikiProperty = (BaseProperty) xwikiPropertyObject;
-
-            com.xpn.xwiki.objects.classes.PropertyClass xwikiPropertyClass =
-                getPropertyType(xwikiContext, xwikiObject, xwikiProperty.getName());
-            PropertyInterface value = xwikiObject.get(xwikiProperty.getName());
+        for (java.lang.Object propertyClassObject : xwikiClass.getProperties()) {
+            com.xpn.xwiki.objects.classes.PropertyClass propertyClass =
+                (com.xpn.xwiki.objects.classes.PropertyClass) propertyClassObject;
 
             Property property = objectFactory.createProperty();
-            property.setName(xwikiProperty.getName());
-            property.setType(xwikiProperty.getClassType());
-            property.setValue(value.toFormString());
-            property.getAttributes().addAll(getAttributesFor(objectFactory, xwikiContext, xwikiPropertyClass));
+
+            for (java.lang.Object o : propertyClass.getProperties()) {
+                BaseProperty baseProperty = (BaseProperty) o;
+                Attribute attribute = objectFactory.createAttribute();
+                attribute.setName(baseProperty.getName());
+                attribute.setValue(baseProperty.getValue().toString());
+                property.getAttributes().add(attribute);
+            }
+
+            if (propertyClass instanceof ListClass) {
+                ListClass listClass = (ListClass) propertyClass;
+
+                List allowedValueList = listClass.getList(xwikiContext);
+
+                if (!allowedValueList.isEmpty()) {
+                    Formatter f = new Formatter();
+                    for (int i = 0; i < allowedValueList.size(); i++) {
+                        if (i != allowedValueList.size() - 1) {
+                            f.format("%s,", allowedValueList.get(i).toString());
+                        } else {
+                            f.format("%s", allowedValueList.get(i).toString());
+                        }
+                    }
+
+                    Attribute attribute = objectFactory.createAttribute();
+                    attribute.setName(Constants.ALLOWED_VALUES_ATTRIBUTE_NAME);
+                    attribute.setValue(f.toString());
+                    property.getAttributes().add(attribute);
+                }
+            }
+
+            property.setName(propertyClass.getName());
+            property.setType(propertyClass.getClassType());
+            if (xwikiObject.get(propertyClass.getName()) != null) {
+                property.setValue(xwikiObject.get(propertyClass.getName()).toFormString());
+            } else {
+                property.setValue("");
+            }
 
             String propertyUri =
                 UriBuilder.fromUri(baseUri).path(ObjectPropertyResource.class).build(doc.getWiki(), doc.getSpace(),
-                    doc.getName(), xwikiObject.getClassName(), xwikiObject.getNumber(), xwikiProperty.getName())
+                    doc.getName(), xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName())
                     .toString();
             Link propertyLink = objectFactory.createLink();
             propertyLink.setHref(propertyUri);
@@ -637,6 +616,7 @@ public class DomainObjectFactory
             property.getLinks().add(propertyLink);
 
             object.getProperties().add(property);
+
         }
 
         String objectUri =

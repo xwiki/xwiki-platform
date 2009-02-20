@@ -47,8 +47,8 @@ public class ClassPropertiesResource extends XWikiResource
     }
 
     @GET
-    public Properties getClassProperties(@PathParam("wikiName") String wikiName, @PathParam("className") String className)
-        throws XWikiException
+    public Properties getClassProperties(@PathParam("wikiName") String wikiName,
+        @PathParam("className") String className) throws XWikiException
     {
 
         String database = xwikiContext.getDatabase();
@@ -57,16 +57,16 @@ public class ClassPropertiesResource extends XWikiResource
             xwikiContext.setDatabase(wikiName);
 
             com.xpn.xwiki.api.Class xwikiClass = xwikiApi.getClass(className);
-            if(xwikiClass == null) {
+            if (xwikiClass == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
-                        
+
             Class clazz = DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass);
-            
+
             Properties properties = objectFactory.createProperties();
             properties.getProperties().addAll(clazz.getProperties());
-            
-            return properties;            
+
+            return properties;
         } finally {
             xwiki.setDatabase(database);
         }

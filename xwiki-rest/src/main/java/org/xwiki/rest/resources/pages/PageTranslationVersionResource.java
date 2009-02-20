@@ -44,14 +44,15 @@ public class PageTranslationVersionResource extends XWikiResource
     }
 
     @GET
-    public Page getPageTranslationVersion(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
-        @PathParam("pageName") String pageName, @PathParam("language") String language,
-        @PathParam("version") String version) throws XWikiException
+    public Page getPageTranslationVersion(@PathParam("wikiName") String wikiName,
+        @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
+        @PathParam("language") String language, @PathParam("version") String version) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, version, true, false);
-        
+
         Document doc = documentInfo.getDocument();
 
-        return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false);
+        return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
+            false);
     }
 }

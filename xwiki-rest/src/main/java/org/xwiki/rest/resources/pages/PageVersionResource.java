@@ -48,10 +48,11 @@ public class PageVersionResource extends XWikiResource
         @PathParam("pageName") String pageName, @PathParam("version") String version) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, version, true, false);
-        
+
         Document doc = documentInfo.getDocument();
 
-        return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, true);
+        return DomainObjectFactory
+            .createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, true);
     }
 
 }

@@ -52,6 +52,8 @@ public class Relations
 
     public static final String OBJECTS = "http://www.xwiki.org/rel/objects";
 
+    public static final String OBJECT = "http://www.xwiki.org/rel/object";
+
     public static final String CLASSES = "http://www.xwiki.org/rel/classes";
 
     public static final String HISTORY = "http://www.xwiki.org/rel/history";

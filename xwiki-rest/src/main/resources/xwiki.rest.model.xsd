@@ -156,19 +156,32 @@
 		</complexContent>
 	</complexType>
 
-	<complexType name="Object">
+	<complexType name="ObjectSummary">
 		<complexContent>
 			<extension base="xwiki:LinkCollection">
 				<sequence>
 					<element name="id" type="string"></element>
 					<element name="guid" type="string"></element>
 					<element name="pageId" type="string"></element>
+					<element name="wiki" type="string"></element>
+					<element name="space" type="string"></element>
+					<element name="pageName" type="string"></element>
 					<element name="className" type="string"></element>
 					<element name="number" type="int"></element>
-					<element name="name" type="string"></element>
-					<element name="properties" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded"></element>
+					<element name="headline" type="string"></element>
 				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
 
+	<complexType name="Object">
+		<complexContent>
+			<extension base="xwiki:ObjectSummary">
+				<sequence>
+					<element name="property" type="xwiki:Property"
+						minOccurs="0" maxOccurs="unbounded">
+					</element>
+				</sequence>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -330,7 +343,7 @@
 			<complexContent>
 				<extension base="xwiki:LinkCollection">
 					<sequence>
-						<element name="object" type="xwiki:Object" minOccurs="0" maxOccurs="unbounded"></element>
+						<element name="objectSummary" type="xwiki:ObjectSummary" minOccurs="0" maxOccurs="unbounded"></element>
 					</sequence>
 				</extension>
 			</complexContent>
@@ -355,4 +368,6 @@
     		</complexContent>
     	</complexType>
     </element>
+
+    <element name="objectSummary" type="xwiki:ObjectSummary"></element>
 </schema>

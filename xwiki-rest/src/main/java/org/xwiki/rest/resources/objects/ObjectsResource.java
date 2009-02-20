@@ -91,8 +91,9 @@ public class ObjectsResource extends XWikiResource
         for (com.xpn.xwiki.objects.BaseObject object : ri) {
             /* By deleting objects, some of them might become null, so we must check for this */
             if (object != null) {
-                objects.getObjects().add(
-                    DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, object));
+                objects.getObjectSummaries().add(
+                    DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc,
+                        object));
             }
         }
 

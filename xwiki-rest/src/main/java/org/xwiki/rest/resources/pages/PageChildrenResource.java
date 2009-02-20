@@ -56,7 +56,7 @@ public class PageChildrenResource extends XWikiResource
         @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
-        
+
         Document doc = documentInfo.getDocument();
 
         Pages pages = objectFactory.createPages();

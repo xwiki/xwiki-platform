@@ -66,7 +66,7 @@ public class PageHistoryResource extends XWikiResource
         /* This try is just needed for executing the finally clause. Exceptions are actually re-thrown. */
         try {
             xwikiContext.setDatabase(wikiName);
-         
+
             String query =
                 String
                     .format(
@@ -77,20 +77,21 @@ public class PageHistoryResource extends XWikiResource
 
             List<Object> queryResult = null;
             queryResult =
-                queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceName).bindValue("name", pageName).setLimit(number)
-                    .bindValue("language", "").setOffset(start).execute();
+                queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceName).bindValue("name", pageName)
+                    .setLimit(number).bindValue("language", "").setOffset(start).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
-                
+
                 XWikiRCSNodeId nodeId = (XWikiRCSNodeId) fields[2];
                 Timestamp timestamp = (Timestamp) fields[3];
                 Date modified = new Date(timestamp.getTime());
                 String modifier = (String) fields[4];
-                
+
                 HistorySummary historySummary =
-                    DomainObjectFactory.createHistorySummary(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, pageName, null, nodeId.getVersion(), modifier, modified);
-                
+                    DomainObjectFactory.createHistorySummary(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName,
+                        pageName, null, nodeId.getVersion(), modifier, modified);
+
                 history.getHistorySummaries().add(historySummary);
             }
         } finally {

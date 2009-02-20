@@ -52,13 +52,15 @@ public class ModificationsResource extends XWikiResource
     public ModificationsResource(@Context UriInfo uriInfo)
     {
         super(uriInfo);
-     
+
     }
-    
-    @GET    
-    public History getModifications(@PathParam("wikiName") String wikiName, @QueryParam("start") @DefaultValue("0") Integer start,
+
+    @GET
+    public History getModifications(@PathParam("wikiName") String wikiName,
+        @QueryParam("start") @DefaultValue("0") Integer start,
         @QueryParam("number") @DefaultValue("-1") Integer number,
-        @QueryParam("order") @DefaultValue("desc") String order, @QueryParam("date") @DefaultValue("0") Long ts) throws XWikiException, QueryException
+        @QueryParam("order") @DefaultValue("desc") String order, @QueryParam("date") @DefaultValue("0") Long ts)
+        throws XWikiException, QueryException
     {
         String database = xwikiContext.getDatabase();
 
@@ -67,7 +69,7 @@ public class ModificationsResource extends XWikiResource
         /* This try is just needed for executing the finally clause. Exceptions are actually re-thrown. */
         try {
             xwikiContext.setDatabase(wikiName);
-         
+
             String query =
                 String
                     .format(
@@ -78,26 +80,27 @@ public class ModificationsResource extends XWikiResource
 
             List<Object> queryResult = null;
             queryResult =
-                queryManager.createQuery(query, Query.XWQL).bindValue("date", new Date(ts)).setLimit(number)
-                    .setOffset(start).execute();
+                queryManager.createQuery(query, Query.XWQL).bindValue("date", new Date(ts)).setLimit(number).setOffset(
+                    start).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
-                
+
                 String spaceName = (String) fields[0];
                 String pageName = (String) fields[1];
                 String language = (String) fields[2];
-                if(language.equals("")) {
+                if (language.equals("")) {
                     language = null;
                 }
                 XWikiRCSNodeId nodeId = (XWikiRCSNodeId) fields[3];
                 Timestamp timestamp = (Timestamp) fields[4];
                 Date modified = new Date(timestamp.getTime());
                 String modifier = (String) fields[5];
-                
+
                 HistorySummary historySummary =
-                    DomainObjectFactory.createHistorySummary(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, pageName, language, nodeId.getVersion(), modifier, modified);
-                
+                    DomainObjectFactory.createHistorySummary(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName,
+                        pageName, language, nodeId.getVersion(), modifier, modified);
+
                 history.getHistorySummaries().add(historySummary);
             }
         } finally {

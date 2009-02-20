@@ -50,10 +50,11 @@ public class PageTranslationResource extends ModifiablePageResource
         @PathParam("pageName") String pageName, @PathParam("language") String language) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, true, false);
-        
+
         Document doc = documentInfo.getDocument();
 
-        return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false);
+        return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
+            false);
     }
 
     @PUT
@@ -62,7 +63,7 @@ public class PageTranslationResource extends ModifiablePageResource
         @PathParam("language") String language, Page page) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, false, true);
-        
+
         return putPage(documentInfo, page);
     }
 

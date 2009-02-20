@@ -70,7 +70,8 @@ public class CommentsResource extends XWikiResource
             new RangeIterable<com.xpn.xwiki.api.Object>(xwikiComments, start, number);
 
         for (com.xpn.xwiki.api.Object xwikiComment : ri) {
-            comments.getComments().add(DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment));
+            comments.getComments().add(
+                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment));
         }
 
         return comments;
@@ -104,11 +105,12 @@ public class CommentsResource extends XWikiResource
         if (save) {
             doc.save();
 
-            Comment createdComment = DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, commentObject);
+            Comment createdComment =
+                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, commentObject);
 
             return Response.created(
-                UriBuilder.fromUri(uriInfo.getBaseUri()).path(CommentResource.class).build(wikiName, spaceName, pageName, id))
-                .entity(createdComment).build();
+                UriBuilder.fromUri(uriInfo.getBaseUri()).path(CommentResource.class).build(wikiName, spaceName,
+                    pageName, id)).entity(createdComment).build();
         }
 
         return null;

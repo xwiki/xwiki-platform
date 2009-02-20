@@ -60,7 +60,7 @@ public class AttachmentHistoryResource extends XWikiResource
         @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
-        
+
         Document doc = documentInfo.getDocument();
 
         final com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
@@ -78,12 +78,12 @@ public class AttachmentHistoryResource extends XWikiResource
 
         Version[] versions = xwikiAttachment.getVersions();
         List<Version> versionList = new ArrayList<Version>();
-        for(Version version : versions) {
+        for (Version version : versions) {
             versionList.add(version);
         }
-        
+
         RangeIterable<Version> ri = new RangeIterable<Version>(versionList, start, number);
-        
+
         for (Version version : ri) {
             com.xpn.xwiki.api.Attachment xwikiAttachmentAtVersion =
                 xwikiAttachment.getAttachmentRevision(version.toString());
@@ -92,8 +92,9 @@ public class AttachmentHistoryResource extends XWikiResource
                 xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
                     .toString();
 
-            attachments.getAttachments().add(DomainObjectFactory.createAttachmentAtVersion(objectFactory, uriInfo.getBaseUri(),
-                xwikiAttachmentAtVersion, attachmentXWikiUrl));
+            attachments.getAttachments().add(
+                DomainObjectFactory.createAttachmentAtVersion(objectFactory, uriInfo.getBaseUri(),
+                    xwikiAttachmentAtVersion, attachmentXWikiUrl));
         }
 
         return attachments;

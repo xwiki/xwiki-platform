@@ -80,8 +80,10 @@ public class ObjectsForClassNameResource extends XWikiResource
             new RangeIterable<com.xpn.xwiki.objects.BaseObject>(objectList, start, number);
 
         for (com.xpn.xwiki.objects.BaseObject object : ri) {
-            objects.getObjects().add(
-                DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, object));
+            objects.getObjectSummaries()
+                .add(
+                    DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc,
+                        object));
         }
 
         return objects;

@@ -14,7 +14,7 @@
 <creationDate>1195803878000</creationDate>
 <date>1208532872000</date>
 <contentUpdateDate>1208532872000</contentUpdateDate>
-<version>2.1</version>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -97,7 +97,7 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader('Current Year Activity')
+<content>#panelheader($msg.get("xe.statistics.current.year.caps"))
 #if($xwiki.statsService.enabled)
 #if(not $chartWidth)
 #set($chartWidth=250)
@@ -107,10 +107,10 @@
 #end
 #set($pattern='yyyy.MM')
 #set($currentYear=$xwiki.criteriaService.periodFactory.currentYear)
-#set($yearStart=$xwiki.jodatime.getDateTime($currentYear.start))
-#set($yearEnd=$xwiki.jodatime.getDateTime($currentYear.end))
+#set($yearStart=$!xwiki.jodatime.getDateTime($currentYear.start))
+#set($yearEnd=$!xwiki.jodatime.getDateTime($currentYear.end))
 #set($dtf=$xwiki.jodatime.getDateTimeFormatterForPattern($pattern))
-&lt;div style="text-align:center;"&gt;{chart:type=time|source=type:table;doc:Stats.ActivityData;table_number:2;ignore_alpha:true|date_format=type:custom;pattern:$pattern|height=$chartHeight|width=$chartWidth|domain_axis_date_format_override=type:custom;pattern:MM|domain_axis_lower_date=value:$dtf.print($yearStart);type:custom;pattern:$pattern|domain_axis_upper_date=value:$dtf.print($yearEnd);type:custom;pattern:$pattern|domain_axis_date_tick_unit=unit:month;count:1|domain_axis_tick_mark_position:ende|title=Current Year Activity}&lt;/div&gt;
+&lt;div style="text-align:center;"&gt;{chart:type=time|source=type:table;doc:Stats.ActivityData;table_number:2;ignore_alpha:true|date_format=type:custom;pattern:$pattern|height=$chartHeight|width=$chartWidth|domain_axis_date_format_override=type:custom;pattern:MM|domain_axis_lower_date=value:$dtf.print($yearStart);type:custom;pattern:$pattern|domain_axis_upper_date=value:$dtf.print($yearEnd);type:custom;pattern:$pattern|domain_axis_date_tick_unit=unit:month;count:1|domain_axis_tick_mark_position:ende|title=${msg.get("xe.statistics.current.year.caps")}}&lt;/div&gt;
 #else
 #printStatisticsDisabled()
 #end

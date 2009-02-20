@@ -295,6 +295,11 @@
     <mime-type>text/css</mime-type>
   </mime-mapping>
 
+  <mime-mapping>
+    <extension>bmp</extension>
+    <mime-type>image/bmp</mime-type>
+  </mime-mapping>
+
   <!-- Redirects to the Main.WebHome page if the user calls the root of the webapp, i.e.
        http://server:port/xwiki/
        Note 1: for this to work fine the redirect file needs to exist in the WAR

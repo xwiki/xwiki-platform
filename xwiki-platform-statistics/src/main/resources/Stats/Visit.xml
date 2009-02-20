@@ -54,7 +54,7 @@
 <tags/>
 </property>
 </object>
-<content>1 Visit Statistics
+<content>1 $msg.get("xe.statistics.visit")
 
 #if($xwiki.statsService.enabled)
 #displayPanelLayout(2 ["Stats.MostActiveContributors", "Stats.LeastActiveContributors"])

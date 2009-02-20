@@ -67,7 +67,7 @@
         #end
           <td><a href="$tdoc.getURL("viewrev","rev=$version")">$version</a></td>
           <td>$xwiki.getLocalUserName($revinfo.author)</td>
-          <td>$xwiki.formatDate($revinfo.date, "dd/MM/yyyy HH:mm")</td>
+          <td>$xwiki.formatDate($revinfo.date)</td>
     #if($xwiki.hasEditComment())
           <td>$!{revinfo.comment}</td>
     #end

@@ -20,7 +20,7 @@
 ## #set($date = $doc.display("date","view",$comment))
 #set($date = $comment.getProperty("date").value)
 #if($date)
- | <span class="commentdate">$!xwiki.formatDate($date, "dd/MM/yyyy") $msg.get("at") $!xwiki.formatDate($date, "HH:mm")</span>
+ | <span class="commentdate">$!xwiki.formatDate($date)</span>
 #end
 #if($hasEdit) <span class="commentdelete"><a class="commentremove" href="$doc.getURL("objectremove" , "classname=XWiki.XWikiComments&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")"
     onclick="return confirm('$msg.get("confirmcommentremove")')">[$msg.get("removethiscomment")]</a></span>#end

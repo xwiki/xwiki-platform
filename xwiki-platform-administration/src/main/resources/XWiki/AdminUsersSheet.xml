@@ -14,7 +14,7 @@
 <creationDate>1211801430000</creationDate>
 <date>1214048039000</date>
 <contentUpdateDate>1214048039000</contentUpdateDate>
-<version>5.1</version>
+<version>1.1</version>
 <title>AdminUsersSheet</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -84,8 +84,8 @@
   #set($mainwk = true) 
 #end
 &lt;div id="xwikieditcontent"&gt;
-  &lt;div id="ajax-loader"&gt;Loading...&lt;br /&gt;
-    &lt;img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." /&gt;
+  &lt;div id="ajax-loader"&gt;$msg.get("xe.admin.users.loading")&lt;br /&gt;
+    &lt;img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$msg.get("xe.admin.users.loading")" title="$msg.get("xe.admin.users.loading")" /&gt;
   &lt;/div&gt;
   &lt;table id="userstable" class="livetable"&gt;
     &lt;tr&gt;&lt;td colspan="3" id="showLimits"&gt;&lt;/td&gt;&lt;/tr&gt;

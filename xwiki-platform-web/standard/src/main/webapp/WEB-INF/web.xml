@@ -219,7 +219,10 @@
 		<init-param>
 			<param-name>providers</param-name>
 			<param-value>
-				org.xwiki.rest.exceptions.XWikiExceptionMapper					
+				org.xwiki.rest.exceptions.XWikiExceptionMapper;
+				org.xwiki.rest.representations.pages.TextPlainPageReader;
+				org.xwiki.rest.representations.objects.TextPlainPropertyReader;
+				org.xwiki.rest.representations.comments.TextPlainCommentReader
 			</param-value>
 		</init-param>   
   </servlet>

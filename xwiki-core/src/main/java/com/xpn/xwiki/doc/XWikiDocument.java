@@ -1594,7 +1594,7 @@ public class XWikiDocument implements DocumentModelBridge
             // We test if we're inside the rendering engine since it's also possible that this display() method is called
             // directly from a template and in this case we only want HTML as a result and not wiki syntax.
             if (isInRenderingEngine && !syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
-                result.insert(0, "{{html}}");
+                result.insert(0, "{{html wiki=\"false\"}}");
                 result.append("{{/html}}");
             }
             

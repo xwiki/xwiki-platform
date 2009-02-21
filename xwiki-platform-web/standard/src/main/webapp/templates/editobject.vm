@@ -52,7 +52,7 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #if(!$hasCustomObject)
 #set($hasobjs = true)
 <div id="field_${class.name}_${obj.number}">
-<div id="field_${class.name}_${obj.number}_title" class="accordionTabTitleBar"><h6><tt><strong>${class.name}[${obj.number}]: </strong>$doc.display($firstfield, $obj)</tt></h6></div>
+<div id="field_${class.name}_${obj.number}_title" class="accordionTabTitleBar"><h6><tt><strong>${class.name}[${obj.number}]</strong></tt></h6></div>
 <div id="field_${class.name}_${obj.number}_content" class="accordionTabContentBox"><div>
 #end
 #if($first == 1)

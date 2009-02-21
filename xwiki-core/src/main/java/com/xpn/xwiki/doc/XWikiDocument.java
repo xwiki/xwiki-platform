@@ -1555,12 +1555,19 @@ public class XWikiDocument implements DocumentModelBridge
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
+                // If the Syntax id is not "xwiki/1.0", i.e. if the new rendering engine is used then we need to 
+                // protect the content with a <pre> since otherwise whitespaces will be stripped by the HTML macro
+                // used to surround the object property content (see below).
                 if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{pre}");
+                } else {
+                	result.append("<pre>");
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
                 if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{/pre}");
+                } else {
+                	result.append("</pre>");
                 }
             } else if (type.equals("hidden")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax

@@ -49,6 +49,7 @@ import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -476,14 +477,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
     {
-        String renderedContent;
-        // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-        if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
-            renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
-        } else {
-            renderedContent = performSyntaxConversion(getContent(), getSyntaxId(), "xhtml/1.0");
-        }
-        return renderedContent;
+    	return getRenderedContent(getTranslatedContent(context), getSyntaxId(), context);
     }
 
     /**
@@ -500,6 +494,13 @@ public class XWikiDocument implements DocumentModelBridge
         try {
             backupContext(backup, context);
             setAsContextDoc(context);
+
+            // This tells display() methods that we are inside the rendering engine and thus
+            // that they can return wiki syntax and not HTML syntax (which is needed when 
+            // outside the rendering engine, i.e. when we're inside templates using only 
+            // Velocity for example).
+            context.put("isInRenderingEngine", true);
+            
             // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
             if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
@@ -1506,11 +1507,25 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String display(String fieldname, String type, BaseObject obj, XWikiContext context)
     {
-        return display(fieldname, type, "", obj, context);
+        return display(fieldname, type, "", obj, getSyntaxId(), context);
     }
 
-    public String display(String fieldname, String type, String pref, BaseObject obj, XWikiContext context)
+    /**
+     * Note: We've introduced this signature taking an extra syntaxId parameter to handle the case where Panels
+     * are written in a syntax other than the main document. The problem is that currently the displayPanel()
+     * velocity macro in macros.vm calls display() on the main document and not on the panel document. Thus if
+     * we don't tell what syntax to use the main document syntax will be used to display panels even if they're
+     * written in another syntax.
+     */
+    public String display(String fieldname, String type, BaseObject obj, String syntaxId, XWikiContext context)
     {
+        return display(fieldname, type, "", obj, syntaxId, context);
+    }
+    
+    public String display(String fieldname, String type, String pref, BaseObject obj, String syntaxId, 
+    		XWikiContext context)
+    {
+    	boolean isInRenderingEngine = BooleanUtils.toBoolean((Boolean) context.get("isInRenderingEngine"));
         HashMap<String, Object> backup = new HashMap<String, Object>();
         try {
             backupContext(backup, context);
@@ -1529,9 +1544,9 @@ public class XWikiDocument implements DocumentModelBridge
                 String fcontent = pclass.displayView(fieldname, prefix, obj, context);
                 // This mode is deprecated for the new rendering and should also be removed for the old rendering
                 // since the way to implement this now is to choose the type of rendering to do in the class itself.
-                // Thus for the new renderinfg we simply make this mode work like the "view" mode.
-                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
-                    result.append(getRenderedContent(fcontent, getSyntaxId(), context));
+                // Thus for the new rendering we simply make this mode work like the "view" mode.
+                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                    result.append(getRenderedContent(fcontent, syntaxId, context));
                 } else {
                     result.append(fcontent);
                 }
@@ -1540,39 +1555,49 @@ public class XWikiDocument implements DocumentModelBridge
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{pre}");
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{/pre}");
                 }
             } else if (type.equals("hidden")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{pre}");
                 }
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
-                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{/pre}");
                 }
             } else if (type.equals("search")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{pre}");
                 }
                 prefix = obj.getxWikiClass(context).getName() + "_";
                 pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
-                if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{/pre}");
                 }
             } else {
                 pclass.displayView(result, fieldname, prefix, obj, context);
             }
+            
+            // If we're in new rendering engine we want to wrap the HTML returned by displayView() in 
+            // a {{html/}} macro so that the user doesn't have to do it.
+            // We test if we're inside the rendering engine since it's also possible that this display() method is called
+            // directly from a template and in this case we only want HTML as a result and not wiki syntax.
+            if (isInRenderingEngine && !syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                result.insert(0, "{{html wiki=\"false\"}}");
+                result.append("{{/html}}");
+            }
+            
             return result.toString();
         } catch (Exception ex) {
             // TODO: It would better to check if the field exists rather than catching an exception
@@ -1626,7 +1651,7 @@ public class XWikiDocument implements DocumentModelBridge
             if (object == null) {
                 return "";
             } else {
-                return display(fieldname, mode, prefix, object, context);
+                return display(fieldname, mode, prefix, object, getSyntaxId(), context);
             }
         } catch (Exception e) {
             return "";

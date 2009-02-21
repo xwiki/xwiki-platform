@@ -1008,7 +1008,8 @@ public class Document extends Api
         if (this.currentObj == null) {
             return this.doc.display(fieldname, mode, prefix, getXWikiContext());
         } else {
-            return this.doc.display(fieldname, mode, prefix, this.currentObj.getBaseObject(), getXWikiContext());
+            return this.doc.display(fieldname, mode, prefix, this.currentObj.getBaseObject(), getSyntaxId(), 
+            		getXWikiContext());
         }
     }
 
@@ -1018,6 +1019,21 @@ public class Document extends Api
             return "";
         }
         return this.doc.display(fieldname, obj.getBaseObject(), getXWikiContext());
+    }
+
+    /**
+     * Note: We've introduced this signature taking an extra syntaxId parameter to handle the case where Panels
+     * are written in a syntax other than the main document. The problem is that currently the displayPanel()
+     * velocity macro in macros.vm calls display() on the main document and not on the panel document. Thus if
+     * we don't tell what syntax to use the main document syntax will be used to display panels even if they're
+     * written in another syntax.
+     */
+    public String display(String fieldname, String type, Object obj, String syntaxId)
+    {
+        if (obj == null) {
+            return "";
+        }
+        return this.doc.display(fieldname, type, obj.getBaseObject(), syntaxId, getXWikiContext());
     }
 
     public String display(String fieldname, String mode, Object obj)
@@ -1033,7 +1049,7 @@ public class Document extends Api
         if (obj == null) {
             return "";
         }
-        return this.doc.display(fieldname, mode, prefix, obj.getBaseObject(), getXWikiContext());
+        return this.doc.display(fieldname, mode, prefix, obj.getBaseObject(), getSyntaxId(), getXWikiContext());
     }
 
     public String displayForm(String className, String header, String format)

@@ -41,6 +41,8 @@ public class XWikiSyntaxEscapeHandler
 
     private static final Pattern HEADER_PATTERN = Pattern.compile("\\p{Blank}*(=+)");
 
+    private static final Pattern TABLE_PATTERN = Pattern.compile("\\p{Blank}*(\\||!!)");
+
     private static final Pattern DOUBLE_CHARS_PATTERN = Pattern.compile("\\/\\/|\\*\\*|__|--|\\^\\^|,,|##|\\\\\\\\");
 
     private static final String ESCAPE_CHAR = "~";
@@ -56,7 +58,7 @@ public class XWikiSyntaxEscapeHandler
         replaceAll(accumulatedBuffer, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
 
         // When in a paragraph we need to escape symbols that are at beginning of lines and that could be confused
-        // with list items or headers.
+        // with list items, headers or tables.
         if (blockStateListener.isInParagraph() && textStateListener.isTextOnNewLine()) {
 
             // Look for list pattern at beginning of line and escape the first character only (it's enough)
@@ -64,8 +66,12 @@ public class XWikiSyntaxEscapeHandler
 
             // Look for header pattern at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(HEADER_PATTERN, accumulatedBuffer);
+
+            // Look for table character patterns at beginning of line and escape the first character only (it's enough)
+            escapeFirstMatchedCharacter(TABLE_PATTERN, accumulatedBuffer);
         }
 
+        // Escape table characters
         if (blockStateListener.isInTable()) {
             replaceAll(accumulatedBuffer, "|", "~|");
             replaceAll(accumulatedBuffer, "!!", "~!!");

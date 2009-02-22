@@ -292,8 +292,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.mockXWiki.stubs().method("exists").will(returnValue(true));
 
-        this.document
-            .setContent("[TargetPage][TargetLabel>TargetPage][TargetSpace.TargetPage][TargetLabel>TargetSpace.TargetPage?param=value#anchor][http://externallink][mailto:mailto]");
+        this.document.setContent("[TargetPage][TargetLabel>TargetPage][TargetSpace.TargetPage]"
+            + "[TargetLabel>TargetSpace.TargetPage?param=value#anchor][http://externallink][mailto:mailto]");
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());
 
@@ -303,13 +303,12 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetLinkedPages()
     {
-        this.document
-            .setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]][[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]");
+        this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
+            + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]");
         this.document.setSyntaxId("xwiki/2.0");
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());
 
-        assertEquals(Arrays.asList("TargetPage", "TargetPage", "TargetSpace.TargetPage", "TargetSpace.TargetPage"),
-            linkedPages);
+        assertEquals(Arrays.asList("XWiki.TargetPage", "TargetSpace.TargetPage"), linkedPages);
     }
 }

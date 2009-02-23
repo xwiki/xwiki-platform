@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.internal.renderer.chaining;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

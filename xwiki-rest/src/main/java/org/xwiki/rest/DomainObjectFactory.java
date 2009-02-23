@@ -60,6 +60,7 @@ import org.xwiki.rest.resources.objects.ObjectPropertiesResource;
 import org.xwiki.rest.resources.objects.ObjectPropertyResource;
 import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
+import org.xwiki.rest.resources.pages.PageChildrenResource;
 import org.xwiki.rest.resources.pages.PageHistoryResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationHistoryResource;
@@ -322,6 +323,17 @@ public class DomainObjectFactory
             classLink.setRel(Relations.CLASS);
             page.getLinks().add(classLink);
         }
+        
+        if(!doc.getChildren().isEmpty()) {
+            String pageChildrenUri = 
+                UriBuilder.fromUri(baseUri).path(PageChildrenResource.class).build(doc.getWiki(), doc.getSpace(),
+                    doc.getName()).toString();
+            Link pageChildrenLink = objectFactory.createLink();
+            pageChildrenLink.setHref(pageChildrenUri);
+            pageChildrenLink.setRel(Relations.CHILDREN);
+            page.getLinks().add(pageChildrenLink);
+        }
+        
 
         if (!doc.getComments().isEmpty()) {
             String commentsUri;
@@ -416,6 +428,7 @@ public class DomainObjectFactory
     {
         Document doc = xwikiAttachment.getDocument();
 
+        attachment.setId(String.format("%s@%s", doc.getPrefixedFullName(), xwikiAttachment.getFilename()));
         attachment.setName(xwikiAttachment.getFilename());
         attachment.setSize(xwikiAttachment.getFilesize());
         attachment.setVersion(xwikiAttachment.getVersion());

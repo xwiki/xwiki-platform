@@ -66,4 +66,6 @@ public class Relations
 
     public static final String MODIFICATIONS = "http://www.xwiki.org/rel/modifications";
 
+    public static final String CHILDREN = "http://www.xwiki.org/rel/children";
+
 }

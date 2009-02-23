@@ -1,0 +1,26 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test that empty links work.
+.#-----------------------------------------------------
+[[]]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Reference = []] [false]
+endLink [Reference = []] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p><!--startwikilink:--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc"><span class="wikigeneratedlinkcontent"></span></a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+[[]]
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p><!--startwikilink:--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc"><span class="wikigeneratedlinkcontent"></span></a></span><!--stopwikilink--></p></html>

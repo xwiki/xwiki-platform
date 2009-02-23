@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.scaffolding;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
@@ -97,7 +98,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      */
     public String getURL(String documentName, String action, String queryString, String anchor)
     {
-        String result = "/xwiki/bin/view/" + (documentName == null ? "currentdoc" : documentName.replace(".", "/"));
+        String result = "/xwiki/bin/view/" + (StringUtils.isBlank(documentName) ? "currentdoc" : documentName.replace(".", "/"));
         if (anchor != null) {
             result = result + "#" + anchor;
         }

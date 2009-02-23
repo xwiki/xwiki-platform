@@ -45,7 +45,7 @@ public class OpenOfficeHTMLCleanerTest extends AbstractHTMLCleanerTest
      * {@inheritDoc}
      */
     protected void setUp() throws Exception
-    {        
+    {
         super.setUp();
         cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "openoffice");
     }
@@ -106,11 +106,12 @@ public class OpenOfficeHTMLCleanerTest extends AbstractHTMLCleanerTest
             assertEquals(1, nodes.getLength());
         }
     }
-    
+
     /**
      * Test filtering of {@code<p><br/></p>} elements.
      */
-    public void testEmptyParagraphFiltering() {
+    public void testEmptyParagraphFiltering()
+    {
         String html = header + "<p><br/></p><p><br/></p><p><br/></p><p><br/></p>" + footer;
         Document doc = cleaner.clean(new StringReader(html));
         NodeList paras = doc.getElementsByTagName("p");
@@ -184,12 +185,28 @@ public class OpenOfficeHTMLCleanerTest extends AbstractHTMLCleanerTest
         nodes = doc.getElementsByTagName("td");
         cellContent = nodes.item(0).getFirstChild();
         assertEquals("div", cellContent.getNodeName());
-        assertEquals("xwiki-document", ((Element)cellContent).getAttribute("class"));
+        assertEquals("xwiki-document", ((Element) cellContent).getAttribute("class"));
         // Empty rows are not allowed.
         html = header + "<table><tbody><tr></tr></tbody></table>" + footer;
         doc = cleaner.clean(new StringReader(html));
         nodes = doc.getElementsByTagName("tr");
         assertEquals(0, nodes.getLength());
+    }
+
+    /**
+     * Test proper cleaning of {@code <th>} elements.
+     */
+    public void testTableHeaderItemCleaning()
+    {
+        // Isolated paragraph elements inside 'th' elements should be removed.
+        String html =
+            header + "<table><thead><tr><th><p>Test</p></th></tr></thead><tbody><tr><td/></tr></tbody></table>"
+                + footer;
+        Document doc = cleaner.clean(new StringReader(html));
+        NodeList nodes = doc.getElementsByTagName("th");
+        Node hearderItemContent = nodes.item(0).getFirstChild();
+        assertEquals(Node.TEXT_NODE, hearderItemContent.getNodeType());
+        assertEquals("Test", hearderItemContent.getNodeValue());
     }
 
     /**
@@ -241,11 +258,12 @@ public class OpenOfficeHTMLCleanerTest extends AbstractHTMLCleanerTest
         assertEquals(Node.COMMENT_NODE, stopLinkComment.getNodeType());
         assertTrue(stopLinkComment.getNodeValue().startsWith("stopwikilink"));
     }
-    
+
     /**
      * Test filtering of {@code<br/>} elements placed in between block elements.
      */
-    public void testLineBreakFiltering() {
+    public void testLineBreakFiltering()
+    {
         String html = header + "<p>para1</p><br/><br/><p>para2</p>" + footer;
         Document doc = cleaner.clean(new StringReader(html), Collections.singletonMap("targetDocument", "Import.Test"));
         NodeList lineBreaks = doc.getElementsByTagName("br");

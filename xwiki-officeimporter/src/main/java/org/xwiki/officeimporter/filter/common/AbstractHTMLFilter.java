@@ -104,6 +104,11 @@ public abstract class AbstractHTMLFilter implements HTMLFilter
      * xhtml table data tag.
      */
     public static final String TAG_TD = "td";
+    
+    /**
+     * xhtml table head tag.
+     */
+    public static final String TAG_TH = "th";
 
     /**
      * xhtml 'rowspan' table attribute.

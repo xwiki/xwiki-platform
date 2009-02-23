@@ -47,8 +47,8 @@ public class TableFilter extends AbstractHTMLFilter
      */
     public void filter(Document document)
     {
-        // Remove isolated paragraphs inside cell items.
-        List<Element> tableCells = filterDescendants(document.getDocumentElement(), TAG_TD);
+        // Remove isolated paragraphs inside cell items / table header items.
+        List<Element> tableCells = filterDescendants(document.getDocumentElement(), new String[] {TAG_TD, TAG_TH});
         for (Element cell : tableCells) {
             List<Element> paragraphs = filterChildren(cell, TAG_P);
             if (paragraphs.size() == 1) {
@@ -56,7 +56,7 @@ public class TableFilter extends AbstractHTMLFilter
             }
         }
         // Filter resulting cell content.
-        tableCells = filterDescendants(document.getDocumentElement(), TAG_TD);
+        tableCells = filterDescendants(document.getDocumentElement(), new String[] {TAG_TD, TAG_TH});
         for (Element cell : tableCells) {
             List<Element> dangerTags = filterDescendants(cell, FILTER_TAGS);
             if (!dangerTags.isEmpty()) {

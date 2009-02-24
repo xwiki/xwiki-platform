@@ -34,9 +34,7 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XMLBlock;
-import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
-import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroFactory;
 import org.xwiki.rendering.macro.MacroNotFoundException;
@@ -232,16 +230,22 @@ public class MacroTransformation extends AbstractTransformation
 
     private void generateError(MacroBlock macroToReplace, String message, String description)
     {
-        List<Block> errorBlocks;
-        
-        List<Block> nestedBlocks = Arrays.asList((Block) new WordBlock(message), 
-            new XMLBlock(new XMLComment("errordescription:" + description)));
-        Map<String, String> params = Collections.singletonMap("class", "xwikirenderingerror"); 
-        
+        List<Block> errorBlocks = new ArrayList<Block>();
+
+        Map<String, String> errorBlockParams = Collections.singletonMap("class", "xwikirenderingerror");
+        Map<String, String> errorDescriptionBlockParams =
+            Collections.singletonMap("class", "xwikirenderingerrordescription hidden");
+
         if (macroToReplace.isInline()) {
-            errorBlocks = Arrays.asList((Block) new XMLBlock(nestedBlocks, new XMLElement("span", params)));
+            errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(message)), new XMLElement("span",
+                errorBlockParams)));
+            errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(description)), new XMLElement("span",
+                errorDescriptionBlockParams)));
         } else {
-            errorBlocks = Arrays.asList((Block) new XMLBlock(nestedBlocks, new XMLElement("div", params)));
+            errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(message)), new XMLElement("div",
+                errorBlockParams)));
+            errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(description)), new XMLElement("div",
+                errorDescriptionBlockParams)));
         }
         
         macroToReplace.replace(wrapInMacroMarker(macroToReplace, errorBlocks));

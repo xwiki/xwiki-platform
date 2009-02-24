@@ -15,9 +15,10 @@ onSpace
 beginMacroMarkerInline [testsimplemacro] [] []
 beginXMLNode [span] [class=xwikirenderingerror]
 onWord [Not an inline macro]
-beginXMLNode [errordescription:This macro can only be used by itself on a new line]
-endXMLNode [errordescription:This macro can only be used by itself on a new line]
 endXMLNode [span] [class=xwikirenderingerror]
+beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
+onWord [This macro can only be used by itself on a new line]
+endXMLNode [span] [class=xwikirenderingerrordescription hidden]
 endMacroMarkerInline [testsimplemacro] [] []
 onSpace
 onWord [macro]
@@ -26,7 +27,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro<!--errordescription:This macro can only be used by itself on a new line--></span><!--stopmacro--> macro</p>
+<p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden">This macro can only be used by itself on a new line</span><!--stopmacro--> macro</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -34,4 +35,4 @@ Not inline {{testsimplemacro/}} macro
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro<!--errordescription:This macro can only be used by itself on a new line--></span><!--stopmacro--> macro</p></html>
+<html><p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden">This macro can only be used by itself on a new line</span><!--stopmacro--> macro</p></html>

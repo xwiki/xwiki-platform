@@ -31,137 +31,137 @@ public interface HTMLConstants
     /**
      * HTML &lt;del&gt; tag name.
      */
-    String DEL = "del";
+    String TAG_DEL = "del";
 
     /**
      * HTML &lt;i&gt; tag name.
      */
-    String I = "i";
+    String TAG_I = "i";
 
     /**
      * HTML &lt;em&gt; tag name.
      */
-    String EM = "em";
+    String TAG_EM = "em";
 
     /**
      * HTML &lt;u&gt; tag name.
      */
-    String U = "u";
+    String TAG_U = "u";
 
     /**
      * HTML &lt;s&gt; tag name.
      */
-    String S = "s";
+    String TAG_S = "s";
 
     /**
      * HTML &lt;strike&gt; tag name.
      */
-    String STRIKE = "strike";
+    String TAG_STRIKE = "strike";
     
     /**
      * HTML &lt;ins&gt; tag name.
      */
-    String INS = "ins";
+    String TAG_INS = "ins";
 
     /**
      * HTML &lt;b&gt; tag name.
      */
-    String B = "b";
+    String TAG_B = "b";
 
     /**
      * HTML &lt;strong&gt; tag name.
      */
-    String STRONG = "strong";
+    String TAG_STRONG = "strong";
 
     /**
      * HTML &lt;p&gt; tag name.
      */
-    String P = "p";
+    String TAG_P = "p";
 
     /**
      * HTML &lt;span&gt; tag name.
      */
-    String SPAN = "span";
+    String TAG_SPAN = "span";
 
     /**
      * HTML &lt;center&gt; tag name.
      */
-    String CENTER = "center";
+    String TAG_CENTER = "center";
 
     /**
      * HTML &lt;font&gt; tag name.
      */
-    String FONT = "font";
+    String TAG_FONT = "font";
     
     /**
      * HTML &lt;h1&gt; tag name.
      */
-    String H1 = "h1";
+    String TAG_H1 = "h1";
 
     /**
      * HTML &lt;h2&gt; tag name.
      */
-    String H2 = "h2";
+    String TAG_H2 = "h2";
 
     /**
      * HTML &lt;h3&gt; tag name.
      */
-    String H3 = "h3";
+    String TAG_H3 = "h3";
 
     /**
      * HTML &lt;h4&gt; tag name.
      */
-    String H4 = "h4";
+    String TAG_H4 = "h4";
 
     /**
      * HTML &lt;h5&gt; tag name.
      */
-    String H5 = "h5";
+    String TAG_H5 = "h5";
 
     /**
      * HTML &lt;h6&gt; tag name.
      */
-    String H6 = "h6";
+    String TAG_H6 = "h6";
     
     /**
      * HTML &lt;br&gt; tag name.
      */
-    String BR = "br";
+    String TAG_BR = "br";
 
     /**
      * HTML &lt;ul&gt; tag name.
      */
-    String UL = "ul";
+    String TAG_UL = "ul";
 
     /**
      * HTML &lt;ol&gt; tag name.
      */
-    String OL = "ol";
+    String TAG_OL = "ol";
     
     /**
      * HTML &lt;li&gt; tag name.
      */
-    String LI = "li";
+    String TAG_LI = "li";
 
     /**
      * HTML &lt;img&gt; tag name.
      */
-    String IMG = "img";
+    String TAG_IMG = "img";
 
     /**
      * HTML &lt;table&gt; tag name.
      */
-    String TABLE = "table";
+    String TAG_TABLE = "table";
 
     /**
      * HTML &lt;tr&gt; tag name.
      */
-    String TR = "tr";
+    String TAG_TR = "tr";
 
     /**
      * HTML &lt;td&gt; tag name.
      */
-    String TD = "td";
+    String TAG_TD = "td";
 
     /**
      * HTML style attribute name.

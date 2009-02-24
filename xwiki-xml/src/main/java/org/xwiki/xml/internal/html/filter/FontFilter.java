@@ -20,10 +20,11 @@
 package org.xwiki.xml.internal.html.filter;
 
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xwiki.xml.html.filter.AbstractCleaningFilter;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
  * Replaces invalid &lt;font&gt; tags with equivalent &lt;span&gt; tags using inline css rules.
@@ -31,16 +32,18 @@ import org.xwiki.xml.html.filter.AbstractCleaningFilter;
  * @version $Id$
  * @since 1.8RC2
  */
-public class FontCleaningFilter extends AbstractCleaningFilter
+public class FontFilter extends AbstractHTMLFilter
 {
     /**
      * {@inheritDoc}
+     * 
+     * <p>The {@link FontFilter} does not use any cleaningParameters passed in.</p>
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParameters)
     {
-        List<Element> fontTags = filterDescendants(document.getDocumentElement(), new String[] {FONT});
+        List<Element> fontTags = filterDescendants(document.getDocumentElement(), new String[] {TAG_FONT});
         for (Element fontTag : fontTags) {
-            Element span = document.createElement(SPAN);
+            Element span = document.createElement(TAG_SPAN);
             moveChildren(fontTag, span);
             StringBuffer buffer = new StringBuffer();
             if (fontTag.hasAttribute(ATTRIBUTE_FONTCOLOR)) {

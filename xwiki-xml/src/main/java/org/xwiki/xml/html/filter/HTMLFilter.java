@@ -19,6 +19,8 @@
  */
 package org.xwiki.xml.html.filter;
 
+import java.util.Map;
+
 import org.w3c.dom.Document;
 
 /**
@@ -27,17 +29,18 @@ import org.w3c.dom.Document;
  * @version $Id$
  * @since 1.8RC2
  */
-public interface CleaningFilter
+public interface HTMLFilter
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    String ROLE = CleaningFilter.class.getName();
+    String ROLE = HTMLFilter.class.getName();
     
     /**
      * Performs cleaning of the html code stored in {@link Document}.
      * 
      * @param document The {@link Document} with html code
+     * @param cleaningParameters additional cleaning parameters for the filter.
      */
-    void filter(Document document);
+    void filter(Document document, Map<String, String> cleaningParameters);
 }

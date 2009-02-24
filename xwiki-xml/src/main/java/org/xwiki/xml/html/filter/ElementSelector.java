@@ -22,18 +22,18 @@ package org.xwiki.xml.html.filter;
 import org.w3c.dom.Element;
 
 /**
- * Interface for defining element selections. Element filters are useful when an operation needs to be performed on a
+ * Interface for defining element selections. Element selectors are useful when an operation needs to be performed on a
  * selection of Elements depending on some criterion. In such cases, the operation will be performed only if the
- * provided filter returns true for that particular Element.
+ * provided selector returns true for that particular Element.
  * 
  * @version $Id$
  * @since 1.8RC2
  */
-public interface ElementFilterCriterion
+public interface ElementSelector
 {
     /**
-     * @param element the {@link Element} against which the criterion is applied.
-     * @return true if this particular element should be filtered.
+     * @param element the {@link Element} against which the criterion is evaluated.
+     * @return true if this particular element should be selected.
      */
-    boolean isFiltered(Element element);
+    boolean isSelected(Element element);
 }

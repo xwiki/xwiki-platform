@@ -22,6 +22,7 @@ package org.xwiki.xml.internal.html;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLConstants;
-import org.xwiki.xml.html.filter.CleaningFilter;
+import org.xwiki.xml.html.filter.HTMLFilter;
 
 /**
  * Default implementation for {@link org.xwiki.xml.html.HTMLCleaner} using the <a href="HTML Cleaner
@@ -55,7 +56,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      * List of default html filters to call when cleaning code with HTML Cleaner. This is for cases when there are no <a
      * href="http://htmlcleaner.sourceforge.net/parameters.php">properties</a> defined in HTML Cleaner.
      */
-    private List<CleaningFilter> filters;
+    private List<HTMLFilter> filters;
 
     /**
      * {@inheritDoc}
@@ -85,7 +86,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      */
     public Document clean(Reader originalHtmlContent)
     {
-        return clean(originalHtmlContent, getDefaultCleanerProperties(), getDefaultCleanerTransformations());
+        return clean(originalHtmlContent, getDefaultCleanerProperties(), getDefaultCleanerTransformations(),
+            Collections.singletonMap("", ""));
     }
 
     /**
@@ -101,7 +103,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         String param = cleaningParameters.get(NAMESPACES_AWARE);
         boolean namespacesAware = param != null ? param.equals(TRUE) : cleanerProperties.isNamespacesAware();
         cleanerProperties.setNamespacesAware(namespacesAware);
-        return clean(originalHtmlContent, cleanerProperties, getDefaultCleanerTransformations());
+        return clean(originalHtmlContent, cleanerProperties, getDefaultCleanerTransformations(), cleaningParameters);
     }
 
     /**
@@ -110,10 +112,11 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      * @param originalHtmlContent original html content.
      * @param cleanerProperties {@link CleanerProperties} to be used for cleaning.
      * @param cleanerTransformations {@link CleanerTransformations} to be used when cleaning.
+     * @param cleaningParameters additional cleaning parameters (if needed) for internal {@link HTMLFilter} components.
      * @return the cleaned html as a {@link org.w3c.dom.Document}.
      */
     private Document clean(Reader originalHtmlContent, CleanerProperties cleanerProperties,
-        CleanerTransformations cleanerTransformations)
+        CleanerTransformations cleanerTransformations, Map<String, String> cleaningParameters)
     {
         Document result = null;
         // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise we would need
@@ -149,8 +152,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             throw new RuntimeException("Error while transforming jdom document into w3c document", ex);
         }        
         // Finally apply filters.
-        for (CleaningFilter filter : filters) {
-            filter.filter(result);
+        for (HTMLFilter filter : filters) {
+            filter.filter(result, cleaningParameters);
         }
         return result;        
     }
@@ -182,22 +185,22 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     {
         CleanerTransformations defaultTransformations = new CleanerTransformations();
 
-        TagTransformation tt = new TagTransformation(HTMLConstants.B, HTMLConstants.STRONG, false);
+        TagTransformation tt = new TagTransformation(HTMLConstants.TAG_B, HTMLConstants.TAG_STRONG, false);
         defaultTransformations.addTransformation(tt);
 
-        tt = new TagTransformation(HTMLConstants.I, HTMLConstants.EM, false);
+        tt = new TagTransformation(HTMLConstants.TAG_I, HTMLConstants.TAG_EM, false);
         defaultTransformations.addTransformation(tt);
 
-        tt = new TagTransformation(HTMLConstants.U, HTMLConstants.INS, false);
+        tt = new TagTransformation(HTMLConstants.TAG_U, HTMLConstants.TAG_INS, false);
         defaultTransformations.addTransformation(tt);
 
-        tt = new TagTransformation(HTMLConstants.S, HTMLConstants.DEL, false);
+        tt = new TagTransformation(HTMLConstants.TAG_S, HTMLConstants.TAG_DEL, false);
         defaultTransformations.addTransformation(tt);
 
-        tt = new TagTransformation(HTMLConstants.STRIKE, HTMLConstants.DEL, false);
+        tt = new TagTransformation(HTMLConstants.TAG_STRIKE, HTMLConstants.TAG_DEL, false);
         defaultTransformations.addTransformation(tt);
 
-        tt = new TagTransformation(HTMLConstants.CENTER, HTMLConstants.P, false);
+        tt = new TagTransformation(HTMLConstants.TAG_CENTER, HTMLConstants.TAG_P, false);
         tt.addAttributeTransformation(HTMLConstants.ATTRIBUTE_STYLE, "text-align:center");
         defaultTransformations.addTransformation(tt);
 

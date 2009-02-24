@@ -127,9 +127,25 @@ a img {
 
 /* Used to signify a rendering error in the rendered page. Valid only with new rendering */
 .xwikirenderingerror {
-    background-color: #FF5555;
-    border: 1px #555555;
-    padding: 3px;
+  background-color: #eee; 
+  background-image: url($xwiki.getSkinFile("icons/silk/exclamation.gif"));
+  background-position: 2px 50%;
+  background-repeat: no-repeat;
+  color: #e14726;
+  padding: 2px 2px 2px 20px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+.xwikirenderingerrordescription {
+  background-color: #eee;
+  clear: both;
+  display: block;
+  font-family: georgia,verdana,arial;
+  padding: 5px;
+  font-size: 80%;
+  -moz-border-radius: 15px;
+  -webkit-border-radius: 15px;
+  overflow:auto;
 }
 
 .main pre p {

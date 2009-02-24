@@ -56,6 +56,7 @@ import org.xwiki.rest.resources.classes.ClassResource;
 import org.xwiki.rest.resources.classes.ClassesResource;
 import org.xwiki.rest.resources.comments.CommentsResource;
 import org.xwiki.rest.resources.comments.CommentsVersionResource;
+import org.xwiki.rest.resources.objects.AllObjectsForClassNameResource;
 import org.xwiki.rest.resources.objects.ObjectPropertiesResource;
 import org.xwiki.rest.resources.objects.ObjectPropertyResource;
 import org.xwiki.rest.resources.objects.ObjectResource;
@@ -323,9 +324,9 @@ public class DomainObjectFactory
             classLink.setRel(Relations.CLASS);
             page.getLinks().add(classLink);
         }
-        
-        if(!doc.getChildren().isEmpty()) {
-            String pageChildrenUri = 
+
+        if (!doc.getChildren().isEmpty()) {
+            String pageChildrenUri =
                 UriBuilder.fromUri(baseUri).path(PageChildrenResource.class).build(doc.getWiki(), doc.getSpace(),
                     doc.getName()).toString();
             Link pageChildrenLink = objectFactory.createLink();
@@ -333,7 +334,6 @@ public class DomainObjectFactory
             pageChildrenLink.setRel(Relations.CHILDREN);
             page.getLinks().add(pageChildrenLink);
         }
-        
 
         if (!doc.getComments().isEmpty()) {
             String commentsUri;
@@ -564,6 +564,14 @@ public class DomainObjectFactory
         objectLink.setRel(Relations.OBJECT);
         objectSummary.getLinks().add(objectLink);
 
+        String propertiesUri =
+            UriBuilder.fromUri(baseUri).path(ObjectPropertiesResource.class).build(doc.getWiki(), doc.getSpace(),
+                doc.getName(), xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
+        Link propertyLink = objectFactory.createLink();
+        propertyLink.setHref(propertiesUri);
+        propertyLink.setRel(Relations.PROPERTIES);
+        objectSummary.getLinks().add(propertyLink);
+
         return objectSummary;
     }
 
@@ -640,14 +648,6 @@ public class DomainObjectFactory
         objectLink.setRel(Relations.SELF);
         object.getLinks().add(objectLink);
 
-        String propertiesUri =
-            UriBuilder.fromUri(baseUri).path(ObjectPropertiesResource.class).build(doc.getWiki(), doc.getSpace(),
-                doc.getName(), xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
-        Link propertyLink = objectFactory.createLink();
-        propertyLink.setHref(propertiesUri);
-        propertyLink.setRel(Relations.PROPERTIES);
-        object.getLinks().add(propertyLink);
-
         return object;
     }
 
@@ -706,6 +706,14 @@ public class DomainObjectFactory
         propertyLink.setHref(propertiesUri);
         propertyLink.setRel(Relations.PROPERTIES);
         clazz.getLinks().add(propertyLink);
+
+        String objectsUri =
+            UriBuilder.fromUri(baseUri).path(AllObjectsForClassNameResource.class)
+                .build(wikiName, xwikiClass.getName()).toString();
+        Link objectsLink = objectFactory.createLink();
+        objectsLink.setHref(objectsUri);
+        objectsLink.setRel(Relations.OBJECTS);
+        clazz.getLinks().add(objectsLink);
 
         return clazz;
     }

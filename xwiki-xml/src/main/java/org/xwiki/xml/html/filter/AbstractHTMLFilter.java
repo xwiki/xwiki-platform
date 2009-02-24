@@ -28,12 +28,12 @@ import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.HTMLConstants;
 
 /**
- * Abstract implementation of {@link CleaningFilter} providing utility methods for various common w3c dom operations.
+ * Abstract implementation of {@link HTMLFilter} providing utility methods for various common w3c dom operations.
  * 
  * @version $Id$
  * @since 1.8M2
  */
-public abstract class AbstractCleaningFilter implements CleaningFilter, HTMLConstants
+public abstract class AbstractHTMLFilter implements HTMLFilter, HTMLConstants
 {
     /**
      * Utility method for filtering an element's children with a tagName.
@@ -76,21 +76,21 @@ public abstract class AbstractCleaningFilter implements CleaningFilter, HTMLCons
     }
 
     /**
-     * Utility method for filtering an element's descendants by their tag names and an {@link ElementFilterCriterion}.
+     * Utility method for filtering an element's descendants by their tag names and an {@link ElementSelector}.
      * 
      * @param parent the parent {@link Element}.
      * @param tagNames an array of tagNames.
-     * @param elementFilter an {@link ElementFilterCriterion} that allows further filtering of elements.
+     * @param elementSelector an {@link ElementSelector} that allows further filtering of elements.
      * @return list of descendants of the parent element having one of given tag names.
      */
-    protected List<Element> filterDescendants(Element parent, String[] tagNames, ElementFilterCriterion elementFilter)
+    protected List<Element> filterDescendants(Element parent, String[] tagNames, ElementSelector elementSelector)
     {
         List<Element> result = new ArrayList<Element>();
         for (String tagName : tagNames) {
             NodeList nodes = parent.getElementsByTagName(tagName);
             for (int i = 0; i < nodes.getLength(); i++) {
                 Element element = (Element) nodes.item(i);
-                if (elementFilter.isFiltered(element)) {
+                if (elementSelector.isSelected(element)) {
                     result.add(element);
                 }
             }

@@ -20,12 +20,13 @@
 package org.xwiki.xml.internal.html.filter;
 
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xwiki.xml.html.filter.AbstractCleaningFilter;
-import org.xwiki.xml.html.filter.ElementFilterCriterion;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
+import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * Transform non XHTML list into XHTML valid lists. Specifically, move &lt;ul&gt; or &lt;ol&gt; element nested inside
@@ -54,22 +55,24 @@ import org.xwiki.xml.html.filter.ElementFilterCriterion;
  * @version $Id: $
  * @since 1.6M1
  */
-public class ListCleaningFilter extends AbstractCleaningFilter
+public class ListFilter extends AbstractHTMLFilter
 {
 
     /**
      * {@inheritDoc}
+     * 
+     * <p>The {@link ListFilter} does not use any cleaningParameters passed in.</p>
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParameters)
     {
         // Collect all nested lists.
         List<Element> nestedLists =
-            filterDescendants(document.getDocumentElement(), new String[] {UL, OL}, new ElementFilterCriterion()
+            filterDescendants(document.getDocumentElement(), new String[] {TAG_UL, TAG_OL}, new ElementSelector()
             {
-                public boolean isFiltered(Element element)
+                public boolean isSelected(Element element)
                 {
                     String parentNodeName = element.getParentNode().getNodeName();
-                    return parentNodeName.equalsIgnoreCase(UL) || parentNodeName.equalsIgnoreCase(OL);
+                    return parentNodeName.equalsIgnoreCase(TAG_UL) || parentNodeName.equalsIgnoreCase(TAG_OL);
                 }
             });
         for (Element nestedList : nestedLists) {            
@@ -84,7 +87,7 @@ public class ListCleaningFilter extends AbstractCleaningFilter
             }
             if (null == previousElement) {
                 // This means we have <ul><ul>. We need to insert a <li> element.
-                Element li = document.createElement(LI);
+                Element li = document.createElement(TAG_LI);
                 parent.insertBefore(li, nestedList);
                 li.appendChild(parent.removeChild(nestedList));                
             } else {

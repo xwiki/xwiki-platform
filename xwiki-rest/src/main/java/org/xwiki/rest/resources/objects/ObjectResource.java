@@ -32,8 +32,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.Property;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -50,7 +50,7 @@ public class ObjectResource extends XWikiResource
     {
         super(uriInfo);
     }
-    
+
     @GET
     public Object getObject(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("className") String className,
@@ -59,7 +59,7 @@ public class ObjectResource extends XWikiResource
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
         Document doc = documentInfo.getDocument();
-        
+
         XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
 
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
@@ -79,7 +79,7 @@ public class ObjectResource extends XWikiResource
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
         Document doc = documentInfo.getDocument();
-        
+
         if (!doc.hasAccessLevel("edit", xwikiUser)) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
@@ -103,7 +103,7 @@ public class ObjectResource extends XWikiResource
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject))
             .build();
     }
-    
+
     @DELETE
     public void deleteObject(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("className") String className,
@@ -112,7 +112,7 @@ public class ObjectResource extends XWikiResource
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
         Document doc = documentInfo.getDocument();
-        
+
         if (!doc.hasAccessLevel("edit", xwikiUser)) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
@@ -123,10 +123,10 @@ public class ObjectResource extends XWikiResource
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
-        
+
         xwikiDocument.removeObject(baseObject);
-        
-        doc.save();     
+
+        doc.save();
     }
 
 }

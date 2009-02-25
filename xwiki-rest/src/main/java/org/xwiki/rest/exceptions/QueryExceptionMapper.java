@@ -21,25 +21,19 @@ package org.xwiki.rest.exceptions;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.query.QueryException;
 
 /**
  * @version $Id$
  */
 @Provider
-public class XWikiExceptionMapper implements ExceptionMapper<XWikiException>
+public class QueryExceptionMapper implements ExceptionMapper<QueryException>
 {
-    public Response toResponse(XWikiException exception)
-    {
-        if (exception.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-            return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage()).type(MediaType.TEXT_PLAIN)
-                .build();
-        }
-
+    public Response toResponse(QueryException exception)
+    {        
         return Response.serverError().entity(exception.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
 

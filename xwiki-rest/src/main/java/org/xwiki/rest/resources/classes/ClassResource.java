@@ -56,10 +56,10 @@ public class ClassResource extends XWikiResource
             xwikiContext.setDatabase(wikiName);
 
             com.xpn.xwiki.api.Class xwikiClass = xwikiApi.getClass(className);
-            if(xwikiClass == null) {
+            if (xwikiClass == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
-                        
+
             return DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass);
         } finally {
             xwiki.setDatabase(database);

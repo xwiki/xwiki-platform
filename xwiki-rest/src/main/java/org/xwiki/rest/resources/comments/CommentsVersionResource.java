@@ -49,8 +49,9 @@ public class CommentsVersionResource extends XWikiResource
     }
 
     @GET
-    public Comments getCommentsVersion(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
-        @PathParam("pageName") String pageName, @PathParam("version") String version, @QueryParam("start") @DefaultValue("0") Integer start,
+    public Comments getCommentsVersion(@PathParam("wikiName") String wikiName,
+        @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
+        @PathParam("version") String version, @QueryParam("start") @DefaultValue("0") Integer start,
         @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, version, true, false);
@@ -65,7 +66,8 @@ public class CommentsVersionResource extends XWikiResource
             new RangeIterable<com.xpn.xwiki.api.Object>(xwikiComments, start, number);
 
         for (com.xpn.xwiki.api.Object xwikiComment : ri) {
-            comments.getComments().add(DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(),  doc, xwikiComment));
+            comments.getComments().add(
+                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment));
         }
 
         return comments;

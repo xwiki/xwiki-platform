@@ -73,13 +73,14 @@ public class SpacesResource extends XWikiResource
 
                 String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
                 Document home = null;
-                
+
                 if (xwikiApi.exists(homeId)) {
                     home = xwikiApi.getDocument(homeId);
                 }
 
-                spaces.getSpaces().add(DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home,
-                    docNames.size()));
+                spaces.getSpaces().add(
+                    DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home,
+                        docNames.size()));
             }
         } finally {
             xwikiContext.setDatabase(database);

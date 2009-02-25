@@ -17,30 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.exceptions;
+package org.xwiki.rest.representations;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 
-import com.xpn.xwiki.XWikiException;
+import javax.ws.rs.ext.MessageBodyReader;
 
 /**
  * @version $Id$
  */
-@Provider
-public class XWikiExceptionMapper implements ExceptionMapper<XWikiException>
+public abstract class TextPlainReader<T> implements MessageBodyReader<T>
 {
-    public Response toResponse(XWikiException exception)
+    protected String getEntityAsString(InputStream entityStream) throws IOException
     {
-        if (exception.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-            return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage()).type(MediaType.TEXT_PLAIN)
-                .build();
+        StringWriter writer = new StringWriter();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(entityStream));
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            writer.write(line);
         }
 
-        return Response.serverError().entity(exception.getMessage()).type(MediaType.TEXT_PLAIN).build();
+        return writer.toString();
     }
-
 }

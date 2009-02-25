@@ -52,7 +52,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-url-implementation</artifactId>
+      <artifactId>xwiki-core-url-default</artifactId>
       <version>${pom.version}</version>
       <scope>runtime</scope>
     </dependency>

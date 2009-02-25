@@ -21,26 +21,29 @@ package org.xwiki.officeimporter.filter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
- * The purpose of this filter is to replace xhtml anchors like {@code<a name="name"></a>} with xwiki compatible links
- * like {@code<!--startmacro:id|-|name="name"|-|--><a name="name"></a><!--stopmacro-->}.
+ * The purpose of this filter is to replace xhtml anchors like {@code<a name="name"></a>} with xwiki compatible anchors
+ * like {@code<!--startmacro:id|-|name="name"|-|--><a name="name"></a><!--stopmacro-->}. Note that this filter is only
+ * used until the following issue get's fixed: http://jira.xwiki.org/jira/browse/XWIKI-3091
  * 
  * @version $Id$
  * @since 1.8M1
  */
-public class AnchorFilter implements HTMLFilter
+public class AnchorFilter extends AbstractHTMLFilter
 {
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParameters)
     {
         NodeList links = document.getElementsByTagName("a");
         List<Node> anchorsToRemove = new ArrayList<Node>();

@@ -21,10 +21,12 @@ package org.xwiki.officeimporter.filter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
  * Open Office server creates a new paragraph element for every line break (enter) in the original office document. For
@@ -36,12 +38,12 @@ import org.w3c.dom.NodeList;
  * into xwiki/2.0 syntax the generated xwiki syntax is also invalid (obviously). The purpose of this filter is to clean
  * up such html content by merging consecutive paragraph sequences and appropriately inserting {@code<br/>} elements.
  */
-public class ParagraphFilter implements HTMLFilter
+public class ParagraphFilter extends AbstractHTMLFilter
 {
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParams)
     {
         for (Node p : findEmptyParagraphSequences(document)) {
             Node next = p.getNextSibling();

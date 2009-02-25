@@ -20,11 +20,12 @@
 package org.xwiki.officeimporter.filter;
 
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xwiki.officeimporter.filter.common.AbstractHTMLFilter;
-import org.xwiki.officeimporter.filter.common.ElementFilterCriterion;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
+import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * Presently xwiki rendering module doesn't support complex table cell items. This filter is used to rip-off or modify
@@ -45,7 +46,7 @@ public class TableFilter extends AbstractHTMLFilter
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParams)
     {
         // Remove isolated paragraphs inside cell items / table header items.
         List<Element> tableCells = filterDescendants(document.getDocumentElement(), new String[] {TAG_TD, TAG_TH});
@@ -67,20 +68,25 @@ public class TableFilter extends AbstractHTMLFilter
             }
         }
         // Strip off empty table rows. see http://jira.xwiki.org/jira/browse/XWIKI-3136.
-        List<Element> emptyRows = filterDescendants(document.getDocumentElement(), TAG_TR, new ElementFilterCriterion()
-        {
-            public boolean isFiltered(Element element)
+        List<Element> emptyRows =
+            filterDescendants(document.getDocumentElement(), new String[] {TAG_TR}, new ElementSelector()
             {
-                return element.getChildNodes().getLength() == 0;
-            }
-        });
-        stripElements(emptyRows);
+                public boolean isSelected(Element element)
+                {
+                    return element.getChildNodes().getLength() == 0;
+                }
+            });
+        for (Element emptyRow : emptyRows) {
+            emptyRow.getParentNode().removeChild(emptyRow);
+        }
         // Remove problematic rowspan attributes.
-        List<Element> rows = filterDescendants(document.getDocumentElement(), TAG_TR);
+        List<Element> rows = filterDescendants(document.getDocumentElement(), new String[] {TAG_TR});
         for (Element row : rows) {
-            List<Element> childCells = filterDescendants(row, TAG_TD);
-            if (hasAttribute(childCells, ATT_ROWSPAN, true)) {
-                stripAttribute(childCells, ATT_ROWSPAN);
+            List<Element> childCells = filterDescendants(row, new String[] {TAG_TD});
+            if (hasAttribute(childCells, ATTRIBUTE_ROWSPAN, true)) {
+                for (Element childCell : childCells) {
+                    childCell.removeAttribute(ATTRIBUTE_ROWSPAN);
+                }
             }
         }
     }

@@ -20,23 +20,13 @@
 package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.officeimporter.filter.HTMLFilter;
-import org.xwiki.officeimporter.filter.ImageFilter;
-import org.xwiki.officeimporter.filter.LinkFilter;
-import org.xwiki.officeimporter.filter.ListFilter;
-import org.xwiki.officeimporter.filter.ParagraphFilter;
-import org.xwiki.officeimporter.filter.RedundancyFilter;
-import org.xwiki.officeimporter.filter.StripperFilter;
-import org.xwiki.officeimporter.filter.StyleFilter;
-import org.xwiki.officeimporter.filter.TableFilter;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.filter.HTMLFilter;
 import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 
 /**
@@ -51,36 +41,71 @@ public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleane
      * The {@link DefaultHTMLCleaner} used internally.
      */
     private HTMLCleaner defaultHtmlCleaner;
+    
+    /**
+     * {@link HTMLFilter} for stripping various tags.
+     */
+    private HTMLFilter stripperFilter;
+    
+    /**
+     * {@link HTMLFilter} filtering styles.
+     */
+    private HTMLFilter styleFilter;
+    
+    /**
+     * {@link HTMLFilter} for stripping redundant tags.
+     */
+    private HTMLFilter redundancyFilter;
+    
+    /**
+     * {@link HTMLFilter} for cleaning empty paragraphs.
+     */
+    private HTMLFilter paragraphFilter;
+    
+    /**
+     * {@link HTMLFilter} for filtering image tags.
+     */
+    private HTMLFilter imageFilter;
+    
+    /**
+     * {@link HTMLFilter} for filtering html links.
+     */
+    private HTMLFilter linkFilter;
+    
+    /**
+     * {@link HTMLFilter} for filtering lists.
+     */
+    private HTMLFilter listFilter;
+    
+    /**
+     * {@link HTMLFilter} for filtering tables.
+     */
+    private HTMLFilter tableFilter;
 
     /**
      * {@inheritDoc}
      */
     public Document clean(Reader originalHtmlContent)
     {
-        return clean(originalHtmlContent, Collections.singletonMap("filterStyles", "moderate"));
+        return clean(originalHtmlContent, Collections.singletonMap("", ""));
     }
 
     /**
      * {@inheritDoc}
      */
-    public Document clean(Reader originalHtmlContent, Map<String, String> params)
+    public Document clean(Reader originalHtmlContent, Map<String, String> cleaningParams)
     {
-        // Initialize filters.
-        List<HTMLFilter> filterList = new ArrayList<HTMLFilter>();
-        filterList.add(new StripperFilter());
-        filterList.add(new StyleFilter(params.get("filterStyles")));
-        filterList.add(new RedundancyFilter());
-        filterList.add(new ParagraphFilter());
-        filterList.add(new ImageFilter());
-        filterList.add(new LinkFilter());
-        filterList.add(new ListFilter());
-        filterList.add(new TableFilter());
         // Default cleaning.        
-        Document document = defaultHtmlCleaner.clean(originalHtmlContent, params);
+        Document document = defaultHtmlCleaner.clean(originalHtmlContent, cleaningParams);
         // Apply filters.
-        for (HTMLFilter filter : filterList) {
-            filter.filter(document);
-        }
+        stripperFilter.filter(document, cleaningParams);
+        styleFilter.filter(document, cleaningParams);
+        redundancyFilter.filter(document, cleaningParams);
+        paragraphFilter.filter(document, cleaningParams);
+        imageFilter.filter(document, cleaningParams);
+        linkFilter.filter(document, cleaningParams);
+        listFilter.filter(document, cleaningParams);
+        tableFilter.filter(document, cleaningParams);
         return document;
     }
 }

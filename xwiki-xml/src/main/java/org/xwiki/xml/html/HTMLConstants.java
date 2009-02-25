@@ -29,6 +29,19 @@ package org.xwiki.xml.html;
 public interface HTMLConstants
 {
     /**
+     * White space characters.<br/>
+     * <p>
+     * \u0020 - Ascii space.<br/>
+     * \u0009 - Ascii tab.<br/>
+     * \u000C - Ascii form feed. <br/>
+     * \u200B - Zero width space.<br/>
+     * \u000A - New line.<br/>
+     * \u000D - Carriage return.<br/>
+     * </p>
+     */
+    String WHITE_SPACE_CHARS = "\u0020\u0009\u000C\u200B" + "\n\r";
+    
+    /**
      * HTML &lt;del&gt; tag name.
      */
     String TAG_DEL = "del";
@@ -162,6 +175,11 @@ public interface HTMLConstants
      * HTML &lt;td&gt; tag name.
      */
     String TAG_TD = "td";
+    
+    /**
+     * HTML &lt;th&gt; tag name.
+     */
+    String TAG_TH = "th";
 
     /**
      * HTML style attribute name.

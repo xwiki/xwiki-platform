@@ -22,7 +22,73 @@
 -->
 <component-set>
   <components>
-  <!-- HTML Cleaners -->
+    <!-- HTML Filters -->
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/anchor</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.AnchorFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/image</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.ImageFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/linebreak</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.LineBreakFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/link</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.LinkFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/list</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.ListFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/paragraph</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.ParagraphFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/redundancy</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.RedundancyFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/stripper</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.StripperFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/style</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.StyleFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+      <role-hint>officeimporter/table</role-hint>
+      <implementation>org.xwiki.officeimporter.filter.TableFilter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <!-- HTML Cleaners -->
     <component>
       <role>org.xwiki.xml.html.HTMLCleaner</role>
       <role-hint>openoffice</role-hint>
@@ -32,7 +98,54 @@
           <role>org.xwiki.xml.html.HTMLCleaner</role>
         </requirement>
         <requirement>
-          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/stripper</role-hint>
+          <field-name>stripperFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/style</role-hint>
+          <field-name>styleFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/redundancy</role-hint>
+          <field-name>redundancyFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/paragraph</role-hint>
+          <field-name>paragraphFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/image</role-hint>
+          <field-name>imageFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/link</role-hint>
+          <field-name>linkFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/anchor</role-hint>
+          <field-name>anchorFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/list</role-hint>
+          <field-name>listFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/table</role-hint>
+          <field-name>tableFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/linebreak</role-hint>
+          <field-name>lineBreakFilter</field-name>
         </requirement>
       </requirements>
       <instantiation-strategy>singleton</instantiation-strategy>
@@ -44,6 +157,46 @@
       <requirements>
         <requirement>
           <role>org.xwiki.xml.html.HTMLCleaner</role>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/stripper</role-hint>
+          <field-name>stripperFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/style</role-hint>
+          <field-name>styleFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/redundancy</role-hint>
+          <field-name>redundancyFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/paragraph</role-hint>
+          <field-name>paragraphFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/image</role-hint>
+          <field-name>imageFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/link</role-hint>
+          <field-name>linkFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/list</role-hint>
+          <field-name>listFilter</field-name>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.filter.HTMLFilter</role>
+          <role-hint>officeimporter/table</role-hint>
+          <field-name>tableFilter</field-name>
         </requirement>
       </requirements>
       <instantiation-strategy>singleton</instantiation-strategy>

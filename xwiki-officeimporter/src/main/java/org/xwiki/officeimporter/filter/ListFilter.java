@@ -19,10 +19,13 @@
  */
 package org.xwiki.officeimporter.filter;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
  * Presently xwiki rendering module doesn't support complex list items. Because of this reason this
@@ -32,12 +35,12 @@ import org.w3c.dom.NodeList;
  * @version $Id$
  * @since 1.8M1
  */
-public class ListFilter implements HTMLFilter
+public class ListFilter extends AbstractHTMLFilter
 {
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParams)
     {
         NodeList listItems = document.getElementsByTagName("li");
         for (int i = 0; i < listItems.getLength(); i++) {

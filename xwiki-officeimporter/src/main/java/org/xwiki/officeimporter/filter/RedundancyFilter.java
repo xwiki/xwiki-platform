@@ -20,18 +20,19 @@
 package org.xwiki.officeimporter.filter;
 
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xwiki.officeimporter.filter.common.AbstractHTMLFilter;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
- * This filter is used to remove those tags that doesn't play any role with the representation of
- * information. This type of tags can result from other filters (like the style filter) or
- * Open Office specific formatting choices (like newlines being represented by empty paragraphs). For
- * an example, empty {@code <span>} or {@code <div>} tags will be ripped off within this filter.
+ * This filter is used to remove those tags that doesn't play any role with the representation of information. This type
+ * of tags can result from other filters (like the style filter) or Open Office specific formatting choices (like
+ * newlines being represented by empty paragraphs). For an example, empty {@code <span>} or {@code <div>} tags will be
+ * ripped off within this filter.
  * 
  * @version $Id$
  * @since 1.8M1
@@ -47,26 +48,26 @@ public class RedundancyFilter extends AbstractHTMLFilter
      * List of those tags which will be filtered if no textual content is present inside them.
      */
     private static final String[] CONTENT_FILTERED_TAGS =
-        new String[] {"em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr",
-        "acronym", "address", "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
-    
+        new String[] {"em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr", "acronym", "address",
+        "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
+
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParams)
     {
         for (String key : ATTRIBUTES_FILTERED_TAGS) {
-            filterNodesWithZeroAttributes(filterDescendants(document.getDocumentElement(), key));
-            
+            filterNodesWithZeroAttributes(filterDescendants(document.getDocumentElement(), new String[] {key}));
+
         }
         for (String key : CONTENT_FILTERED_TAGS) {
-            filterNodesWithEmptyTextContent(filterDescendants(document.getDocumentElement(), key));
+            filterNodesWithEmptyTextContent(filterDescendants(document.getDocumentElement(), new String[] {key}));
         }
     }
 
     /**
-     * Scan the given list of elements and strip those elements that doesn't have any attributes
-     * set. The children elements of such elements will be moved one level up.
+     * Scan the given list of elements and strip those elements that doesn't have any attributes set. The children
+     * elements of such elements will be moved one level up.
      * 
      * @param textElements List of elements to be examined.
      */
@@ -84,8 +85,7 @@ public class RedundancyFilter extends AbstractHTMLFilter
     }
 
     /**
-     * Scan the given list of elements and strip those elements that doesn't have any textual
-     * content inside them.
+     * Scan the given list of elements and strip those elements that doesn't have any textual content inside them.
      * 
      * @param textElements List of elements to be examined.
      */

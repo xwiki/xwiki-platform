@@ -20,13 +20,13 @@
 package org.xwiki.officeimporter.filter;
 
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.officeimporter.filter.common.AbstractHTMLFilter;
-import org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
  * This filter will replace the {@code <img>} tag with corresponding xwiki xhtml syntax. This is required because
@@ -43,37 +43,12 @@ public class ImageFilter extends AbstractHTMLFilter
     private DocumentAccessBridge docBridge;
 
     /**
-     * Target document name.
-     */
-    private String targetDocument;
-
-    /**
-     * Constructs an {@link ImageFilter} with the given {@link DocumentAccessBridge} and the targetDocument. If this
-     * constructor is used, all cleaning operations will be done w.r.t the targetDocument.
-     * 
-     * @param docBridge the {@link DocumentAccessBridge}
-     * @param targetDocument target document.
-     */
-    public ImageFilter(DocumentAccessBridge docBridge, String targetDocument)
-    {
-        this.docBridge = docBridge;
-        this.targetDocument = targetDocument;
-    }
-
-    /**
-     * Default constructor. This constructor is used by {@link WysiwygHTMLCleaner} to strip images from html.
-     */
-    public ImageFilter()
-    {
-
-    }
-
-    /**
      * {@inheritDoc}
      */
-    public void filter(Document htmlDocument)
+    public void filter(Document htmlDocument, Map<String, String> cleaningParams)
     {
-        List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), "img");
+        String targetDocument = cleaningParams.get("targetDocument");
+        List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), new String[] {"img"});
         for (Element image : images) {
             String src = image.getAttribute("src");
             // TODO : We might have to verify that src is a file name. (a.k.a not a

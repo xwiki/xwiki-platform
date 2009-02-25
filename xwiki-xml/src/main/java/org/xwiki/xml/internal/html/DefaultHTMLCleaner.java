@@ -23,7 +23,6 @@ package org.xwiki.xml.internal.html;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.htmlcleaner.CleanerProperties;
@@ -53,10 +52,14 @@ import org.xwiki.xml.html.filter.HTMLFilter;
 public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
 {
     /**
-     * List of default html filters to call when cleaning code with HTML Cleaner. This is for cases when there are no <a
-     * href="http://htmlcleaner.sourceforge.net/parameters.php">properties</a> defined in HTML Cleaner.
+     * {@link HTMLFilter} for filtering html lists.
      */
-    private List<HTMLFilter> filters;
+    private HTMLFilter listFilter;
+    
+    /**
+     * {@link HTMLFilter} for filtering html font elements.
+     */
+    private HTMLFilter fontFilter;
 
     /**
      * {@inheritDoc}
@@ -152,9 +155,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             throw new RuntimeException("Error while transforming jdom document into w3c document", ex);
         }        
         // Finally apply filters.
-        for (HTMLFilter filter : filters) {
-            filter.filter(result, cleaningParameters);
-        }
+        listFilter.filter(result, cleaningParameters);
+        fontFilter.filter(result, cleaningParameters);
         return result;        
     }
 

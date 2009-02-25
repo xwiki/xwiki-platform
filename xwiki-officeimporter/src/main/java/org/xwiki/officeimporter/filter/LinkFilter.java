@@ -19,26 +19,29 @@
  */
 package org.xwiki.officeimporter.filter;
 
+import java.util.Map;
+
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
- * Converts usual xhtml links into xwiki compatible links. As an example, the link {@code <a
- * href="foo">link</a>} will be replaced by {@code <!--startwikilink:foo--><span
- * class="wikiexternallink"><a href="foo">link</a></span><!--stopwikilink-->}
+ * Converts usual xhtml links into xwiki compatible links. As an example, the link {@code <a href="foo">link</a>} will
+ * be replaced by {@code <!--startwikilink:foo--><span class="wikiexternallink"><a
+ * href="foo">link</a></span><!--stopwikilink-->}
  * 
  * @version $Id$
  * @since 1.8M1
  */
-public class LinkFilter implements HTMLFilter
+public class LinkFilter extends AbstractHTMLFilter
 {
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParams)
     {
         NodeList links = document.getElementsByTagName("a");
         for (int i = 0; i < links.getLength(); i++) {

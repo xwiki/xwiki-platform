@@ -21,11 +21,13 @@ package org.xwiki.officeimporter.filter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
  * Replaces {@code<br/>} elements placed in between block elements with {@code<div class="wikikmodel-emptyline"/>}.
@@ -33,7 +35,7 @@ import org.w3c.dom.NodeList;
  * @version $Id$
  * @since 1.8M1
  */
-public class LineBreakFilter implements HTMLFilter
+public class LineBreakFilter extends AbstractHTMLFilter
 {
     /**
      * List of block element tag names.
@@ -44,7 +46,7 @@ public class LineBreakFilter implements HTMLFilter
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParams)
     {
         NodeList lineBreaks = document.getElementsByTagName("br");
         List<Node> lineBreaksToReplace = new ArrayList<Node>();

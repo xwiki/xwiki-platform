@@ -47,8 +47,14 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-url</artifactId>
+      <artifactId>xwiki-core-url-api</artifactId>
       <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-url-implementation</artifactId>
+      <version>${pom.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

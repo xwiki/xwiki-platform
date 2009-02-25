@@ -258,6 +258,24 @@ public class DomainObjectFactory
                 pageSummary.getLinks().add(parentLink);
             }
         }
+
+        String historyUri =
+            UriBuilder.fromUri(baseUri).path(PageHistoryResource.class).build(doc.getWiki(), doc.getSpace(),
+                doc.getName()).toString();
+        Link historyLink = objectFactory.createLink();
+        historyLink.setHref(historyUri);
+        historyLink.setRel(Relations.HISTORY);
+        pageSummary.getLinks().add(historyLink);
+
+        if (!doc.getChildren().isEmpty()) {
+            String pageChildrenUri =
+                UriBuilder.fromUri(baseUri).path(PageChildrenResource.class).build(doc.getWiki(), doc.getSpace(),
+                    doc.getName()).toString();
+            Link pageChildrenLink = objectFactory.createLink();
+            pageChildrenLink.setHref(pageChildrenUri);
+            pageChildrenLink.setRel(Relations.CHILDREN);
+            pageSummary.getLinks().add(pageChildrenLink);
+        }
     }
 
     public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc)
@@ -273,6 +291,38 @@ public class DomainObjectFactory
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
         pageSummary.getLinks().add(pageLink);
+
+        if (!doc.getComments().isEmpty()) {
+            String commentsUri =
+                UriBuilder.fromUri(baseUri).path(CommentsResource.class).build(doc.getWiki(), doc.getSpace(),
+                    doc.getName()).toString();
+
+            Link commentsLink = objectFactory.createLink();
+            commentsLink.setHref(commentsUri);
+            commentsLink.setRel(Relations.COMMENTS);
+            pageSummary.getLinks().add(commentsLink);
+        }
+
+        if (!doc.getAttachmentList().isEmpty()) {
+            String attachmentsUri =
+                UriBuilder.fromUri(baseUri).path(AttachmentsResource.class).build(doc.getWiki(), doc.getSpace(),
+                    doc.getName()).toString();
+
+            Link attachmentsLink = objectFactory.createLink();
+            attachmentsLink.setHref(attachmentsUri);
+            attachmentsLink.setRel(Relations.ATTACHMENTS);
+            pageSummary.getLinks().add(attachmentsLink);
+        }
+
+        if (!doc.getxWikiObjects().keySet().isEmpty()) {
+            String objectsUri =
+                UriBuilder.fromUri(baseUri).path(ObjectsResource.class).build(doc.getWiki(), doc.getSpace(),
+                    doc.getName()).toString();
+            Link objectsLink = objectFactory.createLink();
+            objectsLink.setHref(objectsUri);
+            objectsLink.setRel(Relations.OBJECTS);
+            pageSummary.getLinks().add(objectsLink);
+        }
 
         return pageSummary;
     }
@@ -301,18 +351,12 @@ public class DomainObjectFactory
 
         page.setContent(doc.getContent());
 
-        Link pageLink = objectFactory.createLink();
-        pageLink.setHref(self.toString());
-        pageLink.setRel(Relations.SELF);
-        page.getLinks().add(pageLink);
-
-        String historyUri =
-            UriBuilder.fromUri(baseUri).path(PageHistoryResource.class).build(doc.getWiki(), doc.getSpace(),
-                doc.getName()).toString();
-        Link historyLink = objectFactory.createLink();
-        historyLink.setHref(historyUri);
-        historyLink.setRel(Relations.HISTORY);
-        page.getLinks().add(historyLink);
+        if (self != null) {
+            Link pageLink = objectFactory.createLink();
+            pageLink.setHref(self.toString());
+            pageLink.setRel(Relations.SELF);
+            page.getLinks().add(pageLink);
+        }
 
         com.xpn.xwiki.api.Class xwikiClass = doc.getxWikiClass();
         if (xwikiClass != null) {
@@ -323,16 +367,6 @@ public class DomainObjectFactory
             classLink.setHref(classUri);
             classLink.setRel(Relations.CLASS);
             page.getLinks().add(classLink);
-        }
-
-        if (!doc.getChildren().isEmpty()) {
-            String pageChildrenUri =
-                UriBuilder.fromUri(baseUri).path(PageChildrenResource.class).build(doc.getWiki(), doc.getSpace(),
-                    doc.getName()).toString();
-            Link pageChildrenLink = objectFactory.createLink();
-            pageChildrenLink.setHref(pageChildrenUri);
-            pageChildrenLink.setRel(Relations.CHILDREN);
-            page.getLinks().add(pageChildrenLink);
         }
 
         if (!doc.getComments().isEmpty()) {

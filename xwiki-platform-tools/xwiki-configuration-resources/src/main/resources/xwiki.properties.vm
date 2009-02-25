@@ -4,6 +4,25 @@
 # this file.
 
 #-------------------------------------------------------------------------------------
+# Rendering
+#-------------------------------------------------------------------------------------
+
+#-# [Since 1.8RC2]
+#-# Specifies how links labels are displayed when the user doesn't specify the label explicitely.
+#-# Valid values:
+#-#   %w: wiki name
+#-#   %s: space name
+#-#   %p: page name
+#-#   %P: page name with spaces between camel case words, i.e. "My Page" iff the page name is "MyPage"
+#-#   %t: page title
+#-#
+#-# Note that if the page title is empty or not defined then it defaults to %p. This is also the case
+#-# if the title cannot be retrieved for the document.
+#-#
+#-# The default is "%p". Some examples: "%s.%p", "%w:%s.%p".
+# rendering.linkLabelFormat = %p
+
+#-------------------------------------------------------------------------------------
 # Cache
 #-------------------------------------------------------------------------------------
 

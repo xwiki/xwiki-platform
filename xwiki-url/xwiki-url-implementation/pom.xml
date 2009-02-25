@@ -25,37 +25,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform</groupId>
-    <artifactId>xwiki-core-parent</artifactId>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-core-url</artifactId>
     <version>1.9-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-action</artifactId>
-  <name>XWiki Platform - Core - Actions</name>
+  <artifactId>xwiki-core-url-implementation</artifactId>
+  <name>XWiki Platform - Core - URL - Implementation</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Actions</description>
+  <description>XWiki Platform - Core - URL - Implementation</description>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-url-api</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-url-implementation</artifactId>
-      <version>${pom.version}</version>
-      <scope>runtime</scope>
+      <groupId>com.xpn.xwiki.platform.tools</groupId>
+      <artifactId>xwiki-shared-tests</artifactId>
+      <version>${platform.tool.test.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
-       

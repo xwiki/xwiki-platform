@@ -31,21 +31,12 @@
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-url</artifactId>
-  <name>XWiki Platform - Core - URL</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Core - URL</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform.tools</groupId>
-      <artifactId>xwiki-shared-tests</artifactId>
-      <version>${platform.tool.test.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <name>XWiki Platform - Core - URL - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Core - Parent POM</description>
+  <modules>
+    <module>xwiki-url-api</module>
+    <module>xwiki-url-implementation</module>
+  </modules>
 </project>
        

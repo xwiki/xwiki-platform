@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
  * This particular filter searches HTML tags containing style attributes and removes such attributes if present.
@@ -34,7 +35,7 @@ import org.w3c.dom.NodeList;
  * @version $Id$
  * @since 1.8M1
  */
-public class StyleFilter implements HTMLFilter
+public class StyleFilter extends AbstractHTMLFilter
 {
     /**
      * The html_tag_name->allowed_attribute_names mappings for strict filtering mode. This is used to filter out all
@@ -51,13 +52,10 @@ public class StyleFilter implements HTMLFilter
     private Map<String, String> attributeMappingsStrict;
 
     /**
-     * Filtering mode (strict, moderate, etc). Controls how much is filtered.
+     * Constructs a {@link StyleFilter}.
      */
-    private String mode;
-
-    public StyleFilter(String mode)
+    public StyleFilter()
     {
-        this.mode = mode;
         attributeMappingsStrict = new HashMap<String, String>();
         attributeMappingsStrict.put("a", "|href|name|");
         attributeMappingsStrict.put("img", "|alt|src|");
@@ -73,11 +71,12 @@ public class StyleFilter implements HTMLFilter
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParams)
     {
-        if(null != mode && mode.equals("strict")) {
+        String mode = cleaningParams.get("filterStyles");
+        if (null != mode && mode.equals("strict")) {
             filter(document.getDocumentElement(), attributeMappingsStrict);
-        } else if(null != mode && mode.equals("moderate")) {
+        } else if (null != mode && mode.equals("moderate")) {
             filter(document.getDocumentElement(), attributeMappingsModerate);
         }
     }

@@ -19,10 +19,13 @@
  */
 package org.xwiki.officeimporter.filter;
 
+import java.util.Map;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
  * Remove some tags from HTML, such as style, script. The tag and all the contents under the tag will be removed.
@@ -30,7 +33,7 @@ import org.w3c.dom.NodeList;
  * @version $Id$
  * @since 1.8M1
  */
-public class StripperFilter implements HTMLFilter
+public class StripperFilter extends AbstractHTMLFilter
 {
     /**
      * Tags that will be stripped off completely.
@@ -40,7 +43,7 @@ public class StripperFilter implements HTMLFilter
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> cleaningParams)
     {
         Element root = document.getDocumentElement();
         for (String tag : filterTags) {

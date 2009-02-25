@@ -23,9 +23,8 @@ import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
 
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
-
 /**
- * Abstract class for all html cleaner tests.
+ * Abstract class for all HTML cleaner tests.
  * 
  * @version $Id$
  * @since 1.8M2

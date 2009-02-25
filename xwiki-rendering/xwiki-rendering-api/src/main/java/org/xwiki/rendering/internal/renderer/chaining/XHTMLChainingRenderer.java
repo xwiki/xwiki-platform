@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
@@ -44,6 +43,7 @@ import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.parser.AttachmentParser;
+import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -92,12 +92,12 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
      * @param configuration the rendering configuration
      */
     public XHTMLChainingRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
-        RenderingConfiguration configuration, AttachmentParser attachmentParser, ListenerChain listenerChain)
+       LinkLabelGenerator linkLabelGenerator, AttachmentParser attachmentParser, ListenerChain listenerChain)
     {
         super(printer, listenerChain);
 
         this.documentAccessBridge = documentAccessBridge;
-        this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, configuration, attachmentParser);
+        this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, linkLabelGenerator, attachmentParser);
         this.macroRenderer = new XHTMLMacroRenderer();
         this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
         this.imageRenderer = new XWikiSyntaxImageRenderer();

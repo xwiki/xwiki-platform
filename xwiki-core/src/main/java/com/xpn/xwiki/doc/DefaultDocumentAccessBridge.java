@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
@@ -46,6 +48,30 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     private XWikiContext getContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDocument(String)
+     */
+    public DocumentModelBridge getDocument(String documentName) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        return (DocumentModelBridge) xcontext.getWiki().getDocument(documentName, xcontext);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDocumentName(String)
+     */
+    public DocumentName getDocumentName(String documentName)
+    {
+        XWikiDocument document = new XWikiDocument();
+        document.setFullName(documentName, getContext());
+        
+        return new DocumentName(document.getWikiName(), document.getSpaceName(), document.getPageName());
     }
 
     /**

@@ -24,12 +24,12 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.AttachmentParser;
+import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
@@ -42,17 +42,17 @@ public class XHTMLLinkRenderer
 {
     private DocumentAccessBridge documentAccessBridge;
 
-    private RenderingConfiguration configuration;
+    private LinkLabelGenerator linkLabelGenerator;
 
     private AttachmentParser attachmentParser;
 
     private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
 
-    public XHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, RenderingConfiguration configuration,
+    public XHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, LinkLabelGenerator linkLabelGenerator,
         AttachmentParser attachmentParser)
     {
         this.documentAccessBridge = documentAccessBridge;
-        this.configuration = configuration;
+        this.linkLabelGenerator = linkLabelGenerator;
         this.attachmentParser = attachmentParser;
         this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
     }
@@ -81,8 +81,8 @@ public class XHTMLLinkRenderer
             if (link.getType() == LinkType.INTERWIKI) {
                 // TODO: Resolve the Interwiki link
             } else {
-                if (link.getReference().startsWith("attach:")) {
-                    // use the default attachment syntax parser to extract document name and attchment name
+                if ((link.getType() == LinkType.URI) && link.getReference().startsWith("attach:")) {
+                    // use the default attachment syntax parser to extract document name and attachment name
                     Attachment attachment =
                         this.attachmentParser.parse(link.getReference().substring("attach:".length()));
                     aAttributes.put("href", this.documentAccessBridge.getAttachmentURL(attachment.getDocumentName(),
@@ -121,7 +121,11 @@ public class XHTMLLinkRenderer
         // If there was no link content then generate it based on the passed reference
         if (generateLinkContent) {
             printer.printXMLStartElement("span", new String[][] {{"class", "wikigeneratedlinkcontent"}});
-            printer.printXML(link.getReference());
+            if (link.getType() == LinkType.DOCUMENT) {
+                printer.printXML(this.linkLabelGenerator.generate(link));
+            } else {
+                printer.printXML(link.getReference());
+            }
             printer.printXMLEndElement("span");
         }
 

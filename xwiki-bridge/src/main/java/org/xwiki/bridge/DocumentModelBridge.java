@@ -70,4 +70,19 @@ public interface DocumentModelBridge
      *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
      */
     String getSyntaxId();
+    
+    /**
+     * @return the page to which the document belongs to (eg "WebHome")
+     */
+    String getPageName();
+    
+    /**
+     * @return the space to which the document belongs to (eg "Main")
+     */
+    String getSpaceName();
+    
+    /**
+     * @return the document's title or null if not set
+     */
+    String getTitle();
 }

@@ -21,25 +21,17 @@ package org.xwiki.officeimporter.internal.transformer;
 
 import java.io.StringReader;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.transformer.DocumentTransformer;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
-import org.xwiki.rendering.internal.parser.DefaultAttachmentParser;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.renderer.XHTMLRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
@@ -49,25 +41,17 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  * @version $Id$
  * @since 1.8M2
  */
-public class XWikiToXhtmlTransformer extends AbstractLogEnabled implements DocumentTransformer, Composable
+public class XWikiToXhtmlTransformer extends AbstractLogEnabled implements DocumentTransformer
 {
     /**
-     * Document access bridge used to access wiki documents.
+     * Factory to get the XHTML renderer to output XHTML.
      */
-    private DocumentAccessBridge docBridge;
-    
-    /**
-     * Component manager used to lookup for other components.
-     */
-    private ComponentManager componentManager;
+    private PrintRendererFactory rendererFactory;
 
     /**
-     * {@inheritDoc}
+     * Parser for parsing XWiki 2.0 Syntax
      */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
+    private Parser parser;
     
     /**
      * {@inheritDoc}
@@ -75,19 +59,11 @@ public class XWikiToXhtmlTransformer extends AbstractLogEnabled implements Docum
     public void transform(OfficeImporterContext importerContext) throws OfficeImporterException
     {
         try {
-            Parser parser =
-                (Parser) componentManager.lookup(Parser.ROLE, new Syntax(SyntaxType.XWIKI, "2.0").toIdString());
-            XDOM xdom = parser.parse(new StringReader(importerContext.getContent()));
+            XDOM xdom = this.parser.parse(new StringReader(importerContext.getContent()));
             WikiPrinter printer = new DefaultWikiPrinter();
-            RenderingConfiguration configuraiton = new DefaultRenderingConfiguration();
-            AttachmentParser attachmentParser = new DefaultAttachmentParser();
-            Listener listener = new XHTMLRenderer(printer, docBridge, configuraiton, attachmentParser);
+            Listener listener = this.rendererFactory.createRenderer(new Syntax(SyntaxType.XHTML, "1.0"), printer); 
             xdom.traverse(listener);
             importerContext.setContent(printer.toString());
-        } catch (ComponentLookupException ex) {
-            String message = "Internal error while looking up for xwiki 2.0 parser.";
-            getLogger().error(message, ex);
-            throw new OfficeImporterException(ex);
         } catch (ParseException ex) {
             String message = "Internal error while parsing xwiki 2.0 content.";
             getLogger().error(message, ex);

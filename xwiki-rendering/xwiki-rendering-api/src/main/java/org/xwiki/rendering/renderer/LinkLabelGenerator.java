@@ -19,25 +19,15 @@
  */
 package org.xwiki.rendering.renderer;
 
+import org.xwiki.rendering.listener.Link;
+
 /**
- * Resolve configuration link format (see {@link org.xwiki.rendering.configuration.RenderingConfiguration}).
+ * Generate Link label. Used when no label has been specified by the user for links.
  *
  * @version $Id: $
- * @since 1.6M1
+ * @since 1.8RC2
  */
-public class LinkLabelResolver
+public interface LinkLabelGenerator
 {
-    // TODO: Should we make this a component instead? so that it can be customized by users and so that there's only
-    // a single instance?
-    public static String resolve(String format, String page, String space)
-    {
-        String result;
-
-        // Replace %p with the page name
-        result = format.replaceAll("%p", page);
-        // Replace %s with the space name
-        result = result.replaceAll("%s", space);
-
-        return result;
-    }
+    String generate(Link link);
 }

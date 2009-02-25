@@ -106,7 +106,7 @@
           <role>org.xwiki.bridge.DocumentAccessBridge</role>
         </requirement>
         <requirement>
-          <role>org.xwiki.rendering.configuration.RenderingConfiguration</role>
+          <role>org.xwiki.rendering.renderer.LinkLabelGenerator</role>
         </requirement>
         <requirement>
           <role>org.xwiki.rendering.parser.AttachmentParser</role>
@@ -120,6 +120,20 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.rendering.internal.util.DefaultIdGenerator</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.renderer.LinkLabelGenerator</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.rendering.configuration.RenderingConfiguration</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>org.xwiki.rendering.configuration.RenderingConfiguration</role>

@@ -42,9 +42,9 @@ public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
     {
         XWikiURL url = this.factory.createURL("http://wiki.domain.com:8080/xwiki/bin/view/Main/WebHome?language=fr");
         assertEquals("view", url.getAction());
-        assertEquals("WebHome", url.getPage());
-        assertEquals("Main", url.getSpace());
-        assertEquals("wiki", url.getWiki());
+        assertEquals("WebHome", url.getDocumentName().getPage());
+        assertEquals("Main", url.getDocumentName().getSpace());
+        assertEquals("wiki", url.getDocumentName().getWiki());
         assertEquals("fr", url.getParameterValue("language"));
     }
 
@@ -52,7 +52,7 @@ public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
     {
         XWikiURL url = this.factory.createURL("/xwiki/bin/view/Main/WebHome");
         assertEquals("view", url.getAction());
-        assertEquals("WebHome", url.getPage());
-        assertEquals("Main", url.getSpace());
+        assertEquals("WebHome", url.getDocumentName().getPage());
+        assertEquals("Main", url.getDocumentName().getSpace());
     }
 }

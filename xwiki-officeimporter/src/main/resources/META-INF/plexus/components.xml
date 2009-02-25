@@ -234,18 +234,23 @@
       <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
       <role-hint>xwikitoxhtml</role-hint>
       <implementation>org.xwiki.officeimporter.internal.transformer.XWikiToXhtmlTransformer</implementation>          
+      <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
-          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+          <role>org.xwiki.rendering.parser.Parser</role>
+          <role-hint>xwiki/2.0</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>
         </requirement>
       </requirements>
-      <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <!-- Office Importer -->
     <component>
       <role>org.xwiki.officeimporter.OfficeImporter</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.officeimporter.internal.DefaultOfficeImporter</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
           <role>org.xwiki.bridge.DocumentAccessBridge</role>
@@ -270,7 +275,6 @@
           <role-hint>xwikitoxhtml</role-hint>
           <field-name>xwikiToXhtmlTransformer</field-name>
         </requirement>
-        <instantiation-strategy>singleton</instantiation-strategy>
       </requirements>      
     </component>
     <!-- Velocity -->

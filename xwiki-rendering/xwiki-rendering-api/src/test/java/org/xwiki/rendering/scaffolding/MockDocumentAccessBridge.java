@@ -21,6 +21,8 @@ package org.xwiki.rendering.scaffolding;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.parser.Syntax;
@@ -270,5 +272,25 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     public String getDefaultEncoding()
     {
         throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDocument(String)
+     */
+    public DocumentModelBridge getDocument(String documentName) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDocumentName(String)
+     */
+    public DocumentName getDocumentName(String documentName)
+    {
+        return new DocumentName("xwiki", "Space", "Page");
     }
 }

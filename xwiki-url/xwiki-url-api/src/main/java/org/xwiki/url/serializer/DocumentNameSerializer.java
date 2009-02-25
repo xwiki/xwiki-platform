@@ -20,6 +20,7 @@
  */
 package org.xwiki.url.serializer;
 
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.url.XWikiURL;
 
 /**
@@ -30,22 +31,22 @@ import org.xwiki.url.XWikiURL;
  */
 public class DocumentNameSerializer
 {
-    // TODO: Refactor this when we have the new model which will have a DocumentName or DocumentIdentity class.
     public String serialize(XWikiURL xwikiURL)
     {
         StringBuffer result = new StringBuffer();
-        if (xwikiURL.getWiki() != null) {
-            result.append(xwikiURL.getWiki()).append(':');
+        DocumentName documentName = xwikiURL.getDocumentName();
+        if (documentName.getWiki() != null) {
+            result.append(documentName.getWiki()).append(':');
         }
-        if (xwikiURL.getSpace() != null) {
-            result.append(xwikiURL.getSpace()).append('.');
+        if (documentName.getSpace() != null) {
+            result.append(documentName.getSpace()).append('.');
         } else {
             // Use the default space located in the execution context if it exists.
             // Otherwise raise an exception.
             // TODO: implement it
         }
-        if (xwikiURL.getPage() != null) {
-            result.append(xwikiURL.getPage());
+        if (documentName.getPage() != null) {
+            result.append(documentName.getPage());
         } else {
             // Assume we're asking for the current page if there's one defined in the execution context.
             // Otherwise raise an exception.

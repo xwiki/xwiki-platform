@@ -228,7 +228,7 @@ public class DomainObjectFactory
         pageSummary.setId(doc.getPrefixedFullName());
         pageSummary.setSpace(doc.getSpace());
         pageSummary.setName(doc.getName());
-        pageSummary.setTitle(doc.getTitle());
+        pageSummary.setTitle(doc.getDisplayTitle());
         pageSummary.setParent(doc.getParent());
         pageSummary.setXwikiUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(createTranslations(objectFactory, baseUri, doc));

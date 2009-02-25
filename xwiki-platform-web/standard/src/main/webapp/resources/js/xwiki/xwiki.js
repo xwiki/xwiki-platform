@@ -7,6 +7,22 @@
 var XWiki = {};
 
 /**
+ * Add click listeners on all rendereing error messages to let the user read the detailed error description.
+ */
+document.observe("dom:loaded", function() {
+    $$('[class="xwikirenderingerror"]').each(function(error) {
+        if(error.nextSibling.innerHTML !== "" && error.nextSibling.hasClassName("xwikirenderingerrordescription")) {
+            error.style.cursor="pointer";
+            error.title = "$msg.get('platform.core.rendering.error.readTechnicalInformation')";
+            Event.observe(error, "click", function(event){
+                   toggleClass(event.element().nextSibling,'hidden');
+           });
+        }
+    });
+
+});
+
+/**
  * Hide the fieldset inside the given form. 
  *
  * @param form  {element} The form element.

@@ -64,8 +64,8 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     private Properties properties;
 
     /**
-     * The Container component (Injected automatically by the Component subsystem). We need it in order to store a the
-     * servlet context as a property in the Application Context so that the Velocity Tools WebappLoader can find it.
+     * The Container component (Injected automatically by the Component subsystem). We need it in order to store the
+     * ServletContext as a property in the Application Context so that the Velocity Tools WebappLoader can find it.
      */
     private Container container;
 

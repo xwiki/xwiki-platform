@@ -42,13 +42,6 @@ public class StyleFilter extends AbstractHTMLFilter
      * unnecessary attributes. The mapped object is a '|' separated string of all allowed attributes. If a particular
      * tag name is not present in this map, all of it's attributes will be filtered.
      */
-    private Map<String, String> attributeMappingsModerate;
-
-    /**
-     * The html_tag_name->allowed_attribute_names mappings for moderate filtering mode. This is used to filter out all
-     * unnecessary attributes. The mapped object is a '|' separated string of all allowed attributes. If a particular
-     * tag name is not present in this map, all of it's attributes will be filtered.
-     */
     private Map<String, String> attributeMappingsStrict;
 
     /**
@@ -57,15 +50,9 @@ public class StyleFilter extends AbstractHTMLFilter
     public StyleFilter()
     {
         attributeMappingsStrict = new HashMap<String, String>();
-        attributeMappingsStrict.put("a", "|href|name|");
-        attributeMappingsStrict.put("img", "|alt|src|");
-        attributeMappingsStrict.put("td", "|colspan|rowspan|");
-        attributeMappingsModerate = new HashMap<String, String>();
-        attributeMappingsModerate.put("a", "|href|name|");
-        attributeMappingsModerate.put("img", "|alt|src|width|height|align|");
-        attributeMappingsModerate.put("p", "|align|");
-        attributeMappingsModerate.put("table", "|align|");
-        attributeMappingsModerate.put("td", "|colspan|rowspan|");
+        attributeMappingsStrict.put(TAG_A, "|href|name|");
+        attributeMappingsStrict.put(TAG_IMG, "|alt|src|");
+        attributeMappingsStrict.put(TAG_TD, "|colspan|rowspan|");
     }
 
     /**
@@ -76,8 +63,6 @@ public class StyleFilter extends AbstractHTMLFilter
         String mode = cleaningParams.get("filterStyles");
         if (null != mode && mode.equals("strict")) {
             filter(document.getDocumentElement(), attributeMappingsStrict);
-        } else if (null != mode && mode.equals("moderate")) {
-            filter(document.getDocumentElement(), attributeMappingsModerate);
         }
     }
 

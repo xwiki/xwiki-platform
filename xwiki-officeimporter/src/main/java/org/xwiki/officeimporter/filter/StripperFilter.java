@@ -19,12 +19,11 @@
  */
 package org.xwiki.officeimporter.filter;
 
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
@@ -38,20 +37,16 @@ public class StripperFilter extends AbstractHTMLFilter
     /**
      * Tags that will be stripped off completely.
      */
-    private String[] filterTags = new String[] {"style", "script"};
+    private String[] filterTags = new String[] {TAG_STYLE, TAG_SCRIPT};
 
     /**
      * {@inheritDoc}
      */
     public void filter(Document document, Map<String, String> cleaningParams)
     {
-        Element root = document.getDocumentElement();
-        for (String tag : filterTags) {
-            NodeList toBeRemovedTags = root.getElementsByTagName(tag);
-            while (toBeRemovedTags.getLength() > 0) {
-                Node t = toBeRemovedTags.item(0);
-                t.getParentNode().removeChild(t);
-            }
+        List<Element> toBeStrippedElements = filterDescendants(document.getDocumentElement(), filterTags);
+        for (Element element : toBeStrippedElements) {
+            element.getParentNode().removeChild(element);
         }
     }
 }

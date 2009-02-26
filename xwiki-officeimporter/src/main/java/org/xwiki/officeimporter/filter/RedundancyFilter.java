@@ -24,9 +24,8 @@ import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
+import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * This filter is used to remove those tags that doesn't play any role with the representation of information. This type
@@ -42,62 +41,45 @@ public class RedundancyFilter extends AbstractHTMLFilter
     /**
      * List of those tags which will be filtered if no attributes are present.
      */
-    private static final String[] ATTRIBUTES_FILTERED_TAGS = new String[] {"span", "div"};
+    private static final String[] FILTERED_IF_NO_ATTRIBUTES_TAGS = new String[] {TAG_SPAN, TAG_DIV};
 
     /**
      * List of those tags which will be filtered if no textual content is present inside them.
      */
-    private static final String[] CONTENT_FILTERED_TAGS =
-        new String[] {"em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr", "acronym", "address",
-        "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
+    private static final String[] FILTERED_IF_NO_CONTENT_TAGS =
+        new String[] {TAG_EM, TAG_STRONG, TAG_DFN, TAG_CODE, TAG_SAMP, TAG_KBD, TAG_VAR, TAG_CITE, TAG_ABBR,
+        TAG_ACRONYM, TAG_ADDRESS, TAG_BLOCKQUOTE, TAG_Q, TAG_PRE, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6};
 
     /**
      * {@inheritDoc}
      */
     public void filter(Document document, Map<String, String> cleaningParams)
     {
-        for (String key : ATTRIBUTES_FILTERED_TAGS) {
-            filterNodesWithZeroAttributes(filterDescendants(document.getDocumentElement(), new String[] {key}));
-
-        }
-        for (String key : CONTENT_FILTERED_TAGS) {
-            filterNodesWithEmptyTextContent(filterDescendants(document.getDocumentElement(), new String[] {key}));
-        }
-    }
-
-    /**
-     * Scan the given list of elements and strip those elements that doesn't have any attributes set. The children
-     * elements of such elements will be moved one level up.
-     * 
-     * @param textElements List of elements to be examined.
-     */
-    private void filterNodesWithZeroAttributes(List<Element> textElements)
-    {
-        for (Element textElement : textElements) {
-            if (!textElement.hasAttributes()) {
-                NodeList children = textElement.getChildNodes();
-                while (children.getLength() > 0) {
-                    textElement.getParentNode().insertBefore(children.item(0), textElement);
+        List<Element> elementsWithNoAttributes =
+            filterDescendants(document.getDocumentElement(), FILTERED_IF_NO_ATTRIBUTES_TAGS, new ElementSelector()
+            {
+                public boolean isSelected(Element element)
+                {
+                    return !element.hasAttributes();
                 }
-                textElement.getParentNode().removeChild(textElement);
-            }
+            });
+        for (Element element : elementsWithNoAttributes) {
+            replaceWithChildren(element);
         }
-    }
-
-    /**
-     * Scan the given list of elements and strip those elements that doesn't have any textual content inside them.
-     * 
-     * @param textElements List of elements to be examined.
-     */
-    private void filterNodesWithEmptyTextContent(List<Element> textElements)
-    {
-        for (Element textElement : textElements) {
-            Node parent = textElement.getParentNode();
-            String textContent = textElement.getTextContent();
+        List<Element> elementsWithNoContent =
+            filterDescendants(document.getDocumentElement(), FILTERED_IF_NO_CONTENT_TAGS, new ElementSelector()
+            {
+                public boolean isSelected(Element element)
+                {
+                    return element.getTextContent().trim().equals("");
+                }
+            });
+        for (Element element : elementsWithNoContent) {
+            String textContent = element.getTextContent();
             if (textContent.equals("")) {
-                parent.removeChild(textElement);
-            } else if (textContent.trim().equals("")) {
-                textElement.setTextContent(textContent.replaceAll(" ", "&nbsp;"));
+                element.getParentNode().removeChild(element);
+            } else {
+                element.setTextContent(textContent.replaceAll(" ", "&nbsp;"));
             }
         }
     }

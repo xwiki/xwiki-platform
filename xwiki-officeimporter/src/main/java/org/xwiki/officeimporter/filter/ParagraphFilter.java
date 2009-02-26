@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
+import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * Open Office server creates a new paragraph element for every line break (enter) in the original office document. For
@@ -45,18 +47,14 @@ public class ParagraphFilter extends AbstractHTMLFilter
      */
     public void filter(Document document, Map<String, String> cleaningParams)
     {
-        for (Node p : findEmptyParagraphSequences(document)) {
+        for (Node p : findEmptyLineParagraphSequences(document)) {
             Node next = p.getNextSibling();
             // Remove the first empty paragraph.
             p.getParentNode().removeChild(p);
             // Replace the following ones by their children elements.
-            while (isEmptyLine(next)) {
+            while (isEmptyLineParagraph(next)) {
                 Node following = next.getNextSibling();
-                while (null != next.getFirstChild()) {
-                    Node child = next.removeChild(next.getFirstChild());
-                    next.getParentNode().insertBefore(child, next);
-                }
-                next.getParentNode().removeChild(next);
+                replaceWithChildren((Element) next);
                 next = following;
             }
         }
@@ -68,23 +66,28 @@ public class ParagraphFilter extends AbstractHTMLFilter
      * @param document the {@link Document}
      * @return a list of nodes containing leading paragraph elements of each sequence found.
      */
-    private List<Node> findEmptyParagraphSequences(Document document)
+    private List<Node> findEmptyLineParagraphSequences(Document document)
     {
-        NodeList paragraphElements = document.getElementsByTagName("p");
+        List<Element> emptyLineParagraphs =
+            filterDescendants(document.getDocumentElement(), new String[] {TAG_P}, new ElementSelector()
+            {
+                public boolean isSelected(Element element)
+                {
+                    return isEmptyLineParagraph(element);
+                }
+            });
         List<Node> sequences = new ArrayList<Node>();
-        for (int i = 0; i < paragraphElements.getLength(); i++) {
-            Node p = paragraphElements.item(i);
-            if (isEmptyLine(p)) {
-                Node prev = p.getPreviousSibling();
-                // Skip garbage.
-                while (isEmptyTextNode(prev) || isCommentNode(prev)) {
-                    Node oneBefore = prev.getPreviousSibling();
-                    prev.getParentNode().removeChild(prev);
-                    prev = oneBefore;
-                }
-                if (!isEmptyLine(prev)) {
-                    sequences.add(p);
-                }
+        for (Element emptyLineParagraph : emptyLineParagraphs) {
+            Node prev = emptyLineParagraph.getPreviousSibling();
+            // Skip garbage.
+            while (isEmptyTextNode(prev) || isCommentNode(prev)) {
+                Node oneBefore = prev.getPreviousSibling();
+                prev.getParentNode().removeChild(prev);
+                prev = oneBefore;
+            }
+            if (!isEmptyLineParagraph(prev)) {
+                // This is the beginning of a sequence of empty line paragraphs
+                sequences.add(emptyLineParagraph);
             }
         }
         return sequences;
@@ -98,7 +101,7 @@ public class ParagraphFilter extends AbstractHTMLFilter
      */
     private boolean isParagraph(Node node)
     {
-        return null != node && node.getNodeName().equals("p");
+        return null != node && node.getNodeName().equals(TAG_P);
     }
 
     /**
@@ -107,7 +110,7 @@ public class ParagraphFilter extends AbstractHTMLFilter
      * @param node the {@link Node}
      * @return true if the node represents an empty line.
      */
-    private boolean isEmptyLine(Node node)
+    private boolean isEmptyLineParagraph(Node node)
     {
         boolean isEmptyLine = false;
         if (isParagraph(node)) {
@@ -153,6 +156,6 @@ public class ParagraphFilter extends AbstractHTMLFilter
      */
     private boolean isLineBreak(Node node)
     {
-        return null != node && node.getNodeName().equals("br");
+        return null != node && node.getNodeName().equals(TAG_BR);
     }
 }

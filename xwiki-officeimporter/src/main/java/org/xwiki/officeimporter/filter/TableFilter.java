@@ -61,8 +61,8 @@ public class TableFilter extends AbstractHTMLFilter
         for (Element cell : tableCells) {
             List<Element> dangerTags = filterDescendants(cell, FILTER_TAGS);
             if (!dangerTags.isEmpty()) {
-                Element div = document.createElement("div");
-                div.setAttribute("class", "xwiki-document");
+                Element div = document.createElement(TAG_DIV);
+                div.setAttribute(ATTRIBUTE_CLASS, "xwiki-document");
                 moveChildren(cell, div);
                 cell.appendChild(div);
             }

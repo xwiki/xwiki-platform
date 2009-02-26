@@ -19,14 +19,15 @@
  */
 package org.xwiki.officeimporter.filter;
 
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
+import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * Converts usual xhtml links into xwiki compatible links. As an example, the link {@code <a href="foo">link</a>} will
@@ -43,23 +44,24 @@ public class LinkFilter extends AbstractHTMLFilter
      */
     public void filter(Document document, Map<String, String> cleaningParams)
     {
-        NodeList links = document.getElementsByTagName("a");
-        for (int i = 0; i < links.getLength(); i++) {
-            if (links.item(i) instanceof Element) {
-                Element link = (Element) links.item(i);
-                String hrefVal = link.getAttribute("href");
-                if (!hrefVal.equals("")) {
-                    Node parent = link.getParentNode();
-                    Element span = document.createElement("span");
-                    span.setAttribute("class", "wikiexternallink");
-                    span.appendChild(link.cloneNode(true));
-                    parent.replaceChild(span, link);
-                    Comment beforeComment = document.createComment("startwikilink:" + hrefVal);
-                    Comment afterComment = document.createComment("stopwikilink");
-                    parent.insertBefore(beforeComment, span);
-                    parent.insertBefore(afterComment, span.getNextSibling());
+        List<Element> links =
+            filterDescendants(document.getDocumentElement(), new String[] {TAG_A}, new ElementSelector()
+            {
+                public boolean isSelected(Element element)
+                {
+                    return !element.getAttribute(ATTRIBUTE_HREF).equals("");
                 }
-            }
+            });
+        for (Element link : links) {
+            Node parent = link.getParentNode();
+            Element span = document.createElement(TAG_SPAN);
+            span.setAttribute(ATTRIBUTE_CLASS, "wikiexternallink");
+            span.appendChild(link.cloneNode(true));
+            parent.replaceChild(span, link);
+            Comment beforeComment = document.createComment("startwikilink:" + link.getAttribute(ATTRIBUTE_HREF));
+            Comment afterComment = document.createComment("stopwikilink");
+            parent.insertBefore(beforeComment, span);
+            parent.insertBefore(afterComment, span.getNextSibling());
         }
     }
 }

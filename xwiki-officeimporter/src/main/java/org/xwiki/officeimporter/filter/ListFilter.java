@@ -19,18 +19,22 @@
  */
 package org.xwiki.officeimporter.filter;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
- * Presently xwiki rendering module doesn't support complex list items. Because of this reason this
- * temporary filter is used to rip off any complex formatting elements present in html lists. The
- * JIRA issue is located at http://jira.xwiki.org/jira/browse/XWIKI-2812.
+ * <p>
+ * This filter includes a temporary fix for the JIRA: http://jira.xwiki.org/jira/browse/XWIKI-3262
+ * </p>
+ * <p>
+ * Removes isolated paragraph items from list items.
+ * </p>
  * 
  * @version $Id$
  * @since 1.8M1
@@ -42,24 +46,19 @@ public class ListFilter extends AbstractHTMLFilter
      */
     public void filter(Document document, Map<String, String> cleaningParams)
     {
-        NodeList listItems = document.getElementsByTagName("li");
-        for (int i = 0; i < listItems.getLength(); i++) {
-            Node listItem = listItems.item(i);
-            Node counter = listItem.getFirstChild();
-            while (counter != null) {
-                if (counter.getNodeType() == Node.TEXT_NODE) {
-                    String trimmed = StringUtils.stripStart(counter.getTextContent(), WHITE_SPACE_CHARS);
-                    counter.setTextContent(trimmed);
+        List<Element> listItems = filterDescendants(document.getDocumentElement(), new String[] {TAG_LI});
+        for (Element listItem : listItems) {
+            Node nextChild = listItem.getFirstChild();
+            while (nextChild != null) {
+                if (nextChild.getNodeType() == Node.TEXT_NODE) {
+                    String trimmed = StringUtils.stripStart(nextChild.getTextContent(), WHITE_SPACE_CHARS);
+                    nextChild.setTextContent(trimmed);
                     if (trimmed.equals("")) {
-                        counter = counter.getNextSibling();
+                        nextChild = nextChild.getNextSibling();
                         continue;
                     }
-                } else if (counter.getNodeName().equals("p")) {
-                    NodeList children = counter.getChildNodes();
-                    while (children.getLength() > 0) {
-                        listItem.insertBefore(children.item(0), counter);
-                    }
-                    listItem.removeChild(counter);
+                } else if (nextChild.getNodeName().equals(TAG_P)) {
+                    replaceWithChildren((Element) nextChild);
                 }
                 break;
             }

@@ -27,13 +27,16 @@ import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
- * The purpose of this filter is to replace xhtml anchors like {@code<a name="name"></a>} with xwiki compatible anchors
- * like {@code<!--startmacro:id|-|name="name"|-|--><a name="name"></a><!--stopmacro-->}. Note that this filter is only
- * used until the following issue get's fixed: http://jira.xwiki.org/jira/browse/XWIKI-3091
+ * <p>
+ * This filter includes a temporary fix for the JIRA: http://jira.xwiki.org/jira/browse/XWIKI-3091
+ * </p>
+ * <p>
+ * Replaces xhtml anchors like {@code<a name="name"></a>} with xwiki compatible anchors like
+ * {@code<!--startmacro:id|-|name="name"|-|--><a name="name"></a><!--stopmacro-->}.
+ * </p>
  * 
  * @version $Id$
  * @since 1.8M1
@@ -45,33 +48,25 @@ public class AnchorFilter extends AbstractHTMLFilter
      */
     public void filter(Document document, Map<String, String> cleaningParameters)
     {
-        NodeList links = document.getElementsByTagName("a");
-        List<Node> anchorsToRemove = new ArrayList<Node>();
-        List<Node> anchorsToReplace = new ArrayList<Node>();
-        for (int i = 0; i < links.getLength(); i++) {
-            Node link = links.item(i);
-            if (link instanceof Element) {
-                if (isAnchor(link)) {
-                    Node parent = link.getParentNode();
-                    if (isSameAnchor(link, parent.getPreviousSibling())) {
-                        // Means this anchor was a result of close-before-copy-inside operation of default html cleaner.
-                        anchorsToRemove.add(link);
-                    } else {
-                        anchorsToReplace.add(link);
-                    }
+        List<Element> links = filterDescendants(document.getDocumentElement(), new String[] {TAG_A});
+        List<Element> anchorsToRemove = new ArrayList<Element>();
+        List<Element> anchorsTofix = new ArrayList<Element>();
+        for (Element link : links) {
+            if (isAnchor(link)) {
+                Node parent = link.getParentNode();
+                if (isSameAnchor(link, parent.getPreviousSibling())) {
+                    // Means this anchor was a result of close-before-copy-inside operation of default html cleaner.
+                    anchorsToRemove.add(link);
+                } else {
+                    anchorsTofix.add(link);
                 }
             }
         }
-        for (Node anchor : anchorsToRemove) {
-            Node parent = anchor.getParentNode();
-            while (null != anchor.getFirstChild()) {
-                Node child = anchor.removeChild(anchor.getFirstChild());
-                parent.insertBefore(child, anchor);
-            }
-            parent.removeChild(anchor);
+        for (Element anchor : anchorsToRemove) {
+            replaceWithChildren(anchor);
         }
-        for (Node anchor : anchorsToReplace) {
-            replaceAnchor(document, anchor);
+        for (Element anchor : anchorsTofix) {
+            fixAnchor(document, anchor);
         }
     }
 
@@ -86,7 +81,7 @@ public class AnchorFilter extends AbstractHTMLFilter
         boolean isAnchor = false;
         if (null != node && node instanceof Element) {
             Element element = (Element) node;
-            isAnchor = !element.getAttribute("name").equals("");
+            isAnchor = !element.getAttribute(ATTRIBUTE_NAME).equals("");
         }
         return isAnchor;
     }
@@ -104,7 +99,7 @@ public class AnchorFilter extends AbstractHTMLFilter
         if (isAnchor(first) && isAnchor(second)) {
             Element firstElement = (Element) first;
             Element secondElement = (Element) second;
-            isSameAnchor = firstElement.getAttribute("name").equals(secondElement.getAttribute("name"));
+            isSameAnchor = firstElement.getAttribute(ATTRIBUTE_NAME).equals(secondElement.getAttribute(ATTRIBUTE_NAME));
         }
         return isSameAnchor;
     }
@@ -115,10 +110,10 @@ public class AnchorFilter extends AbstractHTMLFilter
      * @param document the {@link Document}.
      * @param anchor the {@link Node} which is to be converted.
      */
-    private void replaceAnchor(Document document, Node anchor)
+    private void fixAnchor(Document document, Node anchor)
     {
         Node parent = anchor.getParentNode();
-        String anchorName = ((Element) anchor).getAttribute("name");
+        String anchorName = ((Element) anchor).getAttribute(ATTRIBUTE_NAME);
         Comment beforeComment = document.createComment(String.format("startmacro:id|-|name=\"%s\"|-|", anchorName));
         Comment afterComment = document.createComment("stopmacro");
         parent.insertBefore(beforeComment, anchor);

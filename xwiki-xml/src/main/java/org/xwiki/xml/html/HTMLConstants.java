@@ -42,6 +42,21 @@ public interface HTMLConstants
     String WHITE_SPACE_CHARS = "\u0020\u0009\u000C\u200B" + "\n\r";
     
     /**
+     * HTML &lt;style&gt; tag name.
+     */
+    String TAG_STYLE = "style";
+    
+    /**
+     * HTML &lt;script&gt; tag name.
+     */
+    String TAG_SCRIPT = "script";
+    
+    /**
+     * HTML &lt;a&gt; tag name.
+     */
+    String TAG_A = "a";
+    
+    /**
      * HTML &lt;del&gt; tag name.
      */
     String TAG_DEL = "del";
@@ -55,7 +70,67 @@ public interface HTMLConstants
      * HTML &lt;em&gt; tag name.
      */
     String TAG_EM = "em";
+    
+    /**
+     * HTML &lt;dfn&gt; tag name.
+     */
+    String TAG_DFN = "dfn";
+    
+    /**
+     * HTML &lt;code&gt; tag name.
+     */
+    String TAG_CODE = "code";
+    
+    /**
+     * HTML &lt;samp&gt; tag name.
+     */
+    String TAG_SAMP = "samp";
+    
+    /**
+     * HTML &lt;kbd&gt; tag name.
+     */
+    String TAG_KBD = "kbd";
+    
+    /**
+     * HTML &lt;var&gt; tag name.
+     */
+    String TAG_VAR = "var";
+    
+    /**
+     * HTML &lt;cite&gt; tag name.
+     */
+    String TAG_CITE = "cite";
+    
+    /**
+     * HTML &lt;abbr&gt; tag name.
+     */
+    String TAG_ABBR = "abbr";
+    
+    /**
+     * HTML &lt;acronym&gt; tag name.
+     */
+    String TAG_ACRONYM = "acronym";
+    
+    /**
+     * HTML &lt;address&gt; tag name.
+     */
+    String TAG_ADDRESS = "address";
+    
+    /**
+     * HTML &lt;blockquote&gt; tag name.
+     */
+    String TAG_BLOCKQUOTE = "blockquote";
 
+    /**
+     * HTML &lt;q&gt; tag name.
+     */
+    String TAG_Q = "q";
+    
+    /**
+     * HTML &lt;pre&gt; tag name.
+     */
+    String TAG_PRE = "pre";
+    
     /**
      * HTML &lt;u&gt; tag name.
      */
@@ -90,6 +165,11 @@ public interface HTMLConstants
      * HTML &lt;p&gt; tag name.
      */
     String TAG_P = "p";
+    
+    /**
+     * HTML &lt;div&gt; tag name.
+     */
+    String TAG_DIV = "div";
 
     /**
      * HTML &lt;span&gt; tag name.
@@ -182,9 +262,39 @@ public interface HTMLConstants
     String TAG_TH = "th";
 
     /**
+     * HTML name attribute name.
+     */
+    String ATTRIBUTE_NAME = "name";
+    
+    /**
+     * HTML src attribute name.
+     */
+    String ATTRIBUTE_SRC = "src";
+    
+    /**
+     * HTML alt attribute name.
+     */
+    String ATTRIBUTE_ALT = "alt";
+    
+    /**
+     * HTML href attribute name.
+     */
+    String ATTRIBUTE_HREF = "href";
+    
+    /**
      * HTML style attribute name.
      */
-    String ATTRIBUTE_STYLE = "style";
+    String ATTRIBUTE_STYLE = TAG_STYLE;
+    
+    /**
+     * HTML class attribute name.
+     */
+    String ATTRIBUTE_CLASS = "class";
+    
+    /**
+     * HTML align attribute name.
+     */
+    String ATTRIBUTE_ALIGN = "align";
     
     /**
      * HTML rowspan table attribute.

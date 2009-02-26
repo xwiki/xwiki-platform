@@ -28,27 +28,27 @@ import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
  * 
  * @version $Id$
  */
-public final class LinkGenerator
+public final class LinkHTMLGenerator
 {
     /**
      * The singleton instance of this class.
      */
-    private static LinkGenerator instance;
+    private static LinkHTMLGenerator instance;
 
     /**
      * Class constructor, private so that the class is a singleton.
      */
-    private LinkGenerator()
+    private LinkHTMLGenerator()
     {
     }
 
     /**
      * @return the instance of this class.
      */
-    public static synchronized LinkGenerator getInstance()
+    public static synchronized LinkHTMLGenerator getInstance()
     {
         if (instance == null) {
-            instance = new LinkGenerator();
+            instance = new LinkHTMLGenerator();
         }
         return instance;
     }

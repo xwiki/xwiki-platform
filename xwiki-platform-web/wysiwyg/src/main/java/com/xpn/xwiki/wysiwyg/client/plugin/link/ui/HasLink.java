@@ -20,6 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import com.google.gwt.user.client.ui.SourcesClickEvents;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 /**
  * Interface for widgets that return a link html block from user input and are clickable.
@@ -37,12 +39,9 @@ public interface HasLink extends SourcesClickEvents
 
     /**
      * Sets the label for which this {@link HasLink} will generate the link HTML.
-     * 
-     * @param labelHTML the label's HTML value
-     * @param labelText the label's text value
-     * @param readOnly specifies if the user will be allowed to edit the link's label or not.
+     * @param config the configuration of the link to be handled by this widget
      */
-    void setLabel(String labelHTML, String labelText, boolean readOnly);
+    void setLinkConfig(LinkConfig config);
 
     /**
      * Some setup need for the moment when the widget will be display.
@@ -55,4 +54,9 @@ public interface HasLink extends SourcesClickEvents
      * @return true if the user input for this widget is valid, false otherwise.
      */
     boolean validateUserInput();
+    
+    /**
+     * @return the type of link that this widget is handling.
+     */
+    LinkType getLinkType();    
 }

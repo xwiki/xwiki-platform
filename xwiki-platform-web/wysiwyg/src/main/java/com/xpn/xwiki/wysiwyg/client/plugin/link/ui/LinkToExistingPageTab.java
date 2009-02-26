@@ -31,7 +31,9 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkGenerator;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkHTMLGenerator;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 import com.xpn.xwiki.wysiwyg.client.widget.PageSelector;
 
 /**
@@ -134,7 +136,7 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
         pageSelector.setTitle(Strings.INSTANCE.linkPageSelectorTooltip());
         pageSelector.addKeyboardListener(new EnterListener(linkToPageButton));
         pagePanel.add(pageSelector);
-        populatePageSelector(selectedWiki, selectedSpace, currentPage);        
+        populatePageSelector(selectedWiki, selectedSpace, currentPage);
         pagePanel.add(linkToPageButton);
 
         return pagePanel;
@@ -217,8 +219,8 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
             }
 
             // Create the link
-            LinkGenerator.getInstance().getExistingPageLink(getLinkLabel(), wikiName, spaceName, pageName, null, null,
-                new AsyncCallback<String>()
+            LinkHTMLGenerator.getInstance().getExistingPageLink(getLinkLabel(), wikiName, spaceName, pageName, null,
+                null, new AsyncCallback<String>()
                 {
                     public void onFailure(Throwable caught)
                     {
@@ -288,5 +290,35 @@ public class LinkToExistingPageTab extends AbstractWikiPageLinkTab implements Ch
     protected String getLabelTextBoxTooltip()
     {
         return Strings.INSTANCE.linkExistingPageLabelTextBoxTooltip();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractWikiPageLinkTab#updateSpaceSelector(LinkConfig)
+     */
+    protected void updateSpaceSelector(final LinkConfig config)
+    {
+        populateSpaceSelector(config.getWiki(), config.getSpace(), new AsyncCallback<List<String>>()
+        {
+            public void onSuccess(List<String> result)
+            {
+                populatePageSelector(config.getWiki(), config.getSpace(), config.getPage());
+            }
+
+            public void onFailure(Throwable caught)
+            {
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractWikiPageLinkTab#getLinkType()
+     */
+    public LinkType getLinkType()
+    {
+        return LinkType.EXISTING_PAGE;
     }
 }

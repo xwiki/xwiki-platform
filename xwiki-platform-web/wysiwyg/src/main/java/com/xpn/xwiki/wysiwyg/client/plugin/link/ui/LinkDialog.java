@@ -28,6 +28,7 @@ import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 
 /**
@@ -84,10 +85,10 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
         tabs = new TabPanel();
         tabs.addTabListener(this);
 
-        addTab(linkToExistingPageTab, Strings.INSTANCE.linkExistingPageTab());        
+        addTab(linkToExistingPageTab, Strings.INSTANCE.linkExistingPageTab());
         addTab(linkToNewPageTab, Strings.INSTANCE.linkNewPageTab());
         addTab(linkToWebPageTab, Strings.INSTANCE.linkWebPageTab());
-        addTab(linkToEmailAddressTab, Strings.INSTANCE.linkEmailTab());        
+        addTab(linkToEmailAddressTab, Strings.INSTANCE.linkEmailTab());
 
         tabs.selectTab(0);
         selectedTabIndex = 0;
@@ -98,28 +99,8 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
 
         initWidget(tabs);
 
-        // set the initial label HTML to void string, as if no selection was made.
-        setLabel("", "", false);
-    }
-
-    /**
-     * Sets the label for the link created by this dialog. This label has an HTML form and a text form, the stripped
-     * version of the HTML version. If the text form is edited by the user, that label will be used, otherwise the HTML
-     * version, with formatting.
-     * 
-     * @param labelHTML the HTML of the label for the created link.
-     * @param labelText the text of the label for the created link (stripped of HTML tags)
-     * @param readOnly specifies if the link label will be exposed as readonly to the user
-     */
-    public void setLabel(String labelHTML, String labelText, boolean readOnly)
-    {
-        // pass the label to all the tabs in this dialog's tab panel
-        for (int i = 0; i < tabs.getWidgetCount(); i++) {
-            Widget tab = tabs.getWidget(i);
-            if (tab instanceof HasLink) {
-                ((HasLink) tab).setLabel(labelHTML, labelText, readOnly);
-            }
-        }
+        // set the initial configuration to a void config
+        setLinkConfig(new LinkConfig());
     }
 
     /**
@@ -202,5 +183,25 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
     {
         super.center();
         DeferredCommand.addCommand(new SelectCommand());
+    }
+
+    /**
+     * Sets the link that is edited by this dialog.
+     * 
+     * @param config the {@link LinkConfig} corresponding to the edited image.
+     */
+    public void setLinkConfig(LinkConfig config)
+    {
+        // pass the label to all the tabs in this dialog's tab panel
+        for (int i = 0; i < tabs.getWidgetCount(); i++) {
+            Widget tab = tabs.getWidget(i);
+            if (tab instanceof HasLink) {
+                ((HasLink) tab).setLinkConfig(config);
+                if (((HasLink) tab).getLinkType() == config.getType()) {
+                    // select this tab
+                    selectedTabIndex = i;
+                }
+            }
+        }
     }
 }

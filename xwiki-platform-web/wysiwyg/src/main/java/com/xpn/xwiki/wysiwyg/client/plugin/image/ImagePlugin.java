@@ -164,8 +164,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
             // store current selection, we'll need it after to add the image in the right place
             selectionPreserver.saveSelection();
             ImageConfig config = new ImageConfig();
-            String imageParam =
-                getTextArea().getCommandManager().getExecutable(Command.INSERT_IMAGE).getParameter(getTextArea());
+            String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
             if (imageParam != null) {
                 config.fromJSON(imageParam);
             } else {

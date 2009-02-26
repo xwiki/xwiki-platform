@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.SpaceSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.WikiSelector;
 
@@ -177,7 +178,7 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
      * @return the {@link SpaceSelector} with the space names in the selected wiki.
      */
     protected SpaceSelector getSpaceSelector()
-    { 
+    {
         return spaceSelector;
     }
 
@@ -195,5 +196,50 @@ public abstract class AbstractWikiPageLinkTab extends AbstractHasLinkTab
     protected String getLabelTextBoxTooltip()
     {
         return "";
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractWikiPageLinkTab#setLinkConfig(LinkConfig)
+     */
+    public void setLinkConfig(final LinkConfig config)
+    {
+        if (config.getType() == getLinkType()) {
+            super.setLinkConfig(config);
+            // set the wiki and the space of this tab according to the link config
+            if (config.getWiki() == null && config.getSpace() == null && config.getPage() == null) {
+                return;
+            }
+            if (config.getWiki() != null && isMultiWiki()) {
+                getWikiSelector().refreshList(config.getWiki(), new AsyncCallback<List<String>>()
+                {
+                    public void onSuccess(List<String> result)
+                    {
+                        updateSpaceSelector(config);
+                    }
+
+                    public void onFailure(Throwable caught)
+                    {
+                    }
+                });
+            } else {
+                updateSpaceSelector(config);
+            }
+        } else {
+            setLinkLabel(config);
+        }
+    }
+
+    /**
+     * Function to update the space selection mechanism. By default, it only populates the space selector, but it should
+     * be overwritten for subclasses to customize the space selector selection setting (e.g. when a link is edited and
+     * the link space needs to be selected).
+     * 
+     * @param config the link configuration for which to set the space selection.
+     */
+    protected void updateSpaceSelector(LinkConfig config)
+    {
+        populateSpaceSelector(config.getWiki(), config.getSpace(), null);
     }
 }

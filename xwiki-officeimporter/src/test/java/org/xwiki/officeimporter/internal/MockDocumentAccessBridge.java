@@ -20,6 +20,8 @@
 package org.xwiki.officeimporter.internal;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 
@@ -260,6 +262,26 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#setDocumentSyntaxId(String, String)
      */
     public void setDocumentSyntaxId(String documentName, String syntaxId) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDocument(String)
+     */
+    public DocumentModelBridge getDocument(String documentName) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getDocumentName(String)
+     */
+    public DocumentName getDocumentName(String documentName)
     {
         throw new RuntimeException("Not implemented");
     }

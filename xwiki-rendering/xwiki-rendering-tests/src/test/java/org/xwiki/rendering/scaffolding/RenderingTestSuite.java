@@ -31,6 +31,7 @@ import junit.framework.TestSuite;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.internal.parser.DefaultAttachmentParser;
 import org.xwiki.rendering.internal.parser.DefaultSyntaxFactory;
+import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
@@ -59,7 +60,12 @@ public class RenderingTestSuite extends TestSuite
         super(name);
         this.rendererFactory = new DefaultPrintRendererFactory();
         this.rendererFactory.setDocumentAccessBridge(new MockDocumentAccessBridge());
-        this.rendererFactory.setRenderingConfiguration(new DefaultRenderingConfiguration());
+        
+        DefaultLinkLabelGenerator linkLabelGenerator = new DefaultLinkLabelGenerator();
+        linkLabelGenerator.setDocumentAccessBridge(new MockDocumentAccessBridge());
+        linkLabelGenerator.setRenderingConfiguration(new DefaultRenderingConfiguration());
+        this.rendererFactory.setLinkLabelGenerator(linkLabelGenerator);
+        
         this.rendererFactory.setAttachmentParser(new DefaultAttachmentParser());
         this.syntaxFactory = new DefaultSyntaxFactory();
     }

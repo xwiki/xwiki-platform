@@ -20,10 +20,10 @@
 package org.xwiki.rendering.internal.renderer;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.EventsRenderer;
+import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.TexRenderer;
@@ -42,7 +42,7 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
 {
     private DocumentAccessBridge documentAccessBridge;
 
-    private RenderingConfiguration renderingConfiguration;
+    private LinkLabelGenerator linkLabelGenerator;
 
     private AttachmentParser attachmentParser;
 
@@ -58,7 +58,7 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
 
         if (targetSyntax.toIdString().equals("xhtml/1.0")) {
             result =
-                new XHTMLRenderer(printer, this.documentAccessBridge, this.renderingConfiguration,
+                new XHTMLRenderer(printer, this.documentAccessBridge, this.linkLabelGenerator,
                     this.attachmentParser);
         } else if (targetSyntax.toIdString().equals("xwiki/2.0")) {
             result = new XWikiSyntaxRenderer(printer);
@@ -78,9 +78,9 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
         this.documentAccessBridge = bridge;
     }
 
-    public void setRenderingConfiguration(RenderingConfiguration renderingConfiguration)
+    public void setLinkLabelGenerator(LinkLabelGenerator linkLabelGenerator)
     {
-        this.renderingConfiguration = renderingConfiguration;
+        this.linkLabelGenerator = linkLabelGenerator;
     }
 
     /**

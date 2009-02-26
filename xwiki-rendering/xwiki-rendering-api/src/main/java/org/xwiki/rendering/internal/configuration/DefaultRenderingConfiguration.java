@@ -64,7 +64,7 @@ public class DefaultRenderingConfiguration implements Initializable, RenderingCo
         return this.linkLabelFormat;
     }
 
-    public void setLinkLaelFormat(String linkLabelFormat)
+    public void setLinkLabelFormat(String linkLabelFormat)
     {
         this.linkLabelFormat = linkLabelFormat;
     }

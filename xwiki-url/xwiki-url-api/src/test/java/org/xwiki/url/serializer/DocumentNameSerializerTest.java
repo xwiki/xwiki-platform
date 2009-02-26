@@ -21,6 +21,8 @@
 package org.xwiki.url.serializer;
 
 import junit.framework.TestCase;
+
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.url.XWikiURL;
 
 /**
@@ -36,11 +38,10 @@ public class DocumentNameSerializerTest extends TestCase
         DocumentNameSerializer serializer = new DocumentNameSerializer();
         XWikiURL url = new XWikiURL();
 
-        url.setPage("WebHome");
-        url.setSpace("Main");
+        url.setDocumentName(new DocumentName(null, "Main", "WebHome"));
         assertEquals("Main.WebHome", serializer.serialize(url));
 
-        url.setWiki("mywiki");
+        url.setDocumentName(new DocumentName("mywiki", "Main", "WebHome"));
         assertEquals("mywiki:Main.WebHome", serializer.serialize(url));
 
         url.addParameter("language", "fr");

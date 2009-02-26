@@ -20,6 +20,7 @@
  */
 package org.xwiki.url;
 
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
@@ -59,7 +60,6 @@ public class RegexXWikiURLFactory implements XWikiURLFactory, Initializable
 
             // Find the wiki part in the URL
             String wiki = matcher.group(Integer.parseInt((String) this.regexMappings.get("wiki")));
-            url.setWiki(wiki);
             
             // Find the action part in the URL
             String action = matcher.group(Integer.parseInt((String) this.regexMappings.get("action")));
@@ -67,12 +67,12 @@ public class RegexXWikiURLFactory implements XWikiURLFactory, Initializable
 
             // Find the space part in the URL
             String space = matcher.group(Integer.parseInt((String) this.regexMappings.get("space")));
-            url.setSpace(space);
 
             // Find the document part in the URL
             String page = matcher.group(Integer.parseInt((String) this.regexMappings.get("page")));
-            url.setPage(page);
 
+            url.setDocumentName(new DocumentName(wiki, space, page));
+            
             // Find the query string if any and transform it into a parameter Map for easy access
             String queryString = matcher.group(Integer.parseInt((String) this.regexMappings.get("queryString")));
             if (queryString != null) {

@@ -570,6 +570,26 @@ public class XWikiDocument implements DocumentModelBridge
         return StringUtils.isEmpty(getDatabase()) ? DEFAULT_WIKI_NAME : getDatabase();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentModelBridge#getSpaceName()
+     */
+    public String getSpaceName()
+    {
+        return this.getSpace();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentModelBridge#getSpaceName()
+     */
+    public String getPageName()
+    {
+        return this.getName();
+    }
+    
     public String getTitle()
     {
         return (this.title != null) ? this.title : "";

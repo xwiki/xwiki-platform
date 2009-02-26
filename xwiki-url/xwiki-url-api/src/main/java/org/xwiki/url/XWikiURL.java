@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 
+import org.xwiki.bridge.DocumentName;
+
 /**
  * Represents a XWiki URL.
  *
@@ -31,18 +33,9 @@ import java.util.Collections;
  */
 public class XWikiURL
 {
-    // TODO: Refactor this when we have the new model which will have a DocumentName or DocumentIdentity class.
     private String action;
 
-    private String space;
-
-    private String page;
-
-    /**
-     * Short name of a wiki. For example a URL of http://enterprise.xwiki.org would lead to a wiki name of
-     * "enterprise.
-     */
-    private String wiki;
+    private DocumentName documentName;
 
     private Map<String, String> parameters = new HashMap<String, String>();
 
@@ -56,24 +49,14 @@ public class XWikiURL
         this.action = action;
     }
 
-    public String getSpace()
+    public DocumentName getDocumentName()
     {
-        return this.space;
+        return this.documentName;
     }
 
-    public void setSpace(String space)
+    public void setDocumentName(DocumentName documentName)
     {
-        this.space = space;
-    }
-
-    public String getPage()
-    {
-        return this.page;
-    }
-
-    public void setPage(String page)
-    {
-        this.page = page;
+        this.documentName = documentName;
     }
 
     public void addParameter(String name, String value)
@@ -89,15 +72,5 @@ public class XWikiURL
     public String getParameterValue(String name)
     {
         return this.parameters.get(name);
-    }
-
-    public void setWiki(String wiki)
-    {
-        this.wiki = wiki;
-    }
-
-    public String getWiki()
-    {
-        return this.wiki;
     }
 }

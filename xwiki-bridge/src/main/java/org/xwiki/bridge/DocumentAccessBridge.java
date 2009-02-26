@@ -34,6 +34,23 @@ public interface DocumentAccessBridge
     String ROLE = DocumentAccessBridge.class.getName();
 
     /**
+     * Get the document object associated with the passed document name.
+     * 
+     * @param documentName the name of the document to find
+     * @return the document object matching the passed document name
+     * @throws Exception when the storage cannot be accessed
+     */
+    DocumentModelBridge getDocument(String documentName) throws Exception;
+
+    /**
+     * Get the different parts of a document name (wiki, space, page).
+     * 
+     * @param documentName the name of the document for which to return name information
+     * @return the document name object containing the information
+     */
+    DocumentName getDocumentName(String documentName);
+    
+    /**
      * Check if a document exists or not in the wiki.
      * 
      * @param documentName The name of the document to check.
@@ -49,7 +66,7 @@ public interface DocumentAccessBridge
      * @param content Content to be set.
      * @param editComment Comment describing this particular change.
      * @param isMinorEdit Flag indicating if this change is a minor one.
-     * @throws Exception If the storage cannot be accessed.
+     * @throws Exception if the storage cannot be accessed.
      */
     void setDocumentContent(String documentName, String content, String editComment,
         boolean isMinorEdit) throws Exception;

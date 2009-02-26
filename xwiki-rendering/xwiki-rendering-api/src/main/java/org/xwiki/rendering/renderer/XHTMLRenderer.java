@@ -20,7 +20,6 @@
 package org.xwiki.rendering.renderer;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
@@ -40,16 +39,17 @@ public class XHTMLRenderer extends AbstractChainingPrintRenderer
     /**
      * @param printer the object to which to write the XHTML output to
      * @param documentAccessBridge see {@link #documentAccessBridge}
-     * @param configuration the rendering configuration
+     * @param linkLabelGenerator the component in charge of generating link labels when the user doesn't specify 
+     *        a label for links
      * @param attachmentParser the parser to be used to parse attachment locations specified as strings
      */
     public XHTMLRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
-        RenderingConfiguration configuration, AttachmentParser attachmentParser)
+        LinkLabelGenerator linkLabelGenerator, AttachmentParser attachmentParser)
     {
         super(printer, new ListenerChain());
 
         new DocumentStateChainingListener(getListenerChain());
         new BlockStateChainingListener(getListenerChain());
-        new XHTMLChainingRenderer(printer, documentAccessBridge, configuration, attachmentParser, getListenerChain());
+        new XHTMLChainingRenderer(printer, documentAccessBridge, linkLabelGenerator, attachmentParser, getListenerChain());
     }
 }

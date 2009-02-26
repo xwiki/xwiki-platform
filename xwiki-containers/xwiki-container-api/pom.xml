@@ -33,5 +33,17 @@
   <name>XWiki Platform - Core - Containers - API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Containers - API</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-url</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+  </dependencies>
 </project>
        

@@ -253,17 +253,11 @@ public class ImageConfig implements IsSerializable
      */
     public String toJSON()
     {
-        String commaString = "', ";
         String jsonString =
-            "{ " + (getWiki() != null ? "wiki: '" + getWiki() + commaString : "")
-                + (getSpace() != null ? "space: '" + getSpace() + commaString : "")
-                + (getPage() != null ? "page: '" + getPage() + commaString : "")
-                + (getImageFileName() != null ? "filename: '" + getImageFileName() + commaString : "")
-                + (getImageURL() != null ? "url: '" + getImageURL() + commaString : "")
-                + (getWidth() != null ? "width: '" + getWidth() + commaString : "")
-                + (getHeight() != null ? "height: '" + getHeight() + commaString : "")
-                + (getAltText() != null ? "alttext: '" + getAltText() + commaString : "")
-                + (getAlignment() != null ? "alignment: '" + getAlignment() + commaString : "");
+            "{ " + formatValue("wiki", getWiki()) + formatValue("space", getSpace()) + formatValue("page", getPage())
+                + formatValue("filename", getImageFileName()) + formatValue("url", getImageURL())
+                + formatValue("width", getWidth()) + formatValue("height", getHeight())
+                + formatValue("alttext", getAltText()) + formatValue("alignment", getAlignment());
         // Remove last comma
         if (jsonString.length() > 4) {
             jsonString = jsonString.substring(0, jsonString.length() - 2);
@@ -271,6 +265,19 @@ public class ImageConfig implements IsSerializable
         // close it and return it
         jsonString = jsonString + " }";
         return jsonString;
+    }
+
+    /**
+     * Formats the passed value as a key: value JSON pair, if the key is not null. If it is, the void string is
+     * returned.
+     * 
+     * @param key the key of the formatted pair
+     * @param value the value of the formatted pair
+     * @return the formatted key: value JSON pair
+     */
+    private String formatValue(String key, Object value)
+    {
+        return value != null ? key + ": '" + value + "', " : "";
     }
 
     /**

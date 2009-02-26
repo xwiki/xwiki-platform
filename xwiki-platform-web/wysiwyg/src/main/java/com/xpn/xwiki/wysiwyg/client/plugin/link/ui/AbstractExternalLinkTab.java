@@ -9,7 +9,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkGenerator;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkHTMLGenerator;
 
 /**
  * Superclass for the tabs to create links to external resources. Subclasses should implement the labels and default
@@ -125,7 +126,7 @@ public abstract class AbstractExternalLinkTab extends AbstractHasLinkTab impleme
             if (!validateUserInput()) {
                 setLink(null);
             } else {
-                setLink(LinkGenerator.getInstance().getExternalLink(getLinkLabel(), buildUri()));
+                setLink(LinkHTMLGenerator.getInstance().getExternalLink(getLinkLabel(), buildUri()));
                 getClickListeners().fireClick(this);
             }
         }
@@ -138,7 +139,9 @@ public abstract class AbstractExternalLinkTab extends AbstractHasLinkTab impleme
      */
     public void initialize()
     {
-        uriTextBox.setText(getInputDefaultText());
+        if (uriTextBox.getText().trim().length() == 0) {
+            uriTextBox.setText(getInputDefaultText());
+        }
         if (getLabelTextBox().getText().trim().length() == 0) {
             getLabelTextBox().setFocus(true);
         } else {
@@ -202,5 +205,24 @@ public abstract class AbstractExternalLinkTab extends AbstractHasLinkTab impleme
     protected Button getCreateLinkButton()
     {
         return createLinkButton;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractHasLinkTab#setLinkConfig(LinkConfig)
+     */
+    public void setLinkConfig(LinkConfig config)
+    {
+        if (config.getType() == getLinkType()) {
+            // set super's config
+            super.setLinkConfig(config);
+            // now get the link's url and set it in this tab's text
+            if (config.getUrl() != null) {
+                uriTextBox.setText(config.getUrl());
+            }
+        } else {
+            setLinkLabel(config);
+        }
     }
 }

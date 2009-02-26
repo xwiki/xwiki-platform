@@ -23,11 +23,16 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
+import com.xpn.xwiki.wysiwyg.client.dom.Element;
+import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.CreateLinkExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.LinkExecutableUtils;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.UnlinkExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkDialog;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
@@ -68,7 +73,7 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
      * The toolbar extension used to add the link buttons to the toolbar.
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
-    
+
     /**
      * The link metadata extractor, to handle the link metadata.
      */
@@ -83,6 +88,9 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
     {
         super.init(wysiwyg, textArea, config);
 
+        // add the custom executables
+        getTextArea().getCommandManager().registerCommand(Command.CREATE_LINK, new CreateLinkExecutable());
+        getTextArea().getCommandManager().registerCommand(Command.UNLINK, new UnlinkExecutable());
         if (getTextArea().getCommandManager().isSupported(Command.CREATE_LINK)) {
             link = new PushButton(Images.INSTANCE.link().createImage(), this);
             link.setTitle(Strings.INSTANCE.link());
@@ -168,23 +176,19 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
     public void onLink(boolean show)
     {
         if (show) {
-            // save the selection
-            selectionPreserver.saveSelection();
             // setup the dialog data
             // use only the first range in the user selection
-            // Check the special case when the selection is an image and add a link on an image
-            String imageParam =
-                (getTextArea().getCommandManager().getExecutable(Command.INSERT_IMAGE)).getParameter(getTextArea());
-            if (imageParam != null) {
-                // it's an image selection, set the label readonly and put the image filename in the label text
-                ImageConfig imgConfig = new ImageConfig();
-                imgConfig.fromJSON(imageParam);
-                getLinkDialog().setLabel(getTextArea().getDocument().getSelection().getRangeAt(0).toHTML(),
-                    imgConfig.getImageFileName(), true);
+            // check if it's a create link or an edit link
+            LinkConfig linkParams = null;
+            if (getTextArea().getCommandManager().isExecuted(Command.CREATE_LINK)) {
+                linkParams = getEditLinkParams();
             } else {
-                getLinkDialog().setLabel(getTextArea().getDocument().getSelection().getRangeAt(0).toHTML(),
-                    getTextArea().getDocument().getSelection().getRangeAt(0).toString(), false);
+                linkParams = getCreateLinkParams();
             }
+
+            getLinkDialog().setLinkConfig(linkParams);
+            // save the selection
+            selectionPreserver.saveSelection();
             // show the dialog
             getLinkDialog().center();
         } else {
@@ -199,6 +203,73 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
                 getTextArea().setFocus(true);
             }
         }
+    }
+
+    /**
+     * Prepares the link parameters for a link edition, from the current selection. It gathers link parameters from the
+     * currently executed link and sets them in the configuration object.
+     * 
+     * @return the link parameters for link editing
+     */
+    protected LinkConfig getEditLinkParams()
+    {
+        String configString = getTextArea().getCommandManager().getStringValue(Command.CREATE_LINK);
+        LinkConfig linkParam = null;
+        if (configString != null) {
+            linkParam = new LinkConfig();
+            linkParam.fromJSON(configString);
+        }
+        // it's a link edit
+        Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
+        Element wrappingAnchor = LinkExecutableUtils.getSelectedAnchor(getTextArea());
+        // check the content of the wrapping anchor, if it's an image, it should be handled specially
+        if (wrappingAnchor.getChildNodes().getLength() == 1
+            && wrappingAnchor.getChildNodes().getItem(0).getNodeName().equalsIgnoreCase("img")) {
+            Range imageRange = getTextArea().getDocument().createRange();
+            imageRange.selectNode(wrappingAnchor.getChildNodes().getItem(0));
+            getTextArea().getDocument().getSelection().removeAllRanges();
+            getTextArea().getDocument().getSelection().addRange(imageRange);
+            String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
+            if (imageParam != null) {
+                // it's an image selection, set the label readonly and put the image filename in the label text
+                ImageConfig imgConfig = new ImageConfig();
+                imgConfig.fromJSON(imageParam);
+                linkParam.setLabelText(imgConfig.getImageFileName());
+                linkParam.setReadOnlyLabel(true);
+            } else {
+                linkParam.setLabelText(wrappingAnchor.getInnerText());
+            }
+        }
+        // move the selection around the link, to replace it properly upon edit
+        range.selectNode(wrappingAnchor);
+        getTextArea().getDocument().getSelection().removeAllRanges();
+        getTextArea().getDocument().getSelection().addRange(range);
+
+        return linkParam;
+    }
+
+    /**
+     * Prepares the link parameters for a link creation, i.e. sets the link labels.
+     * 
+     * @return the link parameters for link creation
+     */
+    protected LinkConfig getCreateLinkParams()
+    {
+        LinkConfig config = new LinkConfig();
+        config.setLabel(getTextArea().getDocument().getSelection().getRangeAt(0).toHTML());
+        // Check the special case when the selection is an image and add a link on an image
+        String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
+        if (imageParam != null) {
+            // it's an image selection, set the label readonly and put the image filename in the label text
+            ImageConfig imgConfig = new ImageConfig();
+            imgConfig.fromJSON(imageParam);
+            config.setLabelText(imgConfig.getImageFileName());
+            config.setReadOnlyLabel(true);
+        } else {
+            config.setLabelText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+            config.setReadOnlyLabel(false);
+        }
+        return config;
     }
 
     /**

@@ -21,6 +21,7 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 /**
  * Tab to add to the link dialog to get user data and produce a link to an external web page.
@@ -103,5 +104,15 @@ public class LinkToWebPageTab extends AbstractExternalLinkTab
     protected String getURILabel()
     {
         return Strings.INSTANCE.linkWebPageLabel();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#getLinkType()
+     */
+    public LinkType getLinkType()
+    {
+        return LinkType.EXTERNAL;
     }
 }

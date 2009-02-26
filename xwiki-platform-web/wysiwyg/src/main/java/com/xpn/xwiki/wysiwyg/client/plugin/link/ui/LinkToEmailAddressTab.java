@@ -20,6 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 /**
  * Tab to add to the link dialog to get user data and produce an URL to an email address.
@@ -47,6 +49,7 @@ public class LinkToEmailAddressTab extends AbstractExternalLinkTab
         }
         return emailAddress;
     }
+
     /**
      * {@inheritDoc}
      * 
@@ -105,5 +108,36 @@ public class LinkToEmailAddressTab extends AbstractExternalLinkTab
     protected String getURILabel()
     {
         return Strings.INSTANCE.linkEmailLabel();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#setLinkConfig(LinkConfig)
+     */
+    public void setLinkConfig(LinkConfig config)
+    {
+        if (config.getType() == getLinkType()) {
+            super.setLinkConfig(config);
+            // strip protocol out of the external url
+            if (config.getUrl() != null) {
+                String url = config.getUrl();
+                if (url.startsWith(MAILTO)) {
+                    getUriTextBox().setText(url.substring(MAILTO.length()));
+                }
+            }
+        } else {
+            setLinkLabel(config);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractExternalLinkTab#getLinkType()
+     */
+    public LinkType getLinkType()
+    {
+        return LinkType.EMAIL;
     }
 }

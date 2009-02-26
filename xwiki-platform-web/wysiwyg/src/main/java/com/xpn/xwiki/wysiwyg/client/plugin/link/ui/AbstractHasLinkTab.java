@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.ClickListenerCollection;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.TextBox;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 
 /**
  * Abstract class to use as the superclass for the link generating tabs. Implements basic functionality for the link
@@ -133,13 +134,24 @@ public abstract class AbstractHasLinkTab extends Composite implements HasLink
     /**
      * {@inheritDoc}
      * 
-     * @see HasLink#setLabel(String, String, boolean)
+     * @see HasLink#setLinkConfig(LinkConfig)
      */
-    public void setLabel(String labelHTML, String labelText, boolean readOnly)
+    public void setLinkConfig(LinkConfig config)
     {
-        setLabelHTML(labelHTML);
-        setLabelText(labelText);
-        this.labelTextBox.setReadOnly(readOnly);
+        // at this level, only set the link labels
+        setLinkLabel(config);
+    }
+
+    /**
+     * Sets the labels (text and HTML) of the edited link from the passed link configuration object.
+     * 
+     * @param config the link configuration from which to extract the link data
+     */
+    protected void setLinkLabel(LinkConfig config)
+    {
+        setLabelHTML(config.getLabel() != null ? config.getLabel() : "");
+        setLabelText(config.getLabelText() != null ? config.getLabelText() : "");
+        labelTextBox.setReadOnly(config.isReadOnlyLabel());
     }
 
     /**

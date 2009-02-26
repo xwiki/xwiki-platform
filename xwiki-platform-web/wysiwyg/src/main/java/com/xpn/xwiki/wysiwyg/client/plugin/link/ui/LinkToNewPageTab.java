@@ -34,7 +34,9 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkGenerator;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkHTMLGenerator;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 /**
  * Tab to get the information from the user to create a link towards a new wiki page.
@@ -232,7 +234,7 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
                     pageName = "";
                 }
                 String wikiName = isMultiWiki() ? getWikiSelector().getSelectedWiki() : null;
-                LinkGenerator.getInstance().getNewPageLink(getLinkLabel(), wikiName, spaceName, pageName,
+                LinkHTMLGenerator.getInstance().getNewPageLink(getLinkLabel(), wikiName, spaceName, pageName,
                     new AsyncCallback<String>()
                     {
                         public void onFailure(Throwable caught)
@@ -278,8 +280,13 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
      */
     public void initialize()
     {
-        newPageNameTextBox.setText(Strings.INSTANCE.linkNewPageTextBox());
-        newSpaceNameTextBox.setText(Strings.INSTANCE.linkNewSpaceTextBox());
+        if (newPageNameTextBox.getText().trim().length() == 0) {
+            newPageNameTextBox.setText(Strings.INSTANCE.linkNewPageTextBox());
+        }
+        if (newSpaceNameTextBox.getText().trim().length() == 0) {
+            newSpaceNameTextBox.setText(Strings.INSTANCE.linkNewSpaceTextBox());
+            newSpacePanel.setVisible(false);
+        }
         super.initialize();
     }
 
@@ -341,5 +348,43 @@ public class LinkToNewPageTab extends AbstractWikiPageLinkTab implements ChangeL
     protected String getLabelTextBoxTooltip()
     {
         return Strings.INSTANCE.linkNewPageLabelTextBoxTooltip();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractWikiPageLinkTab#updateSpaceSelector(LinkConfig)
+     */
+    protected void updateSpaceSelector(final LinkConfig config)
+    {
+        populateSpaceSelector(config.getWiki(), config.getSpace(), new AsyncCallback<List<String>>()
+        {
+            public void onSuccess(List<String> result)
+            {
+                // if the space isn't the requested space, it means the new space panel must be activated
+                if (!getSpaceSelector().getSelectedSpace().equals(config.getSpace())) {
+                    getSpaceSelector().setSelectedIndex(0);
+                    newSpacePanel.setVisible(true);
+                    newSpaceNameTextBox.setText(config.getSpace());
+                } else {
+                    newSpacePanel.setVisible(false);
+                }
+            }
+
+            public void onFailure(Throwable caught)
+            {
+            }
+        });
+        newPageNameTextBox.setText(config.getPage());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractHasLinkTab#getLinkType()
+     */
+    public LinkType getLinkType()
+    {
+        return LinkType.NEW_PAGE;
     }
 }

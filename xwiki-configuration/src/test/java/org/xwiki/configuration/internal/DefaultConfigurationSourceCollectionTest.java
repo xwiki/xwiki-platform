@@ -19,14 +19,7 @@
  */
 package org.xwiki.configuration.internal;
 
-import org.xwiki.container.Container;
-import org.xwiki.container.ApplicationContext;
 import org.xwiki.configuration.ConfigurationSourceCollection;
-import org.jmock.Mock;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.net.MalformedURLException;
 
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
@@ -43,13 +36,6 @@ public class DefaultConfigurationSourceCollectionTest extends AbstractXWikiCompo
      */
     public void testInitialization() throws Exception
     {
-        Container container = (Container) getComponentManager().lookup(Container.ROLE);
-
-        Mock mockApplicationContext = mock(ApplicationContext.class);
-        mockApplicationContext.expects(once()).method("getResource").with(contains("xwiki.properties")).will(
-            returnValue(this.getClass().getClassLoader().getResource("xwiki.properties")));
-        container.setApplicationContext((ApplicationContext) mockApplicationContext.proxy());
-
         // Verify that initialization works here.
         ConfigurationSourceCollection sources =
             (ConfigurationSourceCollection) getComponentManager().lookup(ConfigurationSourceCollection.ROLE);

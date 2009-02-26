@@ -1,0 +1,11 @@
+.#----------------------------------------------------------------------------------------------
+.input|xhtml/1.0
+.# Verify that the XHTML parser can understand anchors without the special anchor comment format
+.# that the XHTML Renderer uses. Note that for now the HREF value is considered containing
+.# XWiki link syntax.
+.#----------------------------------------------------------------------------------------------
+<p><a href="reference">label</a></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+[[label>>reference]]

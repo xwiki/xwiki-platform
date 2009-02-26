@@ -48,14 +48,14 @@ public class ImageFilter extends AbstractHTMLFilter
     public void filter(Document htmlDocument, Map<String, String> cleaningParams)
     {
         String targetDocument = cleaningParams.get("targetDocument");
-        List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), new String[] {"img"});
+        List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), new String[] {TAG_IMG});
         for (Element image : images) {
-            String src = image.getAttribute("src");
+            String src = image.getAttribute(ATTRIBUTE_SRC);
             // TODO : We might have to verify that src is a file name. (a.k.a not a
             // url). There might be cases where documents have embedded urls (images).
             if (!src.equals("") && null != targetDocument && null != docBridge) {
                 try {
-                    image.setAttribute("src", docBridge.getAttachmentURL(targetDocument, src));
+                    image.setAttribute(ATTRIBUTE_SRC, docBridge.getAttachmentURL(targetDocument, src));
                 } catch (Exception ex) {
                     // Do nothing.
                 }
@@ -63,11 +63,11 @@ public class ImageFilter extends AbstractHTMLFilter
                 // center aligning images (it aligns them to left). Next, OO server uses <br clear"xxx"> for
                 // avoiding content wrapping around images which is not valid xhtml. There for, to be consistent and
                 // simple we will remove the 'align' attribute of all the images so that they are all left aligned.
-                image.removeAttribute("align");
+                image.removeAttribute(ATTRIBUTE_ALIGN);
             } else if (src.startsWith("file://")) {
                 src = "Missing.png";
-                image.setAttribute("src", src);
-                image.setAttribute("alt", src);
+                image.setAttribute(ATTRIBUTE_SRC, src);
+                image.setAttribute(ATTRIBUTE_ALT, src);
             }
             Comment beforeComment = htmlDocument.createComment("startimage:" + src);
             Comment afterComment = htmlDocument.createComment("stopimage");

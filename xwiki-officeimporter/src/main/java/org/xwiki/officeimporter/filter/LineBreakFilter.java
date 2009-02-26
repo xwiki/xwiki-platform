@@ -19,15 +19,15 @@
  */
 package org.xwiki.officeimporter.filter;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
+import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * Replaces {@code<br/>} elements placed in between block elements with {@code<div class="wikikmodel-emptyline"/>}.
@@ -41,34 +41,40 @@ public class LineBreakFilter extends AbstractHTMLFilter
      * List of block element tag names.
      */
     private static final String[] BLOCK_ELEMENT_TAGS =
-        new String[] {"p", "ul", "ol", "hr", "h1", "h2", "h3", "h4", "h5", "h6", "table"};
-
+        new String[] {TAG_P, TAG_UL, TAG_OL, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6, TAG_TABLE};
+    
+    /**
+     * Sort the block elements tag name array.
+     */
+    static {
+        Arrays.sort(BLOCK_ELEMENT_TAGS);
+    }
+    
     /**
      * {@inheritDoc}
      */
     public void filter(Document document, Map<String, String> cleaningParams)
     {
-        NodeList lineBreaks = document.getElementsByTagName("br");
-        List<Node> lineBreaksToReplace = new ArrayList<Node>();
-        for (int i = 0; i < lineBreaks.getLength(); i++) {
-            Node lineBreak = lineBreaks.item(i);
-            Node prev = lineBreak.getPreviousSibling();
-            while (prev != null && (isLineBreak(prev) || isEmptyTextNode(prev) || isCommentNode(prev))) {
-                prev = prev.getPreviousSibling();
-            }
-            Node next = lineBreak.getNextSibling();
-            while (next != null && (isLineBreak(next) || isEmptyTextNode(next) || isCommentNode(next))) {
-                next = next.getNextSibling();
-            }
-            boolean shouldReplace = !(null == prev && null == next) && (isBlockElement(prev) || isBlockElement(next));
-            if (shouldReplace) {
-                lineBreaksToReplace.add(lineBreak);
-            }
-        }
-        for (Node lineBreak : lineBreaksToReplace) {
+        List<Element> lineBreaksToReplace =
+            filterDescendants(document.getDocumentElement(), new String[] {TAG_BR}, new ElementSelector()
+            {
+                public boolean isSelected(Element element)
+                {
+                    Node prev = element.getPreviousSibling();
+                    while (prev != null && (isLineBreak(prev) || isEmptyTextNode(prev) || isCommentNode(prev))) {
+                        prev = prev.getPreviousSibling();
+                    }
+                    Node next = element.getNextSibling();
+                    while (next != null && (isLineBreak(next) || isEmptyTextNode(next) || isCommentNode(next))) {
+                        next = next.getNextSibling();
+                    }
+                    return !(null == prev && null == next) && (isBlockElement(prev) || isBlockElement(next));
+                }
+            });
+        for (Element lineBreak : lineBreaksToReplace) {
             Node parent = lineBreak.getParentNode();
-            Element element = document.createElement("div");
-            element.setAttribute("class", "wikimodel-emptyline");
+            Element element = document.createElement(TAG_DIV);
+            element.setAttribute(ATTRIBUTE_CLASS, "wikimodel-emptyline");
             parent.insertBefore(element, lineBreak);
             parent.removeChild(lineBreak);
         }
@@ -82,13 +88,7 @@ public class LineBreakFilter extends AbstractHTMLFilter
      */
     public boolean isBlockElement(Node node)
     {
-        boolean isBlockElement = false;
-        if (null != node) {
-            for (String blockElementTag : BLOCK_ELEMENT_TAGS) {
-                isBlockElement = node.getNodeName().equals(blockElementTag) ? true : isBlockElement;
-            }
-        }
-        return isBlockElement;
+        return null != node && (Arrays.binarySearch(BLOCK_ELEMENT_TAGS, node.getNodeName()) > 0);        
     }
 
     /**
@@ -121,6 +121,6 @@ public class LineBreakFilter extends AbstractHTMLFilter
      */
     private boolean isLineBreak(Node node)
     {
-        return null != node && node.getNodeName().equals("br");
+        return null != node && node.getNodeName().equals(TAG_BR);
     }
 }

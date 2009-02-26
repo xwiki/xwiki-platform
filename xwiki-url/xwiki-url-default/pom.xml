@@ -30,11 +30,16 @@
     <version>1.8-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-url-implementation</artifactId>
-  <name>XWiki Platform - Core - URL - Implementation</name>
+  <artifactId>xwiki-core-url-default</artifactId>
+  <name>XWiki Platform - Core - URL - Default Implementation</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - URL - Implementation</description>
+  <description>XWiki Platform - Core - URL - Default Implementation</description>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-url-api</artifactId>

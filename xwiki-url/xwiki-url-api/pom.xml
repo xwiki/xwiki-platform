@@ -34,11 +34,4 @@
   <name>XWiki Platform - Core - URL - API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - URL - API</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-  </dependencies>
 </project>

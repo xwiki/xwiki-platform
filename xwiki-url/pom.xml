@@ -36,7 +36,7 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <modules>
     <module>xwiki-url-api</module>
-    <module>xwiki-url-implementation</module>
+    <module>xwiki-url-default</module>
   </modules>
 </project>
        

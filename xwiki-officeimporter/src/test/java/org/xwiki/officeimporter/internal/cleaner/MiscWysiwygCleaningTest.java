@@ -29,46 +29,34 @@ import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.HTMLCleaner;
 
 /**
- * Test case for wysiwyg html cleaner.
+ * Miscellaneous cleaning tests for {@link WysiwygHTMLCleaner}.
  * 
  * @version $Id$
- * @since 1.8M2
+ * @since 1.8
  */
-public class WysiwygHTMLCleanerTest extends AbstractHTMLCleanerTest
+public class MiscWysiwygCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
-     * Open office html cleaner.
+     * Test cleaning of html paragraphs brearing namespaces.
      */
-    private HTMLCleaner cleaner;
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "wysiwyg");
-    }
-
-    /**
-     * Test cleaning of html content with namespaces.
-     */
-    public void testNamespacesAwareFiltering()
+    public void testParagraphsWithNamespaces()
     {
         String html = header + "<w:p>paragraph</w:p>" + footer;
         Document doc =
-            cleaner.clean(new StringReader(html), Collections.singletonMap(HTMLCleaner.NAMESPACES_AWARE, "false"));
+            wysiwygHTMLCleaner.clean(new StringReader(html), Collections.singletonMap(HTMLCleaner.NAMESPACES_AWARE,
+                "false"));
         NodeList nodes = doc.getElementsByTagName("p");
         assertEquals(1, nodes.getLength());
     }
 
     /**
-     * Test filtering of images in html content.
+     * The source of the images in copy pasted html content should be replaces with 'Missing.png' since they can't be
+     * uploaded automatically.
      */
     public void testImageFiltering()
     {
         String html = header + "<img src=\"file://path/to/local/image.png\"/>" + footer;
-        Document doc = cleaner.clean(new StringReader(html));
+        Document doc = wysiwygHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("img");
         assertEquals(1, nodes.getLength());
         Element image = (Element) nodes.item(0);

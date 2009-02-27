@@ -20,6 +20,7 @@
 package org.xwiki.officeimporter.internal.cleaner;
 
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
+import org.xwiki.xml.html.HTMLCleaner;
 
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
@@ -29,7 +30,7 @@ import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.8M2
  */
-public class AbstractHTMLCleanerTest extends AbstractXWikiComponentTestCase
+public class AbstractHTMLCleaningTest extends AbstractXWikiComponentTestCase
 {
     /**
      * Beginning of the test html document.
@@ -37,22 +38,28 @@ public class AbstractHTMLCleanerTest extends AbstractXWikiComponentTestCase
     protected String header = "<html><head><title>Title</title></head><body>";
 
     /**
-     * Beginning of the test html document, which has a {@code <style> tag.}
-     */
-    protected String headerWithStyles =
-        "<html><head><style type=\"text/css\">h1 {color:red} p {color:blue} </style><title>Title</title></head><body>";
-
-    /**
      * Ending of the test html document..
      */
     protected String footer = "</body></html>";
 
+    /**
+     * {@link OpenOfficeHTMLCleaner} used for tests.
+     */
+    protected HTMLCleaner openOfficeHTMLCleaner;
+    
+    /**
+     * {@link WysiwygHTMLCleaner} used for tests.
+     */
+    protected HTMLCleaner wysiwygHTMLCleaner;
+    
     /**
      * {@inheritDoc}
      */
     protected void setUp() throws Exception
     {
         getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
+        openOfficeHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "openoffice");
+        wysiwygHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "wysiwyg");
         super.setUp();
     }
 }

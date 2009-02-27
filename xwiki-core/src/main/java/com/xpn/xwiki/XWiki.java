@@ -1938,7 +1938,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         } catch (Exception e) {
         }
-        return "Copyright 2004" + Calendar.getInstance().get(java.util.Calendar.YEAR) + " XWiki";
+        return "Copyright 2004-" + Calendar.getInstance().get(java.util.Calendar.YEAR) + " XWiki";
     }
 
     public String getXWikiPreference(String prefname, XWikiContext context)

@@ -295,4 +295,28 @@ public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCa
         assertTrue(result.indexOf("<em>") == -1);
         assertTrue(result.indexOf("wikiexternallink") != -1);
     }
+
+    /**
+     * Tests that the java syntax highlighting for the old {code} macro behaves properly when there's an unclosed quote:
+     * no stack overflow, reasonable rendering time, no thrown exceptions.
+     */
+    public void testJavaCodeFilterWithUnclosedQuote()
+    {
+        StringBuffer source = new StringBuffer("{code}private static final String S = \"This is a valid string\";\n");
+        source.append("Unclosed quote: \"\n");
+        for (int i = 0; i < 30; ++i) {
+            source.append("private static final double D = 2.0;\n");
+        }
+        source.append("{code}");
+        long startTime = System.currentTimeMillis();
+        try {
+            String result = this.renderer.render(source.toString(), this.contentDocument, this.document, this.context);
+            // If a stack overflow occurs during rendering, then the valid quotes won't be recognized.
+            assertTrue("Failed to detect strings", result.indexOf("quote\">") != -1);
+        } catch (Throwable ex) {
+            fail("Failed rendering: " + ex.getMessage());
+        }
+        // This test should definitely take less than a minute.
+        assertTrue("Rendering took too much time", System.currentTimeMillis() - startTime < 60000);
+    }
 }

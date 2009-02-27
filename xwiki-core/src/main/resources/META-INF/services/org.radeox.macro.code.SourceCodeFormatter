@@ -1,1 +1,2 @@
 com.xpn.xwiki.render.macro.WikiCodeFilter
+com.xpn.xwiki.render.macro.XWikiJavaCodeFilter

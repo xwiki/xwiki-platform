@@ -1931,14 +1931,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public String getWebCopyright(XWikiContext context)
     {
-        try {
-            String result = getWebPreference("webcopyright", "", context);
-            if (!result.trim().equals("")) {
-                return result;
-            }
-        } catch (Exception e) {
-        }
-        return "Copyright 2004-" + Calendar.getInstance().get(java.util.Calendar.YEAR) + " XWiki";
+        String defaultValue = "Copyright 2004-" + Calendar.getInstance().get(java.util.Calendar.YEAR) + " XWiki";
+        return getWebPreference("webcopyright", defaultValue, context);
     }
 
     public String getXWikiPreference(String prefname, XWikiContext context)

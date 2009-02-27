@@ -38,6 +38,7 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -1937,7 +1938,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         } catch (Exception e) {
         }
-        return "Copyright 2004-2007 (c) XPertNet and Contributing Authors";
+        return "Copyright 2004" + Calendar.getInstance().get(java.util.Calendar.YEAR) + " XWiki";
     }
 
     public String getXWikiPreference(String prefname, XWikiContext context)

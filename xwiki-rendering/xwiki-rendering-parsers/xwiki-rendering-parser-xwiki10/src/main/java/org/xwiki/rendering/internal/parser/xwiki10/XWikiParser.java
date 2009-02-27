@@ -117,7 +117,7 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
         try {
             content = IOUtils.toString(source);
         } catch (IOException e) {
-            throw new ParseException("Failed to reade source");
+            throw new ParseException("Failed to read source", e);
         }
 
         FilterContext filterContext = new FilterContext();

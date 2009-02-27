@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.transformation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +42,10 @@ public class DefaultTransformationManager implements TransformationManager, Comp
 {
     private ComponentManager componentManager;
 
-    private List<Transformation> transformations;
+    /**
+     * Holds the list of transformations to apply. Injected by the Component Manager.
+     */
+    private List<Transformation> transformations = new ArrayList<Transformation>();
 
     /**
      * {@inheritDoc}

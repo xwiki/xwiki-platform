@@ -26,11 +26,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Property;
 
@@ -72,6 +75,14 @@ public class ObjectPropertyResource extends XWikiResource
 
         for (Property property : object.getProperties()) {
             if (property.getName().equals(propertyName)) {
+                String objectUri =
+                    UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(doc.getWiki(),
+                        doc.getSpace(), doc.getName(), object.getClassName(), object.getNumber()).toString();
+                Link objectLink = objectFactory.createLink();
+                objectLink.setHref(objectUri);
+                objectLink.setRel(Relations.OBJECT);
+                property.getLinks().add(objectLink);
+
                 return property;
             }
         }

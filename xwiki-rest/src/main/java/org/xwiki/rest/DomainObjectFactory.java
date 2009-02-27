@@ -667,7 +667,7 @@ public class DomainObjectFactory
                     .toString();
             Link propertyLink = objectFactory.createLink();
             propertyLink.setHref(propertyUri);
-            propertyLink.setRel(Relations.PROPERTY);
+            propertyLink.setRel(Relations.SELF);
             property.getLinks().add(propertyLink);
 
             object.getProperties().add(property);
@@ -720,7 +720,7 @@ public class DomainObjectFactory
                     xwikiPropertyClass.getName()).toString();
             Link propertyLink = objectFactory.createLink();
             propertyLink.setHref(propertyUri);
-            propertyLink.setRel(Relations.PROPERTY);
+            propertyLink.setRel(Relations.SELF);
             property.getLinks().add(propertyLink);
 
             clazz.getProperties().add(property);

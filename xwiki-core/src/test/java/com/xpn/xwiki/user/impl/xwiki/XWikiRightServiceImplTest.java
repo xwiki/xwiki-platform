@@ -22,7 +22,6 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.util.Collections;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 
@@ -31,6 +30,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
 
@@ -39,7 +39,7 @@ import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
  * 
  * @version $Id$
  */
-public class XWikiRightServiceImplTest extends MockObjectTestCase
+public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiRightServiceImpl rightService;
 
@@ -63,8 +63,9 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
      * @see junit.framework.TestCase#setUp()
      */
     @Override
-    protected void setUp()
+    protected void setUp() throws Exception
     {
+        super.setUp();
         this.rightService = new XWikiRightServiceImpl();
 
         this.context = new XWikiContext();

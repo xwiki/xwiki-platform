@@ -82,6 +82,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationManager;
 
+import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
@@ -132,7 +133,7 @@ public class XWikiDocument implements DocumentModelBridge
         Pattern.compile("</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|"
             + "font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>");
 
-    private static final String XWIKI10_SYNTAXID = "xwiki/1.0";
+    public static final String XWIKI10_SYNTAXID = "xwiki/1.0";
 
     private String title;
 
@@ -411,7 +412,7 @@ public class XWikiDocument implements DocumentModelBridge
         this.attachmentList = new ArrayList<XWikiAttachment>();
         this.customClass = "";
         this.comment = "";
-        this.syntaxId = XWIKI10_SYNTAXID;
+        this.syntaxId = getDefaultDocumentSyntax();
 
         // Note: As there's no notion of an Empty document we don't set the original document
         // field. Thus getOriginalDocument() may return null.
@@ -2675,6 +2676,8 @@ public class XWikiDocument implements DocumentModelBridge
 
         String syntaxId = getElement(docel, "syntaxId");
         if ((syntaxId == null) || (syntaxId.length() == 0)) {
+            // Documents that don't have syntax ids are considered old documents and thus in 
+            // XWiki Syntax 1.0 since newer documents always have syntax ids.
             setSyntaxId(XWIKI10_SYNTAXID);
         } else {
             setSyntaxId(syntaxId);
@@ -4095,15 +4098,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getSyntaxId()
     {
-        String result;
-
-        if ((this.syntaxId == null) || (this.syntaxId.length() == 0)) {
-            result = XWIKI10_SYNTAXID;
-        } else {
-            result = this.syntaxId;
-        }
-
-        return result;
+        return this.syntaxId;
     }
 
     /**
@@ -4907,5 +4902,10 @@ public class XWikiDocument implements DocumentModelBridge
     {
         Parser parser = (Parser) Utils.getComponent(Parser.ROLE, syntaxId);
         return parser.parse(new StringReader(content));
+    }
+    
+    private String getDefaultDocumentSyntax()
+    {
+        return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.ROLE)).getDefaultDocumentSyntax();        
     }
 }

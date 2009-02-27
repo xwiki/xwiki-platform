@@ -1,14 +1,13 @@
 package com.xpn.xwiki.api;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
@@ -16,14 +15,15 @@ import com.xpn.xwiki.user.api.XWikiUser;
  * 
  * @version $Id$
  */
-public class UserTest extends MockObjectTestCase
+public class UserTest extends AbstractBridgedXWikiComponentTestCase
 {
     private Mock mockXWiki;
 
     private XWikiContext context;
 
-    protected void setUp() throws XWikiException
+    protected void setUp() throws Exception
     {
+        super.setUp();
         this.context = new XWikiContext();
         this.mockXWiki = mock(XWiki.class);
         context.setWiki((XWiki) mockXWiki.proxy());

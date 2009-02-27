@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -14,8 +13,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
-public class XWikiServletURLFactoryTest extends MockObjectTestCase
+public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
 {
     private static final String MAIN_WIKI_NAME = "xwiki";
 

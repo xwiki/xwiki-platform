@@ -21,8 +21,9 @@ package com.xpn.xwiki.plugin.packaging;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+
 import org.jmock.Mock;
 
 import java.io.BufferedReader;
@@ -38,7 +39,7 @@ import java.util.zip.ZipOutputStream;
  * 
  * @version $Id$
  */
-public class PackageTest extends org.jmock.cglib.MockObjectTestCase
+public class PackageTest extends AbstractBridgedXWikiComponentTestCase
 {
     private Package pack;
 
@@ -46,8 +47,9 @@ public class PackageTest extends org.jmock.cglib.MockObjectTestCase
 
     private Mock mockXWiki;
 
-    protected void setUp() throws XWikiException
+    protected void setUp() throws Exception
     {
+        super.setUp();
         this.pack = new Package();
         this.context = new XWikiContext();
 

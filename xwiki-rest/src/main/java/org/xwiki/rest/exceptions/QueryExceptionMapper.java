@@ -33,7 +33,7 @@ import org.xwiki.query.QueryException;
 public class QueryExceptionMapper implements ExceptionMapper<QueryException>
 {
     public Response toResponse(QueryException exception)
-    {        
+    {
         return Response.serverError().entity(exception.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
 

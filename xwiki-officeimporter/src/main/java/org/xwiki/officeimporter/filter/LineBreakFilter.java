@@ -88,7 +88,13 @@ public class LineBreakFilter extends AbstractHTMLFilter
      */
     public boolean isBlockElement(Node node)
     {
-        return null != node && (Arrays.binarySearch(BLOCK_ELEMENT_TAGS, node.getNodeName()) > 0);        
+        boolean isBlockElement = false;
+        if (null != node) {
+            for (String blockElement : BLOCK_ELEMENT_TAGS) {
+                isBlockElement = blockElement.equals(node.getNodeName()) ? true : isBlockElement;
+            }
+        }
+        return isBlockElement;
     }
 
     /**

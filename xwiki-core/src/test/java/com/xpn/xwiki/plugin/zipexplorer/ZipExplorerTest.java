@@ -26,6 +26,7 @@ import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.jmock.Mock;
 
@@ -40,12 +41,13 @@ import java.io.ByteArrayOutputStream;
  *
  * @version $Id$
  */
-public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase
+public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 {
     private ZipExplorerPlugin plugin;
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
+        super.setUp();
         this.plugin = new ZipExplorerPlugin("zipexplorer", ZipExplorerPlugin.class.getName(), null);
     }
 

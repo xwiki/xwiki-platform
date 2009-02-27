@@ -22,12 +22,12 @@ package com.xpn.xwiki.render;
 import java.net.URL;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Constraint;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
@@ -35,7 +35,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  * 
  * @version $Id$
  */
-public class XWikiRadeoxRendererTest extends MockObjectTestCase
+public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiContext context;
 
@@ -52,8 +52,9 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
     private XWikiDocument contentDocument;
 
     @Override
-    protected void setUp()
+    protected void setUp() throws Exception
     {
+        super.setUp();
         this.renderer = new XWikiRadeoxRenderer();
         this.context = new XWikiContext();
 

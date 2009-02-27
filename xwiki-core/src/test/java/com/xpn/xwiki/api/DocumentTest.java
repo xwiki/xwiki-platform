@@ -2,14 +2,13 @@ package com.xpn.xwiki.api;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
-public class DocumentTest extends TestCase
+public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
     public void testToStringReturnsFullName()
     {

@@ -156,5 +156,20 @@
         </requirement>
       </requirements>
     </component>
+    <component>
+      <role>com.xpn.xwiki.CoreConfiguration</role>
+      <role-hint>default</role-hint>
+      <implementation>com.xpn.xwiki.internal.DefaultCoreConfiguration</implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.configuration.ConfigurationManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.configuration.ConfigurationSourceCollection</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
   </components>
 </component-set>

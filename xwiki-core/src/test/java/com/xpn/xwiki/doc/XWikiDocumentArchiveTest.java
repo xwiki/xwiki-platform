@@ -21,18 +21,18 @@ package com.xpn.xwiki.doc;
 
 import java.util.Date;
 
-import org.jmock.cglib.MockObjectTestCase;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link XWikiDocumentArchive}.
  *
  * @version $Id$
  */
-public class XWikiDocumentArchiveTest extends MockObjectTestCase
+public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiContext context;
     protected void setUp() throws Exception

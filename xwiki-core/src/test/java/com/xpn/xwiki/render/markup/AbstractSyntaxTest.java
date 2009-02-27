@@ -24,15 +24,15 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderer;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
-public abstract class AbstractSyntaxTest extends MockObjectTestCase
+public abstract class AbstractSyntaxTest extends AbstractBridgedXWikiComponentTestCase
 {
     protected XWikiContext context;
 
@@ -45,6 +45,7 @@ public abstract class AbstractSyntaxTest extends MockObjectTestCase
     @Override
     protected void setUp() throws Exception
     {
+        super.setUp();
         this.renderer = new XWikiRadeoxRenderer();
         this.context = new XWikiContext();
 

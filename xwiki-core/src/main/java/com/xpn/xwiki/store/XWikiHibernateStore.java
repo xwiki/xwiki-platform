@@ -641,6 +641,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 doc.setDate(new Date(doc.getDate().getTime()));
                 doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
                 doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
+                
+                // If the syntaxId is not set, default to XWiki Syntax 1.0
+                if (StringUtils.isBlank(doc.getSyntaxId())) {
+                    doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                }
+                
             } catch (ObjectNotFoundException e) { // No document
                 doc.setNew(true);
                 return doc;

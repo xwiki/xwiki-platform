@@ -26,18 +26,18 @@ import java.util.*;
 import org.jmock.Mock;
 import org.jmock.core.stub.CustomStub;
 import org.jmock.core.Invocation;
-import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.web.XWikiMessageTool} class.
  * 
  * @version $Id$
  */
-public class XWikiMessageToolTest extends MockObjectTestCase
+public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
 {
     private Mock mockXWiki;
 
@@ -45,8 +45,9 @@ public class XWikiMessageToolTest extends MockObjectTestCase
 
     private XWikiContext context;
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
+        super.setUp();
         this.context = createXWikiContext();
         this.tool = new XWikiMessageTool(new TestResources(), context);
     }

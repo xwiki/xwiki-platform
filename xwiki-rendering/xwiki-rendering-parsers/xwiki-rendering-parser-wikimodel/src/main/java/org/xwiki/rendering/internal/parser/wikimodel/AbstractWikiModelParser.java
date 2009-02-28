@@ -21,7 +21,6 @@ package org.xwiki.rendering.internal.parser.wikimodel;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.LinkParser;
@@ -31,30 +30,47 @@ import org.wikimodel.wem.IWikiParser;
 import java.io.Reader;
 
 /**
+ * Common code for all WikiModel-based parsers.
+ * 
  * @version $Id$
  * @since 1.5M2
  */
 public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser
 {
+    /**
+     * @see #setLinkParser(LinkParser)
+     */
     protected LinkParser linkParser;
 
+    /**
+     * @see #setImageParser(ImageParser)
+     */
     protected ImageParser imageParser;
-    
+
+    /**
+     * @return the WikiModel parser instance to use to parse input content.
+     * @throws ParseException when there's a problem creating an instance of the parser to use
+     */
     public abstract IWikiParser createWikiModelParser() throws ParseException;
 
     /**
-     * @return the parser to use for the link labels, since wikimodel does not support wiki syntax in links and they
-     *         need to be handled in the XDOMGeneratorListener. By default, the link label parser is the same one as the
-     *         source parser (this), but you should overwrite this method if you need to use a special parser.
+     * @return the syntax parser to use for parsing link labels, since wikimodel does not support wiki syntax 
+     *         in links and they need to be handled in the XDOMGeneratorListener. By default, the link label 
+     *         parser is the same one as the source parser (this), but you should overwrite this method if you
+     *         need to use a special parser.
      * @see XDOMGeneratorListener#XDOMGeneratorListener(Parser, LinkParser, ImageParser)
      * @see http://code.google.com/p/wikimodel/issues/detail?id=87 
      * TODO: Remove this method when the parser will not need to be passed to the XDOMGeneratorListener anymore.
      */
-    public Parser getLinkLabelParser() 
+    protected Parser getLinkLabelParser() 
     {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Parser#parse(Reader)
+     */
     public XDOM parse(Reader source) throws ParseException
     {
         IWikiParser parser = createWikiModelParser();
@@ -69,5 +85,27 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
             throw new ParseException("Failed to parse input source", e);
         }
         return listener.getXDOM();
+    }
+    
+    /**
+     * Sets the parser to use when parsing links. We need to parse links to transform a link reference passed as a raw
+     * string by WikiModel into a {@link org.xwiki.rendering.listener.Link} object.
+     *  
+     * @param linkParser the link parser to use
+     */
+    public void setLinkParser(LinkParser linkParser)
+    {
+        this.linkParser = linkParser;
+    }
+
+    /**
+     * Sets the parser to use when parsing image references (eg "Space.Doc@image.png" in XWiki Syntax 2.0). 
+     * We transform a raw image reference into a {@link org.xwiki.rendering.listener.Image} object.
+     *
+     * @param imageParser the image parser to use
+     */
+    public void setImageParser(ImageParser imageParser)
+    {
+        this.imageParser = imageParser;
     }
 }

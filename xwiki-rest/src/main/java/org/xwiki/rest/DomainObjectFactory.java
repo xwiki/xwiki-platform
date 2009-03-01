@@ -48,14 +48,12 @@ import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.rest.resources.ModificationsResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
-import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
 import org.xwiki.rest.resources.classes.ClassPropertiesResource;
 import org.xwiki.rest.resources.classes.ClassPropertyResource;
 import org.xwiki.rest.resources.classes.ClassResource;
 import org.xwiki.rest.resources.classes.ClassesResource;
 import org.xwiki.rest.resources.comments.CommentsResource;
-import org.xwiki.rest.resources.comments.CommentsVersionResource;
 import org.xwiki.rest.resources.objects.AllObjectsForClassNameResource;
 import org.xwiki.rest.resources.objects.ObjectPropertiesResource;
 import org.xwiki.rest.resources.objects.ObjectPropertyResource;
@@ -64,6 +62,7 @@ import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageChildrenResource;
 import org.xwiki.rest.resources.pages.PageHistoryResource;
 import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.rest.resources.pages.PageTagsResource;
 import org.xwiki.rest.resources.pages.PageTranslationHistoryResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.rest.resources.pages.PageTranslationVersionResource;
@@ -276,21 +275,6 @@ public class DomainObjectFactory
             pageChildrenLink.setRel(Relations.CHILDREN);
             pageSummary.getLinks().add(pageChildrenLink);
         }
-    }
-
-    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc)
-        throws XWikiException
-    {
-        PageSummary pageSummary = objectFactory.createPageSummary();
-        fillPageSummary(pageSummary, objectFactory, baseUri, doc);
-
-        String pageUri =
-            UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
-                .toString();
-        Link pageLink = objectFactory.createLink();
-        pageLink.setHref(pageUri);
-        pageLink.setRel(Relations.PAGE);
-        pageSummary.getLinks().add(pageLink);
 
         if (!doc.getComments().isEmpty()) {
             String commentsUri =
@@ -323,6 +307,35 @@ public class DomainObjectFactory
             objectsLink.setRel(Relations.OBJECTS);
             pageSummary.getLinks().add(objectsLink);
         }
+
+        com.xpn.xwiki.api.Object tagsObject = doc.getObject("XWiki.TagClass", 0);
+        if (tagsObject != null) {
+            if (tagsObject.getProperty("tags") != null) {
+                String tagsUri =
+                    UriBuilder.fromUri(baseUri).path(PageTagsResource.class).build(doc.getWiki(), doc.getSpace(),
+                        doc.getName()).toString();
+                Link tagsLink = objectFactory.createLink();
+                tagsLink.setHref(tagsUri);
+                tagsLink.setRel(Relations.TAGS);
+                pageSummary.getLinks().add(tagsLink);
+            }
+        }
+
+    }
+
+    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc)
+        throws XWikiException
+    {
+        PageSummary pageSummary = objectFactory.createPageSummary();
+        fillPageSummary(pageSummary, objectFactory, baseUri, doc);
+
+        String pageUri =
+            UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
+                .toString();
+        Link pageLink = objectFactory.createLink();
+        pageLink.setHref(pageUri);
+        pageLink.setRel(Relations.PAGE);
+        pageSummary.getLinks().add(pageLink);
 
         return pageSummary;
     }
@@ -367,52 +380,6 @@ public class DomainObjectFactory
             classLink.setHref(classUri);
             classLink.setRel(Relations.CLASS);
             page.getLinks().add(classLink);
-        }
-
-        if (!doc.getComments().isEmpty()) {
-            String commentsUri;
-            if (useVersion) {
-                commentsUri =
-                    UriBuilder.fromUri(baseUri).path(CommentsVersionResource.class).build(doc.getWiki(),
-                        doc.getSpace(), doc.getName(), doc.getVersion()).toString();
-            } else {
-                commentsUri =
-                    UriBuilder.fromUri(baseUri).path(CommentsResource.class).build(doc.getWiki(), doc.getSpace(),
-                        doc.getName()).toString();
-            }
-
-            Link commentsLink = objectFactory.createLink();
-            commentsLink.setHref(commentsUri);
-            commentsLink.setRel(Relations.COMMENTS);
-            page.getLinks().add(commentsLink);
-        }
-
-        if (!doc.getAttachmentList().isEmpty()) {
-            String attachmentsUri;
-            if (useVersion) {
-                attachmentsUri =
-                    UriBuilder.fromUri(baseUri).path(AttachmentsAtPageVersionResource.class).build(doc.getWiki(),
-                        doc.getSpace(), doc.getName(), doc.getVersion()).toString();
-            } else {
-                attachmentsUri =
-                    UriBuilder.fromUri(baseUri).path(AttachmentsResource.class).build(doc.getWiki(), doc.getSpace(),
-                        doc.getName()).toString();
-            }
-
-            Link attachmentsLink = objectFactory.createLink();
-            attachmentsLink.setHref(attachmentsUri);
-            attachmentsLink.setRel(Relations.ATTACHMENTS);
-            page.getLinks().add(attachmentsLink);
-        }
-
-        if (!doc.getxWikiObjects().keySet().isEmpty()) {
-            String objectsUri =
-                UriBuilder.fromUri(baseUri).path(ObjectsResource.class).build(doc.getWiki(), doc.getSpace(),
-                    doc.getName()).toString();
-            Link objectsLink = objectFactory.createLink();
-            objectsLink.setHref(objectsUri);
-            objectsLink.setRel(Relations.OBJECTS);
-            page.getLinks().add(objectsLink);
         }
 
         return page;

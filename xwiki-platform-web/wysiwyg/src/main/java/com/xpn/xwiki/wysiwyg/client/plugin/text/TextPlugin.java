@@ -291,9 +291,9 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractStatefulPlugin#onUpdate()
+     * @see AbstractStatefulPlugin#update()
      */
-    public void onUpdate()
+    public void update()
     {
         if (bold != null) {
             bold.setDown(getTextArea().getCommandManager().isExecuted(Command.BOLD));

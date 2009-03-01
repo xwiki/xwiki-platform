@@ -1,6 +1,6 @@
 #!/bin/bash
 
-XE_VERSION=1.8-SNAPSHOT;
+XE_VERSION=1.9-SNAPSHOT;
 GWT_VERSION=1.5.3;
 
 APP_DIR=`dirname $0`/webapps/xwiki;

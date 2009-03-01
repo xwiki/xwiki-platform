@@ -30,6 +30,16 @@ import java.util.Map;
 public class MacroCall
 {
     /**
+     * The prefix of the start macro comment node's value.
+     */
+    private static final String START_MACRO = "startmacro:";
+
+    /**
+     * The separator used to differentiate between macro name, macro arguments and macro content.
+     */
+    private static final String SEPARATOR = "|-|";
+
+    /**
      * The name of the macro.
      */
     private String name;
@@ -51,7 +61,7 @@ public class MacroCall
      */
     public MacroCall(String startMacroComment)
     {
-        String data = startMacroComment.substring("startmacro:".length());
+        String data = startMacroComment.substring(START_MACRO.length());
         String[] parts = data.split("\\|\\-\\|", 3);
 
         name = parts[0];
@@ -62,6 +72,7 @@ public class MacroCall
         for (int i = 0; i < args.length; i++) {
             String[] pair = args[i].split("=");
             String quotedValue = pair[1].trim();
+            // TODO: We have to unescape the quotes!
             arguments.put(pair[0].trim(), quotedValue.substring(1, quotedValue.length() - 1));
         }
     }
@@ -106,6 +117,17 @@ public class MacroCall
     }
 
     /**
+     * Removes the specified argument from this macro call.
+     * 
+     * @param name the name of a macro parameter
+     * @return the value previously associated with the specified argument
+     */
+    public String removeArgument(String name)
+    {
+        return arguments.remove(name);
+    }
+
+    /**
      * @return {@link #content}
      */
     public String getContent()
@@ -121,5 +143,28 @@ public class MacroCall
     public void setContent(String content)
     {
         this.content = content;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Object#toString()
+     */
+    public String toString()
+    {
+        StringBuffer strBuff = new StringBuffer(START_MACRO);
+        strBuff.append(getName());
+        strBuff.append(SEPARATOR);
+        for (Map.Entry<String, String> entry : arguments.entrySet()) {
+            strBuff.append(entry.getKey());
+            strBuff.append("=\"");
+            // TODO: We have to escape the quotes!
+            strBuff.append(entry.getValue());
+            strBuff.append("\" ");
+        }
+        strBuff.append(SEPARATOR);
+        strBuff.append(getContent());
+
+        return strBuff.toString();
     }
 }

@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 
@@ -318,7 +319,8 @@ public class SymbolPicker extends CompositeDialogBox implements ClickListener
     {
         super(false, true);
 
-        getDialog().setText(Strings.INSTANCE.charmap());
+        getDialog().setIcon(Images.INSTANCE.charmap().createImage());
+        getDialog().setCaption(Strings.INSTANCE.charmap());
         getDialog().addStyleName("xSymbolPicker");
 
         symbolPalette = new SymbolPalette(SYMBOLS, SYMBOLS_PER_ROW, SYMBOLS_PER_COL);

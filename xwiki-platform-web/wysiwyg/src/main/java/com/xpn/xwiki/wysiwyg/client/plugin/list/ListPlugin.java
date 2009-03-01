@@ -176,9 +176,9 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractStatefulPlugin#onUpdate()
+     * @see AbstractStatefulPlugin#update()
      */
-    public void onUpdate()
+    public void update()
     {
         if (ol != null) {
             ol.setDown(getTextArea().getCommandManager().isExecuted(Command.INSERT_ORDERED_LIST));

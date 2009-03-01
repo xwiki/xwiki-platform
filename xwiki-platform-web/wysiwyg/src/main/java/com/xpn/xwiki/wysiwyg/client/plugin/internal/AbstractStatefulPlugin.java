@@ -19,11 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.util.WithDeferredUpdate;
+import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
+import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
@@ -33,15 +33,13 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public abstract class AbstractStatefulPlugin extends AbstractPlugin implements WithDeferredUpdate, MouseListener,
+public abstract class AbstractStatefulPlugin extends AbstractPlugin implements Updatable, MouseListener,
     KeyboardListener, CommandListener
 {
     /**
-     * The index of the last update.
-     * 
-     * @see WithDeferredUpdate#getUpdateIndex()
+     * Schedules updates and executes only the most recent one.
      */
-    private long updateIndex = -1;
+    private final DeferredUpdater updater = new DeferredUpdater(this);
 
     /**
      * {@inheritDoc}
@@ -93,7 +91,7 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements W
         // We listen to mouse up events instead of clicks because if the user selects text and the end points of the
         // selection are in different DOM nodes the click events are not triggered.
         if (sender == getTextArea()) {
-            deferUpdate();
+            updater.deferUpdate();
         }
     }
 
@@ -125,7 +123,7 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements W
     public void onKeyUp(Widget sender, char keyCode, int modifiers)
     {
         if (sender == getTextArea()) {
-            deferUpdate();
+            updater.deferUpdate();
         }
     }
 
@@ -148,35 +146,7 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements W
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (sender == getTextArea().getCommandManager()) {
-            deferUpdate();
+            updater.deferUpdate();
         }
-    }
-
-    /**
-     * Called whenever the state of the editor's text area changes.
-     */
-    private void deferUpdate()
-    {
-        DeferredCommand.addCommand(new UpdateCommand(this));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WithDeferredUpdate#getUpdateIndex()
-     */
-    public long getUpdateIndex()
-    {
-        return updateIndex;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WithDeferredUpdate#incUpdateIndex()
-     */
-    public long incUpdateIndex()
-    {
-        return ++updateIndex;
     }
 }

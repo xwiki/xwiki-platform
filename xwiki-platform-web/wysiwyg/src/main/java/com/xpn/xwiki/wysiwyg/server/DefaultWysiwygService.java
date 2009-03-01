@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.server;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,20 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporterResult;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroFactory;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxFactory;
+import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.XHTMLRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -48,6 +63,8 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
@@ -142,6 +159,38 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public String cleanHTML(String dirtyHTML)
     {
         return getHTMLCleaner().clean(dirtyHTML);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#parseAndRender(String, String)
+     */
+    public String parseAndRender(String html, String syntax)
+    {
+        try {
+            // Parse
+            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "html/4.01");
+            XDOM dom = parser.parse(new StringReader(cleanHTML(html)));
+
+            // Execute macros
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
+            TransformationManager txManager = (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+            txManager.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(syntax));
+
+            // Render
+            WikiPrinter printer = new DefaultWikiPrinter();
+            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
+            XHTMLRenderer renderer =
+                (XHTMLRenderer) factory.createRenderer(new Syntax(SyntaxType.XHTML, "1.0"), printer);
+            dom.traverse(renderer);
+
+            return printer.toString();
+        } catch (ParseException e) {
+            throw new RuntimeException("Exception while parsing HTML", e);
+        } catch (TransformationException e) {
+            throw new RuntimeException("Exception while executing macros", e);
+        }
     }
 
     /**
@@ -435,5 +484,38 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             }
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#getMacroDescriptor(String, String)
+     */
+    public MacroDescriptor getMacroDescriptor(String macroName, String syntaxId)
+    {
+        try {
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
+            MacroFactory macroFactory = (MacroFactory) Utils.getComponent(MacroFactory.ROLE);
+            Macro< ? > macro = macroFactory.getMacro(macroName, syntaxFactory.createSyntaxFromIdString(syntaxId));
+            org.xwiki.rendering.macro.descriptor.MacroDescriptor descriptor = macro.getDescriptor();
+
+            MacroDescriptor result = new MacroDescriptor();
+            result.setDescription(descriptor.getDescription());
+            Map<String, ParameterDescriptor> parameterDescriptorMap = new HashMap<String, ParameterDescriptor>();
+            for (Map.Entry<String, org.xwiki.rendering.macro.descriptor.ParameterDescriptor> entry : descriptor
+                .getParameterDescriptorMap().entrySet()) {
+                ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
+                parameterDescriptor.setName(entry.getValue().getName());
+                parameterDescriptor.setDescription(entry.getValue().getDescription());
+                parameterDescriptor.setType(entry.getValue().getType().getName());
+                parameterDescriptor.setMandatory(entry.getValue().isMandatory());
+                parameterDescriptorMap.put(entry.getKey(), parameterDescriptor);
+            }
+            result.setParameterDescriptorMap(parameterDescriptorMap);
+            return result;
+        } catch (Throwable t) {
+            LOG.error("Exception while retrieving macro descriptor.", t);
+            return null;
+        }
     }
 }

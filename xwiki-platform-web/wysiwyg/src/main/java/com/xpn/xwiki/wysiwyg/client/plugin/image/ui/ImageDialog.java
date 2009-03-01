@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.SourcesTabEvents;
 import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageHTMLGenerator;
@@ -89,7 +90,8 @@ public class ImageDialog extends CompositeDialogBox implements ClickListener, Fo
         this.currentSpace = currentSpace;
         this.currentPage = currentPage;
 
-        getDialog().setText(Strings.INSTANCE.image());
+        getDialog().setIcon(Images.INSTANCE.image().createImage());
+        getDialog().setCaption(Strings.INSTANCE.image());
 
         FlowPanel mainPanel = new FlowPanel();
         tabsPanel = new TabPanel();

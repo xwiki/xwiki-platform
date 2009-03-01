@@ -134,4 +134,17 @@
       <when-property-is name="user.agent" value="gecko"/>
     </any>
   </replace-with>
+
+  <!-- MacroDisplayer -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDisplayer">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDisplayer"/>
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.macro.internal.MozillaMacroDisplayer">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDisplayer"/>
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8"/>
+      <when-property-is name="user.agent" value="gecko"/>
+    </any>
+  </replace-with>
 </module>

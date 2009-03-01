@@ -23,14 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
-import com.xpn.xwiki.wysiwyg.client.util.WithDeferredUpdate;
+import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
+import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
@@ -40,7 +40,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public class MacroSelector implements WithDeferredUpdate, MouseListener, KeyboardListener, CommandListener
+public class MacroSelector implements Updatable, MouseListener, KeyboardListener, CommandListener
 {
     /**
      * The displayer used to select macros.
@@ -48,16 +48,14 @@ public class MacroSelector implements WithDeferredUpdate, MouseListener, Keyboar
     private final MacroDisplayer displayer;
 
     /**
+     * Schedules updates and executes only the most recent one.
+     */
+    private final DeferredUpdater updater = new DeferredUpdater(this);
+
+    /**
      * The list of currently selected macro containers.
      */
     private final List<Element> selectedContainers = new ArrayList<Element>();
-
-    /**
-     * The index of the last update.
-     * 
-     * @see WithDeferredUpdate#getUpdateIndex()
-     */
-    private long updateIndex = -1;
 
     /**
      * Creates a new macro selector.
@@ -98,7 +96,7 @@ public class MacroSelector implements WithDeferredUpdate, MouseListener, Keyboar
                 // If already selected then toggle the collapsed state.
                 displayer.setCollapsed(target, !displayer.isCollapsed(target));
             } else {
-                deferUpdate();
+                updater.deferUpdate();
             }
         }
     }
@@ -171,7 +169,7 @@ public class MacroSelector implements WithDeferredUpdate, MouseListener, Keyboar
     public void onKeyUp(Widget sender, char keyCode, int modifiers)
     {
         if (sender == displayer.getTextArea()) {
-            deferUpdate();
+            updater.deferUpdate();
         }
     }
 
@@ -194,36 +192,16 @@ public class MacroSelector implements WithDeferredUpdate, MouseListener, Keyboar
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (sender == displayer.getTextArea().getCommandManager()) {
-            deferUpdate();
+            updater.deferUpdate();
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WithDeferredUpdate#getUpdateIndex()
+     * @see Updatable#update()
      */
-    public long getUpdateIndex()
-    {
-        return updateIndex;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WithDeferredUpdate#incUpdateIndex()
-     */
-    public long incUpdateIndex()
-    {
-        return ++updateIndex;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WithDeferredUpdate#onUpdate()
-     */
-    public void onUpdate()
+    public void update()
     {
         // Clear previously selected macros.
         for (Element container : selectedContainers) {
@@ -249,10 +227,27 @@ public class MacroSelector implements WithDeferredUpdate, MouseListener, Keyboar
     }
 
     /**
-     * Called whenever the selection changes.
+     * @return the number of macros currently selected
      */
-    private void deferUpdate()
+    public int getMacroCount()
     {
-        DeferredCommand.addCommand(new UpdateCommand(this));
+        return selectedContainers.size();
+    }
+
+    /**
+     * @param index the index of the selected macro to return
+     * @return the selected macro at the specified index
+     */
+    public Element getMacro(int index)
+    {
+        return selectedContainers.get(index);
+    }
+
+    /**
+     * @return the displayer used to select and detect macros
+     */
+    public MacroDisplayer getDisplayer()
+    {
+        return displayer;
     }
 }

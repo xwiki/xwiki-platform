@@ -8,9 +8,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.TextBoxNumberFilter;
+import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 
 /**
  * Table creation dialog.
@@ -65,8 +66,8 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         insertButton = new Button(Strings.INSTANCE.tableInsertButton(), this);
         
         // Miscellaneous settings
-        getDialog().setAnimationEnabled(true);        
-        getDialog().setText(Strings.INSTANCE.table());     
+        getDialog().setIcon(Images.INSTANCE.insertTable().createImage());
+        getDialog().setCaption(Strings.INSTANCE.table());     
         
         // Create main panel
         FlowPanel mainPanel = new FlowPanel();        

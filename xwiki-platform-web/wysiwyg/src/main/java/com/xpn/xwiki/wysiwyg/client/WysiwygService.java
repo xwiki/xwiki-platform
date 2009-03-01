@@ -31,6 +31,7 @@ import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
 /**
@@ -100,6 +101,15 @@ public interface WysiwygService extends RemoteService
      * @return The result of cleaning the given HTML fragment.
      */
     String cleanHTML(String dirtyHTML);
+
+    /**
+     * Parses the given HTML fragment and renders the result in XHTML.
+     * 
+     * @param html the HTML fragment to be rendered
+     * @param syntax the storage syntax
+     * @return the XHTML result of rendering the given HTML fragment
+     */
+    String parseAndRender(String html, String syntax);
 
     /**
      * Cleans dirty html content produced from an office application like MsWord, MsExcel, OpenOffice Writer etc. This
@@ -189,4 +199,11 @@ public interface WysiwygService extends RemoteService
      * @return list of the images
      */
     List<ImageConfig> getImageAttachments(String wikiName, String spaceName, String pageName);
+
+    /**
+     * @param macroName a string representing the name of a macro
+     * @param syntax the string identifier for the storage syntax
+     * @return an object describing the specified macro, or {@code null} if the specified macro is not found
+     */
+    MacroDescriptor getMacroDescriptor(String macroName, String syntax);
 }

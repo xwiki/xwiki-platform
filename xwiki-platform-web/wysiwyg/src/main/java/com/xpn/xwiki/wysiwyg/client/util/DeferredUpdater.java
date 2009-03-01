@@ -20,36 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.util;
 
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 
 /**
- * Interface for an object whose update can be deferred. Only the most recent update gets executed.
+ * Schedules updates for an {@link Updatable} object and ensures that only the most recent update is actually executed.
  * 
  * @version $Id$
  */
-public interface WithDeferredUpdate
+public class DeferredUpdater
 {
     /**
      * A deferred command that executes only the most recent update.
      */
-    static final class UpdateCommand implements Command
+    private final class UpdateCommand implements Command
     {
-        /**
-         * The object that should be updated.
-         */
-        private final WithDeferredUpdate target;
-
         /**
          * The index of this update.
          */
         private final long index;
 
         /**
-         * @param target the object for which to create a new update command.
+         * Creates a new update command.
          */
-        public UpdateCommand(WithDeferredUpdate target)
+        public UpdateCommand()
         {
-            this.target = target;
-            index = target.incUpdateIndex();
+            index = DeferredUpdater.this.incUpdateIndex();
         }
 
         /**
@@ -57,24 +52,61 @@ public interface WithDeferredUpdate
          */
         public void execute()
         {
-            if (index == target.getUpdateIndex()) {
-                target.onUpdate();
+            if (index == DeferredUpdater.this.getUpdateIndex()) {
+                DeferredUpdater.this.onUpdate();
             }
         }
     }
 
     /**
-     * @return The index of the last update.
+     * The index of the last update.
      */
-    long getUpdateIndex();
+    private long updateIndex = -1;
 
     /**
-     * @return The update index after it was incremented.
+     * The underlying object whose update is being deferred.
      */
-    long incUpdateIndex();
+    private final Updatable updatable;
+
+    /**
+     * Creates a new deferred updater for the specified {@link Updatable} object.
+     * 
+     * @param updatable {@link #updatable}
+     */
+    public DeferredUpdater(Updatable updatable)
+    {
+        this.updatable = updatable;
+    }
+
+    /**
+     * @return {@link #updateIndex}
+     */
+    private long getUpdateIndex()
+    {
+        return updateIndex;
+    }
+
+    /**
+     * @return the update index after it was incremented
+     */
+    private long incUpdateIndex()
+    {
+        return ++updateIndex;
+    }
 
     /**
      * Executes the most recent update.
      */
-    void onUpdate();
+    private void onUpdate()
+    {
+        updatable.update();
+    }
+
+    /**
+     * Schedule an update for the underlying object.
+     */
+    public void deferUpdate()
+    {
+        DeferredCommand.addCommand(new UpdateCommand());
+    }
 }

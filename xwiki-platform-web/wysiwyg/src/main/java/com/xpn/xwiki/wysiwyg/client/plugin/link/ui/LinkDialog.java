@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.SourcesTabEvents;
 import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
@@ -93,8 +94,8 @@ public class LinkDialog extends CompositeDialogBox implements ClickListener, Tab
         tabs.selectTab(0);
         selectedTabIndex = 0;
 
-        getDialog().setText(Strings.INSTANCE.link());
-        getDialog().setAnimationEnabled(false);
+        getDialog().setIcon(Images.INSTANCE.link().createImage());
+        getDialog().setCaption(Strings.INSTANCE.link());
         getDialog().addStyleName("linkDialog");
 
         initWidget(tabs);

@@ -28,10 +28,10 @@ import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.LoadListenerCollection;
-import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.SourcesLoadEvents;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.widget.HiddenConfig;
+import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
 import com.xpn.xwiki.wysiwyg.client.widget.ToolBar;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 

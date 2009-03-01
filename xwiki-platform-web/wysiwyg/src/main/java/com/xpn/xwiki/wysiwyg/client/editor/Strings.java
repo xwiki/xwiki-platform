@@ -15,6 +15,10 @@ public interface Strings extends Constants
      */
     Strings INSTANCE = (Strings) GWT.create(Strings.class);
 
+    String yes();
+
+    String no();
+
     String apply();
 
     String attachment();
@@ -88,6 +92,22 @@ public interface Strings extends Constants
     String justifyRight();
 
     String macro();
+
+    String macroCollapse();
+
+    String macroCollapseAll();
+
+    String macroExpand();
+
+    String macroExpandAll();
+
+    String macroRefresh();
+
+    String macroEdit();
+
+    String macroEditDialogCaption();
+
+    String macroParameterMandatory();
 
     String ol();
 
@@ -206,7 +226,7 @@ public interface Strings extends Constants
     String linkNewSpaceTextBoxTooltip();
 
     String linkNewPageTextBoxTooltip();
-    
+
     String image();
 
     String fileUploadLabel();
@@ -252,42 +272,42 @@ public interface Strings extends Constants
     String imageSettingsTabTitle();
 
     String imageNoImageSelectedError();
-    
+
     String table();
-    
+
     String tableRowsLabel();
-    
+
     String tableRowsDefault();
-    
+
     String tableColsLabel();
-    
+
     String tableColsDefault();
-    
+
     String tableBorderLabel();
-    
+
     String tableBorderDefault();
-    
+
     String tableHeaderLabel();
-    
+
     String tablePixel();
-    
+
     String tableInsertButton();
-    
+
     String importerToolTip();
-    
+
     String importerCaption();
-    
+
     String importerClipboardTabCaption();
-    
+
     String importerClipboardTabInfoLabel();
-    
+
     String importerFileTabCaption();
-    
+
     String importerFileTabInfoLabel();
-    
+
     String importerFilterStylesCheckBoxCaption();
-    
-    String importerImportButtonCaption();    
-    
+
+    String importerImportButtonCaption();
+
     String importerCancelButtonCaption();
 }

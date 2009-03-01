@@ -1,5 +1,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
+import com.google.gwt.user.client.ui.UIObject;
+import com.xpn.xwiki.wysiwyg.client.widget.MenuItem;
+
 /**
  * Concrete implementation of the {@link AbstractUIExtension}. Each feature must have associated a menu item.
  * 
@@ -24,8 +27,11 @@ public class MenuItemUIExtension extends AbstractUIExtension
      */
     public boolean isEnabled(String feature)
     {
-        // TODO
-        return true;
+        UIObject uiObject = getUIObject(feature);
+        if (uiObject != null && uiObject instanceof MenuItem) {
+            return ((MenuItem) uiObject).isEnabled();
+        }
+        return false;
     }
 
     /**
@@ -35,6 +41,9 @@ public class MenuItemUIExtension extends AbstractUIExtension
      */
     public void setEnabled(String feature, boolean enabled)
     {
-        // TODO
+        UIObject uiObject = getUIObject(feature);
+        if (uiObject != null && uiObject instanceof MenuItem) {
+            ((MenuItem) uiObject).setEnabled(enabled);
+        }
     }
 }

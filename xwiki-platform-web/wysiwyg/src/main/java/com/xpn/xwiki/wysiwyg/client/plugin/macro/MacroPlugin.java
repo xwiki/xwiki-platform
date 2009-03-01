@@ -19,46 +19,51 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.core.client.GWT;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.MenuItemUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.CollapseExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.InsertExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.RefreshExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.EditMacroDialog;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
+import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * WYSIWYG editor plug-in for inserting macros and for editing macro parameters.
  * 
  * @version $Id$
  */
-public class MacroPlugin extends AbstractPlugin implements ClickListener
+public class MacroPlugin extends AbstractPlugin implements PopupListener
 {
     /**
-     * The tool bar button that opens the insert macro dialog.
+     * Rich text area command for refreshing macro output.
      */
-    private PushButton insertButton;
+    public static final Command REFRESH = new Command("macroRefresh");
 
     /**
-     * The macro menu, including sub-entries for macro specific operations.
+     * Rich text area command for collapsing all the macros.
      */
-    private MenuItem macroMenu;
+    public static final Command COLLAPSE = new Command("macroCollapseAll");
 
     /**
-     * Menu entries for insert related operations.
+     * Rich text area command for expanding all the macros.
      */
-    private MenuBar insertMenu;
+    public static final Command EXPAND = new Command("macroExpandAll");
 
     /**
-     * Menu entries for edit related operations.
+     * Rich text area command for inserting a macro in place of the current selection.
      */
-    private MenuBar editMenu;
+    public static final Command INSERT = new Command("macroInsert");
+
+    /**
+     * The dialog used for editing macro parameters and content.
+     */
+    private EditMacroDialog editDialog;
 
     /**
      * Hides macro meta data and displays macro output in a read only text box.
@@ -71,14 +76,16 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
     private MacroSelector selector;
 
     /**
-     * User interface extension for the editor tool bar.
+     * Provides a user interface extension to allow users to manipulate macros using the top-level menu of the WYSIWYG
+     * editor.
      */
-    private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+    private MacroMenuExtension menuExtension;
 
     /**
-     * User interface extension for the editor menu bar.
+     * Used to preserve the selection of the rich text area while the dialog is opened. Some browsers like Internet
+     * Explorer loose the selection if you click inside a dialog box.
      */
-    private final MenuItemUIExtension menuExtension = new MenuItemUIExtension("menu");
+    private SelectionPreserver selectionPreserver;
 
     /**
      * {@inheritDoc}
@@ -89,29 +96,20 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
     {
         super.init(wysiwyg, textArea, config);
 
-        insertButton = new PushButton(Images.INSTANCE.macro().createImage(), this);
-        insertButton.setTitle(Strings.INSTANCE.macro());
-        toolBarExtension.addFeature(MacroPluginFactory.getInstance().getPluginName(), insertButton);
-
-        displayer = new MacroDisplayer(getTextArea());
+        displayer = GWT.create(MacroDisplayer.class);
+        displayer.setTextArea(getTextArea());
         selector = new MacroSelector(displayer);
 
-        insertMenu = new MenuBar(true);
-        insertMenu.addItem("Browse Macros...", (com.google.gwt.user.client.Command) null);
-        insertMenu.addSeparator();
-        insertMenu.addItem("Table Of Contents", (com.google.gwt.user.client.Command) null);
-        insertMenu.addItem("Information Box", (com.google.gwt.user.client.Command) null);
-        insertMenu.addItem("More...", (com.google.gwt.user.client.Command) null);
+        getTextArea().getCommandManager().registerCommand(REFRESH,
+            new RefreshExecutable(getConfig().getParameter("syntax")));
+        getTextArea().getCommandManager().registerCommand(COLLAPSE, new CollapseExecutable(selector, true));
+        getTextArea().getCommandManager().registerCommand(EXPAND, new CollapseExecutable(selector, false));
+        getTextArea().getCommandManager().registerCommand(INSERT, new InsertExecutable(selector));
 
-        editMenu = new MenuBar(true);
-        editMenu.addItem("Edit Macro Properties", (com.google.gwt.user.client.Command) null);
-        editMenu.addItem("Delete Macro", (com.google.gwt.user.client.Command) null);
+        selectionPreserver = new SelectionPreserver(getTextArea());
 
-        macroMenu = new MenuItem("Macro", insertMenu);
-        menuExtension.addFeature(MacroPluginFactory.getInstance().getPluginName(), macroMenu);
-
-        // getUIExtensionList().add(menuExtension);
-        // getUIExtensionList().add(toolBarExtension);
+        menuExtension = new MacroMenuExtension(this);
+        getUIExtensionList().add(menuExtension.getExtension());
     }
 
     /**
@@ -121,9 +119,19 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
      */
     public void destroy()
     {
-        insertButton.removeFromParent();
-        insertButton.removeClickListener(this);
-        insertButton = null;
+        if (editDialog != null) {
+            editDialog.hide();
+            editDialog.removeFromParent();
+            editDialog.removePopupListener(this);
+            editDialog = null;
+        }
+
+        menuExtension.destroy();
+
+        getTextArea().getCommandManager().unregisterCommand(REFRESH);
+        getTextArea().getCommandManager().unregisterCommand(COLLAPSE);
+        getTextArea().getCommandManager().unregisterCommand(EXPAND);
+        getTextArea().getCommandManager().unregisterCommand(INSERT);
 
         selector.destroy();
         selector = null;
@@ -131,44 +139,73 @@ public class MacroPlugin extends AbstractPlugin implements ClickListener
         displayer.destroy();
         displayer = null;
 
-        insertMenu.clearItems();
-        insertMenu = null;
-
-        editMenu.clearItems();
-        editMenu = null;
-
-        macroMenu.getParentMenu().removeItem(macroMenu);
-        macroMenu = null;
-
-        toolBarExtension.clearFeatures();
-        menuExtension.clearFeatures();
-
         super.destroy();
+    }
+
+    /**
+     * @return the macro selector
+     */
+    public MacroSelector getSelector()
+    {
+        return selector;
+    }
+
+    /**
+     * Shows the edit macro dialog.
+     */
+    public void edit()
+    {
+        edit(true);
+    }
+
+    /**
+     * Either shows the edit macro dialog or applies user changes, depending in the given flag.
+     * 
+     * @param show whether to show the edit macro dialog or apply the changes made using the dialog
+     */
+    private void edit(boolean show)
+    {
+        if (show) {
+            // We save the selection because in some browsers, including Internet Explorer, by clicking on the
+            // dialog we loose the selection in the target document.
+            selectionPreserver.saveSelection();
+            getEditDialog().setMacroCall(new MacroCall(getTextArea().getCommandManager().getStringValue(INSERT)));
+            getEditDialog().center();
+        } else {
+            // We restore the selection in the target document before executing the command.
+            selectionPreserver.restoreSelection();
+            if (getEditDialog().isCanceled()
+                || !getTextArea().getCommandManager().execute(INSERT, getEditDialog().getMacroCall().toString())) {
+                // We get here if the dialog has been closed by clicking the close button or if the command failed.
+                // In this case we return the focus to the text area.
+                getTextArea().setFocus(true);
+            }
+        }
+    }
+
+    /**
+     * We use this method in order to lazy load the edit dialog.
+     * 
+     * @return the dialog used for editing macro parameters and content
+     */
+    private EditMacroDialog getEditDialog()
+    {
+        if (editDialog == null) {
+            editDialog = new EditMacroDialog(getConfig());
+            editDialog.addPopupListener(this);
+        }
+        return editDialog;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see PopupListener#onPopupClosed(SourcesPopupEvents, boolean)
      */
-    public void onClick(Widget sender)
+    public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
     {
-        if (sender == insertButton) {
-            onMacro();
-        }
-    }
-
-    /**
-     * Inserts the macro selected through a dialog in place of the current selection or at the current caret position.
-     */
-    public void onMacro()
-    {
-        // TODO
-        // The following is just a proof of concept.
-        if (macroMenu.getSubMenu() == insertMenu) {
-            macroMenu.setSubMenu(editMenu);
-        } else {
-            macroMenu.setSubMenu(insertMenu);
+        if (sender == getEditDialog() && !autoClosed) {
+            edit(false);
         }
     }
 }

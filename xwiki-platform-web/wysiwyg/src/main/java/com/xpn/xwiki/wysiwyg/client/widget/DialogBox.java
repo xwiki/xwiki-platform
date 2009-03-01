@@ -22,13 +22,10 @@ package com.xpn.xwiki.wysiwyg.client.widget;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHTML;
-import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.widgetideas.client.GlassPanel;
 import com.xpn.xwiki.wysiwyg.client.dom.Style;
@@ -42,47 +39,52 @@ import com.xpn.xwiki.wysiwyg.client.util.DragListener;
  * 
  * @version $Id$
  */
-public class DialogBox extends PopupPanel implements HasHTML, DragListener, ClickListener
+public class DialogBox extends PopupPanel implements DragListener, ClickListener
 {
     /**
      * The style name used when the dialog is dragged.
      */
-    public static final String DRAGGING_STYLE = "xDialogBox-dragging";
+    public static final String DRAGGING_STYLE = "dragging";
 
     /**
-     * The title bar.
+     * The image on the left of the caption bar.
      */
-    private final FlowPanel titleBar;
+    private Image icon;
 
     /**
-     * The title of this dialog. It appears on the title bar.
+     * The text on the caption bar.
      */
-    private final HTML caption;
+    private final Label caption;
 
     /**
-     * The close button on the title bar.
+     * The close icon on the right of the caption bar.
      */
-    private final PushButton closeButton;
+    private final Image closeIcon;
 
     /**
-     * Temporary panel that replaces dialog's body while the dialog box is moved. It is used for optimized dragging.
+     * The bar at the top of the dialog holding the icon, the title and close button.
      */
-    private final Panel panelTemp;
+    private final FlowPanel captionBar;
 
     /**
-     * The outer-most container. It contains the title bar and the contents of the dialog box.
+     * The content of the dialog.
      */
-    private final FlowPanel mainPanel;
+    private FlowPanel content;
+
+    /**
+     * Temporary panel that replaces dialog's content while the dialog box is moved. It is used for optimized dragging.
+     */
+    private final FlowPanel contentPlaceHolder;
+
+    /**
+     * The dialog box containing the caption bar, the content and the content place holder.
+     */
+    private final FlowPanel box;
 
     /**
      * Used when the dialog is in modal state to prevent clicking outside of the dialog.
      */
     private final GlassPanel glassPanel;
-
-    /**
-     * The contents of the dialog.
-     */
-    private Widget child;
 
     /**
      * The horizontal coordinate of the point where the drag started.
@@ -123,24 +125,31 @@ public class DialogBox extends PopupPanel implements HasHTML, DragListener, Clic
         // We use our own modal mechanism, based on glass panel.
         super(autoHide, false);
 
-        caption = new HTML();
-        caption.addStyleName("xCaption");
+        caption = new Label();
+        caption.addStyleName("xDialogCaption");
         (new DragAdaptor(caption)).addDragListener(this);
 
-        closeButton = new PushButton(Images.INSTANCE.close().createImage(), this);
-        closeButton.setTitle(Strings.INSTANCE.close());
+        closeIcon = Images.INSTANCE.close().createImage();
+        closeIcon.setTitle(Strings.INSTANCE.close());
+        closeIcon.addStyleName("xDialogCloseIcon");
+        closeIcon.addClickListener(this);
 
-        titleBar = new FlowPanel();
-        titleBar.addStyleName("xTitleBar");
-        titleBar.add(caption);
-        titleBar.add(closeButton);
+        captionBar = new FlowPanel();
+        captionBar.addStyleName("xDialogCaptionBar");
+        captionBar.add(caption);
+        captionBar.add(closeIcon);
 
-        // Temporary panel that replaces dialog's body while the dialog box is moved.
-        // Used for optimized dragging.
-        panelTemp = new SimplePanel();
+        content = new FlowPanel();
+        content.addStyleName("xDialogContent");
 
-        mainPanel = new FlowPanel();
-        mainPanel.add(titleBar);
+        contentPlaceHolder = new FlowPanel();
+        contentPlaceHolder.setVisible(false);
+
+        box = new FlowPanel();
+        box.setStylePrimaryName("xDialogBox");
+        box.add(captionBar);
+        box.add(content);
+        box.add(contentPlaceHolder);
 
         int zIndex = 100;
         if (modal) {
@@ -150,59 +159,63 @@ public class DialogBox extends PopupPanel implements HasHTML, DragListener, Clic
             glassPanel = null;
         }
 
-        addStyleName("xDialogBox");
         getElement().getStyle().setProperty(Style.Z_INDEX, String.valueOf(zIndex));
-        super.setWidget(mainPanel);
+        super.setWidget(box);
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see HasHTML#getHTML()
+     * @return the text of the caption bar
      */
-    public String getHTML()
-    {
-        return caption.getHTML();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.HasText#getText()
-     */
-    public String getText()
+    public String getCaption()
     {
         return caption.getText();
     }
 
     /**
+     * Sets the text of the caption bar.
+     * 
+     * @param caption the string to be placed on the caption bar
+     */
+    public void setCaption(String caption)
+    {
+        this.caption.setText(caption);
+    }
+
+    /**
+     * @return the image on the left of the caption bar
+     */
+    public Image getIcon()
+    {
+        return icon;
+    }
+
+    /**
+     * Sets the icon on left of the caption bar.
+     * 
+     * @param icon the image to placed on the left of the caption bar
+     */
+    public void setIcon(Image icon)
+    {
+        if (this.icon != null) {
+            this.icon.removeFromParent();
+        }
+        this.icon = icon;
+        icon.addStyleName("xDialogIcon");
+        captionBar.insert(icon, 0);
+    }
+
+    /**
      * {@inheritDoc}
      * 
-     * @see SimplePanel#getWidget()
+     * @see PopupPanel#getWidget()
      */
     public Widget getWidget()
     {
-        return child;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasHTML#setHTML(String)
-     */
-    public void setHTML(String html)
-    {
-        caption.setHTML(html);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.HasText#setText(String)
-     */
-    public void setText(String text)
-    {
-        caption.setText(text);
+        if (content.getWidgetCount() > 0) {
+            return content.getWidget(0);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -212,13 +225,8 @@ public class DialogBox extends PopupPanel implements HasHTML, DragListener, Clic
      */
     public void setWidget(Widget widget)
     {
-        if (child != null) {
-            mainPanel.remove(child);
-        }
-        if (widget != null) {
-            mainPanel.add(widget);
-        }
-        child = widget;
+        content.clear();
+        content.add(widget);
     }
 
     /**
@@ -228,7 +236,7 @@ public class DialogBox extends PopupPanel implements HasHTML, DragListener, Clic
      */
     public boolean onEventPreview(Event event)
     {
-        // We need to preventDefault() on mouseDown events (outside of the DialogBox content) to keep text from being
+        // We need to preventDefault() on mouseDown events (outside of the dialog's content) to keep text from being
         // selected when it is dragged.
         if (event.getTypeInt() == Event.ONMOUSEDOWN) {
             if (caption.getElement().isOrHasChild(event.getTarget())) {
@@ -247,10 +255,10 @@ public class DialogBox extends PopupPanel implements HasHTML, DragListener, Clic
     {
         dragStartX = x;
         dragStartY = y;
-        panelTemp.setPixelSize(child.getOffsetWidth(), child.getOffsetHeight());
-        mainPanel.remove(child);
-        mainPanel.add(panelTemp);
-        addStyleName(DRAGGING_STYLE);
+        contentPlaceHolder.setPixelSize(content.getOffsetWidth(), content.getOffsetHeight());
+        content.setVisible(false);
+        contentPlaceHolder.setVisible(true);
+        box.addStyleDependentName(DRAGGING_STYLE);
     }
 
     /**
@@ -274,9 +282,9 @@ public class DialogBox extends PopupPanel implements HasHTML, DragListener, Clic
      */
     public void onDragEnd(Widget sender, int x, int y)
     {
-        mainPanel.remove(panelTemp);
-        mainPanel.add(child);
-        removeStyleName(DRAGGING_STYLE);
+        contentPlaceHolder.setVisible(false);
+        content.setVisible(true);
+        box.removeStyleDependentName(DRAGGING_STYLE);
     }
 
     /**
@@ -312,7 +320,7 @@ public class DialogBox extends PopupPanel implements HasHTML, DragListener, Clic
      */
     public void onClick(Widget sender)
     {
-        if (sender == closeButton) {
+        if (sender == closeIcon) {
             hide();
         }
     }

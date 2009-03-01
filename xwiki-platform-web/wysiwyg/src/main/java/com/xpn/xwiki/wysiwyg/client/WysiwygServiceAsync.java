@@ -26,6 +26,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
 /**
@@ -61,6 +62,15 @@ public interface WysiwygServiceAsync
      * @param async The callback to be used for notifying the caller after receiving the response from the server.
      */
     void cleanHTML(String dirtyHTML, AsyncCallback<String> async);
+
+    /**
+     * Parses the given HTML fragment and renders the result in XHTML.
+     * 
+     * @param html the HTML fragment to be rendered
+     * @param syntax the storage syntax
+     * @param async the call-back used for notifying the caller after receiving the response from the server
+     */
+    void parseAndRender(String html, String syntax, AsyncCallback<String> async);
 
     /**
      * Makes a request to the server to clean the given HTML fragment which comes from an office application.
@@ -156,4 +166,13 @@ public interface WysiwygServiceAsync
      */
     void getImageAttachments(String wikiName, String spaceName, String pageName,
         AsyncCallback<List<ImageConfig>> async);
+
+    /**
+     * Makes a request to the server to get the descriptor for the specified macro.
+     * 
+     * @param macroName a string representing the name of a macro
+     * @param syntax the string identifier for the storage syntax
+     * @param async the call-back to be used for notifying the caller after receiving the response from the server
+     */
+    void getMacroDescriptor(String macroName, String syntax, AsyncCallback<MacroDescriptor> async);
 }

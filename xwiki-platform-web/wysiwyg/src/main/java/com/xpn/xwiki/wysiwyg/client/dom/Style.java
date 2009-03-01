@@ -74,6 +74,31 @@ public class Style extends com.google.gwt.dom.client.Style
     public static final String FONT_FAMILY = "font-family";
 
     /**
+     * Sets the width of an element.
+     */
+    public static final String WIDTH = "width";
+
+    /**
+     * sets the height of an element.
+     */
+    public static final String HEIGHT = "height";
+
+    /**
+     * Sets how far the top edge of an element is above/below the top edge of the parent element.
+     */
+    public static final String TOP = "top";
+
+    /**
+     * Sets how far the left edge of an element is to the right/left of the left edge of the parent element.
+     */
+    public static final String LEFT = "left";
+
+    /**
+     * Places an element in a static, relative, absolute or fixed position.
+     */
+    public static final String POSITION = "position";
+
+    /**
      * Standard values for {@link Style#DISPLAY}.
      */
     public static final class Display
@@ -161,6 +186,44 @@ public class Style extends com.google.gwt.dom.client.Style
          * This is a utility class so it has a private constructor.
          */
         private TextDecoration()
+        {
+        }
+    }
+
+    /**
+     * Standard values for {@link Style#POSITION}.
+     */
+    public static final class Position
+    {
+        /**
+         * Default. An element with position: static always has the position the normal flow of the page gives it (a
+         * static element ignores any top, bottom, left, or right declarations).
+         */
+        public static final String STATIC = "static";
+
+        /**
+         * An element with position: relative moves an element relative to its normal position, so "left:20" adds 20
+         * pixels to the element's LEFT position.
+         */
+        public static final String RELATIVE = "relative";
+
+        /**
+         * An element with position: absolute is positioned at the specified coordinates relative to its containing
+         * block. The element's position is specified with the "left", "top", "right", and "bottom" properties.
+         */
+        public static final String ABSOLUTE = "absolute";
+
+        /**
+         * An element with position: fixed is positioned at the specified coordinates relative to the browser window.
+         * The element's position is specified with the "left", "top", "right", and "bottom" properties. The element
+         * remains at that position regardless of scrolling. Works in IE7 (strict mode).
+         */
+        public static final String FIXED = "fixed";
+
+        /**
+         * This is a utility class so it has a private constructor.
+         */
+        private Position()
         {
         }
     }

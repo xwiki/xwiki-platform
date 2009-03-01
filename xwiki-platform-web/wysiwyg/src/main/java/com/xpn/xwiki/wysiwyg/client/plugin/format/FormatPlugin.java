@@ -128,9 +128,9 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractStatefulPlugin#onUpdate()
+     * @see AbstractStatefulPlugin#update()
      */
-    public void onUpdate()
+    public void update()
     {
         if (levels != null) {
             String level = getTextArea().getCommandManager().getStringValue(Command.FORMAT_BLOCK);

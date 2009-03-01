@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.NodeList;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
@@ -52,30 +52,14 @@ public class MacroDisplayer implements InnerHTMLListener
     public static final String SELECTED_MACRO_STYLE_NAME = MACRO_STYLE_NAME + "-selected";
 
     /**
-     * The underlying rich text area where the macros are displayed.
-     */
-    private final RichTextArea textArea;
-
-    /**
      * Collection of DOM utility methods.
      */
-    private final DOMUtils domUtils = DOMUtils.getInstance();
+    protected final DOMUtils domUtils = DOMUtils.getInstance();
 
     /**
-     * Creates a new macro displayer for the given rich text area.
-     * 
-     * @param textArea the rich text area whose macros will be displayed using the newly created object
+     * The underlying rich text area where the macros are displayed.
      */
-    public MacroDisplayer(RichTextArea textArea)
-    {
-        this.textArea = textArea;
-
-        // Listen to rich text area's inner HTML changes to detect new macros.
-        textArea.getDocument().addInnerHTMLListener(this);
-
-        // Display the current macros.
-        display(getStartMacroComments(textArea.getDocument().getBody()));
-    }
+    private RichTextArea textArea;
 
     /**
      * Destroys this displayer.
@@ -91,6 +75,28 @@ public class MacroDisplayer implements InnerHTMLListener
     public RichTextArea getTextArea()
     {
         return textArea;
+    }
+
+    /**
+     * Sets the underlying rich text area where the macros are displayed.<br/>
+     * NOTE: We were forced to add this method because instances of this class are created using deferred binding and
+     * thus we cannot pass the rich text area as a parameter to the constructor. As a consequence this method can be
+     * called only once.
+     * 
+     * @param textArea the rich text area whose macros will be displayed using this object
+     */
+    public void setTextArea(RichTextArea textArea)
+    {
+        if (this.textArea != null) {
+            throw new IllegalStateException("Text area has already been set!");
+        }
+        this.textArea = textArea;
+
+        // Listen to rich text area's inner HTML changes to detect new macros.
+        textArea.getDocument().addInnerHTMLListener(this);
+
+        // Display the current macros.
+        display(getStartMacroComments(textArea.getDocument().getBody()));
     }
 
     /**
@@ -132,6 +138,8 @@ public class MacroDisplayer implements InnerHTMLListener
         } else {
             // Put macro output inside a read only text box.
             container = createMacroContainer(start, stop, siblingCount);
+            // Expand the macro by default.
+            setCollapsed(container, false);
         }
 
         // Hide macro meta data.
@@ -150,15 +158,10 @@ public class MacroDisplayer implements InnerHTMLListener
      * @param siblingCount the number of siblings between start and stop nodes
      * @return the created container that holds the macro output
      */
-    private Element createMacroContainer(Node start, Node stop, int siblingCount)
+    protected Element createMacroContainer(Node start, Node stop, int siblingCount)
     {
         // Create the read only text box.
-        Element container = (Element) textArea.getDocument().xCreateButtonElement().cast();
-        // For browsers that support the contentEditable attribute.
-        container.setAttribute("contentEditable", "false");
-
-        // Left caret blocker: prevents the caret from getting inside the macro in Firefox.
-        container.appendChild(createCaretBlocker());
+        Element container = createReadOnlyBox();
 
         MacroCall call = new MacroCall(start.getNodeValue());
         container.setTitle(call.getName() + " macro");
@@ -173,14 +176,39 @@ public class MacroDisplayer implements InnerHTMLListener
         Element output = (Element) textArea.getDocument().xCreateDivElement().cast();
         output.appendChild(domUtils.extractNodeContents(start.getParentNode(), startIndex + 1, endIndex));
 
+        // Let's see if the macro should be displayed in-line or as a block.
+        container.getStyle().setProperty(Style.DISPLAY, getOutputDisplay(output));
+
         container.appendChild(output);
-        // Right caret blocker: prevent the caret from getting inside the macro in Firefox.
-        container.appendChild(createCaretBlocker());
         domUtils.insertAt(start.getParentNode(), container, startIndex);
 
-        // Expand the macro by default.
-        setCollapsed(container, false);
+        return container;
+    }
 
+    /**
+     * @param output the output of a macro
+     * @return {@code Display#BLOCK} if the output of the macro contains block-level elements and thus the macro needs
+     *         to be displayed as a block, {@code Display#INLINE} otherwise
+     */
+    private String getOutputDisplay(Element output)
+    {
+        Node child = output.getFirstChild();
+        while (child != null) {
+            if (domUtils.isBlock(child)) {
+                return Display.BLOCK;
+            }
+            child = child.getNextSibling();
+        }
+        return Display.INLINE;
+    }
+
+    /**
+     * @return an element whose contents cannot be edited inside the rich text area
+     */
+    protected Element createReadOnlyBox()
+    {
+        Element container = textArea.getDocument().xCreateElement(getMacroContainerTagName()).cast();
+        container.setAttribute("contentEditable", "false");
         return container;
     }
 
@@ -219,21 +247,6 @@ public class MacroDisplayer implements InnerHTMLListener
         DocumentFragment output = document.createDocumentFragment();
         output.appendChild(placeHolder);
         return output;
-    }
-
-    /**
-     * Creates a DOM node that can be inserted at the beginning or at the end of a macro container to prevent the caret
-     * from getting inside. Mozilla allows the caret to get inside a button in some situations like for instance when we
-     * delete the last character before the button. The returned node can be used to fix this bug.
-     * 
-     * @return the newly created caret blocker
-     */
-    private Node createCaretBlocker()
-    {
-        ImageElement img = textArea.getDocument().xCreateImageElement();
-        img.setWidth(0);
-        img.setHeight(0);
-        return img;
     }
 
     /**
@@ -279,8 +292,33 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public boolean isMacroContainer(Node node)
     {
-        return "button".equalsIgnoreCase(node.getNodeName())
+        return getMacroContainerTagName().equalsIgnoreCase(node.getNodeName())
             && String.valueOf(((Element) node).getClassName()).contains(MACRO_STYLE_NAME);
+    }
+
+    /**
+     * @param root a DOM element
+     * @return the list of macro containers in the specified subtree
+     */
+    public List<Element> getMacroContainers(Element root)
+    {
+        List<Element> containers = new ArrayList<Element>();
+        NodeList<com.google.gwt.dom.client.Element> divs = root.getElementsByTagName(getMacroContainerTagName());
+        for (int i = 0; i < divs.getLength(); i++) {
+            Element div = divs.getItem(i).cast();
+            if (isMacroContainer(div)) {
+                containers.add(div);
+            }
+        }
+        return containers;
+    }
+
+    /**
+     * @return the name of the element used as macro container
+     */
+    protected String getMacroContainerTagName()
+    {
+        return "button";
     }
 
     /**
@@ -291,11 +329,11 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public void setCollapsed(Element container, boolean collapsed)
     {
-        Element output = (Element) container.getLastChild().getPreviousSibling();
+        Element output = getOutput(container);
         boolean collapse = collapsed || !output.hasChildNodes();
         output.getStyle().setProperty(Style.DISPLAY, collapse ? Display.NONE : Display.BLOCK);
 
-        Element placeHolder = (Element) container.getFirstChild().getNextSibling();
+        Element placeHolder = getPlaceHolder(container);
         placeHolder.getStyle().setProperty(Style.DISPLAY, collapse ? Display.INLINE : Display.NONE);
     }
 
@@ -305,8 +343,25 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public boolean isCollapsed(Element container)
     {
-        Element output = (Element) container.getLastChild().getPreviousSibling();
-        return Display.NONE.equals(output.getStyle().getProperty(Style.DISPLAY));
+        return Display.NONE.equals(getOutput(container).getStyle().getProperty(Style.DISPLAY));
+    }
+
+    /**
+     * @param container a macro container
+     * @return the macro output wrapper from the given macro container
+     */
+    protected Element getOutput(Element container)
+    {
+        return (Element) container.getLastChild();
+    }
+
+    /**
+     * @param container a macro container
+     * @return the macro place holder from the given macro container
+     */
+    protected Element getPlaceHolder(Element container)
+    {
+        return (Element) container.getFirstChild();
     }
 
     /**

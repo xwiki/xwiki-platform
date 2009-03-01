@@ -153,9 +153,9 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractStatefulPlugin#onUpdate()
+     * @see AbstractStatefulPlugin#update()
      */
-    public void onUpdate()
+    public void update()
     {
         if (superScript != null) {
             superScript.setDown(getTextArea().getCommandManager().isExecuted(Command.SUPER_SCRIPT));

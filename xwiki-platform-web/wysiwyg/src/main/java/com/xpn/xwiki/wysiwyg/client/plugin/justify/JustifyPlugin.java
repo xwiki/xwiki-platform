@@ -208,9 +208,9 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractStatefulPlugin#onUpdate()
+     * @see AbstractStatefulPlugin#update()
      */
-    public void onUpdate()
+    public void update()
     {
         if (left != null) {
             left.setDown(getTextArea().getCommandManager().isExecuted(Command.JUSTIFY_LEFT));

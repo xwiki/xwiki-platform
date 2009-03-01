@@ -195,9 +195,9 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractStatefulPlugin#onUpdate()
+     * @see AbstractStatefulPlugin#update()
      */
-    public void onUpdate()
+    public void update()
     {
         if (families != null) {
             String family = getTextArea().getCommandManager().getStringValue(Command.FONT_NAME);

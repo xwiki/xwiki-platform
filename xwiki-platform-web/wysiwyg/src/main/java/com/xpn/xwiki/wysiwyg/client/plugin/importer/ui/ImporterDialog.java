@@ -34,6 +34,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.WysiwygServiceAsync;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 
@@ -104,7 +105,8 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
     {
         // Dialog box.
         super(false, true);
-        getDialog().setText(Strings.INSTANCE.importerCaption());
+        getDialog().setIcon(Images.INSTANCE.importer().createImage());
+        getDialog().setCaption(Strings.INSTANCE.importerCaption());
         this.fullPageName = space + "." + page;
 
         // Main container panel.

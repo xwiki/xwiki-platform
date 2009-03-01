@@ -52,7 +52,7 @@ public interface Images extends ImageBundle
 
     @Resource("image.gif")
     AbstractImagePrototype image();
-    
+
     @Resource("importer.gif")
     AbstractImagePrototype importer();
 
@@ -97,6 +97,12 @@ public interface Images extends ImageBundle
 
     @Resource("macro.gif")
     AbstractImagePrototype macro();
+
+    @Resource("macro_edit.gif")
+    AbstractImagePrototype macroEdit();
+
+    @Resource("macro_refresh.gif")
+    AbstractImagePrototype macroRefresh();
 
     @Resource("ol.gif")
     AbstractImagePrototype ol();

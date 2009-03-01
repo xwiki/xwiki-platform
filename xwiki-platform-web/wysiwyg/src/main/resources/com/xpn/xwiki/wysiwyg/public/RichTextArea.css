@@ -50,9 +50,13 @@ body.main {
   font-size: 100%;
   text-align: left;
   padding: 1px;
-  /* Prevent resizing */
+  /* Prevent resizing in IE */
   width: auto !important;
   height: auto !important;
+  /* Remove button padding in IE */
+  overflow: visible;
+  /* Prevent word wrapping inside a macro container in IE */
+  white-space: nowrap;
 }
 
 .main .macro-selected {

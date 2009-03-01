@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
 /**
@@ -53,6 +55,12 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     private List<String> virtualWikiNamesList;
 
     /**
+     * The cache for macro descriptors. The first key is the syntax identifier and the second is the macro name.
+     */
+    private final Map<String, Map<String, MacroDescriptor>> macroDescriptorsCache =
+        new HashMap<String, Map<String, MacroDescriptor>>();
+
+    /**
      * Creates a new cache proxy for the given service.
      * 
      * @param service the service to be cached.
@@ -70,6 +78,16 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     public void cleanHTML(String dirtyHTML, AsyncCallback<String> async)
     {
         service.cleanHTML(dirtyHTML, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#parseAndRender(String, String, AsyncCallback)
+     */
+    public void parseAndRender(String html, String syntax, AsyncCallback<String> async)
+    {
+        service.parseAndRender(html, syntax, async);
     }
 
     /**
@@ -217,5 +235,45 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
         AsyncCallback<List<ImageConfig>> async)
     {
         service.getImageAttachments(wikiName, spaceName, pageName, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#getMacroDescriptor(String, String, AsyncCallback)
+     */
+    public void getMacroDescriptor(final String macroName, final String syntax,
+        final AsyncCallback<MacroDescriptor> async)
+    {
+        // First let's look in the cache.
+        Map<String, MacroDescriptor> macroDescriptorsForSyntax = macroDescriptorsCache.get(syntax);
+        if (macroDescriptorsForSyntax != null) {
+            MacroDescriptor descriptor = macroDescriptorsForSyntax.get(macroName);
+            if (descriptor != null) {
+                async.onSuccess(descriptor);
+                return;
+            }
+        }
+        // The macro descriptor wasn't found in the cache. We have to make the request to the server.
+        service.getMacroDescriptor(macroName, syntax, new AsyncCallback<MacroDescriptor>()
+        {
+            public void onFailure(Throwable caught)
+            {
+                async.onFailure(caught);
+            }
+
+            public void onSuccess(MacroDescriptor result)
+            {
+                if (result != null) {
+                    Map<String, MacroDescriptor> macroDescriptorsForSyntax = macroDescriptorsCache.get(syntax);
+                    if (macroDescriptorsForSyntax == null) {
+                        macroDescriptorsForSyntax = new HashMap<String, MacroDescriptor>();
+                        macroDescriptorsCache.put(syntax, macroDescriptorsForSyntax);
+                    }
+                    macroDescriptorsForSyntax.put(macroName, result);
+                }
+                async.onSuccess(result);
+            }
+        });
     }
 }

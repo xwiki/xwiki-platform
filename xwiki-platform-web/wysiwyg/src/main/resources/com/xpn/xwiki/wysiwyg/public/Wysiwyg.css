@@ -145,8 +145,9 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 }
 
 .xSymbolPalette {  
-  border:1px solid #EFEFEF;  
-  cursor:pointer; 
+  border-right:1px solid #EFEFEF;
+  border-bottom:1px solid #EFEFEF;
+  margin: 2px 3px 3px 2px;
 }
 
 .xSymbolPalette td {
@@ -173,62 +174,74 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 
 .xSymbolPalette .symbolCell-hover {  
   background-color:#778899;
-  cursor:default;
-}
-
-.xSymbolPicker {
-  border:1px solid #B5B6B5;
-  background-color:#FFFFFF;
-  cursor:default;
 }
 
 .xDialogBox {
-  border:1px solid black;
-}
-
-.xDialogBox .xCaption {
-  border-bottom:1px solid black;	
-  padding-right:16px;
-  background-color:#FFA500;
-  white-space:nowrap;
-  line-height:16px;
-  height: 16px;
-  cursor:move;
-}
-
-.xDialogBox .xTitleBar {
-  text-align:center;
-}
-
-* html .xDialogBox .xTitleBar {
-  width:100%;
-}
-
-.xDialogBox .xTitleBar .gwt-PushButton {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  border-left: 1px solid black;
-  border-bottom: 1px solid black;
-  background-color: #FF0000;
-}
-
-.xDialogBox .xTitleBar .gwt-PushButton .gwt-Image {
-  vertical-align: middle;
+  padding: 3px;
+  background-color: white;
 }
 
 .xDialogBox-dragging {
-  background-color:#6666FF !important;
-  border-style:dashed;
-  opacity:0.5 !important;	
+  background-color: transparent !important;
+  border: 1px dashed #333;
 }
 
-* html .xDialogBox-dragging {
-  filter:alpha(opacity=50) !important;
+.xDialogCaptionBar {
+  background-color: #DDD;
+  color: #777;
+  font-weight: bold;
+  letter-spacing: -1px;
+  padding: 0 27px 0 25px;
+  position: relative;
+  cursor: default;
 }
 
-* html .gwt-PopupPanel .popupContent {
-  width: 1px;
+.xDialogIcon {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+}
+
+.xDialogCaption {
+  white-space: nowrap;
+  height: 27px;
+  line-height: 27px;
+}
+
+.xDialogCloseIcon {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+
+.xDialogContent {
+  border: 2px solid #DDD;
+}
+
+.xDialogHeader, .xDialogFooter {
+  height: 25px;
+  padding: 10px;
+  line-height: 25px;
+}
+
+.xDialogHeader {
+  text-align: center;
+  font-weight: lighter;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+.xDialogFooter {
+  text-align: right;
+}
+
+.xDialogBody {
+  border-top: 2px solid #EEE;
+  border-bottom: 2px solid #EEE;
+  height: 350px;
+  width: 459px;
+  overflow: auto;
+  margin: 0 6px;
 }
 
 .gwt-TabBar {
@@ -268,10 +281,6 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
   padding: 6px;
 }
 
-.gwt-PopupPanel {
-  background: white;
-}
-
 .xLinkToUrl .gwt-Label,
 .xLinkToNewPage .gwt-Label,
 .xLinkToExistingPage .gwt-Label {
@@ -309,6 +318,11 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 
 .gwt-MenuBar .gwt-MenuItem-selected {
   background: #E0EDFE;
+}
+
+.gwt-MenuBar .gwt-MenuItem-disabled {
+  color: #C0C0C0;
+  background-color: transparent !important;
 }
 
 .gwt-MenuBar-horizontal {
@@ -444,6 +458,16 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
   font-size: 12px;
 }
 
+.gwt-MenuItem .gwt-MenuItemIcon {
+  margin-left: -5px;
+  vertical-align: middle;
+}
+
+.gwt-MenuItem .gwt-MenuItemLabel {
+  display: inline;
+  padding-left: 6px;
+}
+
 .xImagePreview {
   width: 116px;
   padding: 3px;
@@ -558,4 +582,38 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 .xImporterCancelButton {
   width: 60px;
   margin-left: 5px;
+}
+
+.xEditMacroDialog {
+}
+
+.xMacroParameter {
+  padding: 14px 0 6px 0;
+}
+
+.xMacroParameterLabel {
+  letter-spacing; -1px;
+  text-transform: capitalize;
+  font-size: 80%;
+  color: #333;
+  margin-bottom: 3px;
+}
+
+.xMacroParameterError {
+  font-size: 80%;
+  color: red;
+  padding: 2px 0;
+}
+
+.xMacroParameter textarea {
+  width: 433px;
+  height: 100px;
+  border: 1px solid #AAA;
+  padding: 2px;
+}
+
+.xMacroParameter .textInput {
+  width: 433px;
+  border: 1px solid #AAA;
+  padding: 2px;
 }

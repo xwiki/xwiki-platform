@@ -40,7 +40,8 @@ import com.xpn.xwiki.wysiwyg.client.plugin.separator.ToolBarSeparator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.WithDeferredUpdate;
+import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
+import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
@@ -52,8 +53,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.StyleWithCssExecutab
  * 
  * @version $Id$
  */
-public class WysiwygEditor implements WithDeferredUpdate, MouseListener, KeyboardListener, CommandListener,
-    ChangeListener, LoadListener
+public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener, CommandListener, ChangeListener,
+    LoadListener
 {
     /**
      * Iterates through the features placed on the tool bar and enables or disables them by following the syntax
@@ -165,9 +166,9 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
     private Map<String, UIExtension> toolBarFeatures;
 
     /**
-     * The index of the last update. It is used to apply only the last update from a queue of consecutive updates.
+     * Schedules updates and executes only the most recent one.
      */
-    private long updateIndex = -1;
+    private final DeferredUpdater updater = new DeferredUpdater(this);
 
     /**
      * Creates a new WYSIWYG editor.
@@ -246,7 +247,7 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
         // We listen to mouse up events instead of clicks because if the user selects text and the end points of the
         // selection are in different DOM nodes the click events are not triggered.
         if (sender == ui.getTextArea()) {
-            deferUpdate();
+            updater.deferUpdate();
         }
     }
 
@@ -278,7 +279,7 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
     public void onKeyUp(Widget sender, char keyCode, int modifier)
     {
         if (sender == ui.getTextArea()) {
-            deferUpdate();
+            updater.deferUpdate();
         }
     }
 
@@ -301,7 +302,7 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (sender == ui.getTextArea().getCommandManager()) {
-            deferUpdate();
+            updater.deferUpdate();
         }
     }
 
@@ -339,7 +340,7 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
             loadPlugins();
             fillMenu();
             fillToolBar();
-            onUpdate();
+            update();
         }
     }
 
@@ -462,37 +463,9 @@ public class WysiwygEditor implements WithDeferredUpdate, MouseListener, Keyboar
     /**
      * {@inheritDoc}
      * 
-     * @see WithDeferredUpdate#getUpdateIndex()
+     * @see Updatable#update()
      */
-    public long getUpdateIndex()
-    {
-        return updateIndex;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WithDeferredUpdate#incUpdateIndex()
-     */
-    public long incUpdateIndex()
-    {
-        return ++updateIndex;
-    }
-
-    /**
-     * Schedules an update. More than one update can be scheduled, but only the last one will be executed.
-     */
-    private void deferUpdate()
-    {
-        DeferredCommand.addCommand(new UpdateCommand(this));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WithDeferredUpdate#onUpdate()
-     */
-    public void onUpdate()
+    public void update()
     {
         DeferredCommand.addCommand(new SyntaxValidationCommand());
     }

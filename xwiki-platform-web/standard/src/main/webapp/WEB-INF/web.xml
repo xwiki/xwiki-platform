@@ -195,6 +195,7 @@
 				org.xwiki.rest.resources.pages.PageTranslationsResource;
 				org.xwiki.rest.resources.pages.PageTranslationVersionResource;
 				org.xwiki.rest.resources.pages.PageVersionResource;
+				org.xwiki.rest.resources.pages.PageTagsResource;
 				org.xwiki.rest.resources.comments.CommentResource;
 				org.xwiki.rest.resources.comments.CommentsResource;
 				org.xwiki.rest.resources.comments.CommentsVersionResource;
@@ -214,6 +215,8 @@
 				org.xwiki.rest.resources.classes.ClassResource;
 				org.xwiki.rest.resources.classes.ClassPropertiesResource;
 				org.xwiki.rest.resources.classes.ClassPropertyResource;
+				org.xwiki.rest.resources.tags.TagsResource;
+				org.xwiki.rest.resources.tags.PagesForTagsResource;
 				org.xwiki.rest.resources.ModificationsResource;
 			</param-value>
 		</init-param>
@@ -224,7 +227,8 @@
 				org.xwiki.rest.exceptions.QueryExceptionMapper;
 				org.xwiki.rest.representations.pages.TextPlainPageReader;
 				org.xwiki.rest.representations.objects.TextPlainPropertyReader;
-				org.xwiki.rest.representations.comments.TextPlainCommentReader
+				org.xwiki.rest.representations.comments.TextPlainCommentReader;
+				org.xwiki.rest.representations.tags.TextPlainTagsReader
 			</param-value>
 		</init-param>   
   </servlet>

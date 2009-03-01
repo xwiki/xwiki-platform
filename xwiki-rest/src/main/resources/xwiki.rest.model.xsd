@@ -370,4 +370,26 @@
     </element>
 
     <element name="objectSummary" type="xwiki:ObjectSummary"></element>
+
+    <complexType name="Tag">
+    	<complexContent>
+    		<extension base="xwiki:LinkCollection">
+    			<attribute name="name" type="string"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <element name="tag" type="xwiki:Tag"></element>
+
+    <element name="tags">
+    	<complexType>
+    		<complexContent>
+    			<extension base="xwiki:LinkCollection">
+    				<sequence>
+    					<element name="tag" type="xwiki:Tag" minOccurs="0" maxOccurs="unbounded"></element>
+    				</sequence>
+    			</extension>
+    		</complexContent>
+    	</complexType>
+    </element>
 </schema>

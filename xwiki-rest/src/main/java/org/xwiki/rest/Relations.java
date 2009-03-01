@@ -68,4 +68,8 @@ public class Relations
 
     public static final String CHILDREN = "http://www.xwiki.org/rel/children";
 
+    public static final String TAGS = "http://www.xwiki.org/rel/tags";
+
+    public static final String TAG = "http://www.xwiki.org/rel/tag";
+
 }

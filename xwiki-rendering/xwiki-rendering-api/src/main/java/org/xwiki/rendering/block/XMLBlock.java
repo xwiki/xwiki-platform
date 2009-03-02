@@ -32,7 +32,7 @@ import org.xwiki.rendering.listener.xml.XMLNode;
 public class XMLBlock extends AbstractFatherBlock
 {
     private XMLNode node;
-    
+
     public XMLBlock(List<Block> childrenBlocks, XMLNode node)
     {
         super(childrenBlocks);
@@ -41,14 +41,14 @@ public class XMLBlock extends AbstractFatherBlock
 
     public XMLBlock(XMLNode node)
     {
-        this(Collections.<Block>emptyList(), node);
+        this(Collections.<Block> emptyList(), node);
     }
-    
+
     public XMLNode getXMLNode()
     {
         return this.node;
     }
-    
+
     public void before(Listener listener)
     {
         listener.beginXMLNode(getXMLNode());
@@ -58,15 +58,16 @@ public class XMLBlock extends AbstractFatherBlock
     {
         listener.endXMLNode(getXMLNode());
     }
-    
+
     /**
      * {@inheritDoc}
-     * @see Object#clone()
+     * 
+     * @see org.xwiki.rendering.block.AbstractBlock#clone(org.xwiki.rendering.block.BlockFilter)
      */
     @Override
-    public Block clone()
+    public XMLBlock clone(BlockFilter blockFilter)
     {
-        XMLBlock clone = (XMLBlock) super.clone();
+        XMLBlock clone = (XMLBlock) super.clone(blockFilter);
         clone.node = getXMLNode().clone();
         return clone;
     }

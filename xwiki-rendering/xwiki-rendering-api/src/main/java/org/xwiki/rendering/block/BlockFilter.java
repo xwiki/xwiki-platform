@@ -19,56 +19,22 @@
  */
 package org.xwiki.rendering.block;
 
-import org.xwiki.rendering.listener.Listener;
+import java.util.List;
 
 /**
- * Represents a word.
+ * Filter provided block into one or more block.
+ * <p>
+ * See {@link AbstractBlock#clone(BlockFilter)} for an example of it's use.
  * 
  * @version $Id$
- * @since 1.5M2
  */
-public class WordBlock extends AbstractBlock
+public interface BlockFilter
 {
     /**
-     * @see #getWord()
-     */
-    private String word;
-
-    /**
-     * @param word the word wrapped by this block. Note that this is supposed to be a single word and space or special
-     *            symbols should be represented by other blocks
-     */
-    public WordBlock(String word)
-    {
-        this.word = word;
-    }
-
-    /**
-     * {@inheritDoc}
+     * Filter provided block into zero or more block.
      * 
-     * @see AbstractBlock#traverse(Listener)
+     * @param block the block to filter.
+     * @return should never be null. The filtered blocks or empty list.
      */
-    public void traverse(Listener listener)
-    {
-        listener.onWord(getWord());
-    }
-
-    /**
-     * @return the word wrapped by this block
-     */
-    public String getWord()
-    {
-        return this.word;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return getWord();
-    }
+    List<Block> filter(Block block);
 }

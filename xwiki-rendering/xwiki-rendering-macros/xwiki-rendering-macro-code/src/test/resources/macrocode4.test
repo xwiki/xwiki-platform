@@ -62,7 +62,8 @@ beginMacroMarkerStandalone [code] [language=javascript] [
 ]
 beginXMLNode [div] [class=box code]
 beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
-onWord [//]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
 onSpace
 onWord [getJSON]
 onSpace
@@ -75,16 +76,39 @@ onSpace
 onWord [Zaytsev]
 onSpace
 onNewLine
-onWord [//]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
 onSpace
-onWord [http://github.com/kangax/protolicious/tree/master/get_json.js]
+onWord [http]
+onSpecialSymbol [:]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
+onWord [github]
+onSpecialSymbol [.]
+onWord [com]
+onSpecialSymbol [/]
+onWord [kangax]
+onSpecialSymbol [/]
+onWord [protolicious]
+onSpecialSymbol [/]
+onWord [tree]
+onSpecialSymbol [/]
+onWord [master]
+onSpecialSymbol [/]
+onWord [get]
+onSpecialSymbol [_]
+onWord [json]
+onSpecialSymbol [.]
+onWord [js]
 onNewLine
 endFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
-onWord [(]
+onSpecialSymbol [(]
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [function]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-onWord [(){]
+onSpecialSymbol [(]
+onSpecialSymbol [)]
+onSpecialSymbol [{]
 onNewLine
 onSpace
 onSpace
@@ -95,72 +119,76 @@ onSpace
 onWord [id]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [0]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [,]
+onSpecialSymbol [,]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 onWord [head]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
-onWord [$$]
-onWord [(]
+onSpecialSymbol [$]
+onSpecialSymbol [$]
+onSpecialSymbol [(]
 beginFormat: [NONE] [[style]=[color: #BA2121; ]]
-onWord ['head']
+onSpecialSymbol [']
+onWord [head]
+onSpecialSymbol [']
 endFormat: [NONE] [[style]=[color: #BA2121; ]]
-onWord [)[]
+onSpecialSymbol [)]
+onSpecialSymbol [[]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onWord [0]
 endFormat: [NONE] [[style]=[color: #666666; ]]
-onWord []]
+onSpecialSymbol []]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [,]
+onSpecialSymbol [,]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 onWord [global]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [this]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [;]
+onSpecialSymbol [;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onNewLine
 onSpace
 onSpace
 onWord [global]
-onWord [.]
+onSpecialSymbol [.]
 onWord [getJSON]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [function]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-onWord [(]
+onSpecialSymbol [(]
 onWord [url]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [,]
+onSpecialSymbol [,]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 onWord [callback]
-onWord [)]
+onSpecialSymbol [)]
 onSpace
-onWord [{]
+onSpecialSymbol [{]
 onNewLine
 onSpace
 onSpace
@@ -173,40 +201,46 @@ onSpace
 onWord [script]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 beginFormat: [NONE] [[style]=[color: #008000; ]]
 onWord [document]
 endFormat: [NONE] [[style]=[color: #008000; ]]
-onWord [.]
+onSpecialSymbol [.]
 onWord [createElement]
-onWord [(]
+onSpecialSymbol [(]
 beginFormat: [NONE] [[style]=[color: #BA2121; ]]
-onWord ['script']
+onSpecialSymbol [']
+onWord [script]
+onSpecialSymbol [']
 endFormat: [NONE] [[style]=[color: #BA2121; ]]
-onWord [)]
+onSpecialSymbol [)]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [,]
+onSpecialSymbol [,]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 onWord [token]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 beginFormat: [NONE] [[style]=[color: #BA2121; ]]
-onWord ['__jsonp']
+onSpecialSymbol [']
+onSpecialSymbol [_]
+onSpecialSymbol [_]
+onWord [jsonp]
+onSpecialSymbol [']
 endFormat: [NONE] [[style]=[color: #BA2121; ]]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [+]
+onSpecialSymbol [+]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 onWord [id]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [;]
+onSpecialSymbol [;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onNewLine
 onSpace
@@ -216,7 +250,8 @@ onSpace
 onSpace
 onSpace
 beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
-onWord [//]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
 onSpace
 onWord [callback]
 onSpace
@@ -236,17 +271,17 @@ onSpace
 onSpace
 onSpace
 onWord [global]
-onWord [[]
+onSpecialSymbol [[]
 onWord [token]
-onWord []]
+onSpecialSymbol []]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 onWord [callback]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [;]
+onSpecialSymbol [;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onNewLine
 onSpace
@@ -256,7 +291,8 @@ onSpace
 onSpace
 onSpace
 beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
-onWord [//]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
 onSpace
 onWord [url]
 onSpace
@@ -264,7 +300,9 @@ onWord [should]
 onSpace
 onWord [have]
 onSpace
-onWord ["?"]
+onSpecialSymbol ["]
+onSpecialSymbol [?]
+onSpecialSymbol ["]
 onSpace
 onWord [parameter]
 onSpace
@@ -294,42 +332,58 @@ onSpace
 onSpace
 onSpace
 onWord [script]
-onWord [.]
+onSpecialSymbol [.]
 onWord [src]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 onWord [url]
-onWord [.]
+onSpecialSymbol [.]
 onWord [replace]
-onWord [(]
+onSpecialSymbol [(]
 beginFormat: [NONE] [[style]=[color: #BB6688; ]]
-onWord [/\?(&|$)/]
+onSpecialSymbol [/]
+onWord [\]
+onSpecialSymbol [?]
+onSpecialSymbol [(]
+onSpecialSymbol [&]
+onSpecialSymbol [|]
+onSpecialSymbol [$]
+onSpecialSymbol [)]
+onSpecialSymbol [/]
 endFormat: [NONE] [[style]=[color: #BB6688; ]]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [,]
+onSpecialSymbol [,]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 beginFormat: [NONE] [[style]=[color: #BA2121; ]]
-onWord ['__jsonp']
+onSpecialSymbol [']
+onSpecialSymbol [_]
+onSpecialSymbol [_]
+onWord [jsonp]
+onSpecialSymbol [']
 endFormat: [NONE] [[style]=[color: #BA2121; ]]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [+]
+onSpecialSymbol [+]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 onWord [id]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [+]
+onSpecialSymbol [+]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 beginFormat: [NONE] [[style]=[color: #BA2121; ]]
-onWord ['$1']
+onSpecialSymbol [']
+onSpecialSymbol [$]
+onWord [1]
+onSpecialSymbol [']
 endFormat: [NONE] [[style]=[color: #BA2121; ]]
-onWord [);]
+onSpecialSymbol [)]
+onSpecialSymbol [;]
 onNewLine
 onSpace
 onNewLine
@@ -338,7 +392,8 @@ onSpace
 onSpace
 onSpace
 beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
-onWord [//]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
 onSpace
 onWord [clean]
 onSpace
@@ -346,13 +401,15 @@ onWord [up]
 onSpace
 onWord [on]
 onSpace
-onWord [load:]
+onWord [load]
+onSpecialSymbol [:]
 onSpace
 onWord [remove]
 onSpace
 onWord [script]
 onSpace
-onWord [tag,]
+onWord [tag]
+onSpecialSymbol [,]
 onSpace
 onWord [null]
 onSpace
@@ -376,19 +433,20 @@ onSpace
 onSpace
 onSpace
 onWord [script]
-onWord [.]
+onSpecialSymbol [.]
 onWord [onload]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [function]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-onWord [()]
+onSpecialSymbol [(]
+onSpecialSymbol [)]
 onSpace
-onWord [{]
+onSpecialSymbol [{]
 onNewLine
 onSpace
 onSpace
@@ -397,9 +455,11 @@ onSpace
 onSpace
 onSpace
 onWord [script]
-onWord [.]
+onSpecialSymbol [.]
 onWord [remove]
-onWord [();]
+onSpecialSymbol [(]
+onSpecialSymbol [)]
+onSpecialSymbol [;]
 onNewLine
 onSpace
 onSpace
@@ -410,14 +470,14 @@ onSpace
 onWord [script]
 onSpace
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [=]
+onSpecialSymbol [=]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onSpace
 beginFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onWord [null]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [;]
+onSpecialSymbol [;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onNewLine
 onSpace
@@ -429,26 +489,29 @@ onSpace
 onWord [delete]
 onSpace
 onWord [global]
-onWord [[]
+onSpecialSymbol [[]
 onWord [token]
-onWord [];]
+onSpecialSymbol []]
+onSpecialSymbol [;]
 onNewLine
 onSpace
 onSpace
 onSpace
 onSpace
-onWord [};]
+onSpecialSymbol [}]
+onSpecialSymbol [;]
 onNewLine
 onSpace
 onSpace
 onSpace
 onSpace
 onWord [head]
-onWord [.]
+onSpecialSymbol [.]
 onWord [appendChild]
-onWord [(]
+onSpecialSymbol [(]
 onWord [script]
-onWord [);]
+onSpecialSymbol [)]
+onSpecialSymbol [;]
 onNewLine
 onSpace
 onNewLine
@@ -457,7 +520,8 @@ onSpace
 onSpace
 onSpace
 beginFormat: [NONE] [[style]=[font-weight: italic; color: #408080; ]]
-onWord [//]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
 onSpace
 onWord [callback]
 onSpace
@@ -476,14 +540,20 @@ onSpace
 onSpace
 onWord [id]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
-onWord [++;]
+onSpecialSymbol [+]
+onSpecialSymbol [+]
+onSpecialSymbol [;]
 endFormat: [NONE] [[style]=[color: #666666; ]]
 onNewLine
 onSpace
 onSpace
-onWord [}]
+onSpecialSymbol [}]
 onNewLine
-onWord [})();]
+onSpecialSymbol [}]
+onSpecialSymbol [)]
+onSpecialSymbol [(]
+onSpecialSymbol [)]
+onSpecialSymbol [;]
 endXMLNode [div] [class=box code]
 endMacroMarkerStandalone [code] [language=javascript] [
 // getJSON function by Juriy Zaytsev 

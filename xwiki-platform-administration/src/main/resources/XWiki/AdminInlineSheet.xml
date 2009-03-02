@@ -25,29 +25,29 @@
 <content>###----------------------------------
 ## modified version of editinline.vm
 ###----------------------------------
-#if ($doc.fullName != "XWiki.AdminInlineSheet") ## Prevents infinite loops
-#set($formname = "inline")
-#set($saveaction = "save")
+#if ($doc.fullName != 'XWiki.AdminInlineSheet') ## Prevents infinite loops
+#set($formname = 'inline')
+#set($saveaction = 'save')
 #set($previewenabled = true)
-#set($xnotification = $!request.getParameter("xnotification"))
-&lt;form id="inline" method="post" action="$doc.getURL("preview")"&gt;
+#set($xnotification = $!request.getParameter('xnotification'))
+&lt;form id="inline" method="post" action="$doc.getURL('preview')"&gt;
   &lt;div&gt;
-    &lt;div class="hidden"&gt;&lt;input type="hidden" name="xcontinue" value="$doc.getURL("admin", "${request.queryString}&amp;editmode=inline").replaceAll("&amp;","&amp;amp;")" /&gt;&lt;/div&gt;
-    &lt;input type="hidden" name="xredirect" value="$doc.getURL("admin", "editor=${editor}&amp;section=${section}&amp;space=XWiki").replaceAll("&amp;","&amp;amp;")" /&gt;
+    &lt;div class="hidden"&gt;&lt;input type="hidden" name="xcontinue" value="$doc.getURL('admin', "${request.queryString}&amp;editmode=inline").replaceAll('&amp;','&amp;amp;')" /&gt;&lt;/div&gt;
+    &lt;input type="hidden" name="xredirect" value="$doc.getURL('admin', "editor=${editor}&amp;section=${section}&amp;space=XWiki").replaceAll('&amp;','&amp;amp;')" /&gt;
     &lt;input type="hidden" name="xnotification" value="$!xnotification" /&gt;
     &lt;input type="hidden" name="template" value="$!request.template" /&gt;
     &lt;input type="hidden" name="language" value="$!doc.language" /&gt;
-    #if("$!request.parent" != "")
+    #if("$!request.parent" != '')
     &lt;input type="hidden" name="parent" value="$!request.parent" /&gt;
     #end
     #if("$!request.title" != "")
     &lt;input type="hidden" name="title" value="$!request.title" /&gt;
     #end
-    #set($force = $!request.get("force"))
+    #set($force = $!request.get('force'))
     #if (($doc.getLocked() == true) &amp;&amp; (!$force)) ## locking
     &lt;div&gt;
-     $msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()). &lt;br /&gt;
-     &lt;a href="$doc.getURL("inline", "$!request.getQueryString()&amp;force=1")"&gt;$msg.get("forcelock")&lt;/a&gt;
+     $msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser()). &lt;br /&gt;
+     &lt;a href="$doc.getURL('inline', "$!request.getQueryString()&amp;force=1")"&gt;$msg.get('forcelock')&lt;/a&gt;
     &lt;/div&gt;
     #else
       #foreach($class in $doc.xWikiClasses)
@@ -57,14 +57,14 @@
       $doc.getTranslatedDocument().getRenderedContent()
       &lt;div class="bottombuttons"&gt;
        &lt;p class="admin-buttons"&gt;
-         &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick="document.forms.update.action='$doc.getURL("cancel")'; if (document.forms.update.onsubmit) document.forms.update.onsubmit();" /&gt;&lt;/span&gt;
-         &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsac" value="$msg.get("saveandcontinue")" onclick="document.forms.update.action='$doc.getURL("saveandcontinue")'; if (document.forms.update.onsubmit) document.forms.update.onsubmit();if(checkDocumentContent()) document.forms.update.submit(); return false;" /&gt;&lt;/span&gt;
-         &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsave" value="$msg.get("saveandview")" onclick="document.forms.update.action='$doc.getURL("saveandview")'; if (document.forms.update.onsubmit) document.forms.update.onsubmit();if(checkDocumentContent()) document.forms.update.submit(); return false;" /&gt;&lt;/span&gt;
+         &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactioncancel" value="$msg.get('cancel')" onclick="document.forms.update.action='$doc.getURL('cancel')'; if (document.forms.update.onsubmit) document.forms.update.onsubmit();" /&gt;&lt;/span&gt;
+         &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsac" value="$msg.get('saveandcontinue')" onclick="document.forms.update.action='$doc.getURL('saveandcontinue')'; if (document.forms.update.onsubmit) document.forms.update.onsubmit();if(checkDocumentContent()) document.forms.update.submit(); return false;" /&gt;&lt;/span&gt;
+         &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsave" value="$msg.get('saveandview')" onclick="document.forms.update.action='$doc.getURL('saveandview')'; if (document.forms.update.onsubmit) document.forms.update.onsubmit();if(checkDocumentContent()) document.forms.update.submit(); return false;" /&gt;&lt;/span&gt;
        &lt;/p&gt;
       &lt;/div&gt; ## bottombuttons
     #end
   &lt;/div&gt; ## form
 &lt;/form&gt;
-#template("textarea_wysiwyg.vm")
+#template('textarea_wysiwyg.vm')
 #end</content>
 </xwikidoc>

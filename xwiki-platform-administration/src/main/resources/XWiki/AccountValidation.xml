@@ -55,14 +55,14 @@
 <tags/>
 </property>
 </object>
-<content>#if("$!{request.validkey}" != "" &amp;&amp; "$!{request.xwikiname}" != "")
+<content>#if("$!{request.validkey}" != '' &amp;&amp; "$!{request.xwikiname}" != '')
   #if($xwiki.validateUser(true) == 0)
-    #set($loginURL = $xwiki.getURL('XWiki.XWikiLogin', 'login'))    
-    #info($msg.get("xe.admin.accountvalidation.success", [${loginURL}]))
+    #set($loginURL = $xwiki.getURL('XWiki.XWikiLogin', 'login'))
+    #info($msg.get('xe.admin.accountvalidation.success', [${loginURL}]))
   #else
-    #warning($msg.get("xe.admin.accountvalidation.failure"))
+    #warning($msg.get('xe.admin.accountvalidation.failure'))
   #end
 #else
-  $response.sendRedirect($xwiki.getURL("Main.WebHome"))
+  $response.sendRedirect($xwiki.getURL('Main.WebHome'))
 #end</content>
 </xwikidoc>

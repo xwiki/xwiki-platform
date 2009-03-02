@@ -56,8 +56,8 @@
 </property>
 </object>
 <content>### Globally administrate the registration of new users in a wiki.
-#set($legend = ["registration"])
+#set($legend = ['registration'])
 #set($params = $util.hashMap)
-#set($params.registration = ["use_email_verification", "auth_active_check", "validation_email_content", "confirmation_email_content", "invitation_email_content"])
-#includeForm("XWiki.AdminFieldsDisplaySheet")
+#set($params.registration = ['use_email_verification', 'auth_active_check', 'validation_email_content', 'confirmation_email_content', 'invitation_email_content'])
+#includeForm('XWiki.AdminFieldsDisplaySheet')
 </content></xwikidoc>

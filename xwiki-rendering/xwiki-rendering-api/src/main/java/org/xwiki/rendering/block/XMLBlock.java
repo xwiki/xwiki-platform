@@ -63,6 +63,7 @@ public class XMLBlock extends AbstractFatherBlock
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.block.AbstractBlock#clone(org.xwiki.rendering.block.BlockFilter)
+     * @since 1.8RC2
      */
     @Override
     public XMLBlock clone(BlockFilter blockFilter)

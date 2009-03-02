@@ -235,6 +235,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
 
     /**
      * @return a new empty list item.
+     * @since 1.8RC2
      */
     private ListItemBlock createEmptyTocEntry()
     {

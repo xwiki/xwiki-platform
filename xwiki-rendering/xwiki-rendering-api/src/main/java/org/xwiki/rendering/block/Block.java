@@ -141,6 +141,7 @@ public interface Block extends Cloneable
      * 
      * @param blockFilter the Block filter.
      * @return the filtered Block.
+     * @since 1.8RC2
      */
     Block clone(BlockFilter blockFilter);
 

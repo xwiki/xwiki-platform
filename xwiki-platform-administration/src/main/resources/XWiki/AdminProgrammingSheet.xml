@@ -56,8 +56,8 @@
 </property>
 </object>
 <content>### Globally administrate the programming preferences.
-#set($legend = ["programming"])
+#set($legend = ['programming'])
 #set($params = $util.hashMap)
-#set($params.programming = ["macros_languages", "macros_velocity", "macros_groovy", "macros_mapping", "notification_pages", "documentBundles"])
-#includeForm("XWiki.AdminFieldsDisplaySheet")
+#set($params.programming = ['macros_languages', 'macros_velocity', 'macros_groovy', 'macros_mapping', 'notification_pages', 'documentBundles'])
+#includeForm('XWiki.AdminFieldsDisplaySheet')
 </content></xwikidoc>

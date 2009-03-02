@@ -56,16 +56,16 @@
 </property>
 </object>
 <content>### Administrate the presentation preferences globally and at space level.
-#if("$!editor"=="globaladmin")
-  #set($legend = ["header", "footer", "skin"])
+#if("$!editor" == 'globaladmin')
+  #set($legend = ['header', 'footer', 'skin'])
 #else
-  #set($legend = ["header", "skin"])
+  #set($legend = ['header', 'skin'])
 #end
 #set($params = $util.hashMap)
-#set($params.header = ["title", "meta"])
-#if("$!editor"=="globaladmin")
-  #set($params.footer = ["webcopyright", "version"])
+#set($params.header = ['title', 'meta'])
+#if("$!editor" == 'globaladmin')
+  #set($params.footer = ['webcopyright', 'version'])
 #end
-#set($params.skin = ["skin", "stylesheet", "stylesheets"])
-#includeForm("XWiki.AdminFieldsDisplaySheet")</content>
+#set($params.skin = ['skin', 'stylesheet', 'stylesheets'])
+#includeForm('XWiki.AdminFieldsDisplaySheet')</content>
 </xwikidoc>

@@ -441,5 +441,5 @@
 <first_name>Administrator</first_name>
 </property>
 </object>
-<content>#includeForm("XWiki.XWikiUserSheet")</content>
+<content>#includeForm('XWiki.XWikiUserSheet')</content>
 </xwikidoc>

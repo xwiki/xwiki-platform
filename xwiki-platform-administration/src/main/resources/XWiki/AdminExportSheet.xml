@@ -24,6 +24,6 @@
 <syntaxId>xwiki/1.0</syntaxId>
 <content>### Administrate the wiki export
 {pre}
-#template("exportinline.vm")
+#template('exportinline.vm')
 {/pre}</content>
 </xwikidoc>

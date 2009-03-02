@@ -24,6 +24,6 @@
 <syntaxId>xwiki/1.0</syntaxId>
 <content>## Administrate the wiki import.
 {pre}
-#template("importinline.vm")
+#template('importinline.vm')
 {/pre}</content>
 </xwikidoc>

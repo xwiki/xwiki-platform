@@ -65,6 +65,7 @@ public class WordBlock extends AbstractBlock
      * {@inheritDoc}
      * 
      * @see java.lang.Object#toString()
+     * @since 1.8RC2
      */
     @Override
     public String toString()

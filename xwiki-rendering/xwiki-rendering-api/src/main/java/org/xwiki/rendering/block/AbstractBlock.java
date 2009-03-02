@@ -330,6 +330,7 @@ public abstract class AbstractBlock implements Block
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.block.Block#clone(org.xwiki.rendering.block.BlockFilter)
+     * @since 1.8RC2
      */
     public Block clone(BlockFilter blockFilter)
     {
@@ -351,6 +352,7 @@ public abstract class AbstractBlock implements Block
      * 
      * @param block the block.
      * @param blockFilter filter to apply on block children.
+     * @since 1.8RC2
      */
     private void clone(AbstractBlock block, BlockFilter blockFilter)
     {
@@ -365,8 +367,9 @@ public abstract class AbstractBlock implements Block
      * 
      * @param block the block.
      * @param blockFilter the filter to apply on children.
+     * @since 1.8RC2
      */
-    public void cloneChildren(AbstractBlock block, BlockFilter blockFilter)
+    private void cloneChildren(AbstractBlock block, BlockFilter blockFilter)
     {
         block.childrenBlocks = new ArrayList<Block>();
         for (Block childBlock : getChildren()) {

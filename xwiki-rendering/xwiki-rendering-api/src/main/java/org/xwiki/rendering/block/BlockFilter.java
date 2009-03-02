@@ -27,6 +27,7 @@ import java.util.List;
  * See {@link AbstractBlock#clone(BlockFilter)} for an example of it's use.
  * 
  * @version $Id$
+ * @since 1.8RC2
  */
 public interface BlockFilter
 {

@@ -51,7 +51,7 @@ public class LinkBlock extends AbstractFatherBlock
      */
     public LinkBlock(List<Block> childrenBlocks, Link link, boolean isFreeStandingURI)
     {
-        this(childrenBlocks, link, isFreeStandingURI, Collections.<String, String>emptyMap());
+        this(childrenBlocks, link, isFreeStandingURI, Collections.<String, String> emptyMap());
     }
 
     /**
@@ -66,7 +66,7 @@ public class LinkBlock extends AbstractFatherBlock
         this.link = link;
         this.isFreeStandingURI = isFreeStandingURI;
     }
-    
+
     /**
      * @return the link
      * @see Link
@@ -86,6 +86,7 @@ public class LinkBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
@@ -95,21 +96,23 @@ public class LinkBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)  
+     * 
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {
         listener.endLink(getLink(), isFreeStandingURI(), getParameters());
     }
-    
+
     /**
      * {@inheritDoc}
-     * @see Object#clone()
+     * 
+     * @see org.xwiki.rendering.block.AbstractBlock#clone(org.xwiki.rendering.block.BlockFilter)
      */
     @Override
-    public Block clone()
+    public LinkBlock clone(BlockFilter blockFilter)
     {
-        LinkBlock clone = (LinkBlock) super.clone();
+        LinkBlock clone = (LinkBlock) super.clone(blockFilter);
         clone.link = getLink().clone();
         return clone;
     }

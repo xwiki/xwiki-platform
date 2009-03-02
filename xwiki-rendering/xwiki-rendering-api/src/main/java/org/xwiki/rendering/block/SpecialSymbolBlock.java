@@ -28,7 +28,7 @@ import org.xwiki.rendering.listener.Listener;
 public class SpecialSymbolBlock extends AbstractBlock
 {
     private char symbol;
-    
+
     public SpecialSymbolBlock(char symbol)
     {
         this.symbol = symbol;
@@ -38,9 +38,20 @@ public class SpecialSymbolBlock extends AbstractBlock
     {
         return this.symbol;
     }
-    
+
     public void traverse(Listener listener)
     {
         listener.onSpecialSymbol(getSymbol());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return "" + getSymbol();
     }
 }

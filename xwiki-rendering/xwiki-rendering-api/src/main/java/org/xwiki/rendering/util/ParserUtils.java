@@ -21,11 +21,13 @@ package org.xwiki.rendering.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 
 /**
@@ -36,11 +38,14 @@ import org.xwiki.rendering.block.WordBlock;
  */
 public class ParserUtils
 {
+    private static final Pattern SPECIALSYMBOL_PATTERN = Pattern.compile("[!\"#$%&'()*+,-./:;<=>?@\\[\\]^_`{|}~]");
+
     /**
      * Parse a simple inline non wiki string to be able to insert it in the XDOM.
      * 
      * @param text the text to parse (pure text)
-     * @return the list of {@link Block} ({@link WordBlock}, {@link SpaceBlock}, {@link NewLineBlock}).
+     * @return the list of {@link Block} ({@link WordBlock}, {@link SpaceBlock}, {@link NewLineBlock},
+     *         {@link SpecialSymbolBlock}).
      * @since 1.7
      */
     public List<Block> parseInlineNonWiki(String text)
@@ -56,7 +61,7 @@ public class ParserUtils
                 }
                 blockList.add(NewLineBlock.NEW_LINE_BLOCK);
 
-                word = new StringBuffer();
+                word.setLength(0);
             } else if (c == '\r') {
                 continue;
             } else if (c == ' ') {
@@ -65,7 +70,14 @@ public class ParserUtils
                 }
                 blockList.add(SpaceBlock.SPACE_BLOCK);
 
-                word = new StringBuffer();
+                word.setLength(0);
+            } else if (SPECIALSYMBOL_PATTERN.matcher(String.valueOf(c)).matches()) {
+                if (word.length() > 0) {
+                    blockList.add(new WordBlock(word.toString()));
+                }
+                blockList.add(new SpecialSymbolBlock(c));
+
+                word.setLength(0);
             } else {
                 word.append(c);
             }

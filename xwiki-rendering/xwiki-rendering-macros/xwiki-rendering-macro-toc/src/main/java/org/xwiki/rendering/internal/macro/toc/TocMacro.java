@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
 import org.xwiki.rendering.block.IdBlock;
@@ -39,6 +41,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
 import org.xwiki.rendering.macro.toc.TocMacroParameters;
+import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
 
@@ -48,7 +51,7 @@ import org.xwiki.rendering.util.IdGenerator;
  * @version $Id$
  * @since 1.5M2
  */
-public class TocMacro extends AbstractMacro<TocMacroParameters>
+public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initializable
 {
     /**
      * The description of the macro.
@@ -61,6 +64,16 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
     private IdGenerator idGenerator;
 
     /**
+     * Used to filter the {@link SectionBlock} title to generate the toc anchor.
+     */
+    private TocBlockFilter tocBlockFilter;
+
+    /**
+     * Generate link label.
+     */
+    private LinkLabelGenerator linkLabelGenerator;
+
+    /**
      * Create and initialize the descriptor of the macro.
      */
     public TocMacro()
@@ -68,6 +81,16 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
         super(new DefaultMacroDescriptor(DESCRIPTION, TocMacroParameters.class));
 
         registerConverter(new EnumConverter(Scope.class), Scope.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.phase.Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        this.tocBlockFilter = new TocBlockFilter(linkLabelGenerator);
     }
 
     /**
@@ -168,20 +191,22 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
             int headerLevel = headerBlock.getLevel().getAsInt();
 
             if (headerLevel >= start && headerLevel <= depth) {
-                ListItemBlock itemBlock = createTocEntry(headerBlock);
-
                 // Move to next header in toc tree
 
                 while (currentLevel < headerLevel) {
+                    if (currentBlock instanceof ListBLock) {
+                        currentBlock = addItemBlock(currentBlock, null);
+                    }
+
                     currentBlock = createChildListBlock(numbered, currentBlock);
                     ++currentLevel;
                 }
                 while (currentLevel > headerLevel) {
-                    currentBlock = currentBlock.getParent();
+                    currentBlock = currentBlock.getParent().getParent();
                     --currentLevel;
                 }
 
-                currentBlock.addChild(itemBlock);
+                currentBlock = addItemBlock(currentBlock, headerBlock);
             }
         }
 
@@ -193,21 +218,47 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
     }
 
     /**
+     * Add a {@link ListItemBlock} in the current toc tree block and return the new {@link ListItemBlock}.
+     * 
+     * @param currentBlock the current block in the toc tree.
+     * @param headerBlock the {@link HeaderBlock} to use to generate toc anchor label.
+     * @return the new {@link ListItemBlock}.
+     */
+    private Block addItemBlock(Block currentBlock, HeaderBlock headerBlock)
+    {
+        ListItemBlock itemBlock = headerBlock == null ? createEmptyTocEntry() : createTocEntry(headerBlock);
+
+        currentBlock.addChild(itemBlock);
+
+        return itemBlock;
+    }
+
+    /**
+     * @return a new empty list item.
+     */
+    private ListItemBlock createEmptyTocEntry()
+    {
+        return new ListItemBlock(Collections.<Block> emptyList());
+    }
+
+    /**
      * Create a new toc list item based on section title.
      * 
-     * @param sectionBlock the {@link HeaderBlock}.
+     * @param headerBlock the {@link HeaderBlock}.
      * @return the new list item block.
      */
-    private ListItemBlock createTocEntry(HeaderBlock sectionBlock)
+    private ListItemBlock createTocEntry(HeaderBlock headerBlock)
     {
+        // Insert anchor before the header to target
         IdBlock idBlock = newUniqueIdBlock();
-        sectionBlock.getParent().insertChildBefore(idBlock, sectionBlock);
+        headerBlock.getParent().insertChildBefore(idBlock, headerBlock);
 
+        // Create the link to target the header anchor
         Link link = new Link();
         link.setAnchor(idBlock.getName());
-        LinkBlock linkBlock = new LinkBlock(sectionBlock.getChildren(), link, false);
+        LinkBlock linkBlock = new LinkBlock(this.tocBlockFilter.generateLabel(headerBlock), link, false);
 
-        return new ListItemBlock(Arrays.<Block> asList(linkBlock));
+        return new ListItemBlock(Collections.<Block> singletonList(linkBlock));
     }
 
     /**

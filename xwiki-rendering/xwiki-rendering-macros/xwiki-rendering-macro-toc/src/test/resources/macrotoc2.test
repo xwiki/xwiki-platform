@@ -16,6 +16,7 @@ onWord [Title1]
 endHeader [1]
 beginMacroMarkerStandalone [toc] [start=1|depth=6|numbered=false|scope=local] []
 beginList [BULLETED]
+beginListItem
 beginList [BULLETED]
 beginListItem
 beginLink [Anchor = [testid]] [false]
@@ -23,8 +24,8 @@ onWord [Title1]
 onSpecialSymbol [.]
 onWord [1]
 endLink [Anchor = [testid]] [false]
-endListItem
 beginList [BULLETED]
+beginListItem
 beginList [BULLETED]
 beginListItem
 beginLink [Anchor = [testid]] [false]
@@ -38,8 +39,11 @@ onWord [1]
 endLink [Anchor = [testid]] [false]
 endListItem
 endList [BULLETED]
+endListItem
 endList [BULLETED]
+endListItem
 endList [BULLETED]
+endListItem
 endList [BULLETED]
 endMacroMarkerStandalone [toc] [start=1|depth=6|numbered=false|scope=local] []
 beginSection

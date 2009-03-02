@@ -1,0 +1,41 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{toc start=1/}}
+
+= h1 =
+
+== h2 ==
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [toc] [start=1] []
+beginList [BULLETED]
+beginListItem
+beginLink [Anchor = [testid]] [false]
+onWord [h1]
+endLink [Anchor = [testid]] [false]
+beginList [BULLETED]
+beginListItem
+beginLink [Anchor = [testid]] [false]
+onWord [h2]
+endLink [Anchor = [testid]] [false]
+endListItem
+endList [BULLETED]
+endListItem
+endList [BULLETED]
+endMacroMarkerStandalone [toc] [start=1] []
+beginSection
+onId [testid]
+beginHeader [1]
+onWord [h1]
+endHeader [1]
+beginSection
+onId [testid]
+beginHeader [2]
+onWord [h2]
+endHeader [2]
+endSection
+endSection
+endDocument

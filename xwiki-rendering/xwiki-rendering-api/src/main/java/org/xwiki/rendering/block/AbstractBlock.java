@@ -318,10 +318,20 @@ public abstract class AbstractBlock implements Block
     /**
      * {@inheritDoc}
      * 
-     * @see Object#clone()
+     * @see org.xwiki.rendering.block.Block#clone()
      */
     @Override
     public Block clone()
+    {
+        return clone(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#clone(org.xwiki.rendering.block.BlockFilter)
+     */
+    public Block clone(BlockFilter blockFilter)
     {
         AbstractBlock block;
         try {
@@ -330,15 +340,49 @@ public abstract class AbstractBlock implements Block
             // Should never happen
             throw new RuntimeException("Failed to clone object", e);
         }
-        block.parameters = new LinkedHashMap<String, String>(getParameters());
-        // Clone all children blocks. Note that we cannot use an iterator since we're going to change the objects
-        // themselves. Using an iterator would lead to a ConcurrentModificationException
-        Object[] objectArray = getChildren().toArray();
-        block.childrenBlocks = new ArrayList<Block>();
-        for (Object object : objectArray) {
-            Block childBlock = (Block) object;
-            block.addChild((Block) childBlock.clone());
-        }
+
+        clone(block, blockFilter);
+
         return block;
+    }
+
+    /**
+     * Clone provided block.
+     * 
+     * @param block the block.
+     * @param blockFilter filter to apply on block children.
+     */
+    private void clone(AbstractBlock block, BlockFilter blockFilter)
+    {
+        block.parameters = new LinkedHashMap<String, String>(block.getParameters());
+
+        // Clone all children blocks.
+        cloneChildren(block, blockFilter);
+    }
+
+    /**
+     * Clone block children.
+     * 
+     * @param block the block.
+     * @param blockFilter the filter to apply on children.
+     */
+    public void cloneChildren(AbstractBlock block, BlockFilter blockFilter)
+    {
+        block.childrenBlocks = new ArrayList<Block>();
+        for (Block childBlock : getChildren()) {
+            if (blockFilter != null) {
+                Block clonedChildBlocks = childBlock.clone(blockFilter);
+
+                List<Block> filteredBlocks = blockFilter.filter(clonedChildBlocks);
+
+                if (filteredBlocks.size() == 0) {
+                    filteredBlocks = clonedChildBlocks.getChildren();
+                }
+
+                block.addChildren(filteredBlocks);
+            } else {
+                block.addChild(childBlock.clone());
+            }
+        }
     }
 }

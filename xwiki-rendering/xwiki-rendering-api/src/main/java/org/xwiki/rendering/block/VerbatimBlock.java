@@ -74,4 +74,15 @@ public class VerbatimBlock extends AbstractBlock
     {
         listener.onVerbatim(getProtectedString(), getParameters(), isInline());
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return getProtectedString();
+    }
 }

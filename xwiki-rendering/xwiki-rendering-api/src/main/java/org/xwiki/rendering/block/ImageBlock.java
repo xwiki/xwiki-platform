@@ -74,13 +74,15 @@ public class ImageBlock extends AbstractBlock
     /**
      * {@inheritDoc}
      * 
-     * @see Object#clone()
+     * @see org.xwiki.rendering.block.AbstractBlock#clone(org.xwiki.rendering.block.BlockFilter)
      */
     @Override
-    public Block clone()
+    public ImageBlock clone(BlockFilter blockFilter)
     {
-        ImageBlock clone = (ImageBlock) super.clone();
+        ImageBlock clone = (ImageBlock) super.clone(blockFilter);
+
         clone.image = getImage().clone();
+
         return clone;
     }
 }

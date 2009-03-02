@@ -3,8 +3,8 @@
 .#-----------------------------------------------------
 = Title1
 {{toc start="1" depth="6" numbered="true" scope="local" /}}
-== Title1.1
-==== Title1.1.1.1
+== [[Title1.1]]
+==== **Title //1.1.1.1//**
 = Title2
 .#-----------------------------------------------------
 .expect|event/1.0
@@ -20,16 +20,16 @@ beginListItem
 beginList [NUMBERED]
 beginListItem
 beginLink [Anchor = [testid]] [false]
-onWord [Title1]
-onSpecialSymbol [.]
-onWord [1]
+onWord [Page]
 endLink [Anchor = [testid]] [false]
 beginList [NUMBERED]
 beginListItem
 beginList [NUMBERED]
 beginListItem
 beginLink [Anchor = [testid]] [false]
-onWord [Title1]
+onWord [Title]
+onSpace
+onWord [1]
 onSpecialSymbol [.]
 onWord [1]
 onSpecialSymbol [.]
@@ -49,21 +49,26 @@ endMacroMarkerStandalone [toc] [start=1|depth=6|numbered=true|scope=local] []
 beginSection
 onId [testid]
 beginHeader [2]
-onWord [Title1]
-onSpecialSymbol [.]
-onWord [1]
+beginLink [Reference = [Title1.1]] [false]
+endLink [Reference = [Title1.1]] [false]
 endHeader [2]
 beginSection
 beginSection
 onId [testid]
 beginHeader [4]
-onWord [Title1]
-onSpecialSymbol [.]
+beginFormat: [BOLD]
+onWord [Title]
+onSpace
+beginFormat: [ITALIC]
 onWord [1]
 onSpecialSymbol [.]
 onWord [1]
 onSpecialSymbol [.]
 onWord [1]
+onSpecialSymbol [.]
+onWord [1]
+endFormat: [ITALIC]
+endFormat: [BOLD]
 endHeader [4]
 endSection
 endSection

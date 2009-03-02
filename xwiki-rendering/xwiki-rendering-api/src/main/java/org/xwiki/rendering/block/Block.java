@@ -137,6 +137,14 @@ public interface Block extends Cloneable
     <T extends Block> T getPreviousBlockByType(Class<T> blockClass, boolean recurse);
 
     /**
+     * Return a copy of the block with filtered children.
+     * 
+     * @param blockFilter the Block filter.
+     * @return the filtered Block.
+     */
+    Block clone(BlockFilter blockFilter);
+
+    /**
      * {@inheritDoc}
      * 
      * @see Object#clone()

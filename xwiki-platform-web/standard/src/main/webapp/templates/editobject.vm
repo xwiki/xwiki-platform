@@ -1,29 +1,39 @@
 #if($request.xpage && $request.xpage=="editobject")
 $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #else
-#set($formname = "update")
-#set($saveaction = "save")
-#set($hasCustomClass = ($request.classname && (!$request.classname.trim().equals(""))))
-#set($hasCustomObject = ($hasCustomClass && $request.nb && (!$request.nb.trim().equals(""))))
-#set($hasCustomField = ($hasCustomClass && ("$!request.property.trim()" != "")))
+#set($formname = 'update')
+#set($saveaction = 'save')
+#set($hasCustomClass = ("$!{request.classname.trim()}" != ''))
+#set($hasCustomObject = ($hasCustomClass && ("$!{request.nb.trim()}$!{request.classid.trim()}$!{request.object.trim()}" != '')))
+#set($hasCustomField = ($hasCustomClass && ("$!{request.property.trim()}" != '')))
 #if($hasCustomClass)
-#set($classes = [$xwiki.getDocument($request.classname).getxWikiClass()])
+  #set($classes = [$xwiki.getDocument($request.classname).getxWikiClass()])
 #else
-#set($classes = $doc.getxWikiClasses())
+  #set($classes = $doc.getxWikiClasses())
 #end
 #set($redirect = $xwiki.getRequestURL())
 <div class="clear"></div>
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent">
-#set($q = "editor=object")
+#set($q = 'editor=object')
 #if($hasCustomClass)
-#set($q = "${q}&amp;classname=${request.classname}")
-#if($hasCustomObject)
-#set($q = "${q}&amp;nb=${request.nb}")
-#end
-#if($hasCustomField)
-#set($q = "${q}&amp;property=${request.property}")
-#end
+  #set($customClass = ${request.classname})
+  #set($q = "${q}&amp;classname=${customClass}")
+  #if($hasCustomObject)
+    #set($customObject = "$!{request.object}")
+    #if($customObject == '')
+      #set($customObject = "$!{request.classid}")
+      #if($customObject == '')
+        #set($customObject = "$!{request.nb}")
+      #end
+    #end
+    #set($customObject = $util.parseInt($customObject))
+    #set($q = "${q}&amp;objectnumber=${customObject}")
+  #end
+  #if($hasCustomField)
+    #set($customField = $request.property)
+    #set($q = "${q}&amp;property=${customField}")
+  #end
 #end
 <div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL($context.action, $q)"/></div>
 <div id="xwikiobjects" class="accordion">
@@ -37,7 +47,7 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #set($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))
 #if($hasCustomObject)
-#set($object = $doc.getObject($class.name, $util.parseInt($request.nb)))
+#set($object = $doc.getObject($class.name, $customObject))
 #if($object)
 #set($objects = [$object])
 #else
@@ -62,7 +72,7 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 <dl>
 #if($hasCustomField)
   #set($properties = $util.arrayList)
-  #foreach($propName in $request.property.split(','))
+  #foreach($propName in $customField.split(','))
     #set($discard = $properties.add($class.get($propName)))
   #end
 #else

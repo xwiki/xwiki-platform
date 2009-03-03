@@ -478,7 +478,14 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
     {
-    	return getRenderedContent(getTranslatedContent(context), getSyntaxId(), context);
+        String renderedContent;
+        // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
+        if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+            renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
+        } else {
+            renderedContent = performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0");
+        }
+        return renderedContent;
     }
 
     /**

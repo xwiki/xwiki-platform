@@ -4,7 +4,143 @@
  * 
  * @type object
  */
-var XWiki = {};
+var XWiki = {
+		
+constants: {
+  /**
+   * Current wiki.
+   */		
+  currentWiki: "$context.getDatabase()",
+
+  /**
+   * Main wiki.
+   */		
+  mainWiki: "$context.getMainWikiName()",
+  
+  /**
+   * Context path.
+   */
+  contextPath: "$request.getContextPath()",
+  
+  /**
+   * Character that separates wiki from space in a page fullName (example: xwiki:Main.WebHome).
+   */
+  wikiSpaceSeparator: ":",
+
+  /**
+   * Character that separates space from page in a page fullName (example: xwiki:Main.WebHome).
+   */
+  spacePageSeparator: ".",
+
+  /**
+   * Character that separates page from attachment in an attachment fullName (example: xwiki:Main.WebHome@Archive.tgz).
+   */
+  pageAttachmentSeparator: "@",
+  
+  /**
+   * URL Anchor separator.
+   */
+  anchorSeparator: "#",
+
+  /**
+   * URL Anchor for page comments.
+   */
+  docextraCommentsAnchor: "#Comments",
+
+  /**
+   * URL Anchor for page comments.
+   */
+  docextraAttachmentsAnchor: "#Attachments",
+
+  /**
+   * URL Anchor for page comments.
+   */
+  docextraHistoryAnchor: "#History",
+
+  /**
+   * URL Anchor for page comments.
+   */
+  docextraInformationAnchor: "#Information"
+},
+
+/**
+ * Build a resource object from a wiki resource descriptor (aka fullName).
+ *
+ * Examples of resource objects:
+ * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main", 
+ *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome", 
+ *   name: "WebHome", attachment: "" }
+ * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main", 
+ *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome", 
+ *   name: "WebHome", attachment: "" }
+ * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main", 
+ *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome", 
+ *   name: "WebHome", attachment: "attach.zip" }
+ *
+ * @param fullName fullName of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).
+ * @return the newly created resource object.
+ */
+getResource : function(fullName) {	 
+	var resource = {
+			wiki : "",
+			space : "",
+			prefixedSpace : "",
+			fullName : fullName,
+			prefixedFullName : "",
+			name : "",
+			attachment : "",
+			anchor: ""
+	}; 
+
+	// Extract wiki and set prefixedFullName.
+	if (fullName.contains(this.constants.wikiSpaceSeparator)) {
+	  	resource.wiki = fullName.substring(0, fullName.indexOf(this.constants.wikiSpaceSeparator));
+	  	// Remove wiki from fullName.
+      	resource.fullName = fullName.substring(fullName.indexOf(this.constants.wikiSpaceSeparator) + 1, fullName.length);
+	  	resource.prefixedFullName = fullName;  	
+	} else if (fullName.contains(this.constants.spacePageSeparator)) {	
+		// Fallback on current wiki.
+		resource.wiki = this.constants.currentWiki;
+		resource.prefixedFullName = resource.wiki + this.constants.wikiSpaceSeparator + fullName;
+	}		
+	
+	// Extract attachment and remove it from fullName and prefixedFullName if any.
+	if (resource.fullName.contains(this.constants.pageAttachmentSeparator)) {
+		resource.fullName = resource.fullName.substring(0, resource.fullName.indexOf(this.constants.pageAttachmentSeparator));
+		resource.prefixedFullName = resource.prefixedFullName.substring(0, resource.prefixedFullName.indexOf(this.constants.pageAttachmentSeparator));
+	}	
+	
+	// Extract anchor and remove it from fullName and prefixedFullName if any.
+	if (resource.fullName.contains(this.constants.anchorSeparator)) {
+		resource.anchor = resource.fullName.substring(resource.fullName.indexOf(this.constants.anchorSeparator) + 1, resource.fullName.length);
+		resource.fullName = resource.fullName.substring(0, resource.fullName.indexOf(this.constants.anchorSeparator));
+		resource.prefixedFullName = resource.prefixedFullName.substring(0, resource.prefixedFullName.indexOf(this.constants.anchorSeparator));
+	}
+
+	// Extract space and page name.
+	if (fullName.contains(this.constants.spacePageSeparator)) {
+		// Space
+		resource.space = fullName.substring(fullName.indexOf(this.constants.wikiSpaceSeparator) + 1, fullName.indexOf(this.constants.spacePageSeparator));
+		resource.prefixedSpace = resource.wiki + this.constants.wikiSpaceSeparator + resource.space;
+		if (fullName.length - fullName.indexOf(this.constants.spacePageSeparator) > 0) {      	
+			if (!fullName.contains(this.constants.pageAttachmentSeparator)) {
+				// Page name.
+				resource.name = fullName.substring(fullName.indexOf(this.constants.spacePageSeparator) + 1, fullName.length);          
+			} else {
+				// Page name.
+				resource.name = fullName.substring(fullName.indexOf(this.constants.spacePageSeparator) + 1, fullName.indexOf(this.constants.pageAttachmentSeparator));          
+				if (fullName.length - fullName.indexOf(this.constants.pageAttachmentSeparator) > 0) {	
+					// Attachment name.
+					resource.attachment = fullName.substring(fullName.indexOf(this.constants.pageAttachmentSeparator) + 1, fullName.length);  
+				}
+			}
+
+		}
+	}
+	
+	return resource;
+}				
+};
 
 /**
  * Add click listeners on all rendereing error messages to let the user read the detailed error description.

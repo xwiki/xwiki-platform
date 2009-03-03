@@ -46,6 +46,7 @@
     <platform.core.version>1.9-SNAPSHOT</platform.core.version>
     <platform.skin.albatross.version>1.17-SNAPSHOT</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.16-SNAPSHOT</platform.skin.toucan.version>
+    <smartgwt.version>1.0b2</smartgwt.version>
   </properties>
   <profiles>
     <profile>

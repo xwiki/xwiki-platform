@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1231841324000</creationDate>
-<date>1231841652000</date>
-<contentUpdateDate>1231841652000</contentUpdateDate>
+<date>1236074871000</date>
+<contentUpdateDate>1236074871000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -93,12 +93,33 @@
 <name>XWiki.WebDAV</name>
 <number>0</number>
 <className>XWiki.JavaScriptExtension</className>
-<guid>f085b166-b508-43b6-8aaa-b1706ab51fa4</guid>
+<guid>e164508e-ef2c-45d1-9620-b82f16fb27bb</guid>
 <property>
 <cache>default</cache>
 </property>
 <property>
-<code>function davEdit(davURL) {
+<code>(function(){
+
+if (typeof window.XWiki == "undefined") {
+   window.XWiki = {};
+}
+
+XWiki = window.XWiki;
+XWiki.WebDAV = {};
+
+XWiki.WebDAV.displayDavLinks = function(domNode) {
+    // un-hide Dav links only if the browser is going to support it
+    if(window.ActiveXObject || window.InstallTrigger) {
+       domNode.select("[class*='attachment']").each(displayDavLink);
+    }
+}
+
+function displayDavLink(node) {
+     node.down("a[class*='editlink']").removeClassName("hidden");
+}
+
+
+XWiki.WebDAV.davEdit = function(davURL) {
   if (window.ActiveXObject) {
     var editor;
     try {
@@ -133,16 +154,16 @@
   } else {
     window.alert("$msg.get('xe.webdav.sorry')");
   }
-}</code>
+}
+
+})();
+</code></property><property><name>WebDAVJSX</name>
 </property>
 <property>
-<name>WebDAVJSX</name>
+<parse>1</parse>
 </property>
 <property>
-<parse>0</parse>
-</property>
-<property>
-<use>onDemand</use>
+<use>always</use>
 </property>
 </object>
 <object>
@@ -174,7 +195,7 @@
 <name>XWiki.WebDAV</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
-<guid>fce21b4c-a63c-423c-a4a8-bc4bfab7edd1</guid>
+<guid>20298688-c55a-488f-b9c9-ecaf8b0e9e94</guid>
 <property>
 <tags/>
 </property>

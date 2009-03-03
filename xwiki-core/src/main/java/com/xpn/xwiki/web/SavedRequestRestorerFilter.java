@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -71,6 +73,12 @@ public class SavedRequestRestorerFilter implements Filter
     private static final String SAVED_REQUESTS_KEY = SavedRequest.class.getCanonicalName() + "_SavedRequests";
 
     /**
+     * Regular expression used for extracting the SRID from the query string. See
+     * {@link #getSavedRequest(HttpServletRequest)}.
+     */
+    private static final Pattern SAVED_REQUEST_REGEXP = Pattern.compile("(?:^|&)" + SAVED_REQUESTS_KEY + "=([^&]++)");
+
+    /**
      * Request Wrapper that inserts data from a previous request into the current request.
      */
     public static class SavedRequestWrapper extends HttpServletRequestWrapper
@@ -107,8 +115,8 @@ public class SavedRequestRestorerFilter implements Filter
          * Retrieves the value for the parameter, either from the new request, or from the saved data.
          * 
          * @param name the name of the parameter
-         * @return a <code>String</code> representing the first value of the parameter, or <code>null</code> if no
-         *         value was set in either of the requests.
+         * @return a <code>String</code> representing the first value of the parameter, or <code>null</code> if no value
+         *         was set in either of the requests.
          * @see javax.servlet.ServletRequest#getParameter(java.lang.String)
          */
         @Override
@@ -126,8 +134,8 @@ public class SavedRequestRestorerFilter implements Filter
          * combined).
          * 
          * @param name the name of the parameter
-         * @return an array of <code>String</code> objects containing the parameter's values, or <code>null</code>
-         *         if no value was set in either of the requests.
+         * @return an array of <code>String</code> objects containing the parameter's values, or <code>null</code> if no
+         *         value was set in either of the requests.
          * @see javax.servlet.ServletRequest#getParameterValues(java.lang.String)
          */
         @Override
@@ -163,9 +171,8 @@ public class SavedRequestRestorerFilter implements Filter
         /**
          * Retrieves the combined list of parameter names, from both the new and saved requests.
          * 
-         * @return an <code>Enumeration</code> of <code>String</code> objects, each <code>String</code> containing
-         *         the name of a request parameter; or an empty <code>Enumeration</code> if the request has no
-         *         parameters
+         * @return an <code>Enumeration</code> of <code>String</code> objects, each <code>String</code> containing the
+         *         name of a request parameter; or an empty <code>Enumeration</code> if the request has no parameters
          * @see javax.servlet.ServletRequest#getParameterNames()
          */
         @SuppressWarnings("unchecked")
@@ -308,7 +315,18 @@ public class SavedRequestRestorerFilter implements Filter
     protected SavedRequest getSavedRequest(HttpServletRequest request)
     {
         // Only do something if the new request contains a Saved Request IDentifier (srid)
-        String savedRequestId = request.getParameter(SAVED_REQUESTS_IDENTIFIER);
+        String savedRequestId = null;
+        // Using request.getParameter is not good, since in some containers it prevents using request.getInputStream
+        // and/or request.getReader. A workaround is to manually extract the srid parameter from the query string, but
+        // this means that:
+        // - the srid cannot be used in POST requests, but in all current use cases GET is used anyway;
+        // - the regular expression used for this is pretty basic, so there might be some URLs that fail to be
+        // recognized; so far this wasn't observed.
+        Matcher m = SAVED_REQUEST_REGEXP.matcher(StringUtils.defaultString(request.getQueryString()));
+        if (m.find()) {
+            savedRequestId = m.group(1);
+        }
+
         if (!StringUtils.isEmpty(savedRequestId)) {
             // Saved requests are stored in the request session
             HttpSession session = request.getSession();
@@ -319,8 +337,7 @@ public class SavedRequestRestorerFilter implements Filter
                 SavedRequest savedRequest = savedRequests.get(savedRequestId);
                 // Only reuse this request if the new request is for the same resource (URL)
                 if (savedRequest != null
-                    && StringUtils.equals(savedRequest.getRequestUrl(), request.getRequestURL().toString()))
-                {
+                    && StringUtils.equals(savedRequest.getRequestUrl(), request.getRequestURL().toString())) {
                     // Remove the saved request from the session
                     savedRequests.remove(savedRequestId);
                     // Return the SavedRequest
@@ -365,8 +382,8 @@ public class SavedRequestRestorerFilter implements Filter
 
     /**
      * Retrieves the original URL requested before a detour. This method returns something different from
-     * <code>null</code> only when there's a <em>rsid</em> parameter in the current request, indicating that there
-     * was another request whose data was saved, related to the current request.
+     * <code>null</code> only when there's a <em>rsid</em> parameter in the current request, indicating that there was
+     * another request whose data was saved, related to the current request.
      * 
      * @param request the current request
      * @return the original requested URL that triggered a detour, or <code>null</code> if there isn't any original

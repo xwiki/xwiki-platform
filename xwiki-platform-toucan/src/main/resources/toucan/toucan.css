@@ -334,15 +334,13 @@ table td {
 }
 
 /* special formatting of a wiki table */
-.mceContentBody table,
-    .main table {
+table.wiki-table {
     font-size: 1em;
     border-color: #e5eff8;
     margin: 1em 0;
 }
 
-.mceContentBody caption,
-    .main caption {
+table.wiki-table caption {
     color: #4e6172;
     font-size: .94em;
     letter-spacing: .1em;
@@ -351,24 +349,20 @@ table td {
     caption-side: top;
 }
 
-.mceContentBody table tr td,
-    .main table tr td {
+table.wiki-table tr td {
     vertical-align: middle;
 }
 
-.mceContentBody table tr td em,
-    .main table tr td em {
+table.wiki-table tr td em {
     font-size: 0.9em;
     font-style: italic;
 }
 
-.mceContentBody tr.odd td,
-    .main tr.odd td {
+table tr.odd td, .main tr.odd td {
     background: #f7fbff
 }
 
-.mceContentBody td,
-    .main td {
+table.wiki-table td {
     color: #4e6172;
     border-color: #e5eff8;
     padding: 3px 4px;
@@ -376,8 +370,7 @@ table td {
     border-style: solid;
 }
 
-.mceContentBody tr.table-head td,
-    .main th {
+table.wiki-table tr.table-head td, table.wiki-table th {
     border-color: #e5eff8;
     padding: .3em 0.5em;
     background: #f4f9fe;
@@ -392,18 +385,18 @@ table.xwikilogintable th {
     background-color: transparent;
 }
 
-.main tfoot th {
+table.wiki-table tfoot th {
     text-align: center;
     background: #f4f9fe;
 }
 
-.main tfoot th strong {
+table.wiki-table tfoot th strong {
     font: bold 1.2em "Century Gothic", "Trebuchet MS", Arial, Helvetica, sans-serif;
     margin: .5em .5em .5em 0;
     color: #66a3d3;
 }
 
-.main tfoot th em {
+table.wiki-table tfoot th em {
     color: #f03b58;
     font-weight: bold;
     font-size: 1.1em;
@@ -436,14 +429,14 @@ table#memberstable td {
     margin: 1em 0;
 }
 
-.main ol, .main ul {
+.main ol, ul.star, ul.minus {
     line-height: 1.4em;
     margin-top: 1em;
     margin-bottom: 1em;
     list-style-position: inside;
 }
 
-.main ol ol, .main ul ul {
+.main ol ol, ul.star ul, ul.minus ul {
     margin-top: 0;
     margin-bottom: 0;
 }
@@ -1568,7 +1561,7 @@ Menu
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 999999;
     overflow: visible;
     border-top: 0 solid #ccc;
     background-color: #ccc;

@@ -48,12 +48,14 @@ import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.rest.resources.ModificationsResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
+import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
 import org.xwiki.rest.resources.classes.ClassPropertiesResource;
 import org.xwiki.rest.resources.classes.ClassPropertyResource;
 import org.xwiki.rest.resources.classes.ClassResource;
 import org.xwiki.rest.resources.classes.ClassesResource;
 import org.xwiki.rest.resources.comments.CommentsResource;
+import org.xwiki.rest.resources.comments.CommentsVersionResource;
 import org.xwiki.rest.resources.objects.AllObjectsForClassNameResource;
 import org.xwiki.rest.resources.objects.ObjectPropertiesResource;
 import org.xwiki.rest.resources.objects.ObjectPropertyResource;
@@ -219,7 +221,7 @@ public class DomainObjectFactory
     }
 
     /* This method is used to fill the "common part" of a Page and a PageSummary */
-    private static void fillPageSummary(PageSummary pageSummary, ObjectFactory objectFactory, URI baseUri, Document doc)
+    private static void fillPageSummary(PageSummary pageSummary, ObjectFactory objectFactory, URI baseUri, Document doc, boolean useVersion)
         throws XWikiException
     {
         pageSummary.setWiki(doc.getWiki());
@@ -277,9 +279,16 @@ public class DomainObjectFactory
         }
 
         if (!doc.getComments().isEmpty()) {
-            String commentsUri =
-                UriBuilder.fromUri(baseUri).path(CommentsResource.class).build(doc.getWiki(), doc.getSpace(),
-                    doc.getName()).toString();
+            String commentsUri;
+            if (useVersion) {
+                commentsUri =
+                    UriBuilder.fromUri(baseUri).path(CommentsVersionResource.class).build(doc.getWiki(),
+                        doc.getSpace(), doc.getName(), doc.getVersion()).toString();
+            } else {
+                commentsUri =
+                    UriBuilder.fromUri(baseUri).path(CommentsResource.class).build(doc.getWiki(), doc.getSpace(),
+                        doc.getName()).toString();
+            }
 
             Link commentsLink = objectFactory.createLink();
             commentsLink.setHref(commentsUri);
@@ -288,9 +297,16 @@ public class DomainObjectFactory
         }
 
         if (!doc.getAttachmentList().isEmpty()) {
-            String attachmentsUri =
-                UriBuilder.fromUri(baseUri).path(AttachmentsResource.class).build(doc.getWiki(), doc.getSpace(),
-                    doc.getName()).toString();
+            String attachmentsUri;
+            if (useVersion) {
+                attachmentsUri =
+                    UriBuilder.fromUri(baseUri).path(AttachmentsAtPageVersionResource.class).build(doc.getWiki(),
+                        doc.getSpace(), doc.getName(), doc.getVersion()).toString();
+            } else {
+                attachmentsUri =
+                    UriBuilder.fromUri(baseUri).path(AttachmentsResource.class).build(doc.getWiki(), doc.getSpace(),
+                        doc.getName()).toString();
+            }
 
             Link attachmentsLink = objectFactory.createLink();
             attachmentsLink.setHref(attachmentsUri);
@@ -327,7 +343,7 @@ public class DomainObjectFactory
         throws XWikiException
     {
         PageSummary pageSummary = objectFactory.createPageSummary();
-        fillPageSummary(pageSummary, objectFactory, baseUri, doc);
+        fillPageSummary(pageSummary, objectFactory, baseUri, doc, false);
 
         String pageUri =
             UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
@@ -344,7 +360,7 @@ public class DomainObjectFactory
         throws XWikiException
     {
         Page page = objectFactory.createPage();
-        fillPageSummary(page, objectFactory, baseUri, doc);
+        fillPageSummary(page, objectFactory, baseUri, doc, useVersion);
 
         page.setVersion(doc.getVersion());
         page.setMajorVersion(doc.getRCSVersion().at(0));

@@ -34,7 +34,7 @@
   <version>1.15-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>Test framework classes shared between functional test modules</description>
-    <properties>
+  <properties>
     <platform.core.version>1.8-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>

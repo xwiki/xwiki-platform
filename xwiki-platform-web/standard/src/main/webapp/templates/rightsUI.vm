@@ -136,17 +136,17 @@
                             #set($auth_view = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_view"))
                             #set($auth_edit = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_edit"))
                             #if("$!auth_view" == "Yes")
-                                #set($view_icon = $xwiki.getSkinFile('icons/rights-manager/allow-black.png'))
+                                #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
                                 #set($view_alt = "yes")
                             #elseif("$!auth_view" == "No" || "$!auth_view" == "---")
-                                #set($view_icon = $xwiki.getSkinFile('icons/rights-manager/none.png'))
+                                #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
                                 #set($view_alt = "no")
                             #end
                             #if("$!auth_edit" == "Yes")
-                                #set($edit_icon = $xwiki.getSkinFile('icons/rights-manager/allow-black.png'))
+                                #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
                                 #set($edit_alt = "yes")
                             #elseif("$!auth_edit" == "No" || "$!auth_edit" == "---")
-                                #set($edit_icon = $xwiki.getSkinFile('icons/rights-manager/none.png'))
+                                #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
                                 #set($edit_alt = "no")
                             #end
 						    <tr><td>$msg.get("authenticate_view")</td><td><img id="allowguestview" alt="$view_alt" src="${view_icon}" /></td></tr>

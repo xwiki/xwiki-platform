@@ -2644,30 +2644,44 @@ Element.addMethods = function(methods) {
 
 document.viewport = {
   getDimensions: function() {
-    var dimensions = { };
-    var B = Prototype.Browser;
-    $w('width height').each(function(d) {
-      var D = d.capitalize();
-      dimensions[d] = (B.WebKit && !document.evaluate) ? self['inner' + D] :
-        (B.Opera) ? document.body['client' + D] : document.documentElement['client' + D];
-    });
-    return dimensions;
+    return { width: this.getWidth(), height: this.getHeight() };
   },
-
-  getWidth: function() {
-    return this.getDimensions().width;
-  },
-
-  getHeight: function() {
-    return this.getDimensions().height;
-  },
-
+ 
   getScrollOffsets: function() {
     return Element._returnOffset(
       window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
       window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop);
   }
 };
+
+(function(viewport) {
+  var B = Prototype.Browser, doc = document, element, property = {};
+
+  function getRootElement() {
+    // Older versions of Safari.
+    if (B.WebKit && !doc.evaluate)
+      return document;
+
+    // Older versions of Opera.
+    if (B.Opera && window.parseFloat(window.opera.version()) < 9.5)
+      return document.body;
+
+    return document.documentElement;
+  }
+
+  function define(D) {
+    if (!element) element = getRootElement();
+
+    property[D] = 'client' + D;
+
+    viewport['get' + D] = function() { return element[property[D]] };
+    return viewport['get' + D]();
+  }
+
+  viewport.getWidth = define.curry('Width');
+  viewport.getHeight = define.curry('Height');
+})(document.viewport);
+
 /* Portions of the Selector class are derived from Jack Slocum’s DomQuery,
  * part of YUI-Ext version 0.40, distributed under the terms of an MIT-style
  * license.  Please see http://www.yui-ext.com/ for more information. */

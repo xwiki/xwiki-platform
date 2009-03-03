@@ -78,4 +78,3 @@ XWiki.servletpath = "${xwiki.servletPath}";
 ## Hook for inserting JavaScript skin extensions
 <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
 <!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
-$xwiki.jsx.use("XWiki.WebDAV")

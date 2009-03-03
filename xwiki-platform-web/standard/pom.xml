@@ -161,6 +161,16 @@
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
+                <artifactItem>
+                  <!-- We extract SmartClient library from smartGWT since smartGWT will use SmartClient from web-standard resources -->
+                  <groupId>com.smartgwt</groupId>
+                  <artifactId>smartgwt</artifactId>
+                  <version>${smartgwt.version}</version>
+                  <type>jar</type>
+                  <outputDirectory>${project.build.directory}/smartclient</outputDirectory>
+                  <!-- We exlude the default initsc.js file since we provide a modified version of it in web-standard sources -->
+                  <excludes>**/initsc.js</excludes>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
@@ -199,6 +209,12 @@
               <targetPath>skins</targetPath>
               <filtering>false</filtering>
             </resource>
+            <!-- Add SmartClient library -->
+            <resource>
+              <directory>${project.build.directory}/smartclient/com/smartclient/public/sc</directory>
+              <targetPath>resources/js/smartclient</targetPath>
+              <filtering>false</filtering>
+            </resource>            
           </webResources>
         </configuration>
       </plugin>
@@ -242,6 +258,7 @@
                 <exclude>**/*-min.js</exclude>               
                 <exclude>**/*-debug.js</exclude>
                 <exclude>**/langs/*.js</exclude>
+                <exclude>resources/js/smartclient/**</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -366,6 +383,7 @@
                 <exclude>**/*-min.js</exclude>
                 <exclude>**/*-debug.js</exclude>
                 <exclude>**/langs/*.js</exclude>
+                <exclude>resources/js/smartclient/**</exclude>
               </excludes>
             </configuration>
           </plugin>          
@@ -373,4 +391,10 @@
       </build>
     </profile>
   </profiles>
+  <repositories>
+    <repository>
+      <id>smartgwt-maven</id>
+      <url>http://smartgwtsnap.rorschach.de</url>
+    </repository>       
+  </repositories>
 </project>

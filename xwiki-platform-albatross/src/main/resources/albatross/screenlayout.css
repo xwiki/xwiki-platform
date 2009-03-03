@@ -465,7 +465,7 @@ Menu
   width: 100%;
   border: 1px solid;
   border-width: 1px 0;
-  z-index: 1000;
+  z-index: 999999;
   overflow: visible;
 }
 

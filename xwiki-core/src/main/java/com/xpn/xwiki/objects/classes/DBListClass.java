@@ -374,9 +374,8 @@ public class DBListClass extends ListClass
 
             // there are more than one columns to select- take the second one (the value)
             if (comIndx > 0 && comIndx < fromIndx) {
-
                 StringTokenizer st = new StringTokenizer(firstPart, " ,()", true);
-                ArrayList words = new ArrayList();
+                ArrayList<String> words = new ArrayList<String>();
 
                 while (st.hasMoreTokens()) {
                     words.add(st.nextToken().toLowerCase());

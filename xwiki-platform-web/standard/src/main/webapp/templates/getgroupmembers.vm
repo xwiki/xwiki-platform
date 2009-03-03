@@ -1,16 +1,16 @@
 #template('xwikivars.vm')
-$response.setContentType("application/x-json")
-#set( $offset = $util.parseInt( $request.get( "offset" ) ) )
-#set( $off = $offset - 1 )
-#set( $limit = $util.parseInt( $request.get( "limit" ) ) )
+$response.setContentType('application/x-json')
+#set($offset = $util.parseInt($request.get('offset')))
+#set($off = $offset - 1 )
+#set($limit = $util.parseInt($request.get('limit')))
 
-#set( $rm = $xwiki.rightsmanager )
-#if($request.member && !$request.member.trim().equals(""))
- #set( $countm = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, 0, 0, false).size())
- #set( $members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, $limit, $off, false))
+#set($rm = $xwiki.rightsmanager)
+#if($request.member && !$request.member.trim().equals(''))
+  #set($countm = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, 0, 0, false).size())
+  #set($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, $limit, $off, false))
 #else
- #set( $countm  = $rm.countAllMembersNamesForGroup($doc.fullName))
- #set( $members = $rm.getAllMembersNamesForGroup($doc.fullName, $limit, $off))
+  #set($countm  = $rm.countAllMembersNamesForGroup($doc.fullName))
+  #set($members = $rm.getAllMembersNamesForGroup($doc.fullName, $limit, $off))
 #end
 
 {
@@ -19,18 +19,18 @@ $response.setContentType("application/x-json")
 "offset": $offset,
 "rows": [
 #foreach( $m in $members )
-    #if($context.user == $m && $doc.fullName == "XWiki.XWikiAdminGroup")
+    #if($context.user == $m && $doc.fullName == 'XWiki.XWikiAdminGroup')
       #set($grayed = true)
     #else
       #set($grayed = false)
     #end
     #set($mdoc = $xwiki.getDocument($m))
     #set($wikiname = $mdoc.getWiki())
-    #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
+    #if($wikiname != 'xwiki' || $wikiname == $context.database) #set($wikiname = 'local') #end
     #if( $velocityCount > 1 ) , #end
    {
     "fullname"     : "$m",
-    "prettyname"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) ($m)#end",
+    "prettyname"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
     "wikiname"     : "$wikiname",
     "memberurl"    : "$xwiki.getURL($m)",
     "docurl"       : "$doc.getURL()",

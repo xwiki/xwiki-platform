@@ -76,7 +76,8 @@ public class SavedRequestRestorerFilter implements Filter
      * Regular expression used for extracting the SRID from the query string. See
      * {@link #getSavedRequest(HttpServletRequest)}.
      */
-    private static final Pattern SAVED_REQUEST_REGEXP = Pattern.compile("(?:^|&)" + SAVED_REQUESTS_KEY + "=([^&]++)");
+    private static final Pattern SAVED_REQUEST_REGEXP =
+        Pattern.compile("(?:^|&)" + SAVED_REQUESTS_IDENTIFIER + "=([^&]++)");
 
     /**
      * Request Wrapper that inserts data from a previous request into the current request.

@@ -1582,13 +1582,13 @@ public class XWikiDocument implements DocumentModelBridge
                 if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{pre}");
                 } else {
-                	result.append("<pre>");
+                    result.append("<pre>");
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
                 if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
                     result.append("{/pre}");
                 } else {
-                	result.append("</pre>");
+                    result.append("</pre>");
                 }
             } else if (type.equals("hidden")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax

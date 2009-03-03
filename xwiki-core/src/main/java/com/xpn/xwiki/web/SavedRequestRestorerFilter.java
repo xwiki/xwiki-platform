@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -69,6 +71,12 @@ public class SavedRequestRestorerFilter implements Filter
 
     /** The key used for storing request data in the HTTP session. */
     private static final String SAVED_REQUESTS_KEY = SavedRequest.class.getCanonicalName() + "_SavedRequests";
+
+    /**
+     * Regular expression used for extracting the SRID from the query string. See
+     * {@link #getSavedRequest(HttpServletRequest)}.
+     */
+    private static final Pattern SAVED_REQUEST_REGEXP = Pattern.compile("(?:^|&)" + SAVED_REQUESTS_KEY + "=([^&]++)");
 
     /**
      * Request Wrapper that inserts data from a previous request into the current request.
@@ -307,7 +315,18 @@ public class SavedRequestRestorerFilter implements Filter
     protected SavedRequest getSavedRequest(HttpServletRequest request)
     {
         // Only do something if the new request contains a Saved Request IDentifier (srid)
-        String savedRequestId = request.getParameter(SAVED_REQUESTS_IDENTIFIER);
+        String savedRequestId = null;
+        // Using request.getParameter is not good, since in some containers it prevents using request.getInputStream
+        // and/or request.getReader. A workaround is to manually extract the srid parameter from the query string, but
+        // this means that:
+        // - the srid cannot be used in POST requests, but in all current use cases GET is used anyway;
+        // - the regular expression used for this is pretty basic, so there might be some URLs that fail to be
+        // recognized; so far this wasn't observed.
+        Matcher m = SAVED_REQUEST_REGEXP.matcher(StringUtils.defaultString(request.getQueryString()));
+        if (m.find()) {
+            savedRequestId = m.group(1);
+        }
+
         if (!StringUtils.isEmpty(savedRequestId)) {
             // Saved requests are stored in the request session
             HttpSession session = request.getSession();

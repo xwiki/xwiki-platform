@@ -36,18 +36,23 @@ ${Msz}Mb
           <div class="information">
           <span class="name"><a href="$doc.getAttachmentURL("${attach.filename}", "download")" title="$msg.get("downloadthisattachment")">#packName($attach.filename)</a></span>
 #if($hasEdit || $hasAdmin)
-          <span class="xwikibuttonlinks"><a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></span>
-	  #set($documentUrl=$doc.getExternalURL("download"))
-      	  #set($attachmentUrl="$documentUrl/$attach.filename")
-          #set($attachmentSignature="${request.contextPath}${request.servletPath}/download/")
-          #set($webdavSignature="${request.contextPath}/webdav/spaces/")
-          #set($fragments=$attachmentUrl.split($attachmentSignature))
-          #if($listtool.size($fragments) == 2)
-            #set($prefix=$listtool.get($fragments, 0))
-            #set($suffix=$listtool.get($fragments, 1))
-            #set($davUrl="$prefix$webdavSignature$suffix")
-            <span class="xwikibuttonlinks"><a class="deletelink" href="$davUrl" onclick="davEdit('$davUrl'); return false;">$msg.get("webdaveditattachment")</a></span>
-          #end                    
+          <span class="xwikibuttonlinks">
+            ## Delete attachment link
+            <a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a>
+            ## Dav Edit attachment link. We display the link hidden by default, and let the WebDAV JSX extension display it if
+            ## the browser supports Dav Edit 
+	    #set($documentUrl=$doc.getExternalURL("download"))
+      	    #set($attachmentUrl="$documentUrl/$attach.filename")
+            #set($attachmentSignature="${request.contextPath}${request.servletPath}/download/")
+            #set($webdavSignature="${request.contextPath}/webdav/spaces/")
+            #set($fragments=$attachmentUrl.split($attachmentSignature))
+            #if($listtool.size($fragments) == 2)
+              #set($prefix=$listtool.get($fragments, 0))
+              #set($suffix=$listtool.get($fragments, 1))
+              #set($davUrl="$prefix$webdavSignature$suffix")              
+              <a class="editlink hidden" href="$davUrl" onclick="if(XWiki && XWiki.WebDAV){XWiki.WebDAV.davEdit('$davUrl')}; return false;">$msg.get("webdaveditattachment")</a>
+            #end                    
+         </span>
 #end
           <span class="version"><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></span>
           <div class="meta">
@@ -58,6 +63,12 @@ ${Msz}Mb
         </div>
   </div> ## row
 #end
+<script type="text/javascript">
+// <![CDATA[
+// Let XWiki.WebDAV JS display links only if the browser support WebDAV.
+if (XWiki && XWiki.WebDAV) { XWiki.WebDAV.displayDavLinks($('_attachments')); }
+// ]]>
+</script>
 #else
 <div>$msg.get("noattachments")</div>
 #end

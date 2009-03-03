@@ -48,14 +48,15 @@ public class XWikiMacroPrinter
 
         return buffer.toString();
     }
-    
+
     public String printParameters(Map<String, String> parameters)
     {
         StringBuffer buffer = new StringBuffer();
-        for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
-            String paramName = paramsIt.next();
-            buffer.append(paramName).append('=').append('\"').append(parameters.get(paramName)).append('\"');
-            if (paramsIt.hasNext()) {
+        for (Iterator<Map.Entry<String, String>> entryIt = parameters.entrySet().iterator(); entryIt.hasNext();) {
+            Map.Entry<String, String> entry = entryIt.next();
+            buffer.append(entry.getKey()).append('=').append('\"').append(
+                entry.getValue().replace("\\", "\\\\").replace("\"", "\\\"")).append('\"');
+            if (entryIt.hasNext()) {
                 buffer.append(' ');
             }
         }

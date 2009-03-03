@@ -334,13 +334,14 @@ function displayMembers(row, i, table)
 
   var membername = document.createElement("td");
 
+  var displayedName = document.createTextNode(row.prettyname);
   if (row.wikiname == "local") {
     var a = document.createElement("a");
     a.href = row.memberurl;
-    a.appendChild(document.createTextNode(row.fullname));
+    a.appendChild(displayedName);
     membername.appendChild(a);
   } else {
-    membername.appendChild(document.createTextNode(row.fullname));
+    membername.appendChild(displayedName);
   }
   membername.className="username";
   tr.appendChild(membername);

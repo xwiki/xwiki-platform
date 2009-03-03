@@ -1,3 +1,4 @@
+#template('xwikivars.vm')
 $response.setContentType("application/x-json")
 #set( $offset = $util.parseInt( $request.get( "offset" ) ) )
 #set( $off = $offset - 1 )
@@ -29,6 +30,7 @@ $response.setContentType("application/x-json")
     #if( $velocityCount > 1 ) , #end
    {
     "fullname"     : "$m",
+    "prettyname"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) ($m)#end",
     "wikiname"     : "$wikiname",
     "memberurl"    : "$xwiki.getURL($m)",
     "docurl"       : "$doc.getURL()",

@@ -107,8 +107,8 @@ public class SavedRequestRestorerFilter implements Filter
          * Retrieves the value for the parameter, either from the new request, or from the saved data.
          * 
          * @param name the name of the parameter
-         * @return a <code>String</code> representing the first value of the parameter, or <code>null</code> if no
-         *         value was set in either of the requests.
+         * @return a <code>String</code> representing the first value of the parameter, or <code>null</code> if no value
+         *         was set in either of the requests.
          * @see javax.servlet.ServletRequest#getParameter(java.lang.String)
          */
         @Override
@@ -126,8 +126,8 @@ public class SavedRequestRestorerFilter implements Filter
          * combined).
          * 
          * @param name the name of the parameter
-         * @return an array of <code>String</code> objects containing the parameter's values, or <code>null</code>
-         *         if no value was set in either of the requests.
+         * @return an array of <code>String</code> objects containing the parameter's values, or <code>null</code> if no
+         *         value was set in either of the requests.
          * @see javax.servlet.ServletRequest#getParameterValues(java.lang.String)
          */
         @Override
@@ -163,9 +163,8 @@ public class SavedRequestRestorerFilter implements Filter
         /**
          * Retrieves the combined list of parameter names, from both the new and saved requests.
          * 
-         * @return an <code>Enumeration</code> of <code>String</code> objects, each <code>String</code> containing
-         *         the name of a request parameter; or an empty <code>Enumeration</code> if the request has no
-         *         parameters
+         * @return an <code>Enumeration</code> of <code>String</code> objects, each <code>String</code> containing the
+         *         name of a request parameter; or an empty <code>Enumeration</code> if the request has no parameters
          * @see javax.servlet.ServletRequest#getParameterNames()
          */
         @SuppressWarnings("unchecked")
@@ -319,8 +318,7 @@ public class SavedRequestRestorerFilter implements Filter
                 SavedRequest savedRequest = savedRequests.get(savedRequestId);
                 // Only reuse this request if the new request is for the same resource (URL)
                 if (savedRequest != null
-                    && StringUtils.equals(savedRequest.getRequestUrl(), request.getRequestURL().toString()))
-                {
+                    && StringUtils.equals(savedRequest.getRequestUrl(), request.getRequestURL().toString())) {
                     // Remove the saved request from the session
                     savedRequests.remove(savedRequestId);
                     // Return the SavedRequest
@@ -365,8 +363,8 @@ public class SavedRequestRestorerFilter implements Filter
 
     /**
      * Retrieves the original URL requested before a detour. This method returns something different from
-     * <code>null</code> only when there's a <em>rsid</em> parameter in the current request, indicating that there
-     * was another request whose data was saved, related to the current request.
+     * <code>null</code> only when there's a <em>rsid</em> parameter in the current request, indicating that there was
+     * another request whose data was saved, related to the current request.
      * 
      * @param request the current request
      * @return the original requested URL that triggered a detour, or <code>null</code> if there isn't any original

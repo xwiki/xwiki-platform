@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{toc start=1/}}
+{{toc/}}
 
 = h1 =
 
@@ -10,12 +10,9 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [toc] [start=1] []
+beginMacroMarkerStandalone [toc] [] []
 beginList [BULLETED]
 beginListItem
-beginLink [Anchor = [testid]] [false]
-onWord [h1]
-endLink [Anchor = [testid]] [false]
 beginList [BULLETED]
 beginListItem
 beginLink [Anchor = [testid]] [false]
@@ -25,9 +22,8 @@ endListItem
 endList [BULLETED]
 endListItem
 endList [BULLETED]
-endMacroMarkerStandalone [toc] [start=1] []
+endMacroMarkerStandalone [toc] [] []
 beginSection
-onId [testid]
 beginHeader [1]
 onWord [h1]
 endHeader [1]
@@ -39,3 +35,11 @@ endHeader [2]
 endSection
 endSection
 endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:toc|-||-|--><ul><li><ul><li><!--startwikilink:#testid--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#testid">h2</a></span><!--stopwikilink--></li></ul></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><a id="testid" name="testid"></a><h2 id="Hh2"><span>h2</span></h2>
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:toc|-||-|--><ul><li><ul><li><!--startwikilink:#testid--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#testid">h2</a></span><!--stopwikilink--></li></ul></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><a id="testid" name="testid"></a><h2 id="Hh2"><span>h2</span></h2>

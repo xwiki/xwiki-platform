@@ -95,6 +95,8 @@ public class XDOMGeneratorListener implements IWemListener
 
     private Stack<Integer> currentSectionLevel = new Stack<Integer>();
 
+    private int documentLevel = 0;
+
     private class MarkerBlock extends AbstractBlock
     {
         public void traverse(Listener listener)
@@ -113,7 +115,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public XDOM getXDOM()
     {
-        return (XDOM) generateListFromStack().get(0);
+        return new XDOM(generateListFromStack());
     }
 
     /**
@@ -143,8 +145,12 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginDocument()
     {
-        this.stack.push(this.marker);
+        if (documentLevel > 0) {
+            this.stack.push(this.marker);
+        }
         this.currentSectionLevel.push(0);
+
+        ++documentLevel;
     }
 
     /**
@@ -253,8 +259,12 @@ public class XDOMGeneratorListener implements IWemListener
             this.stack.push(new SectionBlock(generateListFromStack()));
         }
 
+        --documentLevel;
+
         this.currentSectionLevel.pop();
-        this.stack.push(new XDOM(generateListFromStack()));
+        if (documentLevel > 0) {
+            this.stack.push(new XDOM(generateListFromStack()));
+        }
     }
 
     /**

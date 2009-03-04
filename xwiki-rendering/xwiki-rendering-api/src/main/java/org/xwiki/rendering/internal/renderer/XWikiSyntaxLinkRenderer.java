@@ -37,8 +37,10 @@ public class XWikiSyntaxLinkRenderer
     public String renderLinkReference(Link link)
     {
         StringBuilder buffer = new StringBuilder();
-        
-        buffer.append(link.getReference());
+
+        if (link.getReference() != null) {
+            buffer.append(link.getReference());
+        }
         if (link.getAnchor() != null) {
             buffer.append('#');
             buffer.append(link.getAnchor());
@@ -55,14 +57,14 @@ public class XWikiSyntaxLinkRenderer
         return buffer.toString();
     }
 
-    public void beginRenderLink(WikiPrinter printer, Link link, boolean isFreeStandingURI, 
+    public void beginRenderLink(WikiPrinter printer, Link link, boolean isFreeStandingURI,
         Map<String, String> parameters)
     {
         if (!isFreeStandingURI || (isFreeStandingURI && !parameters.isEmpty())) {
             printer.print("[[");
         }
     }
-        
+
     public void renderLinkContent(WikiPrinter printer, String wikiSyntaxContent)
     {
         // If there was some link content specified then output the character separator ">>".
@@ -72,11 +74,10 @@ public class XWikiSyntaxLinkRenderer
         }
     }
 
-    public void endRenderLink(WikiPrinter printer, Link link, boolean isFreeStandingURI, 
-        Map<String, String> parameters)
+    public void endRenderLink(WikiPrinter printer, Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         printer.print(renderLinkReference(link));
-        
+
         // If there were parameters specified, output them separated by the "||" characters
         if (!parameters.isEmpty()) {
             printer.print("||");
@@ -85,11 +86,11 @@ public class XWikiSyntaxLinkRenderer
                 String key = it.next();
                 printer.print(key + "=\"" + parameters.get(key) + "\"");
                 if (it.hasNext()) {
-                    printer.print(" ");                    
+                    printer.print(" ");
                 }
             }
         }
-        
+
         if (!isFreeStandingURI || (isFreeStandingURI && !parameters.isEmpty())) {
             printer.print("]]");
         }

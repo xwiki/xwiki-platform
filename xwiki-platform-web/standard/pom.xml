@@ -162,13 +162,15 @@
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <!-- We extract SmartClient library from smartGWT since smartGWT will use SmartClient from web-standard resources -->
+                  <!-- We extract SmartClient library from smartGWT since smartGWT will 
+                       use SmartClient from web-standard resources -->
                   <groupId>com.smartgwt</groupId>
                   <artifactId>smartgwt</artifactId>
                   <version>${smartgwt.version}</version>
                   <type>jar</type>
                   <outputDirectory>${project.build.directory}/smartclient</outputDirectory>
-                  <!-- We exlude the default initsc.js file since we provide a modified version of it in web-standard sources -->
+                  <!-- We exlude the default initsc.js file since we provide a modified 
+                       version of it in web-standard sources -->
                   <excludes>**/initsc.js</excludes>
                 </artifactItem>
               </artifactItems>
@@ -213,6 +215,12 @@
             <resource>
               <directory>${project.build.directory}/smartclient/com/smartclient/public/sc</directory>
               <targetPath>resources/js/smartclient</targetPath>
+              <filtering>false</filtering>
+            </resource> 
+            <!-- Add SmartClient skins -->
+            <resource>
+              <directory>${project.build.directory}/smartclient/com/smartclient/theme/enterprise/public/sc/skins</directory>
+              <targetPath>resources/js/smartclient/skins</targetPath>
               <filtering>false</filtering>
             </resource>            
           </webResources>

@@ -78,16 +78,19 @@ public class XWikiCommentHandler extends CommentHandler
     @Override
     public void onComment(String content, TagStack stack)
     {
+        // if ignoreElements is true it means we are inside a macro or another block we don't want to parse content
+        boolean ignoreElements = (Boolean) stack.getStackParameter("ignoreElements");
+
         // If the comment starts with "startwikilink" then we need to gather all XHTML tags inside
         // the A tag, till we get a "stopwikilink" comment.
         // Same for "startimage" and "stopimage".
-        if (content.startsWith("startwikilink:")) {
+        if (!ignoreElements && content.startsWith("startwikilink:")) {
             handleLinkCommentStart(content, stack);
-        } else if (content.startsWith("stopwikilink")) {
+        } else if (!ignoreElements && content.startsWith("stopwikilink")) {
             handleLinkCommentStop(content, stack);
-        } else if (content.startsWith("startimage:")) {
+        } else if (!ignoreElements && content.startsWith("startimage:")) {
             handleImageCommentStart(content, stack);
-        } else if (content.startsWith("stopimage")) {
+        } else if (!ignoreElements && content.startsWith("stopimage")) {
             handleImageCommentStop(content, stack);
         } else {
             super.onComment(content, stack);

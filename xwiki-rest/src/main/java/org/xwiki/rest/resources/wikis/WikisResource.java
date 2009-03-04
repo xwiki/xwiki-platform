@@ -23,8 +23,6 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
@@ -37,12 +35,7 @@ import com.xpn.xwiki.XWikiException;
  */
 @Path("/wikis")
 public class WikisResource extends XWikiResource
-{
-    public WikisResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
+{ 
     @GET
     public Wikis get() throws XWikiException
     {

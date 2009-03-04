@@ -21,8 +21,6 @@ package org.xwiki.rest.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
@@ -33,12 +31,7 @@ import org.xwiki.rest.model.jaxb.Xwiki;
  */
 @Path("/")
 public class RootResource extends XWikiResource
-{
-    public RootResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
+{    
     @GET
     public Xwiki getRoot()
     {

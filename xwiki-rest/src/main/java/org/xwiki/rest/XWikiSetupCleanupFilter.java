@@ -115,8 +115,10 @@ public class XWikiSetupCleanupFilter extends Filter
         attributes.remove(Constants.XWIKI_USER);
 
         /* Avoid that empty entities make the engine forward the response creation to the XWiki servlet. */
-        if (!response.getEntity().isAvailable()) {
-            response.setEntity(null);
+        if (response.getEntity() != null) {
+            if (!response.getEntity().isAvailable()) {
+                response.setEntity(null);
+            }
         }
     }
 

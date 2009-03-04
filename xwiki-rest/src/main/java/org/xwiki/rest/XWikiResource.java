@@ -22,7 +22,11 @@ package org.xwiki.rest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
@@ -34,6 +38,9 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
+ * Base class for all XWiki-related JAX-RS resources. This class provides to subclasses a set of protected fields to
+ * access the XWiki API and a method for retrieving documents in their different incarnations.
+ * 
  * @version $Id$
  */
 public class XWikiResource
@@ -46,6 +53,7 @@ public class XWikiResource
 
     protected String xwikiUser;
 
+    @Context
     protected UriInfo uriInfo;
 
     protected Logger logger;
@@ -85,7 +93,7 @@ public class XWikiResource
      * 
      * @param uriInfo A UriInfo instance typically injected through the @Context annotation in subclasses.
      */
-    public XWikiResource(UriInfo uriInfo)
+    public XWikiResource()
     {
         xwikiContext = (XWikiContext) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_CONTEXT);
         xwiki = (com.xpn.xwiki.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI);
@@ -96,14 +104,12 @@ public class XWikiResource
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
 
-        this.uriInfo = uriInfo;
-
         logger = Logger.getLogger(this.getClass().getName());
 
         objectFactory = new ObjectFactory();
 
-        logger.log(Level.FINE, String.format("Resource %s initialized at %s. Serving user: '%s'\n", getClass()
-            .getName(), uriInfo.getAbsolutePath(), xwikiUser));
+        logger.log(Level.FINE, String.format("Resource %s initialized. Serving user: '%s'\n", getClass().getName(),
+            xwikiUser));
     }
 
     /**
@@ -138,8 +144,6 @@ public class XWikiResource
 
         if (failIfDoesntExist) {
             if (!existed) {
-                // throwWebApplicationException(Status.NOT_FOUND, String.format("Page %s doesn't exist.",
-                // pageFullName));
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
         }
@@ -186,6 +190,19 @@ public class XWikiResource
         }
 
         return new DocumentInfo(doc, !existed);
+    }
+
+    /**
+     * A special GET method that produces the ad-hoc "uritemplate" media type used for retrieving the URI template
+     * associated to a resource. This is an auxiliary method that is used for documenting the REST API.
+     * 
+     * @return The URI template string associated to the requested resource.
+     */
+    @GET
+    @Produces("uritemplate")
+    public String getUriTemplate()
+    {
+        return this.getClass().getAnnotation(Path.class).value();
     }
 
 }

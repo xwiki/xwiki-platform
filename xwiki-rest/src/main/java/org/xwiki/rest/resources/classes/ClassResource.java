@@ -23,8 +23,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
@@ -39,12 +37,6 @@ import com.xpn.xwiki.XWikiException;
 @Path("/wikis/{wikiName}/classes/{className}")
 public class ClassResource extends XWikiResource
 {
-
-    public ClassResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Class getClass(@PathParam("wikiName") String wikiName, @PathParam("className") String className)
         throws XWikiException

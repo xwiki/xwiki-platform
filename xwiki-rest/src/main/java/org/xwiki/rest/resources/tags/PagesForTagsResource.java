@@ -8,8 +8,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
@@ -23,12 +21,6 @@ import com.xpn.xwiki.plugin.tag.TagPlugin;
 @Path("/wikis/{wikiName}/tags/{tagNames}")
 public class PagesForTagsResource extends XWikiResource
 {
-
-    public PagesForTagsResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Pages getTags(@PathParam("wikiName") String wikiName, @PathParam("tagNames") String tagNames,
         @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)

@@ -20,7 +20,6 @@
 package org.xwiki.rest.resources.pages;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
@@ -35,11 +34,6 @@ import com.xpn.xwiki.api.Document;
  */
 public class ModifiablePageResource extends XWikiResource
 {
-    public ModifiablePageResource(UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     public Response putPage(DocumentInfo documentInfo, Page page) throws XWikiException
     {
         Document doc = documentInfo.getDocument();

@@ -25,8 +25,6 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
@@ -42,11 +40,6 @@ import com.xpn.xwiki.api.Document;
 @Path("/wikis/{wikiName}/spaces/{spaceName}")
 public class SpaceResource extends XWikiResource
 {
-    public SpaceResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Space getPage(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName)
         throws XWikiException

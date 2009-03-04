@@ -40,7 +40,7 @@ public class XWikiJaxRsApplication extends JaxRsApplication
         Restlet root = super.createRoot();
         router.attach(root);
         setupCleanupFilter.setNext(xwikiAuthentication);
-        xwikiAuthentication.setNext(super.createRoot());
+        xwikiAuthentication.setNext(router);
 
         return setupCleanupFilter;
     }

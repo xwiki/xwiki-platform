@@ -28,8 +28,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.suigeneris.jrcs.rcs.Version;
@@ -48,11 +46,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history")
 public class AttachmentHistoryResource extends XWikiResource
 {
-    public AttachmentHistoryResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Attachments getAttachmentHistory(@PathParam("wikiName") String wikiName,
         @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,

@@ -53,11 +53,6 @@ import com.xpn.xwiki.plugin.tag.TagPlugin;
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/tags")
 public class PageTagsResource extends ModifiablePageResource
 {
-    public PageTagsResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Tags getPageTags(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName) throws XWikiException

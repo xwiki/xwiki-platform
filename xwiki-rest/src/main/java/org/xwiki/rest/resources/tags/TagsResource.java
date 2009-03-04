@@ -5,9 +5,7 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
@@ -21,12 +19,6 @@ import com.xpn.xwiki.plugin.tag.TagPlugin;
 @Path("/wikis/{wikiName}/tags")
 public class TagsResource extends XWikiResource
 {
-
-    public TagsResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Tags getTags(@PathParam("wikiName") String wikiName) throws XWikiException
     {

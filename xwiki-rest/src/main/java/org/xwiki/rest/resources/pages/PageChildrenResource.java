@@ -27,8 +27,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
@@ -45,11 +43,6 @@ import com.xpn.xwiki.api.Document;
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/children")
 public class PageChildrenResource extends XWikiResource
 {
-    public PageChildrenResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Pages getPageChildren(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,

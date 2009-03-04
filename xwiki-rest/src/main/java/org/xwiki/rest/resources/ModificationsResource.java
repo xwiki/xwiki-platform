@@ -28,8 +28,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -48,13 +46,6 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 @Path("/wikis/{wikiName}/modifications")
 public class ModificationsResource extends XWikiResource
 {
-
-    public ModificationsResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-
-    }
-
     @GET
     public History getModifications(@PathParam("wikiName") String wikiName,
         @QueryParam("start") @DefaultValue("0") Integer start,

@@ -25,9 +25,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
@@ -45,11 +43,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}")
 public class AttachmentResource extends XWikiResource
 {
-    public AttachmentResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Response getAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("attachmentName") String attachmentName)

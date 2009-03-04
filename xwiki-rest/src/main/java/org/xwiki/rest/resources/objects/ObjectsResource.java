@@ -31,10 +31,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
@@ -56,12 +54,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects")
 public class ObjectsResource extends XWikiResource
 {
-
-    public ObjectsResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Objects getObjects(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,

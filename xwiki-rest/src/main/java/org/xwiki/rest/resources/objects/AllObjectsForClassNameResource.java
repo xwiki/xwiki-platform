@@ -26,8 +26,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -48,12 +46,6 @@ import com.xpn.xwiki.objects.BaseObject;
 @Path("/wikis/{wikiName}/classes/{className}/objects")
 public class AllObjectsForClassNameResource extends XWikiResource
 {
-
-    public AllObjectsForClassNameResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public Objects getObjects(@PathParam("wikiName") String wikiName, @PathParam("className") String className,
         @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)

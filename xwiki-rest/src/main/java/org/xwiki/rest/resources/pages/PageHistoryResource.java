@@ -28,8 +28,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -48,11 +46,6 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history")
 public class PageHistoryResource extends XWikiResource
 {
-    public PageHistoryResource(@Context UriInfo uriInfo)
-    {
-        super(uriInfo);
-    }
-
     @GET
     public History getPageHistory(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,

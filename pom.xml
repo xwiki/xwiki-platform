@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>21</version>
     <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-core-parent</artifactId>
@@ -61,7 +61,7 @@
   </dependencies>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <platform.tool.test.version>1.15-SNAPSHOT</platform.tool.test.version>
+    <platform.tool.test.version>1.15</platform.tool.test.version>
   </properties>
   <modules>
     <module>xwiki-xmlrpc</module>

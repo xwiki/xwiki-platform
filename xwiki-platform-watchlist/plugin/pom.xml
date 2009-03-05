@@ -27,33 +27,33 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>14-SNAPSHOT</version>
+    <version>14</version>
   </parent>
   <artifactId>xwiki-plugin-watchlist</artifactId>
   <name>XWiki Platform - Plugins - WatchList Manager</name>
-  <version>1.13-SNAPSHOT</version>
+  <version>1.13</version>
   <description>XWiki Platform - Plugins - WatchList Manager</description>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.7.1</version>
+      <version>1.7.2</version>
       <scope>provided</scope>
     </dependency>        
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-scheduler</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.6</version>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-mailsender</artifactId>
-      <version>1.7-SNAPSHOT</version>
+      <version>1.6</version>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-lucene</artifactId>
-      <version>1.7-SNAPSHOT</version>
+      <version>1.6</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
@@ -61,4 +61,10 @@
       <version>1.4</version>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-watchlist-1.13</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-watchlist-1.13</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-watchlist-1.13</url>
+  </scm>
 </project>

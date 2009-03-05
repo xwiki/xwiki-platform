@@ -27,11 +27,11 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>19</version>
   </parent>
   <artifactId>xwiki-application-scheduler</artifactId>
   <name>XWiki Platform - Applications - Scheduler</name>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.6</version>
   <packaging>xar</packaging>
   <description>Manages Scheduler Jobs</description>
   <dependencies>
@@ -39,8 +39,14 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-scheduler</artifactId>
       <!-- We want to release the Scheduler plugin and application together. Hence they should have the same version -->
-      <version>1.6-SNAPSHOT</version>
+      <version>1.6</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-scheduler-1.6</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-scheduler-1.6</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-scheduler-1.6</url>
+  </scm>
 </project>

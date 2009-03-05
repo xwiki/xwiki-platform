@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -297,8 +298,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());
 
-        assertEquals(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage", "TargetSpace.TargetPage",
-            "Space.TargetPage"), linkedPages);
+        assertEquals(new HashSet<String>(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage",
+            "TargetSpace.TargetPage", "Space.TargetPage")), new HashSet<String>(linkedPages));
     }
 
     public void testGetLinkedPages()

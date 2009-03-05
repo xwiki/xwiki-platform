@@ -39,7 +39,7 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-scheduler</artifactId>
       <!-- We want to release the Scheduler plugin and application together. Hence they should have the same version -->
-      <version>1.6</version>
+      <version>1.7-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

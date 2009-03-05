@@ -29,7 +29,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>15-SNAPSHOT</version>
+    <version>16-SNAPSHOT</version>
   </parent>
   <artifactId>foxwiki</artifactId>
   <version>1.0-SNAPSHOT</version>

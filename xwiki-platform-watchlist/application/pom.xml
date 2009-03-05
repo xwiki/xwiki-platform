@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-application-watchlist</artifactId>
   <name>XWiki Platform - Applications - WatchList</name>
-  <version>1.13</version>
+  <version>1.14-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>WatchList email template</description>
   <dependencies>
@@ -43,10 +43,4 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-watchlist-1.13</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-watchlist-1.13</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-watchlist-1.13</url>
-  </scm>
 </project>

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-shared-tests</artifactId>
   <name>XWiki Platform - Tools - Build - Shared Test</name>
-  <version>1.15</version>
+  <version>1.16-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>Test framework classes shared between functional test modules</description>
   <properties>
@@ -74,10 +74,4 @@
       <version>1.7.0</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-shared-tests-1.15</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-shared-tests-1.15</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-shared-tests-1.15</url>
-  </scm>
 </project>

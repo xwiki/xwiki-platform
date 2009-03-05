@@ -27,11 +27,17 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>19</version>
   </parent>
   <artifactId>xwiki-application-statistics</artifactId>
   <name>XWiki Platform - Applications - Statistics</name>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.4</version>
   <packaging>xar</packaging>
   <description>Panels and pages providing XWiki statistics</description>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-statistics-1.4</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-statistics-1.4</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-statistics-1.4</url>
+  </scm>
 </project>

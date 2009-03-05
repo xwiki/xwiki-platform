@@ -31,13 +31,7 @@
   </parent>
   <artifactId>xwiki-application-blog</artifactId>
   <name>XWiki Platform - Applications - Blog</name>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Blog application for XWiki</description>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-blog-1.1</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-blog-1.1</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-blog-1.1</url>
-  </scm>
 </project>

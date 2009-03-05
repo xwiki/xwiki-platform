@@ -27,11 +27,11 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>19</version>
   </parent>
   <artifactId>xwiki-application-watchlist</artifactId>
   <name>XWiki Platform - Applications - WatchList</name>
-  <version>1.13-SNAPSHOT</version>
+  <version>1.13</version>
   <packaging>xar</packaging>
   <description>WatchList email template</description>
   <dependencies>
@@ -39,8 +39,14 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-watchlist</artifactId>
       <!-- We want to release the Watchlist plugin and application together. Hence they should have the same version -->
-      <version>1.13-SNAPSHOT</version>
+      <version>1.13</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-watchlist-1.13</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-watchlist-1.13</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-watchlist-1.13</url>
+  </scm>
 </project>

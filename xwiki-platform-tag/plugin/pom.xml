@@ -34,12 +34,12 @@
   <artifactId>xwiki-plugins</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Plugins - Parent POM</name>
-  <version>14</version>
+  <version>15-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Parent POM</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugins-14</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugins-14</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugins-14</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</url>
   </scm>
   <profiles>
     <profile>

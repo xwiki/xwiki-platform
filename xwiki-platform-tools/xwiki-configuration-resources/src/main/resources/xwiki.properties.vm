@@ -43,3 +43,23 @@
 #-# [Since 1.7M1]
 #-# The cache component to use as local cache component. 
 # cache.defaultLocalCache=jbosscache/local
+
+#-------------------------------------------------------------------------------------
+# OpenOffice
+#-------------------------------------------------------------------------------------
+
+#-# [Since 1.8RC3]
+#-# Path to openoffice installation.
+# openoffice.homePath=/opt/openoffice.org3/
+
+#-# [Since 1.8RC3]
+#-# Path to openoffice execution profile.
+# openoffice.profilePath=/home/user/.openoffice.org/3
+
+#-# [Since 1.8RC3]
+#-# Maximum number of simultaneous conversion tasks to be handled by a single openoffice process.
+# openoffice.maxTasksPerProcess=50
+
+#-# [Since 1.8RC3]
+#-# Timeout for conversion tasks (in miliseconds).
+# openoffice.taskExecutionTimeout=30000

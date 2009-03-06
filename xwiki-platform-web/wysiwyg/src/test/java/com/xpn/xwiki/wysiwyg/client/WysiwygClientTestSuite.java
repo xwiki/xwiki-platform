@@ -39,6 +39,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerT
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtensionTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkMetaDataExtractorTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroCallTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManagerTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRuleTest;
@@ -69,26 +70,8 @@ public class WysiwygClientTestSuite extends GWTTestSuite
     {
         TestSuite suite = new TestSuite("WYSIWYG Client Unit Tests");
 
-        // dom
-        suite.addTestSuite(DOMUtilsTest.class);
-        suite.addTestSuite(DocumentTest.class);
-        suite.addTestSuite(DocumentFragmentTest.class);
-        suite.addTestSuite(ElementTest.class);
-        suite.addTestSuite(TextTest.class);
-        suite.addTestSuite(RangeTest.class);
-        suite.addTestSuite(StyleTest.class);
-        suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);
-        suite.addTestSuite(IESelectionTest.class);
-
-        // plugin
-        suite.addTestSuite(DefaultPluginFactoryManagerTest.class);
-        suite.addTestSuite(DefaultPluginManagerTest.class);
-        suite.addTestSuite(FocusWidgetUIExtensionTest.class);
-        suite.addTestSuite(ImageMetaDataExtractorTest.class);
-        suite.addTestSuite(LinkMetaDataExtractorTest.class);
-
-        suite.addTestSuite(IndentExecutableTest.class);
-        suite.addTestSuite(OutdentExecutableTest.class);
+        addDOMTests(suite);
+        addPluginTests(suite);
 
         // syntax
         suite.addTestSuite(DefaultSyntaxValidatorManagerTest.class);
@@ -99,7 +82,53 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         // util
         suite.addTestSuite(TimerTest.class);
 
-        // widget
+        addWidgetTests(suite);
+
+        return suite;
+    }
+
+    /**
+     * Adds unit tests for the DOM API to the given test suite.
+     * 
+     * @param suite the test suite
+     */
+    private static void addDOMTests(TestSuite suite)
+    {
+        suite.addTestSuite(DOMUtilsTest.class);
+        suite.addTestSuite(DocumentTest.class);
+        suite.addTestSuite(DocumentFragmentTest.class);
+        suite.addTestSuite(ElementTest.class);
+        suite.addTestSuite(TextTest.class);
+        suite.addTestSuite(RangeTest.class);
+        suite.addTestSuite(StyleTest.class);
+        suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);
+        suite.addTestSuite(IESelectionTest.class);
+    }
+
+    /**
+     * Adds unit tests for the plug-ins to the given test suite.
+     * 
+     * @param suite the test suite
+     */
+    private static void addPluginTests(TestSuite suite)
+    {
+        suite.addTestSuite(DefaultPluginFactoryManagerTest.class);
+        suite.addTestSuite(DefaultPluginManagerTest.class);
+        suite.addTestSuite(FocusWidgetUIExtensionTest.class);
+        suite.addTestSuite(ImageMetaDataExtractorTest.class);
+        suite.addTestSuite(LinkMetaDataExtractorTest.class);
+        suite.addTestSuite(MacroCallTest.class);
+        suite.addTestSuite(IndentExecutableTest.class);
+        suite.addTestSuite(OutdentExecutableTest.class);
+    }
+
+    /**
+     * Adds unit tests for the widgets to the given test suite.
+     * 
+     * @param suite the test suite
+     */
+    private static void addWidgetTests(TestSuite suite)
+    {
         suite.addTestSuite(RichTextAreaTest.class);
         suite.addTestSuite(HistoryTest.class);
         suite.addTestSuite(InsertHTMLExecutableTest.class);
@@ -107,7 +136,5 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(FormatBlockExecutableTest.class);
         suite.addTestSuite(StyleExecutableTest.class);
         suite.addTestSuite(SelectionPreserverTest.class);
-
-        return suite;
     }
 }

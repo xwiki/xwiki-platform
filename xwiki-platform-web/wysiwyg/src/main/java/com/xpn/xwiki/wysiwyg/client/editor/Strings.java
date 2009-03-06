@@ -310,4 +310,6 @@ public interface Strings extends Constants
     String importerImportButtonCaption();
 
     String importerCancelButtonCaption();
+
+    String errorServerRequestFailed();
 }

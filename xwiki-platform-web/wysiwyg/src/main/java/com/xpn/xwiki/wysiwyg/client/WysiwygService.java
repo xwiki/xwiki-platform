@@ -203,7 +203,9 @@ public interface WysiwygService extends RemoteService
     /**
      * @param macroName a string representing the name of a macro
      * @param syntax the string identifier for the storage syntax
-     * @return an object describing the specified macro, or {@code null} if the specified macro is not found
+     * @return an object describing the specified macro
+     * @throws XWikiGWTException if the descriptor of the specified macro is not found or an exception occurs while
+     *             looking for it
      */
-    MacroDescriptor getMacroDescriptor(String macroName, String syntax);
+    MacroDescriptor getMacroDescriptor(String macroName, String syntax) throws XWikiGWTException;
 }

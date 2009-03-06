@@ -47,7 +47,7 @@ public class MacroCall
     /**
      * The arguments passed to the macro.
      */
-    private Map<String, String> arguments;
+    private final Map<String, String> arguments;
 
     /**
      * The content of the macro.
@@ -61,20 +61,41 @@ public class MacroCall
      */
     public MacroCall(String startMacroComment)
     {
-        String data = startMacroComment.substring(START_MACRO.length());
-        String[] parts = data.split("\\|\\-\\|", 3);
+        // Extract macro name.
+        int start = START_MACRO.length();
+        int end = startMacroComment.indexOf(SEPARATOR, start);
+        name = startMacroComment.substring(start, end);
 
-        name = parts[0];
-        content = parts[2];
-
+        // Extract macro arguments.
         arguments = new HashMap<String, String>();
-        String[] args = parts[1].split("\\s+");
-        for (int i = 0; i < args.length; i++) {
-            String[] pair = args[i].split("=");
-            String quotedValue = pair[1].trim();
-            // TODO: We have to unescape the quotes!
-            arguments.put(pair[0].trim(), quotedValue.substring(1, quotedValue.length() - 1));
+        // Look for the first argument.
+        start = end + SEPARATOR.length();
+        int equalIndex = startMacroComment.indexOf('=', start);
+        int separatorIndex = startMacroComment.indexOf(SEPARATOR, start);
+        while (equalIndex < separatorIndex && equalIndex > 0) {
+            String argumentName = startMacroComment.substring(start, equalIndex).trim();
+
+            // Opening quote.
+            start = startMacroComment.indexOf('"', equalIndex + 1) + 1;
+            // Look for the closing quote.
+            end = start;
+            boolean escaped = false;
+            while (escaped || startMacroComment.charAt(end) != '"') {
+                escaped = !escaped && '\\' == startMacroComment.charAt(end);
+                end++;
+            }
+
+            String argumentValue = startMacroComment.substring(start, end);
+            arguments.put(argumentName, unescape(argumentValue));
+
+            // Look for the next argument.
+            start = end + 1;
+            equalIndex = startMacroComment.indexOf('=', start);
+            separatorIndex = startMacroComment.indexOf(SEPARATOR, start);
         }
+
+        // Extract macro content.
+        content = startMacroComment.substring(separatorIndex + SEPARATOR.length());
     }
 
     /**
@@ -158,13 +179,35 @@ public class MacroCall
         for (Map.Entry<String, String> entry : arguments.entrySet()) {
             strBuff.append(entry.getKey());
             strBuff.append("=\"");
-            // TODO: We have to escape the quotes!
-            strBuff.append(entry.getValue());
+            strBuff.append(escape(entry.getValue()));
             strBuff.append("\" ");
         }
         strBuff.append(SEPARATOR);
         strBuff.append(getContent());
 
         return strBuff.toString();
+    }
+
+    /**
+     * Escapes {@code \} and {@code "} symbols in the given string, which usually is the value entered by the user for
+     * some macro parameter.
+     * 
+     * @param value the string to be escaped
+     * @return the escaped string
+     */
+    private String escape(String value)
+    {
+        return value.replaceAll("([\\\\\\\"])", "\\\\$1");
+    }
+
+    /**
+     * Unescapes {@code \} and {@code "} symbols in the given string before letting the user edit it.
+     * 
+     * @param value the string to be unescaped
+     * @return the unescaped string
+     */
+    private String unescape(String value)
+    {
+        return value.replaceAll("\\\\([\\\\\\\"])", "$1");
     }
 }

@@ -931,7 +931,7 @@ b.ts1{border-width: 0 2px}</code>
     ## hard-coded links to app. admin pages which appear at global/space level
     ## TODO: replace this when the new IX are ready
     ##----------------------------------------------------------------------------
-    #set($globalAppAdmin = ["Panels.PanelWizard", "Blog.Categories", "Photos.Links"])
+    #set($globalAppAdmin = ["Panels.PanelWizard", "Blog.Categories", "Photos.Links", "XWiki.OfficeImporterAdmin"])
     #set($spaceAppAdmin = ["Panels.PanelWizard"])
     ##-----------------------------------------------------------------------------
     ## some applications at space level (like Panel Wizard) might require a different type of

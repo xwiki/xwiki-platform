@@ -77,7 +77,7 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
          */
         public void onFailure(Throwable caught)
         {
-            // ignore for now
+            showError(caught);
         }
 
         /**
@@ -194,6 +194,29 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
 
         // Now that all the controls are in place, let's enable the apply button.
         apply.setEnabled(true);
+    }
+
+    /**
+     * If an error occurred while retrieving a macro descriptor then this method can be used to display the error
+     * message to the user.
+     * 
+     * @param caught the exception that has been caught
+     */
+    private void showError(Throwable caught)
+    {
+        // First get the dialog out of the loading state.
+        getBody().removeStyleName(STYLE_NAME_LOADING);
+
+        String message = caught.getLocalizedMessage();
+        if (StringUtils.isEmpty(message)) {
+            // Use a default error message.
+            message = Strings.INSTANCE.errorServerRequestFailed();
+        }
+
+        Label error = new Label(message);
+        error.addStyleName("errormessage");
+
+        getBody().add(error);
     }
 
     /**

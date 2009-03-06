@@ -491,7 +491,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      * 
      * @see WysiwygService#getMacroDescriptor(String, String)
      */
-    public MacroDescriptor getMacroDescriptor(String macroName, String syntaxId)
+    public MacroDescriptor getMacroDescriptor(String macroName, String syntaxId) throws XWikiGWTException
     {
         try {
             SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
@@ -515,7 +515,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             return result;
         } catch (Throwable t) {
             LOG.error("Exception while retrieving macro descriptor.", t);
-            return null;
+            throw new XWikiGWTException(t.getLocalizedMessage(), t.toString(), -1, -1);
         }
     }
 }

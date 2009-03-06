@@ -69,6 +69,10 @@ public class ParameterDisplayer
 
         input = InputFactory.createInput(descriptor.getType());
         input.setTitle(descriptor.getDescription());
+        // Specify an id for debugging and testing.
+        if (StringUtils.isEmpty(input.getElement().getId())) {
+            input.getElement().setId("pd-" + descriptor.getName() + "-input");
+        }
 
         validationMessage = new Label();
         validationMessage.setVisible(false);

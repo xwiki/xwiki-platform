@@ -1,0 +1,58 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.officeimporter.openoffice.configuration;
+
+/**
+ * Configuration properties for office importer module.
+ * <p>
+ * These configuration properties are defined in in XWiki's global configuration file using the prefix of
+ * "officeimporter".
+ * </p>
+ * 
+ * @version $Id$
+ * @since 1.8RC3
+ */
+public interface OpenOfficeServerConfiguration
+{
+    /**
+     * This component's role, used when code needs to look it up.
+     */
+    String ROLE = OpenOfficeServerConfiguration.class.getName();
+
+    /**
+     * @return path to openoffice server installation.
+     */
+    String getHomePath();
+
+    /**
+     * @return path to openoffice execution profile.
+     */
+    String getProfilePath();
+
+    /**
+     * @return maximum number of simultaneous conversion tasks to be handled by a single oo process instance.
+     */
+    int getMaxTasksPerProcess();
+
+    /**
+     * @return timeout for document conversion tasks.
+     */
+    long getTaskExecutionTimeout();
+}

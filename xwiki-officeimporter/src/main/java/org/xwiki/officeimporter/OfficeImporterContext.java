@@ -24,11 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.jodconverter.DefaultDocumentFormatRegistry;
+import net.sf.jodconverter.DocumentFormat;
+import net.sf.jodconverter.DocumentFormatRegistry;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 
-import com.artofsolving.jodconverter.DefaultDocumentFormatRegistry;
-import com.artofsolving.jodconverter.DocumentFormat;
-import com.artofsolving.jodconverter.DocumentFormatRegistry;
 
 /**
  * Contains all the context information for a particular transformation. While an office document is being transformed
@@ -107,7 +108,7 @@ public class OfficeImporterContext
             DocumentFormatRegistry formatRegistry = new DefaultDocumentFormatRegistry();
             int dot = sourceFileName.lastIndexOf('.');
             if (dot != -1) {
-                this.sourceFormat = formatRegistry.getFormatByFileExtension(sourceFileName.substring(dot + 1));
+                this.sourceFormat = formatRegistry.getFormatByExtension(sourceFileName.substring(dot + 1));
             }
             if (sourceFormat == null) {
                 throw new OfficeImporterException("Unable to determine input file format.");
@@ -182,7 +183,7 @@ public class OfficeImporterContext
      */
     public boolean isPresentation()
     {
-        return PRESENTATION_FORMAT_EXTENSIONS.contains(sourceFormat.getFileExtension().toLowerCase());
+        return PRESENTATION_FORMAT_EXTENSIONS.contains(sourceFormat.getExtension().toLowerCase());
     }
 
     /**

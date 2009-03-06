@@ -24,7 +24,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
+
+import net.sf.jodconverter.DefaultDocumentFormatRegistry;
+import net.sf.jodconverter.DocumentFormat;
+import net.sf.jodconverter.DocumentFormatRegistry;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
@@ -32,15 +35,8 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.internal.OfficeImporterFileStorage;
+import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
 import org.xwiki.officeimporter.transformer.DocumentTransformer;
-
-import com.artofsolving.jodconverter.DefaultDocumentFormatRegistry;
-import com.artofsolving.jodconverter.DocumentConverter;
-import com.artofsolving.jodconverter.DocumentFormat;
-import com.artofsolving.jodconverter.DocumentFormatRegistry;
-import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
-import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
-import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
 
 /**
  * Transforms an Office Document into a corresponding Html document.
@@ -56,24 +52,9 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
     public static final String DEFAULT_ENCODING = "UTF-8";
     
     /**
-     * The host address of the Open Office server.
+     * The {@link OpenOfficeServerManager} component.
      */
-    private String openOfficeServerIp;
-
-    /**
-     * The port number of the the Open Office service
-     */
-    private int openOfficeServerPort;
-
-    /**
-     * The connection to the Open Office server.
-     */
-    private OpenOfficeConnection openOfficeServerConnection;
-
-    /**
-     * The document converter capable of transforming office documents into html.
-     */
-    private DocumentConverter openOfficeDocumentConverter;
+    private OpenOfficeServerManager ooManager;
 
     /**
      * Output format of this transformer.
@@ -85,9 +66,8 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
      */
     public void initialize() throws InitializationException
     {
-        openOfficeServerConnection = new SocketOpenOfficeConnection(openOfficeServerIp, openOfficeServerPort);
         DocumentFormatRegistry formatRegistry = new DefaultDocumentFormatRegistry();
-        htmlFormat = formatRegistry.getFormatByFileExtension("html");
+        htmlFormat = formatRegistry.getFormatByExtension("html");
     }
 
     /**
@@ -95,19 +75,10 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
      */
     public void transform(OfficeImporterContext importerContext) throws OfficeImporterException
     {
-        // Make a connection to the OO server.
-        if (!openOfficeServerConnection.isConnected()) {
-            try {
-                openOfficeServerConnection.connect();
-                // Create an instance of the converter.
-                openOfficeDocumentConverter = new OpenOfficeDocumentConverter(openOfficeServerConnection);
-            } catch (ConnectException ex) {
-                String message =
-                    "Could not connect to OpenOffice server at " + openOfficeServerIp + ":" + openOfficeServerPort;
-                getLogger().error(message, ex);
-                throw new OfficeImporterException(message, ex);
-            }
-        }        
+        // Make sure the openoffice server is running.    
+        if (ooManager.getServerState() != OpenOfficeServerManager.ServerState.RUNNING) {
+            throw new OfficeImporterException("OpenOffice server is unavailable.");
+        }
         // Prepare the temporary directory structure.
         OfficeImporterFileStorage storage =
             new OfficeImporterFileStorage("xwiki-office-importer-" + importerContext.getCurrentUser());
@@ -123,8 +94,7 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
             throw new OfficeImporterException(message, ex);
         }
         // Make the conversion.
-        openOfficeDocumentConverter.convert(storage.getInputFile(), importerContext.getSourceFormat(), storage
-            .getOutputFile(), htmlFormat);
+        ooManager.getDocumentConverter().convert(storage.getInputFile(), storage.getOutputFile(), htmlFormat);
         // Collect the output into context. First the html output.
         try {
             FileInputStream fis = new FileInputStream(storage.getOutputFile());

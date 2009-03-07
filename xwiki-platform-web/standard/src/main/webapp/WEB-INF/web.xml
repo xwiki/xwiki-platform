@@ -172,65 +172,70 @@
    <servlet-name>webdav</servlet-name>
    <servlet-class>com.xpn.xwiki.plugin.webdav.XWikiDavServlet</servlet-class>
   </servlet>
-  
+
   <!-- RESTful API Restlet servlet -->
   <servlet>
     <servlet-name>XWikiRestletServlet</servlet-name>
     <servlet-class>
       org.xwiki.rest.XWikiRestletServlet  
     </servlet-class>
-   		<init-param>
-			<param-name>resources</param-name>
-			<param-value>
-				org.xwiki.rest.resources.RootResource;
-				org.xwiki.rest.resources.wikis.WikisResource;
-				org.xwiki.rest.resources.spaces.SpacesResource;
-				org.xwiki.rest.resources.spaces.SpaceResource;
-				org.xwiki.rest.resources.pages.PagesResource;
-				org.xwiki.rest.resources.pages.PageChildrenResource;
-				org.xwiki.rest.resources.pages.PageHistoryResource;
-				org.xwiki.rest.resources.pages.PageResource;
-				org.xwiki.rest.resources.pages.PageTranslationHistoryResource;
-				org.xwiki.rest.resources.pages.PageTranslationResource;
-				org.xwiki.rest.resources.pages.PageTranslationsResource;
-				org.xwiki.rest.resources.pages.PageTranslationVersionResource;
-				org.xwiki.rest.resources.pages.PageVersionResource;
-				org.xwiki.rest.resources.pages.PageTagsResource;
-				org.xwiki.rest.resources.comments.CommentResource;
-				org.xwiki.rest.resources.comments.CommentsResource;
-				org.xwiki.rest.resources.comments.CommentsVersionResource;
-				org.xwiki.rest.resources.comments.CommentVersionResource;
-				org.xwiki.rest.resources.attachments.AttachmentHistoryResource;
-				org.xwiki.rest.resources.attachments.AttachmentResource;
-				org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
-				org.xwiki.rest.resources.attachments.AttachmentsResource;
-				org.xwiki.rest.resources.attachments.AttachmentVersionResource;
-				org.xwiki.rest.resources.objects.ObjectsResource;
-				org.xwiki.rest.resources.objects.ObjectsForClassNameResource;
-				org.xwiki.rest.resources.objects.ObjectResource;
-				org.xwiki.rest.resources.objects.ObjectPropertiesResource;
-				org.xwiki.rest.resources.objects.ObjectPropertyResource;
-				org.xwiki.rest.resources.objects.AllObjectsForClassNameResource;
-				org.xwiki.rest.resources.classes.ClassesResource;
-				org.xwiki.rest.resources.classes.ClassResource;
-				org.xwiki.rest.resources.classes.ClassPropertiesResource;
-				org.xwiki.rest.resources.classes.ClassPropertyResource;
-				org.xwiki.rest.resources.tags.TagsResource;
-				org.xwiki.rest.resources.tags.PagesForTagsResource;
-				org.xwiki.rest.resources.ModificationsResource;
-			</param-value>
-		</init-param>
-		<init-param>
-			<param-name>providers</param-name>
-			<param-value>
-				org.xwiki.rest.exceptions.XWikiExceptionMapper;
-				org.xwiki.rest.exceptions.QueryExceptionMapper;
-				org.xwiki.rest.representations.pages.TextPlainPageReader;
-				org.xwiki.rest.representations.objects.TextPlainPropertyReader;
-				org.xwiki.rest.representations.comments.TextPlainCommentReader;
-				org.xwiki.rest.representations.tags.TextPlainTagsReader
-			</param-value>
-		</init-param>   
+    <init-param>
+      <param-name>resources</param-name>
+      <param-value>
+        org.xwiki.rest.resources.RootResource;
+        org.xwiki.rest.resources.wikis.WikisResource;
+        org.xwiki.rest.resources.spaces.SpacesResource;
+        org.xwiki.rest.resources.spaces.SpaceResource;
+        org.xwiki.rest.resources.pages.PagesResource;
+        org.xwiki.rest.resources.pages.PageChildrenResource;
+        org.xwiki.rest.resources.pages.PageHistoryResource;
+        org.xwiki.rest.resources.pages.PageResource;
+        org.xwiki.rest.resources.pages.PageTranslationHistoryResource;
+        org.xwiki.rest.resources.pages.PageTranslationResource;
+        org.xwiki.rest.resources.pages.PageTranslationsResource;
+        org.xwiki.rest.resources.pages.PageTranslationVersionResource;
+        org.xwiki.rest.resources.pages.PageVersionResource;
+        org.xwiki.rest.resources.pages.PageTagsResource;
+        org.xwiki.rest.resources.comments.CommentResource;
+        org.xwiki.rest.resources.comments.CommentsResource;
+        org.xwiki.rest.resources.comments.CommentsVersionResource;
+        org.xwiki.rest.resources.comments.CommentVersionResource;
+        org.xwiki.rest.resources.attachments.AttachmentHistoryResource;
+        org.xwiki.rest.resources.attachments.AttachmentResource;
+        org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
+        org.xwiki.rest.resources.attachments.AttachmentsResource;
+        org.xwiki.rest.resources.attachments.AttachmentVersionResource;
+        org.xwiki.rest.resources.objects.ObjectsResource;
+        org.xwiki.rest.resources.objects.ObjectsForClassNameResource;
+        org.xwiki.rest.resources.objects.ObjectResource;
+        org.xwiki.rest.resources.objects.ObjectPropertiesResource;
+        org.xwiki.rest.resources.objects.ObjectPropertyResource;
+        org.xwiki.rest.resources.objects.AllObjectsForClassNameResource;
+        org.xwiki.rest.resources.classes.ClassesResource;
+        org.xwiki.rest.resources.classes.ClassResource;
+        org.xwiki.rest.resources.classes.ClassPropertiesResource;
+        org.xwiki.rest.resources.classes.ClassPropertyResource;
+        org.xwiki.rest.resources.tags.TagsResource;
+        org.xwiki.rest.resources.tags.PagesForTagsResource;
+        org.xwiki.rest.resources.ModificationsResource;
+      </param-value>
+    </init-param>
+    <init-param>
+      <param-name>providers</param-name>
+      <param-value>
+        org.xwiki.rest.exceptions.XWikiExceptionMapper;
+        org.xwiki.rest.exceptions.QueryExceptionMapper;
+        org.xwiki.rest.representations.pages.TextPlainPageReader;
+        org.xwiki.rest.representations.pages.FormUrlEncodedPageReader;
+        org.xwiki.rest.representations.objects.TextPlainPropertyReader;
+        org.xwiki.rest.representations.objects.FormUrlEncodedPropertyReader;
+        org.xwiki.rest.representations.objects.FormUrlEncodedObjectReader;
+        org.xwiki.rest.representations.comments.TextPlainCommentReader;
+        org.xwiki.rest.representations.comments.FormUrlEncodedCommentReader;
+        org.xwiki.rest.representations.tags.TextPlainTagsReader;
+        org.xwiki.rest.representations.tags.FormUrlEncodedTagsReader;
+      </param-value>
+    </init-param>
   </servlet>
 
   <!-- RESTful API mapping -->

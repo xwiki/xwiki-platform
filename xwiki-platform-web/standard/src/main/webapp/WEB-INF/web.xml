@@ -74,7 +74,7 @@
 
   <filter-mapping>
     <filter-name>ConversionFilter</filter-name>
-    <url-pattern>/*</url-pattern>
+    <servlet-name>action</servlet-name>
   </filter-mapping>
 
   <filter-mapping>

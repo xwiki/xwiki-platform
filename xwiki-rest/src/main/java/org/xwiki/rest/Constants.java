@@ -33,4 +33,6 @@ public class Constants
     public static final String XWIKI_USER = "xwikiUser";
 
     public static final String ALLOWED_VALUES_ATTRIBUTE_NAME = "allowedValues";
+
+    public static final String HTTP_REQUEST = "httpRequest";
 }

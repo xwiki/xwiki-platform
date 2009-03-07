@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Xwiki;
  */
 @Path("/")
 public class RootResource extends XWikiResource
-{    
+{
     @GET
     public Xwiki getRoot()
     {

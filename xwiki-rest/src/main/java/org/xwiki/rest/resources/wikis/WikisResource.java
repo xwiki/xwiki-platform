@@ -35,7 +35,7 @@ import com.xpn.xwiki.XWikiException;
  */
 @Path("/wikis")
 public class WikisResource extends XWikiResource
-{ 
+{
     @GET
     public Wikis get() throws XWikiException
     {

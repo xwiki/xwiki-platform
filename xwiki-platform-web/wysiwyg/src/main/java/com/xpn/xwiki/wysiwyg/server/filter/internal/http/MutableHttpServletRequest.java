@@ -19,28 +19,17 @@
  */
 package com.xpn.xwiki.wysiwyg.server.filter.internal.http;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.xpn.xwiki.wysiwyg.server.filter.ByteArrayServletInputStream;
 import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequest;
 
 /**
@@ -51,23 +40,10 @@ import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequest;
 public class MutableHttpServletRequest extends HttpServletRequestWrapper implements MutableServletRequest
 {
     /**
-     * The logger instance.
-     */
-    private static final Log LOG = LogFactory.getLog(MutableHttpServletRequest.class);
-
-    /**
      * Parameters used instead of those from the wrapped request. This way exiting request parameters can be overwritten
      * and also new parameters can be added.
      */
     private final Map<String, String[]> params = new HashMap<String, String[]>();
-
-    /**
-     * We have to cache the input stream because calling {@link #getParameterMap()} invalidates the body of the request
-     * in some containers.
-     * 
-     * @see http://jira.codehaus.org/browse/JETTY-477
-     */
-    private final ServletInputStream inputStreamCache;
 
     /**
      * Wraps the specified request and copies its parameters to {@link #params} where they can be overwritten later.
@@ -78,40 +54,7 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
     {
         super(request);
 
-        inputStreamCache = cloneInputStream();
         params.putAll(request.getParameterMap());
-    }
-
-    /**
-     * Clones the content of this request's input stream.
-     * 
-     * @return a new {@link ServletInputStream} that has the same content as the wrapped request's input stream
-     */
-    private ServletInputStream cloneInputStream()
-    {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(bout));
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(getRequest().getInputStream()));
-            String line = in.readLine();
-            while (line != null) {
-                out.write(line);
-                line = in.readLine();
-            }
-            return new ByteArrayServletInputStream(new ByteArrayInputStream(bout.toByteArray()));
-        } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
-            return null;
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    LOG.error(e.getMessage(), e);
-                }
-            }
-        }
     }
 
     /**
@@ -227,15 +170,5 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
         Object oldValue = getSession().getAttribute(attrName);
         getSession().setAttribute(attrName, attrValue);
         return oldValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HttpServletRequestWrapper#getInputStream()
-     */
-    public ServletInputStream getInputStream() throws IOException
-    {
-        return inputStreamCache;
     }
 }

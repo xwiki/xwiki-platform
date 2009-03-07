@@ -84,6 +84,16 @@ public class XWikiSetupCleanupFilter extends Filter
             attributes.put(Constants.XWIKI, xwiki);
             attributes.put(Constants.XWIKI_API, xwikiApi);
             attributes.put(Constants.XWIKI_USER, xwikiUser);
+
+            /*
+             * We put the original HTTP request in context attributes because this is needed for reading
+             * application/www-form-urlencoded POSTs. In fact servlet filters might use getParameters which invalidates
+             * the request body, making Restlet unable to process it. In the case we need to use getParameters as well
+             * instead of reading from the input stream, and for doing this we need the HTTP request object. This is
+             * basically a hack that should be removed as soon as the Restlet JAX-RS extension will support the
+             * injection of the request object via the @Context annotation
+             */
+            attributes.put(Constants.HTTP_REQUEST, getHttpRequest(request));
         } catch (Exception e) {
             if (xwikiContext != null) {
                 cleanupComponents();
@@ -113,6 +123,7 @@ public class XWikiSetupCleanupFilter extends Filter
         attributes.remove(Constants.XWIKI);
         attributes.remove(Constants.XWIKI_API);
         attributes.remove(Constants.XWIKI_USER);
+        attributes.remove(Constants.HTTP_REQUEST);
 
         /* Avoid that empty entities make the engine forward the response creation to the XWiki servlet. */
         if (response.getEntity() != null) {

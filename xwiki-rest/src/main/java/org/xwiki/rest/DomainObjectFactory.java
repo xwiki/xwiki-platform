@@ -221,8 +221,8 @@ public class DomainObjectFactory
     }
 
     /* This method is used to fill the "common part" of a Page and a PageSummary */
-    private static void fillPageSummary(PageSummary pageSummary, ObjectFactory objectFactory, URI baseUri, Document doc, boolean useVersion)
-        throws XWikiException
+    private static void fillPageSummary(PageSummary pageSummary, ObjectFactory objectFactory, URI baseUri,
+        Document doc, boolean useVersion) throws XWikiException
     {
         pageSummary.setWiki(doc.getWiki());
         pageSummary.setFullName(doc.getFullName());

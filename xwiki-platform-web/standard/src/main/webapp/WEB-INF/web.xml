@@ -9,6 +9,14 @@
   <display-name>xwiki</display-name>
   <description>XWiki Application</description>
   
+  <!-- Restlet Application class name -->
+  <context-param>
+    <param-name>org.restlet.application</param-name>
+    <param-value>
+      org.xwiki.rest.XWikiRestletJaxRsApplication  
+    </param-value>
+  </context-param> 
+  
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specificy
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
@@ -175,9 +183,9 @@
 
   <!-- RESTful API Restlet servlet -->
   <servlet>
-    <servlet-name>XWikiRestletServlet</servlet-name>
+    <servlet-name>RestletServlet</servlet-name>
     <servlet-class>
-      org.xwiki.rest.XWikiRestletServlet  
+      com.noelios.restlet.ext.servlet.ServerServlet  
     </servlet-class>
     <init-param>
       <param-name>resources</param-name>
@@ -240,7 +248,7 @@
 
   <!-- RESTful API mapping -->
   <servlet-mapping>
-    <servlet-name>XWikiRestletServlet</servlet-name>
+    <servlet-name>RestletServlet</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
   

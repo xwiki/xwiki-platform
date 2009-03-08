@@ -18,11 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.component.phase;
+package org.xwiki.component.logging;
 
-import org.xwiki.component.logging.Logger;
+import junit.framework.TestCase;
 
-public interface LogEnabled
+/**
+ * Unit tests for {@link AbstractLogEnabled}.
+ * 
+ * @version $Id: $
+ * @since 1.8RC3
+ */
+public class LoggerTest extends TestCase
 {
-    void enableLogging(Logger logger);
+    public void testDefaultVoidLogger()
+    {
+        AbstractLogEnabled component = new AbstractLogEnabled() {};
+        assertEquals(VoidLogger.class.getName(), component.getLogger().getClass().getName());
+    }
 }

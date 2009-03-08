@@ -192,8 +192,10 @@
       <param-value>
         org.xwiki.rest.resources.RootResource;
         org.xwiki.rest.resources.wikis.WikisResource;
+        org.xwiki.rest.resources.wikis.WikiSearchResource;
         org.xwiki.rest.resources.spaces.SpacesResource;
         org.xwiki.rest.resources.spaces.SpaceResource;
+        org.xwiki.rest.resources.spaces.SpaceSearchResource;
         org.xwiki.rest.resources.pages.PagesResource;
         org.xwiki.rest.resources.pages.PageChildrenResource;
         org.xwiki.rest.resources.pages.PageHistoryResource;

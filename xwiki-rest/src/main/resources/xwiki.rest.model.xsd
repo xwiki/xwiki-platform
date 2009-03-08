@@ -1,395 +1,427 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org" xmlns:xwiki="http://www.xwiki.org"
-	elementFormDefault="qualified">
+  elementFormDefault="qualified">
 
-    <complexType name="Link">
-		<attribute name="href" type="string"></attribute>
-		<attribute name="rel" type="string"></attribute>
-		<attribute name="type" type="string"></attribute>
-		<attribute name="hrefLang" type="string"></attribute>
-	</complexType>
+  <complexType name="Link">
+    <attribute name="href" type="string"></attribute>
+    <attribute name="rel" type="string"></attribute>
+    <attribute name="type" type="string"></attribute>
+    <attribute name="hrefLang" type="string"></attribute>
+  </complexType>
 
-	<complexType name="LinkCollection">
-		<sequence>
-			<element name="link" type="xwiki:Link" minOccurs="0" maxOccurs="unbounded"></element>
-		</sequence>
-	</complexType>
+  <complexType name="LinkCollection">
+    <sequence>
+      <element name="link" type="xwiki:Link" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
 
-	<complexType name="Translations">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="translation" type="xwiki:Translation" minOccurs="0" maxOccurs="unbounded"></element>
-				</sequence>
-				<attribute name="default" type="string"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="Translations">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="translation" type="xwiki:Translation" minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+        <attribute name="default" type="string"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="Translation">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<attribute name="language" type="string"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="Translation">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <attribute name="language" type="string"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="XWiki">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="version" type="string"></element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="XWiki">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="version" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="Wiki">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="id" type="string"></element>
-					<element name="name" type="string"></element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="Wiki">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="string"></element>
+          <element name="name" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="Space">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="id" type="string"></element>
-					<element name="wiki" type="string"></element>
-					<element name="name" type="string"></element>
-					<element name="home" type="string"></element>
-					<element name="xwikiUrl" type="string"></element>
-					<element name="numberOfPages" type="int"></element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="Space">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="string"></element>
+          <element name="wiki" type="string"></element>
+          <element name="name" type="string"></element>
+          <element name="home" type="string"></element>
+          <element name="xwikiUrl" type="string"></element>
+          <element name="numberOfPages" type="int"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="PageSummary">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="id" type="string"></element>
-					<element name="fullName" type="string"></element>
-					<element name="wiki" type="string"></element>
-					<element name="space" type="string"></element>
-					<element name="name" type="string"></element>
-					<element name="title" type="string"></element>
-					<element name="parent" type="string"></element>
-					<element name="xwikiUrl" type="string"></element>
-					<element name="translations" type="xwiki:Translations"></element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="PageSummary">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="string"></element>
+          <element name="fullName" type="string"></element>
+          <element name="wiki" type="string"></element>
+          <element name="space" type="string"></element>
+          <element name="name" type="string"></element>
+          <element name="title" type="string"></element>
+          <element name="parent" type="string"></element>
+          <element name="xwikiUrl" type="string"></element>
+          <element name="translations" type="xwiki:Translations"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="Page">
-		<complexContent>
-			<extension base="xwiki:PageSummary">
-				<sequence>
-					<element name="language" type="string"></element>
-					<element name="version" type="string"></element>
-					<element name="majorVersion" type="int"></element>
-					<element name="minorVersion" type="int"></element>
-					<element name="created" type="dateTime"></element>
-					<element name="creator" type="string"></element>
-					<element name="modified" type="dateTime"></element>
-					<element name="modifier" type="string"></element>
-					<element name="content" type="string"></element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="Page">
+    <complexContent>
+      <extension base="xwiki:PageSummary">
+        <sequence>
+          <element name="language" type="string"></element>
+          <element name="version" type="string"></element>
+          <element name="majorVersion" type="int"></element>
+          <element name="minorVersion" type="int"></element>
+          <element name="created" type="dateTime"></element>
+          <element name="creator" type="string"></element>
+          <element name="modified" type="dateTime"></element>
+          <element name="modifier" type="string"></element>
+          <element name="content" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="HistorySummary">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="pageId" type="string"></element>
-					<element name="version" type="string"></element>
-					<element name="majorVersion" type="int"></element>
-					<element name="minorVersion" type="int"></element>
-					<element name="modified" type="dateTime"></element>
-					<element name="modifier" type="string"></element>
-					<element name="language" type="string"></element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="HistorySummary">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="pageId" type="string"></element>
+          <element name="wiki" type="string"></element>
+          <element name="space" type="string"></element>
+          <element name="name" type="string"></element>
+          <element name="version" type="string"></element>
+          <element name="majorVersion" type="int"></element>
+          <element name="minorVersion" type="int"></element>
+          <element name="modified" type="dateTime"></element>
+          <element name="modifier" type="string"></element>
+          <element name="language" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="Attachment">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="id" type="string"></element>
-					<element name="name" type="string"></element>
-					<element name="size" type="int"></element>
-					<element name="version" type="string"></element>
-					<element name="pageId" type="string"></element>
-					<element name="pageVersion" type="string"></element>
-					<element name="mimeType" type="string"></element>
-					<element name="author" type="string"></element>
-					<element name="date" type="dateTime"></element>
-					<element name="xwikiUrl" type="string"></element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="Attachment">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="string"></element>
+          <element name="name" type="string"></element>
+          <element name="size" type="int"></element>
+          <element name="version" type="string"></element>
+          <element name="pageId" type="string"></element>
+          <element name="pageVersion" type="string"></element>
+          <element name="mimeType" type="string"></element>
+          <element name="author" type="string"></element>
+          <element name="date" type="dateTime"></element>
+          <element name="xwikiUrl" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="Comment">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="id" type="int"></element>
-					<element name="pageId" type="string"></element>
-					<element name="author" type="string"></element>
-					<element name="date" type="dateTime"></element>
-					<element name="highlight" type="string"></element>
-					<element name="text" type="string"></element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="Comment">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="int"></element>
+          <element name="pageId" type="string"></element>
+          <element name="author" type="string"></element>
+          <element name="date" type="dateTime"></element>
+          <element name="highlight" type="string"></element>
+          <element name="text" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="ObjectSummary">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="id" type="string"></element>
-					<element name="guid" type="string"></element>
-					<element name="pageId" type="string"></element>
-					<element name="wiki" type="string"></element>
-					<element name="space" type="string"></element>
-					<element name="pageName" type="string"></element>
-					<element name="className" type="string"></element>
-					<element name="number" type="int"></element>
-					<element name="headline" type="string"></element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="ObjectSummary">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="string"></element>
+          <element name="guid" type="string"></element>
+          <element name="pageId" type="string"></element>
+          <element name="wiki" type="string"></element>
+          <element name="space" type="string"></element>
+          <element name="pageName" type="string"></element>
+          <element name="className" type="string"></element>
+          <element name="number" type="int"></element>
+          <element name="headline" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="Object">
-		<complexContent>
-			<extension base="xwiki:ObjectSummary">
-				<sequence>
-					<element name="property" type="xwiki:Property"
-						minOccurs="0" maxOccurs="unbounded">
-					</element>
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+  <complexType name="Object">
+    <complexContent>
+      <extension base="xwiki:ObjectSummary">
+        <sequence>
+          <element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded">
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-	<complexType name="Property">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="attribute" type="xwiki:Attribute" maxOccurs="unbounded" minOccurs="0"></element>
-					<element name="value" type="string"></element>
-				</sequence>
+  <complexType name="Property">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="attribute" type="xwiki:Attribute" maxOccurs="unbounded" minOccurs="0"></element>
+          <element name="value" type="string"></element>
+        </sequence>
 
-				<attribute name="name" type="string" use="required"></attribute>
+        <attribute name="name" type="string" use="required"></attribute>
 
-				<attribute name="type" type="string" use="optional"></attribute>
+        <attribute name="type" type="string" use="optional"></attribute>
 
-			</extension>
-		</complexContent>
-	</complexType>
-	
-
-	<complexType name="Attribute">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<attribute name="name" type="string" use="required"></attribute>
-
-				<attribute name="value" type="string"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<complexType name="Class">
-		<complexContent>
-			<extension base="xwiki:LinkCollection">
-				<sequence>
-					<element name="id" type="string"></element>
-					<element name="name" type="string"></element>
-					<element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded"></element>
-				</sequence>
-
-			</extension>
-		</complexContent>
-	</complexType>
+      </extension>
+    </complexContent>
+  </complexType>
 
 
-	<!--
+  <complexType name="Attribute">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <attribute name="name" type="string" use="required"></attribute>
+
+        <attribute name="value" type="string"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="Class">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="string"></element>
+          <element name="name" type="string"></element>
+          <element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+
+      </extension>
+    </complexContent>
+  </complexType>
+
+
+  <!--
 		* ELEMENTS
 		*
 		*		
 	-->
 
-	<element name="xwiki" type="xwiki:XWiki"></element>
+  <element name="xwiki" type="xwiki:XWiki"></element>
 
-	<element name="wikis">
-		<complexType>
-			<complexContent>
-				<extension base="xwiki:LinkCollection">
-					<sequence>
-						<element name="wiki" type="xwiki:Wiki" minOccurs="0" maxOccurs="unbounded"></element>
-					</sequence>
+  <element name="wikis">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="wiki" type="xwiki:Wiki" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
 
-				</extension>
-			</complexContent>
-		</complexType>
-	</element>
-
-	<element name="spaces">
-		<complexType>
-			<complexContent>
-				<extension base="xwiki:LinkCollection">
-					<sequence>
-						<element name="space" type="xwiki:Space" minOccurs="0" maxOccurs="unbounded"></element>
-					</sequence>
-
-				</extension>
-			</complexContent>
-		</complexType>
-	</element>
-
-	<element name="pages">
-		<complexType>
-			<complexContent>
-				<extension base="xwiki:LinkCollection">
-					<sequence>
-						<element name="pageSummary" type="xwiki:PageSummary" minOccurs="0" maxOccurs="unbounded"></element>
-					</sequence>
-				</extension>
-			</complexContent>
-		</complexType>
-	</element>
-
-	<element name="wiki" type="xwiki:Wiki"></element>
-
-	<element name="space" type="xwiki:Space"></element>
-
-	<element name="page" type="xwiki:Page"></element>
-
-	<element name="history">
-		<complexType>
-			<complexContent>
-				<extension base="xwiki:LinkCollection">
-					<sequence>
-						<element name="historySummary" type="xwiki:HistorySummary" minOccurs="0" maxOccurs="unbounded">
-						</element>
-					</sequence>
-
-				</extension>
-			</complexContent>
-		</complexType>
-	</element>
-
-	<element name="attachments">
-		<complexType>
-			<complexContent>
-				<extension base="xwiki:LinkCollection">
-					<sequence>
-						<element name="attachment" type="xwiki:Attachment" minOccurs="0" maxOccurs="unbounded"></element>
-					</sequence>
-				</extension>
-			</complexContent>
-		</complexType>
-	</element>
-
-	<element name="comments">
-		<complexType>
-			<complexContent>
-				<extension base="xwiki:LinkCollection">
-					<sequence>
-						<element name="comment" type="xwiki:Comment" minOccurs="0" maxOccurs="unbounded"></element>
-					</sequence>
-				</extension>
-			</complexContent>
-		</complexType>
-	</element>
-
-	<element name="comment" type="xwiki:Comment"></element>
-
-	<element name="attachment" type="xwiki:Attachment"></element>
-
-	<element name="property" type="xwiki:Property"></element>
-
-	<element name="class" type="xwiki:Class"></element>
-
-	<element name="classes">
-		<complexType>
-			<complexContent>
-				<extension base="xwiki:LinkCollection">
-					<sequence>
-						<element name="class" type="xwiki:Class" minOccurs="0" maxOccurs="unbounded"></element>
-					</sequence>
-
-				</extension>
-			</complexContent>
-		</complexType>
-	</element>
-
-	<element name="objects">
-		<complexType>
-			<complexContent>
-				<extension base="xwiki:LinkCollection">
-					<sequence>
-						<element name="objectSummary" type="xwiki:ObjectSummary" minOccurs="0" maxOccurs="unbounded"></element>
-					</sequence>
-				</extension>
-			</complexContent>
-		</complexType>
-	</element>
-
-	<element name="object" type="xwiki:Object"></element>
-
-
-    <element name="translations" type="xwiki:Translations"></element>
-
-
-    <element name="properties">
-    	<complexType>
-    		<complexContent>
-    			<extension base="xwiki:LinkCollection">
-    				<sequence>
-    					<element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded"></element>
-    				</sequence>
-
-    			</extension>
-    		</complexContent>
-    	</complexType>
-    </element>
-
-    <element name="objectSummary" type="xwiki:ObjectSummary"></element>
-
-    <complexType name="Tag">
-    	<complexContent>
-    		<extension base="xwiki:LinkCollection">
-    			<attribute name="name" type="string"></attribute>
-    		</extension>
-    	</complexContent>
+        </extension>
+      </complexContent>
     </complexType>
+  </element>
 
-    <element name="tag" type="xwiki:Tag"></element>
+  <element name="spaces">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="space" type="xwiki:Space" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
 
-    <element name="tags">
-    	<complexType>
-    		<complexContent>
-    			<extension base="xwiki:LinkCollection">
-    				<sequence>
-    					<element name="tag" type="xwiki:Tag" minOccurs="0" maxOccurs="unbounded"></element>
-    				</sequence>
-    			</extension>
-    		</complexContent>
-    	</complexType>
-    </element>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <element name="pages">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="pageSummary" type="xwiki:PageSummary" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <element name="wiki" type="xwiki:Wiki"></element>
+
+  <element name="space" type="xwiki:Space"></element>
+
+  <element name="page" type="xwiki:Page"></element>
+
+  <element name="history">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="historySummary" type="xwiki:HistorySummary" minOccurs="0" maxOccurs="unbounded">
+            </element>
+          </sequence>
+
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <element name="attachments">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="attachment" type="xwiki:Attachment" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <element name="comments">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="comment" type="xwiki:Comment" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <element name="comment" type="xwiki:Comment"></element>
+
+  <element name="attachment" type="xwiki:Attachment"></element>
+
+  <element name="property" type="xwiki:Property"></element>
+
+  <element name="class" type="xwiki:Class"></element>
+
+  <element name="classes">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="class" type="xwiki:Class" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <element name="objects">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="objectSummary" type="xwiki:ObjectSummary" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <element name="object" type="xwiki:Object"></element>
+
+
+  <element name="translations" type="xwiki:Translations"></element>
+
+
+  <element name="properties">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <element name="objectSummary" type="xwiki:ObjectSummary"></element>
+
+  <complexType name="Tag">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <attribute name="name" type="string"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="tag" type="xwiki:Tag"></element>
+
+  <element name="tags">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="tag" type="xwiki:Tag" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <complexType name="SearchResult">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="type" type="string"></element>
+          <element name="id" type="string"></element>
+          <element name="wiki" type="string"></element>
+          <element name="space" type="string"></element>
+          <element name="pageName" type="string"></element>
+          <element name="className" type="string" minOccurs="0"></element>
+          <element name="objectNumber" type="int" minOccurs="0"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="searchResult" type="xwiki:SearchResult"></element>
+
+  <element name="searchResults">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="searchResult" type="xwiki:SearchResult" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
 </schema>

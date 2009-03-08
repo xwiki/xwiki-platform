@@ -409,6 +409,9 @@ public class DomainObjectFactory
         String pageId = Utils.getPageId(wikiName, spaceName, pageName);
 
         historySummary.setPageId(pageId);
+        historySummary.setWiki(wikiName);
+        historySummary.setSpace(spaceName);
+        historySummary.setName(pageName);
         historySummary.setVersion(version.toString());
         historySummary.setMajorVersion(version.at(0));
         historySummary.setMinorVersion(version.at(1));

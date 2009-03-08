@@ -49,7 +49,7 @@ public class ModificationsResource extends XWikiResource
     @GET
     public History getModifications(@PathParam("wikiName") String wikiName,
         @QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("number") @DefaultValue("25") Integer number,
         @QueryParam("order") @DefaultValue("desc") String order, @QueryParam("date") @DefaultValue("0") Long ts)
         throws XWikiException, QueryException
     {

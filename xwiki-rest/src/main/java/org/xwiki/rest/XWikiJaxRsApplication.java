@@ -28,25 +28,23 @@ import javax.ws.rs.core.Application;
 import org.restlet.Context;
 
 /**
- * This class is used to configure JAX-RS resources and providers.
- * Currently it builds resources and providers lists from servlet parameters.
- * 
- * TODO: Write an automatic discovery mechanism as it is done in Jersey.
+ * This class is used to configure JAX-RS resources and providers. Currently it builds resources and providers lists
+ * from servlet parameters. TODO: Write an automatic discovery mechanism as it is done in Jersey.
  * 
  * @version $Id$
  */
 public class XWikiJaxRsApplication extends Application
 {
     private static final String RESOURCES_PARAMETER = "resources";
-    
+
     private static final String PROVIDERS_PARAMETER = "providers";
-    
+
     private Set<Class< ? >> jaxRsClasses;
-    
+
     public XWikiJaxRsApplication(Context context)
     {
-        this.jaxRsClasses = new HashSet<Class<?>>();
-        
+        this.jaxRsClasses = new HashSet<Class< ? >>();
+
         /* Retrieve resources list from servlet parameters */
         String resourcesParameter = context.getParameters().getFirstValue(RESOURCES_PARAMETER);
         if (resourcesParameter != null) {
@@ -63,7 +61,7 @@ public class XWikiJaxRsApplication extends Application
                 }
             }
         }
-        
+
         /* Retrieve providers list from servlet parameters */
         String providersParameter = context.getParameters().getFirstValue(PROVIDERS_PARAMETER);
         if (providersParameter != null) {

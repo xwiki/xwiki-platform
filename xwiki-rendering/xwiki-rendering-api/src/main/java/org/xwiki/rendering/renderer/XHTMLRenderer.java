@@ -19,14 +19,16 @@
  */
 package org.xwiki.rendering.renderer;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.renderer.xhtml.SimpleXHTMLImageRenderer;
+import org.xwiki.rendering.renderer.xhtml.SimpleXHTMLLinkRenderer;
+import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
+import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 
 /**
  * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
@@ -38,18 +40,31 @@ public class XHTMLRenderer extends AbstractChainingPrintRenderer
 {
     /**
      * @param printer the object to which to write the XHTML output to
-     * @param documentAccessBridge see {@link #documentAccessBridge}
-     * @param linkLabelGenerator the component in charge of generating link labels when the user doesn't specify 
-     *        a label for links
-     * @param attachmentParser the parser to be used to parse attachment locations specified as strings
+     * @param linkRenderer the object to render link events into XHTML. This is done so that it's pluggable because
+     *        link rendering depends on how the underlying system wants to handle it. For example for XWiki we
+     *        check if the document exists, we get the document URL, etc.
+     * @param imageRenderer the object to render image events into XHTML. This is done so that it's pluggable
+     *        because image rendering depends on how the underlying system wants to handle it. For example for XWiki
+     *        we check if the image exists as a document attachments, we get its URL, etc.
      */
-    public XHTMLRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
-        LinkLabelGenerator linkLabelGenerator, AttachmentParser attachmentParser)
+    public XHTMLRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer)
     {
         super(printer, new ListenerChain());
 
         new DocumentStateChainingListener(getListenerChain());
         new BlockStateChainingListener(getListenerChain());
-        new XHTMLChainingRenderer(printer, documentAccessBridge, linkLabelGenerator, attachmentParser, getListenerChain());
+        new XHTMLChainingRenderer(printer, linkRenderer, imageRenderer, getListenerChain());
+    }
+
+    /**
+     * Convenience constructor that uses default simple implementations for Link and Image Renderers. This is useful
+     * when using the XWiki Rendering system without the notion of XWiki Documents (for example when using it outside
+     * of XWiki).
+     * 
+     * @param printer the object to which to write the XHTML output to
+     */
+    public XHTMLRenderer(WikiPrinter printer)
+    {
+        this(printer, new SimpleXHTMLLinkRenderer(), new SimpleXHTMLImageRenderer());
     }
 }

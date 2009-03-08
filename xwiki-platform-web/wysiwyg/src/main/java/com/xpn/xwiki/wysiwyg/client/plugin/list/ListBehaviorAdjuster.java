@@ -107,8 +107,8 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
         for (int i = 0; i < listElements.getLength(); i++) {
             Element listElement = (Element) listElements.getItem(i);
             // check the parent of this list Element
-            if (listElement.getParentNode().getNodeName().equalsIgnoreCase(ORDERED_LIST_TAG) || listElement
-                    .getParentNode().getNodeName().equalsIgnoreCase(UNORDERED_LIST_TAG)) {
+            if (listElement.getParentNode().getNodeName().equalsIgnoreCase(ORDERED_LIST_TAG)
+                || listElement.getParentNode().getNodeName().equalsIgnoreCase(UNORDERED_LIST_TAG)) {
                 // wrap this element in a list item
                 Element wrappingListItem = ((Document) listElement.getOwnerDocument()).xCreateLIElement().cast();
                 wrappingListItem.wrap(listElement);
@@ -319,6 +319,21 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
      * @see KeyboardListener#onKeyPress(Widget, char, int)
      */
     public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    {
+        dispatchKey(sender, keyCode, modifiers);
+    }
+
+    /**
+     * Dispatches the passed key pressed on the specified sender, with the specified modifiers. This function does
+     * generalized dispatching, regardless of the actual key event that signals the press of the key. The different
+     * implementations for browsers will use their own key detecting mechanisms, but will use this function to dispatch
+     * it.
+     * 
+     * @param sender the sender widget of the key press event
+     * @param keyCode the key code
+     * @param modifiers the modifiers of the key press
+     */
+    protected void dispatchKey(Widget sender, char keyCode, int modifiers)
     {
         if (textArea != sender) {
             return;

@@ -19,12 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.list.internal;
 
-import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster;
 
 /**
@@ -35,35 +30,14 @@ import com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster;
 public class IEListBehaviorAdjuster extends ListBehaviorAdjuster
 {
     /**
-     * {@inheritDoc}
+     * {@inheritDoc}. Internet explorer receives the special keys on key down, not on key pressed, so we'll override the
+     * key press handling and move the handling in this function.
      * 
      * @see ListBehaviorAdjuster#onKeyDown(Widget, char, int)
      */
     public void onKeyDown(Widget sender, char keyCode, int modifiers)
     {
-        if (getTextArea() != sender) {
-            return;
-        }
-
-        // get current range for some checks
-        Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
-        Node li = DOMUtils.getInstance().getFirstAncestor(range.getCommonAncestorContainer(), LIST_ITEM_TAG);
-        if (li == null) {
-            return;
-        }
-
-        // Internet explorer seems to receive the delete key presses onKeyDown so we overwrite this function to dispatch
-        // this key too
-        switch (keyCode) {
-            case KeyboardListener.KEY_DELETE:
-                onDelete((Element) li);
-                break;
-            case KeyboardListener.KEY_BACKSPACE:
-                onBackspace((Element) li);
-                break;                
-            default:
-                break;
-        }
+        dispatchKey(sender, keyCode, modifiers);
     }
 
     /**

@@ -46,7 +46,7 @@ import org.xwiki.rendering.listener.xml.XMLNode;
  * @version $Id$
  * @since 1.5M2
  */
-public interface Listener
+public interface Listener extends LinkListener, ImageListener
 {
     /**
      * Start of the document.
@@ -325,28 +325,6 @@ public interface Listener
     void endQuotationLine();
 
     /**
-     * Start of a link.
-     * 
-     * @param link the link definition (the reference)
-     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
-     * @param parameters a generic list of parameters. Example: style="background-color: blue"
-     * @see Link
-     * @since 1.7M1
-     */
-    void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters);
-
-    /**
-     * End of a link.
-     * 
-     * @param link the link definition (the reference)
-     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
-     * @param parameters a generic list of parameters. Example: style="background-color: blue"
-     * @see Link
-     * @since 1.7M1
-     */
-    void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters);
-
-    /**
      * A new line or line break (it's up to the renderers to decide if it should be outputted as a new line or as a line
      * break in the given syntax).
      */
@@ -417,13 +395,4 @@ public interface Listener
      * @param isInline if true it shouldn't be rendered and that is located inside another Block
      */
     void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline);
-
-    /**
-     * An image.
-     * 
-     * @param image the image definition (location, attachment name)
-     * @param isFreeStandingURI if true then the image is defined directly as a URI in the text
-     * @param parameters a generic list of parameters. Example: style="background-color: blue"
-     */
-    void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters);
 }

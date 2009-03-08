@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer.xhtml;
+package org.xwiki.rendering.renderer.xhtml;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,13 +33,23 @@ import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
- * Renders a XWiki Link into XHTML.
+ * Default XWiki implementation for rendering links as XHTML using XWiki Documents.
  * 
  * @version $Id: $
- * @since 1.5RC1
+ * @since 1.8RC3
  */
-public class XHTMLLinkRenderer
+public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
 {
+    /**
+     * @see #setXHTMLWikiPrinter(XHTMLWikiPrinter)
+     */
+	private XHTMLWikiPrinter xhtmlPrinter;
+	
+    /**
+     * @see #setHasLabel(boolean)
+     */
+	private boolean hasLabel;
+	
     private DocumentAccessBridge documentAccessBridge;
 
     private LinkLabelGenerator linkLabelGenerator;
@@ -48,7 +58,7 @@ public class XHTMLLinkRenderer
 
     private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
 
-    public XHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, LinkLabelGenerator linkLabelGenerator,
+    public XWikiXHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, LinkLabelGenerator linkLabelGenerator,
         AttachmentParser attachmentParser)
     {
         this.documentAccessBridge = documentAccessBridge;
@@ -57,13 +67,34 @@ public class XHTMLLinkRenderer
         this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
     }
 
-    public void beginRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI,
-        Map<String, String> parameters)
+    /**
+     * {@inheritDoc}
+     * @see XHTMLLinkRenderer#setHasLabel(boolean)
+     */
+    public void setHasLabel(boolean hasLabel)
+    {
+        this.hasLabel = hasLabel;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see XHTMLLinkRenderer#setXHTMLWikiPrinter(XHTMLWikiPrinter)
+     */
+    public void setXHTMLWikiPrinter(XHTMLWikiPrinter printer)
+    {
+        this.xhtmlPrinter = printer;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see XHTMLLinkRenderer#beginLink(Link, boolean, Map)
+     */
+    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // Add an XML comment as a placeholder so that the XHTML parser can find the document name.
         // Otherwise it would be too difficult to transform a URL into a document name especially since
         // a link can refer to an external URL.
-        printer.printXMLComment("startwikilink:" + this.xwikiSyntaxLinkRenderer.renderLinkReference(link));
+        this.xhtmlPrinter.printXMLComment("startwikilink:" + this.xwikiSyntaxLinkRenderer.renderLinkReference(link));
 
         Map<String, String> spanAttributes = new LinkedHashMap<String, String>();
         Map<String, String> aAttributes = new LinkedHashMap<String, String>();
@@ -92,8 +123,8 @@ public class XHTMLLinkRenderer
                 }
             }
 
-            printer.printXMLStartElement("span", spanAttributes);
-            printer.printXMLStartElement("a", aAttributes);
+            this.xhtmlPrinter.printXMLStartElement("span", spanAttributes);
+            this.xhtmlPrinter.printXMLStartElement("a", aAttributes);
         } else {
             // This is a link to a document.
 
@@ -102,37 +133,40 @@ public class XHTMLLinkRenderer
                 spanAttributes.put("class", "wikilink");
                 aAttributes.put("href", this.documentAccessBridge.getURL(link.getReference(), "view", link
                     .getQueryString(), link.getAnchor()));
-                printer.printXMLStartElement("span", spanAttributes);
-                printer.printXMLStartElement("a", aAttributes);
+                this.xhtmlPrinter.printXMLStartElement("span", spanAttributes);
+                this.xhtmlPrinter.printXMLStartElement("a", aAttributes);
             } else {
                 spanAttributes.put("class", "wikicreatelink");
                 aAttributes.put("href", this.documentAccessBridge.getURL(link.getReference(), "edit", link
                     .getQueryString(), link.getAnchor()));
 
-                printer.printXMLStartElement("span", spanAttributes);
-                printer.printXMLStartElement("a", aAttributes);
+                this.xhtmlPrinter.printXMLStartElement("span", spanAttributes);
+                this.xhtmlPrinter.printXMLStartElement("a", aAttributes);
             }
         }
     }
 
-    public void endRender(XHTMLWikiPrinter printer, Link link, boolean isFreeStandingURI,
-        boolean generateLinkContent)
+    /**
+     * {@inheritDoc}
+     * @see XHTMLLinkRenderer#endLink(Link, boolean, Map)
+     */
+    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // If there was no link content then generate it based on the passed reference
-        if (generateLinkContent) {
-            printer.printXMLStartElement("span", new String[][] {{"class", "wikigeneratedlinkcontent"}});
+        if (!this.hasLabel) {
+            this.xhtmlPrinter.printXMLStartElement("span", new String[][] {{"class", "wikigeneratedlinkcontent"}});
             if (link.getType() == LinkType.DOCUMENT) {
-                printer.printXML(this.linkLabelGenerator.generate(link));
+                this.xhtmlPrinter.printXML(this.linkLabelGenerator.generate(link));
             } else {
-                printer.printXML(link.getReference());
+                this.xhtmlPrinter.printXML(link.getReference());
             }
-            printer.printXMLEndElement("span");
+            this.xhtmlPrinter.printXMLEndElement("span");
         }
 
-        printer.printXMLEndElement("a");
-        printer.printXMLEndElement("span");
+        this.xhtmlPrinter.printXMLEndElement("a");
+        this.xhtmlPrinter.printXMLEndElement("span");
 
         // Add a XML comment to signify the end of the link.
-        printer.printXMLComment("stopwikilink");
+        this.xhtmlPrinter.printXMLComment("stopwikilink");
     }
 }

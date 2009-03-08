@@ -24,19 +24,13 @@ import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
-import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
@@ -44,14 +38,14 @@ import org.xwiki.rendering.listener.chaining.BlockStateChainingListener.Event;
 import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.listener.xml.XMLNode;
-import org.xwiki.rendering.parser.AttachmentParser;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.MonitoringWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
+import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
+import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 
 /**
  * Convert listener events to XHTML.
@@ -63,23 +57,15 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
 {
     private static final String[][] DOCUMENT_DIV_ATTRIBUTES = new String[][] {{"class", "xwiki-document"}};
 
-    /**
-     * A temporary service offering methods manipulating XWiki Documents that are needed to output the correct XHTML.
-     * For example this is used to verify if a document exists when computing the HREF attribute for a link. It's
-     * temporary because the current Document services have not yet been rewritten with the new architecture. This
-     * bridge allows us to be independent of the XWiki Core module, thus preventing a cyclic dependency.
-     */
-    private DocumentAccessBridge documentAccessBridge;
-
     private XHTMLLinkRenderer linkRenderer;
 
+    private XHTMLImageRenderer imageRenderer;
+    
     private XHTMLMacroRenderer macroRenderer;
 
     private XHTMLIdGenerator idGenerator;
 
     private XHTMLWikiPrinter xhtmlWikiPrinter;
-
-    private XWikiSyntaxImageRenderer imageRenderer;
 
     /**
      * The temporary Printer used to redirect all outputs when computing the header title.
@@ -93,16 +79,15 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
      * @param documentAccessBridge see {@link #documentAccessBridge}
      * @param configuration the rendering configuration
      */
-    public XHTMLChainingRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
-       LinkLabelGenerator linkLabelGenerator, AttachmentParser attachmentParser, ListenerChain listenerChain)
+    public XHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer, 
+        XHTMLImageRenderer imageRenderer, ListenerChain listenerChain)
     {
         super(printer, listenerChain);
 
-        this.documentAccessBridge = documentAccessBridge;
-        this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, linkLabelGenerator, attachmentParser);
+        this.linkRenderer = linkRenderer;
+        this.imageRenderer = imageRenderer;
         this.macroRenderer = new XHTMLMacroRenderer();
         this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
-        this.imageRenderer = new XWikiSyntaxImageRenderer();
         this.idGenerator = new XHTMLIdGenerator();
     }
 
@@ -296,7 +281,11 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.linkRenderer.beginRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, parameters);
+        // Ensure the link renderer is using the latest printer since the original printer used could have been 
+        // superseded by another one in the printer stack.
+        this.linkRenderer.setXHTMLWikiPrinter(getXHTMLWikiPrinter());
+
+        this.linkRenderer.beginLink(link, isFreeStandingURI, parameters);
         pushPrinter(new MonitoringWikiPrinter(getPrinter()));
     }
 
@@ -310,7 +299,8 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     {
         MonitoringWikiPrinter printer = (MonitoringWikiPrinter) getPrinter();
         popPrinter();
-        this.linkRenderer.endRender(getXHTMLWikiPrinter(), link, isFreeStandingURI, !printer.hasContentBeenPrinted());
+        this.linkRenderer.setHasLabel(printer.hasContentBeenPrinted());
+        this.linkRenderer.endLink(link, isFreeStandingURI, parameters);
     }
 
     /**
@@ -794,38 +784,9 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        // First we need to compute the image URL.
-        String imageURL;
-        if (image.getType() == ImageType.DOCUMENT) {
-            DocumentImage documentImage = (DocumentImage) image;
-            imageURL = this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), 
-                documentImage.getAttachmentName());
-        } else {
-            URLImage urlImage = (URLImage) image;
-            imageURL = urlImage.getURL();
-        }
-
-        // Then add it as an attribute of the IMG element.
-        Map<String, String> attributes = new LinkedHashMap<String, String>();
-        attributes.put("src", imageURL);
-
-        // Add the class if we're on a freestanding uri
-        if (isFreeStandingURI) {
-            attributes.put("class", "wikimodel-freestanding");
-        }
-
-        // Add the other parameters as attributes
-        attributes.putAll(parameters);
-
-        // If not ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
-        if (!parameters.containsKey("alt")) {
-            attributes.put("alt", image.getName());
-        }
-
-        // And generate the XHTML IMG element. We need to save the image location in XML comment so that
-        // it can be reconstructed later on when moving from XHTML to wiki syntax.
-        getXHTMLWikiPrinter().printXMLComment("startimage:" + this.imageRenderer.renderImage(image));
-        getXHTMLWikiPrinter().printXMLElement("img", attributes);
-        getXHTMLWikiPrinter().printXMLComment("stopimage");
+        // Ensure the image renderer is using the latest printer since the original printer used could have been 
+        // superseded by another one in the printer stack.
+        this.imageRenderer.setXHTMLWikiPrinter(getXHTMLWikiPrinter());
+        this.imageRenderer.onImage(image, isFreeStandingURI, parameters);
     }
 }

@@ -35,6 +35,21 @@ import com.xpn.xwiki.wysiwyg.client.dom.Element;
 public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
 {
     /**
+     * The name of the anchor tag.
+     */
+    private static final String ANCHOR_TAG_NAME = "a";
+
+    /**
+     * The name of the span tag.
+     */
+    private static final String SPAN_TAG_NAME = "span";
+
+    /**
+     * The content of the end wiki link marker comment.
+     */
+    private static final String STOPWIKILINK_COMMENT = "stopwikilink";
+    
+    /**
      * The DOM element in which we run the tests.
      */
     private Element container;
@@ -81,7 +96,7 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
         Element anchorElement = (Element) container.getFirstChild();
         // test the elements left in the container
         assertEquals(1, container.getChildNodes().getLength());
-        assertEquals("a", container.getChildNodes().getItem(0).getNodeName().toLowerCase());
+        assertEquals(ANCHOR_TAG_NAME, container.getChildNodes().getItem(0).getNodeName().toLowerCase());
         // Get Meta data fragment
         DocumentFragment metaFragment = anchorElement.getMetaData();
         assertNotNull(metaFragment);
@@ -90,13 +105,13 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
         assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(0).getNodeType());
         assertEquals("startwikilink:Space.ExistingPage", metaFragment.getChildNodes().getItem(0).getNodeValue());
         assertEquals(Node.ELEMENT_NODE, metaFragment.getChildNodes().getItem(1).getNodeType());
-        assertEquals("span", metaFragment.getChildNodes().getItem(1).getNodeName().toLowerCase());
+        assertEquals(SPAN_TAG_NAME, metaFragment.getChildNodes().getItem(1).getNodeName().toLowerCase());
         assertEquals(1, metaFragment.getChildNodes().getItem(1).getChildNodes().getLength());
         assertEquals(Node.TEXT_NODE, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0).getNodeType());
         assertEquals(Element.INNER_HTML_PLACEHOLDER, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0)
             .getNodeValue());
         assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(2).getNodeType());
-        assertEquals("stopwikilink", metaFragment.getChildNodes().getItem(2).getNodeValue());
+        assertEquals(STOPWIKILINK_COMMENT, metaFragment.getChildNodes().getItem(2).getNodeValue());
     }
 
     /**
@@ -112,7 +127,7 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
         Element anchorElement = (Element) container.getFirstChild();
         // test the elements left in the container
         assertEquals(1, container.getChildNodes().getLength());
-        assertEquals("a", container.getChildNodes().getItem(0).getNodeName().toLowerCase());
+        assertEquals(ANCHOR_TAG_NAME, container.getChildNodes().getItem(0).getNodeName().toLowerCase());
         // Get Meta data fragment
         DocumentFragment metaFragment = anchorElement.getMetaData();
         assertNotNull(metaFragment);
@@ -120,13 +135,13 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
         assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(0).getNodeType());
         assertEquals("startwikilink:http://xwiki.org", metaFragment.getChildNodes().getItem(0).getNodeValue());
         assertEquals(Node.ELEMENT_NODE, metaFragment.getChildNodes().getItem(1).getNodeType());
-        assertEquals("span", metaFragment.getChildNodes().getItem(1).getNodeName().toLowerCase());
+        assertEquals(SPAN_TAG_NAME, metaFragment.getChildNodes().getItem(1).getNodeName().toLowerCase());
         assertEquals(1, metaFragment.getChildNodes().getItem(1).getChildNodes().getLength());
         assertEquals(Node.TEXT_NODE, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0).getNodeType());
         assertEquals(Element.INNER_HTML_PLACEHOLDER, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0)
             .getNodeValue());
         assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(2).getNodeType());
-        assertEquals("stopwikilink", metaFragment.getChildNodes().getItem(2).getNodeValue());
+        assertEquals(STOPWIKILINK_COMMENT, metaFragment.getChildNodes().getItem(2).getNodeValue());
     }
 
     /**
@@ -142,7 +157,7 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
         Element anchorElement = (Element) container.getFirstChild();
         // test the elements left in the container
         assertEquals(1, container.getChildNodes().getLength());
-        assertEquals("a", container.getChildNodes().getItem(0).getNodeName().toLowerCase());
+        assertEquals(ANCHOR_TAG_NAME, container.getChildNodes().getItem(0).getNodeName().toLowerCase());
         // Get Meta data fragment
         DocumentFragment metaFragment = anchorElement.getMetaData();
         assertNotNull(metaFragment);
@@ -150,12 +165,12 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
         assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(0).getNodeType());
         assertEquals("startwikilink:Space.Page", metaFragment.getChildNodes().getItem(0).getNodeValue());
         assertEquals(Node.ELEMENT_NODE, metaFragment.getChildNodes().getItem(1).getNodeType());
-        assertEquals("span", metaFragment.getChildNodes().getItem(1).getNodeName().toLowerCase());
+        assertEquals(SPAN_TAG_NAME, metaFragment.getChildNodes().getItem(1).getNodeName().toLowerCase());
         assertEquals(1, metaFragment.getChildNodes().getItem(1).getChildNodes().getLength());
         assertEquals(Node.TEXT_NODE, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0).getNodeType());
         assertEquals(Element.INNER_HTML_PLACEHOLDER, metaFragment.getChildNodes().getItem(1).getChildNodes().getItem(0)
             .getNodeValue());
         assertEquals(DOMUtils.COMMENT_NODE, metaFragment.getChildNodes().getItem(2).getNodeType());
-        assertEquals("stopwikilink", metaFragment.getChildNodes().getItem(2).getNodeValue());
+        assertEquals(STOPWIKILINK_COMMENT, metaFragment.getChildNodes().getItem(2).getNodeValue());
     }
 }

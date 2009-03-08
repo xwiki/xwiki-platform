@@ -285,8 +285,6 @@
             com/xpn/xwiki/wysiwyg/client/plugin/image/ImageConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
             com/xpn/xwiki/wysiwyg/server/DefaultWysiwygService.java,
-            com/xpn/xwiki/wysiwyg/client/dom/DepthFirstPreOrderIteratorTest.java,
-            com/xpn/xwiki/wysiwyg/client/plugin/link/LinkMetaDataExtractorTest.java,
             com/xpn/xwiki/wysiwyg/server/DefaultWysiwygServiceTest.java</excludes>
         </configuration>
       </plugin>

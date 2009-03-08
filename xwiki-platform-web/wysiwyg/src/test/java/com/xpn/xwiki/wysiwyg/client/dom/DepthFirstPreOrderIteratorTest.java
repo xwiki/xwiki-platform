@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.dom;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -156,20 +157,20 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
 
         // do setup in the empty container
         Node startContainer = doc.createDivElement();
-        Node aliceText = doc.createTextNode("alice");
-        Node bobText = doc.createTextNode("bob");
-        Node carolText = doc.createTextNode("carol");
-        startContainer.appendChild(aliceText);
-        startContainer.appendChild(bobText);
-        startContainer.appendChild(carolText);
+        Node oneText = doc.createTextNode("one");
+        Node twoText = doc.createTextNode("two");
+        Node threeText = doc.createTextNode("three");
+        startContainer.appendChild(oneText);
+        startContainer.appendChild(twoText);
+        startContainer.appendChild(threeText);
         emptyContainer.appendChild(startContainer);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
         expected.add(startContainer);
-        expected.add(aliceText);
-        expected.add(bobText);
-        expected.add(carolText);
+        expected.add(oneText);
+        expected.add(twoText);
+        expected.add(threeText);
 
         assertSame(expected, doc.getIterator(startContainer));
     }
@@ -186,20 +187,20 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
 
         // do setup in the empty container
         Node startContainer = doc.createDivElement();
-        Node aliceText = doc.createTextNode("alice");
-        Node bobText = doc.createTextNode("bob");
+        Node johnText = doc.createTextNode("john");
+        Node doeText = doc.createTextNode("doe");
         DivElement cargo = doc.createDivElement();
-        startContainer.appendChild(aliceText);
+        startContainer.appendChild(johnText);
         startContainer.appendChild(cargo);
-        startContainer.appendChild(bobText);
+        startContainer.appendChild(doeText);
         emptyContainer.appendChild(startContainer);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
         expected.add(startContainer);
-        expected.add(aliceText);
+        expected.add(johnText);
         expected.add(cargo);
-        expected.add(bobText);
+        expected.add(doeText);
 
         assertSame(expected, doc.getIterator(startContainer));
     }
@@ -216,23 +217,23 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
 
         // do setup in the empty container
         Node startContainer = doc.createDivElement();
-        Node aliceText = doc.createTextNode("alice");
-        Node bobText = doc.createTextNode("bob");
-        Node come = doc.createComment("come");
+        Node fooText = doc.createTextNode("foo");
+        Node barText = doc.createTextNode("bar");
+        Node far = doc.createComment("far");
         DivElement cargo = doc.createDivElement();
-        startContainer.appendChild(aliceText);
+        startContainer.appendChild(fooText);
         startContainer.appendChild(cargo);
-        cargo.appendChild(bobText);
-        cargo.appendChild(come);
+        cargo.appendChild(barText);
+        cargo.appendChild(far);
         emptyContainer.appendChild(startContainer);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
         expected.add(startContainer);
-        expected.add(aliceText);
+        expected.add(fooText);
         expected.add(cargo);
-        expected.add(bobText);
-        expected.add(come);
+        expected.add(barText);
+        expected.add(far);
 
         assertSame(expected, doc.getIterator(startContainer));
     }
@@ -249,23 +250,23 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
 
         // do setup in the empty container
         Node startContainer = doc.createDivElement();
-        Node aliceText = doc.createTextNode("alice");
-        Node bobText = doc.createTextNode("bob");
-        Node come = doc.createComment("come");
+        Node xText = doc.createTextNode("xw");
+        Node wikiText = doc.createTextNode("ikio");
+        Node us = doc.createComment("us");
         DivElement cargo = doc.createDivElement();
         startContainer.appendChild(cargo);
-        cargo.appendChild(bobText);
-        cargo.appendChild(come);
-        startContainer.appendChild(aliceText);
+        cargo.appendChild(wikiText);
+        cargo.appendChild(us);
+        startContainer.appendChild(xText);
         emptyContainer.appendChild(startContainer);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
         expected.add(startContainer);
         expected.add(cargo);
-        expected.add(bobText);
-        expected.add(come);
-        expected.add(aliceText);
+        expected.add(wikiText);
+        expected.add(us);
+        expected.add(xText);
 
         assertSame(expected, doc.getIterator(startContainer));
     }
@@ -337,17 +338,9 @@ public class DepthFirstPreOrderIteratorTest extends AbstractWysiwygClientTest
         emptyContainer.appendChild(startContainer);
 
         // setup expected
-        List<Node> expected = new ArrayList<Node>();
-        expected.add(startContainer);
-        expected.add(preambleText);
-        expected.add(startWikiLinkComment);
-        expected.add(wrappingSpan);
-        expected.add(anchor);
-        expected.add(labelPreamble);
-        expected.add(boldWiki);
-        expected.add(labelBoldWiki);
-        expected.add(stopWikiLinkComment);
-        expected.add(endText);
+        List<Node> expected =
+            Arrays.asList(new Node[] {startContainer, preambleText, startWikiLinkComment, wrappingSpan, anchor,
+                labelPreamble, boldWiki, labelBoldWiki, stopWikiLinkComment, endText});
 
         assertSame(expected, doc.getIterator(startContainer));
     }

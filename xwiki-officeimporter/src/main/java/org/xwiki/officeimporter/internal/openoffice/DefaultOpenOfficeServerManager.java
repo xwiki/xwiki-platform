@@ -72,7 +72,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
      */
     public void initialize() throws InitializationException
     {
-        currentState = ServerState.STOPPED;
+        currentState = ServerState.NOT_RUNNING;
         // Make sure there is no openoffice process left when XE shuts down.
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -91,7 +91,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
      * Initializes the internal {@link OfficeManager}.
      */
     private void initializeOfficeManager() throws OpenOfficeServerManagerException
-    {        
+    {
         File officeHome = new File(getOfficeHome());
         File officeProfile = new File(getOfficeProfile());
         try {
@@ -103,7 +103,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
             this.documentConverter = new OfficeDocumentConverter(officeManager);
             setOfficeManagerInitialized(true);
         } catch (IllegalArgumentException ex) {
-            currentState = ServerState.ERROR;
+            currentState = ServerState.CONF_ERROR;
             throw new OpenOfficeServerManagerException("Error while initializing OpenOffice server.", ex);
         }
     }
@@ -153,7 +153,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
      */
     public void startServer() throws OpenOfficeServerManagerException
     {
-        if (ServerState.STOPPED == currentState) {
+        if (ServerState.UNKNOWN != currentState) {
             if (!isOfficeManagerInitialized()) {
                 initializeOfficeManager();
             }
@@ -161,6 +161,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
                 officeManager.start();
                 currentState = ServerState.RUNNING;
             } catch (OfficeException ex) {
+                currentState = ServerState.UNKNOWN;
                 throw new OpenOfficeServerManagerException("Error while starting OpenOffice server.", ex);
             }
         }
@@ -174,8 +175,9 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
         if (ServerState.RUNNING == currentState) {
             try {
                 officeManager.stop();
-                currentState = ServerState.STOPPED;
+                currentState = ServerState.NOT_RUNNING;
             } catch (OfficeException ex) {
+                currentState = ServerState.UNKNOWN;
                 throw new OpenOfficeServerManagerException("Error while shutting down OpenOffice server.", ex);
             } finally {
                 setOfficeManagerInitialized(false);

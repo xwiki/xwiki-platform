@@ -50,12 +50,17 @@ public interface OpenOfficeServerManager
         /**
          * Not running.
          */
-        STOPPED("Stopped"),
+        NOT_RUNNING("Not Running"),
 
         /**
-         * Error condition.
+         * Configuration error.
          */
-        ERROR("Error");
+        CONF_ERROR("Invalid configuration"),
+        
+        /**
+         * Unknown server state.
+         */
+        UNKNOWN("Unknown");
         
         /**
          * Description of current server state.
@@ -73,9 +78,9 @@ public interface OpenOfficeServerManager
         }
         
         /**
-         * @return a string with the description of current server state.
+         * {@inheritDoc}
          */
-        public String getDescription()
+        public String toString()
         {
             return this.stateDescription;
         }

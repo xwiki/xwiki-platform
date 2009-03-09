@@ -19,8 +19,6 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
-import net.sf.jodconverter.office.OfficeUtils;
-
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
 
@@ -54,8 +52,8 @@ public class DefaultOpenOfficeServerManagerTest extends AbstractXWikiComponentTe
      */
     public void testInitialStatus()
     {
-        assertEquals(OfficeUtils.getDefaultOfficeHome().getAbsolutePath(), manager.getOfficeHome());
-        assertEquals(OfficeUtils.getDefaultProfileDir().getAbsolutePath(), manager.getOfficeProfile());
-        assertEquals(OpenOfficeServerManager.ServerState.STOPPED, manager.getServerState());
+        assertNotNull(manager.getOfficeHome());
+        assertNotNull(manager.getOfficeProfile());
+        assertEquals(OpenOfficeServerManager.ServerState.NOT_RUNNING, manager.getServerState());
     }
 }

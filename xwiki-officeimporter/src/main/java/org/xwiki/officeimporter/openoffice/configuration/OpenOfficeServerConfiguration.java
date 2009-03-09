@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.openoffice.configuration;
 /**
  * Configuration properties for office importer module.
  * <p>
- * These configuration properties are defined in in XWiki's global configuration file using the prefix of
+ * These configuration properties are defined in XWiki's global configuration file using the prefix of
  * "officeimporter".
  * </p>
  * 

@@ -574,6 +574,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
     {
         synchronized (wikiName) {
             this.store.deleteWiki(wikiName, context);
+            flushCache();
         }
     }
 

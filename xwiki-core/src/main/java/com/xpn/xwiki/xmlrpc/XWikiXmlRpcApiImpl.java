@@ -466,8 +466,13 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
              */
             boolean rename = false;
 
-            /* Check if the page already exists. If it doesn't this is surely not a rename request! */
-            if (pageAlreadyExists) {
+            /*
+             * Check if the page already exists. If it doesn't this is surely not a rename request! Check also that the
+             * title is not null. This might happen if a client creates an XWikiPage object with an existing page id and
+             * initializes only the content field (which is perfectly legal for non-existing pages but here causes a
+             * NPE).
+             */
+            if (pageAlreadyExists && page.getTitle() != null) {
                 /* The page already exists... check if we have received a rename request. */
                 if (!page.getTitle().equals(doc.getName())) {
                     /*

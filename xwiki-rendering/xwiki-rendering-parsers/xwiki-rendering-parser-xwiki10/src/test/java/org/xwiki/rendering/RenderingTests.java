@@ -58,6 +58,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/radeox/quote1", false);
 
         suite.addTestsFromResource("pre/pre1", false);
+        suite.addTestsFromResource("pre/pre2", false);
 
         // Wiki syntaxes
         suite.addTestsFromResource("italic/italic1", false);

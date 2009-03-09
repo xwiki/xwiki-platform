@@ -117,7 +117,7 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
         try {
             content = IOUtils.toString(source);
         } catch (IOException e) {
-            throw new ParseException("Failed to reade source");
+            throw new ParseException("Failed to read source", e);
         }
 
         FilterContext filterContext = new FilterContext();
@@ -145,6 +145,7 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
     {
         StringBuffer result = new StringBuffer();
         Matcher matcher = FilterContext.XWIKI1020TOKEN_PATTERN.matcher(content);
+
         int current = 0;
         while (matcher.find()) {
             result.append(content.substring(current, matcher.start()));
@@ -163,6 +164,6 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
 
         result.append(content.substring(current));
 
-        return result.toString();
+        return filterProtectedStrings(result.toString(), filterContext);
     }
 }

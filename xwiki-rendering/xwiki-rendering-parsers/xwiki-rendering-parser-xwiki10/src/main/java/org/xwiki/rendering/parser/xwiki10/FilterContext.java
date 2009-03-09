@@ -34,13 +34,13 @@ import java.util.regex.Pattern;
  */
 public class FilterContext
 {
-    public static final String XWIKI1020TOKEN_O = "\1";
+    public static final String XWIKI1020TOKEN_O = "\255";
 
-    public static final String XWIKI1020TOKEN_OP = "\\01";
+    public static final String XWIKI1020TOKEN_OP = "\\0255";
 
-    public static final String XWIKI1020TOKEN_C = "\1";
+    public static final String XWIKI1020TOKEN_C = "\255";
 
-    public static final String XWIKI1020TOKEN_CP = "\\01";
+    public static final String XWIKI1020TOKEN_CP = "\\0255";
 
     public static final String XWIKI1020TOKEN_INLINE = "inline";
 

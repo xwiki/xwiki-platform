@@ -50,6 +50,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-configuration</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-velocity</artifactId>
       <version>${pom.version}</version>
     </dependency>
@@ -59,25 +64,13 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.artofsolving</groupId>
+      <groupId>net.sf.jodconverter</groupId>
       <artifactId>jodconverter</artifactId>
-      <version>2.2.1</version>
-    </dependency>
-    <!-- Required by jodconverter. Refer http://www.artofsolving.com/node/28 and http://www.slf4j.org/faq.html#maven2-->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.4.3</version>
+      <version>3.0-beta-1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
-      <version>${pom.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-configuration</artifactId>
       <version>${pom.version}</version>
       <scope>runtime</scope>
     </dependency>

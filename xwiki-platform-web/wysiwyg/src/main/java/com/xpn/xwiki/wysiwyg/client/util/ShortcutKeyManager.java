@@ -49,9 +49,12 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
      */
     public void onKeyDown(Widget sender, char keyCode, int modifiers)
     {
-        // Prevent default browser behavior.
-        if (containsKey(new ShortcutKey(keyCode, modifiers))) {
+        Command command = get(new ShortcutKey(keyCode, modifiers));
+        if (command != null) {
+            // Prevent default browser behavior.
             ((RichTextArea) sender).getCurrentEvent().xPreventDefault();
+            // Schedule command.
+            DeferredCommand.addCommand(command);
         }
     }
 
@@ -62,7 +65,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
      */
     public void onKeyPress(Widget sender, char keyCode, int modifiers)
     {
-        // ignore
+        // NOTE: It seems the key modifiers are not detected on this event.
     }
 
     /**
@@ -72,10 +75,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
      */
     public void onKeyUp(Widget sender, char keyCode, int modifiers)
     {
-        // Schedule commands.
-        Command command = get(new ShortcutKey(keyCode, modifiers));
-        if (command != null) {
-            DeferredCommand.addCommand(command);
-        }
+        // NOTE: It seems that KeyboardListener#MODIFIER_META is not detected on apple keyboards (where it is mapped to
+        // apple command key) for this event. We have to detect it on key down.
     }
 }

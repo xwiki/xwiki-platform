@@ -45,7 +45,7 @@
 # cache.defaultLocalCache=jbosscache/local
 
 #-------------------------------------------------------------------------------------
-# OpenOffice
+# Settings for the OpenOffice server instance controlled by the OfficeImporter plugin
 #-------------------------------------------------------------------------------------
 
 #-# [Since 1.8RC3]

@@ -21,6 +21,8 @@ package org.xwiki.officeimporter.internal.openoffice;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
 import org.xwiki.velocity.VelocityContextInitializer;
 
@@ -30,7 +32,8 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.8RC3
  */
-public class OpenOfficeServerManagerVelocityContextInitializer implements VelocityContextInitializer
+public class OpenOfficeServerManagerVelocityContextInitializer extends AbstractLogEnabled implements
+    VelocityContextInitializer
 {
     /**
      * The key to use for openoffice server manager in the velocity context.
@@ -38,20 +41,33 @@ public class OpenOfficeServerManagerVelocityContextInitializer implements Veloci
     public static final String VELOCITY_CONTEXT_KEY = "oomanager";
 
     /**
+     * The {@link Execution} component.
+     */
+    private Execution execution;
+
+    /**
      * The {@link OpenOfficeServerManager} component.
      */
     private OpenOfficeServerManager oomanager;
-    
+
     /**
      * The {@link DocumentAccessBridge} component.
      */
     private DocumentAccessBridge docBridge;
 
     /**
+     * The velocity bridge.
+     */
+    private OpenOfficeServerManagerVelocityBridge velocityBridge;
+
+    /**
      * {@inheritDoc}
      */
     public void initialize(VelocityContext context)
     {
-        context.put(VELOCITY_CONTEXT_KEY, new OpenOfficeServerManagerVelocityBridge(oomanager, docBridge));
+        if (null == velocityBridge) {
+            velocityBridge = new OpenOfficeServerManagerVelocityBridge(oomanager, docBridge, execution, getLogger());
+        }
+        context.put(VELOCITY_CONTEXT_KEY, velocityBridge);
     }
 }

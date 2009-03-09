@@ -302,7 +302,7 @@
       <requirements>
         <requirement>
           <role>org.xwiki.officeimporter.openoffice.configuration.OpenOfficeServerConfiguration</role>
-        </requirement>        
+        </requirement>
       </requirements>
     </component>
     <!-- Velocity -->
@@ -327,11 +327,14 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
+          <role>org.xwiki.context.Execution</role>
+        </requirement>      
+        <requirement>
           <role>org.xwiki.bridge.DocumentAccessBridge</role>
         </requirement>
         <requirement>
           <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerManager</role>
-        </requirement>
+        </requirement>        
       </requirements>
     </component>
   </components>

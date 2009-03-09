@@ -20,6 +20,8 @@
 package org.xwiki.officeimporter.internal.openoffice;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.logging.Logger;
+import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManagerException;
 
@@ -32,6 +34,16 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeServerManagerException;
 public class OpenOfficeServerManagerVelocityBridge
 {
     /**
+     * The key used to place any error messages while trying to control the oo server instance.
+     */
+    public static final String OFFICE_MANAGER_ERROR = "OFFICE_MANAGER_ERROR";
+
+    /**
+     * Provides access to the request context.
+     */
+    private Execution execution;
+
+    /**
      * The {@link OpenOfficeServerManager} component.
      */
     private OpenOfficeServerManager oomanager;
@@ -42,18 +54,21 @@ public class OpenOfficeServerManagerVelocityBridge
     private DocumentAccessBridge docBridge;
 
     /**
-     * Holds any error messages thrown during operations.
+     * The logger instance passed by the velocity context initializer.
      */
-    private String lastErrorMessage;
+    private Logger logger;
 
     /**
      * Creates a new {@link OpenOfficeServerManagerVelocityBridge} with the provided {@link OpenOfficeServerManager}
      * component.
      */
-    public OpenOfficeServerManagerVelocityBridge(OpenOfficeServerManager oomanager, DocumentAccessBridge docBridge)
+    public OpenOfficeServerManagerVelocityBridge(OpenOfficeServerManager oomanager, DocumentAccessBridge docBridge,
+        Execution execution, Logger logger)
     {
         this.oomanager = oomanager;
         this.docBridge = docBridge;
+        this.execution = execution;
+        this.logger = logger;
     }
 
     /**
@@ -69,10 +84,11 @@ public class OpenOfficeServerManagerVelocityBridge
                 oomanager.startServer();
                 success = true;
             } catch (OpenOfficeServerManagerException ex) {
-                this.lastErrorMessage = ex.getMessage();
+                logger.error(ex.getMessage(), ex);
+                execution.getContext().setProperty(OFFICE_MANAGER_ERROR, ex.getMessage());
             }
         } else {
-            this.lastErrorMessage = "Inadequate privileges.";
+            execution.getContext().setProperty(OFFICE_MANAGER_ERROR, "Inadequate privileges.");
         }
         return success;
     }
@@ -90,10 +106,11 @@ public class OpenOfficeServerManagerVelocityBridge
                 oomanager.stopServer();
                 success = true;
             } catch (OpenOfficeServerManagerException ex) {
-                this.lastErrorMessage = ex.getMessage();
+                logger.error(ex.getMessage(), ex);
+                execution.getContext().setProperty(OFFICE_MANAGER_ERROR, ex.getMessage());
             }
         } else {
-            this.lastErrorMessage = "Inadequate privileges.";
+            execution.getContext().setProperty(OFFICE_MANAGER_ERROR, "Inadequate privileges.");
         }
         return success;
     }
@@ -119,7 +136,7 @@ public class OpenOfficeServerManagerVelocityBridge
      */
     public String getServerState()
     {
-        return oomanager.getServerState().getDescription();
+        return oomanager.getServerState().toString();
     }
 
     /**
@@ -127,6 +144,7 @@ public class OpenOfficeServerManagerVelocityBridge
      */
     public String getLastErrorMessage()
     {
-        return this.lastErrorMessage;
+        Object error = execution.getContext().getProperty(OFFICE_MANAGER_ERROR);
+        return (error != null) ? (String) error : null;
     }
 }

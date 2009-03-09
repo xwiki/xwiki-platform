@@ -19,10 +19,7 @@
  */
 package org.xwiki.officeimporter.internal.openoffice.configuration;
 
-import net.sf.jodconverter.office.OfficeUtils;
-
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
-import org.xwiki.officeimporter.internal.openoffice.configuration.DefaultOpenOfficeServerConfiguration;
 import org.xwiki.officeimporter.openoffice.configuration.OpenOfficeServerConfiguration;
 
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
@@ -55,9 +52,9 @@ public class DefaultOpenOfficeConfigurationTest extends AbstractXWikiComponentTe
      */
     public void testDefaultConfiguration()
     {
-        assertEquals(OfficeUtils.getDefaultOfficeHome().getAbsolutePath(), configuration.getHomePath());
-        assertEquals(OfficeUtils.getDefaultProfileDir().getAbsolutePath(), configuration.getProfilePath());
-        assertEquals(50, configuration.getMaxTasksPerProcess());
-        assertEquals(30000, configuration.getTaskExecutionTimeout());
+        assertNotNull(configuration.getHomePath());
+        assertNotNull(configuration.getProfilePath());
+        assertTrue(configuration.getMaxTasksPerProcess() > 0);
+        assertTrue(configuration.getTaskExecutionTimeout() > 0);
     }   
 }

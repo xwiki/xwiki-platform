@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.XDOM;
@@ -35,27 +32,18 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationException;
 
 /**
+ * Calls all existing transformations (executed by priority) on an existing XDOM object to generate a new 
+ * transformed XDOM.
+ * 
  * @version $Id$
  * @since 1.5M2
  */
-public class DefaultTransformationManager implements TransformationManager, Composable, Initializable
+public class DefaultTransformationManager implements TransformationManager, Initializable
 {
-    private ComponentManager componentManager;
-
     /**
-     * Holds the list of transformations to apply. Injected by the Component Manager.
+     * Holds the list of transformations to apply, sorted by priority.
      */
     private List<Transformation> transformations = new ArrayList<Transformation>();
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     /**
      * {@inheritDoc}
@@ -64,14 +52,8 @@ public class DefaultTransformationManager implements TransformationManager, Comp
      */
     public void initialize() throws InitializationException
     {
-        List<Transformation> txs;
-        try {
-            txs = this.componentManager.lookupList(Transformation.ROLE);
-        } catch (ComponentLookupException e) {
-            throw new InitializationException("Failed to create Transformation cache", e);
-        }
-        Collections.sort(txs);
-        this.transformations = txs;
+        // Sort transformations by priority.
+        Collections.sort(this.transformations);
     }
 
     /**

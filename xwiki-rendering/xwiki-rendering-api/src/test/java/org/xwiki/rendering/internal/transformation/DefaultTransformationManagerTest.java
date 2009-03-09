@@ -25,6 +25,11 @@ import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.transformation.TransformationManager;
 
+/**
+ * Unit tests for {@link DefaultTransformationManager}.
+ * 
+ * @version $Id$
+ */
 public class DefaultTransformationManagerTest extends AbstractRenderingTestCase
 {
     public void testTransformations() throws Exception 

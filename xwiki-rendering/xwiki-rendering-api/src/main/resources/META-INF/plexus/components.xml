@@ -96,6 +96,12 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.rendering.internal.transformation.DefaultTransformationManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.transformation.Transformation</role>
+          <field-name>transformations</field-name>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>

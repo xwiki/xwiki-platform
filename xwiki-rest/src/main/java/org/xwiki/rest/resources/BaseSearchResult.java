@@ -52,6 +52,10 @@ public class BaseSearchResult extends XWikiResource
     {
         List<SearchResult> result = new ArrayList<SearchResult>();
 
+        if (keywords == null) {
+            return result;
+        }
+
         Formatter f = new Formatter();
 
         if (space != null) {
@@ -124,6 +128,7 @@ public class BaseSearchResult extends XWikiResource
                 SearchResult searchResult = objectFactory.createSearchResult();
                 searchResult.setType("page");
                 searchResult.setId(pageId);
+                searchResult.setPageFullName(Utils.getPageFullName(wikiName, spaceName, pageName));
                 searchResult.setWiki(wikiName);
                 searchResult.setSpace(spaceName);
                 searchResult.setPageName(pageName);
@@ -149,6 +154,10 @@ public class BaseSearchResult extends XWikiResource
     {
         List<String> addedIds = new ArrayList<String>();
         List<SearchResult> result = new ArrayList<SearchResult>();
+
+        if (keywords == null) {
+            return result;
+        }
 
         Formatter f = new Formatter();
 
@@ -201,6 +210,7 @@ public class BaseSearchResult extends XWikiResource
                     SearchResult searchResult = objectFactory.createSearchResult();
                     searchResult.setType("object");
                     searchResult.setId(id);
+                    searchResult.setPageFullName(Utils.getPageFullName(wikiName, spaceName, pageName));
                     searchResult.setWiki(wikiName);
                     searchResult.setSpace(spaceName);
                     searchResult.setPageName(pageName);

@@ -71,7 +71,9 @@ import org.xwiki.rest.resources.pages.PageTranslationVersionResource;
 import org.xwiki.rest.resources.pages.PageVersionResource;
 import org.xwiki.rest.resources.pages.PagesResource;
 import org.xwiki.rest.resources.spaces.SpaceResource;
+import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 import org.xwiki.rest.resources.spaces.SpacesResource;
+import org.xwiki.rest.resources.wikis.WikiSearchResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
 
 import com.xpn.xwiki.XWikiContext;
@@ -124,6 +126,12 @@ public class DomainObjectFactory
         modificationsLink.setRel(Relations.MODIFICATIONS);
         wiki.getLinks().add(modificationsLink);
 
+        String searchUri = UriBuilder.fromUri(baseUri).path(WikiSearchResource.class).build(wikiName).toString();
+        Link searchLink = objectFactory.createLink();
+        searchLink.setHref(searchUri);
+        searchLink.setRel(Relations.SEARCH);
+        wiki.getLinks().add(searchLink);
+
         return wiki;
     }
 
@@ -155,6 +163,13 @@ public class DomainObjectFactory
             homeLink.setRel(Relations.HOME);
             space.getLinks().add(homeLink);
         }
+
+        String searchUri =
+            UriBuilder.fromUri(baseUri).path(SpaceSearchResource.class).build(wikiName, spaceName).toString();
+        Link searchLink = objectFactory.createLink();
+        searchLink.setHref(searchUri);
+        searchLink.setRel(Relations.SEARCH);
+        space.getLinks().add(searchLink);
 
         return space;
     }

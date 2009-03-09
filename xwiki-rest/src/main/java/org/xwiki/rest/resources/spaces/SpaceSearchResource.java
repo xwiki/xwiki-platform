@@ -27,6 +27,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.model.jaxb.SearchResults;
@@ -45,10 +46,12 @@ public class SpaceSearchResource extends BaseSearchResult
         String database = xwikiContext.getDatabase();
 
         SearchResults searchResults = objectFactory.createSearchResults();
+        searchResults.setTemplate(String.format("%s?q={keywords}(&scope={content|name|title|objects})*", UriBuilder
+            .fromUri(uriInfo.getBaseUri()).path(SpaceSearchResource.class).build(wikiName, spaceName).toString()));
 
         try {
             xwikiContext.setDatabase(wikiName);
-            
+
             List<SearchScope> searchScopes = new ArrayList<SearchScope>();
             for (String searchScopeString : searchScopeStrings) {
                 if (searchScopeString != null && !searchScopes.contains(searchScopeString)) {

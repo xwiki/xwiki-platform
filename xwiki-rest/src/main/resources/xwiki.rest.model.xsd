@@ -401,6 +401,7 @@
         <sequence>
           <element name="type" type="string"></element>
           <element name="id" type="string"></element>
+          <element name="pageFullName" type="string"></element>
           <element name="wiki" type="string"></element>
           <element name="space" type="string"></element>
           <element name="pageName" type="string"></element>
@@ -420,6 +421,7 @@
           <sequence>
             <element name="searchResult" type="xwiki:SearchResult" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
+          <attribute name="template" type="string"></attribute>
         </extension>
       </complexContent>
     </complexType>

@@ -39,6 +39,18 @@ public class Utils
         return document.getPrefixedFullName();
     }
 
+    public static String getPageFullName(String wikiName, String spaceName, String pageName)
+    {
+        XWikiDocument xwikiDocument = new XWikiDocument();
+        xwikiDocument.setDatabase(wikiName);
+        xwikiDocument.setName(pageName);
+        xwikiDocument.setSpace(spaceName);
+
+        Document document = new Document(xwikiDocument, null);
+
+        return document.getFullName();
+    }
+
     public static String getObjectId(String wikiName, String spaceName, String pageName, String className,
         int objectNumber)
     {

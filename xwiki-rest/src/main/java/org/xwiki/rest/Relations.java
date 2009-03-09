@@ -72,4 +72,6 @@ public class Relations
 
     public static final String TAG = "http://www.xwiki.org/rel/tag";
 
+    public static final String SEARCH = "http://www.xwiki.org/rel/search";
+
 }

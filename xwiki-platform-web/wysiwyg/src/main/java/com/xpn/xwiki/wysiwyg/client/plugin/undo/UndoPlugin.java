@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.undo;
 
 import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,9 +29,10 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.util.ClickCommand;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyFactory;
+import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -40,7 +42,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class UndoPlugin extends AbstractPlugin implements ClickListener, KeyboardListener
+public class UndoPlugin extends AbstractPlugin implements ClickListener
 {
     /**
      * The tool bar button used for undoing the last action taken on the rich text area.
@@ -48,19 +50,14 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener, Keyboar
     private PushButton undo;
 
     /**
-     * The shortcut key that triggers the undo action.
-     */
-    private ShortcutKey undoKey;
-
-    /**
      * The tool bar button used for redoing the last action taken on the rich text area.
      */
     private PushButton redo;
 
     /**
-     * The shortcut key that triggers the redo action.
+     * Associates commands to shortcut keys.
      */
-    private ShortcutKey redoKey;
+    private ShortcutKeyManager shortcutKeyManager;
 
     /**
      * Tool bar extension that includes the undo and redo buttons.
@@ -76,24 +73,27 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener, Keyboar
     {
         super.init(wysiwyg, textArea, config);
 
+        shortcutKeyManager = new ShortcutKeyManager();
         if (getTextArea().getCommandManager().isSupported(Command.UNDO)) {
             undo = new PushButton(Images.INSTANCE.undo().createImage(), this);
             undo.setTitle(Strings.INSTANCE.undo());
-            undoKey = ShortcutKeyFactory.createCtrlShortcutKey('Z');
-            textArea.addShortcutKey(undoKey);
+            ClickCommand undoCommand = new ClickCommand(this, undo);
+            shortcutKeyManager.put(new ShortcutKey('Z', KeyboardListener.MODIFIER_CTRL), undoCommand);
+            shortcutKeyManager.put(new ShortcutKey('Z', KeyboardListener.MODIFIER_META), undoCommand);
             toolBarExtension.addFeature("undo", undo);
         }
 
         if (getTextArea().getCommandManager().isSupported(Command.REDO)) {
             redo = new PushButton(Images.INSTANCE.redo().createImage(), this);
             redo.setTitle(Strings.INSTANCE.redo());
-            redoKey = ShortcutKeyFactory.createCtrlShortcutKey('Y');
-            textArea.addShortcutKey(redoKey);
+            ClickCommand redoCommand = new ClickCommand(this, redo);
+            shortcutKeyManager.put(new ShortcutKey('Y', KeyboardListener.MODIFIER_CTRL), redoCommand);
+            shortcutKeyManager.put(new ShortcutKey('Y', KeyboardListener.MODIFIER_META), redoCommand);
             toolBarExtension.addFeature("redo", redo);
         }
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addKeyboardListener(this);
+            getTextArea().addKeyboardListener(shortcutKeyManager);
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -105,26 +105,29 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener, Keyboar
      */
     public void destroy()
     {
-        if (undo != null) {
-            undo.removeFromParent();
-            undo.removeClickListener(this);
-            undo = null;
-            getTextArea().removeShortcutKey(undoKey);
-        }
-
-        if (redo != null) {
-            redo.removeFromParent();
-            redo.removeClickListener(this);
-            redo = null;
-            getTextArea().removeShortcutKey(redoKey);
-        }
+        destroy(undo);
+        destroy(redo);
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeKeyboardListener(this);
+            getTextArea().removeKeyboardListener(shortcutKeyManager);
+            shortcutKeyManager.clear();
             toolBarExtension.clearFeatures();
         }
 
         super.destroy();
+    }
+
+    /**
+     * Releases the given focus widget.
+     * 
+     * @param widget the widget to be destroyed
+     */
+    private void destroy(FocusWidget widget)
+    {
+        if (widget != null) {
+            widget.removeFromParent();
+            widget.removeClickListener(this);
+        }
     }
 
     /**
@@ -135,65 +138,22 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener, Keyboar
     public void onClick(Widget sender)
     {
         if (sender == undo) {
-            onUndo();
+            onClick(undo, Command.UNDO);
         } else if (sender == redo) {
-            onRedo();
+            onClick(redo, Command.REDO);
         }
     }
 
     /**
-     * {@inheritDoc}
+     * Toggles the specifies command if the given focus widget is enabled.
      * 
-     * @see KeyboardListener#onKeyDown(Widget, char, int)
+     * @param sender the widget who sent the click event
+     * @param command the command to be toggled
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    private void onClick(FocusWidget sender, Command command)
     {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyPress(Widget, char, int)
-     */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyUp(Widget, char, int)
-     */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
-    {
-        if (sender == getTextArea() && (modifiers & KeyboardListener.MODIFIER_CTRL) != 0) {
-            if (keyCode == undoKey.getKeyCode()) {
-                onUndo();
-            } else if (keyCode == redoKey.getKeyCode()) {
-                onRedo();
-            }
-        }
-    }
-
-    /**
-     * Loads the previous (older) history state of the rich text area.
-     */
-    public void onUndo()
-    {
-        if (undo.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.UNDO);
-        }
-    }
-
-    /**
-     * Loads the next (newer) history state of the rich text area.
-     */
-    public void onRedo()
-    {
-        if (redo.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.REDO);
+        if (sender.isEnabled()) {
+            getTextArea().getCommandManager().execute(command);
         }
     }
 }

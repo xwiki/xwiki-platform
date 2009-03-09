@@ -19,9 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -30,8 +27,6 @@ import com.google.gwt.user.client.ui.HasName;
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Event;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyFactory;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultCommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.history.History;
@@ -75,11 +70,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     private final ChangeListenerCollection changeListeners = new ChangeListenerCollection();
 
     /**
-     * The list of shortcut keys activated on this rich text area.
-     */
-    private final List<ShortcutKey> shortcutKeys = new ArrayList<ShortcutKey>();
-
-    /**
      * The name of this rich text area. It could be used to submit the edited contents to the server.
      */
     private String name;
@@ -114,29 +104,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         this.cm = cm;
         this.history = history;
         adjuster.setTextArea(this);
-    }
-
-    /**
-     * Activates the given shortcut key on this text area. This way the default behavior of the browser is prevented,
-     * and the caller of this method can associate its own behavior with the specified shortcut key.
-     * 
-     * @param shortcutKey the shortcut key to activate.
-     */
-    public void addShortcutKey(ShortcutKey shortcutKey)
-    {
-        if (!shortcutKeys.contains(shortcutKey)) {
-            shortcutKeys.add(shortcutKey);
-        }
-    }
-
-    /**
-     * Deactivates the specified shortcut key for this rich text area.
-     * 
-     * @param shortcutKey The shortcut key to be deactivated.
-     */
-    public void removeShortcutKey(ShortcutKey shortcutKey)
-    {
-        shortcutKeys.remove(shortcutKey);
     }
 
     /**
@@ -259,11 +226,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         }
         currentEvent = event.cast();
         adjuster.onBeforeBrowserEvent();
-        if (currentEvent.getTypeInt() == Event.ONKEYDOWN) {
-            if (shortcutKeys.contains(ShortcutKeyFactory.createShortcutKey(currentEvent))) {
-                currentEvent.xPreventDefault();
-            }
-        }
         super.onBrowserEvent(event);
         adjuster.onBrowserEvent();
         currentEvent = null;

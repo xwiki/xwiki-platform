@@ -1589,15 +1589,15 @@
             <xsl:call-template name="process-common-attributes"/>
             <xsl:choose>
                 <xsl:when test="lang('ja')">
-                    <xsl:text>???</xsl:text>
+                    <xsl:text>&#x300C;</xsl:text>
                     <xsl:apply-templates/>
-                    <xsl:text>???</xsl:text>
+                    <xsl:text>&#x300D;</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- lang('en') -->
-                    <xsl:text>â??</xsl:text>
+                    <xsl:text>&#x201C;</xsl:text>
                     <xsl:apply-templates/>
-                    <xsl:text>â??</xsl:text>
+                    <xsl:text>&#x201D;</xsl:text>
                     <!-- todo: other languages ...-->
                 </xsl:otherwise>
             </xsl:choose>
@@ -1609,15 +1609,15 @@
             <xsl:call-template name="process-common-attributes"/>
             <xsl:choose>
                 <xsl:when test="lang('ja')">
-                    <xsl:text>???</xsl:text>
+                    <xsl:text>&#x300E;</xsl:text>
                     <xsl:apply-templates/>
-                    <xsl:text>???</xsl:text>
+                    <xsl:text>&#x300F;</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- lang('en') -->
-                    <xsl:text>â??</xsl:text>
+                    <xsl:text>&#x2018;</xsl:text>
                     <xsl:apply-templates/>
-                    <xsl:text>â??</xsl:text>
+                    <xsl:text>&#x2019;</xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
         </fo:inline>

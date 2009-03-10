@@ -3615,6 +3615,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         String database = null, incdatabase = null;
         String prefixedTopic, localTopic;
+
+        // Save current documents in the Velocity and Groovy contexts
         Document currentdoc = null, currentcdoc = null, currenttdoc = null;
         Document gcurrentdoc = null, gcurrentcdoc = null, gcurrenttdoc = null;
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
@@ -3662,6 +3664,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 } catch (Exception e) {
                 }
 
+                // Get document to include
                 doc = getDocument(((XWikiDocument) context.get("doc")).getSpace(), localTopic, context);
 
                 if (checkAccess("view", doc, context) == false) {
@@ -3681,12 +3684,34 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 if (database != null) {
                     context.setDatabase(database);
                 }
-                result =
-                    getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
+
+                // Allow including document in the XWiki Syntax 1.0 but also other syntaxes using the new rendering.
+                if (contentdoc.getSyntaxId().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+                    result = getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
                         (XWikiDocument) context.get("doc"), context);
+                } else {
+                    // Note: the Script macro in the new rendering checks for programming rights for the document in
+                    // the xwiki context.
+                    result = contentdoc.getRenderedContent(context);
+                }
             } else {
-                // We stay in the context included document
-                result = getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, doc, context);
+                // We stay in the included document context
+
+                // Allow including document in the XWiki Syntax 1.0 but also other syntaxes using the new rendering.
+                if (contentdoc.getSyntaxId().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+                    result = getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, doc, context);
+                } else {
+                    // Since the Script macro checks for programming rights in the current doc we need to temporarily set
+                    // the contentdoc as the current doc before rendering it.
+                    XWikiDocument originalDoc = null;
+                    try {
+                        originalDoc = context.getDoc();
+                        context.put("doc", doc);
+                        result = contentdoc.getRenderedContent(context);
+                    } finally {
+                        context.put("doc", originalDoc);
+                    }
+                }
             }
             try {
                 Set<String> includedDocs = (Set<String>) context.get("included_docs");

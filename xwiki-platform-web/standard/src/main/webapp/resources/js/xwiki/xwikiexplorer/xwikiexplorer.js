@@ -7,7 +7,7 @@ if (typeof XWiki == "undefined") {
 }
  
 XWiki.xwikiExplorer = {
-  	  	
+
   /**
    * Base URI for XWiki REST service.
    */
@@ -38,9 +38,9 @@ XWiki.xwikiExplorer = {
    */  
   callbacks : {
     // XWikiExplorerResultTree.dataArrived
-  	dataArrived : new Array(),
-  	// DataSource.transformResponse
-  	transformResponse : new Array()
+    dataArrived : new Array(),
+    // DataSource.transformResponse
+    transformResponse : new Array()
   },
 
   /** 
@@ -49,7 +49,7 @@ XWiki.xwikiExplorer = {
    * Custom icon per entry type without having any icon field in the REST response.
    */
   createXWikiExplorerResultTreeClass : function() {
-  	
+
     /*
      * XWikiExplorerResultTree class overriding default ResultTree class.
      * Used by xwikiExplorer DataSources. 
@@ -84,12 +84,12 @@ XWiki.xwikiExplorer = {
           } else if (xwikiRecordsType == "space") {
             childDSName = XWiki.xwikiExplorer.getDS(node["wiki"], node["name"]);
           } else if (xwikiRecordsType == "page") {
-          	if (node["isXWikiAttachment"] == null) {
-          	  childDSName = XWiki.xwikiExplorer.getDS(node["wiki"], node["space"]);
-          	} else {
+              if (node["isXWikiAttachment"] == null) {
+                childDSName = XWiki.xwikiExplorer.getDS(node["wiki"], node["space"]);
+              } else {
               childDSName = XWiki.xwikiExplorer.getDS(node["wiki"], node["space"], node["name"],
                               XWiki.constants.docextraAttachmentsAnchor);
-          	}
+              }
           }          
         } else if (treeRelations) {      
           // Default multi DataSource behavior                              
@@ -105,7 +105,7 @@ XWiki.xwikiExplorer = {
       /**
        * Get children node matching the given name.
        */   
-      getChildNodeByName : function(parent, name) {  	 
+      getChildNodeByName : function(parent, name) {
         var children = this.getChildren(parent);
         if (children != null) {
           for (var i = 0; i < children.length; i++) {
@@ -122,14 +122,14 @@ XWiki.xwikiExplorer = {
        * See dataArrived() bellow.
        */
       removeBlacklistedSpaces : function(nodes) {
-        for (var i = 0; i < nodes.length; i++) {      	      	      	  
+        for (var i = 0; i < nodes.length; i++) {
           var currentDS = this.getNodeDataSource(nodes[i]);                    
-          if (currentDS.xwikiRecordsType == "space") {          	
+          if (currentDS.xwikiRecordsType == "space") {
             if (xwikiExplorerTree.blacklistedSpaces != "" && xwikiExplorerTree.blacklistedSpaces[nodes[i].name] == true) {
-              this.remove(nodes[i]);	
+              this.remove(nodes[i]);
             }
           }  
-        }                             		
+        }
       },
       
       /**
@@ -139,41 +139,41 @@ XWiki.xwikiExplorer = {
        * See dataArrived() bellow.
        */
       addAttachmentsNode : function(node) {
-      	var hasAttachments = false;
+          var hasAttachments = false;
 
         // Determine if the attachments node must be displayed.
-      	if (xwikiExplorerTree.displayAttachmentsWhenEmpty == true) {
-      	  // xwikiExplorerTree.displayAttachmentsWhenEmpty is set to true.
-      	  hasAttachments = true;
-      	} else {
-      	  // Loop over <link> to find an attachments relationship.
+          if (xwikiExplorerTree.displayAttachmentsWhenEmpty == true) {
+            // xwikiExplorerTree.displayAttachmentsWhenEmpty is set to true.
+            hasAttachments = true;
+          } else {
+            // Loop over <link> to find an attachments relationship.
           var links = (node.link != null) ? node.link : new Array();          
           var hasAttachments = false;
           for (var i = 0; i < links.length; i++) {
             if (links[i].rel == XWiki.xwikiExplorer.restAttachmentsRel) {
               hasAttachments = true;  
-              break;        	    	              
+              break;
             }
           }
-      	}
+          }
           
         // If the attachments node must be displayed.
         if (hasAttachments == true) {        
-        	                	
-          // Create attachments container node title.    	
+
+          // Create attachments container node title.
           var title = "Attachments (" + node.name + ")";
           if (xwikiExplorerTree.displayLinks == true) {
             title = "<a href='" + node.xwikiUrl + XWiki.constants.docextraAttachmentsAnchor + "'>" 
                       + title + "</a>"
           }
-          	
+
           // Create the node itself.
           var attachNode = {
               id: node.id + XWiki.constants.docextraAttachmentsAnchor,
               fullName: node.fullName + XWiki.constants.docextraAttachmentsAnchor,
               wiki: node.wiki,
               space: node.space,              
-              title: title,	
+              title: title,
               name: node.name,
               parentId: node.id,
               parent: node.fullName,
@@ -187,9 +187,9 @@ XWiki.xwikiExplorer = {
           var index;
           // Get position from xwikiExplorerTree options.
           if (xwikiExplorerTree.displayAttachmentsAtTop == true) {
-          	index = 0;
+              index = 0;
           } else {
-          	index = null;
+              index = null;
           }
                         
           // Add the attachments node to the node children list.
@@ -202,14 +202,13 @@ XWiki.xwikiExplorer = {
        * Implementation of the optional isc.ResultTree.dataArrived callback.
        */
       dataArrived : function(parentNode) {       
-      	            	
+
         // Various transformations on children nodes.
         // Redo getChildren to avoid getting previously removed nodes (which have been nullified).
-      	var children = this.getChildren(parentNode);
+        var children = this.getChildren(parentNode);
         for (var i = 0; i < children.length; i++) {
           var currentDS = this.getNodeDataSource(children[i]);                         
           var title = children[i].name;    
-                                                  
           // Transform title to a link if showLinks is activated.
           if (xwikiExplorerTree.displayLinks == true && children[i].xwikiUrl != null) {          
             title = "<a href='" + children[i].xwikiUrl + "'>" + title + "</a>";
@@ -222,17 +221,17 @@ XWiki.xwikiExplorer = {
               canDrag: currentDS.xwikiCanDragNodes,
               canAcceptDrop: currentDS.xwikiCanAcceptDropNodes,
               resource: XWiki.getResource(children[i].id),
-          	  title: title
-            });            	  
-          	
-          // Open current wiki node.	
+              title: title
+            });
+
+          // Open current wiki node.
           if (currentDS.xwikiRecordsType == "wiki" && children[i].name == XWiki.constants.currentWiki) {
-            this.openFolder(children[i]);	
+            this.openFolder(children[i]);
           }          
         }                     
         
         // We don't try to make spaces/pages transformation on the root node.
-      	if (!this.isRoot(parentNode)) {
+        if (!this.isRoot(parentNode)) {
           var parentDS = this.getNodeDataSource(parentNode);          
         
           // Remove blacklisted spaces.
@@ -245,21 +244,23 @@ XWiki.xwikiExplorer = {
                 && !parentNode.isXWikiAttachment) {          
             this.addAttachmentsNode(parentNode);
           }
-      	}              
+        }
                   
         // XWiki dataArrived callback handler.          
         if (XWiki.xwikiExplorer.callbacks.dataArrived.length > 0) {
-          var xwikiCallback = XWiki.xwikiExplorer.callbacks.dataArrived.shift();    		
-          xwikiCallback.params.parentNode = parentNode;
+          var xwikiCallback = XWiki.xwikiExplorer.callbacks.dataArrived.shift();
+          if (parentNode != null) {
+            xwikiCallback.params.parentNode = parentNode;
+          }
           xwikiCallback.callback(xwikiCallback.params);
-        }      	
+        }
       },
       
       /**
        * Override isc.Tree.isFolder to determine if a node has children from XWiki specific information.
        */
       isFolder : function (node) {
-      	var nodeDS = this.getNodeDataSource(node);
+        var nodeDS = this.getNodeDataSource(node);
         if (nodeDS != null) {
           var xwikiRecordsType = nodeDS.xwikiRecordsType;        
           if (xwikiRecordsType != null && xwikiRecordsType != "") {           
@@ -273,11 +274,11 @@ XWiki.xwikiExplorer = {
             } else if (xwikiRecordsType == "page") {
               // If the node is an attachment container it necessarily has children.
               if (node.isXWikiAttachment == true) {
-              	return true;
-              }	
+                  return true;
+              }
               // If the node is page, see if it points to children or attachments. If so it's a folder.
               var links = (node.link != null) ? node.link : new Array();                        
-              for (var i = 0; i < links.length; i++) {              	
+              for (var i = 0; i < links.length; i++) {
                 if (links[i].rel == XWiki.xwikiExplorer.restChildrenRel 
                       || links[i].rel == XWiki.xwikiExplorer.restAttachmentsRel) {
                   return true;
@@ -290,16 +291,16 @@ XWiki.xwikiExplorer = {
             }
           }
         }         
-      	return true;
+        return true;
       }     
     });
   }, 
-  
+ 
   /**
-   * Get an object containing XWiki DataSource default parameters.
+   * Get default DataSource configuration object.
    */
   getDSDefaultParams : function() {
-  	return {
+    return {
         id : "root__DS",
         dataFormat : "xml",
         dataURL : this.baseRestURI + "wikis/",
@@ -308,7 +309,7 @@ XWiki.xwikiExplorer = {
         resultTreeClass : "XWikiExplorerResultTree",
         fields : [ 
             { name:"id", required: true, type: "text", primaryKey:true },
-            { name:"name", required: true, type: "text" },
+            { name:"name", type: "text" },
             { name:"title", type: "text" },
             { name:"xwikiUrl", type: "text" }
           ],
@@ -321,7 +322,7 @@ XWiki.xwikiExplorer = {
         xwikiCanAcceptDropNodes : false
       };
   },
-     
+
   /**
    * Get DataSource id for the given XWiki resource, creates the DataSource if it doesn't exist. 
    * If all the arguments are empty the root DataSource (id: rootDS) will be returned.
@@ -344,8 +345,8 @@ XWiki.xwikiExplorer = {
     if (dsParams.transformResponse == null) {
       dsParams.transformResponse = function (dsResponse, dsRequest, data) {
           if (XWiki.xwikiExplorer.callbacks.transformResponse.length > 0) {
-            var xwikiCallback = XWiki.xwikiExplorer.callbacks.transformResponse.shift();    		
-         	xwikiCallback.callback(xwikiCallback.params, dsResponse, dsRequest, data);
+            var xwikiCallback = XWiki.xwikiExplorer.callbacks.transformResponse.shift();            
+            xwikiCallback.callback(xwikiCallback.params, dsResponse, dsRequest, data);
           }
           return dsResponse;
         };
@@ -361,7 +362,7 @@ XWiki.xwikiExplorer = {
         dsParams.id = wiki + "__DS";
         dsParams.dataURL = this.baseRestURI + "wikis/" + wiki + "/spaces";
         dsParams.recordXPath = "/xwiki:spaces/xwiki:space";
-        dsParams.fields = [   	 
+        dsParams.fields = [
             { name:"id", required: true, type: "text", primaryKey:true },
             { name:"name", required: true, type: "text" },
             { name:"title", type: "text" },
@@ -375,7 +376,7 @@ XWiki.xwikiExplorer = {
         dsParams.id = wiki + "__" + space + "__DS";
         dsParams.dataURL = this.baseRestURI + "wikis/"  + wiki + "/spaces/" + space + "/pages";
         dsParams.recordXPath = "/xwiki:pages/xwiki:pageSummary";
-        dsParams.fields = [   	 
+        dsParams.fields = [
             { name:"id", required: true, type: "text", primaryKey:true },
             { name:"fullName", required: true, type: "text" },
             { name:"wiki", required: true, type: "text" },
@@ -405,12 +406,13 @@ XWiki.xwikiExplorer = {
         dsParams.id = wiki + "__" + space + "__" + page + "__DS";
         dsParams.dataURL = this.baseRestURI + "wikis/"  + wiki + "/spaces/" + space + "/pages/" + page;
         dsParams.recordXPath = "/xwiki:page";
-        dsParams.fields = [   	 
+        dsParams.fields = [
             { name:"id", required: true, type: "text", primaryKey:true },
             { name:"wiki", required: true, type: "text" },
             { name:"space", required: true, type: "text" },
+            { name:"name", required: true, type: "text" },
             { name:"parent", required: true, type: "text" },
-            { name:"link", propertiesOnly: true },
+            { name:"link", propertiesOnly: true }
           ];         
         dsParams.xwikiRecordsType = "page";  
         dsParams.xwikiIcon = "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
@@ -420,7 +422,7 @@ XWiki.xwikiExplorer = {
         dsParams.id = wiki + "__" + space + "__" + page + "__Attachments__DS";
         dsParams.dataURL = this.baseRestURI + "wikis/"  + wiki + "/spaces/" + space + "/pages/" + page + "/attachments";
         dsParams.recordXPath = "/xwiki:attachments/xwiki:attachment";
-        dsParams.fields = [   	 
+        dsParams.fields = [
             { name:"id", required: true, type: "text", primaryKey:true },
             { name:"name", required: true, type: "text" },
             { name:"title", type: "text" },
@@ -432,7 +434,7 @@ XWiki.xwikiExplorer = {
     }           
     
     // Create DataSource
-    isc.DataSource.create(dsParams); 
+    isc.DataSource.create(dsParams);
 
     return dsParams.id;    
   },
@@ -447,20 +449,20 @@ XWiki.xwikiExplorer = {
   openNode : function (rt, nodeId, fireCallback) {
     // Callback the calls xwikiExplorerObserver again when a node has been opened.
     var callback = { 
-  	    callback : function(params) {
+        callback : function(params) {
             XWiki.xwikiExplorer.openNodesFromInput();
           },
         params : { }
       };
                     
     var node = rt.findById(nodeId);
-    if (node != null) {    	      
-            	
+    if (node != null) {
+
       // Open node if it is a folder and it is not opened.
       // If fireCallback is true, register a callback to continue node opening.
       if (rt.isFolder(node) && !rt.isOpen(node)) {
         if (fireCallback == true) {
-          XWiki.xwikiExplorer.callbacks.dataArrived.push(callback);	 
+          XWiki.xwikiExplorer.callbacks.dataArrived.push(callback);
         }
         rt.openFolder(node);
         return null;
@@ -506,34 +508,34 @@ XWiki.xwikiExplorer = {
         // it calls the openParent method again, this time with the parent of the resource.
         var fetchCallback = function(xmlDoc, xmlText, rpcResponse, rpcRequest) {
           if (xmlDoc.httpResponseCode == 200) {    
-            var parentRes = XWiki.getResource(xmlDoc.data[0].parent);      	  
-        	var parentNode = xwikiExplorerTree.data.findById(parentRes.fullName);
-      	    // Store the parent / child relationship in the cache to avoid the need of another request if this
-      	    // relationship is searched again.
-      	    XWiki.xwikiExplorer.parentMap[resource.prefixedFullName] = parentRes;
-      	    if (rt.findById(parentRes.prefixedFullName) != null) {
-      	  	  // The node exists, open it.
-      	  	  XWiki.xwikiExplorer.openNode(rt, parentRes.prefixedFullName, true);
-      	    } else {
-      	      // The node does not exist, call the openParent method again with the parent we've found.
-      	      XWiki.xwikiExplorer.openParent(rt, parentRes);
-      	    }
-      	  }
+            var parentRes = XWiki.getResource(xmlDoc.data[0].parent);
+            var parentNode = xwikiExplorerTree.data.findById(parentRes.fullName);
+            // Store the parent / child relationship in the cache to avoid the need of another request if this
+            // relationship is searched again.
+            XWiki.xwikiExplorer.parentMap[resource.prefixedFullName] = parentRes;
+            if (rt.findById(parentRes.prefixedFullName) != null) {
+              // The node exists, open it.
+              XWiki.xwikiExplorer.openNode(rt, parentRes.prefixedFullName, true);
+            } else {
+              // The node does not exist, call the openParent method again with the parent we've found.
+              XWiki.xwikiExplorer.openParent(rt, parentRes);
+            }
+          }
         }
-        // FetchData call, this method will load the REST resource we've defined above. Note the fetchCallback.      	
+        // FetchData call, this method will load the REST resource we've defined above. Note the fetchCallback.          
         pageDS.fetchData(null, fetchCallback, null);      
       } else {
-      	// Get the parent/child relationship from the cache and open the parent.
-      	var parentRes = XWiki.xwikiExplorer.parentMap[resource.prefixedFullName];
-      	if (rt.findById(parentRes.prefixedFullName) != null) {
-      	  // The node exists, open it.
-      	  XWiki.xwikiExplorer.openNode(rt, parentRes.prefixedFullName, true);
-      	} else {
-      	  // The node does not exist, call the openParent method again with the parent we've found.
-      	  XWiki.xwikiExplorer.openParent(rt, parentRes);
-      	}
+        // Get the parent/child relationship from the cache and open the parent.
+        var parentRes = XWiki.xwikiExplorer.parentMap[resource.prefixedFullName];
+        if (rt.findById(parentRes.prefixedFullName) != null) {
+          // The node exists, open it.
+          XWiki.xwikiExplorer.openNode(rt, parentRes.prefixedFullName, true);
+        } else {
+          // The node does not exist, call the openParent method again with the parent we've found.
+          XWiki.xwikiExplorer.openParent(rt, parentRes);
+        }
       }
-    }	
+    }
   },
       
   /**
@@ -549,7 +551,7 @@ XWiki.xwikiExplorer = {
   openNodesFromInput : function() {
     
     // Build resource, selectedResource and get XWikiExplorerResultTree.
-  	var resource = XWiki.getResource($("xwikiExplorerInput").value);
+    var resource = XWiki.getResource($("xwikiExplorerInput").value);
     var selectedRes = XWiki.getResource("");
     var rt = xwikiExplorerTree.getData();       
         
@@ -558,22 +560,19 @@ XWiki.xwikiExplorer = {
       selectedRes = xwikiExplorerTree.getSelectedRecord().resource; 
     }
         
-    // Open wiki node.
-    //if (resource.wiki == "") { return; }
-    if (selectedRes.wiki != resource.wiki) {
+    // Open wiki node if the tree is displaying multiple wikis.
+    if (XWiki.xwikiExplorer.wiki == "all" && selectedRes.wiki != resource.wiki) {
       var wikiNode = XWiki.xwikiExplorer.openNode(rt, resource.wiki, true);
       if (wikiNode == null) { return; } 
     }
 
     // Open space node.
-    //if (resource.space == "") { return; }
     if (selectedRes.prefixedSpace != resource.prefixedSpace) {
       var spaceNode = XWiki.xwikiExplorer.openNode(rt, resource.prefixedSpace, true);
       if (spaceNode == null) { return; }
     }
     
     // Open page node.
-    //if (resource.name == "") { return; }
     if (selectedRes.prefixedFullName != resource.prefixedFullName) {
       var pageNode = XWiki.xwikiExplorer.openNode(rt, resource.prefixedFullName, true);
       if (pageNode == null) {  
@@ -610,68 +609,82 @@ XWiki.xwikiExplorer = {
    * If so we try to open the corresponding nodes with openNodesFromInput().
    */   
   inputObserver : function() {
-  	var inputValue = $("xwikiExplorerInput").value;
-  	// If the value of xwikiExplorerInput has changed during the last 2s.
-  	if (inputValue != "" && inputValue != XWiki.xwikiExplorer.inputValueCache) {
-  	  // Open nodes.
-  	  XWiki.xwikiExplorer.openNodesFromInput();
-  	  // Set the cache to the new value.
-  	  XWiki.xwikiExplorer.inputValueCache = inputValue;  	  
-  	}
-  	// Indefinitely recall this method every 2s.
-  	setTimeout(XWiki.xwikiExplorer.inputObserver, 2000);
+    var inputValue = $("xwikiExplorerInput").value;
+    // If the value of xwikiExplorerInput has changed during the last 2s.
+    if (inputValue != "" && inputValue != XWiki.xwikiExplorer.inputValueCache) {
+      // Open nodes.
+      XWiki.xwikiExplorer.openNodesFromInput();
+      // Set the cache to the new value.
+      XWiki.xwikiExplorer.inputValueCache = inputValue;
+    }
+    // Indefinitely recall this method every 2s.
+    setTimeout(XWiki.xwikiExplorer.inputObserver, 2000);
   },
   
   /**
    * Callback modifying xwikiExplorerInput value with the id (prefixedFullName) of the clicked node.
    */
   nodeClickCallback : function(viewer,node,recordNum) { 
-    $("xwikiExplorerInput").value = node.id; 
-  },
-  
-  /**
-   * Callback changing page parent on drag and drop.
-   */
-  folderDropCallback : function(moveList, newParent, index, dragTarget) {
-  	// Loop over dragged nodes.
-  	for (var i = 0; i < moveList.length; i++) {
-      var currentNode = moveList[i];
-      var url = XWiki.xwikiExplorer.baseRestURI + "wikis/"  + currentNode.resource.wiki + "/spaces/" 
-                  + currentNode.resource.space + "/pages/" + currentNode.resource.name
-                  + "?method=PUT";
-      // Modify nodes parent.            
-      // Note that the use of xml will be replaced by post paramaters when their use will 
-      // be available in xwiki-rest.
-      //var xmlStart = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-      var xmlStart = "";
-      new Ajax.Request(url, {
-          method: "put",
-          contentType: "application/xml",
-          postBody: xmlStart + '<page xmlns="http://www.xwiki.org"><parent>' 
-                      + newParent.resource.fullName + "</parent></page>"
-        });
-  	}
-  	// console.log(dragTarget); invalidate
-    this.Super("folderDrop", arguments);
-  },
-  
+    if (XWiki.xwikiExplorer.wiki == "all") {
+      $("xwikiExplorerInput").value = node.id; 
+    } else {
+      var resId = node.id;
+      resId = resId.substring(resId.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, resId.length);
+      $("xwikiExplorerInput").value = resId;
+    }
+  }, 
+
   /**
    * Create a text input that will be used as a suggest for the tree.
    * The modifications on this input will be observed and the resource entered in the input,
    * like Main.Dashboard for example, will be opened in the tree.
    */
-  createSuggest : function(displaySuggest, width) {  		
+  createSuggest : function(displaySuggest, width, defaultNode) {          
     // Add xwikiExplorer input to the document if not present.
+    var type = displaySuggest == false ? "hidden" : "text";
     if ($("xwikiExplorerInput") == null) {
-      document.write("<input id='xwikiExplorerInput' name='xwikiExplorerInput' type='hidden' style='width:"
-        + (width - 6) + "px;border-size:3px;'/>");
+      document.write("<input id='xwikiExplorerInput' name='xwikiExplorerInput' type='" + type + "' style='width:"
+        + (width - 6) + "px;border-size:3px;'/ value='" + defaultNode + "'>");
     }
     // Prepare suggest feature.
     if(displaySuggest) {      
-      $("xwikiExplorerInput").type = "text";
-      $("xwikiExplorerInput").observe("focus", function() { new ajaxSuggest(this, { script: '/xwiki/bin/view/Main/Tree?xpage=plain&', varname:'input' }); });  
-      // Call inputObserver for the first time, it will be called every 2s after that.
-      XWiki.xwikiExplorer.inputObserver();
+      var inputFocus = function() {
+          var suggest = new ajaxSuggest(this, { 
+              script: '/xwiki/rest/wikis/' + XWiki.constants.currentWiki + '/search?scope=name&', 
+              varname:'q' 
+            });
+          // We override XWiki's ajax suggest setSuggestions method to adapt it to XWiki REST search results.
+          suggest.setSuggestions = function (req) {
+              this.aSuggestions = [];
+              var xml = req.responseXML;
+              var results = xml.getElementsByTagName('searchResult');
+              for (var i = 0; i < results.length; i++) {  
+                var id = results[i].getElementsByTagName('id')[0].firstChild.nodeValue;
+                var space = results[i].getElementsByTagName('space')[0].firstChild.nodeValue;
+                var pageName = results[i].getElementsByTagName('pageName')[0].firstChild.nodeValue;
+                if (results[i].hasChildNodes()) {                 
+                  this.aSuggestions.push({ 
+                      "id": id, 
+                      "value": space + XWiki.constants.spacePageSeparator + pageName, 
+                      "info": ""
+                    });
+                }
+              }
+              this.idAs = "as_"+this.fld.id;
+              this.createList(this.aSuggestions);
+            };   
+        };
+      $("xwikiExplorerInput").observe("focus", inputFocus);  
+
+      // Call inputObserver for the first time when the first set of data arrives. 
+      // The method will be called every 2s after that. 
+      var callback = { 
+          callback : function(params) {
+              XWiki.xwikiExplorer.inputObserver();
+            },
+          params : { }
+        };                    
+      XWiki.xwikiExplorer.callbacks.dataArrived.push(callback);
     }
   },
  
@@ -686,28 +699,50 @@ XWiki.xwikiExplorer = {
   create : function(params) {  
    
     // Options initialization.
-  	var width = params.width == null ? 500 : params.width;
-   	var height = params.height == null ? 500 : params.height;
-  	var displaySuggest = (params.displaySuggest == null) ? true : params.displaySuggest;
-  	var displayAttachments = (params.displayAttachments == null) ? false : params.displayAttachments;
-  	var displayAttachmentsAtTop = (params.displayAttachmentsAtTop == null) ? true : params.displayAttachmentsAtTop;
-  	var displayAttachmentsWhenEmpty = 
-  	      (params.displayAttachmentsWhenEmpty == null) ? false : params.displayAttachmentsWhenEmpty;
-  	var displayLinks = (params.displayLinks == null) ? false : params.displayLinks;
-  	var blacklistedSpaces = (params.blacklistedSpaces == null) ? "" : params.blacklistedSpaces;  
-                
+    var wiki = params.wiki == null ? XWiki.constants.currentWiki : params.wiki;
+    var space = params.wiki == null ? null : params.space;
+    var width = params.width == null ? 500 : params.width;
+    var height = params.height == null ? 500 : params.height;
+    var defaultNode = params.defaultNode == null ? "" : params.defaultNode;
+    var displaySuggest = (params.displaySuggest == null) ? true : params.displaySuggest;
+    var displayAttachments = (params.displayAttachments == null) ? false : params.displayAttachments;
+    var displayAttachmentsAtTop = (params.displayAttachmentsAtTop == null) ? true : params.displayAttachmentsAtTop;
+    var displayAttachmentsWhenEmpty = 
+            (params.displayAttachmentsWhenEmpty == null) ? false : params.displayAttachmentsWhenEmpty;
+    var displayLinks = (params.displayLinks == null) ? false : params.displayLinks;
+    var blacklistedSpaces = (params.blacklistedSpaces == null) ? "" : params.blacklistedSpaces;  
+
+    // We have to print some CSS (eww) to override toucan table styles.
+    document.write("<style type='text/css'>div.listGrid td, div.listGrid table { margin: 0; padding: 0; }"
+                     + "div.listGrid td { border: 0; color: #333; }</style>");            
+
+    // Create dataSource depending on configuration (available scopes: farm, wiki, space).
+    var dataSource;
+    if (wiki == "all") {
+      // farm
+      dataSource = XWiki.xwikiExplorer.getDS(); 
+    } else {
+      if (space == null) {
+        // wiki
+        dataSource = XWiki.xwikiExplorer.getDS(wiki);
+      } else {
+        // space
+        dataSource = XWiki.xwikiExplorer.getDS(wiki, space);
+      }
+    }
+ 
     // Create xwikiExplorer widget.
     var tree = isc.TreeGrid.create({
-    	ID : "xwikiExplorerTree",        
-    	
-    	// Data management.
-        dataSource : XWiki.xwikiExplorer.getDS(),
+        ID : "xwikiExplorerTree",        
+        
+        // Data management.
+        dataSource : dataSource,
+
         autoFetchData : true,
         multiDSTree : true,
         
         // Callbacks.
         nodeClick : XWiki.xwikiExplorer.nodeClickCallback,        
-        folderDrop : XWiki.xwikiExplorer.folderDropCallback,
         
         // Look and feel.
         width : width,
@@ -719,13 +754,6 @@ XWiki.xwikiExplorer = {
         folderIcon : "$xwiki.getSkinFile('icons/silk/database.gif')",
         animateFolders: false,        
         
-        // Drag and drop.
-        // Those options are effective on Page nodes since they are the only ones to be draggable.
-        // They will be uncommented when the feature will be ready.
-        // canAcceptDroppedRecords: true,
-        // canDropOnLeaves: true,
-        // canReparentNodes: true,
-        
         // XWiki options.
         displayAttachments: displayAttachments,
         displayLinks: displayLinks,
@@ -735,7 +763,7 @@ XWiki.xwikiExplorer = {
       });           
       
     // Create suggest input. 
-    XWiki.xwikiExplorer.createSuggest(displaySuggest, width);                   
+    XWiki.xwikiExplorer.createSuggest(displaySuggest, width, defaultNode);                   
          
     return tree;
   }  

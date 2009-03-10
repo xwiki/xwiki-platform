@@ -72,9 +72,6 @@ constants: {
  *   name: "WebHome", attachment: "" }
  * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main", 
  *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome", 
- *   name: "WebHome", attachment: "" }
- * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main", 
- *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome", 
  *   name: "WebHome", attachment: "attach.zip" }
  *
  * @param fullName fullName of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).

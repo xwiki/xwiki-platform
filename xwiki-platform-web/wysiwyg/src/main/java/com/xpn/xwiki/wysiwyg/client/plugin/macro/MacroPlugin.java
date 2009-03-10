@@ -26,6 +26,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.CollapseExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.InsertExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.RefreshExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.EditMacroDialog;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.SelectMacroDialog;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
 import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
@@ -64,6 +65,11 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
      * The dialog used for editing macro parameters and content.
      */
     private EditMacroDialog editDialog;
+
+    /**
+     * The dialog used for selecting one of the available macros before insertion.
+     */
+    private SelectMacroDialog selectDialog;
 
     /**
      * Hides macro meta data and displays macro output in a read only text box.
@@ -126,6 +132,13 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
             editDialog = null;
         }
 
+        if (selectDialog != null) {
+            selectDialog.hide();
+            selectDialog.removeFromParent();
+            selectDialog.removePopupListener(this);
+            selectDialog = null;
+        }
+
         menuExtension.destroy();
 
         getTextArea().getCommandManager().unregisterCommand(REFRESH);
@@ -184,6 +197,40 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
     }
 
     /**
+     * Shows the insert macro dialog.
+     */
+    public void insert()
+    {
+        insert(true);
+    }
+
+    /**
+     * Either shows the select macro dialog or opens the edit macro dialog for the selected macro, depending in the
+     * given flag.
+     * 
+     * @param show whether to show the select macro dialog or the edit macro dialog for the selected macro
+     */
+    private void insert(boolean show)
+    {
+        if (show) {
+            // We save the selection because in some browsers, including Internet Explorer, by clicking on the
+            // dialog we loose the selection in the target document.
+            selectionPreserver.saveSelection();
+            getSelectDialog().center();
+        } else {
+            if (getSelectDialog().isCanceled()) {
+                getTextArea().setFocus(true);
+                selectionPreserver.restoreSelection();
+            } else {
+                MacroCall macroCall = new MacroCall();
+                macroCall.setName(getSelectDialog().getSelectedMacro());
+                getEditDialog().setMacroCall(macroCall);
+                getEditDialog().center();
+            }
+        }
+    }
+
+    /**
      * We use this method in order to lazy load the edit dialog.
      * 
      * @return the dialog used for editing macro parameters and content
@@ -198,6 +245,20 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
     }
 
     /**
+     * We use this method in order to lazy load the select dialog.
+     * 
+     * @return the dialog used for selecting one of the available macros before insertion
+     */
+    private SelectMacroDialog getSelectDialog()
+    {
+        if (selectDialog == null) {
+            selectDialog = new SelectMacroDialog(getConfig());
+            selectDialog.addPopupListener(this);
+        }
+        return selectDialog;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see PopupListener#onPopupClosed(SourcesPopupEvents, boolean)
@@ -206,6 +267,8 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
     {
         if (sender == getEditDialog() && !autoClosed) {
             edit(false);
+        } else if (sender == getSelectDialog() && !autoClosed) {
+            insert(false);
         }
     }
 }

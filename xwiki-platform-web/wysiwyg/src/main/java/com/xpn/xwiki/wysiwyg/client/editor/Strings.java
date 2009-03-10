@@ -21,6 +21,8 @@ public interface Strings extends Constants
 
     String apply();
 
+    String select();
+
     String attachment();
 
     String backColor();
@@ -106,6 +108,12 @@ public interface Strings extends Constants
     String macroEdit();
 
     String macroEditDialogCaption();
+
+    String macroInsert();
+
+    String macroInsertDialogCaption();
+
+    String macroInsertDialogTitle();
 
     String macroParameterMandatory();
 

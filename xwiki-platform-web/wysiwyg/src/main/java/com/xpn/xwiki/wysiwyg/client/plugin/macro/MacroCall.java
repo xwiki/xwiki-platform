@@ -47,12 +47,21 @@ public class MacroCall
     /**
      * The arguments passed to the macro.
      */
-    private final Map<String, String> arguments;
+    private final Map<String, String> arguments = new HashMap<String, String>();
 
     /**
      * The content of the macro.
      */
     private String content;
+
+    /**
+     * Creates a new empty macro call.
+     */
+    public MacroCall()
+    {
+        name = "";
+        content = "";
+    }
 
     /**
      * Creates a new macro call from a start comment node's value.
@@ -67,7 +76,6 @@ public class MacroCall
         name = startMacroComment.substring(start, end);
 
         // Extract macro arguments.
-        arguments = new HashMap<String, String>();
         // Look for the first argument.
         start = end + SEPARATOR.length();
         int equalIndex = startMacroComment.indexOf('=', start);

@@ -101,6 +101,9 @@ public interface Images extends ImageBundle
     @Resource("macro_edit.gif")
     AbstractImagePrototype macroEdit();
 
+    @Resource("macro_insert.gif")
+    AbstractImagePrototype macroInsert();
+
     @Resource("macro_refresh.gif")
     AbstractImagePrototype macroRefresh();
 

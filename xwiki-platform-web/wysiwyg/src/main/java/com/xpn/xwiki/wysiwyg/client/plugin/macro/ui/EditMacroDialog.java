@@ -47,11 +47,6 @@ import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
 public class EditMacroDialog extends ComplexDialogBox implements ClickListener
 {
     /**
-     * The CSS class name used when the dialog is in loading state.
-     */
-    private static final String STYLE_NAME_LOADING = "loading";
-
-    /**
      * The call-back used by the edit dialog to be notified when a macro descriptor is being received from the server.
      * Only the last request for a macro descriptor triggers an update of the edit dialog.
      */
@@ -145,7 +140,7 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
         title = new Label();
         getHeader().add(title);
 
-        apply = new Button("Apply");
+        apply = new Button(Strings.INSTANCE.apply());
         apply.addClickListener(this);
         getFooter().add(apply);
     }
@@ -158,7 +153,7 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
     private void fill(MacroDescriptor macroDescriptor)
     {
         // First get the dialog out of the loading state.
-        getBody().removeStyleName(STYLE_NAME_LOADING);
+        setLoading(false);
 
         // Set the macro description as the tool tip for the title.
         title.setTitle(macroDescriptor.getDescription());
@@ -197,29 +192,6 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
     }
 
     /**
-     * If an error occurred while retrieving a macro descriptor then this method can be used to display the error
-     * message to the user.
-     * 
-     * @param caught the exception that has been caught
-     */
-    private void showError(Throwable caught)
-    {
-        // First get the dialog out of the loading state.
-        getBody().removeStyleName(STYLE_NAME_LOADING);
-
-        String message = caught.getLocalizedMessage();
-        if (StringUtils.isEmpty(message)) {
-            // Use a default error message.
-            message = Strings.INSTANCE.errorServerRequestFailed();
-        }
-
-        Label error = new Label(message);
-        error.addStyleName("errormessage");
-
-        getBody().add(error);
-    }
-
-    /**
      * @return the macro call being edited
      */
     public MacroCall getMacroCall()
@@ -247,7 +219,7 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
         apply.setEnabled(false);
 
         // Put the dialog in loading state.
-        getBody().addStyleName(STYLE_NAME_LOADING);
+        setLoading(true);
 
         // Request macro descriptor.
         WysiwygService.Singleton.getInstance().getMacroDescriptor(macroCall.getName(), config.getParameter("syntax"),

@@ -208,4 +208,12 @@ public interface WysiwygService extends RemoteService
      *             looking for it
      */
     MacroDescriptor getMacroDescriptor(String macroName, String syntax) throws XWikiGWTException;
+
+    /**
+     * @param syntaxId the string identifier for the storage syntax
+     * @return the list of available macro names for the specified syntax
+     * @throws XWikiGWTException if an exception is caught while retrieving the list of available macros for the
+     *             specified syntax
+     */
+    List<String> getMacros(String syntaxId) throws XWikiGWTException;
 }

@@ -108,11 +108,11 @@ public class ObjectData extends IndexData
     {
         try {
             if (baseObject != null) {
-                Object[] propertyNames = baseObject.getPropertyNames();
-                for (int i = 0; i < propertyNames.length; i++) {
-                    BaseProperty baseProperty = (BaseProperty) baseObject.getField((String) propertyNames[i]);
+                String[] propertyNames = baseObject.getPropertyNames();
+                for (String propertyName : propertyNames) {
+                    BaseProperty baseProperty = (BaseProperty) baseObject.getField(propertyName);
                     if ((baseProperty != null) && (baseProperty.getValue() != null)) {
-                        PropertyInterface prop = baseObject.getxWikiClass(context).getField((String) propertyNames[i]);
+                        PropertyInterface prop = baseObject.getxWikiClass(context).getField(propertyName);
                         if (!(prop instanceof PasswordClass)) {
                             contentText.append(baseProperty.getValue().toString());
                         }

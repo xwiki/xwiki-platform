@@ -72,14 +72,14 @@ public class MacroMenuExtension implements Updatable, MenuListener
     private MenuItem expand;
 
     /**
-     * The menu item used to refresh all the macros.
-     */
-    private MenuItem refresh;
-
-    /**
      * The menu item used to edit the selected macro.
      */
     private MenuItem edit;
+
+    /**
+     * The menu item used to insert one of the available macros.
+     */
+    private MenuItem insert;
 
     /**
      * User interface extension for the editor menu bar.
@@ -105,7 +105,7 @@ public class MacroMenuExtension implements Updatable, MenuListener
     {
         this.plugin = plugin;
 
-        refresh = new MenuItem(Strings.INSTANCE.macroRefresh(), new com.google.gwt.user.client.Command()
+        MenuItem refresh = new MenuItem(Strings.INSTANCE.macroRefresh(), new com.google.gwt.user.client.Command()
         {
             public void execute()
             {
@@ -135,8 +135,18 @@ public class MacroMenuExtension implements Updatable, MenuListener
             }
         });
         edit.setIcon(Images.INSTANCE.macroEdit().createElement());
+        insert = new MenuItem(Strings.INSTANCE.macroInsert(), new com.google.gwt.user.client.Command()
+        {
+            public void execute()
+            {
+                plugin.insert();
+            }
+        });
+        insert.setIcon(Images.INSTANCE.macroInsert().createElement());
 
         insertSubMenuEntries = new ArrayList<UIObject>();
+        insertSubMenuEntries.add(insert);
+        insertSubMenuEntries.add(new MenuItemSeparator());
         insertSubMenuEntries.add(refresh);
         insertSubMenuEntries.add(new MenuItemSeparator());
         insertSubMenuEntries.add(collapse);
@@ -221,6 +231,7 @@ public class MacroMenuExtension implements Updatable, MenuListener
                 macroSubMenu.clearItems();
                 macroSubMenu.addAll(insertSubMenuEntries);
             }
+            insert.setEnabled(plugin.getTextArea().getCommandManager().isEnabled(MacroPlugin.INSERT));
             collapse.setText(Strings.INSTANCE.macroCollapseAll());
             expand.setText(Strings.INSTANCE.macroExpandAll());
         }

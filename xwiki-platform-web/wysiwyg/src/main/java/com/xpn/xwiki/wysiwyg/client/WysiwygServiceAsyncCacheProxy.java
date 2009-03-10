@@ -61,6 +61,12 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
         new HashMap<String, Map<String, MacroDescriptor>>();
 
     /**
+     * The cache for available macros. The key is the syntax identifier and the value if the list of macro names
+     * available for that syntax.
+     */
+    private final Map<String, List<String>> macrosCache = new HashMap<String, List<String>>();
+
+    /**
      * Creates a new cache proxy for the given service.
      * 
      * @param service the service to be cached.
@@ -275,5 +281,36 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
                 async.onSuccess(result);
             }
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#getMacros(String, AsyncCallback)
+     */
+    public void getMacros(final String syntaxId, final AsyncCallback<List<String>> async)
+    {
+        // First let's look in the cache.
+        List<String> macros = macrosCache.get(syntaxId);
+        if (macros != null) {
+            async.onSuccess(macros);
+        } else {
+            // The list of macro names wasn't found in the cache. We have to make the request to the server.
+            service.getMacros(syntaxId, new AsyncCallback<List<String>>()
+            {
+                public void onFailure(Throwable caught)
+                {
+                    async.onFailure(caught);
+                }
+
+                public void onSuccess(List<String> result)
+                {
+                    if (result != null) {
+                        macrosCache.put(syntaxId, result);
+                    }
+                    async.onSuccess(result);
+                }
+            });
+        }
     }
 }

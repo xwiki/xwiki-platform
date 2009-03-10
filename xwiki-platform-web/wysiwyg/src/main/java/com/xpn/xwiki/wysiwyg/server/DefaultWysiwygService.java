@@ -518,4 +518,24 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             throw new XWikiGWTException(t.getLocalizedMessage(), t.toString(), -1, -1);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#getMacros(String)
+     */
+    public List<String> getMacros(String syntaxId) throws XWikiGWTException
+    {
+        try {
+            List<String> macros = new ArrayList<String>();
+            for (Object key : Utils.getComponentManager().lookupMap(Macro.ROLE).keySet()) {
+                macros.add(key.toString());
+            }
+            Collections.sort(macros);
+            return macros;
+        } catch (Throwable t) {
+            LOG.error("Exception while retrieving the list of available macros.", t);
+            throw new XWikiGWTException(t.getLocalizedMessage(), t.toString(), -1, -1);
+        }
+    }
 }

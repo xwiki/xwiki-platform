@@ -20,6 +20,9 @@
 package com.xpn.xwiki.wysiwyg.client.widget;
 
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
  * A dialog box that can be part of a wizard and whose content is structured in three parts: the header, the body and
@@ -31,6 +34,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
  */
 public class ComplexDialogBox extends CompositeDialogBox
 {
+    /**
+     * The CSS class name used when the dialog is in loading state.
+     */
+    private static final String STYLE_NAME_LOADING = "loading";
+
     /**
      * The dialog header, containing the title of the dialog and optional wizard navigation buttons (back and forth).
      */
@@ -50,6 +58,12 @@ public class ComplexDialogBox extends CompositeDialogBox
      * Flag indicating whether the dialog was canceled or not. This flag is reset each time before the dialog is shown.
      */
     private boolean canceled;
+
+    /**
+     * Flag indicating whether the dialog is in loading state or not. Usually when the dialog is in loading state it
+     * means it is waiting for the response of a server request.
+     */
+    private boolean loading;
 
     /**
      * Creates a new complex dialog box.
@@ -129,5 +143,53 @@ public class ComplexDialogBox extends CompositeDialogBox
     protected void setCanceled(boolean canceled)
     {
         this.canceled = canceled;
+    }
+
+    /**
+     * @return {@code true} if the dialog is in loading state, {@code false} otherwise
+     */
+    protected boolean isLoading()
+    {
+        return loading;
+    }
+
+    /**
+     * Puts the dialog in loading state or get it out of it.
+     * 
+     * @param loading {@code true} to put the dialog in loading state, {@code false} to get it out of it
+     */
+    protected void setLoading(boolean loading)
+    {
+        if (this.loading != loading) {
+            this.loading = loading;
+            if (loading) {
+                body.addStyleName(STYLE_NAME_LOADING);
+            } else {
+                body.removeStyleName(STYLE_NAME_LOADING);
+            }
+        }
+    }
+
+    /**
+     * If an error occurred on the server while fulfilling the request then this method can be used to display the error
+     * message to the user.
+     * 
+     * @param caught the exception that has been caught
+     */
+    protected void showError(Throwable caught)
+    {
+        // First get the dialog out of the loading state.
+        setLoading(false);
+
+        String message = caught.getLocalizedMessage();
+        if (StringUtils.isEmpty(message)) {
+            // Use a default error message.
+            message = Strings.INSTANCE.errorServerRequestFailed();
+        }
+
+        Label error = new Label(message);
+        error.addStyleName("errormessage");
+
+        getBody().add(error);
     }
 }

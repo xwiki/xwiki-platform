@@ -37,14 +37,20 @@
     <dependency>
       <groupId>org.codehaus.swizzle</groupId>
       <artifactId>swizzle-confluence</artifactId>
-      <version>${swizzle.swizzle-confluence.version}</version>    
+      <version>${swizzle.swizzle-confluence.version}</version>
       <classifier>xwiki</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>xmlrpc</groupId>
+          <artifactId>xmlrpc-client</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-xmlrpc-model</artifactId>
       <version>${pom.version}</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.apache.xmlrpc</groupId>
       <artifactId>xmlrpc-client</artifactId>

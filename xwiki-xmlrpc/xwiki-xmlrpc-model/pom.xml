@@ -39,6 +39,17 @@
       <artifactId>swizzle-confluence</artifactId>
       <version>${swizzle.swizzle-confluence.version}</version>
       <classifier>xwiki</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>xmlrpc</groupId>
+          <artifactId>xmlrpc-client</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlrpc</groupId>
+      <artifactId>xmlrpc-client</artifactId>
+      <version>3.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

@@ -60,10 +60,39 @@ public class InsertHTMLExecutable extends AbstractExecutable
         }
         // At this point the selection should be collapsed.
         Range range = selection.getRangeAt(0);
+        // NOTE: Range#insertNode(Node) is not allowed to change the start point of the target range. This means that if
+        // the range starts inside a text node then it will start in the same text node after the insertion, but at the
+        // end (of course, the text node would have been split).
         range.insertNode(container.extractContents());
+        // In order to perfectly wrap the inserted nodes (see also the previous comment) we have to contract the range.
+        contractRange(range);
         selection.removeAllRanges();
         selection.addRange(range);
 
         return true;
+    }
+
+    /**
+     * Contracts the given range in order to perfectly wrap the inserted nodes.
+     * 
+     * @param range the {@link Range} to be contracted
+     */
+    private void contractRange(Range range)
+    {
+        if (range.isCollapsed()) {
+            return;
+        }
+        // If the range starts at the end of a DOM node that has value (text, comment, CDATA, etc.) then we have to move
+        // the start point right after that node.
+        String data = range.getStartContainer().getNodeValue();
+        if (data != null && range.getStartOffset() == data.length()) {
+            range.setStartAfter(range.getStartContainer());
+        }
+        // If the range ends at the beginning of a DOM node that has value (text, comment, CDATA, etc.) then we have to
+        // move the end point right before that node.
+        data = range.getEndContainer().getNodeValue();
+        if (data != null && range.getEndOffset() == 0) {
+            range.setEndBefore(range.getEndContainer());
+        }
     }
 }

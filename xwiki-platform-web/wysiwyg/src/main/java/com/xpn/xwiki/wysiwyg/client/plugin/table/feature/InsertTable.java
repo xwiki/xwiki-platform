@@ -21,9 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.ui.PushButton;
+import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
@@ -36,7 +36,6 @@ import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
 import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -57,11 +56,6 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     private TableConfigDialog dialog;
 
     /**
-     * RTA Selection preserver.
-     */
-    private SelectionPreserver selectionPreserver;
-
-    /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
      * their own PushButton.
      * 
@@ -71,7 +65,6 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     {
         super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.insertTable().createImage(), plugin),
             Strings.INSTANCE.insertTable(), plugin);
-        selectionPreserver = new SelectionPreserver(plugin.getTextArea());
     }
 
     /**
@@ -96,10 +89,6 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     public void showDialog(RichTextArea rta)
     {
         if (getButton().isEnabled()) {
-            // We save the selection because in some browsers, including Internet Explorer, by clicking on the
-            // table wizard we loose the selection in the rich text area and the symbol gets inserted at the
-            // beginning of the text.
-            selectionPreserver.saveSelection();
             getDialog().center();
         }
     }
@@ -198,7 +187,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractTableFeature#execute(RichTextArea, String)
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
@@ -216,7 +205,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractTableFeature#isEnabled(RichTextArea)
      */
     public boolean isEnabled(RichTextArea rta)
     {
@@ -227,12 +216,10 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     /**
      * {@inheritDoc}
      * 
-     * @see PopupListener#onPopupClosed(PopupPanel, boolean)
+     * @see PopupListener#onPopupClosed(SourcesPopupEvents, boolean)
      */
     public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
     {
-        // We restore the selection on the text area because it may have been lost when the dialog was opened.
-        selectionPreserver.restoreSelection();
         if (!autoClosed && !getDialog().isCanceled()) {
             // Call the command again, passing the insertion configuration as a JSON object.
             getPlugin().getTextArea().getCommandManager().execute(

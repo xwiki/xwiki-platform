@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.ui.KeyboardListener;
+import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Document;
 import com.xpn.xwiki.wysiwyg.client.dom.Element;
@@ -35,6 +36,62 @@ import com.xpn.xwiki.wysiwyg.client.dom.Range;
  */
 public class IEBehaviorAdjuster extends BehaviorAdjuster
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see BehaviorAdjuster#onLoad(Widget)
+     */
+    public void onLoad(Widget sender)
+    {
+        super.onLoad(sender);
+        ensureSelectionIsPreserved(getTextArea().getDocument());
+    }
+
+    /**
+     * Ensures that the selection of the given document is preserved when the document looses focus. This method is
+     * required because IE has only one selection object per top level window. This means that when a child document
+     * looses the focus its selection object will return ranges from the parent document.
+     * 
+     * @param document the document whose selection has to be preserved
+     */
+    private native void ensureSelectionIsPreserved(Document document)
+    /*-{
+        // If there is a previously stored selection then restore it. We have to do this before the edited document
+        // gets focused to allow users to have a different selection than the stored one (by clicking inside the edited
+        // document when it doesn't have the focus).
+        document.body.attachEvent('onbeforeactivate', function(event) {
+            switch (typeof(document.body.__bookmark)) {
+                case 'string':
+                    // The bookmark is an opaque string that can be used with moveToBookmark to recreate the original
+                    // text range.
+                    var textRange = document.body.createTextRange();
+                    textRange.moveToBookmark(document.body.__bookmark);
+                    textRange.select();
+                    break;
+                case 'object':
+                    // The bookmark is a reference to the element previously selected.
+                    var controlRange = document.body.createControlRange();
+                    controlRange.addElement(document.body.__bookmark);
+                    controlRange.select();
+                    break;
+            }
+        });
+
+        // Save the selection when the edited document is about to loose focus.
+        document.body.attachEvent('onbeforedeactivate', function(event) {
+            document.body.__bookmark = null;
+            var range = document.selection.createRange();
+            // Check the type of the range and if the range is inside the edited document.
+            if (range.getBookmark && range.parentElement().ownerDocument == document) {
+                // Text range.
+                document.body.__bookmark = range.getBookmark();
+            } else if (range.item && range.length > 0 && range.item(0).ownerDocument == document) {
+                // Control range.
+                document.body.__bookmark = range.item(0);
+            }
+        });
+    }-*/;
+
     /**
      * {@inheritDoc}
      * 

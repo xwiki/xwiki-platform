@@ -32,7 +32,6 @@ import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
 import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -51,11 +50,6 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
      * Importer dialog used to communicate with the user.
      */
     private ImporterDialog importerDialog;
-
-    /**
-     * A {@link SelectionPreserver} for saving / restoring user selections on the main wysiwyg editor.
-     */
-    private SelectionPreserver selectionPreserver;
 
     /**
      * The toolbar extension used to add the link buttons to the toolbar.
@@ -77,7 +71,6 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
 
         if (toolBarExtension.getFeatures().length > 0) {
             getUIExtensionList().add(toolBarExtension);
-            selectionPreserver = new SelectionPreserver(textArea);
         }
     }
 
@@ -109,8 +102,6 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
     public void onClick(Widget sender)
     {
         if (sender == importPushButton) {
-            // save the selection
-            selectionPreserver.saveSelection();
             getImporterDialog().center();
         }
     }
@@ -120,9 +111,10 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
      */
     public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
     {
-        selectionPreserver.restoreSelection();
         if (importerDialog.getResult() != null) {
             getTextArea().getCommandManager().execute(Command.INSERT_HTML, importerDialog.getResult());
+        } else {
+            getTextArea().setFocus(true);
         }
     }
 

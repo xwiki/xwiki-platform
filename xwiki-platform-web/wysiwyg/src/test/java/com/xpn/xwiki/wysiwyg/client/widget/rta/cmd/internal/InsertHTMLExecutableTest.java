@@ -185,4 +185,44 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
         assertTrue(executable.execute(rta, "<img/>"));
         assertEquals("<ul><li>f<img>ar</li></ul>", clean(rta.getHTML()));
     }
+
+    /**
+     * Tests if the selection is contracted to perfectly wrap the inserted nodes.
+     */
+    public void testSelectionContractionAfterInsertion()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestSelectionContractionAfterInsertion();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the selection is contracted to perfectly wrap the inserted nodes.
+     */
+    private void doTestSelectionContractionAfterInsertion()
+    {
+        rta.setHTML("2009");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild(), 3);
+        select(range);
+
+        assertEquals("00", rta.getDocument().getSelection().toString());
+        assertTrue(executable.execute(rta, "<img title=\"march 11th\"/>"));
+        assertEquals("2<img title=\"march 11th\">9", clean(rta.getHTML()));
+
+        // Lets test if the selection wraps the inserted image.
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertEquals(getBody(), range.getStartContainer());
+        assertEquals(getBody(), range.getEndContainer());
+        assertEquals(1, range.getStartOffset());
+        assertEquals(2, range.getEndOffset());
+    }
 }

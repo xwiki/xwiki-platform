@@ -20,6 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
@@ -120,5 +122,105 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         rta.getDocument().getSelection().getRangeAt(0).setStartAfter(getBody().getFirstChild());
         assertTrue(new InsertHTMLExecutable().execute(rta, "*"));
         assertEquals("<span></span>*", clean(rta.getHTML()));
+    }
+
+    /**
+     * Tests that text selection is not lost when the rich text area looses focus.
+     */
+    public void testTextSelectionIsNotLostOnBlur()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestTextSelectionIsNotLostOnBlur();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests that text selection is not lost when the rich text area looses focus.
+     */
+    private void doTestTextSelectionIsNotLostOnBlur()
+    {
+        // We use a text input to move the focus out of the rich text area.
+        TextBox textBox = new TextBox();
+        RootPanel.get().add(textBox);
+
+        rta.setHTML("1984");
+
+        // Make a text selection.
+        String selectedText = "98";
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild(), 3);
+        select(range);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        // Move the focus out of the rich text area.
+        textBox.setFocus(true);
+
+        // Move the focus back and test the selection.
+        rta.setFocus(true);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        // Cleanup
+        textBox.removeFromParent();
+    }
+
+    /**
+     * Tests that control selection is not lost when the rich text area looses focus.
+     */
+    public void testControlSelectionIsNotLostOnBlur()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestControlSelectionIsNotLostOnBlur();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests that control selection is not lost when the rich text area looses focus.
+     */
+    private void doTestControlSelectionIsNotLostOnBlur()
+    {
+        // We use a text input to move the focus out of the rich text area.
+        TextBox textBox = new TextBox();
+        RootPanel.get().add(textBox);
+
+        rta.setHTML("):<img/>:(");
+
+        // Make a control selection.
+        Range range = rta.getDocument().createRange();
+        range.selectNode(getBody().getChildNodes().getItem(1));
+        select(range);
+
+        // Verify the control selection.
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertEquals(getBody(), range.getStartContainer());
+        assertEquals(getBody(), range.getEndContainer());
+        assertEquals(1, range.getStartOffset());
+        assertEquals(2, range.getEndOffset());
+
+        // Move the focus out of the rich text area.
+        textBox.setFocus(true);
+
+        // Move the focus back and test the selection.
+        rta.setFocus(true);
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertEquals(getBody(), range.getStartContainer());
+        assertEquals(getBody(), range.getEndContainer());
+        assertEquals(1, range.getStartOffset());
+        assertEquals(2, range.getEndOffset());
+
+        // Cleanup
+        textBox.removeFromParent();
     }
 }

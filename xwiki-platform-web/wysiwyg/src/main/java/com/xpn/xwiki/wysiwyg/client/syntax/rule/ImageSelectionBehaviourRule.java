@@ -51,7 +51,6 @@ public class ImageSelectionBehaviourRule implements ValidationRule
     {
         return new String[] {"bold", "italic", "underline", "strikethrough", "subscript", "superscript",
             "unorderedlist", "orderedlist", "outdent", "indent", "format", "hr", "symbol", "inserttable", 
-            "deletetable"};
+            "deletetable", "importer"};
     }
-
 }

@@ -38,7 +38,6 @@ import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
 import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -63,11 +62,6 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
      * The dialog for create a link.
      */
     private LinkDialog linkDialog;
-
-    /**
-     * Selection preserver to store the selection before and after the dialog showing.
-     */
-    private SelectionPreserver selectionPreserver;
 
     /**
      * The toolbar extension used to add the link buttons to the toolbar.
@@ -106,7 +100,6 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().addClickListener(this);
             getUIExtensionList().add(toolBarExtension);
-            selectionPreserver = new SelectionPreserver(textArea);
             // Initialize the metadata extractor, to handle link metadatas
             metaDataExtractor = new LinkMetaDataExtractor();
             // do the initial extracting on the loaded document
@@ -187,13 +180,9 @@ public class LinkPlugin extends AbstractPlugin implements ClickListener, PopupLi
             }
 
             getLinkDialog().setLinkConfig(linkParams);
-            // save the selection
-            selectionPreserver.saveSelection();
             // show the dialog
             getLinkDialog().center();
         } else {
-            // restore selection to be sure to execute the command on the right selection.
-            selectionPreserver.restoreSelection();
             String url = getLinkDialog().getLink();
             if (url != null) {
                 getTextArea().getCommandManager().execute(Command.CREATE_LINK, url);

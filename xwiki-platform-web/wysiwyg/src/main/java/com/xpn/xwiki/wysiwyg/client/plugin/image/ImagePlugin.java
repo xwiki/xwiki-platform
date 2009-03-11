@@ -33,7 +33,6 @@ import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
 import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -60,19 +59,14 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
     /**
-     * Selection preserver to store the selection before and after the dialog showing.
-     */
-    private SelectionPreserver selectionPreserver;
-    
-    /**
      * Image medadata extractor, to handle the images metadata.
      */
     private ImageMetaDataExtractor metaDataExtractor;
-    
+
     /**
      * Behavior adjuster to handle the images correclty.
      */
-    private ImageBehaviorAdjuster behaviorAdjuster; 
+    private ImageBehaviorAdjuster behaviorAdjuster;
 
     /**
      * {@inheritDoc}
@@ -93,7 +87,6 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().addClickListener(this);
             getUIExtensionList().add(toolBarExtension);
-            selectionPreserver = new SelectionPreserver(textArea);
             // Create an image metadata extractor for this text area
             metaDataExtractor = new ImageMetaDataExtractor();
             // do the initial extracting on the loaded document
@@ -122,7 +115,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
         imageDialog.removeFromParent();
         imageDialog = null;
 
-        if (toolBarExtension.getFeatures().length > 0) {        
+        if (toolBarExtension.getFeatures().length > 0) {
             toolBarExtension.clearFeatures();
             getTextArea().removeClickListener(this);
             // If a metadata extractor was created and setup, remove it
@@ -161,8 +154,6 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
     public void onImage(boolean show)
     {
         if (show) {
-            // store current selection, we'll need it after to add the image in the right place
-            selectionPreserver.saveSelection();
             ImageConfig config = new ImageConfig();
             String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
             if (imageParam != null) {
@@ -174,8 +165,6 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
             getImageDialog().setImageConfig(config);
             getImageDialog().center();
         } else {
-            // restore the selection before executing the command.
-            selectionPreserver.restoreSelection();
             String imageHTML = getImageDialog().getImageHTMLBlock();
             if (imageHTML != null) {
                 getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageHTML);

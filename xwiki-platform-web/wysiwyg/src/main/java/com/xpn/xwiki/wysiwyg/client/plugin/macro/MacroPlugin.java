@@ -31,7 +31,6 @@ import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
 import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -88,12 +87,6 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
     private MacroMenuExtension menuExtension;
 
     /**
-     * Used to preserve the selection of the rich text area while the dialog is opened. Some browsers like Internet
-     * Explorer loose the selection if you click inside a dialog box.
-     */
-    private SelectionPreserver selectionPreserver;
-
-    /**
      * {@inheritDoc}
      * 
      * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
@@ -111,8 +104,6 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
         getTextArea().getCommandManager().registerCommand(COLLAPSE, new CollapseExecutable(selector, true));
         getTextArea().getCommandManager().registerCommand(EXPAND, new CollapseExecutable(selector, false));
         getTextArea().getCommandManager().registerCommand(INSERT, new InsertExecutable(selector));
-
-        selectionPreserver = new SelectionPreserver(getTextArea());
 
         menuExtension = new MacroMenuExtension(this);
         getUIExtensionList().add(menuExtension.getExtension());
@@ -179,14 +170,9 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
     private void edit(boolean show)
     {
         if (show) {
-            // We save the selection because in some browsers, including Internet Explorer, by clicking on the
-            // dialog we loose the selection in the target document.
-            selectionPreserver.saveSelection();
             getEditDialog().setMacroCall(new MacroCall(getTextArea().getCommandManager().getStringValue(INSERT)));
             getEditDialog().center();
         } else {
-            // We restore the selection in the target document before executing the command.
-            selectionPreserver.restoreSelection();
             if (getEditDialog().isCanceled()
                 || !getTextArea().getCommandManager().execute(INSERT, getEditDialog().getMacroCall().toString())) {
                 // We get here if the dialog has been closed by clicking the close button or if the command failed.
@@ -213,14 +199,10 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
     private void insert(boolean show)
     {
         if (show) {
-            // We save the selection because in some browsers, including Internet Explorer, by clicking on the
-            // dialog we loose the selection in the target document.
-            selectionPreserver.saveSelection();
             getSelectDialog().center();
         } else {
             if (getSelectDialog().isCanceled()) {
                 getTextArea().setFocus(true);
-                selectionPreserver.restoreSelection();
             } else {
                 MacroCall macroCall = new MacroCall();
                 macroCall.setName(getSelectDialog().getSelectedMacro());

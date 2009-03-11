@@ -319,5 +319,13 @@ public interface Strings extends Constants
 
     String importerCancelButtonCaption();
 
+    String wizardCancel();
+    
+    String wizardPrevious();    
+    
+    String wizardNext();
+    
+    String wizardFinish();
+
     String errorServerRequestFailed();
 }

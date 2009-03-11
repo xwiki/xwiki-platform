@@ -244,6 +244,19 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
   margin: 0 6px;
 }
 
+/* Wizard styles */
+.xWizardDialog .xDialogHeader .title {
+  padding-left: 75px;
+}
+
+.xWizardDialog .xDialogHeader .button-container {
+  position: absolute;
+}
+
+.xWizardDialog .xDialogFooter button {
+  margin-left: 5px;
+}
+
 .gwt-TabBar {
 }
 

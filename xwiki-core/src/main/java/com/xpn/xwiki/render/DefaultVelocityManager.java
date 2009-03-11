@@ -77,7 +77,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
         // guaranteed it is defined when this method is called.
         VelocityContext vcontext =
             (VelocityContext) this.execution.getContext().getProperty(
-                VelocityExecutionContextInitializer.REQUEST_VELOCITY_CONTEXT);
+                VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
 
         // Bridge. To be removed later.
         if (vcontext.get("util") == null) {

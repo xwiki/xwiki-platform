@@ -36,9 +36,9 @@ import org.xwiki.context.ExecutionContextInitializerException;
 public class VelocityExecutionContextInitializer implements ExecutionContextInitializer
 {
     /**
-     * The id under wich the Velocity Context is stored in the Execution Context.
+     * The id under which the Velocity Context is stored in the Execution Context.
      */
-    public static final String REQUEST_VELOCITY_CONTEXT = "velocityContext";
+    public static final String VELOCITY_CONTEXT_ID = "velocityContext";
 
     /**
      * The Velocity context factory component used for creating the Velocity Context (injected automatically by the
@@ -55,7 +55,7 @@ public class VelocityExecutionContextInitializer implements ExecutionContextInit
     {
         try {
             VelocityContext context = this.velocityContextFactory.createContext();
-            executionContext.setProperty(VelocityExecutionContextInitializer.REQUEST_VELOCITY_CONTEXT, context);
+            executionContext.setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID, context);
         } catch (XWikiVelocityException e) {
             throw new ExecutionContextInitializerException("Failed to initialize Velocity Context", e);
         }

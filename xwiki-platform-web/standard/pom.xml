@@ -399,10 +399,4 @@
       </build>
     </profile>
   </profiles>
-  <repositories>
-    <repository>
-      <id>smartgwt-maven</id>
-      <url>http://smartgwtsnap.rorschach.de</url>
-    </repository>       
-  </repositories>
 </project>

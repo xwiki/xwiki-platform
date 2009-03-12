@@ -1865,7 +1865,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <xsl:template name="process-a-link">
         <xsl:call-template name="process-common-attributes"/>
         <xsl:choose>
-            <xsl:when test="@href = '#'">
+            <xsl:when test="@href = '#' or @href = ''">
                 <xsl:attribute name="internal-destination">xwikimaincontainer</xsl:attribute>
             </xsl:when>
             <xsl:when test="starts-with(@href,'#')">

@@ -70,7 +70,7 @@
     #set($resultDocument = "*[$msg.get('xe.officeimporter.results.result')&gt;$targetDocumentEscaped]*")  
       #info($msg.get("xe.officeimporter.results.success", [$resultDocument, $goBack]))
     #else
-      #error($officeimporter.getMessage())
+      #error($officeimporter.lastErrorMessage)
     #end
   #end
   

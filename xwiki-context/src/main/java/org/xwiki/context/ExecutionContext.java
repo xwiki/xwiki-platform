@@ -20,6 +20,7 @@
  */
 package org.xwiki.context;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -44,6 +45,14 @@ public class ExecutionContext
     }
 
     /**
+     * @return all the context properties
+     */
+    public Map<String, Object> getProperties()
+    {
+        return Collections.unmodifiableMap(this.properties);
+    }
+    
+    /**
      * @param key remove the property whose key matches the passed key
      */
     public void removeProperty(String key)
@@ -58,5 +67,13 @@ public class ExecutionContext
     public void setProperty(String key, Object value)
     {
         this.properties.put(key, value);
+    }
+
+    /**
+     * @param properties the properties to add to the context
+     */
+    public void setProperties(Map<String, Object> properties)
+    {
+        this.properties.putAll(properties);
     }
 }

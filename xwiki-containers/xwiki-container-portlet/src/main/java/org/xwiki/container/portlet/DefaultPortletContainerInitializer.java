@@ -25,16 +25,16 @@ import javax.portlet.PortletContext;
 import org.xwiki.container.RequestInitializerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.RequestInitializerException;
-import org.xwiki.context.ExecutionContextInitializerException;
-import org.xwiki.context.ExecutionContextInitializerManager;
+import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextManager;
 
 public class DefaultPortletContainerInitializer implements PortletContainerInitializer
 {
     private RequestInitializerManager requestInitializerManager;
 
-    private ExecutionContextInitializerManager executionContextInitializerManager;
+    private ExecutionContextManager executionContextManager;
 
     private Container container;
 
@@ -74,8 +74,8 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
 
         // 5) Call Execution Context initializers to perform further Execution Context initializations
         try {
-            this.executionContextInitializerManager.initialize(this.execution.getContext());
-        } catch (ExecutionContextInitializerException e) {
+            this.executionContextManager.initialize(this.execution.getContext());
+        } catch (ExecutionContextException e) {
             throw new PortletContainerException("Failed to initialize Execution Context", e);
         }
     }

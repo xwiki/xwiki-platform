@@ -23,7 +23,7 @@ package org.xwiki.velocity;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializer;
-import org.xwiki.context.ExecutionContextInitializerException;
+import org.xwiki.context.ExecutionContextException;
 
 /**
  * Allow registering the Velocity Context in the Execution Context object since it's shared during the whole execution
@@ -51,13 +51,13 @@ public class VelocityExecutionContextInitializer implements ExecutionContextInit
      * 
      * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
      */
-    public void initialize(ExecutionContext executionContext) throws ExecutionContextInitializerException
+    public void initialize(ExecutionContext executionContext) throws ExecutionContextException
     {
         try {
             VelocityContext context = this.velocityContextFactory.createContext();
             executionContext.setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID, context);
         } catch (XWikiVelocityException e) {
-            throw new ExecutionContextInitializerException("Failed to initialize Velocity Context", e);
+            throw new ExecutionContextException("Failed to initialize Velocity Context", e);
         }
     }
 }

@@ -29,14 +29,14 @@ import org.xwiki.container.Container;
 import org.xwiki.container.RequestInitializerException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextInitializerManager;
-import org.xwiki.context.ExecutionContextInitializerException;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 
 public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
     private RequestInitializerManager requestInitializerManager;
 
-    private ExecutionContextInitializerManager executionContextInitializerManager;
+    private ExecutionContextManager executionContextManager;
 
     private Container container;
 
@@ -54,7 +54,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         //    Container object to get any data they want from the Request.
         this.container.setRequest(new ServletRequest(httpServletRequest));
 
-        // 2) Create en empty Execution context so that the Container initializers can put things in the
+        // 2) Create an empty Execution context so that the Container initializers can put things in the
         //    execution context when they execute.
         this.execution.setContext(new ExecutionContext());
         
@@ -76,8 +76,8 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
 
         // 5) Call Execution Context initializers to perform further Execution Context initializations
         try {
-            this.executionContextInitializerManager.initialize(this.execution.getContext());
-        } catch (ExecutionContextInitializerException e) {
+            this.executionContextManager.initialize(this.execution.getContext());
+        } catch (ExecutionContextException e) {
             throw new ServletContainerException("Failed to initialize Execution Context", e);
         }
     }

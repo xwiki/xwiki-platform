@@ -26,9 +26,8 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextInitializerException;
-import org.xwiki.context.ExecutionContextInitializerManager;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
@@ -65,7 +64,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
     /**
      * Injected by the Component Manager.
      */
-    private ExecutionContextInitializerManager executionContextInitializerManager;
+    private ExecutionContextManager executionContextManager;
 
     /**
      * USed to access document content and check view acces right.
@@ -176,20 +175,15 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
     {
         List<Block> result;
 
-        // Push new Execution Context to isolate the contexts (Velocity, Groovy, etc).
-        // TODO: Instead of creating a new Execution Context we should somehow clone the Execution Context
-        // at the moment the rendering process starts. For example imagine a URL having
-        // &skin=someskin. Since this affects the global velocimacros used the included page
-        // should be processed with the same URL, which is not the case right now.
         try {
-            ExecutionContext ec = new ExecutionContext();
-            this.executionContextInitializerManager.initialize(ec);
-            this.execution.pushContext(ec);
+            // Push new Execution Context to isolate the contexts (Velocity, Groovy, etc).
+            this.execution.pushContext(this.executionContextManager.clone(this.execution.getContext()));
+            
             // TODO: Need to set the current document, space and wiki. This is required for wiki syntax acting on
             // documents. For example if a link says "WebHome" it should point to the webhome of the current space.
-            result =
-                generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, macroTransformation);
-        } catch (ExecutionContextInitializerException e) {
+            result = generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, 
+                macroTransformation);
+        } catch (ExecutionContextException e) {
             throw new MacroExecutionException("Failed to create new Execution Context for included page ["
                 + includedDocumentName + "]", e);
         } finally {

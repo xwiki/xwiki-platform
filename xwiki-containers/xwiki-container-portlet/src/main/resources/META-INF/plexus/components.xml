@@ -43,7 +43,7 @@
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
-          <role>org.xwiki.context.ExecutionContextInitializerManager</role>
+          <role>org.xwiki.context.ExecutionContextManager</role>
           <role-hint>default</role-hint>
         </requirement>
       </requirements>

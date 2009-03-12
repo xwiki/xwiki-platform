@@ -34,7 +34,7 @@
           <role>org.xwiki.context.Execution</role>
         </requirement>
         <requirement>
-          <role>org.xwiki.context.ExecutionContextInitializerManager</role>
+          <role>org.xwiki.context.ExecutionContextManager</role>
         </requirement>
         <requirement>
           <role>org.xwiki.bridge.DocumentAccessBridge</role>

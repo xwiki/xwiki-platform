@@ -20,9 +20,15 @@
  */
 package org.xwiki.context;
 
-public interface ExecutionContextInitializerManager
+public class ExecutionContextException extends Exception
 {
-    String ROLE = ExecutionContextInitializerManager.class.getName();
+    public ExecutionContextException(String message)
+    {
+        super(message);
+    }
 
-    void initialize(ExecutionContext context) throws ExecutionContextInitializerException;
+    public ExecutionContextException(String message, Throwable throwable)
+    {
+        super(message, throwable);
+    }
 }

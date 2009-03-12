@@ -31,10 +31,16 @@
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
-      <role>org.xwiki.context.ExecutionContextInitializerManager</role>
+      <role>org.xwiki.context.ExecutionContextManager</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.context.DefaultExecutionContextInitializerManager</implementation>
+      <implementation>org.xwiki.context.DefaultExecutionContextManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.context.ExecutionContextInitializer</role>
+          <field-name>initializers</field-name>
+        </requirement>
+      </requirements>
     </component>
   </components>
 </component-set>

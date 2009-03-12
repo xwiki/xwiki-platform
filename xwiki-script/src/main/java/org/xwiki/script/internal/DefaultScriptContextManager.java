@@ -47,6 +47,6 @@ public class DefaultScriptContextManager extends AbstractLogEnabled implements S
         // The Script Context is set in ScriptRequestInterceptor, when the XWiki Request is initialized so we are
         // guaranteed it is defined when this method is called.
         return (ScriptContext) this.execution.getContext().getProperty(
-            ScriptExecutionContextInitializer.REQUEST_SCRIPT_CONTEXT);
+            ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID);
     }
 }

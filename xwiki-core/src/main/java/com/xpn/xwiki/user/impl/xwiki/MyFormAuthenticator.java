@@ -128,7 +128,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
 
             Principal principal = request.getUserPrincipal();
 
-            if (principal == null || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1) {
+            if (principal == null || !StringUtils.endsWith(principal.getName(), "XWiki." + username)
+                || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1) {
                 principal = authenticate(username, password, context);
 
                 if (principal != null) {

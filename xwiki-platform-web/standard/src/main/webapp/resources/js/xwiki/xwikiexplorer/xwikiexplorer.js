@@ -643,8 +643,13 @@ XWiki.xwikiExplorer = {
     // Add xwikiExplorer input to the document if not present.
     var type = displaySuggest == false ? "hidden" : "text";
     if ($("xwikiExplorerInput") == null) {
-      document.write("<input id='xwikiExplorerInput' name='xwikiExplorerInput' type='" + type + "' style='width:"
-        + (width - 6) + "px;border-size:3px;'/ value='" + defaultNode + "'>");
+      var input = document.createElement("input");
+      input.setAttribute("id", "xwikiExplorerInput");
+      input.setAttribute("name", "xwikiExplorerInput");
+      input.setAttribute("type", type);
+      input.setAttribute("style", "width:" + (width - 6) + "px;border-size:3px;");
+      input.setAttribute("value", defaultNode);
+      xwikiExplorerTree.htmlElement.appendChild(input);
     }
     // Prepare suggest feature.
     if(displaySuggest) {      
@@ -711,11 +716,20 @@ XWiki.xwikiExplorer = {
             (params.displayAttachmentsWhenEmpty == null) ? false : params.displayAttachmentsWhenEmpty;
     var displayLinks = (params.displayLinks == null) ? false : params.displayLinks;
     var blacklistedSpaces = (params.blacklistedSpaces == null) ? "" : params.blacklistedSpaces;  
+    var htmlElement = (params.htmlElement == null) ? null : $(params.htmlElement);  
+
+    // If no placeholder has been passed, create one.
+    if (htmlElement == null) {
+      document.write("<div id='xwikiExplorerContainer'></div>");
+      htmlElement = $("xwikiExplorerContainer");
+    }
 
     // We have to print some CSS (eww) to override toucan table styles.
-    document.write("<style type='text/css'>div.listGrid td, div.listGrid table { margin: 0; padding: 0; }"
-                     + "div.listGrid td { border: 0; color: #333; }</style>");            
-
+    var style = document.createElement("style");
+    style.setAttribute("type", "text/css");
+    style.innerHTML = "div.listGrid td, div.listGrid table {margin:0;padding:0;} div.listGrid td {border:0;color:#333;}";            
+    htmlElement.appendChild(style);
+     
     // Create dataSource depending on configuration (available scopes: farm, wiki, space).
     var dataSource;
     if (wiki == "all") {
@@ -734,7 +748,10 @@ XWiki.xwikiExplorer = {
     // Create xwikiExplorer widget.
     var tree = isc.TreeGrid.create({
         ID : "xwikiExplorerTree",        
-        
+
+        // Div container.
+        htmlElement: htmlElement,
+
         // Data management.
         dataSource : dataSource,
 
@@ -757,14 +774,16 @@ XWiki.xwikiExplorer = {
         // XWiki options.
         displayAttachments: displayAttachments,
         displayLinks: displayLinks,
+        displaySuggest: displaySuggest,
+        defaultNode: defaultNode,        
         // TODO: build the list of blacklisted spaces in this method and provide a 
         // displayBlacklistedSpaces option.
         blacklistedSpaces: blacklistedSpaces
       });           
-      
+  
     // Create suggest input. 
-    XWiki.xwikiExplorer.createSuggest(displaySuggest, width, defaultNode);                   
-         
+    XWiki.xwikiExplorer.createSuggest(displaySuggest, width, defaultNode);                         
+     
     return tree;
-  }  
+  }
 };

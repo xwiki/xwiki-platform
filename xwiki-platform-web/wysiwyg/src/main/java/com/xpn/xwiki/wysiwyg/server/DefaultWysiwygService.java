@@ -32,7 +32,6 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
-import org.xwiki.officeimporter.OfficeImporterResult;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroFactory;
@@ -213,22 +212,11 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public String officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams)
         throws XWikiGWTException
     {
-        DocumentAccessBridge docBridge = getDocumentAccessBridge();
         OfficeImporter officeImporter = (OfficeImporter) Utils.getComponent(OfficeImporter.ROLE);
         try {
-            byte[] attachmentContent = docBridge.getAttachmentContent(pageName, attachmentName);
-            OfficeImporterResult result =
-                officeImporter.doImport(attachmentContent, attachmentName, pageName, OfficeImporter.XHTML_10,
-                    cleaningParams);
-            for (String artifactName : result.getArtifacts().keySet()) {
-                docBridge.setAttachmentContent(pageName, artifactName, result.getArtifacts().get(artifactName));
-            }
-            return result.getContent();
+            return officeImporter.importAttachment(pageName, attachmentName, cleaningParams);
         } catch (OfficeImporterException ex) {
             throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);
-        } catch (Exception ex) {
-            String message = "Unable to import " + pageName + ":" + attachmentName;
-            throw new XWikiGWTException(message, ex.getMessage(), -1, -1);
         }
     }
 

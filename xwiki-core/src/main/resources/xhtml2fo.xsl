@@ -454,8 +454,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
     <xsl:attribute-set name="img">
-        <xsl:attribute name="content-height">60%</xsl:attribute>
-        <xsl:attribute name="content-width">60%</xsl:attribute>
+        <xsl:attribute name="content-height">75%</xsl:attribute>
+        <xsl:attribute name="content-width">75%</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="img-link" use-attribute-sets="img">
@@ -858,6 +858,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 <!-- These are not valid in XSL, so we ignore them -->
                 <xsl:when test="$name = 'cursor'"/>
                 <xsl:when test="$name = 'quotes'"/>
+                <xsl:when test="$name = 'width' and self::html:img"/>
+                <xsl:when test="$name = 'height' and self::html:img"/>
                 <xsl:when test="starts-with($name, 'list-')"/>
                 <xsl:when test="starts-with($name, 'outline')"/>
                 <!-- These are treated separately in the 'generic' template mode, since they can't be applied directly on the current element -->
@@ -1800,8 +1802,37 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:variable name="style" select="concat(';', translate(normalize-space(@style), ' ', ''))"/>
         <xsl:variable name="has-width" select="@width or contains($style, ';width:')"/>
         <xsl:variable name="has-height" select="@height or contains($style, ';height:')"/>
+        <xsl:variable name="width">
+            <xsl:choose>
+                <xsl:when test="contains($style, ';width:')">
+                    <xsl:call-template name="get-style-value">
+                        <xsl:with-param name="style" select="$style"/>
+                        <xsl:with-param name="property" select="'width'"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="@width">
+                    <xsl:value-of select="@width"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="height">
+            <xsl:choose>
+                <xsl:when test="contains($style, ';height:')">
+                    <xsl:call-template name="get-style-value">
+                        <xsl:with-param name="style" select="$style"/>
+                        <xsl:with-param name="property" select="'height'"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="@height">
+                    <xsl:value-of select="@height"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <!-- If both height and width are specified, allow the image to be transformed to a different aspect ration -->
         <xsl:if test="$has-height and $has-width"><xsl:attribute name="scaling">non-uniform</xsl:attribute></xsl:if>
-        <xsl:if test="$has-height or $has-width">
+        <!-- The img attribute set contains values that scale images to 75%, in order to transform from 72 to 96 DPI;
+             since the user specifies his own width and/or height, let the image scale to fit the specified values -->
+       <xsl:if test="$has-height or $has-width">
             <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
             <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
         </xsl:if>
@@ -1815,12 +1846,34 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 <xsl:value-of select="@alt"/>
             </xsl:attribute>
         </xsl:if>
-        <!-- CSS values for the widht and height will be used in the generic 'process-style' template -->
-        <xsl:if test="@width">
-            <xsl:attribute name="width"><xsl:value-of select="@width"/></xsl:attribute>
+        <!-- Scale px lengths in order to get from 72 to 96 DPI -->
+        <xsl:if test="$has-width">
+            <xsl:variable name="unit"><xsl:value-of select="translate($width, '01234567890.', '')"/></xsl:variable>
+            <xsl:variable name="width-no-unit">
+                <xsl:choose>
+                    <xsl:when test="$unit = 'px' or $unit = ''">
+                        <xsl:value-of select="number(translate($width, 'pxtcminem%', '')) * 0.75"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="number(translate($width, 'pxtcminem%', ''))"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            <xsl:attribute name="width"><xsl:value-of select="$width-no-unit"/><xsl:value-of select="$unit"/></xsl:attribute>
         </xsl:if>
-        <xsl:if test="@height">
-            <xsl:attribute name="height"><xsl:value-of select="@height"/></xsl:attribute>
+        <xsl:if test="$has-height">
+            <xsl:variable name="unit"><xsl:value-of select="translate($height, '01234567890. ', '')"/></xsl:variable>
+            <xsl:variable name="height-no-unit">
+                <xsl:choose>
+                    <xsl:when test="$unit = 'px' or $unit = ''">
+                        <xsl:value-of select="number(translate($height, 'pxtcminem% ', '')) * 0.75"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="number(translate($height, 'pxtcminem% ', ''))"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            <xsl:attribute name="height"><xsl:value-of select="$height-no-unit"/><xsl:value-of select="$unit"/></xsl:attribute>
         </xsl:if>
         <xsl:if test="@border">
             <xsl:attribute name="border">

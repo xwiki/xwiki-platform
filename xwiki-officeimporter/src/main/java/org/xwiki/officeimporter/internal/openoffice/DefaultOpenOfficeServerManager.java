@@ -29,9 +29,9 @@ import net.sf.jodconverter.office.OfficeManager;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManagerException;
-import org.xwiki.officeimporter.openoffice.configuration.OpenOfficeServerConfiguration;
 
 /**
  * Default implementation of {@link OpenOfficeServerManager} component.

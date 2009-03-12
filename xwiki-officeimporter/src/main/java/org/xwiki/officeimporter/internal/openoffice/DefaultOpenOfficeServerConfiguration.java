@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.openoffice.configuration;
+package org.xwiki.officeimporter.internal.openoffice;
 
 import net.sf.jodconverter.office.OfficeUtils;
 
@@ -25,7 +25,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationManager;
 import org.xwiki.configuration.ConfigurationSourceCollection;
-import org.xwiki.officeimporter.openoffice.configuration.OpenOfficeServerConfiguration;
+import org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration;
 
 /**
  * Default implementation of {@link OpenOfficeServerConfiguration}.

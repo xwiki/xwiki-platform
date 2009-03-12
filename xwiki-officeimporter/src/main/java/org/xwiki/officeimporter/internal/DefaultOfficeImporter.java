@@ -19,17 +19,35 @@
  */
 package org.xwiki.officeimporter.internal;
 
-import java.util.HashMap;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.OfficeImporter;
-import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
-import org.xwiki.officeimporter.OfficeImporterResult;
-import org.xwiki.officeimporter.transformer.DocumentTransformer;
+import org.xwiki.officeimporter.openoffice.OpenOfficeDocumentConverter;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLCleaner;
 
 /**
  * Default implementation of the office importer component.
@@ -40,76 +58,217 @@ import org.xwiki.rendering.parser.Syntax;
 public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeImporter
 {
     /**
+     * File extensions corresponding to slide presentations.
+     */
+    public static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
+
+    /**
+     * Name of the presentation archive.
+     */
+    public static final String PRESENTATION_ARCHIVE_NAME = "presentation.zip";
+
+    /**
      * Document access bridge used to access wiki documents.
      */
     private DocumentAccessBridge docBridge;
 
     /**
-     * Transformer responsible for converting office documents into (HTML + artifacts).
+     * OpenOffice document converter.
      */
-    private DocumentTransformer officeToHtmlTransformer;
+    private OpenOfficeDocumentConverter ooConverter;
 
     /**
-     * Transforms a resulting (XHTML + artifacts) into an XWiki presentation (via ZipExplorer).
+     * OpenOffice html cleaner.
      */
-    private DocumentTransformer htmlToPresentationTransformer;
+    private HTMLCleaner ooHtmlCleaner;
 
     /**
-     * Transforms an XHTML document into XWiki 2.0 syntax.
+     * XHTML/1.0 syntax parser.
      */
-    private DocumentTransformer htmlToXWikiTransformer;
+    private Parser xHtmlParser;
 
     /**
-     * Transforms an XWiki 2.0 document into Xhtml 1.0 syntax.
+     * XWiki/2.0 syntax parser.
      */
-    private DocumentTransformer xwikiToXhtmlTransformer;
+    private Parser xwikiParser;
+
+    /**
+     * Factory to get the XHTML renderer to output XHTML.
+     */
+    private PrintRendererFactory rendererFactory;
 
     /**
      * {@inheritDoc}
      */
-    public OfficeImporterResult doImport(byte[] fileContent, String fileName, String targetDocument,
-        Syntax targetSyntax, Map<String, String> options) throws OfficeImporterException
+    public void importStream(InputStream documentStream, String documentFormat, String targetWikiDocument,
+        Map<String, String> params) throws OfficeImporterException
     {
-        options.put("targetDocument", targetDocument);
-        OfficeImporterContext context =
-            new OfficeImporterContext(fileContent, fileName, targetDocument, options, docBridge);
-        officeToHtmlTransformer.transform(context);
-        DocumentTransformer htmlTransformer = null;
-        if (context.isPresentation()) {
-            htmlTransformer = htmlToPresentationTransformer;
-        } else {
-            htmlTransformer = htmlToXWikiTransformer;
+        params.put("targetDocument", targetWikiDocument);
+        OfficeImporterFileStorage storage =
+            new OfficeImporterFileStorage("xwiki-office-importer-" + docBridge.getCurrentUser());
+        try {
+            Map<String, InputStream> artifacts = ooConverter.convert(documentStream, storage);
+            docBridge.setDocumentSyntaxId(targetWikiDocument, XWIKI_20.toIdString());
+            if (isPresentation(documentFormat)) {
+                byte[] archive = buildPresentationArchive(artifacts);
+                docBridge.setAttachmentContent(targetWikiDocument, PRESENTATION_ARCHIVE_NAME, archive);
+                String xwikiPresentationCode = buildPresentationFrameCode(PRESENTATION_ARCHIVE_NAME, "output.html");
+                docBridge.setDocumentContent(targetWikiDocument, xwikiPresentationCode,
+                    "Content updated by office importer", false);
+            } else {
+                InputStreamReader reader = new InputStreamReader(artifacts.remove("output.html"), "UTF-8");
+                Document xhtmlDoc = ooHtmlCleaner.clean(reader, params);
+                XMLUtils.stripHTMLEnvelope(xhtmlDoc);
+                String xwikiCode = convert(new StringReader(XMLUtils.toString(xhtmlDoc)), xHtmlParser, XWIKI_20);
+                docBridge
+                    .setDocumentContent(targetWikiDocument, xwikiCode, "Content updated by office importer", false);
+                attachArtifacts(targetWikiDocument, artifacts);
+            }
+        } catch (Exception ex) {
+            throw new OfficeImporterException(ex.getMessage(), ex);
+        } finally {
+            storage.cleanUp();
         }
-        htmlTransformer.transform(context);
-        if (targetSyntax.equals(XWIKI_20)) {
-            return buildResult(context);
-        } else if (targetSyntax.equals(XHTML_10)) {
-            xwikiToXhtmlTransformer.transform(context);
-            return buildResult(context);
-        } else {
-            throw new OfficeImporterException("Target syntax " + targetSyntax.toIdString() + " is not supported.");
-        }        
     }
 
     /**
-     * Builds an {@link OfficeImporterResult} using information extracted from an {@link OfficeImporterContext} object.
-     * 
-     * @param context the {@link OfficeImporterContext}.
-     * @return the {@link OfficeImporterResult} object containing the results of the import operation.
-     * @throws OfficeImporterException If an error occurs while encoding the office importer results.
+     * {@inheritDoc}
      */
-    private OfficeImporterResult buildResult(OfficeImporterContext context) throws OfficeImporterException
+    public String importAttachment(String documentName, String attachmentName, Map<String, String> params)
+        throws OfficeImporterException
     {
-        Map<String, byte[]> resultArtifacts = null;
-        if (context.isPresentation()) {
-            resultArtifacts = new HashMap<String, byte[]>();
-            resultArtifacts.put(OfficeImporterContext.PRESENTATION_ARCHIVE_NAME, context.getArtifacts().get(
-                OfficeImporterContext.PRESENTATION_ARCHIVE_NAME));
-        } else {
-            resultArtifacts = context.getArtifacts();
-            resultArtifacts.remove("output.html");
+        params.put("targetDocument", documentName);
+        OfficeImporterFileStorage storage =
+            new OfficeImporterFileStorage("xwiki-office-importer-" + docBridge.getCurrentUser());
+        try {
+            ByteArrayInputStream bis =
+                new ByteArrayInputStream(docBridge.getAttachmentContent(documentName, attachmentName));
+            Map<String, InputStream> artifacts = ooConverter.convert(bis, storage);
+            if (isPresentation(attachmentName)) {
+                byte[] archive = buildPresentationArchive(artifacts);
+                docBridge.setAttachmentContent(documentName, PRESENTATION_ARCHIVE_NAME, archive);
+                String xwikiPresentationCode = buildPresentationFrameCode(PRESENTATION_ARCHIVE_NAME, "output.html");
+                return convert(new StringReader(xwikiPresentationCode), xwikiParser, XHTML_10);
+            } else {
+                InputStreamReader reader = new InputStreamReader(artifacts.remove("output.html"), "UTF-8");
+                attachArtifacts(documentName, artifacts);
+                Document xhtmlDoc = ooHtmlCleaner.clean(reader, params);
+                XMLUtils.stripHTMLEnvelope(xhtmlDoc);
+                return XMLUtils.toString(xhtmlDoc);
+            }
+        } catch (Exception ex) {
+            throw new OfficeImporterException(ex.getMessage(), ex);
+        } finally {
+            storage.cleanUp();
         }
-        OfficeImporterResult result = new OfficeImporterResult(context.getContent(), XWIKI_20, resultArtifacts);
-        return result;
-    }    
+    }
+
+    /**
+     * Converts the given code into targetSyntax.
+     * 
+     * @param inputReader the input code.
+     * @param parser parser to be used for parsing the input.
+     * @param targetSyntax expected syntax.
+     * @return the output code in target syntax.
+     * @throws OfficeImporterException if a parsing error occurs.
+     */
+    private String convert(Reader inputReader, Parser parser, Syntax targetSyntax) throws OfficeImporterException
+    {
+        try {
+            XDOM xdom = parser.parse(inputReader);
+            WikiPrinter printer = new DefaultWikiPrinter();
+            Listener listener = this.rendererFactory.createRenderer(targetSyntax, printer);
+            xdom.traverse(listener);
+            return printer.toString();
+        } catch (ParseException ex) {
+            throw new OfficeImporterException("Internal error while parsing content.", ex);
+        }
+    }
+
+    /**
+     * Utility method for checking if a file name corresponds to an office presentation.
+     * 
+     * @param format file name or the extension.
+     * @return true if the file name / extension represents an office presentation format.
+     */
+    private boolean isPresentation(String format)
+    {
+        String extension = format.substring(format.lastIndexOf('.') + 1);
+        return PRESENTATION_FORMAT_EXTENSIONS.contains(extension);
+    }
+
+    /**
+     * Utility method for building xwiki 2.0 code required for displaying an office presentation.
+     * 
+     * @param zipFilename name of the presentation zip archive.
+     * @param index the html file (in the archive) to begin the presentation.
+     * @return the xwiki code for displaying the presentation.
+     */
+    private String buildPresentationFrameCode(String zipFilename, String index)
+    {
+        return "{{velocity}}#set($url=$xwiki.zipexplorer.getFileLink($doc, \"" + zipFilename + "\", \"" + index
+            + "\")){{html}}<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>{{/html}}{{/velocity}}";
+    }
+
+    /**
+     * Utility method for building a zip archive for presentation imports.
+     * 
+     * @param artifacts artifacts collected during the document conversion.
+     * @return the byte[] containing the zip archive.
+     * @throws OfficeImporterException if an I/O exception is encountered.
+     */
+    private byte[] buildPresentationArchive(Map<String, InputStream> artifacts) throws OfficeImporterException
+    {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ZipOutputStream zos = new ZipOutputStream(bos);
+            for (String artifactName : artifacts.keySet()) {
+                ZipEntry entry = new ZipEntry(artifactName);
+                zos.putNextEntry(entry);
+                zos.write(readStream(artifacts.get(artifactName)));
+                zos.closeEntry();
+            }
+            zos.close();
+            return bos.toByteArray();
+        } catch (IOException ex) {
+            throw new OfficeImporterException("Error while creating presentation archive.", ex);
+        }
+    }
+
+    /**
+     * Attached the given artifacts into target wiki document.
+     * 
+     * @param documentName target wiki document name.
+     * @param artifacts artifacts collected during the document conversion.
+     */
+    private void attachArtifacts(String documentName, Map<String, InputStream> artifacts)
+    {
+        for (String artifactName : artifacts.keySet()) {
+            try {
+                docBridge.setAttachmentContent(documentName, artifactName, readStream(artifacts.get(artifactName)));
+            } catch (Exception ex) {
+                getLogger().error("Error while attaching artifact.", ex);
+                // Skip the artifact.
+            }
+        }
+    }
+
+    /**
+     * Utility method for extracting bytes from a stream.
+     * 
+     * @param stream the input stream.
+     * @return collected bytes.
+     * @throws IOException if an I/O error occurs.
+     */
+    private byte[] readStream(InputStream stream) throws IOException
+    {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = stream.read(buf)) > 0) {
+            bos.write(buf, 0, len);
+        }
+        bos.close();
+        return bos.toByteArray();
+    }
 }

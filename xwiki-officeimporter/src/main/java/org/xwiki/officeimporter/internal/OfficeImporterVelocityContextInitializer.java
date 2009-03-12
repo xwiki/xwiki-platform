@@ -21,6 +21,8 @@ package org.xwiki.officeimporter.internal;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.velocity.VelocityContextInitializer;
 
@@ -30,28 +32,34 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.8M1
  */
-public class OfficeImporterVelocityContextInitializer implements VelocityContextInitializer
+public class OfficeImporterVelocityContextInitializer extends AbstractLogEnabled implements VelocityContextInitializer
 {
-    /** 
-     * The key to use for office importer in the velocity context. 
+    /**
+     * The key to use for office importer in the velocity context.
      */
     public static final String VELOCITY_CONTEXT_KEY = "officeimporter";
-    
+
+    /**
+     * The {@link Execution} component.
+     */
+    private Execution execution;
+
+    /**
+     * The {@link OfficeImporter} component.
+     */
+    private OfficeImporter officeImporter;
+
     /**
      * The {@link DocumentAccessBridge}.
      */
     private DocumentAccessBridge docBridge;
-    
-    /**
-     * Office importer component injected by component manager.
-     */
-    private OfficeImporter officeImporter;
-    
+
     /**
      * {@inheritDoc}
      */
     public void initialize(VelocityContext context)
     {
-        context.put(VELOCITY_CONTEXT_KEY, new OfficeImporterVelocityBridge(officeImporter, docBridge));
+        context.put(VELOCITY_CONTEXT_KEY, new OfficeImporterVelocityBridge(execution, officeImporter, docBridge,
+            getLogger()));
     }
 }

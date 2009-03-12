@@ -19,6 +19,7 @@
  */
 package org.xwiki.officeimporter;
 
+import java.io.InputStream;
 import java.util.Map;
 
 import org.xwiki.rendering.parser.Syntax;
@@ -36,7 +37,7 @@ public interface OfficeImporter
      * This component's role, used when code needs to look it up.
      */
     String ROLE = OfficeImporter.class.getName();
-    
+
     /**
      * XHTML/1.0 syntax.
      */
@@ -48,17 +49,29 @@ public interface OfficeImporter
     Syntax XWIKI_20 = new Syntax(SyntaxType.XWIKI, "2.0");
 
     /**
-     * Imports an office document into a given syntax. Although the import operation is carried out w.r.t target
-     * document, this method does not modify the target document. It is up to the caller to update the target document
-     * if it wishes so. Currently xwiki/2.0 and xhtml/1.0 syntaxes are supported.
+     * Imports the specified office attachment into xhtml and returns the result. Any artifacts extracted during the
+     * import operation will be attached to the wiki document. This method does not update the content of the wiki page.
      * 
-     * @param fileContent content of the office document.
-     * @param fileName name of the office document (for determining document type).
-     * @param targetDocument target wiki page.
-     * @param options additional options for the import operation.
-     * @return an {@link OfficeImporterResult} containing the results of the import operation.
+     * @param documentName full name of the wiki document.
+     * @param attachmentName name of the attachment.
+     * @param params additional parameters for the import operation.
+     * @return the xhtml code resulting from the import operation.
      * @throws OfficeImporterException if the import operation fails.
      */
-    OfficeImporterResult doImport(byte[] fileContent, String fileName, String targetDocument, Syntax targetSyntax,
-        Map<String, String> options) throws OfficeImporterException;
+    String importAttachment(String documentName, String attachmentName, Map<String, String> params)
+        throws OfficeImporterException;
+
+    /**
+     * Imports the office document represented by fileStream into xwiki 2.0 syntax and stores the result in
+     * targetWikiDocument.Any artifacts extracted during the import operation will be attached to the target wiki
+     * document.
+     * 
+     * @param documentStream {@link InputStream} representing the input office document.
+     * @param documentFormat string used to identify the input file format. (ppt, xls, odt etc.)
+     * @param targetWikiDocument target wiki document.
+     * @param params additional parameters for the import operation.
+     * @throws OfficeImporterException if the import operation fails.
+     */
+    void importStream(InputStream documentStream, String documentFormat, String targetWikiDocument,
+        Map<String, String> params) throws OfficeImporterException;
 }

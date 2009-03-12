@@ -200,52 +200,7 @@
         </requirement>
       </requirements>
       <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <!-- Document Transformers -->
-    <component>
-      <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
-      <role-hint>officetohtml</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.transformer.OfficeToHtmlTransformer</implementation>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerManager</role>
-        </requirement>
-      </requirements>  
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
-      <role-hint>htmltoxwiki</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToXWikiTransformer</implementation>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.xml.html.HTMLCleaner</role>
-          <role-hint>openoffice</role-hint>
-        </requirement>
-      </requirements>  
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
-      <role-hint>htmltopresentation</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.transformer.HtmlToPresentationTransformer</implementation>          
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
-      <role-hint>xwikitoxhtml</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.transformer.XWikiToXhtmlTransformer</implementation>          
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.rendering.parser.Parser</role>
-          <role-hint>xwiki/2.0</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>
-        </requirement>
-      </requirements>
-    </component>
+    </component>    
     <!-- Office Importer -->
     <component>
       <role>org.xwiki.officeimporter.OfficeImporter</role>
@@ -257,32 +212,32 @@
           <role>org.xwiki.bridge.DocumentAccessBridge</role>
         </requirement>
         <requirement>
-          <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
-          <role-hint>officetohtml</role-hint>
-          <field-name>officeToHtmlTransformer</field-name>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeDocumentConverter</role>
         </requirement>
         <requirement>
-          <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
-          <role-hint>htmltoxwiki</role-hint>
-          <field-name>htmlToXWikiTransformer</field-name>
+          <role>org.xwiki.xml.html.HTMLCleaner</role>
+          <role-hint>openoffice</role-hint>
         </requirement>
         <requirement>
-          <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
-          <role-hint>htmltopresentation</role-hint>
-          <field-name>htmlToPresentationTransformer</field-name>
+          <role>org.xwiki.rendering.parser.Parser</role>
+          <role-hint>xhtml/1.0</role-hint>
+          <field-name>xHtmlParser</field-name>
         </requirement>
         <requirement>
-          <role>org.xwiki.officeimporter.transformer.DocumentTransformer</role>
-          <role-hint>xwikitoxhtml</role-hint>
-          <field-name>xwikiToXhtmlTransformer</field-name>
+          <role>org.xwiki.rendering.parser.Parser</role>
+          <role-hint>xwiki/2.0</role-hint>
+          <field-name>xwikiParser</field-name>
         </requirement>
+        <requirement>
+          <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>
+        </requirement>        
       </requirements>      
     </component>
     <!-- Configuration -->
     <component>
-      <role>org.xwiki.officeimporter.openoffice.configuration.OpenOfficeServerConfiguration</role>
+      <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.openoffice.configuration.DefaultOpenOfficeServerConfiguration</implementation>
+      <implementation>org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeServerConfiguration</implementation>
       <requirements>
         <requirement>
           <role>org.xwiki.configuration.ConfigurationManager</role>
@@ -301,7 +256,18 @@
       <implementation>org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeServerManager</implementation>
       <requirements>
         <requirement>
-          <role>org.xwiki.officeimporter.openoffice.configuration.OpenOfficeServerConfiguration</role>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration</role>
+        </requirement>
+      </requirements>
+    </component>
+    <!-- OpenOffice Document Converter -->
+    <component>
+      <role>org.xwiki.officeimporter.openoffice.OpenOfficeDocumentConverter</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeDocumentConverter</implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerManager</role>
         </requirement>
       </requirements>
     </component>
@@ -313,11 +279,14 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
-          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+          <role>org.xwiki.context.Execution</role>
         </requirement>
         <requirement>
           <role>org.xwiki.officeimporter.OfficeImporter</role>
         </requirement>
+        <requirement>
+          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+        </requirement>        
       </requirements>
     </component>
     <component>

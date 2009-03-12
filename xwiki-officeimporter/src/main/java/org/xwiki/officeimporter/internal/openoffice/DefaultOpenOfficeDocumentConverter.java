@@ -17,13 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.transformer;
+package org.xwiki.officeimporter.internal.openoffice;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.jodconverter.DefaultDocumentFormatRegistry;
 import net.sf.jodconverter.DocumentFormat;
@@ -32,25 +34,20 @@ import net.sf.jodconverter.DocumentFormatRegistry;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.officeimporter.OfficeImporterContext;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.internal.OfficeImporterFileStorage;
+import org.xwiki.officeimporter.openoffice.OpenOfficeDocumentConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
-import org.xwiki.officeimporter.transformer.DocumentTransformer;
 
 /**
- * Transforms an Office Document into a corresponding Html document.
+ * Default implementation of {@link OpenOfficeDocumentConverter}.
  * 
  * @version $Id$
- * @since 1.8M1
+ * @since 1.8RC3
  */
-public class OfficeToHtmlTransformer extends AbstractLogEnabled implements DocumentTransformer, Initializable
+public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled implements OpenOfficeDocumentConverter,
+    Initializable
 {
-    /**
-     * Default encoding for office imported documents.
-     */
-    public static final String DEFAULT_ENCODING = "UTF-8";
-    
     /**
      * The {@link OpenOfficeServerManager} component.
      */
@@ -69,75 +66,44 @@ public class OfficeToHtmlTransformer extends AbstractLogEnabled implements Docum
         DocumentFormatRegistry formatRegistry = new DefaultDocumentFormatRegistry();
         htmlFormat = formatRegistry.getFormatByExtension("html");
     }
-
+    
     /**
      * {@inheritDoc}
      */
-    public void transform(OfficeImporterContext importerContext) throws OfficeImporterException
+    public Map<String, InputStream> convert(InputStream in, OfficeImporterFileStorage storage)
+        throws OfficeImporterException
     {
         // Make sure the openoffice server is running.    
         if (ooManager.getServerState() != OpenOfficeServerManager.ServerState.RUNNING) {
             throw new OfficeImporterException("OpenOffice server is unavailable.");
-        }
-        // Prepare the temporary directory structure.
-        OfficeImporterFileStorage storage =
-            new OfficeImporterFileStorage("xwiki-office-importer-" + importerContext.getCurrentUser());
-        // Fill in the input file.
-        try {
+        }   
+        // Prepare the result.
+        Map<String, InputStream> result = new HashMap<String, InputStream>();
+        // Copy bytes from the input stream into temporary input file.
+        try {            
             FileOutputStream fos = new FileOutputStream(storage.getInputFile());
-            fos.write(importerContext.getSourceData());
-            fos.close();
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                fos.write(buf, 0, len);
+            }
+            fos.close();      
         } catch (IOException ex) {
-            String message = "Internal error while creating temporary files.";
-            getLogger().error(message, ex);
-            storage.cleanUp();
-            throw new OfficeImporterException(message, ex);
+            throw new OfficeImporterException("Error while creating temporary files.", ex);
         }
         // Make the conversion.
         ooManager.getDocumentConverter().convert(storage.getInputFile(), storage.getOutputFile(), htmlFormat);
-        // Collect the output into context. First the html output.
-        try {
-            FileInputStream fis = new FileInputStream(storage.getOutputFile());
-            byte[] content = new byte[(int) storage.getOutputFile().length()];
-            fis.read(content);
-            fis.close();
-            importerContext.setContent(getEncodedHtml(new String(content)));
-        } catch (IOException ex) {
-            String message = "Internal error while reading temporary files.";
-            getLogger().error(message, ex);
-            storage.cleanUp();
-            throw new OfficeImporterException(message, ex);
-        }
-        // Start collecting the artifacts.
+        // Collect the resulting artifact streams
         File[] artifacts = storage.getOutputDir().listFiles();
         for (File artifact : artifacts) {
             try {
                 FileInputStream fis = new FileInputStream(artifact);
-                byte[] data = new byte[(int) artifact.length()];
-                fis.read(data);
-                importerContext.addArtifact(artifact.getName(), data);
+                result.put(artifact.getName(), fis);
             } catch (IOException ex) {
-                String message = "Internal error while reading artifact : " + artifact.getName();
-                getLogger().error(message, ex);
+                getLogger().error("Internal error while reading artifact : " + artifact.getName(), ex);
                 // Skip the artifact.
             }
         }
-        // Cleanup the mess.
-        storage.cleanUp();
-    }
-    
-    /**
-     * Encodes the given html fragment with the default encoding for oo.
-     * 
-     * @param html the html content.
-     * @return the html string encoded with default encoding for oo server.
-     */
-    public String getEncodedHtml(String html) throws OfficeImporterException
-    {
-        try {
-            return new String(html.getBytes(), DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException ex) {
-            throw new OfficeImporterException("Inernal error while encoding document content.", ex);
-        }
+        return result;
     }
 }

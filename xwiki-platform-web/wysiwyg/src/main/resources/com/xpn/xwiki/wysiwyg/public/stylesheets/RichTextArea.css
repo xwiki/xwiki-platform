@@ -64,7 +64,7 @@ body.main {
 }
 
 .main .macro .macro-placeholder {
-  background-image: url(macro.gif);
+  background-image: url(../images/macro.gif);
   background-position: left center;
   background-repeat: no-repeat;
   color: gray;

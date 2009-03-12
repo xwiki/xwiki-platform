@@ -6,7 +6,7 @@
   <inherits name="com.google.gwt.widgetideas.GlassPanel"/>
   <inherits name="com.xpn.xwiki.gwt.api.Api"/>
 
-  <stylesheet src="Wysiwyg.css"/>
+  <stylesheet src="stylesheets/Wysiwyg.css"/>
   <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg"/>
 
   <define-property name="old.user.agent" values="yes,no"/>

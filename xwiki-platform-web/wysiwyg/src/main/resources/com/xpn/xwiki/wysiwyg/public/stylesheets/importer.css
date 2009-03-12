@@ -1,0 +1,24 @@
+.xImporterTabPanel {
+  width: 480px;
+  height: 360px;
+}
+
+.xImporterInfoLabel {
+  text-align: center;
+  padding-bottom: 5px;  
+}
+
+.xImporterClipboardTabEditor {
+  width: 100%;
+  height: 260px;
+  border: solid 1px #000000;
+}
+
+.xImporterImportButton {
+  width: 60px;
+}
+
+.xImporterCancelButton {
+  width: 60px;
+  margin-left: 5px;
+}

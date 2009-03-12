@@ -1,0 +1,94 @@
+div.gwt-PopupPanel, div.gwt-PopupPanel div {
+  display: block;
+}
+
+.xDialogBox {
+  padding: 3px;
+  background-color: white;
+}
+
+.xDialogBox div.clearfloats{
+  margin: 0px !important;
+}
+
+.xDialogBox-dragging {
+  background-color: transparent !important;
+  border: 1px dashed #333;
+}
+
+.xDialogCaptionBar {
+  background-color: #DDD;
+  color: #777;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 27px;
+  padding: 0 27px 0 25px;
+  position: relative;
+  cursor: default;
+}
+
+.xDialogIcon {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+}
+
+.xDialogCaption {
+  white-space: nowrap;
+  height: 27px;
+}
+
+.xDialogCloseIcon {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+
+.xDialogContent {
+  border: 2px solid #DDD;
+  border-top: 1px solid #DDD;
+}
+
+.xDialogHeader, .xDialogFooter {
+  padding: 10px;
+  line-height: 25px;
+}
+
+.xDialogHeader {
+  text-align: center;
+  font-weight: lighter;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+.xDialogFooter {
+  text-align: right;
+}
+
+.xDialogFooter button {
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  border: 1px solid #AAA;
+  height: 25px;
+  line-height: 17px;
+  vertical-align: middle;
+}
+
+.xDialogBody {
+  border-top: 2px solid #EEE;
+  border-bottom: 2px solid #EEE;
+  height: 350px;
+  width: 459px;
+  overflow: auto;
+  margin: 0 6px;
+}
+
+.xWizardDialog .xDialogHeader .button-container {
+  position: absolute;
+}
+
+.xWizardDialog .xDialogFooter button {
+  margin-left: 5px;
+}

@@ -16,8 +16,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextInitializerManager;
-import org.xwiki.context.ExecutionContextInitializerException;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.velocity.VelocityManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -194,8 +194,8 @@ public class HtmlPackager
     private void renderDocuments(ZipOutputStream zos, File tempdir, ExportURLFactory urlf,
         XWikiContext context) throws XWikiException, IOException
     {
-        ExecutionContextInitializerManager ecim =
-            (ExecutionContextInitializerManager) Utils.getComponent(ExecutionContextInitializerManager.ROLE);
+        ExecutionContextManager ecim =
+            (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.ROLE);
         Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
 
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
@@ -229,7 +229,7 @@ public class HtmlPackager
             for (String pageName: this.pages) {
                 renderDocument(pageName, zos, renderContext, vcontext);
             }
-        } catch (ExecutionContextInitializerException e) {
+        } catch (ExecutionContextException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, 
                 XWikiException.ERROR_XWIKI_INIT_FAILED, "Failed to initialize Execution Context", e);
         } finally {

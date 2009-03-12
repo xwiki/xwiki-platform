@@ -20,15 +20,16 @@
  */
 package org.xwiki.context;
 
-public class ExecutionContextInitializerException extends Exception
+public interface ExecutionContextManager
 {
-    public ExecutionContextInitializerException(String message)
-    {
-        super(message);
-    }
+    String ROLE = ExecutionContextManager.class.getName();
 
-    public ExecutionContextInitializerException(String message, Throwable throwable)
-    {
-        super(message, throwable);
-    }
+    void initialize(ExecutionContext context) throws ExecutionContextException;
+    
+    /**
+     * Perform deep cloning of Execution Context properties by calling all implementations of {@link ExecutionContextCloner}.
+     * 
+     * @return the cloned Execution Context
+     */
+    ExecutionContext clone(ExecutionContext context) throws ExecutionContextException;
 }

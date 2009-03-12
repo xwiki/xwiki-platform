@@ -41,7 +41,7 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         // Initializes Plexus
         super.contextInitialized(servletContextEvent);
 
-        // Initializes XWiki's Container with the Servlet Conetext.
+        // Initializes XWiki's Container with the Servlet Context.
         try {
             ServletContainerInitializer containerInitializer =
                 (ServletContainerInitializer) PlexusServletUtils.lookup(servletContextEvent.getServletContext(),

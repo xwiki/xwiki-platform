@@ -26,7 +26,6 @@ import org.jmock.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
-import org.xwiki.rendering.internal.macro.velocity.VelocityMacro;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
@@ -64,7 +63,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($myvar = 'hello')");
 
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include");
+        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.ROLE, "include");
         Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
         mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(

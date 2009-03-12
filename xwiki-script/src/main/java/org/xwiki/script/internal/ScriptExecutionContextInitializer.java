@@ -25,7 +25,7 @@ import javax.script.SimpleScriptContext;
 
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializer;
-import org.xwiki.context.ExecutionContextInitializerException;
+import org.xwiki.context.ExecutionContextException;
 import org.xwiki.script.ScriptContextInitializer;
 
 /**
@@ -39,7 +39,7 @@ public class ScriptExecutionContextInitializer implements ExecutionContextInitia
     /**
      * The id under which the Script Context is stored in the Execution Context.
      */
-    public static final String REQUEST_SCRIPT_CONTEXT = "scriptContext";
+    public static final String SCRIPT_CONTEXT_ID = "scriptContext";
 
     /**
      * The {@link ScriptContextInitializer} list used to initialize {@link ScriptContext}.
@@ -51,7 +51,7 @@ public class ScriptExecutionContextInitializer implements ExecutionContextInitia
      * 
      * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
      */
-    public void initialize(ExecutionContext executionContext) throws ExecutionContextInitializerException
+    public void initialize(ExecutionContext executionContext) throws ExecutionContextException
     {
         SimpleScriptContext context = new SimpleScriptContext()
         {
@@ -70,7 +70,7 @@ public class ScriptExecutionContextInitializer implements ExecutionContextInitia
             }
         };
 
-        executionContext.setProperty(REQUEST_SCRIPT_CONTEXT, context);
+        executionContext.setProperty(SCRIPT_CONTEXT_ID, context);
 
         for (ScriptContextInitializer scriptContextInitializer : this.scriptContextInitializerList) {
             scriptContextInitializer.initialize(context);

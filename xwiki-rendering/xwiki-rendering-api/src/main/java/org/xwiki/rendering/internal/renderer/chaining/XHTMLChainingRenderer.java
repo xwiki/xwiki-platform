@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.internal.renderer.chaining;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -49,7 +47,7 @@ import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 
 /**
  * Convert listener events to XHTML.
- *  
+ * 
  * @version $Id$
  * @since 1.8RC1
  */
@@ -60,7 +58,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     private XHTMLLinkRenderer linkRenderer;
 
     private XHTMLImageRenderer imageRenderer;
-    
+
     private XHTMLMacroRenderer macroRenderer;
 
     private XHTMLIdGenerator idGenerator;
@@ -73,14 +71,14 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
      * @see #originalPrinter
      */
     private WikiPrinter headerTitlePrinter;
-    
+
     /**
      * @param printer the object to which to write the XHTML output to
      * @param documentAccessBridge see {@link #documentAccessBridge}
      * @param configuration the rendering configuration
      */
-    public XHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer, 
-        XHTMLImageRenderer imageRenderer, ListenerChain listenerChain)
+    public XHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer,
+        ListenerChain listenerChain)
     {
         super(printer, listenerChain);
 
@@ -163,7 +161,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endDocument()
     {
-        if (getDocumentState().getDocumentDepth() > 1) { 
+        if (getDocumentState().getDocumentDepth() > 1) {
             getXHTMLWikiPrinter().printXMLEndElement("div");
         }
     }
@@ -281,7 +279,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        // Ensure the link renderer is using the latest printer since the original printer used could have been 
+        // Ensure the link renderer is using the latest printer since the original printer used could have been
         // superseded by another one in the printer stack.
         this.linkRenderer.setXHTMLWikiPrinter(getXHTMLWikiPrinter());
 
@@ -423,7 +421,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     {
         getXHTMLWikiPrinter().printXMLStartElement("li");
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -500,9 +498,11 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
-        // so that the macro can be reconstructed when moving back from XHTML to XDOM.
-        this.macroRenderer.beginRender(getXHTMLWikiPrinter(), name, parameters, content);
+        if (getBlockState().getMacroDepth() == 1) {
+            // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
+            // so that the macro can be reconstructed when moving back from XHTML to XDOM.
+            this.macroRenderer.beginRender(getXHTMLWikiPrinter(), name, parameters, content);
+        }
     }
 
     /**
@@ -513,9 +513,11 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
-        // so that the macro can be reconstructed when moving back from XHTML to XDOM.
-        this.macroRenderer.endRender(getXHTMLWikiPrinter());
+        if (getBlockState().getMacroDepth() == 1) {
+            // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
+            // so that the macro can be reconstructed when moving back from XHTML to XDOM.
+            this.macroRenderer.endRender(getXHTMLWikiPrinter());
+        }
     }
 
     /**
@@ -784,7 +786,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        // Ensure the image renderer is using the latest printer since the original printer used could have been 
+        // Ensure the image renderer is using the latest printer since the original printer used could have been
         // superseded by another one in the printer stack.
         this.imageRenderer.setXHTMLWikiPrinter(getXHTMLWikiPrinter());
         this.imageRenderer.onImage(image, isFreeStandingURI, parameters);

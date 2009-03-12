@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.transformation;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.renderer.EventsRenderer;
@@ -80,9 +81,11 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     {
         String expected = "beginDocument\n"
         	+ "beginMacroMarkerStandalone [testnestedmacro] [] [null]\n"
+        	+ "beginMacroMarkerStandalone [testsimplemacro] [] [null]\n"
             + "beginParagraph\n"
             + "onWord [simplemacro0]\n"
             + "endParagraph\n"
+            + "endMacroMarkerStandalone [testsimplemacro] [] [null]\n"
             + "endMacroMarkerStandalone [testnestedmacro] [] [null]\n"
             + "endDocument";
 
@@ -102,9 +105,9 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     public void testInfiniteRecursionMacroTransform() throws Exception
     {
         String expected = "beginDocument\n"
-        	+ "beginMacroMarkerStandalone [testrecursivemacro] [] [null]\n"
+        	+ StringUtils.repeat("beginMacroMarkerStandalone [testrecursivemacro] [] [null]\n", 1000)
             + "onMacroStandalone [testrecursivemacro] [] [null]\n"
-            + "endMacroMarkerStandalone [testrecursivemacro] [] [null]\n"
+            + StringUtils.repeat("endMacroMarkerStandalone [testrecursivemacro] [] [null]\n", 1000)
             + "endDocument";
         
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testrecursivemacro",

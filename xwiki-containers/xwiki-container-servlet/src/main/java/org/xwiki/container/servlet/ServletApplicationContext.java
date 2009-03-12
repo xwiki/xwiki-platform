@@ -20,12 +20,14 @@
  */
 package org.xwiki.container.servlet;
 
-import org.xwiki.container.ApplicationContext;
-
-import javax.servlet.ServletContext;
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.servlet.ServletContext;
+
+import org.xwiki.container.ApplicationContext;
 
 public class ServletApplicationContext implements ApplicationContext
 {
@@ -41,13 +43,34 @@ public class ServletApplicationContext implements ApplicationContext
         return this.servletContext;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.container.ApplicationContext#getResourceAsStream(String)
+     */
     public InputStream getResourceAsStream(String resourceName)
     {
         return getServletContext().getResourceAsStream(resourceName);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.container.ApplicationContext#getResource(String)
+     */
     public URL getResource(String resourceName) throws MalformedURLException
     {
         return getServletContext().getResource(resourceName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.container.ApplicationContext#getTemporaryDirectory()
+     */
+    public File getTemporaryDirectory()
+    {
+        // Section SRV.4.7.1 of the Servlet 2.5 specification says that this should be available.
+        return (File) this.servletContext.getAttribute("javax.servlet.context.tempdir");
     }
 }

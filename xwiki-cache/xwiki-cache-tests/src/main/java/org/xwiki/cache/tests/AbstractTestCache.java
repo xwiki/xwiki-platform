@@ -19,6 +19,7 @@
  */
 package org.xwiki.cache.tests;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -127,6 +128,21 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
     public URL getResource(String resourceName) throws MalformedURLException
     {
         return getClass().getResource(resourceName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.container.ApplicationContext#getTemporaryDirectory()
+     */
+    public File getTemporaryDirectory()
+    {
+        try {
+            // The system temporary directory is a good place for temporary test data.
+            return new File(System.getProperty("java.io.tmpdir"));
+        } catch (SecurityException e) {
+            return new File(".");
+        }
     }
 
     /**

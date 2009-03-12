@@ -20,13 +20,14 @@
  */
 package org.xwiki.container.portlet;
 
-import org.xwiki.container.ApplicationContext;
-
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.portlet.PortletContext;
+
+import org.xwiki.container.ApplicationContext;
 
 public class PortletApplicationContext implements ApplicationContext
 {
@@ -42,13 +43,34 @@ public class PortletApplicationContext implements ApplicationContext
         return this.portletContext;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.container.ApplicationContext#getResourceAsStream(String)
+     */
     public InputStream getResourceAsStream(String resourceName)
     {
         return getPortletContext().getResourceAsStream(resourceName);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.container.ApplicationContext#getResource(String)
+     */
     public URL getResource(String resourceName) throws MalformedURLException
     {
         return getPortletContext().getResource(resourceName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.container.ApplicationContext#getTemporaryDirectory()
+     */
+    public File getTemporaryDirectory()
+    {
+        // Section PLT.10.3 from the Portlet 1.0 specification says that this should be available.
+        return (File) this.portletContext.getAttribute("javax.servlet.context.tempdir");
     }
 }

@@ -1,5 +1,6 @@
 package com.xpn.xwiki.test;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,7 +19,7 @@ public class TestApplicationContext implements ApplicationContext
     /**
      * {@inheritDoc}
      * 
-     * @see ApplicationContext#getResource(String)
+     * @see org.xwiki.container.ApplicationContext#getResource(String)
      */
     public URL getResource(String resourceName) throws MalformedURLException
     {
@@ -28,10 +29,25 @@ public class TestApplicationContext implements ApplicationContext
     /**
      * {@inheritDoc}
      * 
-     * @see ApplicationContext#getResourceAsStream(String)
+     * @see org.xwiki.container.ApplicationContext#getResourceAsStream(String)
      */
     public InputStream getResourceAsStream(String resourceName)
     {
         return getClass().getResourceAsStream(StringUtils.removeStart(resourceName, "/"));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.container.ApplicationContext#getTemporaryDirectory()
+     */
+    public File getTemporaryDirectory()
+    {
+        try {
+            // The system temporary directory is a good place for temporary test data.
+            return new File(System.getProperty("java.io.tmpdir"));
+        } catch (SecurityException e) {
+            return new File(".");
+        }
     }
 }

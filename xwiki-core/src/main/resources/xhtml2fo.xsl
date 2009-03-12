@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+
+Copyright Antenna House, Inc. (http://www.antennahouse.com) 2001, 2002.
+
+Since this stylesheet is originally developed by Antenna House to be used with XSL Formatter, it may not be compatible with another XSL-FO processors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do so, provided that the above copyright notice(s) and this permission
+notice appear in all copies of the Software and that both the above copyright notice(s) and this permission notice appear in supporting documentation.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE
+BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+-->
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fo="http://www.w3.org/1999/XSL/Format"
@@ -153,16 +170,12 @@
     <xsl:attribute-set name="p">
         <xsl:attribute name="space-before">1em</xsl:attribute>
         <xsl:attribute name="space-after">1em</xsl:attribute>
-        <!-- e.g.,
         <xsl:attribute name="text-indent">1em</xsl:attribute>
-    -->
     </xsl:attribute-set>
 
     <xsl:attribute-set name="p-initial" use-attribute-sets="p">
         <!-- initial paragraph, preceded by h1..6 or div -->
-        <!-- e.g.,
         <xsl:attribute name="text-indent">0em</xsl:attribute>
-    -->
     </xsl:attribute-set>
 
     <xsl:attribute-set name="p-initial-first" use-attribute-sets="p-initial">
@@ -441,9 +454,11 @@
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
     <xsl:attribute-set name="img">
+        <xsl:attribute name="content-height">60%</xsl:attribute>
+        <xsl:attribute name="content-width">60%</xsl:attribute>
     </xsl:attribute-set>
 
-    <xsl:attribute-set name="img-link">
+    <xsl:attribute-set name="img-link" use-attribute-sets="img">
         <xsl:attribute name="border">2px solid</xsl:attribute>
     </xsl:attribute-set>
 
@@ -460,6 +475,147 @@
     <!--======================================================================
     Templates
     =======================================================================-->
+    <!--
+
+      Since XHTML and XSL-FO have somewhat different elements, the transformation is split into two steps:
+      - a preprocessing step that handles special attributes that can't be mapped directly into FO
+      - a transformation step that converts elements into their equivalent
+      The two steps are implemented using two template modes: 'preprocess' and 'transform'. After the root
+      node is matched and the initial FO content is generated, the normal XSLT template matching continues
+      alternating the two modes, starting with 'preprocess'. Upon a successful match in the preprocess mode,
+      the current node is preprocessed, and, if it is not ignored (for example nodes that don't have a
+      meaning in FO), it will be matched again in the 'transform' mode. If another template matches the
+      current node in 'transform' mode, it may continue the template matching process for its child nodes,
+      again in the 'preprocess' mode.
+
+    -->
+
+    <!--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    Generic templates
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
+
+    <!-- The generic preprocess template that simply switches the mode to 'transform' and matches the same node again -->
+    <xsl:template match="*" mode="preprocess">
+        <xsl:apply-templates select="." mode="transform"/>
+    </xsl:template>
+
+    <!-- The 'style' preprocessor, which takes care of a few CSS properties that need special handling in FO -->
+    <xsl:template match="*[@style]" mode="preprocess">
+        <!-- Remove all white space and prepend ; for easier processing of the style -->
+        <xsl:variable name="style" select="concat(';', translate(normalize-space(@style), ' ', ''))"/>
+        <!-- Chain the 'style' processing into several named templates -->
+        <xsl:call-template name="process-style-display">
+            <xsl:with-param name="style" select="$style"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- Transform the eventual 'display' property in equivalent FO elements -->
+    <xsl:template name="process-style-display">
+        <xsl:param name="style"/>
+        <xsl:choose>
+            <!-- display: none => stop processing this branch -->
+            <xsl:when test="contains($style, ';display:none')"/>
+            <!-- display: inline-block => wrap inside fo:inline-container -->
+            <xsl:when test="contains($style, ';display:inline-block')">
+                <fo:inline-container>
+                    <fo:block>
+                        <xsl:call-template name="process-style-float">
+                            <xsl:with-param name="style" select="$style"/>
+                        </xsl:call-template>
+                    </fo:block>
+                </fo:inline-container>
+            </xsl:when>
+            <!-- display: block => wrap inside fo:block -->
+            <xsl:when test="contains($style, ';display:block')">
+                <fo:block>
+                    <xsl:call-template name="process-style-float">
+                        <xsl:with-param name="style" select="$style"/>
+                    </xsl:call-template>
+                </fo:block>
+            </xsl:when>
+            <!-- display: inline => wrap inside fo:inline -->
+            <xsl:when test="contains($style, ';display:inline')">
+                <fo:inline>
+                    <xsl:call-template name="process-style-float">
+                        <xsl:with-param name="style" select="$style"/>
+                    </xsl:call-template>
+                </fo:inline>
+            </xsl:when>
+            <!-- TODO: other display types, like list-item, table, etc. -->
+            <!-- No display or other display types, simply continue processing -->
+            <xsl:otherwise>
+                <xsl:call-template name="process-style-float">
+                    <xsl:with-param name="style" select="$style"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <!-- Transform the eventual 'float' property into fo:float -->
+    <xsl:template name="process-style-float">
+        <xsl:param name="style"/>
+        <xsl:choose>
+            <!-- Disabled since fop-0.95 does not support floats and completely drops floated elements -->
+            <xsl:when test="0 and contains($style, ';float:')">
+                <fo:float>
+                    <xsl:attribute name="float">
+                        <xsl:call-template name="get-style-value">
+                            <xsl:with-param name="style" select="$style"/>
+                            <xsl:with-param name="property" select="'float'"/>
+                        </xsl:call-template>
+                    </xsl:attribute>
+                    <fo:block>
+                        <xsl:call-template name="process-style-clear">
+                            <xsl:with-param name="style" select="$style"/>
+                        </xsl:call-template>
+                    </fo:block>
+                </fo:float>
+            </xsl:when>
+            <!-- No float, simply continue processing -->
+            <xsl:otherwise>
+                <xsl:call-template name="process-style-clear">
+                    <xsl:with-param name="style" select="$style"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <!-- Transform the eventual 'clear' property into a fo:block with the equivalen clear attribute -->
+    <xsl:template name="process-style-clear">
+        <xsl:param name="style"/>
+        <xsl:choose>
+            <xsl:when test="contains($style, ';clear:')">
+                <fo:block>
+                    <xsl:attribute name="clear">
+                        <xsl:call-template name="get-style-value">
+                            <xsl:with-param name="style" select="$style"/>
+                            <xsl:with-param name="property" select="'clear'"/>
+                        </xsl:call-template>
+                    </xsl:attribute>
+                    <xsl:apply-templates select="." mode="transform"/>
+                </fo:block>
+            </xsl:when>
+            <!-- No furher special attributes, continue processing in 'transform' mode -->
+            <xsl:otherwise>
+                <xsl:apply-templates select="." mode="transform"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <!-- Get the value for a given CSS property from a style attribute -->
+    <xsl:template name="get-style-value">
+        <xsl:param name="style"/>
+        <xsl:param name="property"/>
+        <xsl:variable name="value-and-rest" select="normalize-space(substring-after($style, concat($property, ':')))"/>
+        <xsl:choose>
+            <xsl:when test="contains($value-and-rest, ';')">
+                <xsl:value-of select="normalize-space(substring-before($value-and-rest, ';'))"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$value-and-rest"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
 
     <!--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Root
@@ -469,7 +625,7 @@
         <fo:root xsl:use-attribute-sets="root">
             <xsl:call-template name="process-common-attributes"/>
             <xsl:call-template name="make-layout-master-set"/>
-            <xsl:apply-templates/>
+            <xsl:apply-templates mode="preprocess"/>
         </fo:root>
     </xsl:template>
 
@@ -485,10 +641,8 @@
                                 column-gap="{$column-gap}"/>
                 <xsl:choose>
                     <xsl:when test="$writing-mode = 'tb-rl'">
-                        <fo:region-before extent="{$page-margin-right}"
-                                          precedence="true"/>
-                        <fo:region-after  extent="{$page-margin-left}"
-                                          precedence="true"/>
+                        <fo:region-before extent="{$page-margin-right}" precedence="true"/>
+                        <fo:region-after  extent="{$page-margin-left}" precedence="true"/>
                         <fo:region-start  region-name="page-header"
                                           extent="{$page-margin-top}"
                                           writing-mode="lr-tb"
@@ -523,9 +677,10 @@
         </fo:layout-master-set>
     </xsl:template>
 
-    <xsl:template match="html:head | html:script"/>
+    <!-- Ignore the head and all scripts -->
+    <xsl:template match="html:head | html:script" mode="preprocess"/>
 
-    <xsl:template match="html:body">
+    <xsl:template match="html:body" mode="preprocess">
         <fo:page-sequence master-reference="all-pages">
             <fo:title>
                 <xsl:value-of select="/html:html/html:head/html:title[@class='pdftitle']"/>
@@ -551,7 +706,7 @@
             <fo:flow flow-name="xsl-region-body">
                 <fo:block xsl:use-attribute-sets="body">
                     <xsl:call-template name="process-common-attributes"/>
-                    <xsl:apply-templates/>
+                    <xsl:apply-templates mode="preprocess"/>
                 </fo:block>
             </fo:flow>
         </fo:page-sequence>
@@ -560,24 +715,22 @@
     <xsl:template match="/html:html/html:body/html:div[@class='pdfheader']" mode="pdfheader" priority="0">
         <fo:block>
             <xsl:call-template name="process-common-attributes"/>
-            <xsl:apply-templates/>
+            <xsl:apply-templates mode="preprocess"/>
         </fo:block>
     </xsl:template>
 
     <xsl:template match="/html:html/html:body/html:div[@class='pdffooter']" mode="pdffooter" priority="0">
         <fo:block>
             <xsl:call-template name="process-common-attributes"/>
-            <xsl:apply-templates/>
+            <xsl:apply-templates mode="preprocess"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="/html:html/html:body/html:div[@class='pdfheader']" priority="1">
-    </xsl:template>
+    <xsl:template match="/html:html/html:body/html:div[@class='pdfheader']" priority="1" mode="preprocess"/>
 
-    <xsl:template match="/html:html/html:body/html:div[@class='pdffooter']" priority="1">
-    </xsl:template>
+    <xsl:template match="/html:html/html:body/html:div[@class='pdffooter']" priority="1" mode="preprocess"/>
 
-    <xsl:template match="html:span[@class='page-number']">
+    <xsl:template match="html:span[@class='page-number']" mode="preprocess">
           <fo:page-number/>
     </xsl:template>
 
@@ -587,7 +740,7 @@
 
     <xsl:template name="process-common-attributes-and-children">
         <xsl:call-template name="process-common-attributes"/>
-        <xsl:apply-templates/>
+        <xsl:apply-templates mode="preprocess"/>
     </xsl:template>
 
     <xsl:template name="process-common-attributes">
@@ -650,7 +803,6 @@
                 <xsl:with-param name="style" select="@style"/>
             </xsl:call-template>
         </xsl:if>
-
     </xsl:template>
 
     <xsl:template name="process-style">
@@ -703,6 +855,15 @@
                 </xsl:when>
                 <xsl:when test="$name = 'list-style'">
                 </xsl:when>
+                <!-- These are not valid in XSL, so we ignore them -->
+                <xsl:when test="$name = 'cursor'"/>
+                <xsl:when test="$name = 'quotes'"/>
+                <xsl:when test="starts-with($name, 'list-')"/>
+                <xsl:when test="starts-with($name, 'outline')"/>
+                <!-- These are treated separately in the 'generic' template mode, since they can't be applied directly on the current element -->
+                <xsl:when test="$name = 'display'"/>
+                <xsl:when test="$name = 'float'"/>
+                <xsl:when test="$name = 'clear'"/>
                 <xsl:otherwise>
                     <xsl:attribute name="{$name}">
                         <xsl:value-of select="$value"/>
@@ -724,43 +885,43 @@
     Block-level
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:h1">
+    <xsl:template match="html:h1" mode="transform">
         <fo:block xsl:use-attribute-sets="h1">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h2">
+    <xsl:template match="html:h2" mode="transform">
         <fo:block xsl:use-attribute-sets="h2">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h3">
+    <xsl:template match="html:h3" mode="transform">
         <fo:block xsl:use-attribute-sets="h3">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h4">
+    <xsl:template match="html:h4" mode="transform">
         <fo:block xsl:use-attribute-sets="h4">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h5">
+    <xsl:template match="html:h5" mode="transform">
         <fo:block xsl:use-attribute-sets="h5">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h6">
+    <xsl:template match="html:h6" mode="transform">
         <fo:block xsl:use-attribute-sets="h6">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:p">
+    <xsl:template match="html:p" mode="transform">
         <fo:block xsl:use-attribute-sets="p">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
@@ -769,8 +930,7 @@
     <!-- initial paragraph, preceded by h1..6 or div -->
     <xsl:template match="html:p[preceding-sibling::*[1][
     self::html:h1 or self::html:h2 or self::html:h3 or
-    self::html:h4 or self::html:h5 or self::html:h6 or
-    self::html:div]]">
+    self::html:h4 or self::html:h5 or self::html:h6]]" mode="transform">
         <fo:block xsl:use-attribute-sets="p-initial">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
@@ -779,25 +939,25 @@
     <!-- initial paragraph, first child of div, body or td -->
     <xsl:template match="html:p[not(preceding-sibling::*) and (
     parent::html:div or parent::html:body or
-    parent::html:td)]">
+    parent::html:td)]" mode="transform">
         <fo:block xsl:use-attribute-sets="p-initial-first">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:blockquote">
+    <xsl:template match="html:blockquote" mode="transform">
         <fo:block xsl:use-attribute-sets="blockquote">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:pre">
+    <xsl:template match="html:pre" mode="transform">
         <fo:block xsl:use-attribute-sets="pre">
             <xsl:call-template name="process-pre"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template name="process-pre">
+    <xsl:template name="process-pre" mode="transform">
         <xsl:call-template name="process-common-attributes"/>
         <!-- remove leading CR/LF/CRLF char -->
         <xsl:variable name="crlf"><xsl:text>&#xD;&#xA;</xsl:text></xsl:variable>
@@ -817,30 +977,30 @@
                             <xsl:value-of select="substring(., 2)"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:apply-templates select="."/>
+                            <xsl:apply-templates select="." mode="preprocess"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:apply-templates select="."/>
+                    <xsl:apply-templates select="." mode="preprocess"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:for-each>
     </xsl:template>
 
-    <xsl:template match="html:address">
+    <xsl:template match="html:address" mode="transform">
         <fo:block xsl:use-attribute-sets="address">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:hr">
+    <xsl:template match="html:hr" mode="transform">
         <fo:block xsl:use-attribute-sets="hr">
             <xsl:call-template name="process-common-attributes"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:div">
+    <xsl:template match="html:div" mode="transform">
         <!-- need fo:block-container? or normal fo:block -->
         <xsl:variable name="need-block-container">
             <xsl:call-template name="need-block-container"/>
@@ -858,15 +1018,14 @@
                     </xsl:if>
                     <xsl:call-template name="process-common-attributes"/>
                     <fo:block start-indent="0pt" end-indent="0pt">
-                        <xsl:apply-templates/>
+                        <xsl:apply-templates mode="preprocess"/>
                     </fo:block>
                 </fo:block-container>
             </xsl:when>
             <xsl:otherwise>
                 <!-- normal block -->
                 <fo:block>
-                    <xsl:call-template name="process-common-attributes"/>
-                    <xsl:apply-templates/>
+                    <xsl:call-template name="process-common-attributes-and-children"/>
                 </fo:block>
             </xsl:otherwise>
         </xsl:choose>
@@ -892,13 +1051,13 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="html:center">
+    <xsl:template match="html:center" mode="transform">
         <fo:block text-align="center">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:fieldset | html:form | html:dir | html:menu">
+    <xsl:template match="html:fieldset | html:form | html:dir | html:menu" mode="transform">
         <fo:block space-before="1em" space-after="1em">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
@@ -908,31 +1067,31 @@
     List
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:ul">
+    <xsl:template match="html:ul" mode="transform">
         <fo:list-block xsl:use-attribute-sets="ul">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:list-block>
     </xsl:template>
 
-    <xsl:template match="html:li//html:ul">
+    <xsl:template match="html:li//html:ul" mode="transform">
         <fo:list-block xsl:use-attribute-sets="ul-nested">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:list-block>
     </xsl:template>
 
-    <xsl:template match="html:ol">
+    <xsl:template match="html:ol" mode="transform">
         <fo:list-block xsl:use-attribute-sets="ol">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:list-block>
     </xsl:template>
 
-    <xsl:template match="html:li//html:ol">
+    <xsl:template match="html:li//html:ol" mode="transform">
         <fo:list-block xsl:use-attribute-sets="ol-nested">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:list-block>
     </xsl:template>
 
-    <xsl:template match="html:ul/html:li">
+    <xsl:template match="html:ul/html:li" mode="transform">
         <fo:list-item xsl:use-attribute-sets="ul-li">
             <xsl:call-template name="process-ul-li"/>
         </fo:list-item>
@@ -967,12 +1126,12 @@
         </fo:list-item-label>
         <fo:list-item-body start-indent="body-start()">
             <fo:block>
-                <xsl:apply-templates/>
+                <xsl:apply-templates mode="preprocess"/>
             </fo:block>
         </fo:list-item-body>
     </xsl:template>
 
-    <xsl:template match="html:ol/html:li">
+    <xsl:template match="html:ol/html:li" mode="transform">
         <fo:list-item xsl:use-attribute-sets="ol-li">
             <xsl:call-template name="process-ol-li"/>
         </fo:list-item>
@@ -1007,24 +1166,24 @@
         </fo:list-item-label>
         <fo:list-item-body start-indent="body-start()">
             <fo:block>
-                <xsl:apply-templates/>
+                <xsl:apply-templates mode="preprocess"/>
             </fo:block>
         </fo:list-item-body>
     </xsl:template>
 
-    <xsl:template match="html:dl">
+    <xsl:template match="html:dl" mode="transform">
         <fo:block xsl:use-attribute-sets="dl">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:dt">
+    <xsl:template match="html:dt" mode="transform">
         <fo:block xsl:use-attribute-sets="dt">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:dd">
+    <xsl:template match="html:dd" mode="transform">
         <fo:block xsl:use-attribute-sets="dd">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
@@ -1034,7 +1193,7 @@
     Table
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:table">
+    <xsl:template match="html:table" mode="transform">
         <fo:table-and-caption xsl:use-attribute-sets="table-and-caption">
             <xsl:call-template name="make-table-caption"/>
             <fo:table xsl:use-attribute-sets="table">
@@ -1049,7 +1208,7 @@
                 <xsl:value-of select="html:caption/@align"/>
             </xsl:attribute>
         </xsl:if>
-        <xsl:apply-templates select="html:caption"/>
+        <xsl:apply-templates select="html:caption" mode="preprocess"/>
     </xsl:template>
 
     <xsl:template name="process-table">
@@ -1120,16 +1279,16 @@
             </xsl:if>
         </xsl:if>
         <xsl:call-template name="process-common-attributes"/>
-        <xsl:apply-templates select="html:col | html:colgroup"/>
-        <xsl:apply-templates select="html:thead"/>
-        <xsl:apply-templates select="html:tfoot"/>
+        <xsl:apply-templates select="html:col | html:colgroup" mode="preprocess"/>
+        <xsl:apply-templates select="html:thead" mode="preprocess"/>
+        <xsl:apply-templates select="html:tfoot" mode="preprocess"/>
         <xsl:choose>
             <xsl:when test="html:tbody">
-                <xsl:apply-templates select="html:tbody"/>
+                <xsl:apply-templates select="html:tbody" mode="preprocess"/>
             </xsl:when>
             <xsl:otherwise>
                 <fo:table-body xsl:use-attribute-sets="tbody">
-                    <xsl:apply-templates select="html:tr"/>
+                    <xsl:apply-templates select="html:tr" mode="preprocess"/>
                 </fo:table-body>
             </xsl:otherwise>
         </xsl:choose>
@@ -1182,30 +1341,28 @@
         </xsl:if>
     </xsl:template>
 
-
-
-    <xsl:template match="html:caption">
+    <xsl:template match="html:caption" mode="transform">
         <fo:table-caption xsl:use-attribute-sets="table-caption">
             <xsl:call-template name="process-common-attributes"/>
             <fo:block>
-                <xsl:apply-templates/>
+                <xsl:apply-templates mode="preprocess"/>
             </fo:block>
         </fo:table-caption>
     </xsl:template>
 
-    <xsl:template match="html:thead">
+    <xsl:template match="html:thead" mode="transform">
         <fo:table-header xsl:use-attribute-sets="thead">
             <xsl:call-template name="process-table-rowgroup"/>
         </fo:table-header>
     </xsl:template>
 
-    <xsl:template match="html:tfoot">
+    <xsl:template match="html:tfoot" mode="transform">
         <fo:table-footer xsl:use-attribute-sets="tfoot">
             <xsl:call-template name="process-table-rowgroup"/>
         </fo:table-footer>
     </xsl:template>
 
-    <xsl:template match="html:tbody">
+    <xsl:template match="html:tbody" mode="transform">
         <fo:table-body xsl:use-attribute-sets="tbody">
             <xsl:call-template name="process-table-rowgroup"/>
         </fo:table-body>
@@ -1218,17 +1375,17 @@
         <xsl:call-template name="process-common-attributes-and-children"/>
     </xsl:template>
 
-    <xsl:template match="html:colgroup">
+    <xsl:template match="html:colgroup" mode="transform">
         <fo:table-column xsl:use-attribute-sets="table-column">
             <xsl:call-template name="process-table-column"/>
         </fo:table-column>
     </xsl:template>
 
-    <xsl:template match="html:colgroup[html:col]">
-        <xsl:apply-templates/>
+    <xsl:template match="html:colgroup[html:col]" mode="transform">
+        <xsl:apply-templates mode="preprocess"/>
     </xsl:template>
 
-    <xsl:template match="html:col">
+    <xsl:template match="html:col" mode="transform">
         <fo:table-column xsl:use-attribute-sets="table-column">
             <xsl:call-template name="process-table-column"/>
         </fo:table-column>
@@ -1262,13 +1419,13 @@
         <!-- this processes also align and valign -->
     </xsl:template>
 
-    <xsl:template match="html:tr">
+    <xsl:template match="html:tr" mode="transform">
         <fo:table-row xsl:use-attribute-sets="tr">
             <xsl:call-template name="process-table-row"/>
         </fo:table-row>
     </xsl:template>
 
-    <xsl:template match="html:tr[parent::html:table and html:th and not(html:td)]">
+    <xsl:template match="html:tr[parent::html:table and html:th and not(html:td)]" mode="transform">
         <fo:table-row xsl:use-attribute-sets="tr" keep-with-next="always">
             <xsl:call-template name="process-table-row"/>
         </fo:table-row>
@@ -1281,13 +1438,13 @@
         <xsl:call-template name="process-common-attributes-and-children"/>
     </xsl:template>
 
-    <xsl:template match="html:th">
+    <xsl:template match="html:th" mode="transform">
         <fo:table-cell xsl:use-attribute-sets="th">
             <xsl:call-template name="process-table-cell"/>
         </fo:table-cell>
     </xsl:template>
 
-    <xsl:template match="html:td">
+    <xsl:template match="html:td" mode="transform">
         <fo:table-cell xsl:use-attribute-sets="td">
             <xsl:call-template name="process-table-cell"/>
         </fo:table-cell>
@@ -1338,7 +1495,7 @@
         </xsl:if>
         <xsl:call-template name="process-common-attributes"/>
         <fo:block>
-            <xsl:apply-templates/>
+            <xsl:apply-templates mode="preprocess"/>
         </fo:block>
     </xsl:template>
 
@@ -1407,157 +1564,157 @@
     Inline-level
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:b">
+    <xsl:template match="html:b" mode="transform">
         <fo:inline xsl:use-attribute-sets="b">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:strong">
+    <xsl:template match="html:strong" mode="transform">
         <fo:inline xsl:use-attribute-sets="strong">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:strong//html:em | html:em//html:strong">
+    <xsl:template match="html:strong//html:em | html:em//html:strong" mode="transform">
         <fo:inline xsl:use-attribute-sets="strong-em">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:i">
+    <xsl:template match="html:i" mode="transform">
         <fo:inline xsl:use-attribute-sets="i">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:cite">
+    <xsl:template match="html:cite" mode="transform">
         <fo:inline xsl:use-attribute-sets="cite">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:em">
+    <xsl:template match="html:em" mode="transform">
         <fo:inline xsl:use-attribute-sets="em">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:var">
+    <xsl:template match="html:var" mode="transform">
         <fo:inline xsl:use-attribute-sets="var">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:dfn">
+    <xsl:template match="html:dfn" mode="transform">
         <fo:inline xsl:use-attribute-sets="dfn">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:tt">
+    <xsl:template match="html:tt" mode="transform">
         <fo:inline xsl:use-attribute-sets="tt">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:code">
+    <xsl:template match="html:code" mode="transform">
         <fo:inline xsl:use-attribute-sets="code">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:kbd">
+    <xsl:template match="html:kbd" mode="transform">
         <fo:inline xsl:use-attribute-sets="kbd">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:samp">
+    <xsl:template match="html:samp" mode="transform">
         <fo:inline xsl:use-attribute-sets="samp">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:big">
+    <xsl:template match="html:big" mode="transform">
         <fo:inline xsl:use-attribute-sets="big">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:small">
+    <xsl:template match="html:small" mode="transform">
         <fo:inline xsl:use-attribute-sets="small">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:sub">
+    <xsl:template match="html:sub" mode="transform">
         <fo:inline xsl:use-attribute-sets="sub">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:sup">
+    <xsl:template match="html:sup" mode="transform">
         <fo:inline xsl:use-attribute-sets="sup">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:s">
+    <xsl:template match="html:s" mode="transform">
         <fo:inline xsl:use-attribute-sets="s">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:strike">
+    <xsl:template match="html:strike" mode="transform">
         <fo:inline xsl:use-attribute-sets="strike">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:del">
+    <xsl:template match="html:del" mode="transform">
         <fo:inline xsl:use-attribute-sets="del">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:u">
+    <xsl:template match="html:u" mode="transform">
         <fo:inline xsl:use-attribute-sets="u">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:ins">
+    <xsl:template match="html:ins" mode="transform">
         <fo:inline xsl:use-attribute-sets="ins">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:abbr">
+    <xsl:template match="html:abbr" mode="transform">
         <fo:inline xsl:use-attribute-sets="abbr">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:acronym">
+    <xsl:template match="html:acronym" mode="transform">
         <fo:inline xsl:use-attribute-sets="acronym">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:span">
+    <xsl:template match="html:span" mode="transform">
         <fo:inline>
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:span[@dir]">
+    <xsl:template match="html:span[@dir]" mode="transform">
         <fo:bidi-override direction="{@dir}" unicode-bidi="embed">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:bidi-override>
     </xsl:template>
 
-    <xsl:template match="html:span[@style and contains(@style, 'writing-mode')]">
+    <xsl:template match="html:span[@style and contains(@style, 'writing-mode')]" mode="transform">
         <fo:inline-container alignment-baseline="central"
                              text-indent="0pt"
                              last-line-end-indent="0pt"
@@ -1567,36 +1724,36 @@
                              text-align-last="center">
             <xsl:call-template name="process-common-attributes"/>
             <fo:block wrap-option="no-wrap" line-height="1">
-                <xsl:apply-templates/>
+                <xsl:apply-templates mode="preprocess"/>
             </fo:block>
         </fo:inline-container>
     </xsl:template>
 
-    <xsl:template match="html:bdo">
+    <xsl:template match="html:bdo" mode="transform">
         <fo:bidi-override direction="{@dir}" unicode-bidi="bidi-override">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:bidi-override>
     </xsl:template>
 
-    <xsl:template match="html:br">
+    <xsl:template match="html:br" mode="transform">
         <fo:block>
             <xsl:call-template name="process-common-attributes"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:q">
+    <xsl:template match="html:q" mode="transform">
         <fo:inline xsl:use-attribute-sets="q">
             <xsl:call-template name="process-common-attributes"/>
             <xsl:choose>
                 <xsl:when test="lang('ja')">
                     <xsl:text>&#x300C;</xsl:text>
-                    <xsl:apply-templates/>
+                    <xsl:apply-templates mode="preprocess"/>
                     <xsl:text>&#x300D;</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- lang('en') -->
                     <xsl:text>&#x201C;</xsl:text>
-                    <xsl:apply-templates/>
+                    <xsl:apply-templates mode="preprocess"/>
                     <xsl:text>&#x201D;</xsl:text>
                     <!-- todo: other languages ...-->
                 </xsl:otherwise>
@@ -1604,19 +1761,19 @@
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:q//html:q">
+    <xsl:template match="html:q//html:q" mode="transform">
         <fo:inline xsl:use-attribute-sets="q-nested">
             <xsl:call-template name="process-common-attributes"/>
             <xsl:choose>
                 <xsl:when test="lang('ja')">
                     <xsl:text>&#x300E;</xsl:text>
-                    <xsl:apply-templates/>
+                    <xsl:apply-templates mode="preprocess"/>
                     <xsl:text>&#x300F;</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- lang('en') -->
                     <xsl:text>&#x2018;</xsl:text>
-                    <xsl:apply-templates/>
+                    <xsl:apply-templates mode="preprocess"/>
                     <xsl:text>&#x2019;</xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
@@ -1627,19 +1784,27 @@
     Image
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:img">
+    <xsl:template match="html:img" mode="transform">
         <fo:external-graphic xsl:use-attribute-sets="img">
             <xsl:call-template name="process-img"/>
         </fo:external-graphic>
     </xsl:template>
 
-    <xsl:template match="html:img[ancestor::html:a/@href]">
+    <xsl:template match="html:img[ancestor::html:a/@href]" mode="transform">
         <fo:external-graphic xsl:use-attribute-sets="img-link">
             <xsl:call-template name="process-img"/>
         </fo:external-graphic>
     </xsl:template>
 
     <xsl:template name="process-img">
+        <xsl:variable name="style" select="concat(';', translate(normalize-space(@style), ' ', ''))"/>
+        <xsl:variable name="has-width" select="@width or contains($style, ';width:')"/>
+        <xsl:variable name="has-height" select="@height or contains($style, ';height:')"/>
+        <xsl:if test="$has-height and $has-width"><xsl:attribute name="scaling">non-uniform</xsl:attribute></xsl:if>
+        <xsl:if test="$has-height or $has-width">
+            <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
+            <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
+        </xsl:if>
         <xsl:attribute name="src">
             <xsl:text>url('</xsl:text>
             <xsl:value-of select="@src"/>
@@ -1650,45 +1815,12 @@
                 <xsl:value-of select="@alt"/>
             </xsl:attribute>
         </xsl:if>
+        <!-- CSS values for the widht and height will be used in the generic 'process-style' template -->
         <xsl:if test="@width">
-            <xsl:variable name="width">
-              <xsl:value-of select="@width"/>
-            </xsl:variable>
-            <xsl:choose>
-                <xsl:when test="contains(@width, '%')">
-                    <xsl:attribute name="width">
-                        <xsl:value-of select="@width"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
-                </xsl:when>
-                <xsl:when test="$width &gt; '450'">
-                    <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:attribute name="content-width">
-                        <xsl:value-of select="@width"/>px</xsl:attribute>
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:attribute name="width"><xsl:value-of select="@width"/></xsl:attribute>
         </xsl:if>
         <xsl:if test="@height">
-            <xsl:variable name="width">
-              <xsl:value-of select="@width"/>
-            </xsl:variable>
-            <xsl:choose>
-                <xsl:when test="contains(@height, '%')">
-                    <xsl:attribute name="height">
-                        <xsl:value-of select="@height"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
-                </xsl:when>
-                <xsl:when test="$width &gt; '450'">
-                    <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:attribute name="content-height">
-                        <xsl:value-of select="@height"/>px</xsl:attribute>
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:attribute name="height"><xsl:value-of select="@height"/></xsl:attribute>
         </xsl:if>
         <xsl:if test="@border">
             <xsl:attribute name="border">
@@ -1697,33 +1829,34 @@
         <xsl:call-template name="process-common-attributes"/>
     </xsl:template>
 
-    <xsl:template match="html:object">
-        <xsl:apply-templates/>
+    <xsl:template match="html:object" mode="transform">
+        <xsl:apply-templates mode="preprocess"/>
     </xsl:template>
 
-    <xsl:template match="html:param"/>
-    <xsl:template match="html:map"/>
-    <xsl:template match="html:area"/>
-    <xsl:template match="html:label"/>
-    <xsl:template match="html:input"/>
-    <xsl:template match="html:select"/>
-    <xsl:template match="html:optgroup"/>
-    <xsl:template match="html:option"/>
-    <xsl:template match="html:textarea"/>
-    <xsl:template match="html:legend"/>
-    <xsl:template match="html:button"/>
+    <!-- These elements don't have an equivalent in XSL-FO, just ignore them -->
+    <xsl:template match="html:param" mode="preprocess"/>
+    <xsl:template match="html:map" mode="preprocess"/>
+    <xsl:template match="html:area" mode="preprocess"/>
+    <xsl:template match="html:label" mode="preprocess"/>
+    <xsl:template match="html:input" mode="preprocess"/>
+    <xsl:template match="html:select" mode="preprocess"/>
+    <xsl:template match="html:optgroup" mode="preprocess"/>
+    <xsl:template match="html:option" mode="preprocess"/>
+    <xsl:template match="html:textarea" mode="preprocess"/>
+    <xsl:template match="html:legend" mode="preprocess"/>
+    <xsl:template match="html:button" mode="preprocess"/>
 
     <!--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Link
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:a">
+    <xsl:template match="html:a" mode="transform">
         <fo:inline>
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:inline>
     </xsl:template>
 
-    <xsl:template match="html:a[@href]">
+    <xsl:template match="html:a[@href]" mode="transform">
         <fo:basic-link xsl:use-attribute-sets="a-link">
             <xsl:call-template name="process-a-link"/>
         </fo:basic-link>
@@ -1732,6 +1865,9 @@
     <xsl:template name="process-a-link">
         <xsl:call-template name="process-common-attributes"/>
         <xsl:choose>
+            <xsl:when test="@href = '#'">
+                <xsl:attribute name="internal-destination">xwikimaincontainer</xsl:attribute>
+            </xsl:when>
             <xsl:when test="starts-with(@href,'#')">
                 <xsl:attribute name="internal-destination">
                     <xsl:value-of select="substring-after(@href,'#')"/>
@@ -1750,14 +1886,14 @@
                 <xsl:value-of select="@title"/>
             </xsl:attribute>
         </xsl:if>
-        <xsl:apply-templates/>
+        <xsl:apply-templates mode="preprocess"/>
     </xsl:template>
 
     <!--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Ruby
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:ruby">
+    <xsl:template match="html:ruby" mode="transform">
         <fo:inline-container alignment-baseline="central"
                              block-progression-dimension="1em"
                              text-indent="0pt"
@@ -1776,13 +1912,13 @@
                       role="html:rt">
                 <xsl:for-each select="html:rt | html:rtc[1]/html:rt">
                     <xsl:call-template name="process-common-attributes"/>
-                    <xsl:apply-templates/>
+                    <xsl:apply-templates mode="preprocess"/>
                 </xsl:for-each>
             </fo:block>
             <fo:block wrap-option="no-wrap" line-height="1" role="html:rb">
                 <xsl:for-each select="html:rb | html:rbc[1]/html:rb">
                     <xsl:call-template name="process-common-attributes"/>
-                    <xsl:apply-templates/>
+                    <xsl:apply-templates mode="preprocess"/>
                 </xsl:for-each>
             </fo:block>
             <xsl:if test="html:rtc[2]/html:rt">
@@ -1795,7 +1931,7 @@
                           role="html:rt">
                     <xsl:for-each select="html:rt | html:rtc[2]/html:rt">
                         <xsl:call-template name="process-common-attributes"/>
-                        <xsl:apply-templates/>
+                        <xsl:apply-templates mode="preprocess"/>
                     </xsl:for-each>
                 </fo:block>
             </xsl:if>

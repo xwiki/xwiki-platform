@@ -18,6 +18,106 @@
 </div>
 {{/html}}{{/velocity}}
 .#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [velocity] [] [{{html}}
+<div>
+  #set ($name = "John")
+  #set ($list = ['one', 'two'])
+  <h1>Hello $name</h1>
+  <table>
+    #foreach ($item in $list)
+      <tr>
+        <td>
+          * item
+        </td>
+      </tr>
+    #end
+  </table>
+</div>
+{{/html}}]
+beginMacroMarkerStandalone [html] [] [
+<div>
+    <h1>Hello John</h1>
+  <table>
+          <tr>
+        <td>
+          * item
+        </td>
+      </tr>
+          <tr>
+        <td>
+          * item
+        </td>
+      </tr>
+      </table>
+</div>
+]
+beginXMLNode [div]
+beginXMLNode [h1]
+onWord [Hello]
+onSpace
+onWord [John]
+endXMLNode [h1]
+beginXMLNode [table]
+beginXMLNode [tbody]
+beginXMLNode [tr]
+beginXMLNode [td]
+beginList [BULLETED]
+beginListItem
+onWord [item]
+endListItem
+endList [BULLETED]
+endXMLNode [td]
+endXMLNode [tr]
+beginXMLNode [tr]
+beginXMLNode [td]
+beginList [BULLETED]
+beginListItem
+onWord [item]
+endListItem
+endList [BULLETED]
+endXMLNode [td]
+endXMLNode [tr]
+endXMLNode [tbody]
+endXMLNode [table]
+endXMLNode [div]
+endMacroMarkerStandalone [html] [] [
+<div>
+    <h1>Hello John</h1>
+  <table>
+          <tr>
+        <td>
+          * item
+        </td>
+      </tr>
+          <tr>
+        <td>
+          * item
+        </td>
+      </tr>
+      </table>
+</div>
+]
+endMacroMarkerStandalone [velocity] [] [{{html}}
+<div>
+  #set ($name = "John")
+  #set ($list = ['one', 'two'])
+  <h1>Hello $name</h1>
+  <table>
+    #foreach ($item in $list)
+      <tr>
+        <td>
+          * item
+        </td>
+      </tr>
+    #end
+  </table>
+</div>
+{{/html}}]
+endDocument
+.#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
 <!--startmacro:velocity|-||-|{{html}}

@@ -38,41 +38,11 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
 {
     public enum Event
     {
-        NONE,
-        DEFINITION_DESCRIPTION,
-        DEFINITION_TERM,
-        DEFINITION_LIST,
-        DOCUMENT,
-        FORMAT,
-        HEADER,
-        LINK,
-        LIST,
-        LIST_ITEM,
-        MACRO_MARKER,
-        PARAGRAPH,
-        QUOTATION,
-        QUOTATION_LINE,
-        SECTION,
-        TABLE,
-        TABLE_CELL,
-        TABLE_HEAD_CELL,
-        TABLE_ROW,
-        XML_NODE,
-        EMPTY_LINES,
-        HORIZONTAL_LINE,
-        ID,
-        IMAGE,
-        NEW_LINE,
-        SPACE,
-        SPECIAL_SYMBOL,
-        MACRO,
-        VERBATIM_INLINE,
-        VERBATIM_STANDALONE,
-        WORD
+        NONE, DEFINITION_DESCRIPTION, DEFINITION_TERM, DEFINITION_LIST, DOCUMENT, FORMAT, HEADER, LINK, LIST, LIST_ITEM, MACRO_MARKER, PARAGRAPH, QUOTATION, QUOTATION_LINE, SECTION, TABLE, TABLE_CELL, TABLE_HEAD_CELL, TABLE_ROW, XML_NODE, EMPTY_LINES, HORIZONTAL_LINE, ID, IMAGE, NEW_LINE, SPACE, SPECIAL_SYMBOL, MACRO, VERBATIM_INLINE, VERBATIM_STANDALONE, WORD
     }
-    
+
     private Event previousEvent = Event.NONE;
-    
+
     private int inlineDepth = 0;
 
     private boolean isInParagraph;
@@ -94,7 +64,9 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     private int quotationDepth = 0;
 
     private boolean isInQuotationLine;
-    
+
+    private int macroDepth = 0;
+
     public BlockStateChainingListener(ListenerChain listenerChain)
     {
         super(listenerChain);
@@ -102,6 +74,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
 
     /**
      * {@inheritDoc}
+     * 
      * @see StackableChainingListener#createChainingListenerInstance()
      */
     public StackableChainingListener createChainingListenerInstance()
@@ -113,7 +86,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     {
         return this.previousEvent;
     }
-    
+
     public boolean isInLine()
     {
         return this.inlineDepth > 0;
@@ -153,7 +126,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     {
         return this.listDepth;
     }
-    
+
     public boolean isInListItem()
     {
         return this.listItemDepth > 0;
@@ -187,6 +160,11 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     public int getDefinitionListDepth()
     {
         return this.definitionListDepth;
+    }
+
+    public int getMacroDepth()
+    {
+        return this.macroDepth;
     }
 
     // Events
@@ -226,6 +204,12 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         ++this.listItemDepth;
         ++this.inlineDepth;
         super.beginListItem();
+    }
+
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
+    {
+        ++this.macroDepth;
+        super.beginMacroMarker(name, parameters, content, isInline);
     }
 
     public void beginParagraph(Map<String, String> parameters)
@@ -334,6 +318,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     {
         super.endMacroMarker(name, parameters, content, isInline);
         this.previousEvent = Event.MACRO_MARKER;
+        --this.macroDepth;
     }
 
     public void endParagraph(Map<String, String> parameters)
@@ -466,5 +451,5 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     {
         this.previousEvent = Event.MACRO;
         super.onMacro(name, parameters, content, isInline);
-    }    
+    }
 }

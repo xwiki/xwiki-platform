@@ -21,9 +21,9 @@ package com.xpn.xwiki.test;
 
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.plexus.manager.PlexusComponentManager;
-import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 
@@ -34,14 +34,19 @@ public class XWikiComponentInitializer
     public void initialize() throws Exception
     {
         // Initialize the Execution Context
-        ExecutionContextInitializerManager ecim =
-            (ExecutionContextInitializerManager) getComponentManager().lookup(ExecutionContextInitializerManager.ROLE);
+        ExecutionContextManager ecm =
+            (ExecutionContextManager) getComponentManager().lookup(ExecutionContextManager.ROLE);
         Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
 
         ExecutionContext ec = new ExecutionContext();
 
-        ecim.initialize(ec);
+        // Make sure we push this empty context in the Execution component before we call the initialization
+        // so that we don't get any NPE if some initializer code asks to get the Execution Context. This 
+        // happens for example with the Velocity Execution Context initializer which in turns calls the Velocity
+        // Context initializers and some of them look inside the Execution Context.
         execution.setContext(ec);
+        
+        ecm.initialize(ec);
     }
 
     public void shutdown() throws Exception

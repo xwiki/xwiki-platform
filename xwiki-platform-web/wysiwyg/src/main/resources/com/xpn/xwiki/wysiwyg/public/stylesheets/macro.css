@@ -1,0 +1,44 @@
+.xMacroParameter {
+  padding: 14px 0 6px 0;
+}
+
+.xMacroParameterLabel {
+  text-transform: capitalize;
+  font-size: 80%;
+  color: #333;
+  margin-bottom: 3px;
+}
+
+.xMacroParameterError {
+  font-size: 80%;
+  color: red;
+  padding: 2px 0;
+}
+
+.xMacroParameter textarea {
+  width: 433px;
+  height: 150px;
+  border: 1px solid #AAA;
+  padding: 2px;
+}
+
+.xMacroParameter .textInput {
+  width: 433px;
+  border: 1px solid #AAA;
+  padding: 2px;
+}
+
+.xMacroList {
+  height: 338px;
+  margin: 6px 0;
+  width: 459px;
+}
+
+* html .xMacroList {
+  height: 334px;
+  width: 443px;
+}
+
+.xMacroList option {
+  text-transform: capitalize;
+}

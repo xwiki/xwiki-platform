@@ -21,10 +21,11 @@ package com.xpn.xwiki.plugin.lucene;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContextInitializerException;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -40,8 +41,8 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     protected void initXWikiContainer(XWikiContext context)
     {
-        ExecutionContextInitializerManager ecim =
-                (ExecutionContextInitializerManager) Utils.getComponent(ExecutionContextInitializerManager.ROLE);
+        ExecutionContextManager ecim =
+                (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.ROLE);
         Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
 
         try {
@@ -52,7 +53,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
             ecim.initialize(ec);
             execution.setContext(ec);
-        } catch (ExecutionContextInitializerException e) {
+        } catch (ExecutionContextException e) {
             // Note: We should raise an exception here but we cannot since XWikiDefaultPlugin has
             // overrident's XWikiPluginInterface's init() method without declaring a throw XWikiException...
             LOG.error("Failed to initialize Execution Context. Behavior of the Lucene plugin could be "

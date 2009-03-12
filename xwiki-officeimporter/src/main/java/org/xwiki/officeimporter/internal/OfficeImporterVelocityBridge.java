@@ -19,12 +19,14 @@
  */
 package org.xwiki.officeimporter.internal;
 
+import java.io.ByteArrayInputStream;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.logging.Logger;
+import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
-import org.xwiki.officeimporter.OfficeImporterResult;
 
 /**
  * A bridge between velocity and office importer.
@@ -35,29 +37,42 @@ import org.xwiki.officeimporter.OfficeImporterResult;
 public class OfficeImporterVelocityBridge
 {
     /**
-     * Internal {@link OfficeImporter} instance.
+     * The key used to place any error messages while importing office documents.
+     */
+    public static final String OFFICE_IMPORTER_ERROR = "OFFICE_IMPORTER_ERROR";
+
+    /**
+     * The {@link Execution} component.
+     */
+    private Execution execution;
+
+    /**
+     * Internal {@link OfficeImporter} component.
      */
     private OfficeImporter importer;
 
     /**
-     * The {@link DocumentAccessBridge}.
+     * The {@link DocumentAccessBridge} component.
      */
     private DocumentAccessBridge docBridge;
 
     /**
-     * Holds any error messages thrown during the import operation.
+     * The {@link Logger} instance.
      */
-    private String message;
+    private Logger logger;
 
     /**
      * Default constructor.
      * 
      * @param importer internal {@link OfficeImporter} component.
      */
-    public OfficeImporterVelocityBridge(OfficeImporter importer, DocumentAccessBridge docBridge)
+    public OfficeImporterVelocityBridge(Execution execution, OfficeImporter importer, DocumentAccessBridge docBridge,
+        Logger logger)
     {
+        this.execution = execution;
         this.importer = importer;
         this.docBridge = docBridge;
+        this.logger = logger;
     }
 
     /**
@@ -76,18 +91,15 @@ public class OfficeImporterVelocityBridge
         boolean success = false;
         try {
             validateRequest(targetDocument);
-            OfficeImporterResult result =
-                importer.doImport(fileContent, fileName, targetDocument, OfficeImporter.XWIKI_20, options);
-            docBridge.setDocumentSyntaxId(targetDocument, OfficeImporter.XWIKI_20.toIdString());
-            docBridge.setDocumentContent(targetDocument, result.getContent(), "Created by office importer", false);
-            for (String artifactName : result.getArtifacts().keySet()) {
-                docBridge.setAttachmentContent(targetDocument, artifactName, result.getArtifacts().get(artifactName));
-            }
+            importer.importStream(new ByteArrayInputStream(fileContent), fileName, targetDocument, options);
             success = true;
         } catch (OfficeImporterException ex) {
-            this.message = ex.getMessage();
+            logger.error(ex.getMessage(), ex);
+            execution.getContext().setProperty(OFFICE_IMPORTER_ERROR, ex.getMessage());
         } catch (Exception ex) {
-            this.message = "Internal error while finalizing the target document.";
+            logger.error(ex.getMessage(), ex);
+            execution.getContext().setProperty(OFFICE_IMPORTER_ERROR,
+                "Internal error while finalizing the target document.");
         }
         return success;
     }
@@ -115,10 +127,11 @@ public class OfficeImporterVelocityBridge
     }
 
     /**
-     * @return any error messages thrown while importing or null.
+     * @return any error messages thrown while importing.
      */
-    public String getMessage()
+    public String getLastErrorMessage()
     {
-        return this.message;
+        Object error = execution.getContext().getProperty(OFFICE_IMPORTER_ERROR);
+        return (error != null) ? (String) error : null;
     }
 }

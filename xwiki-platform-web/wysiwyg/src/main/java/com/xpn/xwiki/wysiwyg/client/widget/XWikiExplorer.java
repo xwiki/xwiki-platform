@@ -29,7 +29,8 @@ import com.google.gwt.user.client.Element;
  *
  * @version $Id$
  */
-public class XWikiExplorer extends Widget {
+public class XWikiExplorer extends Widget
+{
 
     /**
      * Constructor.
@@ -47,11 +48,11 @@ public class XWikiExplorer extends Widget {
         String parameters = "{"
                 + "width:" + width
                 + ",height:" + height
-                + ",defaultNode:'" + defaultNode + "'"
-                + ",displayAttachments:" + displayAttachments
+                + ",defaultNode:'" + defaultNode
+                + "',displayAttachments:" + displayAttachments
                 + ",displayLinks:" + displayLinks
-                + ",htmlElement:'" + wrapper.getId() + "'"
-                + "}";
+                + ",htmlElement:'" + wrapper.getId()
+                + "'}";
         Element script = DOM.createElement("script");
         DOM.setElementProperty(script, "type", "text/javascript");
         DOM.setInnerText(script, "XWiki.xwikiExplorer.create(" + parameters + ");");

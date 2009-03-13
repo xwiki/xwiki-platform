@@ -246,7 +246,8 @@ public class DomainObjectFactory
         pageSummary.setName(doc.getName());
         pageSummary.setTitle(doc.getDisplayTitle());
         pageSummary.setParent(doc.getParent());
-        pageSummary.setXwikiUrl(doc.getExternalURL("view"));
+        pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
+        pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(createTranslations(objectFactory, baseUri, doc));
 
         String spaceUri =

@@ -160,6 +160,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("section/section6", false);
         suite.addTestsFromResource("section/section7", false);
         suite.addTestsFromResource("section/section8", false);
+        suite.addTestsFromResource("section/section9", false);
 
         // Other
         suite.addTestsFromResource("escape/escape1", false);
@@ -197,7 +198,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
         suite.addTestsFromResource("image/image4", false);
-
+        
         return new RenderingPlexusTestSetup(suite);
     }
 }

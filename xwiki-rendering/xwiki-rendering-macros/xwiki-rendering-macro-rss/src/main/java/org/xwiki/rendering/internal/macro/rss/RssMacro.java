@@ -163,7 +163,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         }
         
         BoxMacroParameters boxParameters = new BoxMacroParameters();
-        boolean hasImage = parameters.isImg() && feed.getImage() != null;
+        boolean hasImage = parameters.isImage() && feed.getImage() != null;
 
         if (parameters.isCss()) {
             boxParameters.setCssClass("rssfeed");

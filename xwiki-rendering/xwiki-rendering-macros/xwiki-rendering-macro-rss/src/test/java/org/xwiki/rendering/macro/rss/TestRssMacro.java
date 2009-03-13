@@ -50,7 +50,7 @@ public class TestRssMacro extends RssMacro
         rssParameters.setFull(true);
         rssParameters.setCss(true);
         rssParameters.setCount(2);
-        rssParameters.setImg(true);
+        rssParameters.setImage(true);
         
         URL feedURL = getClass().getResource("/feed.xml");
         try {

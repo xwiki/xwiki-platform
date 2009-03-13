@@ -219,6 +219,10 @@
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>xmlrpc</groupId>
+          <artifactId>xmlrpc-client</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -365,7 +369,7 @@
     <dependency>
       <groupId>org.apache.xmlrpc</groupId>
       <artifactId>xmlrpc-common</artifactId>
-      <version>3.0</version>
+      <version>3.1</version>
       <exclusions>
         <!-- We need to explicitely exclude JUnit since WS Common 1.0.1 used by XMLRPC Commons is
              having an invalid compile time dependency on it.
@@ -377,9 +381,9 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>xmlrpc</groupId>
+      <groupId>org.apache.xmlrpc</groupId>
       <artifactId>xmlrpc-server</artifactId>
-      <version>3.0</version>
+      <version>3.1</version>
       <exclusions>
         <!-- We need to explicitely exclude JUnit since xmlrpc Server depends transitively
              on Apache WS Common which wrongly defines a compile dependency on JUnit.

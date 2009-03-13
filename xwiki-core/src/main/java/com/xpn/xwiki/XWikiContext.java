@@ -23,6 +23,7 @@ package com.xpn.xwiki;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -110,12 +111,12 @@ public class XWikiContext extends Hashtable<Object, Object>
     private int archiveCacheSize = 20;
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    private Map<String, BaseClass> classCache = java.util.Collections.synchronizedMap(new LRUMap(this.classCacheSize));
+    private Map<String, BaseClass> classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
 
     // Used to avoid reloading archives in the same request
-    private Map<String, XWikiDocumentArchive> archiveCache = new LRUMap(this.archiveCacheSize);
+    private Map<String, XWikiDocumentArchive> archiveCache = Collections.synchronizedMap(new LRUMap(this.archiveCacheSize));
 
-    private List<String> displayedFields = new ArrayList<String>();
+    private List<String> displayedFields = Collections.synchronizedList(new ArrayList<String>());
 
     public XWikiContext()
     {

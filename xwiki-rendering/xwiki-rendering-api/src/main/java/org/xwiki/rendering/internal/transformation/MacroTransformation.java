@@ -226,15 +226,17 @@ public class MacroTransformation extends AbstractTransformation
         Map<String, String> errorDescriptionBlockParams =
             Collections.singletonMap("class", "xwikirenderingerrordescription hidden");
 
+        Block descriptionBlock = new XMLBlock(Arrays.asList((Block) new WordBlock(description)), new XMLElement("pre", Collections.EMPTY_MAP));
+        
         if (macroToReplace.isInline()) {
             errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(message)), new XMLElement("span",
                 errorBlockParams)));
-            errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(description)), new XMLElement("span",
+            errorBlocks.add(new XMLBlock(Arrays.asList((Block) descriptionBlock), new XMLElement("span",
                 errorDescriptionBlockParams)));
         } else {
             errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(message)), new XMLElement("div",
                 errorBlockParams)));
-            errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(description)), new XMLElement("div",
+            errorBlocks.add(new XMLBlock(Arrays.asList((Block) descriptionBlock), new XMLElement("div",
                 errorDescriptionBlockParams)));
         }
 

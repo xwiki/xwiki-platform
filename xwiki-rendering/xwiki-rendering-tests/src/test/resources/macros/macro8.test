@@ -17,7 +17,9 @@ beginXMLNode [span] [class=xwikirenderingerror]
 onWord [Not an inline macro]
 endXMLNode [span] [class=xwikirenderingerror]
 beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
+beginXMLNode [pre]
 onWord [This macro can only be used by itself on a new line]
+endXMLNode [pre]
 endXMLNode [span] [class=xwikirenderingerrordescription hidden]
 endMacroMarkerInline [testsimplemacro] [] []
 onSpace
@@ -27,7 +29,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden">This macro can only be used by itself on a new line</span><!--stopmacro--> macro</p>
+<p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden"><pre>This macro can only be used by itself on a new line</pre></span><!--stopmacro--> macro</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -35,4 +37,4 @@ Not inline {{testsimplemacro/}} macro
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden">This macro can only be used by itself on a new line</span><!--stopmacro--> macro</p></html>
+<html><p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden"><pre>This macro can only be used by itself on a new line</pre></span><!--stopmacro--> macro</p></html>

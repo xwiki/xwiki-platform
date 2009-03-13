@@ -15,7 +15,9 @@ beginXMLNode [span] [class=xwikirenderingerror]
 onWord [Failed to execute macro: testfailingmacro]
 endXMLNode [span] [class=xwikirenderingerror]
 beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
+beginXMLNode [pre]
 onWord [stack trace here]
+endXMLNode [pre]
 endXMLNode [span] [class=xwikirenderingerrordescription hidden]
 endMacroMarkerInline [testfailingmacro] [] []
 onSpace
@@ -25,7 +27,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Execution <!--startmacro:testfailingmacro|-||-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden">stack trace here</span><!--stopmacro--> error</p>
+<p>Execution <!--startmacro:testfailingmacro|-||-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><pre>stack trace here</pre></span><!--stopmacro--> error</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -33,4 +35,4 @@ Execution {{testfailingmacro/}} error
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Execution <!--startmacro:testfailingmacro|-||-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden">stack trace here</span><!--stopmacro--> error</p></html>
+<html><p>Execution <!--startmacro:testfailingmacro|-||-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><pre>stack trace here</pre></span><!--stopmacro--> error</p></html>

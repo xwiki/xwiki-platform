@@ -16,7 +16,9 @@ beginXMLNode [span] [class=xwikirenderingerror]
 onWord [Unknown macro: unknown]
 endXMLNode [span] [class=xwikirenderingerror]
 beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
+beginXMLNode [pre]
 onWord [The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.]
+endXMLNode [pre]
 endXMLNode [span] [class=xwikirenderingerrordescription hidden]
 endMacroMarkerInline [unknown] [] []
 onSpace
@@ -26,7 +28,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Unknown <!--startmacro:unknown|-||-|--><span class="xwikirenderingerror">Unknown macro: unknown</span><span class="xwikirenderingerrordescription hidden">The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.</span><!--stopmacro--> macro</p>
+<p>Unknown <!--startmacro:unknown|-||-|--><span class="xwikirenderingerror">Unknown macro: unknown</span><span class="xwikirenderingerrordescription hidden"><pre>The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.</pre></span><!--stopmacro--> macro</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -34,4 +36,4 @@ Unknown {{unknown/}} macro
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Unknown <!--startmacro:unknown|-||-|--><span class="xwikirenderingerror">Unknown macro: unknown</span><span class="xwikirenderingerrordescription hidden">The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.</span><!--stopmacro--> macro</p></html>
+<html><p>Unknown <!--startmacro:unknown|-||-|--><span class="xwikirenderingerror">Unknown macro: unknown</span><span class="xwikirenderingerrordescription hidden"><pre>The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.</pre></span><!--stopmacro--> macro</p></html>

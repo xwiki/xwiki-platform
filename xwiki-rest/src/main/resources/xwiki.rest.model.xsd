@@ -81,7 +81,8 @@
           <element name="name" type="string"></element>
           <element name="title" type="string"></element>
           <element name="parent" type="string"></element>
-          <element name="xwikiUrl" type="string"></element>
+          <element name="xwikiRelativeUrl" type="string"></element>
+          <element name="xwikiAbsoluteUrl" type="string"></element>          
           <element name="translations" type="xwiki:Translations"></element>
         </sequence>
       </extension>

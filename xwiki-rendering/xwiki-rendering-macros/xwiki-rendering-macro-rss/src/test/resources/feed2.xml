@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+  <channel>
+    <title>Test Feed 2</title>
+    <link>http://localhost/feed.xml</link>
+    <description>A pseudo-feed to test the RSS macro</description>
+    <item>
+      <title>Item1</title>
+      <link>http://localhost/blog/item1</link>
+      <description>An item with&lt;b&gt;HTML&lt;/b&gt;markup.</description>
+    </item>
+  </channel>
+</rss>

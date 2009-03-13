@@ -30,6 +30,7 @@ import com.sun.syndication.io.XmlReader;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
@@ -124,8 +125,17 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             parentBlock.addChild(paragraphTitleBlock);
             
             if (parameters.isFull() && entry.getDescription() != null) {
-                ParagraphBlock descriptionBlock = new ParagraphBlock(
-                    getParserUtils().parseInlineNonWiki(entry.getDescription().getValue()));
+                // We are wrapping the feed entry content in a HTML macro, not considering what the declared content
+                // is, because some feed will declare text while they actually contain HTML.
+                // See http://stuffthathappens.com/blog/2007/10/29/i-hate-rss/
+                // A case where doing this might hurt is if a feed declares "text" and has any XML inside it does
+                // not want to be interpreted as such, but displayed as is instead. But this certainly is too rare
+                // compared to mis-formed feeds that say text while they want to say HTML.
+                Block html = new MacroBlock("html", Collections.singletonMap("wiki", "false"),
+                    entry.getDescription().getValue(), context.isInline());
+                
+                ParagraphBlock descriptionBlock =
+                    new ParagraphBlock(Collections.singletonList(html));
                 if (parameters.isCss()) {
                     descriptionBlock.setParameter(CLASS_ATTRIBUTE, "rssitemdescription");
                 }

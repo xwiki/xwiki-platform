@@ -37,6 +37,7 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Rss Macro");
         suite.addTestsFromResource("macrorss1", true);
+        suite.addTestsFromResource("macrorss2", true);
         return new RenderingPlexusTestSetup(suite);
     }
 }

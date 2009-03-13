@@ -34,9 +34,20 @@
         <requirement>
           <role>org.xwiki.rendering.macro.Macro</role>
           <role-hint>box</role-hint>
-          <fieldName>boxMacro</fieldName>
         </requirement>
       </requirements>
     </component>
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>testrssmacro2</role-hint>
+      <implementation>org.xwiki.rendering.macro.rss.TestRssMacro2</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.macro.Macro</role>
+          <role-hint>box</role-hint>
+        </requirement>
+      </requirements>
+    </component>    
   </components>
 </component-set>

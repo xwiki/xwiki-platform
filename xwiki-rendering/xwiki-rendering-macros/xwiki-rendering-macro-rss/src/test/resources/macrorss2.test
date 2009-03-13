@@ -1,0 +1,12 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{testrssmacro2 feed="http://some.feed.com"/}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:testrssmacro2|-|feed="http://some.feed.com"|-|--><div class="box rssfeed"><p class="rsschanneltitle"><!--startwikilink:http://localhost/feed.xml--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml">Test Feed 2</a></span><!--stopwikilink--></p><p class="rssitemtitle"><!--startwikilink:http://localhost/blog/item1--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/blog/item1">Item1</a></span><!--stopwikilink--></p><p class="rssitemdescription">An item with<strong>HTML</strong>markup.</p></div><!--stopmacro-->
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+{{testrssmacro2 feed="http://some.feed.com"/}}

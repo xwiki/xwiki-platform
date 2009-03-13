@@ -35,119 +35,129 @@ public class RssMacroParameters
 {
 
     /**
-     * If "true" and if the feed has an image, display it.
-     */
-    private boolean img;
-    
-    /**
-     * If "true" then adds class id elements (rssitem, rssitemtitle, rssitemdescription, rsschanneltitle, etc) 
-     * which you can style by modifying your skin's CSS file.
-     */
-    private boolean css = true;
-    
-    /**
-     * The number of feed items to display.
-     */
-    private int count = Integer.MAX_VALUE;
-    
-    /**
-     * The RSS feed URL.
-     */
-    private URL feedURL;
-    
-    /**
-     * The RSS feed URL stored as a String.
+     * The URL of the RSS feed.
      */
     private String feed;
-    
+
     /**
      * If "true" displays a summary in addition to the feed item link.
      */
     private boolean full;
-    
+
+    /**
+     * The number of feed items to display.
+     */
+    private int count = Integer.MAX_VALUE;
+
+    /**
+     * If "true" and if the feed has an image, display it.
+     */
+    private boolean image;
+
+    /**
+     * If "true" then adds class id elements (rssitem, rssitemtitle, rssitemdescription, rsschanneltitle, etc) which you
+     * can style by modifying your skin's CSS file.
+     */
+    private boolean css = true;
+
+    /**
+     * The RSS feed URL.
+     */
+    private URL feedURL;
+
     /**
      * @return the RSS feed URL.
      */
-    public String getFeed() {
+    public String getFeed()
+    {
         return feed;
     }
-    
+
     /**
      * @param feed the RSS feed URL.
      * @throws java.net.MalformedURLException if the URL is malformed.
      */
     @ParameterMandatory
-    @ParameterDescription("The RSS feed's URL.")
+    @ParameterDescription("URL of the RSS feed")
     public void setFeed(String feed) throws java.net.MalformedURLException
     {
         this.feed = feed;
         this.feedURL = new java.net.URL(feed);
     }
-    
+
     /**
-     * @param img whether to display the feed's image.
+     * @param image whether to display the feed's image.
      */
-    @ParameterDescription("Specifies whether to display the feed's image or not.")
-    public void setImg(boolean img) {
-        this.img = img;
+    @ParameterDescription("If the feeds has an image associated, display it?")
+    public void setImage(boolean image)
+    {
+        this.image = image;
     }
-    
+
     /**
-     * @return the feed's image
+     * @return whether to display the feed's image.
      */
-    public boolean isImg() {
-        return img;
+    public boolean isImage()
+    {
+        return image;
     }
-    
+
     /**
      * @param css whether to add class id elements (rssitem, rssitemtitle, rssitemdescription, rsschanneltitle, etc).
      */
     @ParameterDescription("Specifies whether to add class id elements (rssitem, rssitemtitle, rssitemdescription etc).")
-    public void setCss(boolean css) {
+    public void setCss(boolean css)
+    {
         this.css = css;
     }
-    
+
     /**
      * @return whether to add class id elements (rssitem, rssitemtitle, rssitemdescription, rsschanneltitle, etc).
      */
-    public boolean isCss() {
+    public boolean isCss()
+    {
         return this.css;
     }
-    
+
     /**
      * @param count the number of feed items to display.
      */
     @ParameterDescription("The maximum number of feed items to display on the page.")
-    public void setCount(int count) {
+    public void setCount(int count)
+    {
         this.count = count;
     }
-    
+
     /**
      * @return the number of feed items to display.
      */
-    public int getCount() {
+    public int getCount()
+    {
         return count;
     }
-    
+
     /**
      * @return the feed's URL
      */
-    public URL getFeedURL() {
+    public URL getFeedURL()
+    {
         return feedURL;
     }
-    
+
     /**
      * @param full if "true" displays a summary in addition to the feed item link.
      */
-    @ParameterDescription("If 'true', displays a summary in addition to the feed item link.")
-    public void setFull(boolean full) {
+    @ParameterDescription("Display full entries")
+    public void setFull(boolean full)
+    {
         this.full = full;
     }
-    
+
     /**
      * @return if "true" displays a summary in addition to the feed item link
      */
-    public boolean isFull() {
+    public boolean isFull()
+    {
         return full;
     }
 }

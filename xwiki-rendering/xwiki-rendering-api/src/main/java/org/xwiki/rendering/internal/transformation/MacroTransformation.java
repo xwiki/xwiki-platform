@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.commons.beanutils.BeanUtils;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
@@ -226,7 +227,7 @@ public class MacroTransformation extends AbstractTransformation
         Map<String, String> errorDescriptionBlockParams =
             Collections.singletonMap("class", "xwikirenderingerrordescription hidden");
 
-        Block descriptionBlock = new XMLBlock(Arrays.asList((Block) new WordBlock(description)), new XMLElement("pre", Collections.EMPTY_MAP));
+        Block descriptionBlock = new VerbatimBlock(description, macroToReplace.isInline());
         
         if (macroToReplace.isInline()) {
             errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(message)), new XMLElement("span",

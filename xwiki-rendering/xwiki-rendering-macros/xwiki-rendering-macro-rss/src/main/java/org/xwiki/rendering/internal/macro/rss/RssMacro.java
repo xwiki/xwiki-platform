@@ -28,6 +28,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -178,6 +179,11 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         if (parameters.isCss()) {
             boxParameters.setCssClass("rssfeed");
         }
+        
+        if (!StringUtils.isEmpty(parameters.getWidth())) {
+            boxParameters.setWidth(parameters.getWidth());
+        }
+        
         renderFeedOrEntryTitle(boxParameters, parameters.isCss(), "rsschanneltitle", feed.getTitle(), feed.getLink());
 
         List<Block> result = null;

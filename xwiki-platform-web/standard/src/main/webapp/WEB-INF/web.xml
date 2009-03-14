@@ -185,7 +185,7 @@
   <servlet>
     <servlet-name>RestletServlet</servlet-name>
     <servlet-class>
-      com.noelios.restlet.ext.servlet.ServerServlet  
+      org.xwiki.rest.XWikiRestletServlet  
     </servlet-class>
     <init-param>
       <param-name>resources</param-name>

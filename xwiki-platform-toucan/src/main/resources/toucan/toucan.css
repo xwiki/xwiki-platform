@@ -287,6 +287,20 @@ span.edit_section {
 	border: 1px dotted #555555;
 }
 
+#xwikimaincontainerinner .rssfeed {
+	padding: 8px;
+	background-color:transparent;
+}
+
+.rsschanneltitle {
+       background: url($xwiki.getSkinFile('icons/black-rss.png')) #F4F9FE no-repeat right center;
+       font-size:14px;
+       font-weight:bold;
+       margin-bottom:10px;
+       padding:5px;
+       text-align:left;
+}  
+
 #xwikimaincontainerinner .code {
 	font-family: courier, courier new, monospace;
 	white-space: pre;

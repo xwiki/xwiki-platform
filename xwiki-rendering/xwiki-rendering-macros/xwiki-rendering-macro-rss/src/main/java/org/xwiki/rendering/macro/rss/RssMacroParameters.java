@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.rss;
 
 import java.net.URL;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.macro.descriptor.ParameterDescription;
 import org.xwiki.rendering.macro.descriptor.ParameterMandatory;
 
@@ -53,6 +54,11 @@ public class RssMacroParameters
      * If "true" and if the feed has an image, display it.
      */
     private boolean image;
+
+    /**
+     * The width of the enclosing box containing the RSS macro output.
+     */
+    private String width = StringUtils.EMPTY;
 
     /**
      * If "true" then adds class id elements (rssitem, rssitemtitle, rssitemdescription, rsschanneltitle, etc) which you
@@ -100,6 +106,23 @@ public class RssMacroParameters
     public boolean isImage()
     {
         return image;
+    }
+
+    /**
+     * @param width the width of the RSS box, that will dismiss potential CSS rules defining its default value.
+     */
+    @ParameterDescription("The width, in px or %, of the box containing the RSS output (default is 30%)")
+    public void setWidth(String width)
+    {
+        this.width = width;
+    }
+
+    /**
+     * @return the width of the RSS box, that will dismiss potential CSS rules defining its default value.
+     */
+    public String getWidth()
+    {
+        return this.width;
     }
 
     /**

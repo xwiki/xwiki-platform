@@ -48,6 +48,11 @@ public class BoxMacroParameters
     private String image = StringUtils.EMPTY;
 
     /**
+     * Refer to {@link #getWidth()}.
+     */
+    private String width = StringUtils.EMPTY;
+
+    /**
      * @return the title to be displayed in the message box. Note that it can be specified using Wiki 2.0 syntax.
      */
     private List< ? extends Block> blockTitle;
@@ -117,10 +122,26 @@ public class BoxMacroParameters
     /**
      * @param cssClass - refer to {@link BoxMacroParameters#getCssClass()}
      */
-    @ParameterDescription("the CSS sheet used for rendering the document")
+    @ParameterDescription("A CSS class to add to the box element")
     public void setCssClass(String cssClass)
     {
         this.cssClass = cssClass;
     }
 
+    /**
+     * @return an optional width to enforce as an inline style on the DIV element the box will be formed of.
+     */
+    public String getWidth()
+    {
+        return this.width;
+    }
+
+    /**
+     * @param width - refer to {@link BoxMacroParameters#getWidth()}
+     */
+    @ParameterDescription("An optional width for the box, expressed in px or %")
+    public void setWidth(String width)
+    {
+        this.width = width;
+    }
 }

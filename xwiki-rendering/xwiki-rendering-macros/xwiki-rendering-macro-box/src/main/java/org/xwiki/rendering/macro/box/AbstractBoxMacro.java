@@ -21,6 +21,7 @@ package org.xwiki.rendering.macro.box;
 
 import java.io.StringReader;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -123,19 +124,24 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         String titleParameter = parameters.getTitle();
         List< ? extends Block> titleBlockList = parameters.getBlockTitle();
 
+        Map<String, String> boxParameters = new HashMap<String, String>();
         String classParameter = parameters.getCssClass();
         String cssClass =
             StringUtils.isEmpty(classParameter) ? getClassProperty() : getClassProperty() + " " + classParameter;
-        Map<String, String> classParameterMap = Collections.singletonMap("class", cssClass);
+        boxParameters.put("class", cssClass);
 
+        if (!StringUtils.isEmpty(parameters.getWidth())) {
+            boxParameters.put("style", "width:" + parameters.getWidth());
+        }
+        
         Block boxBlock;
         if (context.isInline()) {
             List<Block> contentBlocks = parseContent(parameters, content, context);
             FormatBlock spanBlock = new FormatBlock(contentBlocks, Format.NONE);
-            spanBlock.setParameters(classParameterMap);
+            spanBlock.setParameters(boxParameters);
             boxBlock = spanBlock;
         } else {
-            boxBlock = new XMLBlock(new XMLElement("div", classParameterMap));
+            boxBlock = new XMLBlock(new XMLElement("div", boxParameters));
 
             // we add the image, if there is one
             if (!StringUtils.isEmpty(imageParameter)) {

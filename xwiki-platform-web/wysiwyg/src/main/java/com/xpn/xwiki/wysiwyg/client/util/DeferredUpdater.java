@@ -99,7 +99,11 @@ public class DeferredUpdater
      */
     private void onUpdate()
     {
-        updatable.update();
+        try {
+            updatable.update();
+        } catch (Throwable t) {
+            Console.getInstance().error(t, DeferredUpdater.class.getName(), updatable.getClass().getName());
+        }
     }
 
     /**

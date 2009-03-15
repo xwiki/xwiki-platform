@@ -60,18 +60,22 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
         // gets focused to allow users to have a different selection than the stored one (by clicking inside the edited
         // document when it doesn't have the focus).
         document.body.attachEvent('onbeforeactivate', function(event) {
-            switch (typeof(document.body.__bookmark)) {
+            // Save the bookmark locally to prevent any interference.
+            var bookmark = document.body.__bookmark;
+            // Reset the bookmark to prevent redundant calls to this function.
+            document.body.__bookmark = null;
+            switch (typeof(bookmark)) {
                 case 'string':
                     // The bookmark is an opaque string that can be used with moveToBookmark to recreate the original
                     // text range.
                     var textRange = document.body.createTextRange();
-                    textRange.moveToBookmark(document.body.__bookmark);
+                    textRange.moveToBookmark(bookmark);
                     textRange.select();
                     break;
                 case 'object':
                     // The bookmark is a reference to the element previously selected.
                     var controlRange = document.body.createControlRange();
-                    controlRange.addElement(document.body.__bookmark);
+                    controlRange.addElement(bookmark);
                     controlRange.select();
                     break;
             }
@@ -79,6 +83,13 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
 
         // Save the selection when the edited document is about to loose focus.
         document.body.attachEvent('onbeforedeactivate', function(event) {
+            // The BODY element can have a smaller width and height than the HTML element allowing the user to click
+            // inside the HTML element but outside of the BODY element. As a result the BODY element is deactivated and
+            // its inner selection is cleared. Let's prevent this.
+            if (event.toElement == document.documentElement) {
+                event.returnValue = false;
+                return false;
+            }
             document.body.__bookmark = null;
             var range = document.selection.createRange();
             // Check the type of the range and if the range is inside the edited document.
@@ -88,6 +99,20 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
             } else if (range.item && range.length > 0 && range.item(0).ownerDocument == document) {
                 // Control range.
                 document.body.__bookmark = range.item(0);
+            }
+        });
+        
+        // Prevent the activation of the HTML element which can happen if the BODY element has a smaller width or
+        // height and the user click inside the HTML element but outside of the BODY element.
+        // NOTE: We can use CSS to make the BODY element have the same width and height as the HTML element but then
+        // adding a padding or a margin to the BODY element makes the scroll bars appear (and we can't use a wrapper
+        // inside the BODY element to hold the padding or the margin).
+        // See also XWIKI-3272: Cannot regain focus on the content area by clicking on it if it's empty in IE6.
+        document.documentElement.attachEvent('onbeforeactivate', function(event) {
+            if (event.srcElement == document.documentElement) {
+                setTimeout(function() {
+                    document.body.focus();
+                }, 1);
             }
         });
     }-*/;

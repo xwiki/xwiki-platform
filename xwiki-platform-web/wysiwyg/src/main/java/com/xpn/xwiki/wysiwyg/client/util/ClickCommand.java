@@ -59,6 +59,10 @@ public final class ClickCommand implements com.google.gwt.user.client.Command
      */
     public void execute()
     {
-        listener.onClick(sender);
+        try {
+            listener.onClick(sender);
+        } catch (Throwable t) {
+            Console.getInstance().error(t, ClickCommand.class.getName(), listener.getClass().getName());
+        }
     }
 }

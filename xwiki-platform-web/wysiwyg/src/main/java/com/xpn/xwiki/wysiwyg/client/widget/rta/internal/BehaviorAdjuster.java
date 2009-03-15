@@ -407,11 +407,16 @@ public class BehaviorAdjuster implements LoadListener
         // Create a new paragraph.
         Node paragraph = getTextArea().getDocument().xCreatePElement();
 
+        // This is the node that will contain the caret after the split.
+        Node start;
+
         // Split the container after the found BR.
         if (domUtils.isFlowContainer(container)) {
             Node child = domUtils.getChild(container, br);
             if (child != br) {
-                domUtils.splitNode(container, br.getParentNode(), domUtils.getNodeIndex(br));
+                start = domUtils.splitNode(container, br.getParentNode(), domUtils.getNodeIndex(br));
+            } else {
+                start = paragraph;
             }
             // Insert the created paragraph before the split.
             domUtils.insertAfter(paragraph, child);
@@ -422,23 +427,21 @@ public class BehaviorAdjuster implements LoadListener
                 child = paragraph.getNextSibling();
             }
         } else {
-            domUtils.splitNode(container.getParentNode(), br.getParentNode(), domUtils.getNodeIndex(br));
+            start = domUtils.splitNode(container.getParentNode(), br.getParentNode(), domUtils.getNodeIndex(br));
+            if (start == container.getNextSibling()) {
+                start = paragraph;
+            }
             paragraph.appendChild(Element.as(container.getNextSibling()).extractContents());
             container.getParentNode().replaceChild(paragraph, container.getNextSibling());
         }
         br.getParentNode().removeChild(br);
 
-        // Place the caret inside the created paragraph, at the beginning.
-        Node start = domUtils.getFirstLeaf(paragraph);
-        if (start == paragraph) {
-            start = getTextArea().getDocument().createTextNode("");
-            paragraph.appendChild(start);
+        // Place the caret inside the new container, at the beginning.
+        if (!start.hasChildNodes()) {
+            start.appendChild(getTextArea().getDocument().createTextNode(""));
+            start = start.getFirstChild();
         }
-        if (start.getNodeType() == Node.ELEMENT_NODE) {
-            range.setStartBefore(start);
-        } else {
-            range.setStart(start, 0);
-        }
+        range.setStart(start, 0);
     }
 
     /**

@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.LoadListenerCollection;
 import com.google.gwt.user.client.ui.SourcesLoadEvents;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.util.Console;
 import com.xpn.xwiki.wysiwyg.client.widget.HiddenConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
 import com.xpn.xwiki.wysiwyg.client.widget.ToolBar;
@@ -153,7 +154,12 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
             {
                 public void execute()
                 {
-                    loadListeners.fireLoad(RichTextEditor.this);
+                    try {
+                        loadListeners.fireLoad(RichTextEditor.this);
+                    } catch (Throwable t) {
+                        Console.getInstance().error(t, RichTextEditor.class.getName(),
+                            LoadListenerCollection.class.getName());
+                    }
                 }
             });
         }

@@ -40,6 +40,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.separator.ToolBarSeparator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.Console;
 import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
 import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -83,11 +84,16 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
          */
         public boolean execute()
         {
-            if (iterator.hasNext()) {
-                Map.Entry<String, UIExtension> entry = iterator.next();
-                entry.getValue().setEnabled(entry.getKey(), sv.isValid(entry.getKey(), ui.getTextArea()));
-                return true;
-            } else {
+            try {
+                if (iterator.hasNext()) {
+                    Map.Entry<String, UIExtension> entry = iterator.next();
+                    entry.getValue().setEnabled(entry.getKey(), sv.isValid(entry.getKey(), ui.getTextArea()));
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Throwable t) {
+                Console.getInstance().error(t, WysiwygEditor.class.getName(), SyntaxValidationCommand.class.getName());
                 return false;
             }
         }

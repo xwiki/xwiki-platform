@@ -62,8 +62,6 @@ public class SpacesResource extends XWikiResource
             RangeIterable<String> ri = new RangeIterable<String>(spaceNames, start, number);
 
             for (String spaceName : ri) {
-                List<String> docNames = xwikiApi.getSpaceDocsName(spaceName);
-
                 String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
                 Document home = null;
 
@@ -72,8 +70,7 @@ public class SpacesResource extends XWikiResource
                 }
 
                 spaces.getSpaces().add(
-                    DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home,
-                        docNames.size()));
+                    DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home));
             }
         } finally {
             xwikiContext.setDatabase(database);

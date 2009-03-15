@@ -23,15 +23,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
-import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Object;
-import org.xwiki.rest.model.jaxb.Properties;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -40,40 +36,29 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}/{objectNumber}/properties")
-public class ObjectPropertiesResource extends XWikiResource
+@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/objects/{className}/{objectNumber}")
+public class ObjectAtPageVersionResource extends XWikiResource
 {
     @GET
-    public Properties getObjectProperties(@PathParam("wikiName") String wikiName,
-        @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
+    public Object getObject(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, @PathParam("version") String version,
         @PathParam("className") String className, @PathParam("objectNumber") Integer objectNumber)
         throws XWikiException
     {
-        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, version, true, false);
 
         Document doc = documentInfo.getDocument();
-
+        
         XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-
+        xwikiDocument = xwiki.getDocument(xwikiDocument, doc.getVersion(), xwikiContext);
+        
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        Object object =
-            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject, false);
-
-        Properties properties = objectFactory.createProperties();
-        properties.getProperties().addAll(object.getProperties());
-
-        String objectUri =
-            UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(doc.getWiki(), doc.getSpace(),
-                doc.getName(), object.getClassName(), object.getNumber()).toString();
-        Link objectLink = objectFactory.createLink();
-        objectLink.setHref(objectUri);
-        objectLink.setRel(Relations.OBJECT);
-        properties.getLinks().add(objectLink);
-
-        return properties;
+        return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject,
+            true);
     }
+
 }

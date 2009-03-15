@@ -20,10 +20,12 @@
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
 import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import com.xpn.xwiki.wysiwyg.client.widget.MockEventDispatcher;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
 
 /**
@@ -33,6 +35,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable
  */
 public class RichTextAreaTest extends AbstractRichTextAreaTest
 {
+    /**
+     * The name of the paragraph DOM element.
+     */
+    public static final String PARAGRAPH = "p";
+
     /**
      * Unit test for {@link RichTextArea#setHTML(String)}. We test the workaround we use for Issue 3147.
      * 
@@ -222,5 +229,172 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
 
         // Cleanup
         textBox.removeFromParent();
+    }
+
+    /**
+     * @see XWIKI-3283: Hitting enter twice between 2 titles doesn't create new line in IE6
+     */
+    public void testEnterTwiceBetweenHeadingsWithInnerSpan()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestEnterTwiceBetweenHeadingsWithInnerSpan();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see XWIKI-3283: Hitting enter twice between 2 titles doesn't create new line in IE6
+     */
+    private void doTestEnterTwiceBetweenHeadingsWithInnerSpan()
+    {
+        rta.setHTML("<h2><span>title 2</span></h2><h3><span>title 3</span></h3>");
+
+        // Place the caret at the end of the first heading.
+        Range range = rta.getDocument().createRange();
+        range.selectNodeContents(getBody().getFirstChild().getFirstChild().getFirstChild());
+        range.collapse(false);
+        select(range);
+
+        // Type Enter twice.
+        MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
+        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+
+        // Check if the caret is inside a span which is inside paragraph.
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertNotNull(DOMUtils.getInstance().getFirstAncestor(range.getStartContainer(), "span"));
+        assertNotNull(DOMUtils.getInstance().getFirstAncestor(range.getStartContainer(), PARAGRAPH));
+    }
+
+    /**
+     * Tests if the caret is placed inside a new paragraph after pressing Enter twice between two headings that contain
+     * only text.
+     */
+    public void testEnterTwiceBetweenHeadingsWithoutInnerSpan()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestEnterTwiceBetweenHeadingsWithoutInnerSpan();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the caret is placed inside a new paragraph after pressing Enter twice between two headings that contain
+     * only text.
+     */
+    private void doTestEnterTwiceBetweenHeadingsWithoutInnerSpan()
+    {
+        rta.setHTML("<h2>title 2</h2><h3>title 3/h3>");
+
+        // Place the caret at the end of the first heading.
+        Range range = rta.getDocument().createRange();
+        range.selectNodeContents(getBody().getFirstChild().getFirstChild());
+        range.collapse(false);
+        select(range);
+
+        // Type Enter twice.
+        MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
+        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+
+        // Check if the caret is inside a paragraph.
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertNotNull(DOMUtils.getInstance().getFirstAncestor(range.getStartContainer(), PARAGRAPH));
+    }
+
+    /**
+     * Tests if the caret is placed inside a new paragraph after pressing Enter twice inside a text node that is a
+     * direct child of body.
+     */
+    public void testEnterTwiceInBodyWithPlainText()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestEnterTwiceInBodyWithPlainText();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the caret is placed inside a new paragraph after pressing Enter twice inside a text node that is a
+     * direct child of body.
+     */
+    private void doTestEnterTwiceInBodyWithPlainText()
+    {
+        rta.setHTML("amazing!");
+
+        // Place the caret at the end of the first heading.
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild(), 3);
+        select(range);
+
+        // Type Enter twice.
+        MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
+        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+
+        // Check if the caret is inside a paragraph.
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertNotNull(DOMUtils.getInstance().getFirstAncestor(range.getStartContainer(), PARAGRAPH));
+
+        // Check the result.
+        assertEquals("a<p>zing!</p>", clean(rta.getHTML()));
+    }
+
+    /**
+     * Tests if the caret is placed inside a new paragraph after pressing Enter twice inside a text node that is a
+     * descendant of body with only in-line parents.
+     */
+    public void testEnterTwiceInBodyWithStyledText()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestEnterTwiceInBodyWithStyledText();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the caret is placed inside a new paragraph after pressing Enter twice inside a text node that is a
+     * descendant of body with only in-line parents.
+     */
+    private void doTestEnterTwiceInBodyWithStyledText()
+    {
+        rta.setHTML("<strong>xwiki</strong>enterprise");
+
+        // Place the caret at the end of the first heading.
+        Range range = rta.getDocument().createRange();
+        range.selectNode(getBody().getFirstChild().getFirstChild());
+        range.collapse(false);
+        select(range);
+
+        // Type Enter twice.
+        MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
+        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+
+        // Check if the caret is inside a strong element which is inside a paragraph.
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertNotNull(DOMUtils.getInstance().getFirstAncestor(range.getStartContainer(), "strong"));
+        assertNotNull(DOMUtils.getInstance().getFirstAncestor(range.getStartContainer(), PARAGRAPH));
     }
 }

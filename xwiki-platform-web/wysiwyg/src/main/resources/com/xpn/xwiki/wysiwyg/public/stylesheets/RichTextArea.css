@@ -1,17 +1,18 @@
-body {
-  background-image: none !important;
+html, body {
+  height: auto !important;
+}
+
+* html {
+  overflow-y: scroll;
 }
 
 body.main {
+  background-image: none !important;
+  margin: 0px !important;
+  min-width: 0 !important;
+  padding: 3px !important;
   position: static !important;
-  padding: 0px !important;
-  margin: 6px !important;
-  height: auto !important;
-  min-height: 0px !important;
-  max-height: none !important;
   width: auto !important;
-  min-width: 0px !important;
-  max-width: none !important;
 }
 
 /*

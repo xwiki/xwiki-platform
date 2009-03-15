@@ -1,5 +1,9 @@
-div.gwt-PopupPanel, div.gwt-PopupPanel div {
+* html div.gwt-PopupPanel, * html div.gwt-PopupPanel div {
   display: block;
+}
+
+* html .gwt-PopupPanel {
+  width: 1px;
 }
 
 .xDialogBox {
@@ -25,6 +29,10 @@ div.gwt-PopupPanel, div.gwt-PopupPanel div {
   padding: 0 27px 0 25px;
   position: relative;
   cursor: default;
+}
+
+* html .xDialogCaptionBar {
+  width: 100%;
 }
 
 .xDialogIcon {

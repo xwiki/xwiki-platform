@@ -20,44 +20,49 @@
 package com.xpn.xwiki.wysiwyg.client.dom;
 
 /**
- * DOM Event.
+ * Instances of this class can be used for testing the response of the rich text area to different DOM events. Such
+ * functional tests are useful especially because they can be run on different browsers (including IE) which currently
+ * doesn't happen with the Selenium functional tests.
  * 
  * @version $Id$
  */
-public class Event extends com.google.gwt.user.client.Event
+public final class MockEvent extends Event
 {
     /**
      * Default constructor. Needs to be protected because all instances are created from JavaScript.
      */
-    protected Event()
+    protected MockEvent()
     {
-        super();
     }
 
     /**
-     * @return true if this event was cancelled by calling {@link #xPreventDefault()}.
-     */
-    public final native boolean isCancelled()
-    /*-{
-        return !!this.__cancelled;
-    }-*/;
-
-    /**
-     * Sets this event's cancelled state.
+     * Creates a new mock event.
      * 
-     * @param cancelled specifies if this event should be cancelled or not.
+     * @return the newly created mock event
      */
-    protected final native void setCancelled(boolean cancelled)
+    public static native MockEvent newInstance()
     /*-{
-        this.__cancelled = cancelled;
+        return {
+            preventDefault: function() {}
+        };
     }-*/;
 
     /**
-     * Cancel this event.
+     * Sets the type of this event.
+     * 
+     * @see Event#getType()
+     * @param type the name of the event
      */
-    public final void xPreventDefault()
-    {
-        preventDefault();
-        setCancelled(true);
-    }
+    public native void setType(String type)
+    /*-{
+        this.type = type;
+    }-*/;
+
+    /**
+     * @param keyCode the Unicode value of the key that has been pressed
+     */
+    public native void setKeyCode(int keyCode)
+    /*-{
+        this.keyCode = keyCode;
+    }-*/;
 }

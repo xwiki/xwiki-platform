@@ -214,12 +214,16 @@
         org.xwiki.rest.resources.attachments.AttachmentResource;
         org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
         org.xwiki.rest.resources.attachments.AttachmentsResource;
-        org.xwiki.rest.resources.attachments.AttachmentVersionResource;
+        org.xwiki.rest.resources.attachments.AttachmentVersionResource;        
         org.xwiki.rest.resources.objects.ObjectsResource;
+        org.xwiki.rest.resources.objects.ObjectsAtPageVersionResource;
         org.xwiki.rest.resources.objects.ObjectsForClassNameResource;
         org.xwiki.rest.resources.objects.ObjectResource;
+        org.xwiki.rest.resources.objects.ObjectAtPageVersionResource;
         org.xwiki.rest.resources.objects.ObjectPropertiesResource;
+        org.xwiki.rest.resources.objects.ObjectPropertiesAtPageVersionResource;
         org.xwiki.rest.resources.objects.ObjectPropertyResource;
+        org.xwiki.rest.resources.objects.ObjectPropertyAtPageVersionResource;
         org.xwiki.rest.resources.objects.AllObjectsForClassNameResource;
         org.xwiki.rest.resources.classes.ClassesResource;
         org.xwiki.rest.resources.classes.ClassResource;

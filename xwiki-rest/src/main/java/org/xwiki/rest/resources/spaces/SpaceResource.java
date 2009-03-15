@@ -41,7 +41,7 @@ import com.xpn.xwiki.api.Document;
 public class SpaceResource extends XWikiResource
 {
     @GET
-    public Space getPage(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName)
+    public Space getSpace(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName)
         throws XWikiException
     {
         String database = xwikiContext.getDatabase();
@@ -52,8 +52,7 @@ public class SpaceResource extends XWikiResource
 
             List<String> spaceNames = xwikiApi.getSpaces();
             Collections.sort(spaceNames);
-
-            List<String> docNames = xwikiApi.getSpaceDocsName(spaceName);
+            
             String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
             Document home = null;
 
@@ -61,8 +60,7 @@ public class SpaceResource extends XWikiResource
                 home = xwikiApi.getDocument(homeId);
             }
 
-            return DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home,
-                docNames.size());
+            return DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home);
         } finally {
             xwikiContext.setDatabase(database);
         }

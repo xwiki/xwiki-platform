@@ -75,7 +75,7 @@ public class ObjectsForClassNameResource extends XWikiResource
             objects.getObjectSummaries()
                 .add(
                     DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc,
-                        object));
+                        object, false));
         }
 
         return objects;

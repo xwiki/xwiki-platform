@@ -63,8 +63,7 @@
           <element name="wiki" type="string"></element>
           <element name="name" type="string"></element>
           <element name="home" type="string"></element>
-          <element name="xwikiUrl" type="string"></element>
-          <element name="numberOfPages" type="int"></element>
+          <element name="xwikiUrl" type="string"></element>          
         </sequence>
       </extension>
     </complexContent>

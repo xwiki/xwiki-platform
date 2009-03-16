@@ -98,12 +98,15 @@ public class AttachmentAtPageVersionResource extends XWikiResource
          * external URL for an attachment
          */
         xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-        String attachmentXWikiUrl =
+        String attachmentXWikiAbsoluteUrl =
             xwikiDocument.getExternalAttachmentURL(attachmentName, "download", xwikiContext).toString();
 
+        String attachmentXWikiRelativeUrl =
+            xwikiDocument.getAttachmentURL(attachmentName, "download", xwikiContext).toString();
+        
         Attachment attachment =
             DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(
-                doc, xwikiAttachment, xwikiContext), attachmentXWikiUrl);
+                doc, xwikiAttachment, xwikiContext), attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl);
 
         if (existed) {
             return Response.status(Status.ACCEPTED).entity(attachment).build();

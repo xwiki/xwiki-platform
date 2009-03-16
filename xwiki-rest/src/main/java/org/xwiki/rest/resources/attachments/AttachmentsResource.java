@@ -64,13 +64,16 @@ public class AttachmentsResource extends XWikiResource
         XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
 
         for (com.xpn.xwiki.api.Attachment xwikiAttachment : ri) {
-            String attachmentXWikiUrl =
+            String attachmentXWikiAbsoluteUrl =
                 xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
                     .toString();
 
+            String attachmentXWikiRelativeUrl =
+                xwikiDocument.getAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext).toString();
+
             attachments.getAttachments().add(
                 DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), xwikiAttachment,
-                    attachmentXWikiUrl));
+                    attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl));
         }
 
         return attachments;

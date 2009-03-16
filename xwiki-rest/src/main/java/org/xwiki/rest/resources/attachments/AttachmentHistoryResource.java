@@ -81,13 +81,15 @@ public class AttachmentHistoryResource extends XWikiResource
             com.xpn.xwiki.api.Attachment xwikiAttachmentAtVersion =
                 xwikiAttachment.getAttachmentRevision(version.toString());
 
-            String attachmentXWikiUrl =
-                xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
-                    .toString();
+            String attachmentXWikiAbsoluteUrl =
+                xwikiDocument.getExternalAttachmentURL(attachmentName, "download", xwikiContext).toString();
+
+            String attachmentXWikiRelativeUrl =
+                xwikiDocument.getAttachmentURL(attachmentName, "download", xwikiContext).toString();
 
             attachments.getAttachments().add(
                 DomainObjectFactory.createAttachmentAtVersion(objectFactory, uriInfo.getBaseUri(),
-                    xwikiAttachmentAtVersion, attachmentXWikiUrl));
+                    xwikiAttachmentAtVersion, attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl));
         }
 
         return attachments;

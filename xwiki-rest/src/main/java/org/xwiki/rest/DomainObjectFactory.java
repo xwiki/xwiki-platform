@@ -148,7 +148,8 @@ public class DomainObjectFactory
         space.setName(spaceName);
         if (home != null) {
             space.setHome(home.getPrefixedFullName());
-            space.setXwikiUrl(home.getExternalURL("view"));
+            space.setXwikiRelativeUrl(home.getURL("view"));
+            space.setXwikiAbsoluteUrl(home.getExternalURL("view"));
         }        
 
         String pagesUri = UriBuilder.fromUri(baseUri).path(PagesResource.class).build(wikiName, spaceName).toString();
@@ -471,7 +472,7 @@ public class DomainObjectFactory
     }
 
     private static void fillAttachment(Attachment attachment, ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl)
     {
         Document doc = xwikiAttachment.getDocument();
 
@@ -488,7 +489,8 @@ public class DomainObjectFactory
         calendar.setTime(xwikiAttachment.getDate());
         attachment.setDate(calendar);
 
-        attachment.setXwikiUrl(xwikiUrl);
+        attachment.setXwikiRelativeUrl(xwikiRelativeUrl);
+        attachment.setXwikiAbsoluteUrl(xwikiAbsoluteUrl);
 
         String pageUri =
             UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
@@ -500,11 +502,11 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachment(ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl)
     {
         Attachment attachment = objectFactory.createAttachment();
 
-        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiUrl);
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl);
 
         Document doc = xwikiAttachment.getDocument();
 
@@ -520,11 +522,11 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachmentAtVersion(ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiUrl)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl)
     {
         Attachment attachment = new Attachment();
 
-        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiUrl);
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl);
 
         Document doc = xwikiAttachment.getDocument();
 

@@ -63,7 +63,8 @@
           <element name="wiki" type="string"></element>
           <element name="name" type="string"></element>
           <element name="home" type="string"></element>
-          <element name="xwikiUrl" type="string"></element>          
+          <element name="xwikiRelativeUrl" type="string"></element>
+          <element name="xwikiAbsoluteUrl" type="string"></element>        
         </sequence>
       </extension>
     </complexContent>
@@ -138,7 +139,8 @@
           <element name="mimeType" type="string"></element>
           <element name="author" type="string"></element>
           <element name="date" type="dateTime"></element>
-          <element name="xwikiUrl" type="string"></element>
+          <element name="xwikiRelativeUrl" type="string"></element>
+          <element name="xwikiAbsoluteUrl" type="string"></element>
         </sequence>
       </extension>
     </complexContent>

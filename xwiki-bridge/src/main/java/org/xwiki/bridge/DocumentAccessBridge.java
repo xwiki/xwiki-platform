@@ -19,6 +19,8 @@
  */
 package org.xwiki.bridge;
 
+import java.util.Map;
+
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes
  * and the Document services.
@@ -253,4 +255,22 @@ public interface DocumentAccessBridge
      * @return The default encoding for the current wiki.
      */
     String getDefaultEncoding();
+    
+    /**
+     * Sets the passed document as the current document in the XWiki Context and saves current values
+     * related to the current document into a backup object.
+     * 
+     * @param backupObjects the object in which to some context properties will be saved
+     * @param documentName the document to set as the current document
+     * @throws Exception in case of an error like a problem loading the document from the database
+     */
+    void pushDocumentInContext(Map<String, Object> backupObjects, String documentName) throws Exception;
+
+    /**
+     * Restore values saved in a backup object in the XWiki Context and restore the current document
+     * with the same value before {@link #pushDocumentInContext(Map, String)} was called.
+     * 
+     * @param backupObjects the object containing the backed-up context properties to restore 
+     */
+    void popDocumentFromContext(Map<String, Object> backupObjects);
 }

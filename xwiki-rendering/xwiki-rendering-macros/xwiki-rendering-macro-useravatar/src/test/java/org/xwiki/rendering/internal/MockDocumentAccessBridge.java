@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal;
 
+import java.util.Map;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
@@ -173,6 +175,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     public DocumentName getDocumentName(String documentName)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void popDocumentFromContext(Map<String, Object> backupObjects)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void pushDocumentInContext(Map<String, Object> backupObjects, String documentName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }

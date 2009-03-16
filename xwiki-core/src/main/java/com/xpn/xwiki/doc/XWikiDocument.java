@@ -81,6 +81,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
@@ -4711,10 +4712,11 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
-    public static void backupContext(HashMap<String, Object> backup, XWikiContext context)
+    public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
         backup.put("doc", context.getDoc());
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+        VelocityContext vcontext = velocityManager.getVelocityContext();
         if (vcontext != null) {
             backup.put("vdoc", vcontext.get("doc"));
             backup.put("vcdoc", vcontext.get("cdoc"));
@@ -4728,10 +4730,11 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
-    public static void restoreContext(HashMap<String, Object> backup, XWikiContext context)
+    public static void restoreContext(Map<String, Object> backup, XWikiContext context)
     {
         context.setDoc((XWikiDocument) backup.get("doc"));
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+        VelocityContext vcontext = velocityManager.getVelocityContext();
         Map gcontext = (Map) context.get("gcontext");
         if (vcontext != null) {
             if (backup.get("vdoc") != null) {
@@ -4763,7 +4766,8 @@ public class XWikiDocument implements DocumentModelBridge
             context.setDoc(this);
             com.xpn.xwiki.api.Document apidoc = this.newDocument(context);
             com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+            VelocityContext vcontext = velocityManager.getVelocityContext();
             Map gcontext = (Map) context.get("gcontext");
             if (vcontext != null) {
                 vcontext.put("doc", apidoc);

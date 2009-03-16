@@ -20,6 +20,7 @@
 package com.xpn.xwiki.doc;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -397,5 +398,25 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             // Do nothing
         }
         return hasRight;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see DocumentAccessBridge#popDocumentFromContext(Map)
+     */
+    public void popDocumentFromContext(Map<String, Object> backupObjects)
+    {
+        XWikiDocument.restoreContext(backupObjects, getContext());
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see DocumentAccessBridge#pushDocumentInContext(Map, String)
+     */
+    public void pushDocumentInContext(Map<String, Object> backupObjects, String documentName) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument.backupContext(backupObjects, xcontext);
+        xcontext.getWiki().getDocument(documentName, xcontext).setAsContextDoc(xcontext);
     }
 }

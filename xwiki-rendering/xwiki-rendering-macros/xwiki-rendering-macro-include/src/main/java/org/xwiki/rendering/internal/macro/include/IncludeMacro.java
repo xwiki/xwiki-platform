@@ -20,13 +20,15 @@
 package org.xwiki.rendering.internal.macro.include;
 
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -177,15 +179,24 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
 
         try {
             // Push new Execution Context to isolate the contexts (Velocity, Groovy, etc).
-            this.execution.pushContext(this.executionContextManager.clone(this.execution.getContext()));
+            ExecutionContext clonedEc = this.executionContextManager.clone(this.execution.getContext());
             
+            this.execution.pushContext(clonedEc);
+
             // TODO: Need to set the current document, space and wiki. This is required for wiki syntax acting on
             // documents. For example if a link says "WebHome" it should point to the webhome of the current space.
-            result = generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, 
-                macroTransformation);
-        } catch (ExecutionContextException e) {
-            throw new MacroExecutionException("Failed to create new Execution Context for included page ["
-                + includedDocumentName + "]", e);
+            Map<String, Object> backupObjects = new HashMap<String, Object>();
+            try {
+                this.documentAccessBridge.pushDocumentInContext(backupObjects, includedDocumentName);
+                result = generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, 
+                    macroTransformation);
+            } finally {
+                this.documentAccessBridge.popDocumentFromContext(backupObjects);
+            }
+
+        } catch (Exception e) {
+            throw new MacroExecutionException("Failed to render page [" + includedDocumentName 
+                + "] in new context", e);
         } finally {
             // Reset the Execution Context as before
             this.execution.popContext();

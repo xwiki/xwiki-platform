@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.scaffolding;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -292,5 +294,25 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     public DocumentName getDocumentName(String documentName)
     {
         return new DocumentName("xwiki", "Space", "Page");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#popDocumentFromContext(Map)
+     */
+    public void popDocumentFromContext(Map<String, Object> backupObjects)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#pushDocumentInContext(Map, String)
+     */
+    public void pushDocumentInContext(Map<String, Object> backupObjects, String documentName) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
     }
 }

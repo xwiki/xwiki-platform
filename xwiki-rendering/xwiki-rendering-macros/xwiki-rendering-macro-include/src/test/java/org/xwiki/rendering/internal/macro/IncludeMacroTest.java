@@ -71,6 +71,8 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         mockDocumentAccessBridge.expects(once()).method("getDocumentSyntaxId").will(
             returnValue(new Syntax(SyntaxType.XWIKI, "2.0").toIdString()));
         macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
+        mockDocumentAccessBridge.stubs().method("pushDocumentInContext");
+        mockDocumentAccessBridge.stubs().method("popDocumentFromContext");
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setDocument("wiki:Space.Page");

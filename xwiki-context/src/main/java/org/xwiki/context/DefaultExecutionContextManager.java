@@ -38,11 +38,11 @@ public class DefaultExecutionContextManager implements ExecutionContextManager
         // Execution Context Initializers on it.
         initialize(clonedContext);
         
-        // Manually add the bridged XWiki Context so that old code continues to work.
+        // Manually add the XWiki Context so that old code continues to work.
         // Note that we need to add it manually here since there's no Context Initializer that adds it.
         clonedContext.setProperty("xwikicontext", context.getProperty("xwikicontext"));
 
-        // Manually add the Velocity Context too since currently the XWikiVelocityContextInitializer is not yet 
+        // Manually clone the Velocity Context too since currently the XWikiVelocityContextInitializer is not yet 
         // implemented.
         // Note that we're using reflection since we don't want to add a dependency on Velocity module since that
         // would cause a cyclic dependency.

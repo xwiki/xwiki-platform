@@ -109,6 +109,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macro9", true);
         suite.addTestsFromResource("macros/macro10", true);
         suite.addTestsFromResource("macros/macro11", true);
+        suite.addTestsFromResource("macros/macro12", true);
+        suite.addTestsFromResource("macros/macro13", true);
 
         // Links
         suite.addTestsFromResource("link/links1", false);
@@ -198,7 +200,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
         suite.addTestsFromResource("image/image4", false);
-        
+
         return new RenderingPlexusTestSetup(suite);
     }
 }

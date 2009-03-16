@@ -52,12 +52,12 @@ import org.xwiki.xml.html.filter.HTMLFilter;
 public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
 {
     /**
-     * {@link HTMLFilter} for filtering html lists.
+     * {@link HTMLFilter} for filtering HTML lists.
      */
     private HTMLFilter listFilter;
     
     /**
-     * {@link HTMLFilter} for filtering html font elements.
+     * {@link HTMLFilter} for filtering HTML font elements.
      */
     private HTMLFilter fontFilter;
 
@@ -95,10 +95,11 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
 
     /**
      * {@inheritDoc}
-     * <p>
-     * {@link DefaultHTMLCleaner} supports following cleaning parameters:<br/> 'namespacesAware' : if set to 'true'
-     * namespace information will be preserved during cleaning.<br/>
-     * </p>
+     * <p/>
+     * {@link DefaultHTMLCleaner} supports following cleaning parameters:
+     * <ul>
+     *   <li>namespacesAware: if set to 'true' namespace information will be preserved during cleaning
+     * </ul>
      */
     public Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters)
     {
@@ -110,22 +111,24 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     }
 
     /**
-     * Cleans the given html content with supplied {@link CleanerProperties} and {@link CleanerTransformations}.
+     * Cleans the given HTML content with supplied {@link CleanerProperties} and {@link CleanerTransformations}.
      * 
-     * @param originalHtmlContent original html content.
+     * @param originalHtmlContent original HTML content.
      * @param cleanerProperties {@link CleanerProperties} to be used for cleaning.
      * @param cleanerTransformations {@link CleanerTransformations} to be used when cleaning.
      * @param cleaningParameters additional cleaning parameters (if needed) for internal {@link HTMLFilter} components.
-     * @return the cleaned html as a {@link org.w3c.dom.Document}.
+     * @return the cleaned HTML as a {@link org.w3c.dom.Document}.
      */
     private Document clean(Reader originalHtmlContent, CleanerProperties cleanerProperties,
         CleanerTransformations cleanerTransformations, Map<String, String> cleaningParameters)
     {
         Document result = null;
+        
         // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise we would need
         // to synchronize this clean() method which would slow down the whole system by queuing up cleaning requests.
         // See http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=903699
         HtmlCleaner cleaner = new HtmlCleaner(cleanerProperties);
+        
         cleaner.setTransformations(cleanerTransformations);
         TagNode cleanedNode;
         try {
@@ -135,16 +138,19 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             // Cleaner.
             throw new RuntimeException("Unhandled error when cleaning HTML", e);
         }
-        // Fix cleaned node bug
+        
+        // Workaround HTML XML declaration bug.
         fixCleanedNodeBug(cleanedNode);        
-        // Ideally following code should be enough. But htmlcleaner seems to omit the DocType declaration while
+        
+        // Ideally following code should be enough. But SF's HTML Cleaner seems to omit the DocType declaration while
         // serializing.
+        // See https://sourceforge.net/tracker/index.php?func=detail&aid=2062318&group_id=183053&atid=903696
         //      cleanedNode.setDocType(new DoctypeToken("html", "PUBLIC", "-//W3C//DTD XHTML 1.0 Strict//EN",
         //          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"));
         //      try {
         //          result = new DomSerializer(cleanerProperties, false).createDOM(cleanedNode);
         //      } catch(ParserConfigurationException ex) { }
-        // As a workaround, we have go through jdom so that we can set the DocType manually.
+        // As a workaround, we have go through JDOM so that we can set the DocType manually.
         org.jdom.Document jdomDoc = null;
         jdomDoc = new JDomSerializer(cleanerProperties, false).createJDom(cleanedNode);
         jdomDoc.setDocType(new DocType("html", "-//W3C//DTD XHTML 1.0 Strict//EN", 
@@ -153,10 +159,12 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             result = new DOMOutputter().output(jdomDoc);
         } catch (JDOMException ex) {
             throw new RuntimeException("Error while transforming jdom document into w3c document", ex);
-        }        
+        }
+        
         // Finally apply filters.
-        listFilter.filter(result, cleaningParameters);
-        fontFilter.filter(result, cleaningParameters);
+        this.listFilter.filter(result, cleaningParameters);
+        this.fontFilter.filter(result, cleaningParameters);
+
         return result;        
     }
 
@@ -214,7 +222,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     /**
      * There's a known limitation (bug?) in HTML Cleaner where if there's a XML declaration specified it'll be copied as
      * the first element of the body. Thus remove it if it's there. See
-     * https://sourceforge.net/forum/message.php?msg_id=4657800
+     * https://sourceforge.net/forum/message.php?msg_id=4657800 and
+     * https://sourceforge.net/tracker/index.php?func=detail&aid=2688635&group_id=183053&atid=903696
      * 
      * @param cleanedNode the cleaned node (ie after the HTML cleaning)
      */

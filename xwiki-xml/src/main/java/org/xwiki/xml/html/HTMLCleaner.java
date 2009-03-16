@@ -38,11 +38,6 @@ public interface HTMLCleaner
     String ROLE = HTMLCleaner.class.getName();
 
     /**
-     * String representing the true state of a boolean flag.
-     */
-    String TRUE = "true";
-
-    /**
      * Cleaning property identifier which decides if parsing should omit/keep namespace information.
      */
     String NAMESPACES_AWARE = "namespacesAware";

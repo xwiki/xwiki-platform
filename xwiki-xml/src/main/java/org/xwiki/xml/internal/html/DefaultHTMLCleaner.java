@@ -90,7 +90,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     public Document clean(Reader originalHtmlContent)
     {
         return clean(originalHtmlContent, getDefaultCleanerProperties(), getDefaultCleanerTransformations(),
-            Collections.singletonMap("", ""));
+            Collections.<String, String>emptyMap());
     }
 
     /**
@@ -104,7 +104,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     {
         CleanerProperties cleanerProperties = getDefaultCleanerProperties();
         String param = cleaningParameters.get(NAMESPACES_AWARE);
-        boolean namespacesAware = param != null ? param.equals(TRUE) : cleanerProperties.isNamespacesAware();
+        boolean namespacesAware = (param != null) ? Boolean.parseBoolean(param) : cleanerProperties.isNamespacesAware();
         cleanerProperties.setNamespacesAware(namespacesAware);
         return clean(originalHtmlContent, cleanerProperties, getDefaultCleanerTransformations(), cleaningParameters);
     }
@@ -167,6 +167,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     {
         CleanerProperties defaultProperties = new CleanerProperties();
         defaultProperties.setOmitUnknownTags(true);
+        defaultProperties.setNamespacesAware(true);
+        
         // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if we use the best
         // practice of using CDATA inside a script. For example:
         //  <script type="text/javascript">

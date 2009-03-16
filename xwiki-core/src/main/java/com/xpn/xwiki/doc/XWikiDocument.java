@@ -1579,7 +1579,7 @@ public class XWikiDocument implements DocumentModelBridge
                 // This mode is deprecated for the new rendering and should also be removed for the old rendering
                 // since the way to implement this now is to choose the type of rendering to do in the class itself.
                 // Thus for the new rendering we simply make this mode work like the "view" mode.
-                if (is10Syntax()) {
+                if (is10Syntax(syntaxId)) {
                     result.append(getRenderedContent(fcontent, syntaxId, context));
                 } else {
                     result.append(fcontent);
@@ -1592,13 +1592,13 @@ public class XWikiDocument implements DocumentModelBridge
                 // If the Syntax id is not "xwiki/1.0", i.e. if the new rendering engine is used then we need to
                 // protect the content with a <pre> since otherwise whitespaces will be stripped by the HTML macro
                 // used to surround the object property content (see below).
-                if (is10Syntax()) {
+                if (is10Syntax(syntaxId)) {
                     result.append("{pre}");
                 } else {
                     result.append("<pre>");
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                if (is10Syntax()) {
+                if (is10Syntax(syntaxId)) {
                     result.append("{/pre}");
                 } else {
                     result.append("</pre>");
@@ -1607,23 +1607,23 @@ public class XWikiDocument implements DocumentModelBridge
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (is10Syntax()) {
+                if (is10Syntax(syntaxId)) {
                     result.append("{pre}");
                 }
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
-                if (is10Syntax()) {
+                if (is10Syntax(syntaxId)) {
                     result.append("{/pre}");
                 }
             } else if (type.equals("search")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (is10Syntax()) {
+                if (is10Syntax(syntaxId)) {
                     result.append("{pre}");
                 }
                 prefix = obj.getxWikiClass(context).getName() + "_";
                 pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
-                if (is10Syntax()) {
+                if (is10Syntax(syntaxId)) {
                     result.append("{/pre}");
                 }
             } else {
@@ -1635,7 +1635,7 @@ public class XWikiDocument implements DocumentModelBridge
             // We test if we're inside the rendering engine since it's also possible that this display() method is
             // called
             // directly from a template and in this case we only want HTML as a result and not wiki syntax.
-            if (isInRenderingEngine && !is10Syntax()) {
+            if (isInRenderingEngine && !is10Syntax(syntaxId)) {
                 result.insert(0, "{{html wiki=\"false\"}}");
                 result.append("{{/html}}");
             }
@@ -3486,10 +3486,6 @@ public class XWikiDocument implements DocumentModelBridge
     public void setLanguage(String language)
     {
         this.language = language;
-
-        // invalidate parsed xdom
-        this.xdom = null;
-        this.clonedxdom = null;
     }
 
     public String getDefaultLanguage()
@@ -5057,6 +5053,14 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public boolean is10Syntax()
     {
-        return XWIKI10_SYNTAXID.equalsIgnoreCase(getSyntaxId());
+        return is10Syntax(getSyntaxId());
+    }
+    
+    /**
+     * @return true if the document has a xwiki/1.0 syntax content
+     */
+    public boolean is10Syntax(String syntaxId)
+    {
+        return XWIKI10_SYNTAXID.equalsIgnoreCase(syntaxId);
     }
 }

@@ -2,6 +2,8 @@ package com.xpn.xwiki.doc;
 
 import java.util.List;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -44,5 +46,18 @@ public aspect XWikiDocumentCompatibilityAspect
         bobject.setClassName(className);
         bobject.setListValue(fieldName, value);
         setContentDirty(true);
+    }
+    
+    /**
+     * This method to split section according to title.
+     * 
+     * @return the sections in the current document
+     * @throws XWikiException
+     * @deprecated use {@link #getSections()} instead, since 1.6M1
+     */
+    @Deprecated
+    public List<DocumentSection> XWikiDocument.getSplitSectionsAccordingToTitle() throws XWikiException
+    {
+        return getSections();
     }
 }

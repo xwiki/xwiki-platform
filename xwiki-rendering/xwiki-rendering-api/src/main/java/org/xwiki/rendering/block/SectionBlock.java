@@ -37,14 +37,24 @@ public class SectionBlock extends AbstractFatherBlock
 
     public SectionBlock(List<Block> childBlocks, Map<String, String> parameters)
     {
-        super(childBlocks,  parameters);
+        super(childBlocks, parameters);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginSection(getParameters());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     */
     public void after(Listener listener)
     {
         listener.endSection(getParameters());

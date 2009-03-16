@@ -32,6 +32,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -70,8 +71,11 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.ParseException;
@@ -480,12 +484,14 @@ public class XWikiDocument implements DocumentModelBridge
     public String getRenderedContent(XWikiContext context) throws XWikiException
     {
         String renderedContent;
+
         // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-        if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+        if (is10Syntax()) {
             renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
         } else {
             renderedContent = performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0");
         }
+
         return renderedContent;
     }
 
@@ -505,13 +511,13 @@ public class XWikiDocument implements DocumentModelBridge
             setAsContextDoc(context);
 
             // This tells display() methods that we are inside the rendering engine and thus
-            // that they can return wiki syntax and not HTML syntax (which is needed when 
-            // outside the rendering engine, i.e. when we're inside templates using only 
+            // that they can return wiki syntax and not HTML syntax (which is needed when
+            // outside the rendering engine, i.e. when we're inside templates using only
             // Velocity for example).
             context.put("isInRenderingEngine", true);
-            
+
             // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-            if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+            if (is10Syntax()) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
                 result = performSyntaxConversion(text, getSyntaxId(), "xhtml/1.0");
@@ -588,7 +594,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         return this.getSpace();
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -598,7 +604,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         return this.getName();
     }
-    
+
     public String getTitle()
     {
         return (this.title != null) ? this.title : "";
@@ -1540,21 +1546,20 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Note: We've introduced this signature taking an extra syntaxId parameter to handle the case where Panels
-     * are written in a syntax other than the main document. The problem is that currently the displayPanel()
-     * velocity macro in macros.vm calls display() on the main document and not on the panel document. Thus if
-     * we don't tell what syntax to use the main document syntax will be used to display panels even if they're
-     * written in another syntax.
+     * Note: We've introduced this signature taking an extra syntaxId parameter to handle the case where Panels are
+     * written in a syntax other than the main document. The problem is that currently the displayPanel() velocity macro
+     * in macros.vm calls display() on the main document and not on the panel document. Thus if we don't tell what
+     * syntax to use the main document syntax will be used to display panels even if they're written in another syntax.
      */
     public String display(String fieldname, String type, BaseObject obj, String syntaxId, XWikiContext context)
     {
         return display(fieldname, type, "", obj, syntaxId, context);
     }
-    
-    public String display(String fieldname, String type, String pref, BaseObject obj, String syntaxId, 
-    		XWikiContext context)
+
+    public String display(String fieldname, String type, String pref, BaseObject obj, String syntaxId,
+        XWikiContext context)
     {
-    	boolean isInRenderingEngine = BooleanUtils.toBoolean((Boolean) context.get("isInRenderingEngine"));
+        boolean isInRenderingEngine = BooleanUtils.toBoolean((Boolean) context.get("isInRenderingEngine"));
         HashMap<String, Object> backup = new HashMap<String, Object>();
         try {
             backupContext(backup, context);
@@ -1574,7 +1579,7 @@ public class XWikiDocument implements DocumentModelBridge
                 // This mode is deprecated for the new rendering and should also be removed for the old rendering
                 // since the way to implement this now is to choose the type of rendering to do in the class itself.
                 // Thus for the new rendering we simply make this mode work like the "view" mode.
-                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (is10Syntax()) {
                     result.append(getRenderedContent(fcontent, syntaxId, context));
                 } else {
                     result.append(fcontent);
@@ -1584,56 +1589,57 @@ public class XWikiDocument implements DocumentModelBridge
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                // If the Syntax id is not "xwiki/1.0", i.e. if the new rendering engine is used then we need to 
+                // If the Syntax id is not "xwiki/1.0", i.e. if the new rendering engine is used then we need to
                 // protect the content with a <pre> since otherwise whitespaces will be stripped by the HTML macro
                 // used to surround the object property content (see below).
-                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (is10Syntax()) {
                     result.append("{pre}");
                 } else {
-                	result.append("<pre>");
+                    result.append("<pre>");
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (is10Syntax()) {
                     result.append("{/pre}");
                 } else {
-                	result.append("</pre>");
+                    result.append("</pre>");
                 }
             } else if (type.equals("hidden")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (is10Syntax()) {
                     result.append("{pre}");
                 }
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
-                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (is10Syntax()) {
                     result.append("{/pre}");
                 }
             } else if (type.equals("search")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (is10Syntax()) {
                     result.append("{pre}");
                 }
                 prefix = obj.getxWikiClass(context).getName() + "_";
                 pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
-                if (syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+                if (is10Syntax()) {
                     result.append("{/pre}");
                 }
             } else {
                 pclass.displayView(result, fieldname, prefix, obj, context);
             }
-            
-            // If we're in new rendering engine we want to wrap the HTML returned by displayView() in 
+
+            // If we're in new rendering engine we want to wrap the HTML returned by displayView() in
             // a {{html/}} macro so that the user doesn't have to do it.
-            // We test if we're inside the rendering engine since it's also possible that this display() method is called
+            // We test if we're inside the rendering engine since it's also possible that this display() method is
+            // called
             // directly from a template and in this case we only want HTML as a result and not wiki syntax.
-            if (isInRenderingEngine && !syntaxId.equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+            if (isInRenderingEngine && !is10Syntax()) {
                 result.insert(0, "{{html wiki=\"false\"}}");
                 result.append("{{/html}}");
             }
-            
+
             return result.toString();
         } catch (Exception ex) {
             // TODO: It would better to check if the field exists rather than catching an exception
@@ -2684,7 +2690,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         String syntaxId = getElement(docel, "syntaxId");
         if ((syntaxId == null) || (syntaxId.length() == 0)) {
-            // Documents that don't have syntax ids are considered old documents and thus in 
+            // Documents that don't have syntax ids are considered old documents and thus in
             // XWiki Syntax 1.0 since newer documents always have syntax ids.
             setSyntaxId(XWIKI10_SYNTAXID);
         } else {
@@ -2912,7 +2918,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         List<XWikiLink> links;
 
-        if (getSyntaxId().equals(XWIKI10_SYNTAXID)) {
+        if (is10Syntax()) {
             links = getStore(context).loadLinks(getId(), context, true);
         } else {
             List<String> linkedPages = getLinkedPages(context);
@@ -3009,7 +3015,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         List<String> pageNames;
 
-        if (getSyntaxId().equals(XWIKI10_SYNTAXID)) {
+        if (is10Syntax()) {
             pageNames = getLinkedPages10(context);
         } else {
             XDOM dom = getXDOM();
@@ -3092,7 +3098,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public List<String> getIncludedPages(XWikiContext context)
     {
-        if (getSyntaxId().equalsIgnoreCase(XWIKI10_SYNTAXID)) {
+        if (is10Syntax()) {
             return getIncludedPagesForXWiki10Syntax(context);
         } else {
             // Find all include macros listed on the page
@@ -3480,6 +3486,10 @@ public class XWikiDocument implements DocumentModelBridge
     public void setLanguage(String language)
     {
         this.language = language;
+
+        // invalidate parsed xdom
+        this.xdom = null;
+        this.clonedxdom = null;
     }
 
     public String getDefaultLanguage()
@@ -4390,21 +4400,38 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * @return the sections in the current document
+     * @throws XWikiException
      */
-    public List<DocumentSection> getSections()
+    public List<DocumentSection> getSections() throws XWikiException
     {
-        return getSplitSectionsAccordingToTitle();
+        if (is10Syntax()) {
+            return getSections10();
+        } else {
+            List<DocumentSection> splitSections = new ArrayList<DocumentSection>();
+            List<HeaderBlock> headers = getXDOM().getChildrenByType(HeaderBlock.class, true);
+
+            int sectionNumber = 1;
+            for (HeaderBlock header : headers) {
+                // put -1 as index since there is no way to get the position of the header in the source
+                int documentSectionIndex = -1;
+
+                // Need to do the same thing than 1.0 content here
+                String documentSectionLevel = StringUtils.repeat("1.", header.getLevel().getAsInt() - 1) + "1";
+
+                DocumentSection docSection =
+                    new DocumentSection(sectionNumber++, documentSectionIndex, documentSectionLevel, renderXDOM(
+                        new XDOM(header.getChildren()), getSyntaxId()));
+                splitSections.add(docSection);
+            }
+
+            return splitSections;
+        }
     }
 
     /**
-     * This method to split section according to title.
-     * 
      * @return the sections in the current document
-     * @throws XWikiException
-     * @deprecated use {@link #getSections()} instead, since 1.6M1
      */
-    @Deprecated
-    public List<DocumentSection> getSplitSectionsAccordingToTitle()
+    public List<DocumentSection> getSections10()
     {
         // Pattern to match the title. Matches only level 1 and level 2 headings.
         Pattern headingPattern = Pattern.compile("^[ \\t]*+(1(\\.1){0,1}+)[ \\t]++(.++)$", Pattern.MULTILINE);
@@ -4425,17 +4452,54 @@ public class XWikiDocument implements DocumentModelBridge
         return splitSections;
     }
 
-    // This function to return a Document section with parameter is sectionNumber
+    /**
+     * Return a Document section with parameter is sectionNumber.
+     * 
+     * @param sectionNumber the index (+1) of the section in the list of all sections in the document.
+     * @return
+     * @throws XWikiException error when extracting sections from document
+     */
     public DocumentSection getDocumentSection(int sectionNumber) throws XWikiException
     {
         // return a document section according to section number
-        return getSplitSectionsAccordingToTitle().get(sectionNumber - 1);
+        return getSections().get(sectionNumber - 1);
     }
 
-    // This method to return the content of a section
+    /**
+     * Return the content of a section.
+     * 
+     * @param sectionNumber the index (+1) of the section in the list of all sections in the document.
+     * @return the content of a section or null if the section can't be found.
+     * @throws XWikiException error when trying to extract section content
+     */
     public String getContentOfSection(int sectionNumber) throws XWikiException
     {
-        List<DocumentSection> splitSections = getSplitSectionsAccordingToTitle();
+        String content = null;
+
+        if (is10Syntax()) {
+            content = getContentOfSection10(sectionNumber);
+        } else {
+            List<HeaderBlock> headers = getXDOM().getChildrenByType(HeaderBlock.class, true);
+
+            if (headers.size() >= sectionNumber) {
+                SectionBlock section = headers.get(sectionNumber - 1).getSection();
+                content = renderXDOM(new XDOM(Collections.<Block> singletonList(section)), getSyntaxId());
+            }
+        }
+
+        return content;
+    }
+
+    /**
+     * Return the content of a section.
+     * 
+     * @param sectionNumber the index (+1) of the section in the list of all sections in the document.
+     * @return the content of a section
+     * @throws XWikiException error when trying to extract section content
+     */
+    public String getContentOfSection10(int sectionNumber) throws XWikiException
+    {
+        List<DocumentSection> splitSections = getSections();
         int indexEnd = 0;
         // get current section
         DocumentSection section = splitSections.get(sectionNumber - 1);
@@ -4460,16 +4524,58 @@ public class XWikiDocument implements DocumentModelBridge
         } else {
             sectionContent = getContent().substring(indexStart, indexEnd);
         }
+
         return sectionContent;
     }
 
-    // This function to update a section content in document
+    /**
+     * Update a section content in document.
+     * 
+     * @param sectionNumber the index (+1) of the section in the list of all sections in the document.
+     * @param newSectionContent the new section content.
+     * @return the new document content.
+     * @throws XWikiException error when updating content
+     */
     public String updateDocumentSection(int sectionNumber, String newSectionContent) throws XWikiException
+    {
+        String content;
+        if (is10Syntax()) {
+            content = updateDocumentSection10(sectionNumber, newSectionContent);
+        } else {
+            // Get the current section block
+            HeaderBlock header = getXDOM().getChildrenByType(HeaderBlock.class, true).get(sectionNumber - 1);
+
+            // newSectionContent -> Blocks
+            List<Block> blocks = parseContent(newSectionContent).getChildren();
+            int sectionLevel = header.getLevel().getAsInt();
+            for (int level = 1; level < sectionLevel && blocks.size() == 1 && blocks.get(0) instanceof SectionBlock; ++level) {
+                blocks = blocks.get(0).getChildren();
+            }
+
+            // replace old current SectionBlock with new Blocks
+            header.getSection().replace(blocks);
+
+            // render back XDOM to document's content syntax
+            content = renderXDOM(getXDOM(), getSyntaxId());
+        }
+
+        return content;
+    }
+
+    /**
+     * Update a section content in document.
+     * 
+     * @param sectionNumber the index (+1) of the section in the list of all sections in the document.
+     * @param newSectionContent the new section content.
+     * @return the new document content.
+     * @throws XWikiException error when updating document content with section content
+     */
+    public String updateDocumentSection10(int sectionNumber, String newSectionContent) throws XWikiException
     {
         StringBuffer newContent = new StringBuffer();
         // get document section that will be edited
         DocumentSection docSection = getDocumentSection(sectionNumber);
-        int numberOfSections = getSplitSectionsAccordingToTitle().size();
+        int numberOfSections = getSections().size();
         int indexSection = docSection.getSectionIndex();
         if (numberOfSections == 1) {
             // there is only a sections in document
@@ -4842,7 +4948,7 @@ public class XWikiDocument implements DocumentModelBridge
             try {
                 this.xdom = parseContent(getContent());
                 this.clonedxdom = this.xdom.clone();
-            } catch (ParseException e) {
+            } catch (XWikiException e) {
                 log.error("Failed to parse document content to XDOM", e);
             }
         }
@@ -4875,7 +4981,7 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Convert the passed content from the passed syntax to the passed new syntax.
      * 
-     * @param content the XDOM content to convert, the XDOM can be modified suring the transformation
+     * @param content the XDOM content to convert, the XDOM can be modified during the transformation
      * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntaxId the new syntax after the conversion
      * @return the converted content in the new syntax
@@ -4884,7 +4990,6 @@ public class XWikiDocument implements DocumentModelBridge
     private String performSyntaxConversion(XDOM content, String currentSyntaxId, String targetSyntaxId)
         throws XWikiException
     {
-        WikiPrinter printer;
         try {
             // Transform XDOM
             TransformationManager transformations =
@@ -4893,30 +4998,65 @@ public class XWikiDocument implements DocumentModelBridge
             transformations.performTransformations(content, syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
 
             // Render XDOM
-            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
-            printer = new DefaultWikiPrinter();
-            content.traverse(factory.createRenderer(syntaxFactory.createSyntaxFromIdString(targetSyntaxId), printer));
+            return renderXDOM(content, targetSyntaxId);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to convert document to syntax [" + targetSyntaxId + "]", e);
         }
-
-        return printer.toString();
     }
 
-    private XDOM parseContent(String content) throws ParseException
+    /**
+     * Render privided XDOM into content of the provided syntax identifier.
+     * 
+     * @param content the XDOM content to render
+     * @param targetSyntaxId the syntax identifier of the rendered content
+     * @return the rendered content
+     * @throws XWikiException if an exception occurred during the rendering process
+     */
+    private String renderXDOM(XDOM content, String targetSyntaxId) throws XWikiException
+    {
+        try {
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
+            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
+
+            WikiPrinter printer = new DefaultWikiPrinter();
+
+            content.traverse(factory.createRenderer(syntaxFactory.createSyntaxFromIdString(targetSyntaxId), printer));
+
+            return printer.toString();
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to render document to syntax [" + targetSyntaxId + "]", e);
+        }
+
+    }
+
+    private XDOM parseContent(String content) throws XWikiException
     {
         return parseContent(getSyntaxId(), content);
     }
 
-    private XDOM parseContent(String syntaxId, String content) throws ParseException
+    private XDOM parseContent(String syntaxId, String content) throws XWikiException
     {
-        Parser parser = (Parser) Utils.getComponent(Parser.ROLE, syntaxId);
-        return parser.parse(new StringReader(content));
+        try {
+            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, syntaxId);
+            return parser.parse(new StringReader(content));
+        } catch (ParseException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to parse content of syntax [" + syntaxId + "]", e);
+        }
     }
-    
+
     private String getDefaultDocumentSyntax()
     {
-        return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.ROLE)).getDefaultDocumentSyntax();        
+        return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.ROLE)).getDefaultDocumentSyntax();
+    }
+
+    /**
+     * @return true if the document has a xwiki/1.0 syntax content
+     */
+    public boolean is10Syntax()
+    {
+        return XWIKI10_SYNTAXID.equalsIgnoreCase(getSyntaxId());
     }
 }

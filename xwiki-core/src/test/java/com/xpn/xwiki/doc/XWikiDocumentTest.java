@@ -154,80 +154,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Main.WebHome", new XWikiDocument().toString());
     }
 
-    public void testSectionSplit() throws XWikiException
-    {
-        List<DocumentSection> sections;
-        // Simple test
-        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
-            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSections();
-        assertEquals(3, sections.size());
-        assertEquals("Section 1", sections.get(0).getSectionTitle());
-        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
-            + "Content of second section\n", this.document.getContentOfSection(1));
-        assertEquals("1.1", sections.get(1).getSectionLevel());
-        assertEquals("1.1 Subsection 2\nContent of second section\n", this.document.getContentOfSection(2));
-        assertEquals(3, sections.get(2).getSectionNumber());
-        assertEquals(80, sections.get(2).getSectionIndex());
-        assertEquals("1 Section 3\nContent of section 3", this.document.getContentOfSection(3));
-        // Test comments don't break the section editing
-        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "## 1.1 Subsection 2\n"
-            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSections();
-        assertEquals(2, sections.size());
-        assertEquals("Section 1", sections.get(0).getSectionTitle());
-        assertEquals("1", sections.get(1).getSectionLevel());
-        assertEquals(2, sections.get(1).getSectionNumber());
-        assertEquals(83, sections.get(1).getSectionIndex());
-        // Test spaces are ignored
-        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "   1.1    Subsection 2  \n"
-            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSections();
-        assertEquals(3, sections.size());
-        assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
-        assertEquals("1.1", sections.get(1).getSectionLevel());
-        // Test lower headings are ignored
-        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1.1 Lower subsection\n"
-            + "This content is not important\n" + "   1.1    Subsection 2  \n" + "Content of second section\n"
-            + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSections();
-        assertEquals(3, sections.size());
-        assertEquals("Section 1", sections.get(0).getSectionTitle());
-        assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
-        assertEquals("1.1", sections.get(1).getSectionLevel());
-        // Test blank lines are preserved
-        this.document
-            .setContent("\n\n1 Section 1\n\n\n" + "Content of first section\n\n\n" + "   1.1    Subsection 2  \n\n"
-                + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
-        sections = this.document.getSections();
-        assertEquals(3, sections.size());
-        assertEquals(2, sections.get(0).getSectionIndex());
-        assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
-        assertEquals(43, sections.get(1).getSectionIndex());
-    }
-
-    public void testUpdateDocumentSection() throws XWikiException
-    {
-        List<DocumentSection> sections;
-        // Fill the document
-        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
-            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
-        String content = this.document.updateDocumentSection(3, "1 Section 3\n" + "Modified content of section 3");
-        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
-            + "Content of second section\n" + "1 Section 3\n" + "Modified content of section 3", content);
-        this.document.setContent(content);
-        sections = this.document.getSections();
-        assertEquals(3, sections.size());
-        assertEquals("Section 1", sections.get(0).getSectionTitle());
-        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
-            + "Content of second section\n", this.document.getContentOfSection(1));
-        assertEquals("1.1", sections.get(1).getSectionLevel());
-        assertEquals("1.1 Subsection 2\nContent of second section\n", this.document.getContentOfSection(2));
-        assertEquals(3, sections.get(2).getSectionNumber());
-        assertEquals(80, sections.get(2).getSectionIndex());
-        assertEquals("1 Section 3\nModified content of section 3", this.document.getContentOfSection(3));
-    }
-
     public void testCloneSaveVersions()
     {
         XWikiDocument doc1 = new XWikiDocument("qwe", "qwe");
@@ -305,11 +231,214 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetLinkedPages()
     {
         this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
-            + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]");
+            + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]"
+            + "[[]]");
         this.document.setSyntaxId("xwiki/2.0");
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());
 
-        assertEquals(Arrays.asList("XWiki.TargetPage", "TargetSpace.TargetPage"), linkedPages);
+        assertEquals(Arrays.asList("XWiki.TargetPage", "TargetSpace.TargetPage", "XWiki.WebHome"), linkedPages);
+    }
+
+    public void testGetSections10() throws XWikiException
+    {
+        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
+            + "1.1 header 2\nheader 2 content");
+
+        List<DocumentSection> headers = this.document.getSections();
+
+        assertEquals(2, headers.size());
+
+        DocumentSection header1 = headers.get(0);
+        DocumentSection header2 = headers.get(1);
+
+        assertEquals("header 1", header1.getSectionTitle());
+        assertEquals(23, header1.getSectionIndex());
+        assertEquals(1, header1.getSectionNumber());
+        assertEquals("1", header1.getSectionLevel());
+        assertEquals("header 2", header2.getSectionTitle());
+        assertEquals(51, header2.getSectionIndex());
+        assertEquals(2, header2.getSectionNumber());
+        assertEquals("1.1", header2.getSectionLevel());
+    }
+
+    public void testGetSections() throws XWikiException
+    {
+        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+        this.document.setSyntaxId("xwiki/2.0");
+
+        List<DocumentSection> headers = this.document.getSections();
+
+        assertEquals(2, headers.size());
+
+        DocumentSection header1 = headers.get(0);
+        DocumentSection header2 = headers.get(1);
+
+        assertEquals("header 1", header1.getSectionTitle());
+        assertEquals(-1, header1.getSectionIndex());
+        assertEquals(1, header1.getSectionNumber());
+        assertEquals("1", header1.getSectionLevel());
+        assertEquals("header 2", header2.getSectionTitle());
+        assertEquals(-1, header2.getSectionIndex());
+        assertEquals(2, header2.getSectionNumber());
+        assertEquals("1.1", header2.getSectionLevel());
+    }
+
+    public void testGetDocumentSection10() throws XWikiException
+    {
+        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
+            + "1.1 header 2\nheader 2 content");
+
+        DocumentSection header1 = this.document.getDocumentSection(1);
+        DocumentSection header2 = this.document.getDocumentSection(2);
+
+        assertEquals("header 1", header1.getSectionTitle());
+        assertEquals(23, header1.getSectionIndex());
+        assertEquals(1, header1.getSectionNumber());
+        assertEquals("1", header1.getSectionLevel());
+        assertEquals("header 2", header2.getSectionTitle());
+        assertEquals(51, header2.getSectionIndex());
+        assertEquals(2, header2.getSectionNumber());
+        assertEquals("1.1", header2.getSectionLevel());
+    }
+
+    public void testGetDocumentSection() throws XWikiException
+    {
+        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+        this.document.setSyntaxId("xwiki/2.0");
+
+        DocumentSection header1 = this.document.getDocumentSection(1);
+        DocumentSection header2 = this.document.getDocumentSection(2);
+
+        assertEquals("header 1", header1.getSectionTitle());
+        assertEquals(-1, header1.getSectionIndex());
+        assertEquals(1, header1.getSectionNumber());
+        assertEquals("1", header1.getSectionLevel());
+        assertEquals("header 2", header2.getSectionTitle());
+        assertEquals(-1, header2.getSectionIndex());
+        assertEquals(2, header2.getSectionNumber());
+        assertEquals("1.1", header2.getSectionLevel());
+    }
+
+    public void testGetContentOfSection10() throws XWikiException
+    {
+        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
+            + "1.1 header 2\nheader 2 content");
+
+        String content1 = this.document.getContentOfSection(1);
+        String content2 = this.document.getContentOfSection(2);
+
+        assertEquals("1 header 1\nheader 1 content\n1.1 header 2\nheader 2 content", content1);
+        assertEquals("1.1 header 2\nheader 2 content", content2);
+    }
+
+    public void testGetContentOfSection() throws XWikiException
+    {
+        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+        this.document.setSyntaxId("xwiki/2.0");
+
+        String content1 = this.document.getContentOfSection(1);
+        String content2 = this.document.getContentOfSection(2);
+
+        assertEquals("= header 1 =\n\nheader 1 content\n\n== header 2 ==\n\nheader 2 content", content1);
+        assertEquals("== header 2 ==\n\nheader 2 content", content2);
+    }
+
+    public void testSectionSplit10() throws XWikiException
+    {
+        List<DocumentSection> sections;
+        // Simple test
+        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
+        sections = this.document.getSections();
+        assertEquals(3, sections.size());
+        assertEquals("Section 1", sections.get(0).getSectionTitle());
+        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n", this.document.getContentOfSection(1));
+        assertEquals("1.1", sections.get(1).getSectionLevel());
+        assertEquals("1.1 Subsection 2\nContent of second section\n", this.document.getContentOfSection(2));
+        assertEquals(3, sections.get(2).getSectionNumber());
+        assertEquals(80, sections.get(2).getSectionIndex());
+        assertEquals("1 Section 3\nContent of section 3", this.document.getContentOfSection(3));
+        // Test comments don't break the section editing
+        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "## 1.1 Subsection 2\n"
+            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
+        sections = this.document.getSections();
+        assertEquals(2, sections.size());
+        assertEquals("Section 1", sections.get(0).getSectionTitle());
+        assertEquals("1", sections.get(1).getSectionLevel());
+        assertEquals(2, sections.get(1).getSectionNumber());
+        assertEquals(83, sections.get(1).getSectionIndex());
+        // Test spaces are ignored
+        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "   1.1    Subsection 2  \n"
+            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
+        sections = this.document.getSections();
+        assertEquals(3, sections.size());
+        assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
+        assertEquals("1.1", sections.get(1).getSectionLevel());
+        // Test lower headings are ignored
+        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1.1 Lower subsection\n"
+            + "This content is not important\n" + "   1.1    Subsection 2  \n" + "Content of second section\n"
+            + "1 Section 3\n" + "Content of section 3");
+        sections = this.document.getSections();
+        assertEquals(3, sections.size());
+        assertEquals("Section 1", sections.get(0).getSectionTitle());
+        assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
+        assertEquals("1.1", sections.get(1).getSectionLevel());
+        // Test blank lines are preserved
+        this.document
+            .setContent("\n\n1 Section 1\n\n\n" + "Content of first section\n\n\n" + "   1.1    Subsection 2  \n\n"
+                + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
+        sections = this.document.getSections();
+        assertEquals(3, sections.size());
+        assertEquals(2, sections.get(0).getSectionIndex());
+        assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
+        assertEquals(43, sections.get(1).getSectionIndex());
+    }
+
+    public void testUpdateDocumentSection10() throws XWikiException
+    {
+        List<DocumentSection> sections;
+        // Fill the document
+        this.document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
+        String content = this.document.updateDocumentSection(3, "1 Section 3\n" + "Modified content of section 3");
+        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n" + "1 Section 3\n" + "Modified content of section 3", content);
+        this.document.setContent(content);
+        sections = this.document.getSections();
+        assertEquals(3, sections.size());
+        assertEquals("Section 1", sections.get(0).getSectionTitle());
+        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n", this.document.getContentOfSection(1));
+        assertEquals("1.1", sections.get(1).getSectionLevel());
+        assertEquals("1.1 Subsection 2\nContent of second section\n", this.document.getContentOfSection(2));
+        assertEquals(3, sections.get(2).getSectionNumber());
+        assertEquals(80, sections.get(2).getSectionIndex());
+        assertEquals("1 Section 3\nModified content of section 3", this.document.getContentOfSection(3));
+    }
+
+    public void testUpdateDocumentSection() throws XWikiException
+    {
+        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+        this.document.setSyntaxId("xwiki/2.0");
+
+        String content1 = this.document.updateDocumentSection(2, "== header 2==\nmodified header 2 content");
+
+        assertEquals(
+            "content not in section\n\n= header 1 =\n\nheader 1 content\n\n== header 2 ==\n\nmodified header 2 content",
+            content1);
+
+        String content2 =
+            this.document.updateDocumentSection(1,
+                "= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content");
+
+        assertEquals(
+            "content not in section\n\n= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content",
+            content2);
     }
 }

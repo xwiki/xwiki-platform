@@ -20,11 +20,11 @@
  */
 package com.xpn.xwiki.pdf.api;
 
+import java.io.OutputStream;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import java.io.OutputStream;
 
 public interface PdfExport
 {
@@ -38,5 +38,9 @@ public interface PdfExport
 
     public byte[] convertToStrictXHtml(byte[] input, XWikiContext context);
 
+    public String convertToStrictXHtml(String input);
+
     public byte[] convertXHtmlToXMLFO(byte[] input, XWikiContext context) throws XWikiException;
+
+    public String convertXHtmlToXMLFO(String input, XWikiContext context) throws XWikiException;
 }

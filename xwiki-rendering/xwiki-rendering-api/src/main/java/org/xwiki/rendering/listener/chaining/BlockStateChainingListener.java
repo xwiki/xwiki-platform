@@ -87,9 +87,14 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         return this.previousEvent;
     }
 
+    public int getInlineDepth()
+    {
+        return this.inlineDepth;
+    }
+    
     public boolean isInLine()
     {
-        return this.inlineDepth > 0;
+        return getInlineDepth() > 0;
     }
 
     public boolean isInParagraph()
@@ -112,44 +117,54 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         return this.isInTableCell;
     }
 
+    public int getDefinitionListDepth()
+    {
+        return this.definitionListDepth;
+    }
+    
     public boolean isInDefinitionList()
     {
-        return this.definitionListDepth > 0;
-    }
-
-    public boolean isInList()
-    {
-        return this.listDepth > 0;
+        return getDefinitionListDepth() > 0;
     }
 
     public int getListDepth()
     {
         return this.listDepth;
     }
-
-    public boolean isInListItem()
+    
+    public boolean isInList()
     {
-        return this.listItemDepth > 0;
+        return getListDepth() > 0;
     }
 
-    public boolean isInLink()
+    public int getListItemDepth()
     {
-        return this.linkDepth > 0;
+        return this.listItemDepth;
+    }
+    
+    public boolean isInListItem()
+    {
+        return getListItemDepth() > 0;
     }
 
     public int getLinkDepth()
     {
         return this.linkDepth;
     }
-
-    public boolean isInQuotation()
+    
+    public boolean isInLink()
     {
-        return this.quotationDepth > 0;
+        return getLinkDepth() > 0;
     }
 
     public int getQuotationDepth()
     {
         return this.quotationDepth;
+    }
+    
+    public boolean isInQuotation()
+    {
+        return getQuotationDepth() > 0;
     }
 
     public boolean isInQuotationLine()
@@ -157,14 +172,14 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         return this.isInQuotationLine;
     }
 
-    public int getDefinitionListDepth()
-    {
-        return this.definitionListDepth;
-    }
-
     public int getMacroDepth()
     {
         return this.macroDepth;
+    }
+
+    public boolean isInMacro()
+    {
+        return getMacroDepth() < 0;
     }
 
     // Events

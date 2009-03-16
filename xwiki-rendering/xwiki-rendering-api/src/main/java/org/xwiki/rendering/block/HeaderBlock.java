@@ -41,13 +41,18 @@ public class HeaderBlock extends AbstractFatherBlock
 
     public HeaderBlock(List<Block> childBlocks, HeaderLevel level, Map<String, String> parameters)
     {
-        super(childBlocks,  parameters);
+        super(childBlocks, parameters);
         this.level = level;
     }
 
     public HeaderLevel getLevel()
     {
         return this.level;
+    }
+
+    public SectionBlock getSection()
+    {
+        return (SectionBlock) getParent();
     }
 
     public void before(Listener listener)

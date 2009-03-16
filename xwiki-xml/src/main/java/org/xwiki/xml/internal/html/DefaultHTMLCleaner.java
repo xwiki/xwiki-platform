@@ -96,7 +96,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     /**
      * {@inheritDoc}
      * <p/>
-     * {@link DefaultHTMLCleaner} supports following cleaning parameters:
+     * {@link DefaultHTMLCleaner} adds support for cleaning parameters. The following are supported:
      * <ul>
      *   <li>namespacesAware: if set to 'true' namespace information will be preserved during cleaning
      * </ul>

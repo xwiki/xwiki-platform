@@ -777,39 +777,6 @@
 </class>
 <object>
 <class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>tags</name>
-<number>1</number>
-<prettyName>Tags</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>XWiki.XWikiPreferences</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
-</property>
-</object>
-<object>
-<class>
 <name>XWiki.XWikiGlobalRights</name>
 <customClass></customClass>
 <customMapping></customMapping>
@@ -880,7 +847,7 @@
 <groups>XWiki.XWikiAdminGroup,</groups>
 </property>
 <property>
-<levels>admin,edit,</levels>
+<levels>admin,edit,undelete,</levels>
 </property>
 <property>
 <users></users>
@@ -958,7 +925,7 @@
 <groups>XWiki.XWikiAllGroup,</groups>
 </property>
 <property>
-<levels>view,edit,comment,register,</levels>
+<levels>view,edit,comment,register,undelete,</levels>
 </property>
 <property>
 <users></users>

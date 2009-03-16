@@ -1,26 +1,26 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{testsimplemacro param="val\"u\\e"/}}
+{{testsimplemacro}}a|-|b{{/testsimplemacro}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [testsimplemacro] [param=val"u\e] []
+beginMacroMarkerStandalone [testsimplemacro] [] [a|-|b]
 beginParagraph
 onWord [simplemacro0]
 endParagraph
-endMacroMarkerStandalone [testsimplemacro] [param=val"u\e] []
+endMacroMarkerStandalone [testsimplemacro] [] [a|-|b]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-|param="val\"u\\e"|-|--><p>simplemacro0</p><!--stopmacro-->
+<!--startmacro:testsimplemacro|-||-|a|-|b--><p>simplemacro0</p><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{testsimplemacro param="val\"u\\e"/}}
+{{testsimplemacro}}a|-|b{{/testsimplemacro}}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-|param="val\"u\\e"|-|--><p>simplemacro0</p><!--stopmacro-->
+<!--startmacro:testsimplemacro|-||-|a|-|b--><p>simplemacro0</p><!--stopmacro-->

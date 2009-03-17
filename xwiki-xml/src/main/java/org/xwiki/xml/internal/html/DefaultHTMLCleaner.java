@@ -69,6 +69,11 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     private HTMLFilter fontFilter;
 
     /**
+     * {@link HTMLFilter} for wrapping invalid body elements with paragraphs.
+     */
+    private HTMLFilter bodyFilter;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.component.phase.Initializable#initialize()
@@ -168,6 +173,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             throw new RuntimeException("Error while serializing TagNode into w3c dom.", ex);
         }
         // Finally apply filters.
+        this.bodyFilter.filter(result, cleaningParameters);
         this.listFilter.filter(result, cleaningParameters);
         this.fontFilter.filter(result, cleaningParameters);
         return result;

@@ -67,14 +67,29 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
 
     public void testConversionsFromHTML()
     {
-        assertHTML("this <strong>is</strong> bold", "this <b>is</b> bold");
-        assertHTML("<em>italic</em>", "<i>italic</i>");
+        assertHTML("<p>this <strong>is</strong> bold</p>", "this <b>is</b> bold");
+        assertHTML("<p><em>italic</em></p>", "<i>italic</i>");
         assertHTML("<del>strike</del>", "<strike>strike</strike>");
         assertHTML("<del>strike</del>", "<s>strike</s>");
         assertHTML("<ins>strike</ins>", "<u>strike</u>");
         assertHTML("<p style=\"text-align:center\">center</p>", "<center>center</center>");
-        assertHTML("<span style=\"color:red;font-family=arial;font-size=3pt;\">This is some text!</span>",
+        assertHTML("<p><span style=\"color:red;font-family=arial;font-size=3pt;\">This is some text!</span></p>",
             "<font face=\"arial\" size=\"3\" color=\"red\">This is some text!</font>");
+    }
+
+    public void testConvertImplicitParagraphs()
+    {
+        assertHTML("<p>word1</p><p>word2</p><p>word3</p><hr /><p>word4</p>", "word1<p>word2</p>word3<hr />word4");
+        
+        // Don't convert when there are only spaces or new lines
+        assertHTML("<p>word1</p>  \n  <p>word2</p>", "<p>word1</p>  \n  <p>word2</p>");
+        
+        // Ensure that whitespaces at the end works.
+        assertHTML("\n ", "\n ");
+        
+        // Ensure that comments are not wrapped
+        assertHTML("<!-- comment1 -->\n<p>hello</p>\n<!-- comment2 -->", 
+            "<!-- comment1 -->\n<p>hello</p>\n<!-- comment2 -->");
     }
 
     public void testCleanNonXHTMLLists()

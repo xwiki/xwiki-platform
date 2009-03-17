@@ -15,4 +15,4 @@
 .#-----------------------------------------------------
 <!--startmacro:html|-||-|
 <b>bold</b>
---><strong>bold</strong><!--stopmacro-->
+--><p><strong>bold</strong></p><!--stopmacro-->

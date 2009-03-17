@@ -4,6 +4,9 @@
 .# Note: whitespaces in PRE and CDATA element are preserved (except for leading and trailing ones)
 .#----------------------------------------------------------------------------------------------------
 {{html}}
+.# Verify that white spaces are correctly handled in an implicit paragraph (i.e. invalid XHTML fixed
+.# by the HTML cleaner and transformed into a valid XHTML paragraph)
+a <strong>b</strong> c 
 <pre>
   newline
   newline
@@ -20,6 +23,7 @@ hello  world
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [html] [] [
+a <strong>b</strong> c 
 <pre>
   newline
   newline
@@ -31,6 +35,15 @@ hello  world
    ]]>
 </p>
 ]
+beginXMLNode [p]
+onWord [a]
+onSpace
+beginXMLNode [strong]
+onWord [b]
+endXMLNode [strong]
+onSpace
+onWord [c]
+endXMLNode [p]
 beginXMLNode [pre]
 onWord [newline]
 onNewLine
@@ -57,6 +70,7 @@ onWord [world]
 endXMLNode [CDATA]
 endXMLNode [p]
 endMacroMarkerStandalone [html] [] [
+a <strong>b</strong> c 
 <pre>
   newline
   newline

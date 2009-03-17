@@ -12,7 +12,9 @@ beginDocument
 beginMacroMarkerStandalone [html] [wiki=false] [
 **some escaped text**
 ]
+beginXMLNode [p]
 onWord [**some escaped text**]
+endXMLNode [p]
 endMacroMarkerStandalone [html] [wiki=false] [
 **some escaped text**
 ]

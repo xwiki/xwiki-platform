@@ -9,9 +9,6 @@ $xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js")
 $xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js")
 ## XWikiExplorer
 $xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
-## Suggest
-$xwiki.ssfx.use("js/xwiki/suggest/ajaxSuggest.css")
-$xwiki.jsfx.use("js/xwiki/suggest/ajaxSuggest.js")
 #set($formname = "edit")
 #set($saveaction = "save")
 #set($previewenabled = true)

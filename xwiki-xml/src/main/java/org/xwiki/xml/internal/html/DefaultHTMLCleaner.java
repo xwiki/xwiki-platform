@@ -145,7 +145,16 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         }        
         // Workaround HTML XML declaration bug.
         fixCleanedNodeBug(cleanedNode);
-        // Serialize the cleanedNode TagNode into a w3c dom.
+        // Serialize the cleanedNode TagNode into a w3c dom. Ideally following code should be enough. 
+        // But SF's HTML Cleaner seems to omit the DocType declaration while serializing.
+        // See https://sourceforge.net/tracker/index.php?func=detail&aid=2062318&group_id=183053&atid=903696
+        //      cleanedNode.setDocType(new DoctypeToken("html", "PUBLIC", "-//W3C//DTD XHTML 1.0 Strict//EN",
+        //          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"));
+        //      try {
+        //          result = new DomSerializer(cleanerProperties, false).createDOM(cleanedNode);
+        //      } catch(ParserConfigurationException ex) { }
+        // As a workaround, we must serialize the cleanedNode into a temporary w3c document, create a new w3c document
+        // with proper DocType declaration and move the root node from the temporary document to the new one.
         try {
             Document tempDoc = new DomSerializer(cleanerProperties, false).createDOM(cleanedNode);
             DOMImplementation domImpl =

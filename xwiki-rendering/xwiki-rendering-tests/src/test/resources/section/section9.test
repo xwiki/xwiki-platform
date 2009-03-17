@@ -38,6 +38,6 @@ endDocument
 
 text after a header
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
 <h1 id="HTitlelevel1"><span>Title level 1</span></h1><p>text after a header</p>

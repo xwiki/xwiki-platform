@@ -517,7 +517,7 @@ public class XWikiDocument implements DocumentModelBridge
             context.put("isInRenderingEngine", true);
 
             // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-            if (is10Syntax()) {
+            if (is10Syntax(syntaxId)) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
                 result = performSyntaxConversion(text, getSyntaxId(), "xhtml/1.0");

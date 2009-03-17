@@ -43,11 +43,6 @@ public class TestApplicationContext implements ApplicationContext
      */
     public File getTemporaryDirectory()
     {
-        try {
-            // The system temporary directory is a good place for temporary test data.
-            return new File(System.getProperty("java.io.tmpdir"));
-        } catch (SecurityException e) {
-            return new File(".");
-        }
+        throw new UnsupportedOperationException("This method is not implemented for this test class.");
     }
 }

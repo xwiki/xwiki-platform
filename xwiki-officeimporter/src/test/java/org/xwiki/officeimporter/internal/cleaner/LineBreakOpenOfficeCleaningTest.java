@@ -39,76 +39,68 @@ public class LineBreakOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      */
     public void testLineBreaksNextToParagraphElements()
     {
-/* TODO/FIXME: Temporarily commenting out so that Asiri can fix the failing test. This needs to be uncommted before 1.8 final
-        checkLineBreakReplacements("<br/><br/><p>para</p>", 0, 2);
-        checkLineBreakReplacements("<p>para</p><br/><br/>", 0, 2);
-        checkLineBreakReplacements("<p>para</p><br/><br/><p>para</p>", 0, 2);
-*/
+        checkLineBreakReplacements("<div><br/><br/><p>para</p></div>", 0, 2);
+        checkLineBreakReplacements("<div><p>para</p><br/><br/></div>", 0, 2);
+        checkLineBreakReplacements("<div><p>para</p><br/><br/><p>para</p></div>", 0, 2);
     }
 
     /**
      * {@code <br/>} elements placed next to list elements should be converted to {@code<div
      * class="wikikmodel-emptyline"/>} elements.
      */
-/* TODO/FIXME: Temporarily commenting out so that Asiri can fix the failing test. This needs to be uncommted before 1.8 final
     public void testLineBreaksNextToListElements()
     {
-        checkLineBreakReplacements("<br/><br/><ol><li>para</li></ol>", 0, 2);
-        checkLineBreakReplacements("<ol><li>para</li></ol><br/><br/>", 0, 2);
-        checkLineBreakReplacements("<ol><li>para</li></ol><br/><br/><ol><li>para</li></ol>", 0, 2);
+        checkLineBreakReplacements("<div><br/><br/><ol><li>para</li></ol></div>", 0, 2);
+        checkLineBreakReplacements("<div><ol><li>para</li></ol><br/><br/></div>", 0, 2);
+        checkLineBreakReplacements("<div><ol><li>para</li></ol><br/><br/><ol><li>para</li></ol></div>", 0, 2);
 
-        checkLineBreakReplacements("<br/><br/><ul><li>para</li></ul>", 0, 2);
-        checkLineBreakReplacements("<ul><li>para</li></ul><br/><br/>", 0, 2);
-        checkLineBreakReplacements("<ul><li>para</li></ul><br/><br/><ul><li>para</li></ul>", 0, 2);
+        checkLineBreakReplacements("<div><br/><br/><ul><li>para</li></ul></div>", 0, 2);
+        checkLineBreakReplacements("<div><ul><li>para</li></ul><br/><br/></div>", 0, 2);
+        checkLineBreakReplacements("<div><ul><li>para</li></ul><br/><br/><ul><li>para</li></ul></div>", 0, 2);
     }
-*/
 
     /**
      * {@code <br/>} elements placed next to html heading elements should be converted to {@code<div
      * class="wikikmodel-emptyline"/>} elements.
      */
-/* TODO/FIXME: Temporarily commenting out so that Asiri can fix the failing test. This needs to be uncommted before 1.8 final
     public void testLineBreaksNextToHeadingElements()
     {
-        checkLineBreakReplacements("<br/><br/><h1>test</h1>", 0, 2);
-        checkLineBreakReplacements("<h1>test</h1><br/><br/>", 0, 2);
-        checkLineBreakReplacements("<h1>test</h1><br/><br/><h1>test</h1>", 0, 2);
+        checkLineBreakReplacements("<div><br/><br/><h1>test</h1></div>", 0, 2);
+        checkLineBreakReplacements("<div><h1>test</h1><br/><br/></div>", 0, 2);
+        checkLineBreakReplacements("<div><h1>test</h1><br/><br/><h1>test</h1></div>", 0, 2);
 
-        checkLineBreakReplacements("<br/><br/><h2>test</h2>", 0, 2);
-        checkLineBreakReplacements("<h2>test</h2><br/><br/>", 0, 2);
-        checkLineBreakReplacements("<h2>test</h2><br/><br/><h2>test</h2>", 0, 2);
+        checkLineBreakReplacements("<div><br/><br/><h2>test</h2></div>", 0, 2);
+        checkLineBreakReplacements("<div><h2>test</h2><br/><br/></div>", 0, 2);
+        checkLineBreakReplacements("<div><h2>test</h2><br/><br/><h2>test</h2></div>", 0, 2);
 
-        checkLineBreakReplacements("<br/><br/><h3>test</h3>", 0, 2);
-        checkLineBreakReplacements("<h3>test</h3><br/><br/>", 0, 2);
-        checkLineBreakReplacements("<h3>test</h3><br/><br/><h3>test</h3>", 0, 2);
+        checkLineBreakReplacements("<div><br/><br/><h3>test</h3></div>", 0, 2);
+        checkLineBreakReplacements("<div><h3>test</h3><br/><br/></div>", 0, 2);
+        checkLineBreakReplacements("<div><h3>test</h3><br/><br/><h3>test</h3></div>", 0, 2);
 
-        checkLineBreakReplacements("<br/><br/><h4>test</h4>", 0, 2);
-        checkLineBreakReplacements("<h4>test</h4><br/><br/>", 0, 2);
-        checkLineBreakReplacements("<h4>test</h4><br/><br/><h4>test</h4>", 0, 2);
+        checkLineBreakReplacements("<div><br/><br/><h4>test</h4></div>", 0, 2);
+        checkLineBreakReplacements("<div><h4>test</h4><br/><br/></div>", 0, 2);
+        checkLineBreakReplacements("<div><h4>test</h4><br/><br/><h4>test</h4></div>", 0, 2);
 
-        checkLineBreakReplacements("<br/><br/><h5>test</h5>", 0, 2);
-        checkLineBreakReplacements("<h5>test</h5><br/><br/>", 0, 2);
-        checkLineBreakReplacements("<h5>test</h5><br/><br/><h5>test</h5>", 0, 2);
+        checkLineBreakReplacements("<div><br/><br/><h5>test</h5></div>", 0, 2);
+        checkLineBreakReplacements("<div><h5>test</h5><br/><br/></div>", 0, 2);
+        checkLineBreakReplacements("<div><h5>test</h5><br/><br/><h5>test</h5></div>", 0, 2);
 
-        checkLineBreakReplacements("<br/><br/><h6>test</h6>", 0, 2);
-        checkLineBreakReplacements("<h6>test</h6><br/><br/>", 0, 2);
-        checkLineBreakReplacements("<h6>test</h6><br/><br/><h6>test</h6>", 0, 2);
+        checkLineBreakReplacements("<div><br/><br/><h6>test</h6></div>", 0, 2);
+        checkLineBreakReplacements("<div><h6>test</h6><br/><br/></div>", 0, 2);
+        checkLineBreakReplacements("<div><h6>test</h6><br/><br/><h6>test</h6></div>", 0, 2);
     }
-*/
 
     /**
      * {@code <br/>} elements placed next to html table elements should be converted to {@code<div
      * class="wikikmodel-emptyline"/>} elements.
      */
-/* TODO/FIXME: Temporarily commenting out so that Asiri can fix the failing test. This needs to be uncommted before 1.8 final
     public void testLineBreaksNextToTableElements()
     {
-        checkLineBreakReplacements("<br/><br/><table><tr><td>test</td></tr></table>", 0, 2);
-        checkLineBreakReplacements("<table><tr><td>test</td></tr></table><br/><br/>", 0, 2);
+        checkLineBreakReplacements("<div><br/><br/><table><tr><td>test</td></tr></table></div>", 0, 2);
+        checkLineBreakReplacements("<div><table><tr><td>test</td></tr></table><br/><br/></div>", 0, 2);
         checkLineBreakReplacements(
-            "<table><tr><td>test</td></tr></table><br/><br/><table><tr><td>test</td></tr></table>", 0, 2);
+            "<div><table><tr><td>test</td></tr></table><br/><br/><table><tr><td>test</td></tr></table></div>", 0, 2);
     }
-*/
 
     /**
      * Utility methods for checking if {@code <br/>} elements are properly converted to {@code<div

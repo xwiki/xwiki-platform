@@ -134,11 +134,13 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     private Document clean(Reader originalHtmlContent, CleanerProperties cleanerProperties,
         CleanerTransformations cleanerTransformations, Map<String, String> cleaningParameters)
     {
-        Document result = null;        
+        Document result = null;   
+             
         // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise we would need
         // to synchronize this clean() method which would slow down the whole system by queuing up cleaning requests.
         // See http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=903699
         HtmlCleaner cleaner = new HtmlCleaner(cleanerProperties);        
+        
         cleaner.setTransformations(cleanerTransformations);
         TagNode cleanedNode;
         try {
@@ -148,8 +150,10 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             // Cleaner.
             throw new RuntimeException("Unhandled error when cleaning HTML", e);
         }        
+        
         // Workaround HTML XML declaration bug.
         fixCleanedNodeBug(cleanedNode);
+        
         // Serialize the cleanedNode TagNode into a w3c dom. Ideally following code should be enough. 
         // But SF's HTML Cleaner seems to omit the DocType declaration while serializing.
         // See https://sourceforge.net/tracker/index.php?func=detail&aid=2062318&group_id=183053&atid=903696
@@ -172,10 +176,12 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         } catch (ParserConfigurationException ex) {
             throw new RuntimeException("Error while serializing TagNode into w3c dom.", ex);
         }
+        
         // Finally apply filters.
         this.bodyFilter.filter(result, cleaningParameters);
         this.listFilter.filter(result, cleaningParameters);
         this.fontFilter.filter(result, cleaningParameters);
+        
         return result;
     }
 
@@ -186,7 +192,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     {
         CleanerProperties defaultProperties = new CleanerProperties();
         defaultProperties.setOmitUnknownTags(true);
-        defaultProperties.setNamespacesAware(true);        
+        defaultProperties.setNamespacesAware(true);
+                
         // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if we use the best
         // practice of using CDATA inside a script. For example:
         //  <script type="text/javascript">

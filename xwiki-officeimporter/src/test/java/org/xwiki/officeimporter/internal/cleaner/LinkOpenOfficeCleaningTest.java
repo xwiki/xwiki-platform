@@ -61,7 +61,6 @@ public class LinkOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      * name="table1">Sheet 1: <em>Hello</em></a></h1>} this is because of the close-before-copy-inside
      * behaviour of default html cleaner. Thus the additional (copy-inside) anchor needs to be ripped off.
      */
-/* TODO/FIXME: Temporarily commenting out so that Asiri can fix the failing test. This needs to be uncommted before 1.8 final
     public void testDuplicateAnchorRemoving()
     {
         String html = header + "<a name=\"table1\"/><h1><a name=\"table1\">Sheet 1: <em>Hello</em></a></h1>" + footer;
@@ -69,9 +68,8 @@ public class LinkOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         NodeList nodes = doc.getElementsByTagName("a");
         assertEquals(1, nodes.getLength());
         Element parent = (Element) nodes.item(0).getParentNode();
-        assertEquals("body", parent.getNodeName());
+        assertEquals("p", parent.getNodeName());
     }
-*/    
 
     /**
      * Test wrapping of html anchors with xwiki specific xhtml elements so that XHTML parser can recognize them.

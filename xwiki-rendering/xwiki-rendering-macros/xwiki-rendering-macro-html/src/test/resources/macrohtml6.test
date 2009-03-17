@@ -13,7 +13,9 @@ beginDocument
 beginMacroMarkerStandalone [html] [] [
 &nbsp;
 ]
+beginXMLNode [p]
 onWord [(((160)))]
+endXMLNode [p]
 endMacroMarkerStandalone [html] [] [
 &nbsp;
 ]

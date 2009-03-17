@@ -36,6 +36,11 @@ public class XMLElement extends XMLNode
     
     private Map<String, String> attributes;
 
+    public XMLElement(String name)
+    {
+        this(name, Collections.<String, String>emptyMap());
+    }
+    
     public XMLElement(String name, Map<String, String> attributes)
     {
         super();
@@ -55,6 +60,11 @@ public class XMLElement extends XMLNode
         return Collections.unmodifiableMap(this.attributes);
     }
 
+    public void setAttribute(String name, String value)
+    {
+        this.attributes.put(name, value);
+    }
+    
     public XMLNodeType getNodeType()
     {
         return XMLNodeType.ELEMENT;

@@ -20,6 +20,7 @@
 
 package org.xwiki.rendering.internal.macro.rss;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,8 +34,10 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -134,13 +137,12 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
                 // compared to mis-formed feeds that say text while they want to say HTML.
                 Block html = new MacroBlock("html", Collections.singletonMap("wiki", "false"),
                     entry.getDescription().getValue(), context.isInline());
-                
-                ParagraphBlock descriptionBlock =
-                    new ParagraphBlock(Collections.singletonList(html));
+
+                XMLElement xmlElement = new XMLElement("div");
                 if (parameters.isCss()) {
-                    descriptionBlock.setParameter(CLASS_ATTRIBUTE, "rssitemdescription");
+                    xmlElement.setAttribute(CLASS_ATTRIBUTE, "rssitemdescription");
                 }
-                parentBlock.addChild(descriptionBlock);
+                parentBlock.addChild(new XMLBlock(Arrays.asList(html), xmlElement));
             }
         }
     }

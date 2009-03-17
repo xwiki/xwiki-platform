@@ -42,6 +42,11 @@ public interface HTMLConstants
     String WHITE_SPACE_CHARS = "\u0020\u0009\u000C\u200B" + "\n\r";
     
     /**
+     * HTML &lt;body@gt; tag name.
+     */
+    String TAG_BODY = "body";
+    
+    /**
      * HTML &lt;style&gt; tag name.
      */
     String TAG_STYLE = "style";
@@ -260,6 +265,31 @@ public interface HTMLConstants
      * HTML &lt;th&gt; tag name.
      */
     String TAG_TH = "th";
+
+    /**
+     * HTML &lt;fieldset&gt; tag name.
+     */
+    String TAG_FIELDSET = "fieldset";
+
+    /**
+     * HTML &lt;form&gt; tag name.
+     */
+    String TAG_FORM = "form";
+
+    /**
+     * HTML &lt;hr&gt; tag name.
+     */
+    String TAG_HR = "hr";
+
+    /**
+     * HTML &lt;noscript&gt; tag name.
+     */
+    String TAG_NOSCRIPT = "noscript";
+
+    /**
+     * HTML &lt;dl&gt; tag name.
+     */
+    String TAG_DL = "dl";
 
     /**
      * HTML name attribute name.

@@ -45,11 +45,6 @@
       <artifactId>htmlcleaner</artifactId>
       <version>2.1</version>
     </dependency>
-    <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.1</version>
-    </dependency>
     <!-- Testing dependencies -->
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>

@@ -25,17 +25,19 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.CleanerTransformations;
 import org.htmlcleaner.ContentToken;
+import org.htmlcleaner.DomSerializer;
 import org.htmlcleaner.HtmlCleaner;
-import org.htmlcleaner.JDomSerializer;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.TagTransformation;
-import org.jdom.DocType;
-import org.jdom.JDOMException;
-import org.jdom.output.DOMOutputter;
+import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -52,10 +54,15 @@ import org.xwiki.xml.html.filter.HTMLFilter;
 public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
 {
     /**
-     * {@link HTMLFilter} for filtering HTML lists.
+     * The qualified name to be used when generating an html {@link DocumentType}.
+     */
+    private static final String QUALIFIED_NAME_HTML = "html";
+
+    /**
+     * {@link HTMLFilter} for filtering html lists.
      */
     private HTMLFilter listFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering HTML font elements.
      */
@@ -127,13 +134,11 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     private Document clean(Reader originalHtmlContent, CleanerProperties cleanerProperties,
         CleanerTransformations cleanerTransformations, Map<String, String> cleaningParameters)
     {
-        Document result = null;
-        
+        Document result = null;        
         // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise we would need
         // to synchronize this clean() method which would slow down the whole system by queuing up cleaning requests.
         // See http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=903699
-        HtmlCleaner cleaner = new HtmlCleaner(cleanerProperties);
-        
+        HtmlCleaner cleaner = new HtmlCleaner(cleanerProperties);        
         cleaner.setTransformations(cleanerTransformations);
         TagNode cleanedNode;
         try {
@@ -142,36 +147,36 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             // This shouldn't happen since we're not doing any IO... I consider this a flaw in the design of HTML
             // Cleaner.
             throw new RuntimeException("Unhandled error when cleaning HTML", e);
-        }
-        
+        }        
         // Workaround HTML XML declaration bug.
-        fixCleanedNodeBug(cleanedNode);        
-        
-        // Ideally following code should be enough. But SF's HTML Cleaner seems to omit the DocType declaration while
-        // serializing.
+        fixCleanedNodeBug(cleanedNode);
+        // Serialize the cleanedNode TagNode into a w3c dom. Ideally following code should be enough. 
+        // But SF's HTML Cleaner seems to omit the DocType declaration while serializing.
         // See https://sourceforge.net/tracker/index.php?func=detail&aid=2062318&group_id=183053&atid=903696
         //      cleanedNode.setDocType(new DoctypeToken("html", "PUBLIC", "-//W3C//DTD XHTML 1.0 Strict//EN",
         //          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"));
         //      try {
         //          result = new DomSerializer(cleanerProperties, false).createDOM(cleanedNode);
         //      } catch(ParserConfigurationException ex) { }
-        // As a workaround, we have go through JDOM so that we can set the DocType manually.
-        org.jdom.Document jdomDoc = null;
-        jdomDoc = new JDomSerializer(cleanerProperties, false).createJDom(cleanedNode);
-        jdomDoc.setDocType(new DocType("html", "-//W3C//DTD XHTML 1.0 Strict//EN", 
-            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"));
+        // As a workaround, we must serialize the cleanedNode into a temporary w3c document, create a new w3c document
+        // with proper DocType declaration and move the root node from the temporary document to the new one.
         try {
-            result = new DOMOutputter().output(jdomDoc);
-        } catch (JDOMException ex) {
-            throw new RuntimeException("Error while transforming jdom document into w3c document", ex);
+            Document tempDoc = new DomSerializer(cleanerProperties, false).createDOM(cleanedNode);
+            DOMImplementation domImpl =
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().getDOMImplementation();
+            DocumentType docType =
+                domImpl.createDocumentType(QUALIFIED_NAME_HTML, "-//W3C//DTD XHTML 1.0 Strict//EN",
+                    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
+            result = domImpl.createDocument(null, QUALIFIED_NAME_HTML, docType);
+            result.replaceChild(result.adoptNode(tempDoc.getDocumentElement()), result.getDocumentElement());
+        } catch (ParserConfigurationException ex) {
+            throw new RuntimeException("Error while serializing TagNode into w3c dom.", ex);
         }
-        
         // Finally apply filters.
         this.bodyFilter.filter(result, cleaningParameters);
         this.listFilter.filter(result, cleaningParameters);
         this.fontFilter.filter(result, cleaningParameters);
-
-        return result;        
+        return result;
     }
 
     /**
@@ -181,8 +186,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     {
         CleanerProperties defaultProperties = new CleanerProperties();
         defaultProperties.setOmitUnknownTags(true);
-        defaultProperties.setNamespacesAware(true);
-        
+        defaultProperties.setNamespacesAware(true);        
         // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if we use the best
         // practice of using CDATA inside a script. For example:
         //  <script type="text/javascript">

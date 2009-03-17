@@ -25,7 +25,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xwiki.xml.XMLUtils;
 
 /**
  * Test case for cleaning html links ({@code<a/>} elements) in {@link OpenOfficeHTMLCleaner}.
@@ -66,7 +65,6 @@ public class LinkOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     {
         String html = header + "<a name=\"table1\"/><h1><a name=\"table1\">Sheet 1: <em>Hello</em></a></h1>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
-        System.out.println(XMLUtils.toString(doc));
         NodeList nodes = doc.getElementsByTagName("a");
         assertEquals(1, nodes.getLength());
         Element parent = (Element) nodes.item(0).getParentNode();

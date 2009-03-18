@@ -19,6 +19,9 @@
  */
 package org.xwiki.xml;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -41,13 +44,23 @@ public final class XMLUtils
 {
     /**
      * JDOM's XMLOutputter class converts reserved XML characters (<, >, ' , &, \r and \n) into their entity 
-     * format (&lt;, &gt; &apos; &amp; &#xD; and \r\n). However since clean XHTML will already have content
-     * such as &apos; for example this gets translated as &amp;apos; which isn't correct.
-     * Since we should always pass valid XHTML to this method we can disable escaping by extending the 
-     * XMLOutputter class.
+     * format (&lt;, &gt; &apos; &amp; &#xD; and \r\n). However since we're using HTML Cleaner
+     * (http://htmlcleaner.sourceforge.net/) and since it's buggy for character escapes we have turned of
+     * character escaping for it and thus we need to perform selective escaping here. 
+     * @todo Remove this complex escaping code when SF HTML Cleaner will do proper escaping
      */
     public static class XWikiXMLOutputter extends XMLOutputter
     {
+        /**
+         * Regex to recognize a XML Entity.
+         */
+        private static final Pattern ENTITY = Pattern.compile("&[a-z]+;|&#[0-9a-zA-Z]+;");
+        
+        /**
+         * Ampersand character.
+         */
+        private static final String AMPERSAND = "&";
+        
         /**
          * {@inheritDoc}
          * @see XMLOutputter#XMLOutputter(Format)
@@ -64,8 +77,30 @@ public final class XMLUtils
         @Override
         public String escapeElementEntities(String text)
         {
-            // Do not escape the text
-            return text; 
+            if (text.length() == 0) {
+                return text;
+            }
+            
+            String result;
+            int pos1 = text.indexOf("<![CDATA[");
+            if (pos1 > -1) {
+                int pos2 = text.indexOf("]]>", pos1 + 9);
+                if (pos2 + 3 == text.length()) {
+                    return text;
+                }
+                result = escapeElementEntities(text.substring(0, pos1));
+                if (pos2 + 3 == text.length()) {
+                    result = result + text.substring(pos1);
+                } else {
+                    result = result + text.substring(pos1, pos2 + 3) + escapeElementEntities(text.substring(pos2 + 3)); 
+                }
+            } else {
+                result = escapeAmpersand(text);
+                result = result.replaceAll("<", "&lt;");
+                result = result.replaceAll(">", "&gt;");
+            }
+            
+            return result; 
         }
 
         /**
@@ -75,8 +110,39 @@ public final class XMLUtils
         @Override
         public String escapeAttributeEntities(String text)
         {
-            // Do not escape the text
-            return text;
+            String result = escapeElementEntities(text);
+            
+            // Attribute values must have quotes escaped since attributes are defined with quotes...
+            result.replaceAll("\"", "&quot;");
+            
+            return result;
+        }
+        
+        /**
+         * Escape ampersand when it's not defining an entity.
+         * 
+         * @param text the text to escape
+         * @return the escaped text
+         */
+        private String escapeAmpersand(String text)
+        {
+            StringBuffer buffer = new StringBuffer(text);
+            // find all occurrences of &
+            int pos = buffer.indexOf(AMPERSAND);
+            while (pos > -1 && pos < buffer.length()) {
+                // Check if the & is an entity
+                Matcher matcher = ENTITY.matcher(buffer.substring(pos));
+                if (matcher.lookingAt()) {
+                    // We've found an entity, don't do anything, just skip it
+                    pos = pos + matcher.end() - matcher.start();
+                } else {
+                    // No entity, escape the &
+                    buffer.replace(pos, pos + 1, "&amp;");
+                    pos += 5;
+                }
+                pos = buffer.indexOf(AMPERSAND, pos);
+            }
+            return buffer.toString();
         }
     }
 

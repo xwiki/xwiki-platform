@@ -165,6 +165,11 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         // As a workaround, we must serialize the cleanedNode into a temporary w3c document, create a new w3c document
         // with proper DocType declaration and move the root node from the temporary document to the new one.
         try {
+            // Since there's a bug in SF's HTML Cleaner in that it doesn't recognize CDATA blocks we need to turn off
+            // character escaping (hence the false value passed) and do the escaping in XMLUtils.toString(). Note that
+            // this can cause problem for code not serializing the W3C DOM to a String since it won't have the 
+            // characters escaped.
+            // See https://sourceforge.net/tracker/index.php?func=detail&aid=2691888&group_id=183053&atid=903696
             Document tempDoc = new DomSerializer(cleanerProperties, false).createDOM(cleanedNode);
             DOMImplementation domImpl =
                 DocumentBuilderFactory.newInstance().newDocumentBuilder().getDOMImplementation();
@@ -195,14 +200,16 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         defaultProperties.setNamespacesAware(true);
                 
         // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if we use the best
-        // practice of using CDATA inside a script. For example:
+        // practice of using CDATA inside a script since we would have 2 nested CDATA blocks. For example:
         //  <script type="text/javascript">
         //  <![CDATA[
         //  ...
         //  ]]>
         //  </script>
         // Thus we need to turn off this feature.
+        // The problem is that SF's HTML Cleaner doesn't recognize CDATA blocks.
         defaultProperties.setUseCdataForScriptAndStyle(false);
+
         return defaultProperties;
     }
 

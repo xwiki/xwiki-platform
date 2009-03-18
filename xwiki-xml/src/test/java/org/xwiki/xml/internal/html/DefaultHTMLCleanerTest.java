@@ -57,8 +57,11 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         // text they are not escaped. This is because we have use "false" in DefaultHTMLCleaner here:
         // Document document = new JDomSerializer(this.cleanerProperties, false).createJDom(cleanedNode);
         // See the problem described here: http://sourceforge.net/forum/forum.php?thread_id=2243880&forum_id=637246
-        assertHTML("<p>&quot;&amp;**notbold**&lt;notag&gt;</p>", "<p>&quot;&amp;**notbold**&lt;notag&gt;</p>");
-    }
+        assertHTML("<p>&quot;&amp;**notbold**&lt;notag&gt;&nbsp;</p>", "<p>&quot;&amp;**notbold**&lt;notag&gt;&nbsp;</p>");
+        assertHTML("<p>\"&amp;</p>", "<p>\"&</p>");
+        assertHTML("<p><img src=\"http://host.com/a.gif?a=foo&amp;b=bar\" /></p>", "<img src=\"http://host.com/a.gif?a=foo&b=bar\" />");
+        assertHTML("<p>&#xA;</p>", "<p>&#xA;</p>");
+}
 
     public void testCloseUnbalancedTags()
     {
@@ -108,12 +111,17 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
     }
 
     /**
-     * Verify that scripts are not cleaned and that we can have a CDATA section inside.
+     * Verify that scripts are not cleaned and that we can have a CDATA section inside. Also verify CADATA behaviors.
      */
-    public void testScript()
+    public void testScriptAndCData()
     {
-        String script = "<script type=\"text/javascript\">//<![CDATA[alert(\"Hello World\")// ]]></script>";
-        assertHTML(script, script);
+        String content = "<script type=\"text/javascript\">//<![CDATA[alert(\"Hello World\")// ]]></script>";
+        assertHTML(content, content);
+        
+        content = "<p><![CDATA[&]]></p>";
+        assertHTML(content, content);
+
+        assertHTML("<p>&amp;<![CDATA[&]]>&amp;</p>", "<p>&<![CDATA[&]]>&</p>");
     }
 
     private void assertHTML(String expected, String actual)

@@ -924,42 +924,42 @@ b.ts1{border-width: 0 2px}</code>
 ## Administration Sheet,used to display a common UI for some wiki features (presentation, users,
 ## groups, rights etc.) at global / space level and also for several applications.
 ##**************************************************************************************************
-#if($context.action == "view")
-  $response.sendRedirect($xwiki.getURL("XWiki.XWikiPreferences", "admin", $request.getQueryString()))
+#if($context.action == 'view')
+  $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', $request.getQueryString()))
 #else
     ##----------------------------------------------------------------------------
     ## hard-coded links to app. admin pages which appear at global/space level
     ## TODO: replace this when the new IX are ready
     ##----------------------------------------------------------------------------
-    #set($globalAppAdmin = ["Panels.PanelWizard", "Blog.Categories", "Photos.Links", "XWiki.OfficeImporterAdmin"])
-    #set($spaceAppAdmin = ["Panels.PanelWizard"])
+    #set($globalAppAdmin = ['Panels.PanelWizard', 'Blog.Categories', 'Photos.Links', 'XWiki.OfficeImporterAdmin'])
+    #set($spaceAppAdmin = ['Panels.PanelWizard'])
     ##-----------------------------------------------------------------------------
     ## some applications at space level (like Panel Wizard) might require a different type of
-    ## integration to allow users with space admin rights to use them, so they will have  a 
+    ## integration to allow users with space admin rights to use them, so they will have a
     ## "/xwiki/bin/Space/WebPreferences?section=application" type of url, while some at global level
-    ## need to use a "/xwiki/admin/Blog/Categories?" type of url, to be edited inline 
+    ## need to use a "/xwiki/admin/Blog/Categories?" type of url, to be edited inline
     ## inside the administration application UI.
     ##------------------------------------------------------------------------------
-    #set($hasAdminActionUrl = ["Blog.Categories", "Photos.Links"])
+    #set($hasAdminActionUrl = ['Blog.Categories', 'Photos.Links'])
     #set($section = "$!{request.section}")
     ##-------------------------------------
     ## determine the displayed sections
     ##-------------------------------------
-    $xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")##
-    $xwiki.jsx.use("XWiki.AdminSheet")##
-    $xwiki.ssx.use("XWiki.AdminSheet")##
-    #if($editor == "globaladmin")
-      #set($currentDoc = "XWiki.XWikiPreferences")
-      #set($sections = ["General", "Presentation", "Registration", "Programming", "Rights", "Users", "Groups", "Import", "Export"])
+    $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
+    $xwiki.jsx.use('XWiki.AdminSheet')##
+    $xwiki.ssx.use('XWiki.AdminSheet')##
+    #if($editor == 'globaladmin')
+      #set($currentDoc = 'XWiki.XWikiPreferences')
+      #set($sections = ['General', 'Presentation', 'Registration', 'Programming', 'Rights', 'Users', 'Groups', 'Import', 'Export'])
       #set($discard = $sections.addAll($globalAppAdmin))
-    #elseif($editor == "spaceadmin")
+    #elseif($editor == 'spaceadmin')
       #set($currentDoc = "${currentSpace}.WebPreferences")
-      #set($sections = ["Presentation", "Rights"])
+      #set($sections = ['Presentation', 'Rights'])
       #set($discard = $sections.addAll($spaceAppAdmin))
     #end
-    #if($section != "" &amp;&amp; $section.indexOf('.') &gt; 0)
+    #if($section != '' &amp;&amp; $section.indexOf('.') &gt; 0)
       #set($sectionname = $xwiki.getDocument($section).getDisplayTitle())
-    #elseif($section != "")
+    #elseif($section != '')
       #set($sectionname = $msg.get("admin.${section.toLowerCase()}"))
     #end
     ##-----------------------------------------
@@ -968,36 +968,36 @@ b.ts1{border-width: 0 2px}</code>
     &lt;div id="admin-page"&gt;
      &lt;div id="admin-page-header"&gt;
         &lt;div class="admin-page-header-spacer"&gt;&amp;nbsp;&lt;/div&gt;
-        &lt;h1 id="admin-header"&gt;#if($section == "")$msg.get("admin.${editor}")#else $sectionname#end&lt;/h1&gt;
+        &lt;h1 id="admin-header"&gt;#if($section == '')$msg.get("admin.${editor}")#else $sectionname#end&lt;/h1&gt;
         &lt;div id="change-context"&gt;
           &lt;select id="goto-select"&gt;
-            #if ($xwiki.hasAccessLevel("admin", $context.user, "XWiki.XWikiPreferences"))
-              &lt;optgroup label="$msg.get("admin.gotoglobaladministration")"&gt;
-              &lt;option value="$xwiki.getURL("XWiki.XWikiPreferences", "admin")" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$msg.get("admin.globaladministration")&lt;/option&gt;
+            #if ($xwiki.hasAccessLevel('admin', $context.user, 'XWiki.XWikiPreferences'))
+              &lt;optgroup label="$msg.get('admin.gotoglobaladministration')"&gt;
+              &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin')" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$msg.get('admin.globaladministration')&lt;/option&gt;
               &lt;/optgroup&gt;
             #end
-            &lt;optgroup label="$msg.get("admin.gotospaceadministration")"&gt;
+            &lt;optgroup label="$msg.get('admin.gotospaceadministration')"&gt;
               #foreach($spaceitem in $xwiki.spaces)
-                #if ($xwiki.hasAccessLevel("admin", $context.user, "${spaceitem}.WebPreferences"))
-                  &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", "admin")" #if("$!{currentSpace}"==${spaceitem} &amp;&amp; "$!{editor}"!="globaladmin")selected="selected"#end&gt;$spaceitem&lt;/option&gt;
+                #if ($xwiki.hasAccessLevel('admin', $context.user, "${spaceitem}.WebPreferences"))
+                  &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", 'admin')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$spaceitem&lt;/option&gt;
                 #end
               #end
             &lt;/optgroup&gt;
             &lt;/select&gt;
-          #if($section != "")&lt;br/&gt;&lt;span id="showsectionswrapper" class="buttonwrapper"&gt;&lt;a id="showsections" href="$xwiki.getURL($currentDoc, "admin")"&gt;$msg.get("admin.showsections")&lt;/a&gt;&lt;/span&gt;
-          &lt;span id="hidesectionswrapper" class="hidden buttonwrapper"&gt;&lt;a id="hidesections" href="$xwiki.getURL($currentDoc, "admin")"&gt;$msg.get("admin.hidesections")&lt;/a&gt;&lt;/span&gt;#end
+          #if($section != '')&lt;br/&gt;&lt;span id="showsectionswrapper" class="buttonwrapper"&gt;&lt;a id="showsections" href="$xwiki.getURL($currentDoc, 'admin')"&gt;$msg.get('admin.showsections')&lt;/a&gt;&lt;/span&gt;
+          &lt;span id="hidesectionswrapper" class="hidden buttonwrapper"&gt;&lt;a id="hidesections" href="$xwiki.getURL($currentDoc, 'admin')"&gt;$msg.get('admin.hidesections')&lt;/a&gt;&lt;/span&gt;#end
        &lt;/div&gt; ## change-context
         &lt;div class="admin-page-header-spacer"&gt;&amp;nbsp;&lt;/div&gt;
      &lt;/div&gt; ## admin-page-header
-     #if($section != "")
+     #if($section != '')
      &lt;div id="admin-page-content"&gt;
        &lt;div class="$sectionname"&gt;&lt;/div&gt;
        ##------------------------------------------------------------------------------------------------------------
        ## The Administration allows editing other pages from different applications inside the admin context (UI)
        ##------------------------------------------------------------------------------------------------------------
-       #if("$!{request.editmode}" == "inline" &amp;&amp; $xwiki.exists($section))
-         $context.setDisplayMode("edit")
-         #includeForm("XWiki.AdminInlineSheet")
+       #if("$!{request.editmode}" == 'inline' &amp;&amp; $xwiki.exists($section))
+         $context.setDisplayMode('edit')
+         #includeForm('XWiki.AdminInlineSheet')
        ##--------------------------------------------------------------------------------------------------------------
        ## The Administration app., along with its default sections, dynamically includes and display pages from apps.
        ## (hard-coded links). TODO: replace the hard-coded links by Interface Extensions
@@ -1019,38 +1019,38 @@ b.ts1{border-width: 0 2px}</code>
        #end
      &lt;/div&gt; ## admin-page-content
      #end
-     &lt;div id="admin-page-menu" style="#if($section != "")display:none;#end"&gt;
+     &lt;div id="admin-page-menu" style="#if($section != '')display:none;#end"&gt;
        &lt;ul id="admin-icons"&gt;
          #foreach($asection in $sections)
            #if($xwiki.exists($asection) || $xwiki.exists("XWiki.Admin${asection}Sheet"))
-            #set ($aiconurl = "")
-            #if ($asection.indexOf(".") &gt; 0)
+            #set ($aiconurl = '')
+            #if ($asection.indexOf('.') &gt; 0)
               #set ($adoc = $xwiki.getDocument($asection))
               #set ($atitle = $adoc.getDisplayTitle())
-              #if ($adoc.getAttachment("icon.png"))
-                #set ($aiconurl = $adoc.getAttachmentURL("icon.png"))
+              #if ($adoc.getAttachment('icon.png'))
+                #set ($aiconurl = $adoc.getAttachmentURL('icon.png'))
               #end
             #end
             #set($query = "editor=${editor}&amp;amp;section=${asection}")
-            #if($editor != "globaladmin")
+            #if($editor != 'globaladmin')
              #set($query = $query + "&amp;amp;space=${currentSpace}")
             #end
-            #set($dotindx = $asection.indexOf("."))
+            #set($dotindx = $asection.indexOf('.'))
             #if($dotindx &gt; 0) #set($name = $asection.substring(0, $dotindx)) #else #set($name = $asection) #end
-            #if($asection == "Import")
-             #set($url =  $xwiki.getURL("XWiki.Import", "import", $query))
-            #elseif($asection == "Export")
-             #set($url = $xwiki.getURL("XWiki.Export", "export", $query))
+            #if($asection == 'Import')
+             #set($url =  $xwiki.getURL('XWiki.Import', 'import', $query))
+            #elseif($asection == 'Export')
+             #set($url = $xwiki.getURL('XWiki.Export', 'export', $query))
             #elseif($xwiki.exists("XWiki.Admin${asection}Sheet"))
-             #set($url = $xwiki.getURL($currentDoc, "admin", $query))
+             #set($url = $xwiki.getURL($currentDoc, 'admin', $query))
             #elseif($xwiki.exists($asection))
              #if($hasAdminActionUrl.contains($asection))
-               #set($url = $xwiki.getURL($asection, "admin", $query))
+               #set($url = $xwiki.getURL($asection, 'admin', $query))
              #else
-               #set($url = $xwiki.getURL($currentDoc, "admin", $query))
+               #set($url = $xwiki.getURL($currentDoc, 'admin', $query))
              #end
             #end
-            &lt;li class="${name}"&gt;&lt;a href="$url" #if("$!aiconurl"!="")style="background:url($aiconurl) no-repeat;"#end&gt;&lt;span&gt;#if("$!atitle"!="")$atitle#else$name#end&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+            &lt;li class="${name}"&gt;&lt;a href="$url" #if("$!aiconurl" != '')style="background:url($aiconurl) no-repeat;"#end&gt;&lt;span&gt;#if("$!atitle" != '')$atitle#else$name#end&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
           #end
         #end
        &lt;/ul&gt;

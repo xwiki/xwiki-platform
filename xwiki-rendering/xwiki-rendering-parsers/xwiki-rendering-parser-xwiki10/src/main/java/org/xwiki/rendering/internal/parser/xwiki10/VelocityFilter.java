@@ -49,12 +49,16 @@ public class VelocityFilter extends AbstractFilter implements Composable
 
     public static final String VELOCITY_MACRO_SPATTERN = "\\#(\\w+)\\(([^)]*)\\)";
 
+    public static final String VELOCITY_INTERNAL_SPATTERN = "\\#end";
+
     public static final String VELOCITY_VARIABLEMETHOD_SPATTERN = "\\.\\p{Alpha}\\w*(\\(.*\\))?";
-    
-    public static final String VELOCITY_VARIABLE_SPATTERN = "\\$\\{?\\p{Alpha}\\w*("+VELOCITY_VARIABLEMETHOD_SPATTERN+")*\\}?";
+
+    public static final String VELOCITY_VARIABLE_SPATTERN =
+        "\\$\\{?\\p{Alpha}\\w*(" + VELOCITY_VARIABLEMETHOD_SPATTERN + ")*\\}?";
 
     public static final Pattern VELOCITY_PATTERN =
-        Pattern.compile(VELOCITY_COMMENT_SPATTERN + "|" + VELOCITY_MACRO_SPATTERN + "|" + VELOCITY_VARIABLE_SPATTERN);
+        Pattern.compile(VELOCITY_COMMENT_SPATTERN + "|" + VELOCITY_INTERNAL_SPATTERN + "|" + VELOCITY_MACRO_SPATTERN
+            + "|" + VELOCITY_VARIABLE_SPATTERN);
 
     public static final String VELOCITYOPEN_SPATTERN =
         "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VelocityFilter.VELOCITYOPEN_SUFFIX

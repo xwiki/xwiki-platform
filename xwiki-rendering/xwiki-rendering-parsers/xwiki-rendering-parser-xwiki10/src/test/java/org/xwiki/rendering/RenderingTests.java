@@ -79,6 +79,9 @@ public class RenderingTests extends TestCase
 
         // Cleaning
         suite.addTestsFromResource("cleaning/cleaning1", false);
+        
+        //Misc
+        suite.addTestsFromResource("misc/misc1", false);
 
         return new RenderingPlexusTestSetup(suite);
     }

@@ -103,7 +103,6 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      * @param context the macro's transformation context
      * @throws MacroExecutionException if the content cannot be rendered
      */ 
-
     private void renderEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters, 
         MacroTransformationContext context) throws MacroExecutionException 
     {
@@ -128,7 +127,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             }
             parentBlock.addChild(paragraphTitleBlock);
             
-            if (parameters.isFull() && entry.getDescription() != null) {
+            if (parameters.isContent() && entry.getDescription() != null) {
                 // We are wrapping the feed entry content in a HTML macro, not considering what the declared content
                 // is, because some feed will declare text while they actually contain HTML.
                 // See http://stuffthathappens.com/blog/2007/10/29/i-hate-rss/

@@ -21,7 +21,7 @@ public class TestRssMacro2 extends RssMacro
         throws MacroExecutionException
     {
         RssMacroParameters rssParameters = new RssMacroParameters();
-        rssParameters.setFull(true);
+        rssParameters.setContent(true);
         rssParameters.setCss(true);
         rssParameters.setCount(1);
         rssParameters.setImage(false);

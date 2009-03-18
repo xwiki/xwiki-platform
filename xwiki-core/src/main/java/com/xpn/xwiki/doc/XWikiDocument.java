@@ -126,7 +126,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiDocument implements DocumentModelBridge
 {
-    private static final Log log = LogFactory.getLog(XWikiDocument.class);
+    private static final Log LOG = LogFactory.getLog(XWikiDocument.class);
 
     /** The default wiki name to use when one isn't specified. */
     private static final String DEFAULT_WIKI_NAME = "xwiki";
@@ -506,6 +506,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         String result;
         HashMap<String, Object> backup = new HashMap<String, Object>();
+        Object isInRenderingEngine = context.get("isInRenderingEngine");
         try {
             backupContext(backup, context);
             setAsContextDoc(context);
@@ -525,10 +526,15 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (XWikiException e) {
             // Failed to render for some reason. This method should normally throw an exception but this
             // requires changing the signature of calling methods too.
-            log.warn(e);
+            LOG.warn(e);
             result = "";
         } finally {
             restoreContext(backup, context);
+            if (isInRenderingEngine != null) {
+                context.put("isInRenderingEngine", isInRenderingEngine);
+            } else {
+                context.remove("isInRenderingEngine");
+            }
         }
         return result;
     }
@@ -611,7 +617,7 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @param context the XWiki context used to get acces to the XWikiRenderingEngine object
+     * @param context the XWiki context used to get access to the XWikiRenderingEngine object
      * @return the document title. If a title has not been provided, look for a section title in the document's content
      *         and if not found return the page name. The returned title is also interpreted which means it's allowed to
      *         use Velocity, Groovy, etc syntax within a title.
@@ -629,7 +635,7 @@ public class XWikiDocument implements DocumentModelBridge
         // 3) Last if a title has been found renders it as it can contain macros, velocity code,
         // groovy, etc.
         if (title.length() > 0) {
-            // This will not completely work for scriting code in title referencing variables
+            // This will not completely work for scripting code in title referencing variables
             // defined elsewhere. In that case it'll only work if those variables have been
             // parsed and put in the corresponding scripting context. This will not work for
             // breadcrumbs for example.
@@ -990,7 +996,7 @@ public class XWikiDocument implements DocumentModelBridge
             try {
                 return newDocument(Class.forName(customClassName), context);
             } catch (ClassNotFoundException e) {
-                log.error("Failed to get java Class object from class name", e);
+                LOG.error("Failed to get java Class object from class name", e);
             }
         }
 
@@ -1015,7 +1021,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                 return (com.xpn.xwiki.api.Document) customClass.getConstructor(classes).newInstance(args);
             } catch (Exception e) {
-                log.error("Failed to create a custom Document object", e);
+                LOG.error("Failed to create a custom Document object", e);
             }
         }
 
@@ -1380,7 +1386,7 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @return true if the document is a new one (ie it has never been saved) or false otherwise
+     * @return true if the document is a new one (i.e. it has never been saved) or false otherwise
      */
     public boolean isNew()
     {
@@ -1542,7 +1548,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String display(String fieldname, String type, BaseObject obj, XWikiContext context)
     {
-        return display(fieldname, type, "", obj, getSyntaxId(), context);
+        return display(fieldname, type, "", obj, context.getDoc() != null ? context.getDoc().getSyntaxId()
+            : getSyntaxId(), context);
     }
 
     /**
@@ -1580,7 +1587,7 @@ public class XWikiDocument implements DocumentModelBridge
                 // since the way to implement this now is to choose the type of rendering to do in the class itself.
                 // Thus for the new rendering we simply make this mode work like the "view" mode.
                 if (is10Syntax(syntaxId)) {
-                    result.append(getRenderedContent(fcontent, syntaxId, context));
+                    result.append(getRenderedContent(fcontent, getSyntaxId(), context));
                 } else {
                     result.append(fcontent);
                 }
@@ -1635,6 +1642,7 @@ public class XWikiDocument implements DocumentModelBridge
             // We test if we're inside the rendering engine since it's also possible that this display() method is
             // called
             // directly from a template and in this case we only want HTML as a result and not wiki syntax.
+            // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
             if (isInRenderingEngine && !is10Syntax(syntaxId)) {
                 result.insert(0, "{{html wiki=\"false\"}}");
                 result.append("{{/html}}");
@@ -1644,8 +1652,9 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (Exception ex) {
             // TODO: It would better to check if the field exists rather than catching an exception
             // raised by a NPE as this is currently the case here...
-            log.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object ["
+            LOG.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object ["
                 + (obj == null ? "NULL" : obj.getName()) + "]");
+            ex.printStackTrace();
             return "";
         } finally {
             restoreContext(backup, context);
@@ -1674,6 +1683,8 @@ public class XWikiDocument implements DocumentModelBridge
             }
             return display(fieldname, object, context);
         } catch (Exception e) {
+            LOG.error("Faild to display fiedl " + fieldname + "of document" + getFullName(), e);
+
             return "";
         }
     }
@@ -1693,7 +1704,8 @@ public class XWikiDocument implements DocumentModelBridge
             if (object == null) {
                 return "";
             } else {
-                return display(fieldname, mode, prefix, object, getSyntaxId(), context);
+                return display(fieldname, mode, prefix, object, context.getDoc() != null ? context.getDoc()
+                    .getSyntaxId() : getSyntaxId(), context);
             }
         } catch (Exception e) {
             return "";
@@ -2034,13 +2046,13 @@ public class XWikiDocument implements DocumentModelBridge
         XWikiContext context)
     {
         // Do nothing for the moment..
-        // A usefull thing here would be to look at any instances of a Notification Object
+        // A useful thing here would be to look at any instances of a Notification Object
         // with email addresses and send an email to warn that the document has been modified..
 
     }
 
     /**
-     * Use the document passsed as parameter as the new identity for the current document.
+     * Use the document passed as parameter as the new identity for the current document.
      * 
      * @param document the document containing the new identity
      * @throws XWikiException in case of error
@@ -2145,7 +2157,7 @@ public class XWikiDocument implements DocumentModelBridge
             doc.originalDocument = this.originalDocument;
         } catch (Exception e) {
             // This should not happen
-            log.error("Exception while doc.clone", e);
+            LOG.error("Exception while doc.clone", e);
         }
         return doc;
     }
@@ -2526,7 +2538,7 @@ public class XWikiDocument implements DocumentModelBridge
                 el.addText(getDocumentArchive(context).getArchive(context));
                 docel.add(el);
             } catch (XWikiException e) {
-                log.error("Document [" + this.getFullName() + "] has malformed history");
+                LOG.error("Document [" + this.getFullName() + "] has malformed history");
             }
         }
 
@@ -3005,7 +3017,7 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Extract all the static (ie not generated by macros) wiki links (pointing to wiki page) from this document's
+     * Extract all the static (i.e. not generated by macros) wiki links (pointing to wiki page) from this document's
      * content.
      * 
      * @param context the XWiki context.
@@ -3625,7 +3637,7 @@ public class XWikiDocument implements DocumentModelBridge
             return getDeltas(Diff.diff(ToString.stringToArray(prevDoc.getContent()), ToString
                 .stringToArray(getContent())));
         } catch (Exception ex) {
-            log.debug("Exception getting differences from previous version: " + ex.getMessage());
+            LOG.debug("Exception getting differences from previous version: " + ex.getMessage());
         }
         return new ArrayList<Delta>();
     }
@@ -4621,7 +4633,7 @@ public class XWikiDocument implements DocumentModelBridge
         try {
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException ex) {
-            log.error("Cannot create MD5 object", ex);
+            LOG.error("Cannot create MD5 object", ex);
             return this.hashCode() + "";
         }
 
@@ -4640,7 +4652,7 @@ public class XWikiDocument implements DocumentModelBridge
             }
             return sb.toString();
         } catch (Exception ex) {
-            log.error("Exception while computing document hash", ex);
+            LOG.error("Exception while computing document hash", ex);
         }
         return this.hashCode() + "";
     }
@@ -4834,7 +4846,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     public static void restoreContext(Map<String, Object> backup, XWikiContext context)
     {
-        context.setDoc((XWikiDocument) backup.get("doc"));
+        if (backup.get("doc") != null) {
+            context.setDoc((XWikiDocument) backup.get("doc"));
+        }
         VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         Map gcontext = (Map) context.get("gcontext");
@@ -4880,7 +4894,7 @@ public class XWikiDocument implements DocumentModelBridge
                 gcontext.put("tdoc", tdoc);
             }
         } catch (XWikiException ex) {
-            log.warn("Unhandled exception setting context", ex);
+            LOG.warn("Unhandled exception setting context", ex);
         }
     }
 
@@ -4945,7 +4959,7 @@ public class XWikiDocument implements DocumentModelBridge
                 this.xdom = parseContent(getContent());
                 this.clonedxdom = this.xdom.clone();
             } catch (XWikiException e) {
-                log.error("Failed to parse document content to XDOM", e);
+                LOG.error("Failed to parse document content to XDOM", e);
             }
         }
 
@@ -5055,7 +5069,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         return is10Syntax(getSyntaxId());
     }
-    
+
     /**
      * @return true if the document has a xwiki/1.0 syntax content
      */

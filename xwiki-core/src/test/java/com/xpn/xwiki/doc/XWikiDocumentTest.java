@@ -44,6 +44,14 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  */
 public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
+    private static final String DOCSPACE = "Space";
+
+    private static final String DOCNAME = "Page";
+
+    private static final String DOCFULLNAME = DOCSPACE + "." + DOCNAME;
+
+    private static final String CLASSNAME = DOCFULLNAME;
+
     private XWikiDocument document;
 
     private Mock mockXWiki;
@@ -52,13 +60,19 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     private Mock mockXWikiVersioningStore;
 
+    private BaseClass baseClass;
+
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        this.document = new XWikiDocument("Space", "Page");
+        this.document = new XWikiDocument(DOCSPACE, DOCNAME);
         this.document.setSyntaxId("xwiki/1.0");
+        this.document.setLanguage("en");
+        this.document.setDefaultLanguage("en");
+
+        getContext().put("isInRenderingEngine", true);
 
         this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("Param").will(returnValue(null));
@@ -70,8 +84,28 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
+        this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
+        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
+
+        this.baseClass = this.document.getxWikiClass();
+        this.baseClass.addTextField("string", "String", 30);
+        this.baseClass.addTextAreaField("area", "Area", 10, 10);
+        this.baseClass.addPasswordField("passwd", "Password", 30);
+        this.baseClass.addBooleanField("boolean", "Boolean", "yesno");
+        this.baseClass.addNumberField("int", "Int", 10, "integer");
+        this.baseClass.addStaticListField("stringlist", "StringList", "value1, value2");
+
+        this.mockXWiki.stubs().method("getClass").will(returnValue(this.baseClass));
+
+        BaseObject baseObject = this.document.newObject(CLASSNAME, getContext());
+        baseObject.setStringValue("string", "string");
+        baseObject.setLargeStringValue("area", "area");
+        baseObject.setStringValue("passwd", "passwd");
+        baseObject.setIntValue("boolean", 1);
+        baseObject.setIntValue("int", 42);
+        baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
     }
 
     public void testGetDisplayTitleWhenNoTitleAndNoContent()
@@ -440,5 +474,92 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(
             "content not in section\n\n= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content",
             content2);
+    }
+
+    public void testDisplay10()
+    {
+        assertEquals("string", this.document.display("string", "view", getContext()));
+        assertEquals(
+            "{pre}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
+            this.document.display("string", "edit", getContext()));
+
+        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING).will(
+            returnValue("area"));
+
+        assertEquals("area", this.document.display("area", "view", getContext()));
+    }
+
+    public void testDisplay()
+    {
+        this.document.setSyntaxId("xwiki/2.0");
+
+        assertEquals("{{html wiki=\"false\"}}string{{/html}}", this.document.display("string", "view", getContext()));
+        assertEquals(
+            "{{html wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
+            this.document.display("string", "edit", getContext()));
+
+        assertEquals("{{html wiki=\"false\"}}<p>area</p>{{/html}}", this.document.display("area", "view", getContext()));
+    }
+
+    public void testDisplay1020()
+    {
+        XWikiDocument doc10 = new XWikiDocument();
+        doc10.setSyntaxId("xwiki/1.0");
+        getContext().setDoc(doc10);
+
+        this.document.setSyntaxId("xwiki/2.0");
+
+        assertEquals("string", this.document.display("string", "view", getContext()));
+        assertEquals(
+            "{pre}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
+            this.document.display("string", "edit", getContext()));
+
+        assertEquals("<p>area</p>", this.document.display("area", "view", getContext()));
+    }
+
+    public void testDisplay2010()
+    {
+        XWikiDocument doc10 = new XWikiDocument();
+        doc10.setSyntaxId("xwiki/2.0");
+        getContext().setDoc(doc10);
+
+        assertEquals("{{html wiki=\"false\"}}string{{/html}}", this.document.display("string", "view", getContext()));
+        assertEquals(
+            "{{html wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
+            this.document.display("string", "edit", getContext()));
+
+        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING).will(
+            returnValue("area"));
+
+        assertEquals("{{html wiki=\"false\"}}area{{/html}}", this.document.display("area", "view", getContext()));
+    }
+
+    public void testDisplayTemplate10()
+    {
+        getContext().put("isInRenderingEngine", false);
+
+        assertEquals("string", this.document.display("string", "view", getContext()));
+        assertEquals(
+            "{pre}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
+            this.document.display("string", "edit", getContext()));
+
+        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING).will(
+            returnValue("area"));
+
+        assertEquals("area", this.document.display("area", "view", getContext()));
+    }
+
+    public void testDisplayTemplate20()
+    {
+        getContext().put("isInRenderingEngine", false);
+
+        this.document.setSyntaxId("xwiki/2.0");
+
+        assertEquals("string", this.document.display("string", "view", getContext()));
+        assertEquals(
+            "<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>",
+            this.document.display("string", "edit", getContext()));
+
+        assertEquals("<p>area</p>", this.document.display("area", "view", getContext()));
     }
 }

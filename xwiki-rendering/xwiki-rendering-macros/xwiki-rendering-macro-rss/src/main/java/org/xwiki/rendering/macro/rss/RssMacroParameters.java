@@ -34,16 +34,15 @@ import org.xwiki.rendering.macro.descriptor.ParameterMandatory;
  */
 public class RssMacroParameters
 {
-
     /**
      * The URL of the RSS feed.
      */
     private String feed;
 
     /**
-     * If "true" displays a summary in addition to the feed item link.
+     * If "true" displays the content of each feed in addition to the feed item link.
      */
-    private boolean full;
+    private boolean content;
 
     /**
      * The number of feed items to display.
@@ -168,19 +167,19 @@ public class RssMacroParameters
     }
 
     /**
-     * @param full if "true" displays a summary in addition to the feed item link.
+     * @param content if "true" displays the content of each feed in addition to the feed item link
      */
-    @ParameterDescription("Display full entries")
-    public void setFull(boolean full)
+    @ParameterDescription("Display content for feed entries")
+    public void setContent(boolean content)
     {
-        this.full = full;
+        this.content = content;
     }
 
     /**
-     * @return if "true" displays a summary in addition to the feed item link
+     * @return true if the content of each feed should be displayed
      */
-    public boolean isFull()
+    public boolean isContent()
     {
-        return full;
+        return this.content;
     }
 }

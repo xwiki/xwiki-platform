@@ -489,7 +489,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (is10Syntax()) {
             renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
         } else {
-            renderedContent = performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0");
+            renderedContent = performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0", true);
         }
 
         return renderedContent;
@@ -521,7 +521,7 @@ public class XWikiDocument implements DocumentModelBridge
             if (is10Syntax(syntaxId)) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
-                result = performSyntaxConversion(text, getSyntaxId(), "xhtml/1.0");
+                result = performSyntaxConversion(text, getSyntaxId(), "xhtml/1.0", true);
             }
         } catch (XWikiException e) {
             // Failed to render for some reason. This method should normally throw an exception but this
@@ -4946,7 +4946,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void convertSyntax(String targetSyntaxId) throws XWikiException
     {
-        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntaxId));
+        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntaxId, false));
     }
 
     /**
@@ -4972,16 +4972,17 @@ public class XWikiDocument implements DocumentModelBridge
      * @param content the content to convert
      * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntaxId the new syntax after the conversion
+     * @param transform indicate if transformations has to be applyed or not
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      */
-    private String performSyntaxConversion(String content, String currentSyntaxId, String targetSyntaxId)
-        throws XWikiException
+    private String performSyntaxConversion(String content, String currentSyntaxId, String targetSyntaxId,
+        boolean transform) throws XWikiException
     {
         try {
             XDOM dom = parseContent(currentSyntaxId, content);
 
-            return performSyntaxConversion(dom, currentSyntaxId, targetSyntaxId);
+            return performSyntaxConversion(dom, currentSyntaxId, targetSyntaxId, transform);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to convert document to syntax [" + targetSyntaxId + "]", e);
@@ -4994,18 +4995,22 @@ public class XWikiDocument implements DocumentModelBridge
      * @param content the XDOM content to convert, the XDOM can be modified during the transformation
      * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntaxId the new syntax after the conversion
+     * @param transform indicate if transformations has to be applyed or not
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      */
-    private String performSyntaxConversion(XDOM content, String currentSyntaxId, String targetSyntaxId)
-        throws XWikiException
+    private String performSyntaxConversion(XDOM content, String currentSyntaxId, String targetSyntaxId,
+        boolean transform) throws XWikiException
     {
         try {
-            // Transform XDOM
-            TransformationManager transformations =
-                (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
-            transformations.performTransformations(content, syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
+            if (transform) {
+                // Transform XDOM
+                TransformationManager transformations =
+                    (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+                SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
+                transformations
+                    .performTransformations(content, syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
+            }
 
             // Render XDOM
             return renderXDOM(content, targetSyntaxId);

@@ -185,7 +185,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
     private Block generateTree(List<HeaderBlock> headers, int start, int depth, boolean numbered)
     {
         Block tocBlock = null;
-        int currentLevel = 0;
+        int currentLevel = start - 1;
         Block currentBlock = null;
         for (HeaderBlock headerBlock : headers) {
             int headerLevel = headerBlock.getLevel().getAsInt();

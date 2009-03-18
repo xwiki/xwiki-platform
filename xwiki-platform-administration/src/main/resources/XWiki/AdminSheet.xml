@@ -925,7 +925,7 @@ b.ts1{border-width: 0 2px}</code>
 ## groups, rights etc.) at global / space level and also for several applications.
 ##**************************************************************************************************
 #if($context.action == 'view')
-  $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', $request.getQueryString()))
+  $response.sendRedirect($xwiki.getURL($doc.getFullName(), 'admin', $request.getQueryString()))
 #else
     ##----------------------------------------------------------------------------
     ## hard-coded links to app. admin pages which appear at global/space level

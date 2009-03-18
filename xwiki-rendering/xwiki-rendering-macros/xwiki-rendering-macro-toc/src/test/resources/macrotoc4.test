@@ -17,8 +17,6 @@ endHeader [1]
 beginMacroMarkerStandalone [toc] [] []
 beginList [BULLETED]
 beginListItem
-beginList [BULLETED]
-beginListItem
 beginLink [Anchor = [testid]] [false]
 onWord [Title1]
 onSpecialSymbol [.]
@@ -37,8 +35,6 @@ onWord [1]
 onSpecialSymbol [.]
 onWord [1]
 endLink [Anchor = [testid]] [false]
-endListItem
-endList [BULLETED]
 endListItem
 endList [BULLETED]
 endListItem

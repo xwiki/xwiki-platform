@@ -13,13 +13,9 @@ beginDocument
 beginMacroMarkerStandalone [toc] [] []
 beginList [BULLETED]
 beginListItem
-beginList [BULLETED]
-beginListItem
 beginLink [Anchor = [testid]] [false]
 onWord [h2]
 endLink [Anchor = [testid]] [false]
-endListItem
-endList [BULLETED]
 endListItem
 endList [BULLETED]
 endMacroMarkerStandalone [toc] [] []
@@ -38,10 +34,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:toc|-||-|--><ul><li><ul><li><!--startwikilink:#testid--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#testid">h2</a></span><!--stopwikilink--></li></ul></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><a id="testid" name="testid"></a><h2 id="Hh2"><span>h2</span></h2>
+<!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#testid--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#testid">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><a id="testid" name="testid"></a><h2 id="Hh2"><span>h2</span></h2>
 .#-----------------------------------------------------
 .input|xhtml/1.0|skip
 .# The problem is that the Id macro can generate invalid XHTML (in this example it generates a A element at the level of BODY).
 .# see http://jira.xwiki.org/jira/browse/XWIKI-3367
 .#-----------------------------------------------------
-<!--startmacro:toc|-||-|--><ul><li><ul><li><!--startwikilink:#testid--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#testid">h2</a></span><!--stopwikilink--></li></ul></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><a id="testid" name="testid"></a><h2 id="Hh2"><span>h2</span></h2>
+<!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#testid--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#testid">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><a id="testid" name="testid"></a><h2 id="Hh2"><span>h2</span></h2>

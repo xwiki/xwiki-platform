@@ -4972,7 +4972,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @param content the content to convert
      * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntaxId the new syntax after the conversion
-     * @param transform indicate if transformations has to be applyed or not
+     * @param transform indicate if transformations has to be applied or not
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      */
@@ -4995,7 +4995,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @param content the XDOM content to convert, the XDOM can be modified during the transformation
      * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntaxId the new syntax after the conversion
-     * @param transform indicate if transformations has to be applyed or not
+     * @param transform indicate if transformations has to be applied or not
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      */

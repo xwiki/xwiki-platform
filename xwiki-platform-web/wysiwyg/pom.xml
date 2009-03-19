@@ -118,8 +118,8 @@
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <!--
-        I can't restrict the scope because maven-googlewebtoolkit2-plugin fails to compile the sources. We shouldn't
-        have this artifact in the final lib directory.
+        I can't restrict the scope because maven-googlewebtoolkit2-plugin fails to compile the sources. Since we shouldn't
+        have this artifact in the final lib directory it's manually excluded when building the standard WAR.
       -->
       <!-- <scope>test</scope> -->
     </dependency>

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-lucene</artifactId>
   <name>XWiki Platform - Plugins - Lucene search</name>
-  <version>1.7-SNAPSHOT</version>
+  <version>1.7</version>
   <description>XWiki Platform - Plugins - Lucene search</description>
   <dependencies>
     <dependency>
@@ -81,4 +81,10 @@
       <artifactId>log4j</artifactId>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-lucene-1.7</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-lucene-1.7</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-lucene-1.7</url>
+  </scm>
 </project>

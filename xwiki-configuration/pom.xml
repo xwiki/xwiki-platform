@@ -48,12 +48,18 @@
     <dependency>
       <groupId>commons-configuration</groupId>
       <artifactId>commons-configuration</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
+      <!--  Exclude BeanUtils Core since we're already packaging the full BeanUtils JAR -->
+      <exclusions>
+        <exclusion>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils-core</artifactId>
-      <version>1.7.0</version>
+      <artifactId>commons-beanutils</artifactId>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>

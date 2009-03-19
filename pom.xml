@@ -35,6 +35,11 @@
   <packaging>pom</packaging>
   <version>1.9-SNAPSHOT</version>
   <description>XWiki Platform - Core - Parent POM</description>
+  <properties>
+    <!-- Versions of XWiki dependencies used in Core modules -->
+    <platform.tool.test.version>1.17-SNAPSHOT</platform.tool.test.version>
+    <platform.tag.version>1.1-SNAPSHOT</platform.tag.version>
+  </properties>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
@@ -59,10 +64,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <properties>
-    <!-- Versions of XWiki dependencies used in Core modules -->
-    <platform.tool.test.version>1.16-SNAPSHOT</platform.tool.test.version>
-  </properties>
   <modules>
     <module>xwiki-xmlrpc</module>
     <module>xwiki-cache</module>

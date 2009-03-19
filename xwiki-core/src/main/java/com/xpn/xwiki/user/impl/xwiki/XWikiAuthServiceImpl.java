@@ -33,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
@@ -45,6 +46,7 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.util.Util;
 
 public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
@@ -159,11 +161,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 sconfig.setPersistentLoginManager(persistent);
 
                 MyFilterConfig fconfig = new MyFilterConfig();
-                if (xwiki.Param("xwiki.authentication.loginsubmitpage") != null) {
-                    fconfig.setInitParameter("loginSubmitPattern", xwiki.Param("xwiki.authentication.loginsubmitpage"));
-                } else {
-                    fconfig.setInitParameter("loginSubmitPattern", "/loginsubmit/XWiki/XWikiLogin");
-                }
+                fconfig.setInitParameter(FormAuthenticator.LOGIN_SUBMIT_PATTERN_KEY,
+                    xwiki.Param("xwiki.authentication.loginsubmitpage", "/loginsubmit/XWiki/XWikiLogin"));
 
                 this.authenticator.init(fconfig, sconfig);
             }
@@ -569,6 +568,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         if (contextPath.endsWith("/") && !contextPath.startsWith("/")) {
             contextPath = "/" + StringUtils.chop(contextPath);
         }
+        // URLFactory.getURL applies Util.escapeURL, which might convert the contextPath into an %NN escaped string.
+        // Apply the same escape method to compensate this.
+        contextPath = Util.escapeURL(contextPath);
         return StringUtils.removeStart(context.getURLFactory().getURL(url, context), contextPath);
     }
 }

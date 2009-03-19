@@ -35,6 +35,6 @@ public class RootResource extends XWikiResource
     @GET
     public Xwiki getRoot()
     {
-        return DomainObjectFactory.createXWikiRoot(objectFactory, uriInfo.getBaseUri(), "1.8-SNAPSHOT");
+        return DomainObjectFactory.createXWikiRoot(objectFactory, uriInfo.getBaseUri(), xwiki.getVersion());
     }
 }

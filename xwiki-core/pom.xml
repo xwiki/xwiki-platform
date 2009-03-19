@@ -91,6 +91,7 @@
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-core</artifactId>
       <version>1.1</version>
+      <classifier>xwiki</classifier>
     </dependency>
 
     <!-- We need to find what version of the googleapi we're using and get that to the central repository if the
@@ -153,6 +154,7 @@
       <groupId>jfree</groupId>
       <artifactId>jfreechart</artifactId>
       <version>1.0.0-rc1</version>
+      <classifier>xwiki</classifier>
     </dependency>
     <dependency>
       <groupId>jfree</groupId>

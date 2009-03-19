@@ -128,13 +128,6 @@
       <version>1.0a7</version>
     </dependency>
 
-    <!-- We need to upload rome-fetcher-0.7 to the central repository -->
-    <dependency>
-      <groupId>rome</groupId>
-      <artifactId>rome-fetcher</artifactId>
-      <version>0.7</version>
-    </dependency>
-
     <!-- We need to get JCaptcha to upload its jar to the central repository.
          See http://forge.octo.com/jcaptcha/jira/browse/FWK-65 -->
     <dependency>
@@ -488,7 +481,26 @@
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-      <version>0.8</version>
+      <version>1.0</version>
+      <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
+      <exclusions>
+        <exclusion>
+          <groupId>jdom</groupId>
+          <artifactId>jdom</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome-fetcher</artifactId>
+      <version>1.0</version>
+      <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
+      <exclusions>
+        <exclusion>
+          <groupId>jdom</groupId>
+          <artifactId>jdom</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- iCal processing -->
     <dependency>
@@ -882,4 +894,12 @@
       </build>
     </profile>
   </profiles>
+  <repositories>
+    <!-- Used to get Rome 1.0 which is not yet on the Central Maven repo. Remove this when it is -->
+    <repository>
+      <id>maven2-repository.dev.java.net.2</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2</url>
+    </repository>
+  </repositories>  
 </project>

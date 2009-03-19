@@ -1,44 +1,52 @@
 #set($showactions = 0)
 <div id="changescontent" class="xwikiintracontent">
-#set($rev1= $request.get("rev1"))
-#set($rev2= $request.get("rev2"))
-#if (!$rev1 && !$rev2)
- #set($rev2 = $tdoc.version)
- #set($rev1 = $tdoc.previousVersion)
+#set($rev1 = "$!request.get('rev1')")
+#set($rev2 = "$!request.get('rev2')")
+## Try to determine valid revisions based on the input parameters, which might be missing or invalid.
+## List all the valid versions first, and see if the requested ones are among them.
+#set($revcrit = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria())
+#set($revcrit.includeMinorVersions = true)
+#set($validVersions = $tdoc.getRevisions($revcrit))
+#set($fromIndex = $validVersions.indexOf($rev1))
+#set($toIndex = $validVersions.indexOf($rev2))
+## Check all possible problems with the specified versions.
+#if($validVersions.size() < 2)
+  ## Not enough versions, show all the content introduced by the first (if any) version of the document
+  #set($origdoc = $util.null)
+  #set($newdoc = $tdoc)
+  #set($rev1 = '0')
+  #set($rev2 = $tdoc.version)
 #else
- #set($revcrit = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria())
- #set($revcrit.includeMinorVersions = true)
- #set($lst = $tdoc.getRevisions($revcrit)) 
- #if (!$rev1)
-  #set($ind = $lst.indexOf($rev2) - 1)
-  #if ($ind >= 0)
-   #set($rev1 = $lst.get($ind))
+  #if($fromIndex == -1 && $toIndex == -1)
+    ## If no versions are specified, then show differences between the last two (the changes made in the latest version).
+    #set($fromIndex = $validVersions.size() - 2)
+    #set($toIndex = $validVersions.size() - 1)
+  #elseif($fromIndex == -1)
+    ## Only $rev2 is valid, let $rev1 be the one just before it if possible, or the one right after.
+    #if($toIndex == 0)
+      #set($fromIndex = 0)
+      #set($toIndex = 1)
+    #else
+      #set($fromIndex = $toIndex - 1)
+    #end
+  #elseif($toIndex == -1)
+    ## Only $rev1 is valid, let $rev2 be the one just after it if possible, or the one right before.
+    #if($fromIndex == $validVersions.size() - 1)
+      #set($fromIndex = $validVersions.size() - 2)
+      #set($toIndex = $validVersions.size() - 1)
+    #else
+      #set($toIndex = $fromIndex + 1)
+    #end
+  #elseif($toIndex < $fromIndex)
+    ## Both versions are valid, but they are not in the right order. Swap them
+    #set($discard = $toIndex)
+    #set($toIndex = $fromIndex)
+    #set($fromIndex = $discard)
   #end
- #elseif (!$rev2) 
-  #set($ind = $lst.indexOf($rev1) + 1)
-  #if ($ind < $lst.size())
-   #set($rev2 = $lst.get($ind))
-  #end
- #end
+  #set($rev1 = $validVersions.get($fromIndex))
+  #set($rev2 = $validVersions.get($toIndex))
+  #set($origdoc = $xwiki.getDocument($tdoc, $rev1))
+  #set($newdoc = $xwiki.getDocument($tdoc, $rev2))
 #end
-#if($request.get("type"))
-#set($type= $request.get("type"))
-#else
-#set($type = "html")
-#end
-#if ($tdoc.realLanguage!="")
-#set($lang = "&language=${tdoc.realLanguage}")
-#else
-#set($lang = "")
-#end
-#set($origdoc = $xwiki.getDocument($tdoc, $rev1))
-#set($newdoc = $xwiki.getDocument($tdoc, $rev2))
-#if (!$rev1)
- #set($rev1 = "0")
-#end
-#if (!$rev2)
- #set($rev2 = "0")
-#end
-#template("changesdoc.vm")
-<br /><br />
+#template('changesdoc.vm')
 </div>

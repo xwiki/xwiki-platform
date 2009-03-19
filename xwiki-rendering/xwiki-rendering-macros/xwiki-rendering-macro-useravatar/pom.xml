@@ -26,12 +26,12 @@
   <parent>
     <artifactId>xwiki-core-rendering-macros-parent</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-core-rendering-macro-useravatar</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - User Avatar</name>
-  <version>1.8-SNAPSHOT</version>
+  <version>1.8</version>
   <description>XWiki Platform - Core - Rendering - Macro - User Avatar</description>
   <build>
     <plugins>

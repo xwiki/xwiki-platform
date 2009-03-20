@@ -153,6 +153,16 @@
       <groupId>xwiki.jfree</groupId>
       <artifactId>jfreechart</artifactId>
       <version>1.0.0-rc1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>gnujaxp</groupId>
+          <artifactId>gnujaxp</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>jfree</groupId>

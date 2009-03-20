@@ -279,7 +279,7 @@
           <!-- New code should follow checkstyle rules -->
           <excludes>com/xpn/xwiki/wysiwyg/client/diff/**/*,
             com/xpn/xwiki/wysiwyg/client/sync/**/*, com/xpn/xwiki/wysiwyg/server/sync/**/*,
-            com/xpn/xwiki/wysiwyg/client/dom/DOMUtils.java, com/xpn/xwiki/wysiwyg/client/editor/Images.java,
+            org/xwiki/gwt/dom/client/DOMUtils.java, com/xpn/xwiki/wysiwyg/client/editor/Images.java,
             com/xpn/xwiki/wysiwyg/client/editor/Strings.java, com/xpn/xwiki/wysiwyg/client/editor/WysiwygEditor.java,
             com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfig.java, 
             com/xpn/xwiki/wysiwyg/client/plugin/image/ImageConfig.java,

@@ -88,9 +88,9 @@
          issue in version 1.0.1, see http://jira.codehaus.org/browse/MEV-453 -->
     <!-- TODO: Version 1.4.2 is published in the central repo, can we use that? -->
     <dependency>
-      <groupId>xwiki.org.apache.jackrabbit</groupId>
+      <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-core</artifactId>
-      <version>1.1</version>
+      <version>1.1-xwiki</version>
     </dependency>
 
     <!-- We need to find what version of the googleapi we're using and get that to the central repository if the
@@ -150,9 +150,9 @@
          move to 1.0.0 or beyond... See http://jira.xwiki.org/jira/browse/XWIKI-390.
          Note: when we move to using the central repo version we'll only need 1 dependency on jfreechart -->
     <dependency>
-      <groupId>xwiki.jfree</groupId>
+      <groupId>jfree</groupId>
       <artifactId>jfreechart</artifactId>
-      <version>1.0.0-rc1</version>
+      <version>1.0.0-rc1-xwiki</version>
       <exclusions>
         <exclusion>
           <groupId>gnujaxp</groupId>

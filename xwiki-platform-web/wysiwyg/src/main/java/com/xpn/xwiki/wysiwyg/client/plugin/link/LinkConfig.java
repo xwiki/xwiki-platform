@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
+import org.xwiki.gwt.dom.client.JavaScriptObject;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.xpn.xwiki.wysiwyg.client.dom.JavaScriptObject;
 
 /**
  * Stores the data about a link: information about the link: reference (wiki, space, page), URL and also about its

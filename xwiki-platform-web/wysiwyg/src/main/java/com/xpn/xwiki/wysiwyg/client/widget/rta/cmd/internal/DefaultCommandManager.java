@@ -22,10 +22,11 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.dom.Style;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;

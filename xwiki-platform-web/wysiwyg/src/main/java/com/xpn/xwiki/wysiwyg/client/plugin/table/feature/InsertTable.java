@@ -19,13 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Selection;
+
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.ui.PushButton;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;

@@ -19,9 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.color;
 
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.xpn.xwiki.wysiwyg.client.dom.Style;
 
 /**
  * Defines a cell in the {@link ColorPalette} that can be selected by being clicked.

@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.util;
 
-import com.xpn.xwiki.wysiwyg.client.dom.JavaScriptObject;
+import org.xwiki.gwt.dom.client.JavaScriptObject;
 
 /**
  * @version $Id$

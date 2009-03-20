@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client;
 
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.junit.client.GWTTestCase;
 
 /**
@@ -38,18 +37,5 @@ public abstract class AbstractWysiwygClientTest extends GWTTestCase
     public String getModuleName()
     {
         return "com.xpn.xwiki.wysiwyg.Wysiwyg";
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see GWTTestCase#gwtSetUp()
-     */
-    protected void gwtSetUp() throws Exception
-    {
-        super.gwtSetUp();
-
-        // We have to remove the default body border because it affects the range detection in IE.
-        Document.get().getBody().getStyle().setProperty("borderStyle", "none");
     }
 }

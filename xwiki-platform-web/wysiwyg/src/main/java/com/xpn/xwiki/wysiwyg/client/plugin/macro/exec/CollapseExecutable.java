@@ -22,7 +22,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
+import org.xwiki.gwt.dom.client.Element;
+
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;

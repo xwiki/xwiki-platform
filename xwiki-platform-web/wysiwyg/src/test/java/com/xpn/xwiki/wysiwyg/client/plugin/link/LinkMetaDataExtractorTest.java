@@ -19,12 +19,13 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.DocumentFragment;
+import org.xwiki.gwt.dom.client.Element;
+
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
 
 /**
  * Class to test the {@link LinkMetaDataExtractor} class, to check whether all links are correctly parsed and extracted

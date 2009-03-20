@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Style;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Style;
 
 /**
  * If there is no selection, the insertion point will set bold for subsequently typed characters. If there is a

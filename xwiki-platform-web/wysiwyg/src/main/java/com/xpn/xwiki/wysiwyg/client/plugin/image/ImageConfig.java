@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.image;
 
+import org.xwiki.gwt.dom.client.JavaScriptObject;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.xpn.xwiki.wysiwyg.client.dom.JavaScriptObject;
 
 /**
  * Stores the data about an image: information about the image file (filename, url, etc.) and also about its

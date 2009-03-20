@@ -1,0 +1,72 @@
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+<module>
+  <inherits name='com.google.gwt.dom.DOM'/>
+  <inherits name="com.google.gwt.junit.JUnit"/>
+
+  <define-property name="old.user.agent" values="yes,no"/>
+
+  <property-provider name="old.user.agent"><![CDATA[
+    var ua = navigator.userAgent.toLowerCase();
+    var makeVersion = function(result) {
+      return (parseInt(result[1]) * 1000) + parseInt(result[2]);
+    };
+    if (ua.indexOf("gecko") != -1) {
+      var result = /rv:([0-9]+)\.([0-9]+)/.exec(ua);
+      if (result && result.length == 3) {
+        if (makeVersion(result) >= 1009) {
+          return "no";
+        }
+      }
+    }
+    return "yes";
+  ]]></property-provider>
+
+  <!-- SelectionManager -->
+  <replace-with class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager">
+    <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager"/>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.dom.client.internal.mozilla.MozillaSelectionManager">
+    <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager"/>
+    <when-property-is name="old.user.agent" value="yes"/>
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8"/>
+      <when-property-is name="user.agent" value="gecko"/>
+    </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IESelectionManager">
+    <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager"/>
+    <when-property-is name="user.agent" value="ie6"/>
+  </replace-with>
+
+  <!-- DOMUtils -->
+  <replace-with class="org.xwiki.gwt.dom.client.internal.mozilla.MozillaDOMUtils">
+    <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils"/>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEDOMUtils">
+    <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils"/>
+    <when-property-is name="user.agent" value="ie6"/>
+  </replace-with>
+</module>

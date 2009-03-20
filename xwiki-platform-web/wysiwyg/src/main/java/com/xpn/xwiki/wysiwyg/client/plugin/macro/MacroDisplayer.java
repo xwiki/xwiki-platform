@@ -23,15 +23,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.DocumentFragment;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.InnerHTMLListener;
+import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.dom.client.Style.Display;
+
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.InnerHTMLListener;
-import com.xpn.xwiki.wysiwyg.client.dom.Style;
-import com.xpn.xwiki.wysiwyg.client.dom.Style.Display;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**

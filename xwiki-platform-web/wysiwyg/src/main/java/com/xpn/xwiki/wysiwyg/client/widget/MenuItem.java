@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Element;
+
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.AbstractImagePrototype.ImagePrototypeElement;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
 
 /**
  * Improves the default menu item widget provided by GWT:

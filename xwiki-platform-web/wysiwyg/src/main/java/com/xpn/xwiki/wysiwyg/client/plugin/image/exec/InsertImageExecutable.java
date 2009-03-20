@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.image.exec;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.DocumentFragment;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Range;
+
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
@@ -196,13 +197,13 @@ public class InsertImageExecutable extends InsertHTMLExecutable
         String autoValue = "auto";
         if ("block".equalsIgnoreCase(img.getStyle().getProperty("display"))
             && autoValue.equalsIgnoreCase(img.getStyle().getProperty(
-                com.xpn.xwiki.wysiwyg.client.dom.Style.toCamelCase("margin-left")))
+                org.xwiki.gwt.dom.client.Style.toCamelCase("margin-left")))
             && autoValue.equalsIgnoreCase(img.getStyle().getProperty(
-                com.xpn.xwiki.wysiwyg.client.dom.Style.toCamelCase("margin-right")))) {
+                org.xwiki.gwt.dom.client.Style.toCamelCase("margin-right")))) {
             foundAlignment = ImageAlignment.CENTER;
         }
         String verticalAlignValue =
-            img.getStyle().getProperty(com.xpn.xwiki.wysiwyg.client.dom.Style.toCamelCase("vertical-align"));
+            img.getStyle().getProperty(org.xwiki.gwt.dom.client.Style.toCamelCase("vertical-align"));
         if ("top".equalsIgnoreCase(verticalAlignValue)) {
             foundAlignment = ImageAlignment.TOP;
         }

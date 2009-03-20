@@ -1931,7 +1931,9 @@ public class Document extends Api
      */
     public void rename(String newDocumentName) throws XWikiException
     {
-        this.doc.rename(newDocumentName, getXWikiContext());
+        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit", this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
+            this.doc.rename(newDocumentName, getXWikiContext());
+        }
     }
 
     /**

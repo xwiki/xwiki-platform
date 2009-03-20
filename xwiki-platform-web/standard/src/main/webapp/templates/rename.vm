@@ -1,7 +1,7 @@
 ###
 ### Rename document template
 ###
-#if(!$xwiki.hasAccessLevel("edit"))
+#if(!$xwiki.hasAccessLevel('delete'))
   #template("accessdenied.vm")
 #elseif($doc.isNew())
   #template("startpage.vm")
@@ -33,6 +33,9 @@
       #elseif($xwiki.exists($newFullName))
         #error("$msg.get('core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])")
         #template("renameStep1.vm")
+      #elseif(!$xwiki.hasAccessLevel('edit', $context.user, $newFullName))
+        #error($msg.get('core.rename.targetNotWritable', [$newFullName]))
+        #template('renameStep1.vm')
       #else
         #set($renamedBLs = $util.arrayList)
         #foreach($param in $request.parameterNames)

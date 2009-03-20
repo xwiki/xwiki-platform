@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
+import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Selection;
+
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Timer;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -139,7 +140,7 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
     /**
      * Tests the preserver when we have a text range and the range contents are replaced by some HTML.
      * 
-     * @see com.xpn.xwiki.wysiwyg.client.dom.DOMUtils#getTextRange(Range)
+     * @see org.xwiki.gwt.dom.client.DOMUtils#getTextRange(Range)
      */
     public void testTextRangeSelectionWithHTMLInsertion()
     {
@@ -157,7 +158,7 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
     /**
      * Tests the preserver when we have a text range and the range contents are replaced by some HTML.
      * 
-     * @see com.xpn.xwiki.wysiwyg.client.dom.DOMUtils#getTextRange(Range)
+     * @see org.xwiki.gwt.dom.client.DOMUtils#getTextRange(Range)
      */
     private void doTestTextRangeSelectionWithHTMLInsertion()
     {

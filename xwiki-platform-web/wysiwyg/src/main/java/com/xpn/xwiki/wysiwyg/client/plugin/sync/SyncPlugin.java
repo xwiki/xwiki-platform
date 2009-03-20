@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.sync;
 
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.RangeFactory;
+import org.xwiki.gwt.dom.client.Selection;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.PushButton;
@@ -29,10 +34,6 @@ import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.dom.client.NodeList;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.dom.RangeFactory;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Selection;
 import com.xpn.xwiki.wysiwyg.client.diff.Diff;
 import com.xpn.xwiki.wysiwyg.client.diff.DifferentiationFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.PatchFailedException;

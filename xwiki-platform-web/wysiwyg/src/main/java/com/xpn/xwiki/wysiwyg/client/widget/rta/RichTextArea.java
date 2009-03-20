@@ -19,14 +19,15 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Event;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ChangeListenerCollection;
 import com.google.gwt.user.client.ui.HasName;
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Event;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultCommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.history.History;

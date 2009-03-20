@@ -19,10 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.list.internal;
 
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Element;
+
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster;
 
 /**

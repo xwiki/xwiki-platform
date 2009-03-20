@@ -19,9 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.internal;
 
+import org.xwiki.gwt.dom.client.Element;
+
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDisplayer;
 
 /**

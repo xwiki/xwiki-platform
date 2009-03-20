@@ -21,10 +21,11 @@ package com.xpn.xwiki.wysiwyg.client.widget;
 
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.Element;
+
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.UIObject;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
 
 /**
  * Improves the default menu bar widget provided by GWT.

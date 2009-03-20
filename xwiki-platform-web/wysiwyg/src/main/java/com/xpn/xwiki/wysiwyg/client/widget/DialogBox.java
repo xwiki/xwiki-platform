@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget;
 
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -28,7 +30,6 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.widgetideas.client.GlassPanel;
-import com.xpn.xwiki.wysiwyg.client.dom.Style;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.DragAdaptor;

@@ -19,10 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.exec;
 
+import org.xwiki.gwt.dom.client.DocumentFragment;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Range;
+
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;

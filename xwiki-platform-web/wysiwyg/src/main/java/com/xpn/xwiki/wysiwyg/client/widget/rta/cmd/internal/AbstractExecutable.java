@@ -19,7 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
+import org.xwiki.gwt.dom.client.DOMUtils;
+
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 

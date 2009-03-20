@@ -23,15 +23,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtilsTest;
-import com.xpn.xwiki.wysiwyg.client.dom.DepthFirstPreOrderIteratorTest;
-import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragmentTest;
-import com.xpn.xwiki.wysiwyg.client.dom.DocumentTest;
-import com.xpn.xwiki.wysiwyg.client.dom.ElementTest;
-import com.xpn.xwiki.wysiwyg.client.dom.RangeTest;
-import com.xpn.xwiki.wysiwyg.client.dom.StyleTest;
-import com.xpn.xwiki.wysiwyg.client.dom.TextTest;
-import com.xpn.xwiki.wysiwyg.client.dom.internal.ie.IESelectionTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.indent.IndentExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.indent.OutdentExecutableTest;
@@ -70,7 +61,6 @@ public class WysiwygClientTestSuite extends GWTTestSuite
     {
         TestSuite suite = new TestSuite("WYSIWYG Client Unit Tests");
 
-        addDOMTests(suite);
         addPluginTests(suite);
 
         // syntax
@@ -85,24 +75,6 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         addWidgetTests(suite);
 
         return suite;
-    }
-
-    /**
-     * Adds unit tests for the DOM API to the given test suite.
-     * 
-     * @param suite the test suite
-     */
-    private static void addDOMTests(TestSuite suite)
-    {
-        suite.addTestSuite(DOMUtilsTest.class);
-        suite.addTestSuite(DocumentTest.class);
-        suite.addTestSuite(DocumentFragmentTest.class);
-        suite.addTestSuite(ElementTest.class);
-        suite.addTestSuite(TextTest.class);
-        suite.addTestSuite(RangeTest.class);
-        suite.addTestSuite(StyleTest.class);
-        suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);
-        suite.addTestSuite(IESelectionTest.class);
     }
 
     /**

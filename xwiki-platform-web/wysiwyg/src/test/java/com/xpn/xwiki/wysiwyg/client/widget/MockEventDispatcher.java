@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget;
 
+import org.xwiki.gwt.dom.client.MockEvent;
+
 import com.google.gwt.user.client.EventListener;
-import com.xpn.xwiki.wysiwyg.client.dom.MockEvent;
 
 /**
  * Dispatches mock events to an event listener. Use this class to write functional tests for GWT widgets.

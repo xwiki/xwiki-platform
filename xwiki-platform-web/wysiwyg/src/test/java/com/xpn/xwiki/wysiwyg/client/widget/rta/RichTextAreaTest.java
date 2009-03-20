@@ -19,12 +19,13 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Range;
+
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
 import com.xpn.xwiki.wysiwyg.client.widget.MockEventDispatcher;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
 

@@ -19,14 +19,15 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.image;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.DocumentFragment;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.InnerHTMLListener;
+import org.xwiki.gwt.dom.client.Text;
+
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.DocumentFragment;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.InnerHTMLListener;
-import com.xpn.xwiki.wysiwyg.client.dom.Text;
 
 /**
  * Analyzes the passed subtree and detects the image structures and transforms them in minimal HTML elements with

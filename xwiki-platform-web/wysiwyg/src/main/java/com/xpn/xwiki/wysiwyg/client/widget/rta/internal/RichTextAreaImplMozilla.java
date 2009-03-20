@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
+import org.xwiki.gwt.dom.client.Element;
+
 import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.LoadListenerCollection;
 import com.google.gwt.user.client.ui.SourcesLoadEvents;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**

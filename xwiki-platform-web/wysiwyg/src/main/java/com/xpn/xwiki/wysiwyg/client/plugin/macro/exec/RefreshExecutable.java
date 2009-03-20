@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Style;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 

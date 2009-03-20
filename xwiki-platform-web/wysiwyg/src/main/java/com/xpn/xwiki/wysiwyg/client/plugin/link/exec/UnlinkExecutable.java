@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.exec;
 
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Range;
+
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 

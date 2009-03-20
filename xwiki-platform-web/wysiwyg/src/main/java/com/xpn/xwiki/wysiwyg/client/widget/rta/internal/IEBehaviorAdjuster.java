@@ -19,15 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Event;
+import org.xwiki.gwt.dom.client.Range;
+
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.dom.DOMUtils;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Element;
-import com.xpn.xwiki.wysiwyg.client.dom.Event;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
 
 /**
  * Adjusts the behavior of the rich text area in Internet Explorer browsers.

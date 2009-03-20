@@ -19,10 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.user.client.Timer;
-import com.xpn.xwiki.wysiwyg.client.dom.Document;
-import com.xpn.xwiki.wysiwyg.client.dom.Range;
-import com.xpn.xwiki.wysiwyg.client.dom.Style;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 

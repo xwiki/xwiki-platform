@@ -83,13 +83,6 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
 
         // Save the selection when the edited document is about to loose focus.
         document.body.attachEvent('onbeforedeactivate', function(event) {
-            // The BODY element can have a smaller width and height than the HTML element allowing the user to click
-            // inside the HTML element but outside of the BODY element. As a result the BODY element is deactivated and
-            // its inner selection is cleared. Let's prevent this.
-            if (event.toElement == document.documentElement) {
-                event.returnValue = false;
-                return false;
-            }
             document.body.__bookmark = null;
             var range = document.selection.createRange();
             // Check the type of the range and if the range is inside the edited document.
@@ -99,20 +92,6 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
             } else if (range.item && range.length > 0 && range.item(0).ownerDocument == document) {
                 // Control range.
                 document.body.__bookmark = range.item(0);
-            }
-        });
-        
-        // Prevent the activation of the HTML element which can happen if the BODY element has a smaller width or
-        // height and the user click inside the HTML element but outside of the BODY element.
-        // NOTE: We can use CSS to make the BODY element have the same width and height as the HTML element but then
-        // adding a padding or a margin to the BODY element makes the scroll bars appear (and we can't use a wrapper
-        // inside the BODY element to hold the padding or the margin).
-        // See also XWIKI-3272: Cannot regain focus on the content area by clicking on it if it's empty in IE6.
-        document.documentElement.attachEvent('onbeforeactivate', function(event) {
-            if (event.srcElement == document.documentElement) {
-                setTimeout(function() {
-                    document.body.focus();
-                }, 1);
             }
         });
     }-*/;

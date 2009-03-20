@@ -16,17 +16,23 @@
 }
 
 .gwt-MenuBar-horizontal {
-  background-color: #e3e8f3;
-  border: 1px solid #BBBBBB;
+  background-color: #F0F0EE;
+}
+
+.gwt-MenuBar-horizontal table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  padding: 0;
 }
 
 .gwt-MenuBar-horizontal .gwt-MenuItem {
   padding: 0px 10px;
   color: #666;
   font-weight: bold;
-  background-color:#F0F0EE;
-  border-left:1px solid #FFFFFF;
-  border-right:1px solid #AAAAAA;
+  background-color: #EAEAEA;
+  border-top:1px solid #DDD;
+  border-right:1px solid #DDD;
+  height: 24px;
 }
 
 .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {

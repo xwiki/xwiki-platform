@@ -10,7 +10,8 @@
 
 .xToolbar {
   background:#F0F0EE none repeat scroll 0%;
-  border:1px solid #CCCCCC;
+  border-top:1px solid #DDD;
+  border-bottom:1px solid #DDD;
   width:100%;
 }
 

@@ -1,5 +1,18 @@
-html, body {
-  height: auto !important;
+/*
+  The BODY element can have a smaller width and height than the HTML element allowing the user to click inside the HTML
+  element but outside of the BODY element. In IE this leads to the HTML element being activated and the selection
+  within the BODY element being cleared. This is very annoying for the user which expects to see the caret when he
+  clicks inside the rich text area. Also, GWT's rich text area listens to DOM events generated within the BODY element
+  and thus events triggered by the HTML element are ignored. We cannot prevent the activation of the HTML element
+  because this will make scrolling with the mouse impossible. The best way to avoid this problem is to ensure through
+  CSS that the BODY element has at least the width and height of the HTML element. In other words, initially when the
+  document is empty the BODY should have the width and height of the rich text area. Once the user starts adding
+  content and this content grows beyond the height/width of the rich text area requiring the vertical/horizontal scroll
+  bar then the BODY element should increase its height/width to be able to wrap the content.
+*/
+html {
+  height: 100%;
+  width: 100%;
 }
 
 * html {
@@ -7,12 +20,20 @@ html, body {
 }
 
 body.main {
-  background-image: none !important;
-  margin: 0px !important;
-  min-width: 0 !important;
-  padding: 3px !important;
-  position: static !important;
-  width: auto !important;
+  background-image: none;
+  height: auto;
+  margin: 0;
+  min-height: 100%; 
+  min-width: 100%;
+  overflow: visible;
+  padding: 0;
+  position: static;
+  width: auto;
+}
+
+* html body.main {
+  height: 100%;
+  width: 100%;
 }
 
 /*

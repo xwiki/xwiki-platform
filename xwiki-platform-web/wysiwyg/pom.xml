@@ -85,6 +85,19 @@
       <classifier>sources</classifier>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-dom</artifactId>
+      <version>${pom.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-dom</artifactId>
+      <version>${pom.version}</version>
+      <!-- We need the sources for debugging in hosted mode -->
+      <classifier>sources</classifier>
+    </dependency>
+    <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>${platform.core.version}</version>
@@ -110,7 +123,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>
-      <version>1.12</version>
+      <version>${platform.tool.shared.tests.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -277,13 +290,16 @@
           <failsOnError>true</failsOnError>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <!-- New code should follow checkstyle rules -->
-          <excludes>com/xpn/xwiki/wysiwyg/client/diff/**/*,
-            com/xpn/xwiki/wysiwyg/client/sync/**/*, com/xpn/xwiki/wysiwyg/server/sync/**/*,
-            org/xwiki/gwt/dom/client/DOMUtils.java, com/xpn/xwiki/wysiwyg/client/editor/Images.java,
-            com/xpn/xwiki/wysiwyg/client/editor/Strings.java, com/xpn/xwiki/wysiwyg/client/editor/WysiwygEditor.java,
+          <excludes>
+            com/xpn/xwiki/wysiwyg/client/diff/**/*,
+            com/xpn/xwiki/wysiwyg/client/sync/**/*,
+            com/xpn/xwiki/wysiwyg/client/editor/Images.java,
+            com/xpn/xwiki/wysiwyg/client/editor/Strings.java,
+            com/xpn/xwiki/wysiwyg/client/editor/WysiwygEditor.java,
             com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/image/ImageConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
+            com/xpn/xwiki/wysiwyg/server/sync/**/*,
             com/xpn/xwiki/wysiwyg/server/DefaultWysiwygService.java,
             com/xpn/xwiki/wysiwyg/server/DefaultWysiwygServiceTest.java</excludes>
         </configuration>

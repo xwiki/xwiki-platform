@@ -17,7 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.dom.client;
+package com.xpn.xwiki.wysiwyg.client.widget;
+
+import org.xwiki.gwt.dom.client.Event;
 
 /**
  * Instances of this class can be used for testing the response of the rich text area to different DOM events. Such

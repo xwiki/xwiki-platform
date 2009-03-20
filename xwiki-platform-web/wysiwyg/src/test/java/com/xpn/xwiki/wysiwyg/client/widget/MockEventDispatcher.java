@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget;
 
-import org.xwiki.gwt.dom.client.MockEvent;
-
 import com.google.gwt.user.client.EventListener;
 
 /**

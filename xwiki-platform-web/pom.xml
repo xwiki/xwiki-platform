@@ -43,6 +43,7 @@
     <gwtVersion>1.5.3</gwtVersion>
     <smartgwt.version>1.0b2</smartgwt.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
+    <platform.tool.shared.tests.version>1.17-SNAPSHOT</platform.tool.shared.tests.version>
     <platform.tool.configuration.version>1.26-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>1.8-SNAPSHOT</platform.core.version>
     <platform.skin.albatross.version>1.18-SNAPSHOT</platform.skin.albatross.version>
@@ -56,6 +57,7 @@
       </activation>
       <modules>
         <module>gwt</module>
+	<module>xwiki-gwt-dom</module>
         <module>wysiwyg</module>
         <module>standard</module>
         <module>exo</module>
@@ -66,6 +68,7 @@
       <id>xe</id>
       <modules>
         <module>gwt</module>
+	<module>xwiki-gwt-dom</module>
         <module>wysiwyg</module>
         <module>standard</module>
       </modules>
@@ -75,6 +78,7 @@
       <id>xem</id>
       <modules>
         <module>gwt</module>
+	<module>xwiki-gwt-dom</module>
         <module>wysiwyg</module>
         <module>standard</module>
       </modules>

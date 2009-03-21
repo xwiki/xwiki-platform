@@ -55,21 +55,17 @@
     </dependency>
   </dependencies>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <!-- We need to include the source files in the generated JAR because they are needed by the GWT module that
+          depends on this as the GWT compiler needs the sources to generate the JS files -->
+        <directory>src/main/java</directory>
+      </resource>
+    </resources>
     <plugins>
-      <!-- We need to generate the source JAR as it'll be needed by the GWT module that depends
-           on this as the GWT compiler needs the sources to generate the JS files -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-source-jar</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

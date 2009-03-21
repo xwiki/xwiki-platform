@@ -21,7 +21,6 @@
 -->
 <module>
   <inherits name='com.google.gwt.dom.DOM'/>
-  <inherits name="com.google.gwt.junit.JUnit"/>
 
   <define-property name="old.user.agent" values="yes,no"/>
 

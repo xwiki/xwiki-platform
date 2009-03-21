@@ -37,20 +37,20 @@
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
-      <version>${gwtVersion}</version>
+      <version>${gwt.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
-      <version>${gwtVersion}</version>
+      <version>${gwt.version}</version>
       <classifier>${platform}</classifier>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.2</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -99,13 +99,15 @@
     </plugins>
   </build>
   <profiles>
+    <!-- We have to define the following profiles because gwt-dev is platform dependent. These profiles set the value
+      of the ${platform} property which is used as a classifier for loading the proper gwt-dev jar. This jar is needed
+      by the GWT modules that have unit tests extending GWTTestCase. -->
     <profile>
       <id>gwt-dev-windows</id>
       <properties>
         <platform>windows</platform>
       </properties>
       <activation>
-        <activeByDefault>false</activeByDefault>
         <os>
           <family>windows</family>
         </os>
@@ -117,7 +119,6 @@
         <platform>mac</platform>
       </properties>
       <activation>
-        <activeByDefault>false</activeByDefault>
         <os>
           <family>mac</family>
         </os>

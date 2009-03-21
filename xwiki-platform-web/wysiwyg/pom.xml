@@ -32,11 +32,11 @@
   <packaging>war</packaging>
   <description>XWiki's GWT WYSIWYG editor</description>
   <dependencies>
+    <!-- GWT core dependencies -->
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-servlet</artifactId>
       <version>${gwtVersion}</version>
-      <!-- Included in xwiki-web-standard -->
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -59,30 +59,26 @@
       <version>${gwtVersion}</version>
       <classifier>${platform}</classifier>
       <scope>provided</scope>
-      <!-- We load this library this way because GWT looks for SWT libraries in the same folder -->
-      <!--
-        <scope>system</scope>
-        <systemPath>${settings.localRepository}/com/google/gwt/gwt-dev/${gwtVersion}/gwt-dev-${platform}.jar</systemPath>
-      -->
     </dependency>
+    <!-- GWT libraries -->
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>incubator-glasspanel</artifactId>
       <version>r729</version>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt</artifactId>
-      <version>${pom.version}</version>
-      <!-- Included in xwiki-web-standard -->
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt</artifactId>
       <version>${pom.version}</version>
-      <!-- We need the sources for debugging in hosted mode -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt</artifactId>
+      <version>${pom.version}</version>
       <classifier>sources</classifier>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -90,13 +86,7 @@
       <version>${pom.version}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-dom</artifactId>
-      <version>${pom.version}</version>
-      <!-- We need the sources for debugging in hosted mode -->
-      <classifier>sources</classifier>
-    </dependency>
+    <!-- XWiki dependencies for server side -->
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
@@ -120,6 +110,7 @@
       <artifactId>commons-logging</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- Test dependencies -->
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>
@@ -129,23 +120,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <!--
-        I can't restrict the scope because maven-googlewebtoolkit2-plugin fails to compile the sources. Since we shouldn't
-        have this artifact in the final lib directory it's manually excluded when building the standard WAR.
-      -->
-      <!-- <scope>test</scope> -->
-    </dependency>
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock</artifactId>
-      <version>1.1.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock-cglib</artifactId>
-      <version>1.1.0</version>
+      <version>3.8.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -179,20 +154,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-classes</id>
-            <phase>compile</phase>
-            <configuration>
-              <source>1.5</source>
-              <target>1.5</target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>com.totsp.gwt</groupId>
         <artifactId>maven-googlewebtoolkit2-plugin</artifactId>
         <version>2.0-beta24</version>
@@ -218,49 +179,11 @@
         </executions>
       </plugin>
       <plugin>
-        <!--
-          GWT's hosted browser needs client sources. We include all the sources for now because we cannot filter server
-          sources.
-        -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>build-source-jar</id>
-            <!--
-              We bind this plugin to the test phase because we need to include the sources jar in the final war, so the
-              jar must be created before the war is assembled.
-            -->
-            <phase>test</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <!-- The sources jar is not meant to be installed but to be included in the war -->
-              <attach>false</attach>
-              <!-- Resources are includes in the classes jar -->
-              <excludeResources>true</excludeResources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <dependentWarExcludes />
           <archiveClasses>true</archiveClasses>
-          <webResources>
-            <resource>
-              <!-- needed by GWT hosted browser -->
-              <directory>target</directory>
-              <targetPath>WEB-INF/lib</targetPath>
-              <includes>
-                <!-- generated by maven-source-plugin -->
-                <include>${pom.artifactId}-${pom.version}-sources.jar</include>
-              </includes>
-            </resource>
-          </webResources>
         </configuration>
       </plugin>
       <plugin>
@@ -308,48 +231,65 @@
   </build>
   <profiles>
     <profile>
-      <id>linux</id>
+      <id>hosted</id>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- GWT's hosted browser needs client sources. We include all the sources for now because we cannot filter
+              server sources. -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>build-source-jar</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+                <configuration>
+                  <!-- Resources are included in the classes jar -->
+                  <excludeResources>true</excludeResources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>gwt-dev-windows</id>
+      <properties>
+        <platform>windows</platform>
+      </properties>
       <activation>
+        <activeByDefault>false</activeByDefault>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+    </profile>
+    <profile>
+      <id>gwt-dev-mac</id>
+      <properties>
+        <platform>mac</platform>
+      </properties>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+    </profile>
+    <profile>
+      <id>gwt-dev-linux</id>
+      <properties>
+        <platform>linux</platform>
+      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
         <os>
           <name>linux</name>
         </os>
       </activation>
-      <properties>
-        <platform>linux</platform>
-      </properties>
-    </profile>
-    <profile>
-      <id>solaris</id>
-      <activation>
-        <os>
-          <name>SunOS</name>
-        </os>
-      </activation>
-      <properties>
-        <platform>linux</platform>
-      </properties>
-    </profile>
-    <profile>
-      <id>mac</id>
-      <activation>
-        <os>
-          <name>mac os x</name>
-        </os>
-      </activation>
-      <properties>
-        <platform>mac</platform>
-      </properties>
-    </profile>
-    <profile>
-      <id>windows</id>
-      <activation>
-        <os>
-          <name>windows</name>
-        </os>
-      </activation>
-      <properties>
-        <platform>windows</platform>
-      </properties>
     </profile>
   </profiles>
   <pluginRepositories>

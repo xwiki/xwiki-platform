@@ -3,10 +3,9 @@
 XE_VERSION=1.9-SNAPSHOT;
 GWT_VERSION=1.5.3;
 
-APP_DIR=`dirname $0`/webapps/xwiki;
-LIB_DIR=$APP_DIR/WEB-INF/lib;
 JAVA32_HOME=/usr/lib/jvm/ia32-java-1.5.0-sun/bin;
-GWT_REPO=~/.m2/repository/com/google/gwt;
+M2_REPO=~/.m2/repository;
+APP_DIR=`dirname $0`/webapps/xwiki;
 WYSIWYG_PATH=resources/js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg;
 
 $JAVA32_HOME/java \
@@ -16,13 +15,13 @@ $JAVA32_HOME/java \
 -Djava.compiler=NONE \
 -Xrunjdwp:transport=dt_socket,server=y,address=5006,suspend=y \
 -cp \
-$LIB_DIR/xwiki-web-wysiwyg-$XE_VERSION.jar:\
-$LIB_DIR/xwiki-web-wysiwyg-$XE_VERSION-sources.jar:\
-$LIB_DIR/xwiki-web-gwt-$XE_VERSION-sources.jar:\
-$LIB_DIR/junit-3.8.1.jar:\
-$LIB_DIR/incubator-glasspanel-r729.jar:\
-$GWT_REPO/gwt-dev/$GWT_VERSION/gwt-dev-$GWT_VERSION-linux.jar:\
-$GWT_REPO/gwt-user/$GWT_VERSION/gwt-user-$GWT_VERSION.jar \
+$APP_DIR/WEB-INF/lib/xwiki-web-wysiwyg-$XE_VERSION.jar:\
+$M2_REPO/com/xpn/xwiki/platform/xwiki-web-wysiwyg/$XE_VERSION/xwiki-web-wysiwyg-$XE_VERSION-sources.jar:\
+$M2_REPO/com/xpn/xwiki/platform/xwiki-web-gwt/$XE_VERSION/xwiki-web-gwt-$XE_VERSION-sources.jar:\
+$M2_REPO/org/xwiki/platform/xwiki-web-gwt-dom/$XE_VERSION/xwiki-web-gwt-dom-$XE_VERSION.jar:\
+$M2_REPO/com/google/gwt/incubator-glasspanel/r729/incubator-glasspanel-r729.jar:\
+$M2_REPO/com/google/gwt/gwt-dev/$GWT_VERSION/gwt-dev-$GWT_VERSION-linux.jar:\
+$M2_REPO/com/google/gwt/gwt-user/$GWT_VERSION/gwt-user-$GWT_VERSION.jar \
 com.google.gwt.dev.GWTShell \
 -logLevel WARN \
 -style DETAILED \

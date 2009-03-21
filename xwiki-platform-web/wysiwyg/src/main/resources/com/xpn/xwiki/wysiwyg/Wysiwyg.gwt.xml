@@ -21,9 +21,7 @@
 -->
 <module>
   <inherits name='com.google.gwt.user.User'/>
-  <inherits name="com.google.gwt.i18n.I18N"/>
   <inherits name="com.google.gwt.http.HTTP"/>
-  <inherits name="com.google.gwt.junit.JUnit"/>
   <inherits name="com.google.gwt.widgetideas.GlassPanel"/>
   <inherits name="com.xpn.xwiki.gwt.api.Api"/>
   <inherits name="org.xwiki.gwt.dom.DOM"/>

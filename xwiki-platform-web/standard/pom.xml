@@ -184,10 +184,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <!-- TODO: Remove any JUnit JAR in overlays. This is because in the Web WYSIWYG module we include
-               JUnit as a compile time dependency because of some issue with the maven-googlewebtoolkit2-plugin
-               plugin which fails to compile otherwise. We need to fix this. -->
-          <dependentWarExcludes>WEB-INF/lib/junit*.jar</dependentWarExcludes>
+          <dependentWarExcludes />
           <webResources>
             <!-- Include Configuration resources -->
             <resource>

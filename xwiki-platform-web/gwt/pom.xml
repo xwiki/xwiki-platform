@@ -35,12 +35,12 @@
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-servlet</artifactId>
-      <version>${gwtVersion}</version>
+      <version>${gwt.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
-      <version>${gwtVersion}</version>
+      <version>${gwt.version}</version>
       <!-- This JAR is used to generate JS files and shouldn't be included in the server side
            WAR -->
       <scope>provided</scope>
@@ -55,7 +55,7 @@
     </dependency>
     <!-- Not sure why we have to add again this dependency. It's already defined in xwiki-core
          but it doesn't get imported as a transitive dependency. Maybe because we're importing
-         xwiki-ocre with a provided scope... -->
+         xwiki-core with a provided scope... -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -83,10 +83,4 @@
       </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>gwt-maven</id>
-      <url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/</url>
-    </repository>
-  </repositories>
 </project>

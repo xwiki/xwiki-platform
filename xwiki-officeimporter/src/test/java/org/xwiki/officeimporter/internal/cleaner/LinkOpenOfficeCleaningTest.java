@@ -72,6 +72,21 @@ public class LinkOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     }
 
     /**
+     * Test duplicate anchor filtering with TOC structures. see: http://jira.xwiki.org/jira/browse/XWIKI-3415
+     */
+    public void testAnchorFilteringWithTOC()
+    {
+        String html = header + "<div>some text<h1><a name=\"Topic1\"/>Topic1</h1></div>" + footer;
+        try {
+            Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
+            NodeList nodes = doc.getElementsByTagName("a");
+            assertEquals(1, nodes.getLength());
+        } catch (ClassCastException ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    /**
      * Test wrapping of html anchors with xwiki specific xhtml elements so that XHTML parser can recognize them.
      */
     public void testAnchorWrapping()

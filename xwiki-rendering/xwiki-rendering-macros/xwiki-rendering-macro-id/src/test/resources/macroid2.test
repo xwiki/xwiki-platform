@@ -1,13 +1,13 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Test standalone mode
+.# Test inline mode
 .#-----------------------------------------------------
-{{id name="idname"/}}
+some text {{id name="idname"/}} and other
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:id|-|name="idname"|-|--><a id="idname" name="idname"></a><!--stopmacro-->
+<p>some text <!--startmacro:id|-|name="idname"|-|--><a id="idname" name="idname"></a><!--stopmacro--> and other</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{id name="idname"/}}
+some text {{id name="idname"/}} and other

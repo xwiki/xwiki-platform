@@ -61,7 +61,7 @@ public class AnchorFilter extends AbstractHTMLFilter
                 Node heading = link.getParentNode();
                 Node paragraph = (heading != null) ? heading.getPreviousSibling() : null;
                 Node originalAnchor =
-                    (paragraph != null) ? ((Element) paragraph).getElementsByTagName(TAG_A).item(0) : null;
+                    (paragraph instanceof Element) ? ((Element) paragraph).getElementsByTagName(TAG_A).item(0) : null;
                 if (isSameAnchor(link, originalAnchor)) {
                     // Means this anchor was a result of close-before-copy-inside operation of default html cleaner.
                     anchorsToRemove.add(link);

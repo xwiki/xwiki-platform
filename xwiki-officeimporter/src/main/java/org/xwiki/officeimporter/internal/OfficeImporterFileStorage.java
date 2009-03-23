@@ -50,13 +50,19 @@ public class OfficeImporterFileStorage
     private File outputFile = null;
 
     /**
+     * Some characters are not allowed as file names under the windows platform. Following regular expression is used to
+     * match such characters.
+     */
+    public static final String INVALID_FILE_NAME_CHARS = "[/\\\\:\\*\\?\"<>|]";
+
+    /**
      * Default constructor.
      * 
      * @param tempDirName name of the temporary files directory.
      */
     public OfficeImporterFileStorage(String tempDirName)
     {
-        tempDir = new File(System.getProperty("java.io.tmpdir"), tempDirName);
+        tempDir = new File(System.getProperty("java.io.tmpdir"), tempDirName.replaceAll(INVALID_FILE_NAME_CHARS, "-"));
         tempDir.mkdir();
         inputFile = new File(tempDir, "input.tmp");
         outputDir = new File(tempDir, "output");

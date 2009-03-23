@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.internal;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
- * Test calss for {@link OfficeImporterFileStorage}.
+ * Test class for {@link OfficeImporterFileStorage}.
  * 
  * @version $Id$
  * @since 1.9M1
@@ -37,22 +37,13 @@ public class OfficeImporterFileStorageTest extends AbstractXWikiComponentTestCas
         getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();
     }
-    
+
     /**
      * Test filtering of invalid file name characters.
      */
-    public void testInvalidFileNameCharacterFiltering()
+    public void testInvalidFileNameCharacterFiltering() throws RuntimeException
     {
-        String[] invalidCharacters = {"/", "\\", ":", "*", "?", "\"", "<", ">", "|"};
-        String filePath = "Temp%sDir";
-        OfficeImporterFileStorage storage = null;
-        try {
-            for (String s : invalidCharacters) {
-                storage = new OfficeImporterFileStorage(String.format(filePath, s));
-                assertEquals("Temp-Dir", storage.getTempDir().getName());
-            }
-        } catch (RuntimeException ex) {
-            fail(ex.getMessage());
-        }
+        OfficeImporterFileStorage storage = new OfficeImporterFileStorage("Temp/\\:*?\"<>|Dir");
+        assertEquals("Temp---------Dir", storage.getTempDir().getName());
     }
 }

@@ -50,7 +50,8 @@ public class OfficeImporterFileStorage
     private File outputFile = null;
 
     /**
-     * A regular expression matching any invalid file name character.
+     * Some characters are not allowed as file names under the windows platform. Following regular expression is used to
+     * match such characters.
      */
     public static final String INVALID_FILE_NAME_CHARS = "[/\\\\:\\*\\?\"<>|]";
 

@@ -61,7 +61,7 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
      */
     public boolean supportsInlineMode()
     {
-        return false;
+        return true;
     }
 
     /**

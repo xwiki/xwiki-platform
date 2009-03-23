@@ -45,5 +45,6 @@ public class OfficeImporterFileStorageTest extends AbstractXWikiComponentTestCas
     {
         OfficeImporterFileStorage storage = new OfficeImporterFileStorage("Temp/\\:*?\"<>|Dir");
         assertEquals("Temp---------Dir", storage.getTempDir().getName());
+        storage.cleanUp();
     }
 }

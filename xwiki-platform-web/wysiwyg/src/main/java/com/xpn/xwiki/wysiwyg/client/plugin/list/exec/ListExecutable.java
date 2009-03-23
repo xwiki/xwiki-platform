@@ -62,6 +62,6 @@ public class ListExecutable extends DefaultExecutable
     {
         Range range = rta.getDocument().getSelection().getRangeAt(0);
         Node rangeContainer = range.getCommonAncestorContainer();
-        return (Element) DOMUtils.getInstance().getFirstAncestor(rangeContainer, ordered ? "ul" : "ol") != null;
+        return (Element) DOMUtils.getInstance().getFirstAncestor(rangeContainer, ordered ? "ol" : "ul") != null;
     }
 }

@@ -567,6 +567,14 @@ public class XWikiDocument implements DocumentModelBridge
         this.name = name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setParent(DocumentModelBridge parent)
+    {
+        this.parent = parent.getFullName();
+    }
+    
     public String getFullName()
     {
         StringBuffer buf = new StringBuffer();

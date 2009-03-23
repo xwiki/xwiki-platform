@@ -30,6 +30,13 @@ package org.xwiki.bridge;
 public interface DocumentModelBridge
 {
     /**
+     * Sets the parent document attribute of this document to the given value.
+     * 
+     * @param parent the {@link DocumentModelBridge} representing the parent document.
+     */
+    void setParent(DocumentModelBridge parent);
+    
+    /**
      * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example <tt>Main.WebHome</tt>.
      * 
      * @return A <code>String</code> representation of the document's full name.

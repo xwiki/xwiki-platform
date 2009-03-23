@@ -58,9 +58,17 @@ public class XWikiUtils
         XWikiXmlRpcUser user = null;
         String ip = context.getRequest().getRemoteAddr();
 
+        /* Check if we must grant access when no token is provided */        
+        boolean allowGuest = context.getWiki().ParamAsLong("xwiki.authentication.always", 0) != 1;
+
         if (token != null) {
             if (token.equals("")) {
-                user = new XWikiXmlRpcUser("XWiki.XWikiGuest", ip);
+                /* If no token is provided, then grant guest access or refuse it, depending on the current configuration */
+                if (allowGuest) {
+                    user = new XWikiXmlRpcUser("XWiki.XWikiGuest", ip);
+                } else {
+                    throw new Exception(String.format("[Guest access denied from IP '%s']", ip));
+                }
             } else {
                 user = (XWikiXmlRpcUser) getTokens(context).get(token);
             }

@@ -375,6 +375,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 bobject.setClassName(className);
                 bobject.set(propertyname, value, context);
                 doc.setContentDirty(true);
+                doc.setAuthor(context.getUser());
                 context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.updateProperty"), context);
                 return true;
             } else
@@ -391,6 +392,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
                 doc.setIntValue(className, propertyname, value);
+                doc.setAuthor(context.getUser());
                 context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.updateProperty"), context);
                 return true;
             } else
@@ -410,6 +412,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 ListClass lclass = (ListClass) ((bclass==null) ? null : bclass.get(propertyname));
                 BaseProperty prop = lclass.fromValue(value);
                 doc.setProperty(className, propertyname, prop);
+                doc.setAuthor(context.getUser());
                 context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.updateProperty"), context);
                 return true;
             } else

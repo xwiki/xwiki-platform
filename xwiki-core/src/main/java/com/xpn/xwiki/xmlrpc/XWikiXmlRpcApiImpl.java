@@ -20,6 +20,7 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -86,13 +87,13 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     {
         String token;
 
-        if (this.xwiki.getAuthService().authenticate(userName, password, this.xwikiContext) != null) {
+        Principal principal = this.xwiki.getAuthService().authenticate(userName, password, this.xwikiContext);
+        if (principal != null) {
             // Generate "unique" token using a random number
             token = this.xwiki.generateValidationKey(128);
             String ip = this.xwikiContext.getRequest().getRemoteAddr();
 
-            XWikiUtils.getTokens(this.xwikiContext).put(token,
-                new XWikiXmlRpcUser(String.format("XWiki.%s", userName), ip));
+            XWikiUtils.getTokens(this.xwikiContext).put(token, new XWikiXmlRpcUser(principal.getName(), ip));
 
             return token;
         } else {

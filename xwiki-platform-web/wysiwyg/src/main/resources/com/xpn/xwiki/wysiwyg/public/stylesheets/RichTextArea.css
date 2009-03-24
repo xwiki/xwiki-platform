@@ -21,6 +21,12 @@ html {
 
 body.main {
   background-image: none;
+  /*
+    We use float:left in order to remove the body from the normal flow and thus prevent collapsing margins between
+    body and its first in-flow block-level child. Otherwise the vertical scroll bar would be visible because of the
+    min-height:100% rule. See http://www.w3.org/TR/CSS21/box.html#collapsing-margins
+  */
+  float: left;
   height: auto;
   margin: 0;
   min-height: 100%; 

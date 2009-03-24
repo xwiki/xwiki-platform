@@ -74,5 +74,13 @@
       </implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
+    <component>
+      <role>com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequestFactory</role>
+      <role-hint>HTTP/1.0</role-hint>
+      <implementation>
+        com.xpn.xwiki.wysiwyg.server.filter.internal.http.MutableHttpServletRequestFactory
+      </implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
   </components>
 </component-set>

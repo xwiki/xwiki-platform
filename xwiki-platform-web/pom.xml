@@ -44,7 +44,6 @@
     <smartgwt.version>1.0b2</smartgwt.version>
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <platform.tool.shared.tests.version>1.17-SNAPSHOT</platform.tool.shared.tests.version>
     <platform.tool.configuration.version>1.26-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>1.9-SNAPSHOT</platform.core.version>
     <platform.skin.albatross.version>1.18-SNAPSHOT</platform.skin.albatross.version>

@@ -31,9 +31,9 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.util.introspection.SecureUberspector;
 import org.apache.velocity.util.introspection.UberspectImpl;
 import org.codehaus.plexus.util.StringOutputStream;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 import org.xwiki.velocity.VelocityEngine;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link ChainingUberspector}.

@@ -50,7 +50,7 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     * @see org.xwiki.test.AbstractXWikiComponentTestCase#setUp()
      */
     @Override
     protected void setUp() throws Exception

@@ -24,7 +24,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Properties;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
+
 
 /**
  * Unit tests for {@link DefaultVelocityEngine}.

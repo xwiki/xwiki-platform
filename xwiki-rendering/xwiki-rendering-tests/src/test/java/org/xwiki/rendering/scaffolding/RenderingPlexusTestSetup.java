@@ -1,9 +1,10 @@
 package org.xwiki.rendering.scaffolding;
 
 
+import org.xwiki.test.PlexusTestSetup;
+
 import junit.framework.TestSuite;
 
-import com.xpn.xwiki.test.PlexusTestSetup;
 
 public class RenderingPlexusTestSetup extends PlexusTestSetup
 {

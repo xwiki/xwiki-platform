@@ -20,7 +20,7 @@
  */
 package org.xwiki.url;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link RegexXWikiURLFactory}.

@@ -20,8 +20,8 @@
 package org.xwiki.configuration.internal;
 
 import org.xwiki.configuration.ConfigurationSourceCollection;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link org.xwiki.configuration.internal.DefaultConfigurationSourceCollection}.

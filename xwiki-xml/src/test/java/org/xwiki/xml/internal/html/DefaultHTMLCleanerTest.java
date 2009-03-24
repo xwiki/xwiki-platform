@@ -25,7 +25,7 @@ import java.io.StringReader;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link org.xwiki.xml.internal.html.DefaultHTMLCleaner}.

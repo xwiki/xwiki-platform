@@ -28,8 +28,8 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Base class for testing cache component implementation.
@@ -79,7 +79,7 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     * @see org.xwiki.test.AbstractXWikiComponentTestCase#setUp()
      */
     @Override
     protected void setUp() throws Exception

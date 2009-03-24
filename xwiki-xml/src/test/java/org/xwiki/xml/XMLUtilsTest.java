@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link org.xwiki.xml.XMLUtils}.

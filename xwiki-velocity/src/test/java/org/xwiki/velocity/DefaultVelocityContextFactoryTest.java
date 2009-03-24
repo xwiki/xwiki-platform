@@ -25,7 +25,7 @@ import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link DefaultVelocityContextFactory}.

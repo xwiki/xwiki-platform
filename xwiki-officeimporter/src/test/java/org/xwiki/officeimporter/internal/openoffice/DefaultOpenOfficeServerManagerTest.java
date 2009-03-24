@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.internal.openoffice;
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Test case for {@link DefaultOpenOfficeServerManager}.

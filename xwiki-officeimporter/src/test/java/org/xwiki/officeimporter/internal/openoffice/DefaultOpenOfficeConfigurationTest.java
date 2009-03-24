@@ -23,7 +23,7 @@ import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
 import org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeServerConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Test case for {@link DefaultOpenOfficeServerConfiguration}.

@@ -52,9 +52,9 @@
     </dependency>
     <!-- provide plexus.xml -->
     <dependency>
-      <groupId>com.xpn.xwiki.platform.tools</groupId>
-      <artifactId>xwiki-shared-tests</artifactId>
-      <version>${platform.tool.test.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${pom.version}</version>
       <exclusions>
         <exclusion>
           <!-- old oscache conflicts with xwiki-cache-oscache -->

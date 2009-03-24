@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.internal.cleaner;
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
 import org.xwiki.xml.html.HTMLCleaner;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Abstract class for all HTML cleaner tests.

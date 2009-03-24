@@ -30,7 +30,7 @@ import org.apache.velocity.util.introspection.SecureUberspector;
 import org.apache.velocity.util.introspection.UberspectImpl;
 import org.xwiki.velocity.VelocityEngine;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link LinkingUberspector}.

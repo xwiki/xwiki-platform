@@ -26,8 +26,8 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTestCase
 {
@@ -54,7 +54,7 @@ public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTe
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     * @see org.xwiki.test.AbstractXWikiComponentTestCase#setUp()
      */
     @Override
     protected void setUp() throws Exception

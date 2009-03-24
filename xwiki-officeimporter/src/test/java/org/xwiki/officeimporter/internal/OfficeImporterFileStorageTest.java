@@ -19,7 +19,7 @@
  */
 package org.xwiki.officeimporter.internal;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Test class for {@link OfficeImporterFileStorage}.

@@ -85,7 +85,7 @@
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
-      <artifactId>xwiki-shared-tests</artifactId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
       <version>${platform.tool.test.version}</version>
       <scope>test</scope>
     </dependency>

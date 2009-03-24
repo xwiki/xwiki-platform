@@ -32,7 +32,7 @@ import org.jmock.Mock;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiServletContext;
 import com.xpn.xwiki.web.XWikiServletRequest;

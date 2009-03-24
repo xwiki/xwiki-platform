@@ -115,9 +115,9 @@
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-      <groupId>com.xpn.xwiki.platform.tools</groupId>
-      <artifactId>xwiki-shared-tests</artifactId>
-      <version>${platform.tool.shared.tests.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${platform.core.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -77,4 +77,14 @@ public class DocumentName
     {
         return this.page;
     }
+    
+    /**
+     * Converts this {@link DocumentName} into a string representation.
+     * 
+     * @return a string representing this {@link DocumentName} of the form wiki:space.page.
+     */
+    public String toString()
+    {
+        return getWiki() + ":" + getSpace() + "." + getPage();
+    }
 }

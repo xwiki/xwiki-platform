@@ -71,6 +71,7 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -570,9 +571,9 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * {@inheritDoc}
      */
-    public void setParent(DocumentModelBridge parent)
-    {
-        this.parent = parent.getFullName();
+    public void setParent(DocumentName parentName)
+    {        
+        this.parent = parentName.toString();
     }
     
     public String getFullName()

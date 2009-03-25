@@ -34,7 +34,7 @@ import org.xwiki.rendering.util.ParserUtils;
  * Used to filter plain text blocks.
  * 
  * @version $Id$
- * @since 1.8.1
+ * @since 1.9M1
  */
 public class PlainTextBlockFilter implements BlockFilter
 {

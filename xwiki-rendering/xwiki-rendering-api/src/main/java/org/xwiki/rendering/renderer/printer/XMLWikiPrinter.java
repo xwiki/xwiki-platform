@@ -38,7 +38,7 @@ import org.xwiki.rendering.internal.renderer.printer.XHTMLWriter;
  * Base toolkit class for all XML-based printers.
  * 
  * @version $Id$
- * @since 1.8.1
+ * @since 1.9M1
  */
 public class XMLWikiPrinter
 {

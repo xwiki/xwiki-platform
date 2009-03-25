@@ -31,7 +31,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  * label like in a TOC.
  * 
  * @version $Id$
- * @since 1.8.1
+ * @since 1.9M1
  */
 public class PlainTextRenderer extends AbstractChainingPrintRenderer
 {

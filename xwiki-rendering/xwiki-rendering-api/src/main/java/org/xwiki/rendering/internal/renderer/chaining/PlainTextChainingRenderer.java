@@ -42,7 +42,7 @@ import org.xwiki.rendering.renderer.printer.XMLWikiPrinter;
  * label like in a TOC.
  * 
  * @version $Id$
- * @since 1.8.1
+ * @since 1.9M1
  */
 public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
 {

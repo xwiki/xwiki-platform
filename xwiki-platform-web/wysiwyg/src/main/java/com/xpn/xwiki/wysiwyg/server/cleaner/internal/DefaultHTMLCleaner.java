@@ -20,9 +20,13 @@
 package com.xpn.xwiki.wysiwyg.server.cleaner.internal;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Document;
 import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.xwiki.xml.html.filter.HTMLFilter;
 
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
@@ -49,8 +53,12 @@ public class DefaultHTMLCleaner implements HTMLCleaner
     {
         org.xwiki.xml.html.HTMLCleaner cleaner =
             (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.ROLE);
-        Document document = cleaner.clean(new StringReader(dirtyHTML));
-        filter.filter(document);
+        HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
+        List<HTMLFilter> filters = new ArrayList<HTMLFilter>();
+        filters.add(filter);
+        filters.addAll(config.getFilters());
+        config.setFilters(filters);
+        Document document = cleaner.clean(new StringReader(dirtyHTML), config);
         return XMLUtils.toString(document);
     }
 }

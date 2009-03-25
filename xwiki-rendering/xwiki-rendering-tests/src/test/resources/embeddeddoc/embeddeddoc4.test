@@ -67,4 +67,5 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><td>&nbsp;Line One&nbsp;</td><td>&nbsp;First doc:<div class="xwiki-document"><p>&nbsp;inside</p></div>after</td></tr><tr><td>Line Two&nbsp;</td><td>&nbsp;Second doc:<div class="xwiki-document"><p>lkjlj</p></div>skdjg</td></tr></table>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><table><tr><td>&nbsp;Line One&nbsp;</td><td>&nbsp;First doc:<div class="xwiki-document"><p>&nbsp;inside</p></div>after</td></tr><tr><td>Line Two&nbsp;</td><td>&nbsp;Second doc:<div class="xwiki-document"><p>lkjlj</p></div>skdjg</td></tr></table></html>

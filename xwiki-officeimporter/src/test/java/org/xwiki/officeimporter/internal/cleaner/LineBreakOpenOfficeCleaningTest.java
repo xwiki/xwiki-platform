@@ -24,6 +24,7 @@ import java.util.Collections;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
 /**
  * Test case for cleaning html {@code<br/>} elements in {@link OpenOfficeHTMLCleaner}.
@@ -112,9 +113,9 @@ public class LineBreakOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      */
     private void checkLineBreakReplacements(String html, int expectedBrCount, int expectedDivCount)
     {
-        Document doc =
-            openOfficeHTMLCleaner.clean(new StringReader(header + html + footer), Collections.singletonMap(
-                "targetDocument", "Import.Test"));
+        HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
+        configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
+        Document doc = openOfficeHTMLCleaner.clean(new StringReader(header + html + footer), configuration);
         NodeList lineBreaks = doc.getElementsByTagName("br");
         assertEquals(expectedBrCount, lineBreaks.getLength());
         NodeList divs = doc.getElementsByTagName("div");

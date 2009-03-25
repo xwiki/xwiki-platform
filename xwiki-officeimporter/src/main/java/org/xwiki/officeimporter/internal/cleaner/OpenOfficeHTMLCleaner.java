@@ -20,17 +20,20 @@
 package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
 import org.w3c.dom.Document;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.filter.HTMLFilter;
 import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 
 /**
- * {@link HTMLCleaner} for cleaning html generated from an openoffice server.
+ * {@link HTMLCleaner} for cleaning HTML generated from an OpenOffice server.
  * 
  * @version $Id$
  * @since 1.8M1
@@ -68,12 +71,12 @@ public class OpenOfficeHTMLCleaner extends AbstractLogEnabled implements HTMLCle
     private HTMLFilter imageFilter;
     
     /**
-     * {@link HTMLFilter} for filtering html links.
+     * {@link HTMLFilter} for filtering HTML links.
      */
     private HTMLFilter linkFilter;
     
     /**
-     * {@link HTMLFilter} for filtering html anchors.
+     * {@link HTMLFilter} for filtering HTML anchors.
      */
     private HTMLFilter anchorFilter;
     
@@ -94,30 +97,52 @@ public class OpenOfficeHTMLCleaner extends AbstractLogEnabled implements HTMLCle
     
     /**
      * {@inheritDoc}
+     * 
+     * @see HTMLCleaner#clean(Reader)
      */
     public Document clean(Reader originalHtmlContent)
     {
-        return clean(originalHtmlContent, Collections.singletonMap("filterStyles", "strict"));
+        // Add special parameters used in filters
+        HTMLCleanerConfiguration configuration = getDefaultConfiguration(); 
+        configuration.setParameters(Collections.singletonMap("filterStyles", "strict"));
+
+        return clean(originalHtmlContent, configuration);
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see HTMLCleaner#clean(Reader, HTMLCleanerConfiguration)
      */
-    public Document clean(Reader originalHtmlContent, Map<String, String> cleaningParams)
+    public Document clean(Reader originalHtmlContent, HTMLCleanerConfiguration configuration)
     {
-        // Default cleaning.
-        Document document = defaultHtmlCleaner.clean(originalHtmlContent);
-        // Apply filters.
-        stripperFilter.filter(document, cleaningParams);
-        styleFilter.filter(document, cleaningParams);
-        redundancyFilter.filter(document, cleaningParams);
-        paragraphFilter.filter(document, cleaningParams);
-        imageFilter.filter(document, cleaningParams);
-        linkFilter.filter(document, cleaningParams);
-        anchorFilter.filter(document, cleaningParams);
-        listFilter.filter(document, cleaningParams);
-        tableFilter.filter(document, cleaningParams);
-        lineBreakFilter.filter(document, cleaningParams);
-        return document;
+        return this.defaultHtmlCleaner.clean(originalHtmlContent, configuration);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HTMLCleaner#getDefaultConfiguration()
+     */
+    public HTMLCleanerConfiguration getDefaultConfiguration()
+    {
+        HTMLCleanerConfiguration configuration = this.defaultHtmlCleaner.getDefaultConfiguration();
+
+        // Add OO cleaning filters after the default filters
+        List<HTMLFilter> filters = new ArrayList<HTMLFilter>(configuration.getFilters());
+        filters.addAll(Arrays.asList(
+            this.stripperFilter, 
+            this.styleFilter, 
+            this.redundancyFilter,
+            this.paragraphFilter,
+            this.imageFilter,
+            this.linkFilter,
+            this.anchorFilter,
+            this.listFilter,
+            this.tableFilter,
+            this.lineBreakFilter));
+        configuration.setFilters(filters);
+        
+        return configuration;
     }
 }

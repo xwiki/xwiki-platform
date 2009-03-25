@@ -44,6 +44,6 @@ Some **content**
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|
+<html><p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|
 Some **content**
---><p>simplemacro2</p><!--stopmacro-->
+--><p>simplemacro2</p><!--stopmacro--></html>

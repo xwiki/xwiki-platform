@@ -48,6 +48,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
 /**
  * Default implementation of the office importer component.
@@ -117,7 +118,9 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                     "Content updated by office importer", false);
             } else {
                 InputStreamReader reader = new InputStreamReader(artifacts.remove("output.html"), "UTF-8");
-                Document xhtmlDoc = ooHtmlCleaner.clean(reader, params);
+                HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
+                configuration.setParameters(params);
+                Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
                 XMLUtils.stripHTMLEnvelope(xhtmlDoc);
                 String xwikiCode = convert(new StringReader(XMLUtils.toString(xhtmlDoc)), xHtmlParser, XWIKI_20);
                 docBridge
@@ -152,7 +155,9 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
             } else {
                 InputStreamReader reader = new InputStreamReader(artifacts.remove("output.html"), "UTF-8");
                 attachArtifacts(documentName, artifacts);
-                Document xhtmlDoc = ooHtmlCleaner.clean(reader, params);
+                HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
+                configuration.setParameters(params);
+                Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
                 XMLUtils.stripHTMLEnvelope(xhtmlDoc);
                 return XMLUtils.toString(xhtmlDoc);
             }

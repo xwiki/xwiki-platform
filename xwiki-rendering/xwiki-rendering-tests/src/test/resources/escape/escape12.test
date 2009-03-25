@@ -4,7 +4,8 @@
 .# Perform check for ensuring a bold at beginning of a line will have its following character escaped if 
 .# it's a space to prevent confusing it for a list.
 .#---------------------------------------------------------------------------------------------------------
-<p><strong>&nbsp;word</strong></p><p><strong>1. word</strong></p>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><p><strong>&nbsp;word</strong></p><p><strong>1. word</strong></p></html>
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------

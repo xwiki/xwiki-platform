@@ -34,4 +34,4 @@ before
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p>before</p><div class="xwiki-document"><p>opened and not closed</p></div>
+<html><p>before</p><div class="xwiki-document"><p>opened and not closed</p></div></html>

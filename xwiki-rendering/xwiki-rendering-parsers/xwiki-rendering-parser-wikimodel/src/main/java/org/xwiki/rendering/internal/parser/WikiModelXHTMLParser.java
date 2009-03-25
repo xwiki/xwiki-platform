@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.parser;
 
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,8 +44,6 @@ import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiImageTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiReferenceTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiSpanTagHandler;
 import org.xwiki.xml.XMLReaderFactory;
-import org.xwiki.xml.XMLUtils;
-import org.xwiki.xml.html.HTMLCleaner;
 
 /**
  * Parses XHTML and generate a {@link XDOM} object.
@@ -56,14 +53,12 @@ import org.xwiki.xml.html.HTMLCleaner;
  */
 public class WikiModelXHTMLParser extends AbstractWikiModelParser
 {
+    /**
+     * The XHTML syntax supported by this parser.
+     */
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XHTML, "1.0");
 
     private PrintRendererFactory printRendererFactory;
-
-    /**
-     * Used to clean the HTML into valid XHTML. Injected by the Component Manager.
-     */
-    private HTMLCleaner htmlCleaner;
 
     /**
      * Used to create an optimized SAX XML Reader. In general SAX parsers don't cache DTD grammars and
@@ -98,7 +93,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     @Override
     public XDOM parse(Reader source) throws ParseException
     {
-        return super.parse(new StringReader(XMLUtils.toString(this.htmlCleaner.clean(source))));
+        return super.parse(source);
     }
     
     /**

@@ -20,7 +20,6 @@
 package org.xwiki.xml.html;
 
 import java.io.Reader;
-import java.util.Map;
 
 import org.w3c.dom.Document;
 
@@ -36,14 +35,10 @@ public interface HTMLCleaner
      * This component's role, used when code needs to look it up.
      */
     String ROLE = HTMLCleaner.class.getName();
-
-    /**
-     * Cleaning property identifier which decides if parsing should omit/keep namespace information.
-     */
-    String NAMESPACES_AWARE = "namespacesAware";
     
     /**
      * Transforms any HTML content into valid XHTML that can be fed to the XHTML Parser for example.
+     * A default configuration is applied for cleaning the original HTML (see {@link #getDefaultConfiguration()}).
      * 
      * @param originalHtmlContent the original content (HTML) to clean
      * @return the cleaned HTML as a w3c DOM (this allows further transformations if needed)
@@ -51,12 +46,24 @@ public interface HTMLCleaner
     Document clean(Reader originalHtmlContent);
 
     /**
-     * Transforms any HTML content into valid XHTML. Additional parameters may be passed in to fine tune the cleaning
-     * process.
+     * Transforms any HTML content into valid XHTML. A specific cleaning configuration can be passed to control
+     * the cleaning process.
      * 
-     * @param originalHtmlContent The original html content to be cleaned.
-     * @param cleaningParameters Additional parameters (implementation dependent) for cleaning.
+     * @param originalHtmlContent the original HTML content to be cleaned.
+     * @param configuration the configuration to use for cleaning the HTML content
      * @return the cleaned HTML as a w3c DOM
+     * @since 1.8.1
      */
-    Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters);
+    Document clean(Reader originalHtmlContent, HTMLCleanerConfiguration configuration);
+
+    /**
+     * Allows getting the default configuration that will be used thus allowing the user to configure it like 
+     * adding some more filters before or after or even remove some filters to completely control what filters will
+     * be executed. This is to be used for very specific use cases. In the majority of cases you should instead use
+     * the clean API that doesn't require passing a configuration.
+     * 
+     * @return the default configuration that will be used to clean the original HTML
+     * @since 1.8.1
+     */
+    HTMLCleanerConfiguration getDefaultConfiguration();
 }

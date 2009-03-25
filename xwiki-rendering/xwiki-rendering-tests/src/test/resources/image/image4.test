@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<img src="http://www.google.ro/intl/en_com/images/logo_plain.png" alt="bar" title="foo" />
+<html><img src="http://www.google.ro/intl/en_com/images/logo_plain.png" alt="bar" title="foo" /></html>
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------

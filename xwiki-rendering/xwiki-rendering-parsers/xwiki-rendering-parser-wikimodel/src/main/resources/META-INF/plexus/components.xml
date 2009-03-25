@@ -100,9 +100,6 @@
           <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>
         </requirement>
         <requirement>
-          <role>org.xwiki.xml.html.HTMLCleaner</role>
-        </requirement>
-        <requirement>
           <role>org.xwiki.xml.XMLReaderFactory</role>
         </requirement>
         <requirement>

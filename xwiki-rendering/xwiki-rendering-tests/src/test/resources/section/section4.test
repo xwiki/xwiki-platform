@@ -50,4 +50,4 @@ not header =
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="Hheaderbrendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p>
+<html><h1 id="Hheaderbrendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p></html>

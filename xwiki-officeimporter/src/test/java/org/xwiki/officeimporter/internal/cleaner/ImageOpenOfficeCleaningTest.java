@@ -26,6 +26,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.xwiki.xml.html.HTMLConstants;
 
 /**
  * Test case for cleaning html images in {@link OpenOfficeHTMLCleaner}.
@@ -42,9 +44,9 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     public void testImageWrapping()
     {
         String html = header + "<img src=\"foo.png\"/>" + footer;
-        Document doc =
-            openOfficeHTMLCleaner.clean(new StringReader(html), Collections.singletonMap("targetDocument",
-                "Import.Test"));
+        HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
+        configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
+        Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
         NodeList nodes = doc.getElementsByTagName("img");
         assertEquals(1, nodes.getLength());
         Element image = (Element) nodes.item(0);
@@ -64,7 +66,9 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     public void testCompoundImageLinkWrapping()
     {
         String html = header + "<a href=\"http://www.xwiki.org\"><img src=\"foo.png\"/></a>" + footer;
-        Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), Collections.singletonMap("targetDocument", "Import.Test"));
+        HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
+        configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
+        Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
         NodeList nodes = doc.getElementsByTagName("img");
         assertEquals(1, nodes.getLength());
         Element image = (Element) nodes.item(0);

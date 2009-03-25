@@ -42,4 +42,4 @@ before
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p>before</p><div class="xwiki-document"><p>one</p><div class="xwiki-document"><p>two</p><div class="xwiki-document"><p>three</p></div></div></div>
+<html><p>before</p><div class="xwiki-document"><p>one</p><div class="xwiki-document"><p>two</p><div class="xwiki-document"><p>three</p></div></div></div></html>

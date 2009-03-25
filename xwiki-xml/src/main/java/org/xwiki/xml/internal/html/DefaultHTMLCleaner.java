@@ -22,8 +22,7 @@ package org.xwiki.xml.internal.html;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Collections;
-import java.util.Map;
+import java.util.Arrays;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,6 +40,7 @@ import org.w3c.dom.DocumentType;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLConstants;
 import org.xwiki.xml.html.filter.HTMLFilter;
 
@@ -101,47 +101,26 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      */
     public Document clean(Reader originalHtmlContent)
     {
-        return clean(originalHtmlContent, getDefaultCleanerProperties(), getDefaultCleanerTransformations(),
-            Collections.<String, String>emptyMap());
+        return clean(originalHtmlContent, getDefaultConfiguration());
     }
 
     /**
      * {@inheritDoc}
-     * <p/>
-     * {@link DefaultHTMLCleaner} adds support for cleaning parameters. The following are supported:
-     * <ul>
-     *   <li>namespacesAware: if set to 'true' namespace information will be preserved during cleaning
-     * </ul>
-     */
-    public Document clean(Reader originalHtmlContent, Map<String, String> cleaningParameters)
-    {
-        CleanerProperties cleanerProperties = getDefaultCleanerProperties();
-        String param = cleaningParameters.get(NAMESPACES_AWARE);
-        boolean namespacesAware = (param != null) ? Boolean.parseBoolean(param) : cleanerProperties.isNamespacesAware();
-        cleanerProperties.setNamespacesAware(namespacesAware);
-        return clean(originalHtmlContent, cleanerProperties, getDefaultCleanerTransformations(), cleaningParameters);
-    }
-
-    /**
-     * Cleans the given HTML content with supplied {@link CleanerProperties} and {@link CleanerTransformations}.
      * 
-     * @param originalHtmlContent original HTML content.
-     * @param cleanerProperties {@link CleanerProperties} to be used for cleaning.
-     * @param cleanerTransformations {@link CleanerTransformations} to be used when cleaning.
-     * @param cleaningParameters additional cleaning parameters (if needed) for internal {@link HTMLFilter} components.
-     * @return the cleaned HTML as a {@link org.w3c.dom.Document}.
+     * @see org.xwiki.xml.html.HTMLCleaner#clean(Reader, HTMLCleanerConfiguration)
+     * @since 1.8.1
      */
-    private Document clean(Reader originalHtmlContent, CleanerProperties cleanerProperties,
-        CleanerTransformations cleanerTransformations, Map<String, String> cleaningParameters)
+    public Document clean(Reader originalHtmlContent, HTMLCleanerConfiguration configuration)
     {
         Document result = null;   
-             
+        
         // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise we would need
         // to synchronize this clean() method which would slow down the whole system by queuing up cleaning requests.
         // See http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=903699
+        CleanerProperties cleanerProperties = getDefaultCleanerProperties(configuration);
         HtmlCleaner cleaner = new HtmlCleaner(cleanerProperties);        
         
-        cleaner.setTransformations(cleanerTransformations);
+        cleaner.setTransformations(getDefaultCleanerTransformations());
         TagNode cleanedNode;
         try {
             cleanedNode = cleaner.clean(originalHtmlContent);
@@ -183,17 +162,31 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         }
         
         // Finally apply filters.
-        this.bodyFilter.filter(result, cleaningParameters);
-        this.listFilter.filter(result, cleaningParameters);
-        this.fontFilter.filter(result, cleaningParameters);
+        for (HTMLFilter filter : configuration.getFilters()) {
+            filter.filter(result, configuration.getParameters());
+        }
         
         return result;
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see HTMLCleaner#getDefaultConfiguration()
+     * @since 1.8.1
+     */
+    public HTMLCleanerConfiguration getDefaultConfiguration()
+    {
+        HTMLCleanerConfiguration configuration = new DefaultHTMLCleanerConfiguration();
+        configuration.setFilters(Arrays.asList(this.bodyFilter, this.listFilter, this.fontFilter));
+        return configuration;
+    }
+
+    /**
+     * @param configuration the configuration to use for the cleaning
      * @return the default {@link CleanerProperties} to be used for cleaning.
      */
-    private CleanerProperties getDefaultCleanerProperties()
+    private CleanerProperties getDefaultCleanerProperties(HTMLCleanerConfiguration configuration)
     {
         CleanerProperties defaultProperties = new CleanerProperties();
         defaultProperties.setOmitUnknownTags(true);
@@ -209,7 +202,12 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         // Thus we need to turn off this feature.
         // The problem is that SF's HTML Cleaner doesn't recognize CDATA blocks.
         defaultProperties.setUseCdataForScriptAndStyle(false);
-
+        
+        // Handle the NAMESPACE_AWARE configuration property
+        String param = configuration.getParameters().get(HTMLCleanerConfiguration.NAMESPACES_AWARE);
+        boolean namespacesAware = (param != null) ? Boolean.parseBoolean(param) : defaultProperties.isNamespacesAware();
+        defaultProperties.setNamespacesAware(namespacesAware);
+        
         return defaultProperties;
     }
 

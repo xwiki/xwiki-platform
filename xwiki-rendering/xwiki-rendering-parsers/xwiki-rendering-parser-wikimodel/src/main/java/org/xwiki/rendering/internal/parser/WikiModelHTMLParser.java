@@ -19,9 +19,15 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import java.io.Reader;
+import java.io.StringReader;
+
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLCleaner;
 
 /**
  * Parses HTML and generate a {@link XDOM} object.
@@ -31,7 +37,15 @@ import org.xwiki.rendering.parser.SyntaxType;
  */
 public class WikiModelHTMLParser extends WikiModelXHTMLParser
 {
+    /**
+     * The HTML syntax supported by this parser.
+     */
     private static final Syntax SYNTAX = new Syntax(SyntaxType.HTML, "4.01");
+
+    /**
+     * Used to clean the HTML into valid XHTML. Injected by the Component Manager.
+     */
+    private HTMLCleaner htmlCleaner;
 
     /**
      * {@inheritDoc}
@@ -42,5 +56,16 @@ public class WikiModelHTMLParser extends WikiModelXHTMLParser
     public Syntax getSyntax()
     {
         return SYNTAX;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WikiModelXHTMLParser#parse(Reader)
+     */
+    @Override
+    public XDOM parse(Reader source) throws ParseException
+    {
+        return super.parse(new StringReader(XMLUtils.toString(this.htmlCleaner.clean(source))));
     }
 }

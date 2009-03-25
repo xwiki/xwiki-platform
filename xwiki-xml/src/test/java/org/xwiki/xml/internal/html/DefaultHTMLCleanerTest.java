@@ -21,10 +21,13 @@
 package org.xwiki.xml.internal.html;
 
 import java.io.StringReader;
+import java.util.Collections;
 
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.xwiki.xml.html.filter.HTMLFilter;
 
 
 /**
@@ -124,6 +127,19 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         assertHTML("<p>&amp;<![CDATA[&]]>&amp;</p>", "<p>&<![CDATA[&]]>&</p>");
     }
 
+    /**
+     * Verify that we can control what filters are used for cleaning.
+     */
+    public void testExplicitFilterList()
+    {
+        HTMLCleanerConfiguration configuration = this.cleaner.getDefaultConfiguration();
+        configuration.setFilters(Collections.<HTMLFilter>emptyList());
+        String result = XMLUtils.toString(this.cleaner.clean(new StringReader("something"), configuration));
+        // Note that if the default Body filter had been executed the result would have been:
+        // <p>something</p>.
+        assertEquals(HEADER_FULL + "something" + FOOTER, result);
+    }
+    
     private void assertHTML(String expected, String actual)
     {
         assertEquals(HEADER_FULL + expected + FOOTER, XMLUtils.toString(this.cleaner.clean(new StringReader(actual))));

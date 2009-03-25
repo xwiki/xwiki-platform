@@ -169,8 +169,10 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public String parseAndRender(String html, String syntax)
     {
         try {
+            Syntax xhtmlSyntax = new Syntax(SyntaxType.XHTML, "1.0");
+
             // Parse
-            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "html/4.01");
+            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, xhtmlSyntax.toIdString());
             XDOM dom = parser.parse(new StringReader(cleanHTML(html)));
 
             // Execute macros
@@ -181,8 +183,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
             PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
-            XHTMLRenderer renderer =
-                (XHTMLRenderer) factory.createRenderer(new Syntax(SyntaxType.XHTML, "1.0"), printer);
+            XHTMLRenderer renderer = (XHTMLRenderer) factory.createRenderer(xhtmlSyntax, printer);
             dom.traverse(renderer);
 
             return printer.toString();

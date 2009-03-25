@@ -67,7 +67,9 @@ public class RefreshExecutable extends AbstractExecutable
     public boolean execute(final RichTextArea rta, String param)
     {
         // Check if there is a refresh in progress.
-        if (waiting.getParentNode() != null) {
+        // NOTE: We don't test the parent but the next sibling because in IE the parent of an orphan node is sometimes a
+        // document fragment, thus not null.
+        if (waiting.getNextSibling() != null) {
             return false;
         }
 

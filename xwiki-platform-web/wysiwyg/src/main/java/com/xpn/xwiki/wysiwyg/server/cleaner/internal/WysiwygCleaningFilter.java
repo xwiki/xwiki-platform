@@ -21,10 +21,12 @@ package com.xpn.xwiki.wysiwyg.server.cleaner.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xwiki.xml.html.filter.HTMLFilter;
 
 /**
  * Removes or replaces the HTML elements that were added by the WYSIWYG editor only for internal reasons. The following
@@ -36,7 +38,7 @@ import org.w3c.dom.NodeList;
  * 
  * @version $Id$
  */
-public class WysiwygCleaningFilter
+public class WysiwygCleaningFilter implements HTMLFilter
 {
     /**
      * The HTML class attribute.
@@ -44,12 +46,11 @@ public class WysiwygCleaningFilter
     private static final String CLASS = "class";
 
     /**
-     * Filters the given document for HTML elements specific to the WYSIWYG editor.
+     * {@inheritDoc}
      * 
-     * @param document the document to be filtered. It should be the document resulted from cleaning the HTML generated
-     *            by the WYSIWYG editor.
+     * @see HTMLFilter#filter(Document, Map)
      */
-    public void filter(Document document)
+    public void filter(Document document, Map<String, String> arg1)
     {
         // Remove the BRs needed by Firefox in edit mode.
         NodeList brs = document.getElementsByTagName("br");

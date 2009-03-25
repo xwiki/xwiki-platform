@@ -84,14 +84,13 @@ public interface WysiwygServiceAsync
         AsyncCallback<String> async);
     
     /**
-     * Imports an office document attached to a wiki page into XHTML/1.0.
+     * Imports the most recent office document attached to a wiki page into XHTML/1.0.
      * 
      * @param pageName the wiki page into which the office document is attached.
-     * @param attachmentName name of the attached office document.
      * @param cleaningParams additional parameters for the import operation.
      * @param async the callback to be used for notifying the caller after receiving the response from the server.
      */
-    void officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams, 
+    void officeToXHTML(String pageName, Map<String, String> cleaningParams, 
         AsyncCallback<String> async);
 
     /**

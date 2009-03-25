@@ -29,6 +29,9 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -42,8 +45,14 @@ import org.xwiki.rendering.util.ParserUtils;
  * @version $Id$
  * @since 1.7M3
  */
-public abstract class AbstractScriptMacro<P> extends AbstractMacro<P> implements Composable
+public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractMacro<P> implements
+    Composable
 {
+    /**
+     * The default description of the script macro content.
+     */
+    protected static final String CONTENT_DESCRIPTION = "the script to execute";
+
     /**
      * Used to get the current syntax parser.
      */
@@ -62,6 +71,24 @@ public abstract class AbstractScriptMacro<P> extends AbstractMacro<P> implements
     public AbstractScriptMacro(MacroDescriptor macroDescriptor)
     {
         super(macroDescriptor);
+    }
+
+    /**
+     * @param macroDescription the text description of the macro.
+     */
+    public AbstractScriptMacro(String macroDescription)
+    {
+        super(new DefaultMacroDescriptor(macroDescription, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
+            ScriptMacroParameters.class));
+    }
+
+    /**
+     * @param macroDescription the text description of the macro.
+     * @param contentDescriptor the description of the macro content.
+     */
+    public AbstractScriptMacro(String macroDescription, ContentDescriptor contentDescriptor)
+    {
+        super(new DefaultMacroDescriptor(macroDescription, contentDescriptor, ScriptMacroParameters.class));
     }
 
     /**

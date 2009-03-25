@@ -2,6 +2,10 @@ package org.xwiki.rendering.macro.descriptor;
 
 import java.util.Map;
 
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterHidden;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
+
 import junit.framework.TestCase;
 
 /**
@@ -22,6 +26,8 @@ public class DefaultMacroDescriptorTest extends TestCase
         private int param2;
 
         private boolean param3;
+
+        private String hiddenParameter;
 
         public void setLowerparam(String lowerparam)
         {
@@ -77,6 +83,17 @@ public class DefaultMacroDescriptorTest extends TestCase
         {
             return this.param3;
         }
+
+        @ParameterHidden
+        public void setHiddenParameter(String hiddenParameter)
+        {
+            this.hiddenParameter = hiddenParameter;
+        }
+
+        public String getHiddenParameter()
+        {
+            return hiddenParameter;
+        }
     }
 
     private DefaultMacroDescriptor macroDescriptor = new DefaultMacroDescriptor("Description", ParametersTests.class);
@@ -84,6 +101,8 @@ public class DefaultMacroDescriptorTest extends TestCase
     public void testParameterDescriptor()
     {
         Map<String, ParameterDescriptor> map = this.macroDescriptor.getParameterDescriptorMap();
+
+        assertNull(map.get("hiddenParameter".toLowerCase()));
 
         ParameterDescriptor lowerParamDescriptor = map.get("lowerparam");
 

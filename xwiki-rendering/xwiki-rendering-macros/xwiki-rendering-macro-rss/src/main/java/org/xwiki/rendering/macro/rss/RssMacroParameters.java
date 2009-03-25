@@ -23,8 +23,8 @@ package org.xwiki.rendering.macro.rss;
 import java.net.URL;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.ParameterMandatory;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.rss.RssMacro} Macro.

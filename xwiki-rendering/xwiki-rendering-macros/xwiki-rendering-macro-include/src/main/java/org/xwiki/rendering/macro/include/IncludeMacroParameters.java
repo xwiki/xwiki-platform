@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.macro.include;
 
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.ParameterMandatory;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.

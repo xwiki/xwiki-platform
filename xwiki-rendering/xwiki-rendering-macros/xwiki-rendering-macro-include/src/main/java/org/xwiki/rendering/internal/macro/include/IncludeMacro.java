@@ -78,7 +78,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
      */
     public IncludeMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, IncludeMacroParameters.class));
+        super(new DefaultMacroDescriptor(DESCRIPTION, null, IncludeMacroParameters.class));
 
         registerConverter(new EnumConverter(Context.class), Context.class);
     }

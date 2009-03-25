@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.html;
 
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.html.HTMLMacro} Macro.

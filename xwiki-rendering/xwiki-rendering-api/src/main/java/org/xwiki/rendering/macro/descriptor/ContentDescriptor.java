@@ -19,35 +19,21 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
-import java.util.Map;
-
 /**
- * Describe a Macro (macro description and macro parameters description).
+ * Define a macro content.
  * 
  * @version $Id$
- * @since 1.6M1
+ * @since 1.9M1
  */
-public interface MacroDescriptor
+public interface ContentDescriptor
 {
     /**
-     * @return the description of the macro.
+     * @return the description of the macro content.
      */
     String getDescription();
 
     /**
-     * @return the class of the JAVA bean containing macro parameters.
+     * @return indicate if the macro content is mandatory.
      */
-    Class< ? > getParametersBeanClass();
-
-    /**
-     * @return describe the macro content. If null the macro does not support content.
-     * @since 1.9M1
-     */
-    ContentDescriptor getContentDescriptor();
-
-    /**
-     * @return a {@link Map} containing the {@link ParameterDescriptor} for each parameter.
-     * @since 1.7M2
-     */
-    Map<String, ParameterDescriptor> getParameterDescriptorMap();
+    boolean isMandatory();
 }

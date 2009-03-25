@@ -27,7 +27,7 @@
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>script</role-hint>
-      <implementation>org.xwiki.rendering.internal.macro.script.ScriptMacro</implementation>
+      <implementation>org.xwiki.rendering.internal.macro.script.DefaultScriptMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>

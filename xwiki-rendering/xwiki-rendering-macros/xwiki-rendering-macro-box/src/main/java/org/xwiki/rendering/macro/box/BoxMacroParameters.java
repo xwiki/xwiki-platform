@@ -23,7 +23,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterHidden;
 
 /**
  * Parameters for macro box.
@@ -70,6 +71,7 @@ public class BoxMacroParameters
     /**
      * @param blockTitle - refer to {@link #getBlockTitle()}
      */
+    @ParameterHidden
     public void setBlockTitle(List< ? extends Block> blockTitle)
     {
         this.blockTitle = blockTitle;

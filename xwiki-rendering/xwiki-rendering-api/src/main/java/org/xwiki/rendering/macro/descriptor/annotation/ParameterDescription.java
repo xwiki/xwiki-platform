@@ -17,37 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor;
+package org.xwiki.rendering.macro.descriptor.annotation;
 
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Describe a Macro (macro description and macro parameters description).
+ * Use this annotation to add a description to a macro parameters bean method.
  * 
  * @version $Id$
- * @since 1.6M1
+ * @since 1.7M2
  */
-public interface MacroDescriptor
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ParameterDescription
 {
     /**
-     * @return the description of the macro.
+     * @return the description.
      */
-    String getDescription();
-
-    /**
-     * @return the class of the JAVA bean containing macro parameters.
-     */
-    Class< ? > getParametersBeanClass();
-
-    /**
-     * @return describe the macro content. If null the macro does not support content.
-     * @since 1.9M1
-     */
-    ContentDescriptor getContentDescriptor();
-
-    /**
-     * @return a {@link Map} containing the {@link ParameterDescriptor} for each parameter.
-     * @since 1.7M2
-     */
-    Map<String, ParameterDescriptor> getParameterDescriptorMap();
+    String value();
 }

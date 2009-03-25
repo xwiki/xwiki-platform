@@ -19,35 +19,13 @@
  */
 package org.xwiki.rendering.macro.script;
 
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
-
 /**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.code.ScriptMacro} Macro.
+ * Parameters for the {@link AbstractScriptMacro} Macro.
  * 
  * @version $Id$
  * @since 1.7M3
  */
 public class ScriptMacroParameters
 {
-    /**
-     * The identifier of the script language.
-     */
-    private String language;
 
-    /**
-     * @param language the identifier of the script language.
-     */
-    @ParameterDescription("the identifier of the script language (java, python, etc.)")
-    public void setLanguage(String language)
-    {
-        this.language = language;
-    }
-
-    /**
-     * @return the identifier of the script language.
-     */
-    public String getLanguage()
-    {
-        return this.language;
-    }
 }

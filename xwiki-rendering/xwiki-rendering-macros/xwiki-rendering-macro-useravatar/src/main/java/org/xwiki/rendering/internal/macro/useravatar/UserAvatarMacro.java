@@ -66,7 +66,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
      */
     public UserAvatarMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, UserAvatarMacroParameters.class));
+        super(new DefaultMacroDescriptor(DESCRIPTION, null, UserAvatarMacroParameters.class));
     }
 
     /**

@@ -17,37 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor;
+package org.xwiki.rendering.internal.macro.groovy;
 
-import java.util.Map;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.script.AbstractJRSR223ScriptMacro;
+import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
 
 /**
- * Describe a Macro (macro description and macro parameters description).
+ * Execute script in provided script language.
  * 
  * @version $Id$
- * @since 1.6M1
+ * @since 1.7M3
  */
-public interface MacroDescriptor
+public class GroovyMacro extends AbstractJRSR223ScriptMacro<JSR223ScriptMacroParameters>
 {
     /**
-     * @return the description of the macro.
+     * The description of the macro.
      */
-    String getDescription();
+    private static final String DESCRIPTION = "Execute a groovy script.";
 
     /**
-     * @return the class of the JAVA bean containing macro parameters.
+     * The description of the macro content.
      */
-    Class< ? > getParametersBeanClass();
+    private static final String CONTENT_DESCRIPTION = "the groovy script to execute";
 
     /**
-     * @return describe the macro content. If null the macro does not support content.
-     * @since 1.9M1
+     * Create and initialize the descriptor of the macro.
      */
-    ContentDescriptor getContentDescriptor();
-
-    /**
-     * @return a {@link Map} containing the {@link ParameterDescriptor} for each parameter.
-     * @since 1.7M2
-     */
-    Map<String, ParameterDescriptor> getParameterDescriptorMap();
+    public GroovyMacro()
+    {
+        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
+    }
 }

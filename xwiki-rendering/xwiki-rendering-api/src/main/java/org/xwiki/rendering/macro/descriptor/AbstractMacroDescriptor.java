@@ -29,6 +29,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterHidden;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
+
 /**
  * Describe a macro.
  * 
@@ -43,6 +47,11 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
     private String description;
 
     /**
+     * Define a macro content.
+     */
+    private ContentDescriptor contentDescriptor;
+
+    /**
      * The class of the JAVA bean containing macro parameters.
      */
     private Class< ? > parametersBeanClass;
@@ -55,10 +64,17 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
      */
     private Map<String, ParameterDescriptor> parameterDescriptorMap = new LinkedHashMap<String, ParameterDescriptor>();
 
-    public AbstractMacroDescriptor(String description, Class< ? > parametersBeanClass)
+    /**
+     * @param description the description of the macro.
+     * @param contentDescriptor the description of the macro content. null indicate macro does not support content.
+     * @param parametersBeanClass the class of the JAVA bean containing macro parameters.
+     */
+    public AbstractMacroDescriptor(String description, ContentDescriptor contentDescriptor,
+        Class< ? > parametersBeanClass)
     {
         this.description = description;
         this.parametersBeanClass = parametersBeanClass;
+        this.contentDescriptor = contentDescriptor;
     }
 
     /**
@@ -102,18 +118,23 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
         if (writeMethod != null) {
             Method readMethod = propertyDescriptor.getReadMethod();
 
-            ParameterDescription parameterDescription =
-                extractParameterAnnotation(writeMethod, readMethod, ParameterDescription.class);
+            ParameterHidden parameterHidden =
+                extractParameterAnnotation(writeMethod, readMethod, ParameterHidden.class);
 
-            desc.setDescription(parameterDescription != null ? parameterDescription.value() : propertyDescriptor
-                .getShortDescription());
+            if (parameterHidden == null) {
+                ParameterDescription parameterDescription =
+                    extractParameterAnnotation(writeMethod, readMethod, ParameterDescription.class);
 
-            ParameterMandatory parameterMandatory =
-                extractParameterAnnotation(writeMethod, readMethod, ParameterMandatory.class);
+                desc.setDescription(parameterDescription != null ? parameterDescription.value() : propertyDescriptor
+                    .getShortDescription());
 
-            desc.setMandatory(parameterMandatory != null);
+                ParameterMandatory parameterMandatory =
+                    extractParameterAnnotation(writeMethod, readMethod, ParameterMandatory.class);
 
-            this.parameterDescriptorMap.put(desc.getName().toLowerCase(), desc);
+                desc.setMandatory(parameterMandatory != null);
+
+                this.parameterDescriptorMap.put(desc.getName().toLowerCase(), desc);
+            }
         }
     }
 
@@ -137,6 +158,16 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
         }
 
         return parameterDescription;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.MacroDescriptor#getContentDescriptor()
+     */
+    public ContentDescriptor getContentDescriptor()
+    {
+        return this.contentDescriptor;
     }
 
     /**

@@ -51,7 +51,7 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
      */
     public IdMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, IdMacroParameters.class));
+        super(new DefaultMacroDescriptor(DESCRIPTION, null, IdMacroParameters.class));
     }
 
     /**

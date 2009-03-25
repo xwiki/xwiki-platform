@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.toc;
 
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
 import org.xwiki.rendering.macro.parameter.ParameterValueTooLowException;
 
 /**

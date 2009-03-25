@@ -44,7 +44,6 @@
   <modules>
     <module>xwiki-license-resources</module>
     <module>xwiki-verification-resources</module>
-    <module>xwiki-shared-tests</module>
     <module>xwiki-xar-plugin</module>
     <module>xwiki-xar-handlers</module>
     <module>xwiki-xmldoc-update-plugin</module>

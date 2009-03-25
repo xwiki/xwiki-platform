@@ -24,7 +24,13 @@ import java.util.List;
 /**
  * Filter provided block into one or more block.
  * <p>
- * See {@link AbstractBlock#clone(BlockFilter)} for an example of it's use.
+ * The block filter is generally called for each block in a block list and is asked to return a filtered version of the
+ * provided block. This means:
+ * <ul>
+ * <li>an empty list if the block as to be removed</li>
+ * <li>the block itself in a list if the filter does not have anything particular to filter on it</li>
+ * <li>or even a list of new block to replace the provided block</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 1.8RC2

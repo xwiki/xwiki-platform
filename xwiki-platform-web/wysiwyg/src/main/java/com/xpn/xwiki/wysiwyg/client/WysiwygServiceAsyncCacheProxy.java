@@ -110,12 +110,12 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#officeToXHTML(String, String, Map, AsyncCallback)
+     * @see WysiwygServiceAsync#officeToXHTML(String, Map, AsyncCallback)
      */
-    public void officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams,
+    public void officeToXHTML(String pageName, Map<String, String> cleaningParams,
         AsyncCallback<String> async)
     {
-        service.officeToXHTML(pageName, attachmentName, cleaningParams, async);
+        service.officeToXHTML(pageName, cleaningParams, async);
     }
 
     /**

@@ -244,7 +244,7 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
     public void onSubmitComplete(FormSubmitCompleteEvent event)
     {
         WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
-        wysiwygService.officeToXHTML(fullPageName, fileImportTab.getFileName(), getCleaningParams(), this);
+        wysiwygService.officeToXHTML(fullPageName, getCleaningParams(), this);
     }
 
     /**

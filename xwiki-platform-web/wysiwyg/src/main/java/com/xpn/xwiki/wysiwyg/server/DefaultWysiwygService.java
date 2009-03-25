@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.server;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,15 +208,25 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#officeToXHTML(String, String, Map)
+     * @see WysiwygService#officeToXHTML(String, Map)
      */
-    public String officeToXHTML(String pageName, String attachmentName, Map<String, String> cleaningParams)
-        throws XWikiGWTException
+    public String officeToXHTML(String pageName, Map<String, String> cleaningParams) throws XWikiGWTException
     {
         OfficeImporter officeImporter = (OfficeImporter) Utils.getComponent(OfficeImporter.ROLE);
+        XWikiContext context = getXWikiContext();
         try {
-            return officeImporter.importAttachment(pageName, attachmentName, cleaningParams);
+            List<XWikiAttachment> attachments = context.getWiki().getDocument(pageName, context).getAttachmentList();
+            XWikiAttachment latestAttachment = Collections.max(attachments, new Comparator<XWikiAttachment>()
+            {
+                public int compare(XWikiAttachment firstAttachment, XWikiAttachment secondAttachment)
+                {
+                    return firstAttachment.getDate().compareTo(secondAttachment.getDate());
+                }
+            });            
+            return officeImporter.importAttachment(pageName, latestAttachment.getFilename(), cleaningParams);
         } catch (OfficeImporterException ex) {
+            throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);
+        } catch (XWikiException ex) {
             throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);
         }
     }
@@ -370,7 +381,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         String newPageName = pageName;
         String newSpaceName = spaceName;
         String pageURL = null;
-        LinkConfig linkConfig = new LinkConfig();        
+        LinkConfig linkConfig = new LinkConfig();
         try {
             if (wikiName != null) {
                 context.setDatabase(wikiName);
@@ -415,15 +426,15 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                 getXWikiContext().setDatabase(database);
             }
         }
-        
+
         return linkConfig;
     }
 
     /**
      * Clears forbidden characters out of the passed name, in a way which is consistent with the algorithm used in the
-     * create page panel. <br />
-     * FIXME: this function needs to be deleted when there will be a function to do this operation in a consistent
-     * manner across the whole xwiki, and all calls to this function should be replaced with calls to that function.
+     * create page panel. <br /> FIXME: this function needs to be deleted when there will be a function to do this
+     * operation in a consistent manner across the whole xwiki, and all calls to this function should be replaced with
+     * calls to that function.
      * 
      * @param name the name to clear from forbidden characters and transform in a xwiki name.
      * @return the cleared up xwiki name, ready to be used as a page or space name.

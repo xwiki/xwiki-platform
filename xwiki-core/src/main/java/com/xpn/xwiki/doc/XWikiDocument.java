@@ -285,8 +285,6 @@ public class XWikiDocument implements DocumentModelBridge
 
     private XDOM xdom;
 
-    private XDOM clonedxdom;
-
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return context.getWiki().getStore();
@@ -480,7 +478,6 @@ public class XWikiDocument implements DocumentModelBridge
 
         // invalidate parsed xdom
         this.xdom = null;
-        this.clonedxdom = null;
     }
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
@@ -4987,13 +4984,12 @@ public class XWikiDocument implements DocumentModelBridge
         if (this.xdom == null) {
             try {
                 this.xdom = parseContent(getContent());
-                this.clonedxdom = this.xdom.clone();
             } catch (XWikiException e) {
                 LOG.error("Failed to parse document content to XDOM", e);
             }
         }
 
-        return this.clonedxdom;
+        return this.xdom.clone();
     }
 
     /**

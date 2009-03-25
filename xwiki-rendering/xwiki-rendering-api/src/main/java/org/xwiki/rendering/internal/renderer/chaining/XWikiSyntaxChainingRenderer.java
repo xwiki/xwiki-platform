@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.renderer.chaining;
 
 import java.util.Map;
-import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;

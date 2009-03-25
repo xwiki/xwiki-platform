@@ -581,7 +581,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("Page", this.document.extractTitle());
 
-        this.document.setContent("content not in section\n");
+        this.document.setContent("content not in section\n=== header 3===");
 
         assertEquals("", this.document.extractTitle());
     }

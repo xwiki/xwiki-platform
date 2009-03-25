@@ -666,7 +666,7 @@ public class XWikiDocument implements DocumentModelBridge
                 List<HeaderBlock> blocks = getXDOM().getChildrenByType(HeaderBlock.class, true);
                 if (blocks.size() > 0) {
                     HeaderBlock header = blocks.get(0);
-                    if (header.getLevel().getAsInt() <= HeaderLevel.LEVEL2.getAsInt()) {
+                    if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
                         title = renderXDOM(new XDOM(header.getChildren()), "plain/1.0");
                     }
                 }

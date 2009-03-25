@@ -58,8 +58,8 @@ public class XWikiUtils
         XWikiXmlRpcUser user = null;
         String ip = context.getRequest().getRemoteAddr();
 
-        /* Check if we must grant access when no token is provided */        
-        boolean allowGuest = context.getWiki().ParamAsLong("xwiki.authentication.always", 0) != 1;
+        /* Check if we must grant guest access when no token is provided. Default is true. */        
+        boolean allowGuest = context.getWiki().ParamAsLong("xwiki.xmlrpc.allowGuest", 1) != 0;
 
         if (token != null) {
             if (token.equals("")) {

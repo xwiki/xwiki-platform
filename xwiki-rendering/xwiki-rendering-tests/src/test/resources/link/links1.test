@@ -23,3 +23,7 @@ endDocument
 .input|xhtml/1.0
 .#-----------------------------------------------------
 <html><p><!--startwikilink:Space.ExistingPage--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></p></html>
+.#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+Page

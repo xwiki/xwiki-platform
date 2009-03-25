@@ -62,6 +62,20 @@ fourth paragraph
 .#-----------------------------------------------------
 <html><p>first<br/>paragraph</p><p>second paragraph</p><div class="wikimodel-emptyline"></div><p>third paragraph</p><div class="wikimodel-emptyline"></div><div class="wikimodel-emptyline"></div><p>fourth paragraph</p></html>
 .#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+first
+paragraph
+
+second paragraph
+
+
+third paragraph
+
+
+
+fourth paragraph
+.#-----------------------------------------------------
 .input|mediawiki/1.0|skip
 .#-----------------------------------------------------
 .# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=59

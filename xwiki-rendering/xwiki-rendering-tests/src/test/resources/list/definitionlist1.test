@@ -52,6 +52,15 @@ endDocument
 .#-----------------------------------------------------
 <html><dl><dt>title1</dt><dd>definition1<dl><dt>title2</dt><dd>definition2</dd></dl></dd><dt>title3</dt><dd>definition3</dd></dl></html>
 .#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+title1
+definition1
+title2
+definition2
+title3
+definition3
+.#-----------------------------------------------------
 .input|mediawiki/1.0
 .#-----------------------------------------------------
 ; title1

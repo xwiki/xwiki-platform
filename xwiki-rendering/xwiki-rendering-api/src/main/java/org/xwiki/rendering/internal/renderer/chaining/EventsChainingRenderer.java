@@ -659,15 +659,25 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
 
     private String serializeParameters(Map<String, String> parameters)
     {
-        StringBuffer buffer = new StringBuffer();
-        if (!parameters.isEmpty()) {
-            buffer.append(' ').append('[');
-            for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                buffer.append('[').append(getEscaped(entry.getKey())).append(']').append('=').append('[').append(
-                    getEscaped(entry.getValue())).append(']');
+        StringBuffer parametersStr = new StringBuffer();
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            String value = entry.getValue();
+            String key = entry.getKey();
+
+            if (key != null && value != null) {
+                parametersStr.append('[').append(getEscaped(entry.getKey())).append(']').append('=').append('[')
+                    .append(getEscaped(entry.getValue())).append(']');
             }
-            buffer.append(']');
         }
-        return buffer.toString();
+
+        if (parametersStr.length() > 0) {
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(' ').append('[');
+            buffer.append(parametersStr);
+            buffer.append(']');
+            return buffer.toString();
+        } else {
+            return "";
+        }
     }
 }

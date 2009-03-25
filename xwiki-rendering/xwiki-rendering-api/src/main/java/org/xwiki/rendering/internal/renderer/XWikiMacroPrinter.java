@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -52,14 +51,20 @@ public class XWikiMacroPrinter
     public String printParameters(Map<String, String> parameters)
     {
         StringBuffer buffer = new StringBuffer();
-        for (Iterator<Map.Entry<String, String>> entryIt = parameters.entrySet().iterator(); entryIt.hasNext();) {
-            Map.Entry<String, String> entry = entryIt.next();
-            buffer.append(entry.getKey()).append('=').append('\"').append(
-                entry.getValue().replace("\\", "\\\\").replace("\"", "\\\"")).append('\"');
-            if (entryIt.hasNext()) {
-                buffer.append(' ');
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            String value = entry.getValue();
+            String key = entry.getKey();
+
+            if (key != null && value != null) {
+                if (buffer.length() > 0) {
+                    buffer.append(' ');
+                }
+
+                buffer.append(entry.getKey()).append('=').append('\"').append(
+                    entry.getValue().replace("\\", "\\\\").replace("\"", "\\\"")).append('\"');
             }
         }
+
         return buffer.toString();
     }
 }

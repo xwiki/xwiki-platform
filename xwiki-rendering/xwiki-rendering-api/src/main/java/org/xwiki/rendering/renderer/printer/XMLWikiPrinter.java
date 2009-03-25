@@ -254,7 +254,12 @@ public class XMLWikiPrinter
 
         if (parameters != null && !parameters.isEmpty()) {
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                attributes.addAttribute(null, null, entry.getKey(), null, entry.getValue());
+                String value = entry.getValue();
+                String key = entry.getKey();
+
+                if (key != null && value != null) {
+                    attributes.addAttribute(null, null, key, null, value);
+                }
             }
         }
 

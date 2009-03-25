@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest;
 
+import java.security.Principal;
 import java.util.logging.Level;
 
 import org.restlet.Context;
@@ -83,8 +84,9 @@ public class XWikiAuthentication extends Guard
         XWiki xwiki = (XWiki) getContext().getAttributes().get(Constants.XWIKI);
 
         try {
-            if (xwiki.getAuthService().authenticate(identifier, new String(secret), xwikiContext) != null) {
-                String xwikiUser = String.format("XWiki.%s", identifier);
+            Principal principal = xwiki.getAuthService().authenticate(identifier, new String(secret), xwikiContext);
+            if (principal != null) {
+                String xwikiUser = principal.getName();
 
                 xwikiContext.setUser(xwikiUser);
                 getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));

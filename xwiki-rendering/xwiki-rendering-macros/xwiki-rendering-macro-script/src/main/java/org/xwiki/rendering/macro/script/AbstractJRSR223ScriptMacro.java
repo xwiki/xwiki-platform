@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.script;
+package org.xwiki.rendering.macro.script;
 
 import java.io.StringWriter;
 import java.util.List;
@@ -33,25 +33,22 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
-import org.xwiki.rendering.macro.script.AbstractScriptMacro;
-import org.xwiki.rendering.macro.script.ScriptMacroParameters;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.script.ScriptContextManager;
 
 /**
- * Execute script in provided script language.
+ * Base Class for script evaluation macros based on JSR223.
  * 
+ * @param <P> the type of macro parameters bean.
  * @version $Id$
  * @since 1.7M3
  */
-public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
+public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroParameters> extends AbstractScriptMacro<P>
 {
-    /**
-     * The description of the macro.
-     */
-    private static final String DESCRIPTION = "Execute script in provided script language.";
-
     /**
      * Used to get the current script context to give to script engine evaluation method.
      */
@@ -63,16 +60,29 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * The identifier of the script language. If null, {@link ScriptMacroParameters#getLanguage()} as to be not null.
+     * @param macroDescriptor the descriptor of the macro
      */
-    private String language;
+    public AbstractJRSR223ScriptMacro(MacroDescriptor macroDescriptor)
+    {
+        super(macroDescriptor);
+    }
 
     /**
-     * Create and initialize the descriptor of the macro.
+     * @param macroDescription the text description of the macro.
      */
-    public ScriptMacro()
+    public AbstractJRSR223ScriptMacro(String macroDescription)
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, ScriptMacroParameters.class));
+        super(new DefaultMacroDescriptor(macroDescription, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
+            JSR223ScriptMacroParameters.class));
+    }
+
+    /**
+     * @param macroDescription the text description of the macro.
+     * @param contentDescriptor the description of the macro content.
+     */
+    public AbstractJRSR223ScriptMacro(String macroDescription, ContentDescriptor contentDescriptor)
+    {
+        super(new DefaultMacroDescriptor(macroDescription, contentDescriptor, JSR223ScriptMacroParameters.class));
     }
 
     /**
@@ -92,7 +102,7 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
      *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
     @Override
-    public List<Block> execute(ScriptMacroParameters parameters, String content, MacroTransformationContext context)
+    public List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         if (!canExecuteScript()) {
@@ -103,33 +113,32 @@ public class ScriptMacro extends AbstractScriptMacro<ScriptMacroParameters>
     }
 
     /**
+     * Method to overwrite to indicate the script engine name.
+     * 
+     * @param parameters the macro parameters.
+     * @param context the context of the macro transformation.
+     * @return the name of the script engine to use.
+     */
+    protected String getScriptEngineName(P parameters, MacroTransformationContext context)
+    {
+        return context.getCurrentMacroBlock().getName().toLowerCase();
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.macro.script.AbstractScriptMacro#evaluate(java.lang.Object, java.lang.String,
      *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
     @Override
-    protected String evaluate(ScriptMacroParameters parameters, String content, MacroTransformationContext context)
+    protected String evaluate(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         if (StringUtils.isEmpty(content)) {
             return "";
         }
 
-        String engineName;
-
-        // 1) resolve script engine name
-        if (this.language == null) {
-            String macroName = context.getCurrentMacroBlock().getName().toLowerCase();
-
-            if (macroName.equals("script")) {
-                engineName = parameters.getLanguage();
-            } else {
-                engineName = macroName;
-            }
-        } else {
-            engineName = this.language;
-        }
+        String engineName = getScriptEngineName(parameters, context);
 
         String scriptResult;
         if (engineName != null) {

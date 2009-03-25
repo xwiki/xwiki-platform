@@ -29,6 +29,7 @@ import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.parser.HighlightParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -48,11 +49,17 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     private static final String DESCRIPTION = "";
 
     /**
+     * The description of the macro content.
+     */
+    private static final String CONTENT_DESCRIPTION = "the content to highlight";
+
+    /**
      * Create and initialize the descriptor of the macro.
      */
     public CodeMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, CodeMacroParameters.class));
+        super(new DefaultMacroDescriptor(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
+            CodeMacroParameters.class));
     }
 
     /**

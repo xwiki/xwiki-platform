@@ -17,22 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor;
+package org.xwiki.rendering.macro.script;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
 
 /**
- * Use this annotation to add a description to a macro parameters bean method.
+ * Parameters for the {@link DefaultScriptMacro} Macro.
  * 
  * @version $Id$
- * @since 1.7
+ * @since 1.9M1
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface ParameterMandatory
+public class DefaultScriptMacroParameters extends JSR223ScriptMacroParameters
 {
-    
+    /**
+     * The identifier of the script language.
+     */
+    private String language;
+
+    /**
+     * @param language the identifier of the script language.
+     */
+    @ParameterDescription("the identifier of the script language (java, python, etc.)")
+    public void setLanguage(String language)
+    {
+        this.language = language;
+    }
+
+    /**
+     * @return the identifier of the script language.
+     */
+    public String getLanguage()
+    {
+        return this.language;
+    }
 }

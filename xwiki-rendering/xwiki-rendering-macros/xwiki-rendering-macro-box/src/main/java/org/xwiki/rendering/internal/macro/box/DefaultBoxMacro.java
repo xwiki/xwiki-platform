@@ -26,6 +26,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -47,11 +48,17 @@ public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMa
     private static final String DESCRIPTION = "Draw a box around provided content.";
 
     /**
+     * The description of the macro content.
+     */
+    private static final String CONTENT_DESCRIPTION = "the content to put in the box";
+
+    /**
      * Create and initialize the descriptor of the macro.
      */
     public DefaultBoxMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, BoxMacroParameters.class));
+        super(new DefaultMacroDescriptor(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
+            BoxMacroParameters.class));
     }
 
     /**

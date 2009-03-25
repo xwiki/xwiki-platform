@@ -22,8 +22,9 @@ package org.xwiki.rendering.internal.macro.velocity;
 import java.io.StringWriter;
 
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.AbstractScriptMacro;
+import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -32,12 +33,17 @@ import org.xwiki.velocity.XWikiVelocityException;
  * @version $Id$
  * @since 1.5M2
  */
-public class VelocityMacro extends AbstractScriptMacro<Object>
+public class VelocityMacro extends AbstractScriptMacro<ScriptMacroParameters>
 {
     /**
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Executes a Velocity script.";
+
+    /**
+     * The description of the macro content.
+     */
+    private static final String CONTENT_DESCRIPTION = "the velocity script to execute";
 
     /**
      * Injected by the Component Manager.
@@ -49,7 +55,7 @@ public class VelocityMacro extends AbstractScriptMacro<Object>
      */
     public VelocityMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION));
+        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
     }
 
     /**
@@ -69,7 +75,7 @@ public class VelocityMacro extends AbstractScriptMacro<Object>
      *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
     @Override
-    protected String evaluate(Object parameters, String content, MacroTransformationContext context)
+    protected String evaluate(ScriptMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         StringWriter writer = new StringWriter();

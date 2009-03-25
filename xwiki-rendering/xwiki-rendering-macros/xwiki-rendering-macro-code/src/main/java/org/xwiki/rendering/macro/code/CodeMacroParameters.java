@@ -20,7 +20,7 @@
 package org.xwiki.rendering.macro.code;
 
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.code.CodeMacro} Macro.

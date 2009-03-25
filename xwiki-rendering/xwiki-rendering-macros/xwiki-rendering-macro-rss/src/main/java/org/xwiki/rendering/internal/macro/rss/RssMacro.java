@@ -80,7 +80,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      */
     public RssMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, RssMacroParameters.class));
+        super(new DefaultMacroDescriptor(DESCRIPTION, null, RssMacroParameters.class));
     }
 
     /**

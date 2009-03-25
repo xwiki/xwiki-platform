@@ -78,7 +78,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
      */
     public TocMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, TocMacroParameters.class));
+        super(new DefaultMacroDescriptor(DESCRIPTION, null, TocMacroParameters.class));
 
         registerConverter(new EnumConverter(Scope.class), Scope.class);
     }

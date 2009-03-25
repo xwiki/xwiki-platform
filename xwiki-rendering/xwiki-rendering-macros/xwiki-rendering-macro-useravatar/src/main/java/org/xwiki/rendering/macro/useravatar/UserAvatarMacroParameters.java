@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.macro.useravatar;
 
-import org.xwiki.rendering.macro.descriptor.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.ParameterMandatory;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.useravatar.UserAvatarMacro} Macro.
@@ -34,17 +34,17 @@ public class UserAvatarMacroParameters
      * The name of the user whose avatar is to be displayed.
      */
     private String username;
-    
+
     /**
      * The width of the image (optional).
      */
     private Integer width;
-    
+
     /**
      * The height of the image.
      */
     private Integer height;
-    
+
     /**
      * @return the name of the user whose avatar is to be displayed
      */
@@ -70,6 +70,7 @@ public class UserAvatarMacroParameters
     {
         return width;
     }
+
     /**
      * @param width the width of the image
      */

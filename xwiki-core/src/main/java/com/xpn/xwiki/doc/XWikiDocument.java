@@ -4577,8 +4577,10 @@ public class XWikiDocument implements DocumentModelBridge
         if (is10Syntax()) {
             content = updateDocumentSection10(sectionNumber, newSectionContent);
         } else {
+            XDOM xdom = getXDOM();
+            
             // Get the current section block
-            HeaderBlock header = getXDOM().getChildrenByType(HeaderBlock.class, true).get(sectionNumber - 1);
+            HeaderBlock header = xdom.getChildrenByType(HeaderBlock.class, true).get(sectionNumber - 1);
 
             // newSectionContent -> Blocks
             List<Block> blocks = parseContent(newSectionContent).getChildren();
@@ -4591,7 +4593,7 @@ public class XWikiDocument implements DocumentModelBridge
             header.getSection().replace(blocks);
 
             // render back XDOM to document's content syntax
-            content = renderXDOM(getXDOM(), getSyntaxId());
+            content = renderXDOM(xdom, getSyntaxId());
         }
 
         return content;

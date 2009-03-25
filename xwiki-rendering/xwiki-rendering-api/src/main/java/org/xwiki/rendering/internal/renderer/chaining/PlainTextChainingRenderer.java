@@ -26,7 +26,6 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
-import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.xml.XMLComment;
@@ -93,17 +92,6 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endParagraph(java.util.Map)
-     */
-    @Override
-    public void endParagraph(Map<String, String> parameters)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onNewLine()
      */
     @Override
@@ -131,18 +119,6 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endLink(org.xwiki.rendering.listener.Link,
-     *      boolean, java.util.Map)
-     */
-    @Override
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginHeader(org.xwiki.rendering.listener.HeaderLevel,
      *      java.util.Map)
      */
@@ -155,36 +131,12 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endHeader(org.xwiki.rendering.listener.HeaderLevel,
-     *      java.util.Map)
-     */
-    @Override
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onWord(java.lang.String)
      */
     @Override
     public void onWord(String word)
     {
         getPrinter().print(word);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginList(org.xwiki.rendering.listener.ListType,
-     *      java.util.Map)
-     */
-    @Override
-    public void beginList(ListType listType, Map<String, String> parameters)
-    {
-
     }
 
     /**
@@ -202,29 +154,6 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
         }
 
         // TODO: add some syntax here like a - or not, that's the question
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endList(org.xwiki.rendering.listener.ListType,
-     *      java.util.Map)
-     */
-    @Override
-    public void endList(ListType listType, Map<String, String> parameters)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endListItem()
-     */
-    @Override
-    public void endListItem()
-    {
-
     }
 
     /**
@@ -329,28 +258,6 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginDefinitionList()
-     */
-    @Override
-    public void beginDefinitionList()
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endDefinitionList()
-     */
-    @Override
-    public void endDefinitionList()
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginDefinitionTerm()
      */
     @Override
@@ -381,50 +288,6 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endDefinitionTerm()
-     */
-    @Override
-    public void endDefinitionTerm()
-    {
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endDefinitionDescription()
-     */
-    @Override
-    public void endDefinitionDescription()
-    {
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginQuotation(java.util.Map)
-     */
-    @Override
-    public void beginQuotation(Map<String, String> parameters)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endQuotation(java.util.Map)
-     */
-    @Override
-    public void endQuotation(Map<String, String> parameters)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginQuotationLine()
      */
     @Override
@@ -435,17 +298,6 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
         } else {
             printEmptyLine();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endQuotationLine()
-     */
-    @Override
-    public void endQuotationLine()
-    {
-
     }
 
     /**
@@ -494,50 +346,6 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
         if (getBlockState().getCellRow() > 0) {
             getPrinter().print("\n");
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endTable(java.util.Map)
-     */
-    @Override
-    public void endTable(Map<String, String> parameters)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endTableCell(java.util.Map)
-     */
-    @Override
-    public void endTableCell(Map<String, String> parameters)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endTableHeadCell(java.util.Map)
-     */
-    @Override
-    public void endTableHeadCell(Map<String, String> parameters)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endTableRow(java.util.Map)
-     */
-    @Override
-    public void endTableRow(Map<String, String> parameters)
-    {
-
     }
 
     /**

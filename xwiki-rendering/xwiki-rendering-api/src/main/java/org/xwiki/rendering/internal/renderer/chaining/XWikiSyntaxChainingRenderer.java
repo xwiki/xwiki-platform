@@ -65,8 +65,6 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
     private StringBuffer listStyle = new StringBuffer();
 
-    private Stack<Boolean> isEndTableRowFoundStack = new Stack<Boolean>();
-
     private Map<String, String> previousFormatParameters;
 
     public XWikiSyntaxChainingRenderer(WikiPrinter printer, ListenerChain listenerChain)
@@ -669,8 +667,6 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         if (!parameters.isEmpty()) {
             printParameters(parameters);
         }
-
-        this.isEndTableRowFoundStack.push(false);
     }
 
     /**
@@ -705,22 +701,11 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void beginTableRow(Map<String, String> parameters)
     {
-        if (this.isEndTableRowFoundStack.peek()) {
+        if (getBlockState().getCellRow() > 0) {
             print("\n");
         }
 
         printParameters(parameters, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#endTable(java.util.Map)
-     */
-    @Override
-    public void endTable(Map<String, String> parameters)
-    {
-        this.isEndTableRowFoundStack.pop();
     }
 
     /**
@@ -743,17 +728,6 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     public void endTableHeadCell(Map<String, String> parameters)
     {
         this.previousFormatParameters = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#endTableRow(java.util.Map)
-     */
-    @Override
-    public void endTableRow(Map<String, String> parameters)
-    {
-        this.isEndTableRowFoundStack.set(this.isEndTableRowFoundStack.size() - 1, true);
     }
 
     /**

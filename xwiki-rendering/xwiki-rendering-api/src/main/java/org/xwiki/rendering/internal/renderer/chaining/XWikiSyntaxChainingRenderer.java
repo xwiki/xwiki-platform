@@ -752,16 +752,23 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
     protected void printParameters(Map<String, String> parameters, boolean newLine)
     {
-        if (!parameters.isEmpty()) {
-            StringBuffer buffer = new StringBuffer("(%");
-            for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                String value = entry.getValue();
+        StringBuffer parametersStr = new StringBuffer();
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            String value = entry.getValue();
+            String key = entry.getKey();
+
+            if (key != null && value != null) {
                 // Escape quotes in value to not break parameter value syntax
                 value = value.replaceAll("[\\\\\"]", "\\\\$0");
                 // Escape ending custom parameters syntax
                 value = value.replaceAll("\\%\\)", "~%)");
-                buffer.append(' ').append(entry.getKey()).append('=').append('\"').append(value).append('\"');
+                parametersStr.append(' ').append(key).append('=').append('\"').append(value).append('\"');
             }
+        }
+
+        if (parametersStr.length() > 0) {
+            StringBuffer buffer = new StringBuffer("(%");
+            buffer.append(parametersStr);
             buffer.append(" %)");
 
             if (newLine) {

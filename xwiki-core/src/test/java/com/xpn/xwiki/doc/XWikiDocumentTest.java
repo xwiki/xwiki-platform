@@ -562,4 +562,39 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("<p>area</p>", this.document.display("area", "view", getContext()));
     }
+
+    public void testExtractTitle()
+    {
+        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+        this.document.setSyntaxId("xwiki/2.0");
+
+        assertEquals("header 1", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("header 1", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n" + "= [[Space.Page]]=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("Page", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n");
+
+        assertEquals("", this.document.extractTitle());
+    }
+
+    public void testExtractTitle10()
+    {
+        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
+            + "1.1 header 2\nheader 2 content");
+
+        assertEquals("header 1", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n");
+
+        assertEquals("", this.document.extractTitle());
+    }
 }

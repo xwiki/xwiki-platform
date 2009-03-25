@@ -24,6 +24,7 @@ import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.PlainTextRenderer;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.TexRenderer;
@@ -59,15 +60,18 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
         PrintRenderer result;
 
         if (targetSyntax.toIdString().equals("xhtml/1.0")) {
-            result = new XHTMLRenderer(printer, 
-                new XWikiXHTMLLinkRenderer(this.documentAccessBridge, this.linkLabelGenerator, this.attachmentParser), 
-                new XWikiXHTMLImageRenderer(this.documentAccessBridge));
+            result =
+                new XHTMLRenderer(printer, new XWikiXHTMLLinkRenderer(this.documentAccessBridge,
+                    this.linkLabelGenerator, this.attachmentParser), new XWikiXHTMLImageRenderer(
+                    this.documentAccessBridge));
         } else if (targetSyntax.toIdString().equals("xwiki/2.0")) {
             result = new XWikiSyntaxRenderer(printer);
         } else if (targetSyntax.toIdString().equals("event/1.0")) {
             result = new EventsRenderer(printer);
         } else if (targetSyntax.toIdString().equals("tex/1.0")) {
             result = new TexRenderer(printer);
+        } else if (targetSyntax.toIdString().equals("plain/1.0")) {
+            result = new PlainTextRenderer(printer, linkLabelGenerator);
         } else {
             throw new RuntimeException("No renderer found for target syntax [" + targetSyntax + "]");
         }

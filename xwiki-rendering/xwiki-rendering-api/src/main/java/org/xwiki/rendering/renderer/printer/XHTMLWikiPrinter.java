@@ -19,45 +19,29 @@
  */
 package org.xwiki.rendering.renderer.printer;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Element;
-import org.dom4j.io.XMLWriter;
-import org.dom4j.tree.DefaultComment;
-import org.dom4j.tree.DefaultElement;
-import org.dom4j.tree.DefaultEntity;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
-import org.xwiki.rendering.internal.renderer.printer.WikiWriter;
-import org.xwiki.rendering.internal.renderer.printer.XHTMLWriter;
 
 /**
- * Base toolkit class for all XHTML-based renderers. This printer handles whitespaces so that it prints "&nbsp;"
- * when needed (i.e. when the spaces are at the beginning or at the end of an element's content or when there are
- * more than 1 contiguous spaces, except for CDATA sections and inside PRE elements. It also knows how to handle
- * XHTML comments).
+ * Base toolkit class for all XHTML-based renderers. This printer handles whitespaces so that it prints "&nbsp;" when
+ * needed (i.e. when the spaces are at the beginning or at the end of an element's content or when there are more than 1
+ * contiguous spaces, except for CDATA sections and inside PRE elements. It also knows how to handle XHTML comments).
  * 
  * @version $Id$
  * @since 1.7M1
  */
-public class XHTMLWikiPrinter
+public class XHTMLWikiPrinter extends XMLWikiPrinter
 {
-    protected WikiWriter wikiWriter;
-
-    protected XMLWriter xmlWriter;
-
     private int spaceCount = 0;
-    
+
     private boolean isInCData;
-    
+
     private boolean isInPreserveElement;
-    
+
     private boolean elementEnded;
-    
+
     private boolean hasTextBeenPrinted;
 
     /**
@@ -65,242 +49,164 @@ public class XHTMLWikiPrinter
      */
     public XHTMLWikiPrinter(WikiPrinter printer)
     {
-        this.wikiWriter = new WikiWriter(printer);
-
-        try {
-            this.xmlWriter = new XHTMLWriter(this.wikiWriter);
-        } catch (UnsupportedEncodingException e) {
-            // TODO: add error log "should not append"
-        }
-    }
-
-    public XMLWriter getXMLWriter()
-    {
-        return this.xmlWriter;
-    }
-
-    public void setWikiPrinter(WikiPrinter printer)
-    {
-        this.wikiWriter.setWikiPrinter(printer);
+        super(printer);
     }
 
     /**
-     * Print provided text. Takes care of xml escaping.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXML(java.lang.String)
      */
+    @Override
     public void printXML(String str)
     {
         handleSpaceWhenInText();
-        printXMLInternal(str);
+        super.printXML(str);
         this.hasTextBeenPrinted = true;
     }
 
     /**
-     * Print the xml element. In the form <name/>.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLElement(java.lang.String)
      */
+    @Override
     public void printXMLElement(String name)
     {
         handleSpaceWhenStartElement();
-        printXMLElement(name, (String[][]) null);
+        super.printXMLElement(name);
     }
 
     /**
-     * Print the xml element. In the form <name att1="value1" att2="value2"/>.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLElement(java.lang.String, java.lang.String[][])
      */
+    @Override
     public void printXMLElement(String name, String[][] attributes)
     {
         handleSpaceWhenStartElement();
-        Element element = new DefaultElement(name);
-
-        if (attributes != null && attributes.length > 0) {
-            for (String[] entry : attributes) {
-                element.addAttribute(entry[0], entry[1]);
-            }
-        }
-
-        try {
-            this.xmlWriter.write(element);
-        } catch (IOException e) {
-            // TODO: add error log here
-        }
+        super.printXMLElement(name, attributes);
     }
 
     /**
-     * Print the xml element. In the form <name att1="value1" att2="value2"/>.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLElement(java.lang.String, java.util.Map)
      */
+    @Override
     public void printXMLElement(String name, Map<String, String> attributes)
     {
         handleSpaceWhenStartElement();
-        Element element = new DefaultElement(name);
-
-        if (attributes != null && !attributes.isEmpty()) {
-            for (Map.Entry<String, String> entry : attributes.entrySet()) {
-                element.addAttribute(entry.getKey(), entry.getValue());
-            }
-        }
-
-        try {
-            this.xmlWriter.write(element);
-        } catch (IOException e) {
-            // TODO: add error log here
-        }
+        super.printXMLElement(name, attributes);
     }
 
     /**
-     * Print the start tag of xml element. In the form &lt;name&gt;.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLStartElement(java.lang.String)
      */
+    @Override
     public void printXMLStartElement(String name)
     {
         handleSpaceWhenStartElement();
-        printXMLStartElement(name, new AttributesImpl());
+        super.printXMLStartElement(name);
     }
 
     /**
-     * Print the start tag of xml element. In the form &lt;name att1="value1" att2="value2"&gt;.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLStartElement(java.lang.String,
+     *      java.lang.String[][])
      */
+    @Override
     public void printXMLStartElement(String name, String[][] attributes)
     {
         handleSpaceWhenStartElement();
-        printXMLStartElement(name, createAttributes(attributes));
+        super.printXMLStartElement(name, attributes);
     }
 
     /**
-     * Print the start tag of xml element. In the form &lt;name att1="value1" att2="value2"&gt;.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLStartElement(java.lang.String, java.util.Map)
      */
+    @Override
     public void printXMLStartElement(String name, Map<String, String> attributes)
     {
         handleSpaceWhenStartElement();
-        printXMLStartElement(name, createAttributes(attributes));
+        super.printXMLStartElement(name, attributes);
     }
 
     /**
-     * Print the start tag of xml element. In the form &lt;name att1="value1" att2="value2"&gt;.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLStartElement(java.lang.String,
+     *      org.xml.sax.Attributes)
      */
+    @Override
     public void printXMLStartElement(String name, Attributes attributes)
     {
         handleSpaceWhenStartElement();
-        try {
-            this.xmlWriter.startElement("", name, name, attributes);
-        } catch (SAXException e) {
-            // TODO: add error log here
-        }
+        super.printXMLStartElement(name, attributes);
     }
 
     /**
-     * Print the end tag of xml element. In the form &lt;/name&gt;.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLEndElement(java.lang.String)
      */
+    @Override
     public void printXMLEndElement(String name)
     {
         handleSpaceWhenEndlement();
-        try {
-            this.xmlWriter.endElement("", name, name);
-        } catch (SAXException e) {
-            // TODO: add error log here
-        }
+        super.printXMLEndElement(name);
         this.elementEnded = true;
     }
 
     /**
-     * Print a XML comment.
+     * {@inheritDoc}
      * 
-     * @param content the comment content
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLComment(java.lang.String)
      */
+    @Override
     public void printXMLComment(String content)
     {
         handleSpaceWhenStartElement();
-        try {
-            DefaultComment commentElement = new DefaultComment(content);
-            this.xmlWriter.write(commentElement);
-        } catch (IOException e) {
-            // TODO: add error log here
-        }
+        super.printXMLComment(content);
         this.elementEnded = true;
     }
 
     /**
-     * Start a CDATA section.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLStartCData()
      */
+    @Override
     public void printXMLStartCData()
     {
         handleSpaceWhenStartElement();
-        try {
-            this.xmlWriter.startCDATA();
-            // Ensure that characters inside CDATA sections are not escaped
-            this.xmlWriter.setEscapeText(false);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-    }
-    
-    /**
-     * End a CDATA section.
-     */
-    public void printXMLEndCData()
-    {
-        handleSpaceWhenEndlement();
-        try {
-            this.xmlWriter.setEscapeText(true);
-            this.xmlWriter.endCDATA();
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
+        super.printXMLStartCData();
     }
 
     /**
-     * This method should be used to print a space rather than calling <code>printXML(" ")</code>. 
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLEndCData()
+     */
+    @Override
+    public void printXMLEndCData()
+    {
+        handleSpaceWhenEndlement();
+        super.printXMLEndCData();
+    }
+
+    /**
+     * This method should be used to print a space rather than calling <code>printXML(" ")</code>.
      */
     public void printSpace()
     {
         this.spaceCount++;
-    }
-    
-    public void printEntity(String entity)
-    {
-        try {
-            this.xmlWriter.write(new DefaultEntity(entity, entity));
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-    }
-    
-    /**
-     * Convert provided table into {@link Attributes} to use in xml writer.
-     */
-    private Attributes createAttributes(String[][] parameters)
-    {
-        AttributesImpl attributes = new AttributesImpl();
-
-        if (parameters != null && parameters.length > 0) {
-            for (String[] entry : parameters) {
-                attributes.addAttribute(null, null, entry[0], null, entry[1]);
-            }
-        }
-
-        return attributes;
-    }
-
-    /**
-     * Convert provided map into {@link Attributes} to use in xml writer.
-     */
-    private Attributes createAttributes(Map<String, String> parameters)
-    {
-        AttributesImpl attributes = new AttributesImpl();
-
-        if (parameters != null && !parameters.isEmpty()) {
-            for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                attributes.addAttribute(null, null, entry.getKey(), null, entry.getValue());
-            }
-        }
-
-        return attributes;
-    }
-    
-    private void printXMLInternal(String str)
-    {
-        try {
-            this.xmlWriter.write(str);
-        } catch (IOException e) {
-            // TODO: add error log here
-        }
     }
 
     private void handleSpaceWhenInText()
@@ -314,34 +220,34 @@ public class XHTMLWikiPrinter
 
     private void handleSpaceWhenStartElement()
     {
-        // Use case: <tag1>something   <tag2>...
-        // Use case: <tag1>something   <!--...
+        // Use case: <tag1>something <tag2>...
+        // Use case: <tag1>something <!--...
         if (this.spaceCount > 0) {
             if (!this.isInCData && !this.isInPreserveElement) {
                 // The first space is a normal space
-                printXMLInternal(" ");
+                super.printXML(" ");
                 for (int i = 0; i < this.spaceCount - 1; i++) {
                     printEntity("&nbsp;");
                 }
             } else {
-                printXMLInternal(StringUtils.repeat(" ", this.spaceCount));
+                super.printXML(StringUtils.repeat(" ", this.spaceCount));
             }
         }
         this.spaceCount = 0;
         this.elementEnded = false;
         this.hasTextBeenPrinted = false;
     }
-    
+
     private void handleSpaceWhenEndlement()
     {
-        // Use case: <tag1>something   </tag1>...
+        // Use case: <tag1>something </tag1>...
         // All spaces are &nbsp; spaces since otherwise they'll be all stripped by browsers
         if (!this.isInCData && !this.isInPreserveElement) {
-            for (int i = 0; i < this.spaceCount ; i++) {
+            for (int i = 0; i < this.spaceCount; i++) {
                 printEntity("&nbsp;");
             }
         } else {
-            printXMLInternal(StringUtils.repeat(" ", this.spaceCount));
+            super.printXML(StringUtils.repeat(" ", this.spaceCount));
         }
         this.spaceCount = 0;
         this.elementEnded = false;

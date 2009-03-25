@@ -78,6 +78,7 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -572,10 +573,10 @@ public class XWikiDocument implements DocumentModelBridge
      * {@inheritDoc}
      */
     public void setParent(DocumentName parentName)
-    {        
+    {
         this.parent = parentName.toString();
     }
-    
+
     public String getFullName()
     {
         StringBuffer buf = new StringBuffer();
@@ -657,35 +658,55 @@ public class XWikiDocument implements DocumentModelBridge
         return title;
     }
 
+    public String extractTitle()
+    {
+        String title = "";
+
+        try {
+            if (is10Syntax()) {
+                title = extractTitle10();
+            } else {
+                List<HeaderBlock> blocks = getXDOM().getChildrenByType(HeaderBlock.class, true);
+                if (blocks.size() > 0) {
+                    HeaderBlock header = blocks.get(0);
+                    if (header.getLevel().getAsInt() <= HeaderLevel.LEVEL2.getAsInt()) {
+                        title = renderXDOM(new XDOM(header.getChildren()), "plain/1.0");
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        return title;
+    }
+
     /**
      * @return the first level 1 or level 1.1 title text in the document's content or "" if none are found
      * @todo this method has nothing to do in this class and should be moved elsewhere
      */
-    public String extractTitle()
+    public String extractTitle10()
     {
-        try {
-            String content = getContent();
-            int i1 = 0;
-            int i2;
+        String content = getContent();
+        int i1 = 0;
+        int i2;
 
-            while (true) {
-                i2 = content.indexOf("\n", i1);
-                String title = "";
-                if (i2 != -1) {
-                    title = content.substring(i1, i2).trim();
-                } else {
-                    title = content.substring(i1).trim();
-                }
-                if ((!title.equals("")) && (title.matches("1(\\.1)?\\s+.+"))) {
-                    return title.substring(title.indexOf(" ")).trim();
-                }
-                if (i2 == -1) {
-                    break;
-                }
-                i1 = i2 + 1;
+        while (true) {
+            i2 = content.indexOf("\n", i1);
+            String title = "";
+            if (i2 != -1) {
+                title = content.substring(i1, i2).trim();
+            } else {
+                title = content.substring(i1).trim();
             }
-        } catch (Exception e) {
+            if ((!title.equals("")) && (title.matches("1(\\.1)?\\s+.+"))) {
+                return title.substring(title.indexOf(" ")).trim();
+            }
+            if (i2 == -1) {
+                break;
+            }
+            i1 = i2 + 1;
         }
+
         return "";
     }
 

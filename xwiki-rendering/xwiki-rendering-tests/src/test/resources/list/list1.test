@@ -108,6 +108,21 @@ endDocument
 .#-----------------------------------------------------
 <html><ol><li>Item 1<ol><li>Item 2<ul><li>Item 3</li></ul></li><li>Item 4</li></ol></li><li>Item 5</li></ol><ul><li>Item 1<ul><li>Item 2<ul><li>Item 3</li></ul></li><li>Item 4</li></ul></li><li>Item 5</li><li>Item 6</li></ul></html>
 .#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+Item 1
+Item 2
+Item 3
+Item 4
+Item 5
+
+Item 1
+Item 2
+Item 3
+Item 4
+Item 5
+Item 6
+.#-----------------------------------------------------
 .input|confluence/1.0|skip
 .#-----------------------------------------------------
 .# TODO: See http://jira.codehaus.org/browse/DOXIA-232

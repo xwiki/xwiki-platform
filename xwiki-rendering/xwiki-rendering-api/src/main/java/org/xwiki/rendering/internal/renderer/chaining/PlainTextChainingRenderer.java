@@ -19,95 +19,65 @@
  */
 package org.xwiki.rendering.internal.renderer.chaining;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.rendering.listener.DocumentImage;
-import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.URLImage;
-import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
+import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.listener.xml.XMLComment;
+import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.renderer.printer.XMLWikiPrinter;
 
 /**
- * Prints listener event names in a format useful for testing and debugging.
+ * Print only plain text information. For example it remove anything which need a specific syntax a simple plain text
+ * editor can't support like the style, link, image, etc. This renderer is mainly used to generate a simple as possible
+ * label like in a TOC.
  * 
  * @version $Id$
- * @since 1.8RC1
+ * @since 1.9M1
  */
-public class EventsChainingRenderer extends AbstractChainingPrintRenderer
+public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
 {
-    public EventsChainingRenderer(WikiPrinter printer, ListenerChain listenerChain)
+    private boolean isFirstElementRendered = false;
+
+    private XMLWikiPrinter xmlWikiPrinter;
+
+    /**
+     * Generate link label.
+     */
+    private LinkLabelGenerator linkLabelGenerator;
+
+    public PlainTextChainingRenderer(WikiPrinter printer, LinkLabelGenerator linkLabelGenerator,
+        ListenerChain listenerChain)
     {
         super(printer, listenerChain);
+
+        this.linkLabelGenerator = linkLabelGenerator;
+        this.xmlWikiPrinter = new XMLWikiPrinter(printer);
+    }
+
+    protected XMLWikiPrinter getXMLWikiPrinter()
+    {
+        return this.xmlWikiPrinter;
     }
 
     // State
 
-    private DocumentStateChainingListener getDocumentState()
+    private BlockStateChainingListener getBlockState()
     {
-        return (DocumentStateChainingListener) getListenerChain().getListener(DocumentStateChainingListener.class);
+        return (BlockStateChainingListener) getListenerChain().getListener(BlockStateChainingListener.class);
     }
 
     // Events
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginDocument()
-     */
-    @Override
-    public void beginDocument()
-    {
-        getPrinter().println("beginDocument");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endDocument()
-     */
-    @Override
-    public void endDocument()
-    {
-        if (getDocumentState().getDocumentDepth() > 1) {
-            getPrinter().println("endDocument");
-        } else {
-            getPrinter().print("endDocument");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginFormat(org.xwiki.rendering.listener.Format,
-     *      java.util.Map)
-     */
-    @Override
-    public void beginFormat(Format format, Map<String, String> parameters)
-    {
-        getPrinter().println("beginFormat: [" + format + "]" + serializeParameters(parameters));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endFormat(org.xwiki.rendering.listener.Format,
-     *      java.util.Map)
-     */
-    @Override
-    public void endFormat(Format format, Map<String, String> parameters)
-    {
-        getPrinter().println("endFormat: [" + format + "]" + serializeParameters(parameters));
-    }
 
     /**
      * {@inheritDoc}
@@ -117,7 +87,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginParagraph(Map<String, String> parameters)
     {
-        getPrinter().println("beginParagraph" + serializeParameters(parameters));
+        printEmptyLine();
     }
 
     /**
@@ -128,7 +98,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endParagraph(Map<String, String> parameters)
     {
-        getPrinter().println("endParagraph" + serializeParameters(parameters));
+
     }
 
     /**
@@ -139,7 +109,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onNewLine()
     {
-        getPrinter().println("onNewLine");
+        getPrinter().print("\n");
     }
 
     /**
@@ -151,7 +121,11 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        getPrinter().println("beginLink [" + link + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
+        if (link.getType() == LinkType.DOCUMENT) {
+            getPrinter().print(this.linkLabelGenerator.generate(link));
+        } else {
+            getPrinter().print(link.getReference());
+        }
     }
 
     /**
@@ -163,30 +137,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        getPrinter().println("endLink [" + link + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
-    }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onMacro(java.lang.String, java.util.Map,
-     *      java.lang.String, boolean)
-     */
-    @Override
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
-    {
-        printMacroData("onMacro", name, parameters, content, isInline);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginSection(java.util.Map)
-     */
-    @Override
-    public void beginSection(Map<String, String> parameters)
-    {
-        getPrinter().println("beginSection" + serializeParameters(parameters));
     }
 
     /**
@@ -198,18 +149,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        getPrinter().println("beginHeader [" + level + "]" + serializeParameters(parameters));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endSection(java.util.Map)
-     */
-    @Override
-    public void endSection(Map<String, String> parameters)
-    {
-        getPrinter().println("endSection" + serializeParameters(parameters));
+        printEmptyLine();
     }
 
     /**
@@ -221,7 +161,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endHeader(HeaderLevel level, Map<String, String> parameters)
     {
-        getPrinter().println("endHeader [" + level + "]" + serializeParameters(parameters));
+
     }
 
     /**
@@ -232,7 +172,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onWord(String word)
     {
-        getPrinter().println("onWord [" + getEscaped(word) + "]");
+        getPrinter().print(word);
     }
 
     /**
@@ -244,7 +184,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginList(ListType listType, Map<String, String> parameters)
     {
-        getPrinter().println("beginList [" + listType + "]" + serializeParameters(parameters));
+
     }
 
     /**
@@ -255,7 +195,13 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginListItem()
     {
-        getPrinter().println("beginListItem");
+        if (getBlockState().getListItemIndex() > 0) {
+            getPrinter().print("\n");
+        } else {
+            printEmptyLine();
+        }
+
+        // TODO: add some syntax here like a - or not, that's the question
     }
 
     /**
@@ -267,7 +213,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endList(ListType listType, Map<String, String> parameters)
     {
-        getPrinter().println("endList [" + listType + "]" + serializeParameters(parameters));
+
     }
 
     /**
@@ -278,7 +224,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endListItem()
     {
-        getPrinter().println("endListItem");
+
     }
 
     /**
@@ -289,7 +235,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onSpace()
     {
-        getPrinter().println("onSpace");
+        getPrinter().print(" ");
     }
 
     /**
@@ -300,7 +246,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onSpecialSymbol(char symbol)
     {
-        getPrinter().println("onSpecialSymbol [" + symbol + "]");
+        getPrinter().print(String.valueOf(symbol));
     }
 
     /**
@@ -311,7 +257,19 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginXMLNode(XMLNode node)
     {
-        getPrinter().println("beginXMLNode " + node);
+        switch (node.getNodeType()) {
+            case CDATA:
+                getXMLWikiPrinter().printXMLStartCData();
+                break;
+            case COMMENT:
+                XMLComment commentNode = (XMLComment) node;
+                getXMLWikiPrinter().printXMLComment(commentNode.getComment());
+                break;
+            case ELEMENT:
+                XMLElement elementNode = (XMLElement) node;
+                getXMLWikiPrinter().printXMLStartElement(elementNode.getName(), elementNode.getAttributes());
+                break;
+        }
     }
 
     /**
@@ -322,42 +280,15 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endXMLNode(XMLNode node)
     {
-        getPrinter().println("endXMLNode " + node);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginMacroMarker(java.lang.String,
-     *      java.util.Map, java.lang.String, boolean)
-     */
-    @Override
-    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
-    {
-        printMacroData("beginMacroMarker", name, parameters, content, isInline);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endMacroMarker(java.lang.String,
-     *      java.util.Map, java.lang.String, boolean)
-     */
-    @Override
-    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
-    {
-        printMacroData("endMacroMarker", name, parameters, content, isInline);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onId(java.lang.String)
-     */
-    @Override
-    public void onId(String name)
-    {
-        getPrinter().println("onId [" + name + "]");
+        switch (node.getNodeType()) {
+            case CDATA:
+                getXMLWikiPrinter().printXMLEndCData();
+                break;
+            case ELEMENT:
+                XMLElement elementNode = (XMLElement) node;
+                getXMLWikiPrinter().printXMLEndElement(elementNode.getName());
+                break;
+        }
     }
 
     /**
@@ -368,7 +299,8 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onHorizontalLine(Map<String, String> parameters)
     {
-        getPrinter().println("onHorizontalLine" + serializeParameters(parameters));
+        printEmptyLine();
+        getPrinter().print("----");
     }
 
     /**
@@ -379,7 +311,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onEmptyLines(int count)
     {
-        getPrinter().println("onEmptyLines [" + count + "]");
+        getPrinter().print(StringUtils.repeat("\n", count));
     }
 
     /**
@@ -391,9 +323,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
-        getPrinter().println(
-            "onVerbatim" + (isInline ? "Inline" : "Standalone") + " [" + protectedString + "]"
-                + serializeParameters(parameters));
+        getPrinter().print(protectedString);
     }
 
     /**
@@ -404,7 +334,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginDefinitionList()
     {
-        getPrinter().println("beginDefinitionList");
+
     }
 
     /**
@@ -415,7 +345,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endDefinitionList()
     {
-        getPrinter().println("endDefinitionList");
+
     }
 
     /**
@@ -426,7 +356,11 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginDefinitionTerm()
     {
-        getPrinter().println("beginDefinitionTerm");
+        if (getBlockState().getDefinitionListItemIndex() > 0 || getBlockState().getListItemIndex() >= 0) {
+            getPrinter().print("\n");
+        } else {
+            printEmptyLine();
+        }
     }
 
     /**
@@ -437,7 +371,11 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginDefinitionDescription()
     {
-        getPrinter().println("beginDefinitionDescription");
+        if (getBlockState().getDefinitionListItemIndex() > 0 || getBlockState().getListItemIndex() >= 0) {
+            getPrinter().print("\n");
+        } else {
+            printEmptyLine();
+        }
     }
 
     /**
@@ -448,7 +386,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endDefinitionTerm()
     {
-        getPrinter().println("endDefinitionTerm");
+        
     }
 
     /**
@@ -459,7 +397,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endDefinitionDescription()
     {
-        getPrinter().println("endDefinitionDescription");
+        
     }
 
     /**
@@ -470,7 +408,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginQuotation(Map<String, String> parameters)
     {
-        getPrinter().println("beginQuotation" + serializeParameters(parameters));
+
     }
 
     /**
@@ -481,7 +419,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endQuotation(Map<String, String> parameters)
     {
-        getPrinter().println("endQuotation" + serializeParameters(parameters));
+
     }
 
     /**
@@ -492,7 +430,11 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginQuotationLine()
     {
-        getPrinter().println("beginQuotationLine");
+        if (getBlockState().getQuotationLineIndex() > 0) {
+            getPrinter().print("\n");
+        } else {
+            printEmptyLine();
+        }
     }
 
     /**
@@ -503,7 +445,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endQuotationLine()
     {
-        getPrinter().println("endQuotationLine");
+
     }
 
     /**
@@ -514,7 +456,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginTable(Map<String, String> parameters)
     {
-        getPrinter().println("beginTable" + serializeParameters(parameters));
+        printEmptyLine();
     }
 
     /**
@@ -525,7 +467,9 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginTableCell(Map<String, String> parameters)
     {
-        getPrinter().println("beginTableCell" + serializeParameters(parameters));
+        if (getBlockState().getCellCol() > 0) {
+            getPrinter().print("\t");
+        }
     }
 
     /**
@@ -536,7 +480,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginTableHeadCell(Map<String, String> parameters)
     {
-        getPrinter().println("beginTableHeadCell" + serializeParameters(parameters));
+        beginTableCell(parameters);
     }
 
     /**
@@ -547,7 +491,9 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginTableRow(Map<String, String> parameters)
     {
-        getPrinter().println("beginTableRow" + serializeParameters(parameters));
+        if (getBlockState().getCellRow() > 0) {
+            getPrinter().print("\n");
+        }
     }
 
     /**
@@ -558,7 +504,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endTable(Map<String, String> parameters)
     {
-        getPrinter().println("endTable" + serializeParameters(parameters));
+
     }
 
     /**
@@ -569,7 +515,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endTableCell(Map<String, String> parameters)
     {
-        getPrinter().println("endTableCell" + serializeParameters(parameters));
+
     }
 
     /**
@@ -580,7 +526,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endTableHeadCell(Map<String, String> parameters)
     {
-        getPrinter().println("endTableHeadCell" + serializeParameters(parameters));
+
     }
 
     /**
@@ -591,7 +537,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endTableRow(Map<String, String> parameters)
     {
-        getPrinter().println("endTableRow" + serializeParameters(parameters));
+
     }
 
     /**
@@ -603,71 +549,15 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        if (image.getType() == ImageType.DOCUMENT) {
-            DocumentImage documentImage = (DocumentImage) image;
-            getPrinter().println(
-                "onImage: "
-                    + (documentImage.getDocumentName() != null ? "[" + documentImage.getDocumentName() + "] " : "")
-                    + "[" + documentImage.getAttachmentName() + "] [" + isFreeStandingURI + "]"
-                    + serializeParameters(parameters));
+        // TODO: maybe something could be done here
+    }
+
+    private void printEmptyLine()
+    {
+        if (this.isFirstElementRendered) {
+            getPrinter().print("\n\n");
         } else {
-            URLImage urlImage = (URLImage) image;
-            getPrinter().println(
-                "onImage: [" + urlImage.getURL() + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
+            this.isFirstElementRendered = true;
         }
-    }
-
-    public String getEscaped(String str)
-    {
-        String printableStr;
-
-        if (str == null) {
-            printableStr = null;
-        } else if (StringUtils.isAsciiPrintable(str)) {
-            printableStr = str;
-        } else {
-            StringBuffer buffer = new StringBuffer();
-            for (int i = 0; i < str.length(); i++) {
-                char c = str.charAt(i);
-                if (c > 126) {
-                    buffer.append("(((").append((int) c).append(")))");
-                } else {
-                    buffer.append(c);
-                }
-            }
-            printableStr = buffer.toString();
-        }
-
-        return printableStr;
-    }
-
-    private void printMacroData(String eventName, String name, Map<String, String> parameters, String content,
-        boolean isInline)
-    {
-        StringBuffer buffer = new StringBuffer();
-        for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
-            String paramName = paramsIt.next();
-            buffer.append(paramName).append("=").append(parameters.get(paramName));
-            if (paramsIt.hasNext()) {
-                buffer.append("|");
-            }
-        }
-        getPrinter().println(
-            eventName + (isInline ? "Inline" : "Standalone") + " [" + name + "] [" + buffer.toString() + "] ["
-                + content + "]");
-    }
-
-    private String serializeParameters(Map<String, String> parameters)
-    {
-        StringBuffer buffer = new StringBuffer();
-        if (!parameters.isEmpty()) {
-            buffer.append(' ').append('[');
-            for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                buffer.append('[').append(getEscaped(entry.getKey())).append(']').append('=').append('[').append(
-                    getEscaped(entry.getValue())).append(']');
-            }
-            buffer.append(']');
-        }
-        return buffer.toString();
     }
 }

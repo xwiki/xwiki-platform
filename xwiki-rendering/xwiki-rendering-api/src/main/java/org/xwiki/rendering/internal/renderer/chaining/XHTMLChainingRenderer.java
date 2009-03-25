@@ -91,12 +91,12 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
 
     // State
 
-    public DocumentStateChainingListener getDocumentState()
+    private DocumentStateChainingListener getDocumentState()
     {
         return (DocumentStateChainingListener) getListenerChain().getListener(DocumentStateChainingListener.class);
     }
 
-    public BlockStateChainingListener getBlockState()
+    private BlockStateChainingListener getBlockState()
     {
         return (BlockStateChainingListener) getListenerChain().getListener(BlockStateChainingListener.class);
     }
@@ -484,8 +484,8 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
                 getXHTMLWikiPrinter().printXMLEndCData();
                 break;
             case ELEMENT:
-                XMLElement element = (XMLElement) node;
-                getXHTMLWikiPrinter().printXMLEndElement(element.getName());
+                XMLElement elementNode = (XMLElement) node;
+                getXHTMLWikiPrinter().printXMLEndElement(elementNode.getName());
                 break;
         }
     }

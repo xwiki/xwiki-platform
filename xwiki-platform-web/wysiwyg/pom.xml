@@ -71,6 +71,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.smartgwt</groupId>
+      <artifactId>smartgwt</artifactId>
+      <version>${smartgwt.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt</artifactId>
       <version>${pom.version}</version>
@@ -222,7 +227,7 @@
             com/xpn/xwiki/wysiwyg/client/editor/Images.java,
             com/xpn/xwiki/wysiwyg/client/editor/Strings.java,
             com/xpn/xwiki/wysiwyg/client/editor/WysiwygEditor.java,
-            com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfig.java, 
+            com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/image/ImageConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
             com/xpn/xwiki/wysiwyg/server/sync/**/*,

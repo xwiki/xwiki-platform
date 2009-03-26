@@ -53,11 +53,18 @@ public class DefaultHTMLCleaner implements HTMLCleaner
     {
         org.xwiki.xml.html.HTMLCleaner cleaner =
             (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.ROLE);
+
+        // We have to remove or replace the HTML elements that were added by the WYSIWYG editor only for internal
+        // reasons, before any cleaning filter is applied. Otherwise cleaning filters might transform these
+        // WYSIWYG-specific HTML elements making their removal difficult. We cannot transform the WYSIWYG output on the
+        // client side because the editor is a widget that can be used independently inside or outside an HTML form and
+        // thus it doesn't know when its current value is submitted.
         HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
         List<HTMLFilter> filters = new ArrayList<HTMLFilter>();
         filters.add(filter);
         filters.addAll(config.getFilters());
         config.setFilters(filters);
+
         Document document = cleaner.clean(new StringReader(dirtyHTML), config);
         return XMLUtils.toString(document);
     }

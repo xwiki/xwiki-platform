@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.util.IdGenerator;
+import org.xwiki.rendering.util.RenderersUtils;
 
 /**
  * @version $Id$
@@ -33,16 +35,34 @@ public class HeaderBlock extends AbstractFatherBlock
 {
     private HeaderLevel level;
 
+    private String id;
+
     public HeaderBlock(List<Block> childBlocks, HeaderLevel level)
     {
         super(childBlocks);
+
         this.level = level;
     }
 
     public HeaderBlock(List<Block> childBlocks, HeaderLevel level, Map<String, String> parameters)
     {
         super(childBlocks, parameters);
+
         this.level = level;
+    }
+
+    public HeaderBlock(List<Block> childBlocks, HeaderLevel level, String id)
+    {
+        this(childBlocks, level);
+
+        this.id = id;
+    }
+
+    public HeaderBlock(List<Block> childBlocks, HeaderLevel level, Map<String, String> parameters, String id)
+    {
+        this(childBlocks, level, parameters);
+
+        this.id = id;
     }
 
     public HeaderLevel getLevel()
@@ -55,13 +75,65 @@ public class HeaderBlock extends AbstractFatherBlock
         return (SectionBlock) getParent();
     }
 
+    public String getId()
+    {
+        return this.id;
+    }
+
+    /**
+     * Force to regenerate id. This method get the root parent {@link XDOM} {@link IdGenerator} to generate unique
+     * identifier.
+     */
+    public void generateId()
+    {
+        Block rootBlock = getRoot();
+        if (rootBlock instanceof XDOM) {
+            XDOM xdom = (XDOM) rootBlock;
+
+            IdGenerator idGenerator = xdom.getIdGenerator();
+            if (this.id != null) {
+                idGenerator.remove(this.id);
+            }
+
+            if (idGenerator != null) {
+                this.id = "H" + idGenerator.generateUniqueId(getPlainTextTitle());
+            } else {
+                this.id = "H" + getPlainTextTitle();
+            }
+        } else {
+            this.id = "H" + getPlainTextTitle();
+        }
+    }
+
+    public String getPlainTextTitle()
+    {
+        RenderersUtils renderersUtils = new RenderersUtils();
+
+        return renderersUtils.renderPlainText(getChildren());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.AbstractBlock#setParent(org.xwiki.rendering.block.Block)
+     */
+    @Override
+    public void setParent(Block parentBlock)
+    {
+        super.setParent(parentBlock);
+
+        if (id == null) {
+            generateId();
+        }
+    }
+
     public void before(Listener listener)
     {
-        listener.beginHeader(getLevel(), getParameters());
+        listener.beginHeader(getLevel(), getId(), getParameters());
     }
 
     public void after(Listener listener)
     {
-        listener.endHeader(getLevel(), getParameters());
+        listener.endHeader(getLevel(), getId(), getParameters());
     }
 }

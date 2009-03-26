@@ -9,13 +9,13 @@ text after a header
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, HTitlelevel1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endHeader [1]
+endHeader [1, HTitlelevel1]
 beginParagraph
 onWord [text]
 onSpace

@@ -11,9 +11,9 @@
 beginDocument
 beginSection
 beginSection
-beginHeader [2]
+beginHeader [2, Hheader]
 onWord [header]
-endHeader [2]
+endHeader [2, Hheader]
 beginParagraph
 onWord [paragraph]
 endParagraph

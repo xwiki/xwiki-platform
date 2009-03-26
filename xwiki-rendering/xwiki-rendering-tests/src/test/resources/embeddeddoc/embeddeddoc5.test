@@ -21,7 +21,7 @@ The next paragraph in the top-level document
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, HThetopleveldocument]
 onWord [The]
 onSpace
 onWord [top]
@@ -29,7 +29,7 @@ onSpecialSymbol [-]
 onWord [level]
 onSpace
 onWord [document]
-endHeader [1]
+endHeader [1, HThetopleveldocument]
 beginTable
 beginTableRow
 beginTableHeadCell
@@ -66,7 +66,7 @@ onSpace
 onWord [Two]
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, HThisisanembeddeddocument]
 onWord [This]
 onSpace
 onWord [is]
@@ -76,7 +76,7 @@ onSpace
 onWord [embedded]
 onSpace
 onWord [document]
-endHeader [1]
+endHeader [1, HThisisanembeddeddocument]
 beginParagraph
 onWord [The]
 onSpace

@@ -130,7 +130,7 @@ public class DoxiaGeneratorListener implements Listener
 
     }
 
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         if (level == HeaderLevel.LEVEL1) {
             this.sink.section1();
@@ -193,7 +193,7 @@ public class DoxiaGeneratorListener implements Listener
 
     }
 
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         if (level == HeaderLevel.LEVEL1) {
             this.sink.section1_();

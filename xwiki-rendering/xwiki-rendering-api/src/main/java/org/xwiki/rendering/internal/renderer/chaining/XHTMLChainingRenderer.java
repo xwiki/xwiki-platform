@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.renderer.chaining;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLIdGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMacroRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
@@ -38,7 +37,6 @@ import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.MonitoringWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
@@ -61,16 +59,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
 
     private XHTMLMacroRenderer macroRenderer;
 
-    private XHTMLIdGenerator idGenerator;
-
     private XHTMLWikiPrinter xhtmlWikiPrinter;
-
-    /**
-     * The temporary Printer used to redirect all outputs when computing the header title.
-     * 
-     * @see #originalPrinter
-     */
-    private WikiPrinter headerTitlePrinter;
 
     /**
      * @param printer the object to which to write the XHTML output to
@@ -86,7 +75,6 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
         this.imageRenderer = imageRenderer;
         this.macroRenderer = new XHTMLMacroRenderer();
         this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
-        this.idGenerator = new XHTMLIdGenerator();
     }
 
     // State
@@ -317,28 +305,17 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginHeader(HeaderLevel, Map)
+     * @see org.xwiki.rendering.renderer.Renderer#beginHeader(HeaderLevel, String, Map)
      */
     @Override
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
-    {
-        // Don't output anything yet since we need the header title to generate the unique XHTML id attribute.
-        // Thus we're doing the output in the #endHeader() event.
-
-        // Redirect all output to our writer
-        this.headerTitlePrinter = new DefaultWikiPrinter();
-        pushPrinter(this.headerTitlePrinter);
-    }
-
-    private void processBeginHeader(HeaderLevel level, String headerTitle, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         Map<String, String> attributes = new LinkedHashMap<String, String>();
 
-        attributes.put("id", this.idGenerator.generateUniqueId(headerTitle));
+        attributes.put("id", id);
         attributes.putAll(parameters);
 
-        int levelAsInt = level.getAsInt();
-        getXHTMLWikiPrinter().printXMLStartElement("h" + levelAsInt, attributes);
+        getXHTMLWikiPrinter().printXMLStartElement("h" + level.getAsInt(), attributes);
         // We generate a span so that CSS rules have a hook to perform some magic that wouldn't work on just a H
         // element. Like some IE6 magic and others.
         getXHTMLWikiPrinter().printXMLStartElement("span");
@@ -347,19 +324,13 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endHeader(HeaderLevel, Map)
+     * @see org.xwiki.rendering.renderer.Renderer#endHeader(HeaderLevel, String, Map)
      */
     @Override
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        String headerTitle = this.headerTitlePrinter.toString();
-        popPrinter();
-        processBeginHeader(level, headerTitle, parameters);
-        getPrinter().print(headerTitle);
-
-        int levelAsInt = level.getAsInt();
         getXHTMLWikiPrinter().printXMLEndElement("span");
-        getXHTMLWikiPrinter().printXMLEndElement("h" + levelAsInt);
+        getXHTMLWikiPrinter().printXMLEndElement("h" + level.getAsInt());
     }
 
     /**

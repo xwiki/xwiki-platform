@@ -31,10 +31,10 @@ onWord [paragraph1]
 onNewLine
 endParagraph
 beginSection
-beginHeader [1]
+beginHeader [1, Hheader]
 onWord [header]
 onNewLine
-endHeader [1]
+endHeader [1, Hheader]
 beginList [BULLETED]
 beginListItem
 onWord [list]

@@ -193,12 +193,12 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginHeader(org.xwiki.rendering.listener.HeaderLevel,
-     *      java.util.Map)
+     *      String, java.util.Map)
      */
     @Override
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        getPrinter().println("beginHeader [" + level + "]" + serializeParameters(parameters));
+        getPrinter().println("beginHeader [" + level + ", " + id + "]" + serializeParameters(parameters));
     }
 
     /**
@@ -216,12 +216,12 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endHeader(org.xwiki.rendering.listener.HeaderLevel,
-     *      java.util.Map)
+     *      String, java.util.Map)
      */
     @Override
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        getPrinter().println("endHeader [" + level + "]" + serializeParameters(parameters));
+        getPrinter().println("endHeader [" + level + ", " + id + "]" + serializeParameters(parameters));
     }
 
     /**

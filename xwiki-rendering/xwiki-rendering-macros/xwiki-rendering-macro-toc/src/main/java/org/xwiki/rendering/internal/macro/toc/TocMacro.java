@@ -27,7 +27,6 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
-import org.xwiki.rendering.block.IdBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ListBLock;
 import org.xwiki.rendering.block.ListItemBlock;
@@ -43,7 +42,6 @@ import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
 import org.xwiki.rendering.macro.toc.TocMacroParameters;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * Generate a Table Of Contents based on the document sections.
@@ -57,11 +55,6 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Generates a Table Of Contents.";
-
-    /**
-     * The id generator.
-     */
-    private IdGenerator idGenerator;
 
     /**
      * Used to filter the {@link SectionBlock} title to generate the toc anchor.
@@ -166,14 +159,6 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
     }
 
     /**
-     * @return e new {@link IdBlock} with a unique name.
-     */
-    private IdBlock newUniqueIdBlock()
-    {
-        return new IdBlock(this.idGenerator.generateRandomUniqueId());
-    }
-
-    /**
      * Convert headers into list block tree.
      * 
      * @param headers the headers to convert.
@@ -250,13 +235,9 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
      */
     private ListItemBlock createTocEntry(HeaderBlock headerBlock)
     {
-        // Insert anchor before the header to target
-        IdBlock idBlock = newUniqueIdBlock();
-        headerBlock.getParent().insertChildBefore(idBlock, headerBlock);
-
         // Create the link to target the header anchor
         Link link = new Link();
-        link.setAnchor(idBlock.getName());
+        link.setAnchor(headerBlock.getId());
         LinkBlock linkBlock = new LinkBlock(this.tocBlockFilter.generateLabel(headerBlock), link, false);
 
         return new ListItemBlock(Collections.<Block> singletonList(linkBlock));

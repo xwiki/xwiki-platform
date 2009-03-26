@@ -137,12 +137,6 @@
 
     <!-- Utils -->
     <component>
-      <role>org.xwiki.rendering.util.IdGenerator</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.util.DefaultIdGenerator</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
       <role>org.xwiki.rendering.renderer.LinkLabelGenerator</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator</implementation>

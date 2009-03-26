@@ -11,11 +11,11 @@
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, Hinheader]
 onWord [inheader]
 onSpace
 onSpecialSymbol [=]
-endHeader [1]
+endHeader [1, Hinheader]
 beginParagraph
 onSpecialSymbol [=]
 onSpecialSymbol [=]

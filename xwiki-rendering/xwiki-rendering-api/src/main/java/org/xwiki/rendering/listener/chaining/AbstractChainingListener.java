@@ -29,9 +29,9 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
- * Default and basic implementation of a chaining listener that knows how to delegate event calls
- * to the next listener in the chain.
- *  
+ * Default and basic implementation of a chaining listener that knows how to delegate event calls to the next listener
+ * in the chain.
+ * 
  * @version $Id$
  * @since 1.8RC1
  */
@@ -61,6 +61,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginDefinitionDescription()
      */
     public void beginDefinitionDescription()
@@ -73,6 +74,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginDefinitionList()
      */
     public void beginDefinitionList()
@@ -85,6 +87,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginDefinitionTerm()
      */
     public void beginDefinitionTerm()
@@ -97,6 +100,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginDocument()
      */
     public void beginDocument()
@@ -109,6 +113,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginFormat(Format, Map)
      */
     public void beginFormat(Format format, Map<String, String> parameters)
@@ -121,18 +126,20 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
-     * @see ChainingListener#beginHeader(HeaderLevel, Map)
+     * 
+     * @see ChainingListener#beginHeader(HeaderLevel, String, Map)
      */
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.beginHeader(level, parameters);
+            next.beginHeader(level, id, parameters);
         }
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginLink(Link, boolean, Map)
      */
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -145,6 +152,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginList(ListType, Map)
      */
     public void beginList(ListType listType, Map<String, String> parameters)
@@ -157,6 +165,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginListItem()
      */
     public void beginListItem()
@@ -169,6 +178,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginMacroMarker(String, Map, String, boolean)
      */
     public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
@@ -181,6 +191,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginParagraph(Map)
      */
     public void beginParagraph(Map<String, String> parameters)
@@ -193,6 +204,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginQuotation(Map)
      */
     public void beginQuotation(Map<String, String> parameters)
@@ -205,6 +217,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginQuotationLine()
      */
     public void beginQuotationLine()
@@ -217,6 +230,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginSection(Map)
      */
     public void beginSection(Map<String, String> parameters)
@@ -229,6 +243,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginTable(Map)
      */
     public void beginTable(Map<String, String> parameters)
@@ -241,6 +256,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginTableCell(Map)
      */
     public void beginTableCell(Map<String, String> parameters)
@@ -253,6 +269,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginTableHeadCell(Map)
      */
     public void beginTableHeadCell(Map<String, String> parameters)
@@ -265,6 +282,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginTableRow(Map)
      */
     public void beginTableRow(Map<String, String> parameters)
@@ -277,6 +295,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#beginXMLNode(XMLNode)
      */
     public void beginXMLNode(XMLNode node)
@@ -289,6 +308,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endDefinitionDescription()
      */
     public void endDefinitionDescription()
@@ -301,6 +321,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endDefinitionList()
      */
     public void endDefinitionList()
@@ -313,6 +334,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endDefinitionTerm()
      */
     public void endDefinitionTerm()
@@ -325,6 +347,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endDocument()
      */
     public void endDocument()
@@ -337,6 +360,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endFormat(Format, Map)
      */
     public void endFormat(Format format, Map<String, String> parameters)
@@ -349,18 +373,20 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
-     * @see ChainingListener#endHeader(HeaderLevel, Map)
+     * 
+     * @see ChainingListener#endHeader(HeaderLevel, String, Map)
      */
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.endHeader(level, parameters);
+            next.endHeader(level, id, parameters);
         }
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endLink(Link, boolean, Map)
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -373,6 +399,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endList(ListType, Map)
      */
     public void endList(ListType listType, Map<String, String> parameters)
@@ -385,6 +412,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endListItem()
      */
     public void endListItem()
@@ -397,6 +425,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endMacroMarker(String, Map, String, boolean)
      */
     public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
@@ -409,6 +438,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endParagraph(Map)
      */
     public void endParagraph(Map<String, String> parameters)
@@ -421,6 +451,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endQuotation(Map)
      */
     public void endQuotation(Map<String, String> parameters)
@@ -433,6 +464,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endQuotationLine()
      */
     public void endQuotationLine()
@@ -445,6 +477,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endSection(Map)
      */
     public void endSection(Map<String, String> parameters)
@@ -457,6 +490,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endTable(Map)
      */
     public void endTable(Map<String, String> parameters)
@@ -469,6 +503,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endTableCell(Map)
      */
     public void endTableCell(Map<String, String> parameters)
@@ -481,6 +516,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endTableHeadCell(Map)
      */
     public void endTableHeadCell(Map<String, String> parameters)
@@ -493,6 +529,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endTableRow(Map)
      */
     public void endTableRow(Map<String, String> parameters)
@@ -505,6 +542,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#endXMLNode(XMLNode)
      */
     public void endXMLNode(XMLNode node)
@@ -517,6 +555,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onEmptyLines(int)
      */
     public void onEmptyLines(int count)
@@ -529,6 +568,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onHorizontalLine(Map)
      */
     public void onHorizontalLine(Map<String, String> parameters)
@@ -541,6 +581,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onId(String)
      */
     public void onId(String name)
@@ -553,6 +594,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onImage(Image, boolean, Map)
      */
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -565,6 +607,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onMacro(String, Map, String, boolean)
      */
     public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
@@ -577,6 +620,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onNewLine()
      */
     public void onNewLine()
@@ -589,6 +633,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onSpace()
      */
     public void onSpace()
@@ -601,6 +646,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onSpecialSymbol(char)
      */
     public void onSpecialSymbol(char symbol)
@@ -613,6 +659,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onVerbatim(String, Map, boolean)
      */
     public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
@@ -625,6 +672,7 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see ChainingListener#onWord(String)
      */
     public void onWord(String word)

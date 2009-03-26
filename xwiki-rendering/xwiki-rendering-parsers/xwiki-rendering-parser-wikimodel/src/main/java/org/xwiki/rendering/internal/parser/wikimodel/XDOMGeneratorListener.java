@@ -74,6 +74,8 @@ import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.util.IdGenerator;
+import org.xwiki.rendering.util.RenderersUtils;
 
 /**
  * Transforms WikiModel events into XWiki Rendering events.
@@ -96,6 +98,10 @@ public class XDOMGeneratorListener implements IWemListener
     private Stack<Integer> currentSectionLevel = new Stack<Integer>();
 
     private int documentLevel = 0;
+    
+    private IdGenerator idGenerator = new IdGenerator();
+    
+    private RenderersUtils renderersUtils = new RenderersUtils();
 
     private class MarkerBlock extends AbstractBlock
     {
@@ -115,7 +121,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public XDOM getXDOM()
     {
-        return new XDOM(generateListFromStack());
+        return new XDOM(generateListFromStack(), this.idGenerator);
     }
 
     /**
@@ -319,8 +325,13 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endHeader(int level, WikiParameters params)
     {
+        List<Block> children = generateListFromStack();
+        HeaderLevel headerLevel = HeaderLevel.parseInt(level);
+        Map<String, String> parameters = convertParameters(params);
+        String id = "H" + this.idGenerator.generateUniqueId(this.renderersUtils.renderPlainText(children));
+        
         this.stack
-            .push(new HeaderBlock(generateListFromStack(), HeaderLevel.parseInt(level), convertParameters(params)));
+            .push(new HeaderBlock(children, headerLevel, parameters, id));
     }
 
     public void endInfoBlock(char infoType, WikiParameters params)

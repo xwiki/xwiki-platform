@@ -21,13 +21,13 @@ beginSection
 beginSection
 beginSection
 beginSection
-beginHeader [6]
+beginHeader [6, HTitlelevel6]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [6]
-endHeader [6]
+endHeader [6, HTitlelevel6]
 endSection
 endSection
 endSection
@@ -35,67 +35,67 @@ endSection
 endSection
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, HTitlelevel1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endHeader [1]
+endHeader [1, HTitlelevel1]
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, HTitlelevel1-1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endHeader [1]
+endHeader [1, HTitlelevel1-1]
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, HTitlelevel1-2]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endHeader [1]
+endHeader [1, HTitlelevel1-2]
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, HTitlelevel1-3]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endHeader [1]
+endHeader [1, HTitlelevel1-3]
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, HTitlelevel1-4]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endHeader [1]
+endHeader [1, HTitlelevel1-4]
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, HTitlelevel1-5]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endHeader [1]
+endHeader [1, HTitlelevel1-5]
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, HTitlelevel1-6]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endHeader [1]
+endHeader [1, HTitlelevel1-6]
 beginParagraph
 onWord [some]
 onSpace
@@ -103,18 +103,18 @@ onWord [text]
 endParagraph
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, Hunclosedheader]
 onWord [unclosed]
 onSpace
 onWord [header]
-endHeader [1]
+endHeader [1, Hunclosedheader]
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, Hkeyvalue]
 onWord [key]
 onSpecialSymbol [=]
 onWord [value]
-endHeader [1]
+endHeader [1, Hkeyvalue]
 endSection
 endDocument
 .#-----------------------------------------------------

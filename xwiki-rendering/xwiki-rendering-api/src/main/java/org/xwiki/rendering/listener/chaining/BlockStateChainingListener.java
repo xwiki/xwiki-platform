@@ -314,12 +314,12 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         super.beginQuotationLine();
     }
 
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         this.isInHeader = true;
         ++this.inlineDepth;
 
-        super.beginHeader(level, parameters);
+        super.beginHeader(level, id, parameters);
     }
 
     public void beginTable(Map<String, String> parameters)
@@ -468,9 +468,9 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         this.previousEvent = Event.SECTION;
     }
 
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        super.endHeader(level, parameters);
+        super.endHeader(level, id, parameters);
 
         this.isInHeader = false;
         --this.inlineDepth;

@@ -21,6 +21,9 @@ package org.xwiki.rendering.listener;
 
 import java.util.Map;
 
+import org.xwiki.rendering.listener.xml.XMLCData;
+import org.xwiki.rendering.listener.xml.XMLComment;
+import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
@@ -241,20 +244,22 @@ public interface Listener extends LinkListener, ImageListener
     /**
      * Start of a header.
      * 
-     * @param level the header level (1, 2, 3, etc).
+     * @param level the header level (1, 2, 3, etc)
+     * @param id the header unique identifier
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see org.xwiki.rendering.listener.HeaderLevel
      */
-    void beginHeader(HeaderLevel level, Map<String, String> parameters);
+    void beginHeader(HeaderLevel level, String id, Map<String, String> parameters);
 
     /**
      * End of a header.
      * 
-     * @param level the header level (1, 2, 3, etc).
+     * @param level the header level (1, 2, 3, etc)
+     * @param id the header unique identifier
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see org.xwiki.rendering.listener.HeaderLevel
      */
-    void endHeader(HeaderLevel level, Map<String, String> parameters);
+    void endHeader(HeaderLevel level, String id, Map<String, String> parameters);
 
     /**
      * Start of an XML node. We use this type of event whenever there's no other equivalent event. For example for a

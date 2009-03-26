@@ -9,7 +9,7 @@
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, Hheaderstillinheader]
 onWord [header]
 onNewLine
 onNewLine
@@ -18,13 +18,13 @@ onSpace
 onWord [in]
 onSpace
 onWord [header]
-endHeader [1]
+endHeader [1, Hheaderstillinheader]
 endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="Hheaderbrbrstillinheader"><span>header<br/><br/>still in header</span></h1>
+<h1 id="Hheaderstillinheader"><span>header<br/><br/>still in header</span></h1>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -33,4 +33,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><h1 id="Hheaderbrbrstillinheader"><span>header<br/><br/>still in header</span></h1></html>
+<html><h1 id="Hheaderstillinheader"><span>header<br/><br/>still in header</span></h1></html>

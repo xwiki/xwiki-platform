@@ -350,10 +350,10 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#beginHeader(HeaderLevel, Map)
+     * @see PrintRenderer#beginHeader(HeaderLevel, String, Map)
      */
     @Override
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         printEmptyLine();
         printParameters(parameters);
@@ -363,10 +363,10 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#endHeader(HeaderLevel, Map)
+     * @see PrintRenderer#endHeader(HeaderLevel, String, Map)
      */
     @Override
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         print(" " + StringUtils.repeat("=", level.getAsInt()));
     }

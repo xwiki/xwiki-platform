@@ -69,7 +69,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
             return;
         }
 
-        List<Block> blockList = this.parserUtils.parseInlineNonWiki(value);
+        List<Block> blockList = this.parserUtils.parsePlainText(value);
 
         if (!blockList.isEmpty()) {
             String styleParameter = formatStyle(style);

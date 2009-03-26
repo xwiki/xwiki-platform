@@ -1,5 +1,6 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Verify the TOC list is well formated (down and up, jump more that one level, etc.) for a page scope
 .#-----------------------------------------------------
 = Level 1
 

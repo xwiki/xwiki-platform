@@ -35,7 +35,7 @@ import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
-import org.xwiki.rendering.macro.MacroFactory;
+import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
@@ -513,8 +513,8 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     {
         try {
             SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
-            MacroFactory macroFactory = (MacroFactory) Utils.getComponent(MacroFactory.ROLE);
-            Macro< ? > macro = macroFactory.getMacro(macroName, syntaxFactory.createSyntaxFromIdString(syntaxId));
+            MacroManager manager = (MacroManager) Utils.getComponentManager().lookup(MacroManager.ROLE);
+            Macro< ? > macro = manager.getMacro(macroName, syntaxFactory.createSyntaxFromIdString(syntaxId));
             org.xwiki.rendering.macro.descriptor.MacroDescriptor descriptor = macro.getDescriptor();
 
             MacroDescriptor result = new MacroDescriptor();
@@ -545,12 +545,10 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public List<String> getMacros(String syntaxId) throws XWikiGWTException
     {
         try {
-            List<String> macros = new ArrayList<String>();
-            for (Object key : Utils.getComponentManager().lookupMap(Macro.ROLE).keySet()) {
-                macros.add(key.toString());
-            }
-            Collections.sort(macros);
-            return macros;
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
+            MacroManager manager = (MacroManager) Utils.getComponentManager().lookup(MacroManager.ROLE);
+            return new ArrayList<String>(manager.getAllMacros(syntaxFactory.createSyntaxFromIdString(syntaxId))
+                .keySet());
         } catch (Throwable t) {
             LOG.error("Exception while retrieving the list of available macros.", t);
             throw new XWikiGWTException(t.getLocalizedMessage(), t.toString(), -1, -1);

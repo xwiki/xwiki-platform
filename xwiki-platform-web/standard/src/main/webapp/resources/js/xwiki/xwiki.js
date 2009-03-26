@@ -1,27 +1,27 @@
 /**
  * XWiki namespace.
  * TODO: move everything in it.
- * 
+ *
  * @type object
  */
 var XWiki = {
-		
+
 constants: {
   /**
    * Current wiki.
-   */		
+   */
   currentWiki: "$context.getDatabase()",
 
   /**
    * Main wiki.
-   */		
+   */
   mainWiki: "$context.getMainWikiName()",
-  
+
   /**
    * Context path.
    */
   contextPath: "$request.getContextPath()",
-  
+
   /**
    * Character that separates wiki from space in a page fullName (example: xwiki:Main.WebHome).
    */
@@ -36,7 +36,7 @@ constants: {
    * Character that separates page from attachment in an attachment fullName (example: xwiki:Main.WebHome@Archive.tgz).
    */
   pageAttachmentSeparator: "@",
-  
+
   /**
    * URL Anchor separator.
    */
@@ -67,17 +67,17 @@ constants: {
  * Build a resource object from a wiki resource descriptor (aka fullName).
  *
  * Examples of resource objects:
- * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main", 
- *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome", 
+ * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main",
+ *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome",
  *   name: "WebHome", attachment: "" }
- * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main", 
- *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome", 
+ * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main",
+ *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome",
  *   name: "WebHome", attachment: "attach.zip" }
  *
  * @param fullName fullName of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).
  * @return the newly created resource object.
  */
-getResource : function(fullName) {	 
+getResource : function(fullName) {
 	var resource = {
 			wiki : "",
 			space : "",
@@ -87,31 +87,39 @@ getResource : function(fullName) {
 			name : "",
 			attachment : "",
 			anchor: ""
-	}; 
+	};
 
 	// Extract wiki and set prefixedFullName.
 	if (fullName.contains(this.constants.wikiSpaceSeparator)) {
 	  	resource.wiki = fullName.substring(0, fullName.indexOf(this.constants.wikiSpaceSeparator));
 	  	// Remove wiki from fullName.
       	resource.fullName = fullName.substring(fullName.indexOf(this.constants.wikiSpaceSeparator) + 1, fullName.length);
-	  	resource.prefixedFullName = fullName;  	
-	} else if (fullName.contains(this.constants.spacePageSeparator)) {	
-		// Fallback on current wiki.
-		resource.wiki = this.constants.currentWiki;
-		resource.prefixedFullName = resource.wiki + this.constants.wikiSpaceSeparator + fullName;
-	}		
-	
+	  	resource.prefixedFullName = fullName;
+	} else {
+        if (fullName.contains(this.constants.spacePageSeparator)) {
+		    // Fallback on current wiki.
+		    resource.wiki = this.constants.currentWiki;
+		    resource.prefixedFullName = resource.wiki + this.constants.wikiSpaceSeparator + fullName;
+        } else {
+            resource.wiki = fullName;
+        }
+	}
+
 	// Extract attachment and remove it from fullName and prefixedFullName if any.
 	if (resource.fullName.contains(this.constants.pageAttachmentSeparator)) {
+        // Attachment name.
+		resource.attachment = fullName.substring(fullName.indexOf(this.constants.pageAttachmentSeparator) + 1, fullName.length);
 		resource.fullName = resource.fullName.substring(0, resource.fullName.indexOf(this.constants.pageAttachmentSeparator));
+        fullName = resource.fullName;
 		resource.prefixedFullName = resource.prefixedFullName.substring(0, resource.prefixedFullName.indexOf(this.constants.pageAttachmentSeparator));
-	}	
-	
+	}
+
 	// Extract anchor and remove it from fullName and prefixedFullName if any.
 	if (resource.fullName.contains(this.constants.anchorSeparator)) {
 		resource.anchor = resource.fullName.substring(resource.fullName.indexOf(this.constants.anchorSeparator) + 1, resource.fullName.length);
 		resource.fullName = resource.fullName.substring(0, resource.fullName.indexOf(this.constants.anchorSeparator));
-		resource.prefixedFullName = resource.prefixedFullName.substring(0, resource.prefixedFullName.indexOf(this.constants.anchorSeparator));
+		fullName = resource.fullName;
+        resource.prefixedFullName = resource.prefixedFullName.substring(0, resource.prefixedFullName.indexOf(this.constants.anchorSeparator));
 	}
 
 	// Extract space and page name.
@@ -119,24 +127,16 @@ getResource : function(fullName) {
 		// Space
 		resource.space = fullName.substring(fullName.indexOf(this.constants.wikiSpaceSeparator) + 1, fullName.indexOf(this.constants.spacePageSeparator));
 		resource.prefixedSpace = resource.wiki + this.constants.wikiSpaceSeparator + resource.space;
-		if (fullName.length - fullName.indexOf(this.constants.spacePageSeparator) > 0) {      	
-			if (!fullName.contains(this.constants.pageAttachmentSeparator)) {
-				// Page name.
-				resource.name = fullName.substring(fullName.indexOf(this.constants.spacePageSeparator) + 1, fullName.length);          
-			} else {
-				// Page name.
-				resource.name = fullName.substring(fullName.indexOf(this.constants.spacePageSeparator) + 1, fullName.indexOf(this.constants.pageAttachmentSeparator));          
-				if (fullName.length - fullName.indexOf(this.constants.pageAttachmentSeparator) > 0) {	
-					// Attachment name.
-					resource.attachment = fullName.substring(fullName.indexOf(this.constants.pageAttachmentSeparator) + 1, fullName.length);  
-				}
-			}
-
+		if (fullName.length - fullName.indexOf(this.constants.spacePageSeparator) > 0) {
+		  // Page name.
+	      resource.name = fullName.substring(fullName.indexOf(this.constants.spacePageSeparator) + 1, fullName.length);
 		}
-	}
-	
+	} else {
+        resource.space = resource.fullName;
+    }
+
 	return resource;
-}				
+}
 };
 
 /**
@@ -156,7 +156,7 @@ document.observe("dom:loaded", function() {
 });
 
 /**
- * Hide the fieldset inside the given form. 
+ * Hide the fieldset inside the given form.
  *
  * @param form  {element} The form element.
  * @return
@@ -166,7 +166,7 @@ function hideForm(form){
 }
 
 /**
- * Hide the fieldset inside the given form if visible, show it if it's not. 
+ * Hide the fieldset inside the given form if visible, show it if it's not.
  *
  * @param form  {element} The form element.
  * @return
@@ -182,7 +182,7 @@ function toggleForm(form){
 }
 
 /**
- * Expand the given panel if collapsed, collapse if visible. 
+ * Expand the given panel if collapsed, collapse if visible.
  *
  * @param form  {element} The panel element.
  * @return
@@ -197,9 +197,9 @@ function togglePanelVisibility(element){
 }
 
 /**
- * Show items under the given entry in the top menu (menuview.vm). 
- * 
- * @param element The selected item 
+ * Show items under the given entry in the top menu (menuview.vm).
+ *
+ * @param element The selected item
  * @return
  */
 function showsubmenu(element){
@@ -226,9 +226,9 @@ function showsubmenu(element){
 }
 
 /**
- * hide items under the given entry in the top menu (menuview.vm). 
- * 
- * @param element The selected item 
+ * hide items under the given entry in the top menu (menuview.vm).
+ *
+ * @param element The selected item
  * @return
  */
 function hidesubmenu(element){
@@ -240,7 +240,7 @@ function hidesubmenu(element){
 
 /**
  * Method doing the hide action on the element set by hidesubmenu() in the window object.
- * 
+ *
  * @return
  */
 function doHide(){
@@ -252,7 +252,7 @@ function doHide(){
 
 /**
  * Toggle CSS class in the given element.
- * 
+ *
  * @param o Element.
  * @param className CSS class.
  * @return
@@ -268,9 +268,9 @@ function toggleClass(o, className){
 
 /**
  * Add a CSS class to an element.
- * 
+ *
  * @param o Element.
- * @param className CSS class. 
+ * @param className CSS class.
  * @return
  */
 function addClass(o, className){
@@ -280,7 +280,7 @@ function addClass(o, className){
 
 /**
  * Check if an element has a CSS class.
- * 
+ *
  * @param o Element.
  * @param className CSS class.
  * @return True if the element has the class.
@@ -293,7 +293,7 @@ function eltHasClass(o,className){
 
 /**
  * Remove a CSS class from an element.
- * 
+ *
  * @param o Element.
  * @param className CSS class.
  * @return
@@ -304,7 +304,7 @@ function rmClass(o, className){
 
 /**
  * Open an URL in a pop-up.
- *  
+ *
  * @param url URL to open.
  * @return
  */
@@ -317,7 +317,7 @@ function openURL(url) {
 
 /**
  * Open XWiki syntax documentation in a pop-up.
- * 
+ *
  * @deprecated
  * @return
  */
@@ -330,7 +330,7 @@ function openHelp() {
 
 /**
  * Ajax request wrapper.
- * 
+ *
  * @deprecated
  */
 var XWikiAjax = {
@@ -366,10 +366,10 @@ end: function() {
 
 /**
  * Remove special characters from text inputs.
- * 
- * @param field1 Text input 
+ *
+ * @param field1 Text input
  * @param field2 Text input
- * @param removeclass 
+ * @param removeclass
  * @return true if the text empty after the operation.
  */
 function updateName(field1, field2, removeclass) {
@@ -390,8 +390,8 @@ function updateName(field1, field2, removeclass) {
 }
 
 /**
- * Replace accented chars by non-accented chars in a string. 
- * 
+ * Replace accented chars by non-accented chars in a string.
+ *
  * @param txt String to clean.
  * @return The cleaned string.
  */
@@ -448,7 +448,7 @@ function noaccent(txt) {
 /**
  * Method used by register.vm to concatenate first name and last name to generate
  * the name of the profile page of the user who is registering.
- * 
+ *
  * @param form The register form.
  * @return
  */
@@ -471,7 +471,7 @@ function prepareName(form) {
 
 /**
  * Create a cookie, with or without expiration date.
- * 
+ *
  * @param name Name of the cookie.
  * @param value Value of the cookie.
  * @param days Days to keep the cookie (can be null).
@@ -489,7 +489,7 @@ function createCookie(name,value,days) {
 
 /**
  * Read a cookie.
- * 
+ *
  * @param name Name of the cookie.
  * @return Value for the given cookie.
  */
@@ -510,7 +510,7 @@ function readCookie(name) {
 
 /**
  * Erase a cookie.
- * 
+ *
  * @param name Name of the cookie to erase.
  * @return
  */
@@ -519,8 +519,8 @@ function eraseCookie(name) {
 }
 
 /**
- * Method used by docextra.vm to emulate tabbed panes.  
- * 
+ * Method used by docextra.vm to emulate tabbed panes.
+ *
  * @param extraID Id of the pane to show.
  * @param extraTemplate Velocity template to retrieve and display in the pane.
  * @param scrollToAnchor Jump to the pane anchor.
@@ -608,7 +608,7 @@ function displayDocExtra(extraID, extraTemplate, scrollToAnchor)
 /**
  * Method used by editmodes.vm to warn the user if he tries to go to the WYSIWYG editor
  * with HTML in his content.
- * 
+ *
  * @param message Translated warning message.
  */
 function checkAdvancedContent(message) {
@@ -619,15 +619,15 @@ function checkAdvancedContent(message) {
 	data = document.forms.edit.content.value;
 	myRE = new RegExp("</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>", "ig")
 	results = data.match(myRE)
-	if (results&&results.length>0) 
+	if (results&&results.length>0)
 		result = true;
 
 	myRE2 = new RegExp("(#(set|include|if|end|for)|#(#) Advanced content|public class|/\* Advanced content \*/)", "ig")
 	results = data.match(myRE2)
-	if (results&&results.length>0) 
+	if (results&&results.length>0)
 		result = true;
 
-	if (result==true) 
+	if (result==true)
 		return confirm(message);
 
 	return true;
@@ -863,28 +863,28 @@ shortcut = {
 		}
 }
 
-/** 
- * Browser Detect  
+/**
+ * Browser Detect
  * Version: 2.1.6
  * URL: http://dithered.chadlindstrom.ca/javascript/browser_detect/index.html
  * License: http://creativecommons.org/licenses/by/1.0/
  * Author: Chris Nott (chris[at]dithered[dot]com)
-*/ 
+*/
 function BrowserDetect() {
-	var ua = navigator.userAgent.toLowerCase(); 
+	var ua = navigator.userAgent.toLowerCase();
 
     // browser engine name
 	this.isGecko       = (ua.indexOf('gecko') != -1 && ua.indexOf('safari') == -1);
 	this.isAppleWebKit = (ua.indexOf('applewebkit') != -1);
 
     // browser name
-	this.isKonqueror   = (ua.indexOf('konqueror') != -1); 
+	this.isKonqueror   = (ua.indexOf('konqueror') != -1);
 	this.isSafari      = (ua.indexOf('safari') != - 1);
 	this.isOmniweb     = (ua.indexOf('omniweb') != - 1);
-	this.isOpera       = (ua.indexOf('opera') != -1); 
-	this.isIcab        = (ua.indexOf('icab') != -1); 
-	this.isAol         = (ua.indexOf('aol') != -1); 
-	this.isIE          = (ua.indexOf('msie') != -1 && !this.isOpera && (ua.indexOf('webtv') == -1) ); 
+	this.isOpera       = (ua.indexOf('opera') != -1);
+	this.isIcab        = (ua.indexOf('icab') != -1);
+	this.isAol         = (ua.indexOf('aol') != -1);
+	this.isIE          = (ua.indexOf('msie') != -1 && !this.isOpera && (ua.indexOf('webtv') == -1) );
 	this.isMozilla     = (this.isGecko && ua.indexOf('gecko/') + 14 == ua.length);
 	this.isFirefox     = (ua.indexOf('firefox/') != -1 || ua.indexOf('firebird/') != -1);
 	this.isNS          = ( (this.isGecko) ? (ua.indexOf('netscape') != -1) : ( (ua.indexOf('mozilla') != -1) && !this.isOpera && !this.isSafari && (ua.indexOf('spoofer') == -1) && (ua.indexOf('compatible') == -1) && (ua.indexOf('webtv') == -1) && (ua.indexOf('hotjava') == -1) ) );
@@ -899,7 +899,7 @@ function BrowserDetect() {
 	this.appleWebKitVersion = ( (this.isAppleWebKit) ? parseFloat( ua.substring( ua.indexOf('applewebkit/') + 12) ) : -1 );
 
     // browser version
-	this.versionMinor = parseFloat(navigator.appVersion); 
+	this.versionMinor = parseFloat(navigator.appVersion);
 
     // correct version number
 	if (this.isGecko && !this.isMozilla) {
@@ -927,7 +927,7 @@ function BrowserDetect() {
 		this.versionMinor = parseFloat( ua.substring( ua.indexOf('icab') + 5 ) );
 	}
 
-	this.versionMajor = parseInt(this.versionMinor); 
+	this.versionMajor = parseInt(this.versionMinor);
 
     // dom support
 	this.isDOM1 = (document.getElementById);

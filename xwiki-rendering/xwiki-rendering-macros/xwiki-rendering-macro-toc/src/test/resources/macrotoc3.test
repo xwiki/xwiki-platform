@@ -46,11 +46,11 @@ endListItem
 endList [BULLETED]
 endListItem
 endList [BULLETED]
+endListItem
 beginListItem
 beginLink [Anchor = [HTitle2]] [false]
 onWord [Title2]
 endLink [Anchor = [HTitle2]] [false]
-endListItem
 endListItem
 endList [BULLETED]
 endMacroMarkerStandalone [toc] [start=1|depth=6|numbered=false|scope=page] []

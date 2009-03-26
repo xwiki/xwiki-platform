@@ -122,9 +122,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             Block titleBlock = new LinkBlock(
                 getParserUtils().parseInlineNonWiki(entry.getTitle()), titleLink, true);
             ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
-            if (parameters.isCss()) {
-                paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
-            }
+            paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
             parentBlock.addChild(paragraphTitleBlock);
             
             if (parameters.isContent() && entry.getDescription() != null) {
@@ -138,9 +136,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
                     entry.getDescription().getValue(), context.isInline());
 
                 XMLElement xmlElement = new XMLElement("div");
-                if (parameters.isCss()) {
-                    xmlElement.setAttribute(CLASS_ATTRIBUTE, "rssitemdescription");
-                }
+                xmlElement.setAttribute(CLASS_ATTRIBUTE, "rssitemdescription");
                 parentBlock.addChild(new XMLBlock(Arrays.asList(html), xmlElement));
             }
         }
@@ -177,15 +173,13 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         BoxMacroParameters boxParameters = new BoxMacroParameters();
         boolean hasImage = parameters.isImage() && feed.getImage() != null;
 
-        if (parameters.isCss()) {
-            boxParameters.setCssClass("rssfeed");
-        }
+        boxParameters.setCssClass("rssfeed");
         
         if (!StringUtils.isEmpty(parameters.getWidth())) {
             boxParameters.setWidth(parameters.getWidth());
         }
         
-        renderFeedOrEntryTitle(boxParameters, parameters.isCss(), "rsschanneltitle", feed.getTitle(), feed.getLink());
+        renderFeedOrEntryTitle(boxParameters, "rsschanneltitle", feed.getTitle(), feed.getLink());
 
         List<Block> result = null;
         if (hasImage) {
@@ -203,12 +197,11 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     /**
      * Renders the RSS's title.
      * @param boxParameters the BoxParameters where the title will be fitted
-     * @param isCss whether CSS formatting should be applied
      * @param cssClass the CSS sheet
      * @param title the title's text
      * @param link the title's link (if there is one)
      */
-    private void renderFeedOrEntryTitle(BoxMacroParameters boxParameters, boolean isCss, 
+    private void renderFeedOrEntryTitle(BoxMacroParameters boxParameters, 
         String cssClass, String title, String link) {
         List<Block> titleBlocks = null;
         
@@ -222,9 +215,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             titleBlocks = Collections.singletonList(linkBlock);
         }
         ParagraphBlock titleBlock = new ParagraphBlock(titleBlocks);
-        if (isCss) {
-            titleBlock.setParameter(CLASS_ATTRIBUTE, cssClass);
-        }
+        titleBlock.setParameter(CLASS_ATTRIBUTE, cssClass);
         
         boxParameters.setBlockTitle(Collections.singletonList(titleBlock));
     }

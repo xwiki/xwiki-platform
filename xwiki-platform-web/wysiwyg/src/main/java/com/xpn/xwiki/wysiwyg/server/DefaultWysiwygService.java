@@ -224,9 +224,24 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             {
                 public int compare(XWikiAttachment firstAttachment, XWikiAttachment secondAttachment)
                 {
-                    return firstAttachment.getDate().compareTo(secondAttachment.getDate());
+                    String currentAuthor = "";
+                    try {
+                        currentAuthor = getUser().getAuthor();
+                    } catch (XWikiGWTException e) {
+                        // Do nothing.
+                    }
+                    if (firstAttachment.getAuthor().equals(currentAuthor)
+                        && secondAttachment.getAuthor().equals(currentAuthor)) {
+                        return firstAttachment.getDate().compareTo(secondAttachment.getDate());
+                    } else if(firstAttachment.getAuthor().equals(currentAuthor)) {
+                        return +1;
+                    } else if(secondAttachment.getAuthor().equals(currentAuthor)){
+                        return -1;
+                    } else {
+                        return 0;
+                    }
                 }
-            });            
+            });
             return officeImporter.importAttachment(pageName, latestAttachment.getFilename(), cleaningParams);
         } catch (OfficeImporterException ex) {
             throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);

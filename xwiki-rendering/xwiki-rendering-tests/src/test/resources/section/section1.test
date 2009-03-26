@@ -12,53 +12,53 @@
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, HTitlelevel1]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [1]
-endHeader [1]
+endHeader [1, HTitlelevel1]
 beginSection
-beginHeader [2]
+beginHeader [2, HTitlelevel2]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [2]
-endHeader [2]
+endHeader [2, HTitlelevel2]
 beginSection
-beginHeader [3]
+beginHeader [3, HTitlelevel3]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [3]
-endHeader [3]
+endHeader [3, HTitlelevel3]
 beginSection
-beginHeader [4]
+beginHeader [4, HTitlelevel4]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [4]
-endHeader [4]
+endHeader [4, HTitlelevel4]
 beginSection
-beginHeader [5]
+beginHeader [5, HTitlelevel5]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [5]
-endHeader [5]
+endHeader [5, HTitlelevel5]
 beginSection
-beginHeader [6]
+beginHeader [6, HTitlelevel6]
 onWord [Title]
 onSpace
 onWord [level]
 onSpace
 onWord [6]
-endHeader [6]
+endHeader [6, HTitlelevel6]
 endSection
 endSection
 endSection

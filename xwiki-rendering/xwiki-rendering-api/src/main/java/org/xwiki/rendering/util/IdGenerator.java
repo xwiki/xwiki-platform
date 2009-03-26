@@ -19,31 +19,67 @@
  */
 package org.xwiki.rendering.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Id generator.
+ * Stateful generator of id attributes. It's stateful since it remembers the generated ids. Thus a new instance of it
+ * should be used for each document.
  * 
  * @version $Id: $
+ * @since 1.6M1
  */
-public interface IdGenerator
+public class IdGenerator
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = IdGenerator.class.getName();
+    private Set<String> generatedIds = new HashSet<String>();
 
     /**
-     * Randomly generate a unique id. The generated id complies with the XHTML specification. Extract from <a
+     * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML
+     * specification. Extract from <a
      * href="http://www.devguru.com/technologies/xhtml/QuickRef/xhtml_attribute_id.html">DevGuru</a>:
      * <p>
-     * <quote>
-     * "The id attribute is used to assign a identifier value to a tag. Each id must be unique within the document 
-     *   and each element can only have one id.
-     *   In XHTML, the id attribute has essentially replaced the use of the name attribute. The value of the id must 
-     *   start with an alphabetic letter or an underscore. The rest of the value can contain any alpha/numeric 
-     *   character."
-     * </quote></p> 
+     * <quote> "The id attribute is used to assign a identifier value to a tag. Each id must be unique within the
+     * document and each element can only have one id. In XHTML, the id attribute has essentially replaced the use of
+     * the name attribute. The value of the id must start with an alphabetic letter or an underscore. The rest of the
+     * value can contain any alpha/numeric character." </quote>
+     * </p>
      * 
+     * @param text the text used to generate the unique id. For example "Hello" will generate "HHello".
      * @return the unique id
      */
-    String generateRandomUniqueId();
+    public String generateUniqueId(String text)
+    {
+        // Remove all non alpha numeric characters to make a nice compact id which respect the XHTML specification.
+        String idPrefix = text.replaceAll("[^a-zA-Z0-9]", "");
+
+        int occurence = 0;
+        String id = idPrefix;
+        while (this.generatedIds.contains(id)) {
+            occurence++;
+            id = idPrefix + "-" + occurence;
+        }
+
+        // Save the generated id so that the next call to this method will not generate the same id.
+        this.generatedIds.add(id);
+
+        return id;
+    }
+
+    /**
+     * Remove the saved previously generated id to make it available again.
+     * 
+     * @param id the id to remove from the generated ids.
+     */
+    public void remove(String id)
+    {
+        generatedIds.remove(id);
+    }
+
+    /**
+     * Reset the known generated ids.
+     */
+    public void reset()
+    {
+        this.generatedIds.clear();
+    }
 }

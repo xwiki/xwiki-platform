@@ -148,7 +148,7 @@ public class WikiModelGeneratorListener implements Listener
         // Don't do anything since there's no notion of Section in WikiModel
     }
 
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         this.wikimodelListener.beginHeader(level.getAsInt(), createWikiParameters(parameters));
     }
@@ -189,7 +189,7 @@ public class WikiModelGeneratorListener implements Listener
         // Don't do anything since there's no notion of Section in WikiModel
     }
 
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         this.wikimodelListener.endHeader(level.getAsInt(), createWikiParameters(parameters));
     }

@@ -30,20 +30,22 @@ import org.apache.maven.doxia.sink.Sink;
 import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.HorizontalLineBlock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.block.HorizontalLineBlock;
-import org.xwiki.rendering.block.FormatBlock;
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.util.IdGenerator;
+import org.xwiki.rendering.util.RenderersUtils;
 
 /**
  * Doxia Sink that generates a XWiki {@link XDOM} object containing page Blocks.
@@ -62,6 +64,10 @@ public class XDOMGeneratorSink implements Sink
     private static final Pattern SPLIT_TEXT_PATTERN =
         Pattern.compile("(\\w+)?([ <>=.\"\\?\\*!#\\$%'\\(\\)\\+,/:;@\\[\\]\\\\^_`\\{\\}\\|~])?");
 
+    private IdGenerator idGenerator = new IdGenerator();
+
+    private RenderersUtils renderersUtils = new RenderersUtils();
+
     private class MarkerBlock extends AbstractBlock
     {
         public void traverse(Listener listener)
@@ -76,7 +82,7 @@ public class XDOMGeneratorSink implements Sink
 
     public XDOM getDOM()
     {
-        return new XDOM(generateListFromStack());
+        return new XDOM(generateListFromStack(), this.idGenerator);
     }
 
     public void anchor(String arg0)
@@ -364,8 +370,11 @@ public class XDOMGeneratorSink implements Sink
 
     public void section1_()
     {
+        List<Block> children = generateListFromStack();
+        String id = "H" + this.idGenerator.generateUniqueId(this.renderersUtils.renderPlainText(children));
+
         List<Block> headerTitleBlocks = generateListFromStack();
-        this.stack.push(new HeaderBlock(headerTitleBlocks, HeaderLevel.LEVEL1));
+        this.stack.push(new HeaderBlock(headerTitleBlocks, HeaderLevel.LEVEL1, id));
     }
 
     public void section2()

@@ -41,14 +41,14 @@ public class ParserUtils
     private static final Pattern SPECIALSYMBOL_PATTERN = Pattern.compile("[!\"#$%&'()*+,-./:;<=>?@\\[\\]^_`{|}~]");
 
     /**
-     * Parse a simple inline non wiki string to be able to insert it in the XDOM.
+     * Parse a simple non wiki string to be able to insert it in the XDOM.
      * 
      * @param text the text to parse (pure text)
      * @return the list of {@link Block} ({@link WordBlock}, {@link SpaceBlock}, {@link NewLineBlock},
      *         {@link SpecialSymbolBlock}).
      * @since 1.7
      */
-    public List<Block> parseInlineNonWiki(String text)
+    public List<Block> parsePlainText(String text)
     {
         List<Block> blockList = new ArrayList<Block>();
         StringBuffer word = new StringBuffer();

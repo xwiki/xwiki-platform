@@ -125,12 +125,12 @@ public enum EventType
     },
     BEGIN_HEADER {
         void fireEvent(Listener listener, Object[] eventParameters) {
-            listener.beginHeader((HeaderLevel) eventParameters[0], (Map<String, String>) eventParameters[1]);
+            listener.beginHeader((HeaderLevel) eventParameters[0], (String)eventParameters[1], (Map<String, String>) eventParameters[2]);
         }
     },
     END_HEADER {
         void fireEvent(Listener listener, Object[] eventParameters) {
-            listener.endHeader((HeaderLevel) eventParameters[0], (Map<String, String>) eventParameters[1]);
+            listener.endHeader((HeaderLevel) eventParameters[0], (String)eventParameters[1], (Map<String, String>) eventParameters[2]);
         }
     },
     BEGIN_LINK {

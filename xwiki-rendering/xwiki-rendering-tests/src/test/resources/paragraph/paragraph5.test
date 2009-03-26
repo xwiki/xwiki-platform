@@ -11,9 +11,9 @@ beginParagraph
 onWord [Paragraph]
 endParagraph
 beginSection
-beginHeader [1]
+beginHeader [1, HHeader]
 onWord [Header]
-endHeader [1]
+endHeader [1, HHeader]
 endSection
 endDocument
 .#-----------------------------------------------------

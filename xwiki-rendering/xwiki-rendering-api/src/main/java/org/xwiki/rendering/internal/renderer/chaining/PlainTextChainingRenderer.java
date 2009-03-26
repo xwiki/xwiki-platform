@@ -42,7 +42,7 @@ import org.xwiki.rendering.renderer.printer.XMLWikiPrinter;
  * label like in a TOC.
  * 
  * @version $Id$
- * @since 1.8.1
+ * @since 1.9M1
  */
 public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
 {
@@ -110,7 +110,11 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         if (link.getType() == LinkType.DOCUMENT) {
-            getPrinter().print(this.linkLabelGenerator.generate(link));
+            if (this.linkLabelGenerator != null) {
+                getPrinter().print(this.linkLabelGenerator.generate(link));
+            } else {
+                getPrinter().print(link.getReference());
+            }
         } else {
             getPrinter().print(link.getReference());
         }
@@ -120,10 +124,10 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginHeader(org.xwiki.rendering.listener.HeaderLevel,
-     *      java.util.Map)
+     *      String, java.util.Map)
      */
     @Override
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         printEmptyLine();
     }

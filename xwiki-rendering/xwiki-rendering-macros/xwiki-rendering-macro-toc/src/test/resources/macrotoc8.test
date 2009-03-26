@@ -13,31 +13,28 @@ beginDocument
 beginMacroMarkerStandalone [toc] [] []
 beginList [BULLETED]
 beginListItem
-beginLink [Anchor = [testid]] [false]
+beginLink [Anchor = [Hh2]] [false]
 onWord [h2]
-endLink [Anchor = [testid]] [false]
+endLink [Anchor = [Hh2]] [false]
 endListItem
 endList [BULLETED]
 endMacroMarkerStandalone [toc] [] []
 beginSection
-beginHeader [1]
+beginHeader [1, Hh1]
 onWord [h1]
-endHeader [1]
+endHeader [1, Hh1]
 beginSection
-onId [testid]
-beginHeader [2]
+beginHeader [2, Hh2]
 onWord [h2]
-endHeader [2]
+endHeader [2, Hh2]
 endSection
 endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#testid--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#testid">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><a id="testid" name="testid"></a><h2 id="Hh2"><span>h2</span></h2>
+<!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2>
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
-.# The problem is that the Id macro can generate invalid XHTML (in this example it generates a A element at the level of BODY).
-.# see http://jira.xwiki.org/jira/browse/XWIKI-3367
+.input|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#testid--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#testid">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><a id="testid" name="testid"></a><h2 id="Hh2"><span>h2</span></h2>
+<html><!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2></html>

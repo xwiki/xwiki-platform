@@ -8,12 +8,12 @@
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, Hhello]
 onWord [hello]
 onSpace
 beginMacroMarkerInline [velocity] [] [world]
 onWord [world]
 endMacroMarkerInline [velocity] [] [world]
-endHeader [1]
+endHeader [1, Hhello]
 endSection
 endDocument

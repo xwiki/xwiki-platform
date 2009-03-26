@@ -31,9 +31,6 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
-          <role>org.xwiki.rendering.util.IdGenerator</role>
-        </requirement>
-        <requirement>
           <role>org.xwiki.rendering.renderer.LinkLabelGenerator</role>
         </requirement>
       </requirements>

@@ -120,7 +120,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             titleLink.setType(LinkType.URI);
             titleLink.setReference(entry.getLink());
             Block titleBlock = new LinkBlock(
-                getParserUtils().parseInlineNonWiki(entry.getTitle()), titleLink, true);
+                getParserUtils().parsePlainText(entry.getTitle()), titleLink, true);
             ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
             paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
             parentBlock.addChild(paragraphTitleBlock);
@@ -206,12 +206,12 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         List<Block> titleBlocks = null;
         
         if (link == null) {
-            titleBlocks = getParserUtils().parseInlineNonWiki(title);
+            titleBlocks = getParserUtils().parsePlainText(title);
         } else {
             Link titleLink = new Link();
             titleLink.setReference(link);
             titleLink.setType(LinkType.URI);
-            Block linkBlock = new LinkBlock(getParserUtils().parseInlineNonWiki(title), titleLink, true);
+            Block linkBlock = new LinkBlock(getParserUtils().parsePlainText(title), titleLink, true);
             titleBlocks = Collections.singletonList(linkBlock);
         }
         ParagraphBlock titleBlock = new ParagraphBlock(titleBlocks);

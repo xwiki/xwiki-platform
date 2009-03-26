@@ -129,10 +129,10 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
         super.endQuotationLine();
     }
 
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         this.newLineCount = 0;
-        super.endHeader(level, parameters);
+        super.endHeader(level, id, parameters);
     }
 
     public void endTable(Map<String, String> parameters)

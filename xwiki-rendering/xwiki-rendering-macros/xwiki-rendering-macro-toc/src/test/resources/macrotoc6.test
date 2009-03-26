@@ -12,8 +12,8 @@ beginDocument
 beginMacroMarkerStandalone [toc] [] []
 endMacroMarkerStandalone [toc] [] []
 beginSection
-beginHeader [1]
+beginHeader [1, Hheader]
 onWord [header]
-endHeader [1]
+endHeader [1, Hheader]
 endSection
 endDocument

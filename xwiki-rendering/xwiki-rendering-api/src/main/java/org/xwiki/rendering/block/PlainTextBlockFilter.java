@@ -34,7 +34,7 @@ import org.xwiki.rendering.util.ParserUtils;
  * Used to filter plain text blocks.
  * 
  * @version $Id$
- * @since 1.8.1
+ * @since 1.9M1
  */
 public class PlainTextBlockFilter implements BlockFilter
 {
@@ -75,9 +75,9 @@ public class PlainTextBlockFilter implements BlockFilter
         } else if (block.getClass() == LinkBlock.class && ((LinkBlock) block).getChildren().size() == 0) {
             Link link = ((LinkBlock) block).getLink();
             if (link.getType() == LinkType.DOCUMENT) {
-                return this.parseUtils.parseInlineNonWiki(this.linkLabelGenerator.generate(link));
+                return this.parseUtils.parsePlainText(this.linkLabelGenerator.generate(link));
             } else {
-                return this.parseUtils.parseInlineNonWiki(link.getReference());
+                return this.parseUtils.parsePlainText(link.getReference());
             }
         } else {
             return Collections.emptyList();

@@ -13,18 +13,18 @@ not header =
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, Hheaderendheader]
 onWord [header]
 onNewLine
 onWord [end]
 onSpace
 onWord [header]
-endHeader [1]
+endHeader [1, Hheaderendheader]
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, Hheader]
 onWord [header]
-endHeader [1]
+endHeader [1, Hheader]
 beginParagraph
 onWord [not]
 onSpace
@@ -37,7 +37,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="Hheaderbrendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p>
+<h1 id="Hheaderendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -50,4 +50,4 @@ not header =
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><h1 id="Hheaderbrendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p></html>
+<html><h1 id="Hheaderendheader"><span>header<br/>end header</span></h1><h1 id="Hheader"><span>header</span></h1><p>not header =</p></html>

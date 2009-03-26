@@ -8,12 +8,12 @@
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, Hhello]
 onWord [hello]
 onSpace
 beginMacroMarkerInline [groovy] [] [print "world"]
 onWord [world]
 endMacroMarkerInline [groovy] [] [print "world"]
-endHeader [1]
+endHeader [1, Hhello]
 endSection
 endDocument

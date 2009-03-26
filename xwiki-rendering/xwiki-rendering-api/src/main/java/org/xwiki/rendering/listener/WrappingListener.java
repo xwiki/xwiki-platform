@@ -63,9 +63,9 @@ public class WrappingListener implements Listener
         this.listener.beginSection(parameters);
     }
 
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        this.listener.beginHeader(level, parameters);
+        this.listener.beginHeader(level, id, parameters);
     }
 
     /**
@@ -113,9 +113,9 @@ public class WrappingListener implements Listener
         this.listener.endSection(parameters);
     }
 
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        this.listener.endHeader(level, parameters);
+        this.listener.endHeader(level, id, parameters);
     }
 
     /**

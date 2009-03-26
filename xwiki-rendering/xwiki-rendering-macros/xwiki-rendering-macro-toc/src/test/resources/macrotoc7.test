@@ -11,22 +11,22 @@
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, HTitle1]
 onWord [Title1]
-endHeader [1]
+endHeader [1, HTitle1]
 beginMacroMarkerStandalone [toc] [start=1|depth=6|numbered=true|scope=local] []
 beginList [NUMBERED]
 beginListItem
 beginList [NUMBERED]
 beginListItem
-beginLink [Anchor = [testid]] [false]
+beginLink [Anchor = [HTitle11]] [false]
 onWord [Page]
-endLink [Anchor = [testid]] [false]
+endLink [Anchor = [HTitle11]] [false]
 beginList [NUMBERED]
 beginListItem
 beginList [NUMBERED]
 beginListItem
-beginLink [Anchor = [testid]] [false]
+beginLink [Anchor = [HTitle1111]] [false]
 onWord [Title]
 onSpace
 onWord [1]
@@ -36,7 +36,7 @@ onSpecialSymbol [.]
 onWord [1]
 onSpecialSymbol [.]
 onWord [1]
-endLink [Anchor = [testid]] [false]
+endLink [Anchor = [HTitle1111]] [false]
 endListItem
 endList [NUMBERED]
 endListItem
@@ -47,15 +47,13 @@ endListItem
 endList [NUMBERED]
 endMacroMarkerStandalone [toc] [start=1|depth=6|numbered=true|scope=local] []
 beginSection
-onId [testid]
-beginHeader [2]
+beginHeader [2, HTitle11]
 beginLink [Reference = [Title1.1]] [false]
 endLink [Reference = [Title1.1]] [false]
-endHeader [2]
+endHeader [2, HTitle11]
 beginSection
 beginSection
-onId [testid]
-beginHeader [4]
+beginHeader [4, HTitle1111]
 beginFormat: [BOLD]
 onWord [Title]
 onSpace
@@ -69,14 +67,14 @@ onSpecialSymbol [.]
 onWord [1]
 endFormat: [ITALIC]
 endFormat: [BOLD]
-endHeader [4]
+endHeader [4, HTitle1111]
 endSection
 endSection
 endSection
 endSection
 beginSection
-beginHeader [1]
+beginHeader [1, HTitle2]
 onWord [Title2]
-endHeader [1]
+endHeader [1, HTitle2]
 endSection
 endDocument

@@ -30,30 +30,31 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.xml.XMLNode;
 
 /**
- * Stores events without emitting them back in order to accumulate them and to provide a lookahead feature. 
- * The lookahead depth is configurable.
- *  
+ * Stores events without emitting them back in order to accumulate them and to provide a lookahead feature. The
+ * lookahead depth is configurable.
+ * 
  * @version $Id$
  * @since 1.8RC1
  */
 public class LookaheadChainingListener extends AbstractChainingListener
 {
     private LinkedList<Event> previousEvents = new LinkedList<Event>();
-    
+
     private int lookaheadDepth;
-    
+
     public class Event
     {
         public EventType eventType;
+
         public Object[] eventParameters;
-        
+
         public Event(EventType eventType, Object[] eventParameters)
         {
             this.eventType = eventType;
             this.eventParameters = eventParameters;
         }
     }
-    
+
     public LookaheadChainingListener(ListenerChain listenerChain, int lookaheadDepth)
     {
         super(listenerChain);
@@ -73,7 +74,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
         }
         return event;
     }
-    
+
     public void beginDefinitionDescription()
     {
         saveEvent(EventType.BEGIN_DEFINITION_DESCRIPTION);
@@ -104,9 +105,9 @@ public class LookaheadChainingListener extends AbstractChainingListener
         firePreviousEvent();
     }
 
-    public void beginHeader(HeaderLevel level, Map<String, String> parameters)
+    public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_HEADER, level, parameters);
+        saveEvent(EventType.BEGIN_HEADER, level, id, parameters);
         firePreviousEvent();
     }
 
@@ -218,9 +219,9 @@ public class LookaheadChainingListener extends AbstractChainingListener
         firePreviousEvent();
     }
 
-    public void endHeader(HeaderLevel level, Map<String, String> parameters)
+    public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        saveEvent(EventType.END_HEADER, level, parameters);
+        saveEvent(EventType.END_HEADER, level, id, parameters);
         firePreviousEvent();
     }
 
@@ -378,8 +379,8 @@ public class LookaheadChainingListener extends AbstractChainingListener
             event.eventType.fireEvent(getListenerChain().getNextListener(getClass()), event.eventParameters);
         }
     }
-    
-    private void saveEvent(EventType eventType, Object...objects)
+
+    private void saveEvent(EventType eventType, Object... objects)
     {
         this.previousEvents.offer(new Event(eventType, objects));
     }

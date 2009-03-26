@@ -9,20 +9,20 @@ header on newline
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1]
+beginHeader [1, Hheaderonnewline]
 onNewLine
 onWord [header]
 onSpace
 onWord [on]
 onSpace
 onWord [newline]
-endHeader [1]
+endHeader [1, Hheaderonnewline]
 endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="Hbrheaderonnewline"><span><br/>header on newline</span></h1>
+<h1 id="Hheaderonnewline"><span><br/>header on newline</span></h1>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -31,4 +31,4 @@ header on newline =
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><h1 id="Hbrheaderonnewline"><span><br/>header on newline</span></h1></html>
+<html><h1 id="Hheaderonnewline"><span><br/>header on newline</span></h1></html>

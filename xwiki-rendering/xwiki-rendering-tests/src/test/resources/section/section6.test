@@ -9,9 +9,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1] [[param]=[value]]
+beginHeader [1, Hheader] [[param]=[value]]
 onWord [header]
-endHeader [1] [[param]=[value]]
+endHeader [1, Hheader] [[param]=[value]]
 endSection
 endDocument
 .#-----------------------------------------------------

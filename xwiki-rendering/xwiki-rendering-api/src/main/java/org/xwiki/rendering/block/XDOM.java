@@ -20,6 +20,7 @@
 package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.util.IdGenerator;
 
 import java.util.List;
 import java.util.Collections;
@@ -39,6 +40,11 @@ public class XDOM extends AbstractFatherBlock
     public static final XDOM EMPTY = new XDOM(Collections.<Block> emptyList());
 
     /**
+     * Sateful id generator for this document.
+     */
+    private IdGenerator idGenerator;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
@@ -46,6 +52,42 @@ public class XDOM extends AbstractFatherBlock
     public XDOM(List<Block> childBlocks)
     {
         super(childBlocks);
+
+        this.idGenerator = new IdGenerator();
+    }
+
+    public XDOM(List<Block> childBlocks, IdGenerator idGenerator)
+    {
+        super(childBlocks);
+
+        this.idGenerator = idGenerator;
+    }
+
+    /**
+     * @return a stateful id generator for the whole document.
+     */
+    public IdGenerator getIdGenerator()
+    {
+        return this.idGenerator;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.AbstractBlock#setParent(org.xwiki.rendering.block.Block)
+     */
+    @Override
+    public void setParent(Block parentBlock)
+    {
+        if (parentBlock != null) {
+            // The document become a embedded document
+            this.idGenerator = null;
+        } else if (this.idGenerator == null) {
+            // The embedded document become a root document
+            this.idGenerator = new IdGenerator();
+        }
+
+        super.setParent(parentBlock);
     }
 
     /**

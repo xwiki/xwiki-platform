@@ -33,6 +33,12 @@
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>testsimpleinlinemacro</role-hint>
+      <implementation>org.xwiki.rendering.internal.transformation.TestSimpleInlineMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>testnestedmacro</role-hint>
       <implementation>org.xwiki.rendering.internal.transformation.TestNestedMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>

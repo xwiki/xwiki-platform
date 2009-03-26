@@ -29,11 +29,11 @@ import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
-public class TestSimpleMacro extends AbstractNoParameterMacro
+public class TestSimpleInlineMacro extends AbstractNoParameterMacro
 {
-    public TestSimpleMacro()
+    public TestSimpleInlineMacro()
     {
-        super("Simple Macro");
+        super("Simple Inline Macro");
     }
 
     /**
@@ -43,7 +43,7 @@ public class TestSimpleMacro extends AbstractNoParameterMacro
      */
     public boolean supportsInlineMode()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -56,7 +56,7 @@ public class TestSimpleMacro extends AbstractNoParameterMacro
         throws MacroExecutionException
     {
         int wordCount = context.getXDOM().getChildrenByType(WordBlock.class, true).size();
-        return Arrays.asList(new Block[] {new ParagraphBlock(Arrays.<Block> asList(new WordBlock("simplemacro"
+        return Arrays.asList(new Block[] {new ParagraphBlock(Arrays.<Block> asList(new WordBlock("simpleinlinemacro"
             + wordCount)))});
     }
 }

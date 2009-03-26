@@ -178,17 +178,21 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
             if (headerLevel >= start && headerLevel <= depth) {
                 // Move to next header in toc tree
 
-                while (currentLevel < headerLevel) {
-                    if (currentBlock instanceof ListBLock) {
-                        currentBlock = addItemBlock(currentBlock, null);
-                    }
+                if (currentLevel < headerLevel) {
+                    while (currentLevel < headerLevel) {
+                        if (currentBlock instanceof ListBLock) {
+                            currentBlock = addItemBlock(currentBlock, null);
+                        }
 
-                    currentBlock = createChildListBlock(numbered, currentBlock);
-                    ++currentLevel;
-                }
-                while (currentLevel > headerLevel) {
-                    currentBlock = currentBlock.getParent().getParent();
-                    --currentLevel;
+                        currentBlock = createChildListBlock(numbered, currentBlock);
+                        ++currentLevel;
+                    }
+                } else {
+                    while (currentLevel > headerLevel) {
+                        currentBlock = currentBlock.getParent().getParent();
+                        --currentLevel;
+                    }
+                    currentBlock = currentBlock.getParent();
                 }
 
                 currentBlock = addItemBlock(currentBlock, headerBlock);

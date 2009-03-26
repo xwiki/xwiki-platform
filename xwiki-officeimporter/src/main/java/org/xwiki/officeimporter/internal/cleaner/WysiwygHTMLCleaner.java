@@ -91,7 +91,7 @@ public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleane
      */
     public Document clean(Reader originalHtmlContent)
     {
-        return this.defaultHtmlCleaner.clean(originalHtmlContent);
+        return clean(originalHtmlContent, getDefaultConfiguration());
     }
 
     /**

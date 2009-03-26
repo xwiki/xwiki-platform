@@ -54,8 +54,7 @@ public class MiscWysiwygCleaningTest extends AbstractHTMLCleaningTest
      * uploaded automatically.
      */
     public void testImageFiltering()
-    {
-/* TODO: Commented so that Asiri can look into it and fix the problem caused by the refactoring I've done.        
+    {        
         String html = header + "<img src=\"file://path/to/local/image.png\"/>" + footer;
         Document doc = wysiwygHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("img");
@@ -67,7 +66,6 @@ public class MiscWysiwygCleaningTest extends AbstractHTMLCleaningTest
         assertTrue(startComment.getNodeValue().equals("startimage:Missing.png"));
         assertEquals("Missing.png", image.getAttribute("src"));
         assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
-        assertTrue(stopComment.getNodeValue().equals("stopimage"));
-*/        
+        assertTrue(stopComment.getNodeValue().equals("stopimage"));     
     }
 }

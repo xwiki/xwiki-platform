@@ -109,6 +109,11 @@ public class XWikiLDAPUtils
     private String baseDN = "";
 
     /**
+     * LDAP search format string.
+     */
+    private String userSearchFormatString = "({0}={1})";
+
+    /**
      * Create an instance of {@link XWikiLDAPUtils}.
      * 
      * @param connection the XWiki LDAP connection tool.
@@ -148,6 +153,22 @@ public class XWikiLDAPUtils
     public String getBaseDN()
     {
         return this.baseDN;
+    }
+
+    /**
+     * @param fmt the user search format string.
+     */
+    public void setUserSearchFormatString(String fmt)
+    {
+        this.userSearchFormatString = fmt;
+    }
+
+    /**
+     * @return the user search format string.
+     */
+    public String getUserSearchFormatString()
+    {
+        return this.userSearchFormatString;
     }
 
     /**
@@ -538,7 +559,7 @@ public class XWikiLDAPUtils
     public List<XWikiLDAPSearchAttribute> searchUserAttributesByUid(String uid, String[] attributeNameTable)
     {
         // search for the user in LDAP
-        String query = MessageFormat.format("({0}={1})", new Object[] {this.uidAttributeName, uid});
+        String query = MessageFormat.format(this.userSearchFormatString, new Object[] {this.uidAttributeName, uid});
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Searching for the user in LDAP: user:" + uid + " base:" + this.baseDN + " query:" + query

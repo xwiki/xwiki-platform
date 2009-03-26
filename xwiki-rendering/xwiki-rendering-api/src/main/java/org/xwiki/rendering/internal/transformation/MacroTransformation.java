@@ -104,7 +104,7 @@ public class MacroTransformation extends AbstractTransformation
         int executions = 0;
         List<MacroBlock> macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
         while (!macroBlocks.isEmpty() && executions < this.maxMacroExecutions) {
-            if (!transformOnce(macroBlocks, context, syntax)) {
+            if (!transformOnce(context, syntax)) {
                 break;
             }
             // TODO: Make this less inefficient by caching the blocks list.
@@ -113,8 +113,7 @@ public class MacroTransformation extends AbstractTransformation
         }
     }
 
-    private boolean transformOnce(List<MacroBlock> macroBlocks, MacroTransformationContext context, Syntax syntax)
-        throws TransformationException
+    private boolean transformOnce(MacroTransformationContext context, Syntax syntax) throws TransformationException
     {
         // 1) Get highest priority macro to execute
         MacroHolder macroHolder = getHighestPriorityMacro(context.getXDOM(), syntax);
@@ -134,6 +133,8 @@ public class MacroTransformation extends AbstractTransformation
                 getLogger().debug("The [" + macroHolder.macroBlock.getName() + "] macro doesn't support inline mode.");
                 return false;
             }
+        } else {
+            context.setInline(false);
         }
 
         // 3) Execute the highest priority macro
@@ -228,16 +229,16 @@ public class MacroTransformation extends AbstractTransformation
             Collections.singletonMap("class", "xwikirenderingerrordescription hidden");
 
         Block descriptionBlock = new VerbatimBlock(description, macroToReplace.isInline());
-        
+
         if (macroToReplace.isInline()) {
-            errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(message)), new XMLElement("span",
+            errorBlocks.add(new XMLBlock(Arrays.<Block> asList(new WordBlock(message)), new XMLElement("span",
                 errorBlockParams)));
-            errorBlocks.add(new XMLBlock(Arrays.asList((Block) descriptionBlock), new XMLElement("span",
+            errorBlocks.add(new XMLBlock(Arrays.asList(descriptionBlock), new XMLElement("span",
                 errorDescriptionBlockParams)));
         } else {
-            errorBlocks.add(new XMLBlock(Arrays.asList((Block) new WordBlock(message)), new XMLElement("div",
+            errorBlocks.add(new XMLBlock(Arrays.<Block> asList(new WordBlock(message)), new XMLElement("div",
                 errorBlockParams)));
-            errorBlocks.add(new XMLBlock(Arrays.asList((Block) descriptionBlock), new XMLElement("div",
+            errorBlocks.add(new XMLBlock(Arrays.asList(descriptionBlock), new XMLElement("div",
                 errorDescriptionBlockParams)));
         }
 

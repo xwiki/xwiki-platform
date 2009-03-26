@@ -111,6 +111,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macro11", true);
         suite.addTestsFromResource("macros/macro12", true);
         suite.addTestsFromResource("macros/macro13", true);
+        suite.addTestsFromResource("macros/macro14", true);
 
         // Links
         suite.addTestsFromResource("link/links1", false);

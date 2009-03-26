@@ -284,6 +284,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         ldapUtils.setGroupClasses(config.getGroupClasses(context));
         ldapUtils.setGroupMemberFields(config.getGroupMemberFields(context));
         ldapUtils.setBaseDN(config.getLDAPParam("ldap_base_DN", "", context));
+        ldapUtils.setUserSearchFormatString(config.getLDAPParam("ldap_user_search_fmt", "({0}={1})", context));
 
         // ////////////////////////////////////////////////////////////////////
         // 1. check if ldap authentication is off => authenticate against db

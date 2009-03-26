@@ -70,7 +70,7 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
-          <role>org.xwiki.rendering.macro.MacroFactory</role>
+          <role>org.xwiki.rendering.macro.MacroManager</role>
         </requirement>
       </requirements>
     </component>
@@ -81,15 +81,30 @@
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
-      <role>org.xwiki.rendering.macro.MacroFactory</role>
+      <role>org.xwiki.rendering.macro.MacroManager</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.macro.DefaultMacroFactory</implementation>
+      <implementation>org.xwiki.rendering.internal.macro.DefaultMacroManager</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.macro.MacroSource</role>
+          <field-name>macroSources</field-name> <!-- Plexus requires explicit field names to inject lists -->
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.macro.MacroSource</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.internal.macro.RealmMacroSource</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
           <role>org.xwiki.rendering.parser.SyntaxFactory</role>
         </requirement>
       </requirements>
+      <configuration>
+        <priority>10</priority>
+      </configuration>
     </component>
     <component>
       <role>org.xwiki.rendering.transformation.TransformationManager</role>

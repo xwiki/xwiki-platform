@@ -37,8 +37,8 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.macro.Macro;
-import org.xwiki.rendering.macro.MacroFactory;
-import org.xwiki.rendering.macro.MacroNotFoundException;
+import org.xwiki.rendering.macro.MacroLookupException;
+import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.transformation.AbstractTransformation;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -66,7 +66,7 @@ public class MacroTransformation extends AbstractTransformation
     /**
      * Handles macro registration and macro lookups. Injected by the Component Manager.
      */
-    private MacroFactory macroFactory;
+    private MacroManager macroManager;
 
     private class MacroHolder implements Comparable<MacroHolder>
     {
@@ -195,9 +195,9 @@ public class MacroTransformation extends AbstractTransformation
         // 1) Sort the macros by priority to find the highest priority macro to execute
         for (MacroBlock macroBlock : xdom.getChildrenByType(MacroBlock.class, true)) {
             try {
-                Macro< ? > macro = this.macroFactory.getMacro(macroBlock.getName(), syntax);
+                Macro< ? > macro = this.macroManager.getMacro(macroBlock.getName(), syntax);
                 macroHolders.add(new MacroHolder(macro, macroBlock));
-            } catch (MacroNotFoundException e) {
+            } catch (MacroLookupException e) {
                 // Macro cannot be found. Generate an error message instead of the macro execution result.
                 // TODO: make it internationalized
                 generateError(macroBlock, "Unknown macro: " + macroBlock.getName(), "The \"" + macroBlock.getName()

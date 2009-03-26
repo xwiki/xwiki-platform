@@ -20,34 +20,27 @@
 package org.xwiki.rendering.macro;
 
 /**
- * Encapsulate a rendering error.
+ * Encapsulate macro lookup error.
  * 
  * @version $Id$
- * @since 1.5M2
+ * @since 1.9M1
  */
-public class MacroNotFoundException
-    extends Exception
+public class MacroLookupException extends Exception
 {
-    /**
-     * Class ID for serialization.
-     */
-    private static final long serialVersionUID = -8755048990117621041L;
 
     /**
-     * {@inheritDoc}
-     * @see Exception#Exception(String)
+     * For serialization
      */
-    public MacroNotFoundException(String message)
+    private static final long serialVersionUID = -5252067975654888225L;
+
+    public MacroLookupException(String message)
     {
         super(message);
     }
-
-    /**
-     * {@inheritDoc}
-     * @see Exception#Exception(String, Throwable)
-     */
-    public MacroNotFoundException(String message, Throwable throwable)
+    
+    public MacroLookupException(String message, Throwable cause)
     {
-        super(message, throwable);
+        super(message, cause);
     }
+    
 }

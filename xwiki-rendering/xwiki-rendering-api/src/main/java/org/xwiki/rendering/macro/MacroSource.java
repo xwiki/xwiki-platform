@@ -19,28 +19,24 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.parser.Syntax;
 
 /**
+ * Tag interface representing an aggregated {@link MacroManager}. A macro source is a specific macro manager that knows
+ * how to retrieve macros in a certain manner.
+ * Examples of macro sources can be:
+ * <ul>
+ * <li>A java class loader source that provides macros directly from compiled java classes</li>
+ * <li>A wiki macro source that creates instances of macros upon code and configuration retrieved in macro pages</li>
+ * <li>A macro source that consumes a web service to load macros whose definition is located on a distant server</li>
+ * </ul>
+ * 
+ * @since 1.9M1
  * @version $Id$
- * @since 1.5M2
  */
-public interface MacroFactory
+public interface MacroSource extends MacroManager
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = MacroFactory.class.getName();
 
-    /**
-     * Look up for a Macro component matching the macro name passed as a parameter + the syntax type (eg "xwiki",
-     * "confluence", etc). The format is <code>macroname-syntaxtype</code>. The reason for this is that different
-     * syntax types can have different Macros (eg the XWiki {html} macro vs the Confluence {html} macro).
-     * 
-     * @param macroName the macro name for the macro to return
-     * @param syntax the syntax for which to find the corresponding macro
-     * @return the matching macro or null if not found
-     * @throws MacroNotFoundException if the macro cannot be found
-     */
-    Macro< ? > getMacro(String macroName, Syntax syntax) throws MacroNotFoundException;
+    /** The component role under which the implementations of this interface can be looked up. */
+    String ROLE = MacroSource.class.getName();
+
 }

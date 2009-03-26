@@ -26,31 +26,33 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.internal.macro.RealmMacroSource;
 import org.xwiki.rendering.internal.transformation.TestSimpleMacro;
 import org.xwiki.rendering.macro.Macro;
-import org.xwiki.rendering.macro.MacroFactory;
+import org.xwiki.rendering.macro.MacroLookupException;
+import org.xwiki.rendering.macro.MacroSource;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
- * Unit tests for {@link org.xwiki.rendering.internal.macro.DefaultMacroFactory}.
+ * Unit tests for {@link org.xwiki.rendering.internal.macro.RealmMacroSource}.
  * 
  * @version $Id$
- * @since 1.5M2
+ * @since 1.9M1
  */
-public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
+public class RealmMacroSourceTest extends AbstractRenderingTestCase
 {
     private Mock mockLogger;
 
     private Mock mockComponentManager;
 
-    private DefaultMacroFactory factory;
+    private RealmMacroSource source;
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
      */
     @Override
     protected void setUp() throws Exception
@@ -60,13 +62,37 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
         this.mockLogger = mock(Logger.class);
         this.mockComponentManager = mock(ComponentManager.class);
 
-        this.factory = (DefaultMacroFactory) getComponentManager().lookup(MacroFactory.ROLE);
-        this.factory.enableLogging((Logger) this.mockLogger.proxy());
+        this.source = (RealmMacroSource) getComponentManager().lookup(MacroSource.ROLE);
+        this.source.enableLogging((Logger) this.mockLogger.proxy());
+    }
+
+    public void testMacroExists()
+    {
+        assertTrue(this.source.exists("testsimplemacro"));
     }
 
     public void testGetExistingMacro() throws Exception
     {
-        this.factory.getMacro("testsimplemacro", new Syntax(SyntaxType.XWIKI, "2.0"));
+        this.source.getMacro("testsimplemacro");
+    }
+
+    public void testGetNotExistingMacro()
+    {
+        try {
+            this.source.getMacro("notregisteredmacro");
+            fail("Expected a macro lookup exception when looking for not registered macro");
+        } catch (MacroLookupException e) {
+        }
+    }
+
+    public void testSyntaxSpecificMacroExistsWhenMacroIsRegisteredForAllSyntaxes()
+    {
+        assertFalse(this.source.exists("testsimplemacro", new Syntax(SyntaxType.XWIKI, "2.0")));
+    }
+
+    public void testGetExistingMacroForASpecificSyntaxWhenMacroIsRegisteredForAllSyntaxes() throws Exception
+    {
+        this.source.getMacro("testsimplemacro", new Syntax(SyntaxType.XWIKI, "2.0"));
     }
 
     public void testMacroRegisteredForAGivenSyntaxOnly() throws Exception
@@ -74,10 +100,13 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
         Macro< ? > macro = new TestSimpleMacro();
         this.mockComponentManager.expects(once()).method("lookupMap").will(
             returnValue(Collections.singletonMap("macro/xwiki/2.0", macro)));
-        this.factory.compose((ComponentManager) this.mockComponentManager.proxy());
-        this.factory.initialize();
+        this.source.compose((ComponentManager) this.mockComponentManager.proxy());
+        this.source.initialize();
 
-        Macro< ? > macroResult = this.factory.getMacro("macro", new Syntax(SyntaxType.XWIKI, "2.0"));
+        assertFalse(this.source.exists("macro"));
+        assertTrue(this.source.exists("macro", new Syntax(SyntaxType.XWIKI, "2.0")));
+
+        Macro< ? > macroResult = this.source.getMacro("macro", new Syntax(SyntaxType.XWIKI, "2.0"));
         assertSame(macro, macroResult);
     }
 
@@ -90,11 +119,17 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
         macroDefinitions.put("macro/xwiki/2.0", macro2);
 
         this.mockComponentManager.expects(once()).method("lookupMap").will(returnValue(macroDefinitions));
-        this.factory.compose((ComponentManager) this.mockComponentManager.proxy());
-        this.factory.initialize();
+        this.source.compose((ComponentManager) this.mockComponentManager.proxy());
+        this.source.initialize();
 
-        Macro< ? > macroResult = this.factory.getMacro("macro", new Syntax(SyntaxType.XWIKI, "2.0"));
-        assertSame(macro2, macroResult);
+        assertTrue(this.source.exists("macro"));
+        assertTrue(this.source.exists("macro", new Syntax(SyntaxType.XWIKI, "2.0")));
+
+        Macro< ? > macroResult1 = this.source.getMacro("macro", new Syntax(SyntaxType.XWIKI, "2.0"));
+        assertSame(macro2, macroResult1);
+
+        Macro< ? > macroResult2 = this.source.getMacro("macro");
+        assertSame(macro1, macroResult2);
     }
 
     /**
@@ -104,7 +139,7 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
     {
         this.mockComponentManager.expects(once()).method("lookupMap").will(
             returnValue(Collections.singletonMap("macro/invalidsyntax", "dummy")));
-        this.factory.compose((ComponentManager) this.mockComponentManager.proxy());
+        this.source.compose((ComponentManager) this.mockComponentManager.proxy());
 
         // Verify that when a Macro has an invalid hint it's logged as a warning.
         this.mockLogger.expects(once()).method("warn").with(
@@ -113,7 +148,7 @@ public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
                 + "followed by the syntax for which it is valid. In that case the macro name should be followed by "
                 + "a \"/\" followed by the syntax name followed by another \"/\" followed by the syntax version. "
                 + "This macro will not be available in the system."));
-        this.factory.initialize();
+        this.source.initialize();
     }
 
 }

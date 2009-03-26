@@ -48,6 +48,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -203,7 +204,9 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     {
         org.xwiki.xml.html.HTMLCleaner cleaner =
             (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.ROLE, cleanerHint);
-        return XMLUtils.toString(cleaner.clean(new StringReader(htmlPaste), cleaningParams));
+        HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
+        configuration.setParameters(cleaningParams);
+        return XMLUtils.toString(cleaner.clean(new StringReader(htmlPaste), configuration));
     }
 
     /**

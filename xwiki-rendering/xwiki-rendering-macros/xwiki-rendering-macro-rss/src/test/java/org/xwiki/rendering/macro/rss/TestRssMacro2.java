@@ -22,7 +22,6 @@ public class TestRssMacro2 extends RssMacro
     {
         RssMacroParameters rssParameters = new RssMacroParameters();
         rssParameters.setContent(true);
-        rssParameters.setCss(true);
         rssParameters.setCount(1);
         rssParameters.setImage(false);
         

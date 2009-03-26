@@ -60,12 +60,6 @@ public class RssMacroParameters
     private String width = StringUtils.EMPTY;
 
     /**
-     * If "true" then adds class id elements (rssitem, rssitemtitle, rssitemdescription, rsschanneltitle, etc) which you
-     * can style by modifying your skin's CSS file.
-     */
-    private boolean css = true;
-
-    /**
      * The RSS feed URL.
      */
     private URL feedURL;
@@ -122,23 +116,6 @@ public class RssMacroParameters
     public String getWidth()
     {
         return this.width;
-    }
-
-    /**
-     * @param css whether to add class id elements (rssitem, rssitemtitle, rssitemdescription, rsschanneltitle, etc).
-     */
-    @ParameterDescription("Specifies whether to add class id elements (rssitem, rssitemtitle, rssitemdescription etc).")
-    public void setCss(boolean css)
-    {
-        this.css = css;
-    }
-
-    /**
-     * @return whether to add class id elements (rssitem, rssitemtitle, rssitemdescription, rsschanneltitle, etc).
-     */
-    public boolean isCss()
-    {
-        return this.css;
     }
 
     /**

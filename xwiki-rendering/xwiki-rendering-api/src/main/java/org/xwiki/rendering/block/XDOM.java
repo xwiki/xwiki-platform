@@ -40,7 +40,9 @@ public class XDOM extends AbstractFatherBlock
     public static final XDOM EMPTY = new XDOM(Collections.<Block> emptyList());
 
     /**
-     * Sateful id generator for this document.
+     * Sateful id generator for this document. We store it in the XDOM because it's the only object which remain is the
+     * same between parsing, transformation and rendering and we need to generate id during parsing and during
+     * transformation.
      */
     private IdGenerator idGenerator;
 

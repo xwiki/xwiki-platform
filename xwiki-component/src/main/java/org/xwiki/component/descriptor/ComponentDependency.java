@@ -26,6 +26,9 @@ package org.xwiki.component.descriptor;
  * @version $Id$
  * @since 1.7M1
  */
-public interface ComponentDependency extends ComponentDescriptor
+public interface ComponentDependency
 {
+    String getRole();
+
+    String getRoleHint();
 }

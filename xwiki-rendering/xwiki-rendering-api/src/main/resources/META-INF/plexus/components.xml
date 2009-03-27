@@ -135,20 +135,5 @@
         </requirement>
       </requirements>
     </component>
-    <component>
-      <role>org.xwiki.rendering.configuration.RenderingConfiguration</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration</implementation>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.configuration.ConfigurationManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.xwiki.configuration.ConfigurationSourceCollection</role>
-          <role-hint>default</role-hint>
-        </requirement>
-      </requirements>
-    </component>
   </components>
 </component-set>

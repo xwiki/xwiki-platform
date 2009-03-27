@@ -30,12 +30,8 @@ import java.util.List;
  * @version $Id$
  * @since 1.7M1
  */
-public class DefaultComponentDescriptor implements ComponentDescriptor
+public class DefaultComponentDescriptor extends DefaultComponentDependency implements ComponentDescriptor
 {
-    private String role;
-
-    private String roleHint = "default";
-
     private String implementation;
 
     private String instantiationStrategy;
@@ -43,26 +39,6 @@ public class DefaultComponentDescriptor implements ComponentDescriptor
     private List<ComponentProperty> componentConfiguration = new ArrayList<ComponentProperty>();
 
     private List<ComponentDependency> componentDependencies = new ArrayList<ComponentDependency>();
-
-    public void setRole(String role)
-    {
-        this.role = role;
-    }
-
-    public String getRole()
-    {
-        return role;
-    }
-
-    public void setRoleHint(String roleHint)
-    {
-        this.roleHint = roleHint;
-    }
-
-    public String getRoleHint()
-    {
-        return roleHint;
-    }
 
     public void setImplementation(String implementation)
     {

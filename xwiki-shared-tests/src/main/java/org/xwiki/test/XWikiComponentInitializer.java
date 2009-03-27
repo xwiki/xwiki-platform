@@ -19,6 +19,7 @@
  */
 package org.xwiki.test;
 
+import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 import org.xwiki.context.Execution;
@@ -31,6 +32,8 @@ public class XWikiComponentInitializer
 {
     private ComponentManager componentManager;
 
+    private ComponentAnnotationLoader componentAnnotationInitializer = new ComponentAnnotationLoader();
+    
     public void initialize() throws Exception
     {
         // Initialize the Execution Context
@@ -71,6 +74,8 @@ public class XWikiComponentInitializer
             configuration.setContainerConfiguration("/plexus.xml");
             DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
             this.componentManager = new PlexusComponentManager(container);
+            // Initialize dynamically all components defined using annotations
+            this.componentAnnotationInitializer.initialize(this.componentManager);
         }
 
         return this.componentManager;

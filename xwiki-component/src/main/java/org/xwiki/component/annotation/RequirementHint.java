@@ -18,37 +18,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.component.descriptor;
+package org.xwiki.component.annotation;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * Default implementation of {@link ComponentDependency}.
- * 
- * @version $Id$
- * @since 1.7M1
+ * Defines the role hint of a component to be injected to a field or method.
+ *
+ * @version $Id: $
+ * @since 1.8.1
  */
-public class DefaultComponentDependency implements ComponentDependency
+@Documented
+@Retention(RUNTIME)
+@Target({ FIELD, METHOD })
+@Inherited
+public @interface RequirementHint
 {
-    private String role;
-
-    private String roleHint = "default";
-
-    public void setRole(String role)
-    {
-        this.role = role;
-    }
-
-    public String getRole()
-    {
-        return role;
-    }
-
-    public void setRoleHint(String roleHint)
-    {
-        this.roleHint = roleHint;
-    }
-
-    public String getRoleHint()
-    {
-        return roleHint;
-    }
+    String value() default "default";
 }

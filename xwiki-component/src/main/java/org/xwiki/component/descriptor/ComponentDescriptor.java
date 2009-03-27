@@ -28,12 +28,8 @@ import java.util.Collection;
  * @version $Id$
  * @since 1.7M1
  */
-public interface ComponentDescriptor
+public interface ComponentDescriptor extends ComponentDependency
 {
-    String getRole();
-
-    String getRoleHint();
-
     String getImplementation();
 
     String getInstantiationStrategy();

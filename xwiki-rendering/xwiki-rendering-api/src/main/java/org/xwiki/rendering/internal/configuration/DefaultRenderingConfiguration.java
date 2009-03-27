@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationManager;
@@ -26,6 +27,8 @@ import org.xwiki.configuration.ConfigurationSourceCollection;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
+ * All configuration options for the rendering subsystem.
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
@@ -37,13 +40,15 @@ public class DefaultRenderingConfiguration implements Initializable, RenderingCo
     private String linkLabelFormat = "%p";
 
     /**
-     * Injected by the Component Manager.
+     * Allows reading the rendering configuration from where it's defined.
      */
+    @Requirement
     private ConfigurationManager configurationManager;
 
     /**
-     * Injected by the Component Manager.
+     * Defines from where to read the rendering configuration data. 
      */
+    @Requirement
     private ConfigurationSourceCollection sourceCollection;
 
     /**

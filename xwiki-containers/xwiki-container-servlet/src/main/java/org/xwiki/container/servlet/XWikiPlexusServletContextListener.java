@@ -23,6 +23,7 @@ package org.xwiki.container.servlet;
 import org.codehaus.plexus.servlet.PlexusServletContextListener;
 import org.codehaus.plexus.servlet.PlexusServletUtils;
 import org.codehaus.plexus.PlexusContainer;
+import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 
 import javax.servlet.ServletContextEvent;
@@ -41,6 +42,12 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         // Initializes Plexus
         super.contextInitialized(servletContextEvent);
 
+        // Register all components defined using annotations
+        PlexusContainer plexusContainer =
+            PlexusServletUtils.getPlexusContainer(servletContextEvent.getServletContext());
+        org.xwiki.component.manager.ComponentManager xwikiManager = new PlexusComponentManager(plexusContainer);
+        new ComponentAnnotationLoader().initialize(xwikiManager);
+        
         // Initializes XWiki's Container with the Servlet Context.
         try {
             ServletContainerInitializer containerInitializer =
@@ -59,9 +66,6 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         // the Composable interface to get access to the Component Manager or better they simply
         // need to define the Components they require as field members and configure the Plexus
         // deployment descriptors (components.xml) so that they are automatically injected.
-        PlexusContainer plexusContainer =
-            PlexusServletUtils.getPlexusContainer(servletContextEvent.getServletContext());
-        org.xwiki.component.manager.ComponentManager xwikiManager = new PlexusComponentManager(plexusContainer);
         servletContextEvent.getServletContext().setAttribute(
             org.xwiki.component.manager.ComponentManager.class.getName(), xwikiManager);
     }

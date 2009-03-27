@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.configuration;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Configuration properties for the Rendering module.
  * <p>
@@ -29,6 +31,7 @@ package org.xwiki.rendering.configuration;
  * @version $Id: $
  * @since 1.6M1
  */
+@ComponentRole
 public interface RenderingConfiguration
 {
     /**

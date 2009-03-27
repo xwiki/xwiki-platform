@@ -315,7 +315,7 @@
 
     <module name="StringLiteralEquality"/>
 
-    <module name="SuperClone"/>
+    <!--<module name="SuperClone"/>-->
 
     <module name="SuperFinalize"/>
 

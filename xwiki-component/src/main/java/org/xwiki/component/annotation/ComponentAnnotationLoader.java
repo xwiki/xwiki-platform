@@ -104,8 +104,7 @@ public class ComponentAnnotationLoader
         }
 
         // Set the instantiation strategy
-        InstantiationStrategy instantiationStrategy = 
-            componentClass.getAnnotation(InstantiationStrategy.class);
+        InstantiationStrategy instantiationStrategy = componentClass.getAnnotation(InstantiationStrategy.class);
         if (instantiationStrategy != null) {
             descriptor.setInstantiationStrategy(instantiationStrategy.value());
         } else {

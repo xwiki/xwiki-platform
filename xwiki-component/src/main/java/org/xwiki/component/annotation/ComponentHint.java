@@ -41,8 +41,8 @@ import java.lang.annotation.Target;
 public @interface ComponentHint
 {
     /**
-     * @return the hint value. Can be any text value. It's used to differentiate one component implementation
-     *         from another one
+     * The hint value. Can be any text value. It's used to differentiate one component implementation
+     * from another one.
      */
     String value();
 }

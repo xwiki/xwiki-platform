@@ -42,9 +42,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <includes>
-            **/annotation/ComponentAnnotationLoader.java,
-            **/annotation/ComponentRole.java,
-            **/annotation/Requirement.java
+            **/annotation/*.java
           </includes>
         </configuration>
       </plugin>

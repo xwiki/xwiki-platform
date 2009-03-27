@@ -42,5 +42,8 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 @Inherited
 public @interface InstantiationStrategy
 {
+    /**
+     * The instantiation strategy to use, see {@link ComponentInstantiationStrategy}.
+     */
     ComponentInstantiationStrategy value();
 }

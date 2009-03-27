@@ -41,5 +41,8 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface RequirementHint
 {
+    /**
+     * The hint value specifying a specific component implementation to use.
+     */
     String value();
 }

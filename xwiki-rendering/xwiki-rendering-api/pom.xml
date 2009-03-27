@@ -120,9 +120,10 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <includes>
-            **/block/*.java,
-            **/configuration/*.java,
-            **/configuration/*.java,
+            **/rendering/block/*.java,
+            **/rendering/configuration/*.java,
+            **/rendering/internal/configuration/*.java,
+            **/rendering/internal/parser/*.java,
             **/rendering/listener/*.java,
             **/rendering/listener/chaining/AbstractChainingListener.java,
             **/rendering/listener/chaining/ChainingListener.java,
@@ -137,6 +138,9 @@
             **/rendering/transformation/*.java,
             **/rendering/util/*.java
           </includes>
+          <excludes>
+            **/rendering/internal/parser/XMLBlockConverterHandler.java,
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

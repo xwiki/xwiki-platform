@@ -29,36 +29,30 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 /**
- * Parses the content of XWiki links.
- * 
- * The format is as follows:
- * <code>(link)(@interWikiAlias)?</code>, where:
+ * Parses the content of XWiki links. The format is as follows: <code>(link)(@interWikiAlias)?</code>, where:
  * <ul>
- *   <li><code>link</code>: The full link reference using the following syntax:
- *       <code>(reference)(#anchor)?(?queryString)?</code>, where:
- *       <ul>
- *         <li><code>reference</code>: The link reference. This can be either a URI in the form
- *             <code>protocol:path</code> (example: "http://xwiki.org", "mailto:john@smith.com) or
- *             a wiki page name (example: "wiki:Space.WebHome").</li>
- *         <li><code>anchor</code>: An optional anchor name pointing to an anchor defined in the
- *             referenced link. Note that in XWiki anchors are automatically created for titles.
- *             Example: "TableOfContentAnchor".</li>
- *         <li><code>queryString</code>: An optional query string for specifying parameters that
- *             will be used in the rendered URL. Example: "mydata1=5&mydata2=Hello".</li>
- *       </ul>
- *       The <code>link</code> element is mandatory.</li>
- *   <li><code>interWikiAlias</code>: An optional
- *       <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias as defined in the
- *       InterWiki Map. Example: "wikipedia"</li>
+ * <li><code>link</code>: The full link reference using the following syntax:
+ * <code>(reference)(#anchor)?(?queryString)?</code>, where:
+ * <ul>
+ * <li><code>reference</code>: The link reference. This can be either a URI in the form <code>protocol:path</code>
+ * (example: "http://xwiki.org", "mailto:john@smith.com) or a wiki page name (example: "wiki:Space.WebHome").</li>
+ * <li><code>anchor</code>: An optional anchor name pointing to an anchor defined in the referenced link. Note that in
+ * XWiki anchors are automatically created for titles. Example: "TableOfContentAnchor".</li>
+ * <li><code>queryString</code>: An optional query string for specifying parameters that will be used in the rendered
+ * URL. Example: "mydata1=5&mydata2=Hello".</li>
+ * </ul>
+ * The <code>link</code> element is mandatory.</li>
+ * <li><code>interWikiAlias</code>: An optional <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias as
+ * defined in the InterWiki Map. Example: "wikipedia"</li>
  * </ul>
  * Examples of valid wiki links:
  * <ul>
- *   <li>Hello World</li>
- *   <li>http://myserver.com/HelloWorld</li>
- *   <li>HelloWorld#Anchor</li>
- *   <li>Hello World@Wikipedia</li>
- *   <li>mywiki:HelloWorld</li>
- *   <li>Hello World?param1=1&param2=2</li>
+ * <li>Hello World</li>
+ * <li>http://myserver.com/HelloWorld</li>
+ * <li>HelloWorld#Anchor</li>
+ * <li>Hello World@Wikipedia</li>
+ * <li>mywiki:HelloWorld</li>
+ * <li>Hello World?param1=1&param2=2</li>
  * </ul>
  * 
  * @version $Id$
@@ -69,15 +63,26 @@ public class XWikiLinkParser implements LinkParser
     // Implementation note: We're not using regex in general in order to provide better error
     // messages when throwing exceptions. In addition regex makes the code less readable.
     // FWIW this is the kind of regex that would need to be used:
-    //   private static final Pattern LINK_PATTERN = Pattern.compile(
-    //      "(?:([^\\|>]*)[\\|>])?([^\\|>]*)(?:@([^\\|>]*))?(?:[\\|>](.*))?");
-    //   private static final Pattern REFERENCE_PATTERN = Pattern.compile(
-    //      "(mailto:.*|http:.*)|(?:([^?#]*)[?#]?)?(?:([^#]*)[#]?)?(.*)?");
+    // private static final Pattern LINK_PATTERN = Pattern.compile(
+    // "(?:([^\\|>]*)[\\|>])?([^\\|>]*)(?:@([^\\|>]*))?(?:[\\|>](.*))?");
+    // private static final Pattern REFERENCE_PATTERN = Pattern.compile(
+    // "(mailto:.*|http:.*)|(?:([^?#]*)[?#]?)?(?:([^#]*)[#]?)?(.*)?");
 
+    /**
+     * URL matching pattern.
+     */
     private static final Pattern URL_SCHEME_PATTERN = Pattern.compile("[a-zA-Z0-9+.-]*://");
 
+    /**
+     * The list of recognized URL prefixes.
+     */
     private static final List<String> URI_PREFIXES = Arrays.asList("mailto", "image", "attach");
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.LinkParser#parse(java.lang.String)
+     */
     public Link parse(String rawLink)
     {
         StringBuffer content = new StringBuffer(rawLink.trim());
@@ -116,16 +121,15 @@ public class XWikiLinkParser implements LinkParser
 
             link.setReference(content.toString());
         }
-        
+
         return link;
     }
 
     /**
-     * Find out the URI part of the full link. Supported URIs are "mailto:", "image:", "attach:" or any URL
-     * in the form "protocol://".
-     *
-     * @param content the string to parse. This parameter will be modified by the method to remove
-     *                the parsed content.
+     * Find out the URI part of the full link. Supported URIs are "mailto:", "image:", "attach:" or any URL in the form
+     * "protocol://".
+     * 
+     * @param content the string to parse. This parameter will be modified by the method to remove the parsed content.
      * @return the parsed URI or null if no URI was specified
      */
     protected String parseURI(StringBuffer content)
@@ -145,7 +149,8 @@ public class XWikiLinkParser implements LinkParser
             // Look for a URL pattern
             Matcher matcher = URL_SCHEME_PATTERN.matcher(content.toString());
             if (matcher.lookingAt()) {
-                // We don't parse the URL since it can contain unknown protocol for the JVM but protocols known by the browser
+                // We don't parse the URL since it can contain unknown protocol for the JVM but protocols known by the
+                // browser
                 // (such as skype:// for example).
                 uri = content.toString();
                 content.setLength(0);
@@ -157,9 +162,8 @@ public class XWikiLinkParser implements LinkParser
 
     /**
      * Find out the element located to the right of the passed separator.
-     *
-     * @param content the string to parse. This parameter will be modified by the method to remove
-     *                the parsed content.
+     * 
+     * @param content the string to parse. This parameter will be modified by the method to remove the parsed content.
      * @param separator the separator string to locate the element
      * @return the parsed element or null if the separator string wasn't found
      */

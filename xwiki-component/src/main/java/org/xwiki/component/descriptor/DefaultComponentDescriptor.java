@@ -34,7 +34,7 @@ public class DefaultComponentDescriptor extends DefaultComponentDependency imple
 {
     private String implementation;
 
-    private ComponentInstantiationStrategy instantiationStrategy;
+    private ComponentInstantiationStrategy instantiationStrategy = ComponentInstantiationStrategy.SINGLETON;
 
     private List<ComponentProperty> componentConfiguration = new ArrayList<ComponentProperty>();
 

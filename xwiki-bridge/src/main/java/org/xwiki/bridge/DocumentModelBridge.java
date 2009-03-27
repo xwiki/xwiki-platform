@@ -37,6 +37,13 @@ public interface DocumentModelBridge
     void setParent(DocumentName parentName);
     
     /**
+     * Sets the title of this document.
+     * 
+     * @param title the title to be set.
+     */
+    void setTitle(String title);
+    
+    /**
      * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example <tt>Main.WebHome</tt>.
      * 
      * @return A <code>String</code> representation of the document's full name.

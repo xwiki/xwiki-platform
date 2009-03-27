@@ -173,13 +173,11 @@ public class PlexusComponentManager implements ComponentManager
         }
 
         Collection<ComponentDependency> componentDependencies = componentDescriptor.getComponentDependencies();
-        if (!componentConfiguration.isEmpty()) {
-            for (ComponentDependency dependency : componentDependencies) {
-                ComponentRequirement requirement = new ComponentRequirement();
-                requirement.setRole(dependency.getRole());
-                requirement.setRoleHint(dependency.getRoleHint());
-                pcd.addRequirement(requirement);
-            }
+        for (ComponentDependency dependency : componentDependencies) {
+            ComponentRequirement requirement = new ComponentRequirement();
+            requirement.setRole(dependency.getRole());
+            requirement.setRoleHint(dependency.getRoleHint());
+            pcd.addRequirement(requirement);
         }
 
         return pcd;

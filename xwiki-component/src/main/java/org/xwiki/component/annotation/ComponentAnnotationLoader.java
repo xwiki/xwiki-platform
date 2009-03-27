@@ -31,6 +31,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.DefaultComponentDependency;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
@@ -65,10 +66,10 @@ public class ComponentAnnotationLoader
             // 2) For each component class name found, load its class and use introspection to find the necessary 
             //    annotations required to register it as a component
             for (String componentClassName : componentClassNames) {
-                Class<?> componentClass = cl.loadClass(componentClassName);
+                Class< ? > componentClass = cl.loadClass(componentClassName);
                 
                 // Look for ComponentRole annotations and register one component per ComponentRole found
-                for (Class<?> componentRoleClass : findComponentRoleClasses(componentClass)) {
+                for (Class< ? > componentRoleClass : findComponentRoleClasses(componentClass)) {
                     ComponentDescriptor descriptor = createComponentDescriptor(componentClass, componentRoleClass);
                     manager.registerComponent(descriptor);
                 }
@@ -88,7 +89,7 @@ public class ComponentAnnotationLoader
      * @param componentRoleClass the component role class
      * @return the component descriptor with resolved component dependencies
      */
-    protected ComponentDescriptor createComponentDescriptor(Class<?> componentClass, Class<?> componentRoleClass)
+    protected ComponentDescriptor createComponentDescriptor(Class< ? > componentClass, Class< ? > componentRoleClass)
     {
         DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor();
         descriptor.setRole(componentRoleClass.getName());
@@ -106,9 +107,9 @@ public class ComponentAnnotationLoader
         InstantiationStrategy instantiationStrategy = 
             componentClass.getAnnotation(InstantiationStrategy.class);
         if (instantiationStrategy != null) {
-            descriptor.setInstantiationStrategy(instantiationStrategy.value().getType());
+            descriptor.setInstantiationStrategy(instantiationStrategy.value());
         } else {
-            descriptor.setInstantiationStrategy(InstantiationStrategy.StrategyType.SINGLETON.getType());
+            descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
         }
         
         // Set the requirements
@@ -137,12 +138,12 @@ public class ComponentAnnotationLoader
      * @param componentClass the component implementation class for which to find the component roles it implements 
      * @return the list of component role classes implemented
      */
-    protected List<Class<?>> findComponentRoleClasses(Class<?> componentClass)
+    protected List<Class< ? >> findComponentRoleClasses(Class< ? > componentClass)
     {
-        List<Class<?>> classes = new ArrayList<Class<?>>();
+        List<Class< ? >> classes = new ArrayList<Class< ? >>();
         
         // Only look in interfaces since we only want to allow using @ComponentRole in interfaces
-        for (Class<?> interfaceClass : componentClass.getInterfaces()) {
+        for (Class< ? > interfaceClass : componentClass.getInterfaces()) {
             classes.addAll(findComponentRoleClasses(interfaceClass));
             for (Annotation annotation : interfaceClass.getDeclaredAnnotations()) {
                 if (annotation.annotationType().getName().equals(ComponentRole.class.getName())) {

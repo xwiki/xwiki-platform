@@ -18,31 +18,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.component.annotation;
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+package org.xwiki.component.descriptor;
 
 /**
- * Defines a hint implemented by the class marked with this annotation.
- *
+ * Lists valid instantiation strategy types (singleton, per lookup).
+ *  
  * @version $Id: $
  * @since 1.8.1
  */
-@Documented
-@Retention(RUNTIME)
-@Target(TYPE)
-@Inherited
-public @interface ComponentHint
+public enum ComponentInstantiationStrategy
 {
     /**
-     * @return the hint value. Can be any text value. It's used to differentiate one component implementation
-     *         from another one
+     * The same component implementation instance is returned for all lookups.
      */
-    String value();
+    SINGLETON, 
+    
+    /**
+     * A new component implementation instance is created at a each lookup.
+     */
+    PER_LOOKUP;
 }

@@ -34,7 +34,7 @@ public class DefaultComponentDescriptor implements ComponentDescriptor
 {
     private String role;
 
-    private String roleHint;
+    private String roleHint = "default";
 
     private String implementation;
 

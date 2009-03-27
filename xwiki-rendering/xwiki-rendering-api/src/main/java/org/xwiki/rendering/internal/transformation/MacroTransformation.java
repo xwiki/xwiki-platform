@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
@@ -55,6 +57,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("macro")
 public class MacroTransformation extends AbstractTransformation
 {
     /**
@@ -66,6 +69,7 @@ public class MacroTransformation extends AbstractTransformation
     /**
      * Handles macro registration and macro lookups. Injected by the Component Manager.
      */
+    @Requirement
     private MacroManager macroManager;
 
     private class MacroHolder implements Comparable<MacroHolder>

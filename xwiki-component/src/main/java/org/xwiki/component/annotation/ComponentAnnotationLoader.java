@@ -96,9 +96,9 @@ public class ComponentAnnotationLoader
         descriptor.setImplementation(componentClass.getName());
         
         // Set the hint if it exists
-        ComponentHint hint = componentClass.getAnnotation(ComponentHint.class);
-        if (hint != null) {
-            descriptor.setRoleHint(hint.value());
+        Component component = componentClass.getAnnotation(Component.class);
+        if (component != null && component.value().trim().length() > 0) {
+            descriptor.setRoleHint(component.value());
         } else {
             // The descriptor sets a default hint by default. 
         }
@@ -118,9 +118,8 @@ public class ComponentAnnotationLoader
                 DefaultComponentDependency dependency = new DefaultComponentDependency();
                 dependency.setRole(field.getType().getName());
 
-                RequirementHint requirementHint = field.getAnnotation(RequirementHint.class);
-                if (requirementHint != null) {
-                    dependency.setRoleHint(requirementHint.value());
+                if (requirement.value().trim().length() > 0) {
+                    dependency.setRoleHint(requirement.value());
                 }
                 
                 descriptor.addComponentDependency(dependency);
@@ -141,7 +140,7 @@ public class ComponentAnnotationLoader
     {
         List<Class< ? >> classes = new ArrayList<Class< ? >>();
         
-        // Only look in interfaces since we only want to allow using @ComponentRole in interfaces
+        // Look in both superclass and interfaces for @ComponentRole.
         for (Class< ? > interfaceClass : componentClass.getInterfaces()) {
             classes.addAll(findComponentRoleClasses(interfaceClass));
             for (Annotation annotation : interfaceClass.getDeclaredAnnotations()) {
@@ -149,6 +148,13 @@ public class ComponentAnnotationLoader
                     classes.add(interfaceClass);
                 }
             }
+        }
+        
+        // Note that we need to look into the superclass since the super class can itself implements an interface 
+        // that has the @ComponentRole annotation.
+        Class< ? > superClass = componentClass.getSuperclass();
+        if (superClass != null && !superClass.getName().equals(Object.class.getName())) {
+            classes.addAll(findComponentRoleClasses(superClass));
         }
         
         return classes;

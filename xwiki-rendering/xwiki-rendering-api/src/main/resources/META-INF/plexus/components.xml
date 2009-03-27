@@ -24,62 +24,6 @@
 
 <component-set>
   <components>
-
-    <!-- Parsers -->
-    <component>
-      <role>org.xwiki.rendering.parser.LinkParser</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.GenericLinkParser</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.xwiki.rendering.parser.LinkParser</role>
-      <role-hint>xwiki/2.0</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.XWikiLinkParser</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.xwiki.rendering.parser.ImageParser</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.GenericImageParser</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.xwiki.rendering.parser.ImageParser</role>
-      <role-hint>xwiki/2.0</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.XWikiImageParser</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.rendering.parser.AttachmentParser</role>
-        </requirement>
-      </requirements>
-    </component>
-    <component>
-      <role>org.xwiki.rendering.parser.AttachmentParser</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.DefaultAttachmentParser</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-
-    <!-- Others -->
-    <component>
-      <role>org.xwiki.rendering.transformation.Transformation</role>
-      <role-hint>macro</role-hint>
-      <implementation>org.xwiki.rendering.internal.transformation.MacroTransformation</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.rendering.macro.MacroManager</role>
-        </requirement>
-      </requirements>
-    </component>
-    <component>
-      <role>org.xwiki.rendering.parser.SyntaxFactory</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.parser.DefaultSyntaxFactory</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
     <component>
       <role>org.xwiki.rendering.macro.MacroManager</role>
       <role-hint>default</role-hint>
@@ -115,38 +59,6 @@
         <requirement>
           <role>org.xwiki.rendering.transformation.Transformation</role>
           <field-name>transformations</field-name>
-        </requirement>
-      </requirements>
-    </component>
-    <component>
-      <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory</implementation>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.bridge.DocumentAccessBridge</role>
-        </requirement>
-        <requirement>
-          <role>org.xwiki.rendering.renderer.LinkLabelGenerator</role>
-        </requirement>
-        <requirement>
-          <role>org.xwiki.rendering.parser.AttachmentParser</role>
-        </requirement>
-      </requirements>
-    </component>
-
-    <!-- Utils -->
-    <component>
-      <role>org.xwiki.rendering.renderer.LinkLabelGenerator</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.bridge.DocumentAccessBridge</role>
-        </requirement>
-        <requirement>
-          <role>org.xwiki.rendering.configuration.RenderingConfiguration</role>
         </requirement>
       </requirements>
     </component>

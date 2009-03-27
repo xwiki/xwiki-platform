@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
@@ -58,6 +59,7 @@ import java.util.regex.Matcher;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("xwiki/2.0")
 public class XWikiLinkParser implements LinkParser
 {
     // Implementation note: We're not using regex in general in order to provide better error

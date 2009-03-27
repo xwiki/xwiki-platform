@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.parser;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.listener.Link;
 
 /**
@@ -29,6 +30,7 @@ import org.xwiki.rendering.listener.Link;
  * @version $Id$
  * @since 1.5M2
  */
+@ComponentRole
 public interface LinkParser
 {
     Link parse(String rawLink);

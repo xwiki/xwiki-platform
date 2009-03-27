@@ -20,6 +20,8 @@
 package org.xwiki.rendering.internal.renderer;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.EventsRenderer;
@@ -41,12 +43,16 @@ import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
  * @since 1.6M2
  * @see PrintRendererFactory
  */
+@Component
 public class DefaultPrintRendererFactory implements PrintRendererFactory
 {
+    @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
+    @Requirement
     private LinkLabelGenerator linkLabelGenerator;
 
+    @Requirement
     private AttachmentParser attachmentParser;
 
     /**

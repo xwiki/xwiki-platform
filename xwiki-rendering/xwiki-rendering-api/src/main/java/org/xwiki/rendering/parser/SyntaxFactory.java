@@ -21,10 +21,13 @@ package org.xwiki.rendering.parser;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * @version $Id$
  * @since 1.5M2
  */
+@ComponentRole
 public interface SyntaxFactory
 {
     /**

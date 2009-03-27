@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.DefaultAttachement;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
@@ -32,6 +33,7 @@ import org.xwiki.rendering.parser.ImageParser;
  * @version $Id$
  * @since 1.7M3
  */
+@Component
 public class GenericImageParser implements ImageParser
 {
     /**

@@ -32,6 +32,9 @@ import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
  */
 public class WikiModelXWikiParser extends AbstractWikiModelParser
 {
+    /**
+     * XWiki 2.0 Syntax.
+     */
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");
 
     /**

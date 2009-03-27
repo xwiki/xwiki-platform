@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity}}{{html}}
+{{velocity}}{{html wiki="true"}}
 <div>
   #set ($name = "John")
   #set ($list = ['one', 'two'])
@@ -21,7 +21,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [{{html}}
+beginMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
 <div>
   #set ($name = "John")
   #set ($list = ['one', 'two'])
@@ -37,7 +37,7 @@ beginMacroMarkerStandalone [velocity] [] [{{html}}
   </table>
 </div>
 {{/html}}]
-beginMacroMarkerStandalone [html] [] [
+beginMacroMarkerStandalone [html] [wiki=true] [
 <div>
     <h1>Hello John</h1>
   <table>
@@ -83,7 +83,7 @@ endXMLNode [tr]
 endXMLNode [tbody]
 endXMLNode [table]
 endXMLNode [div]
-endMacroMarkerStandalone [html] [] [
+endMacroMarkerStandalone [html] [wiki=true] [
 <div>
     <h1>Hello John</h1>
   <table>
@@ -100,7 +100,7 @@ endMacroMarkerStandalone [html] [] [
       </table>
 </div>
 ]
-endMacroMarkerStandalone [velocity] [] [{{html}}
+endMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
 <div>
   #set ($name = "John")
   #set ($list = ['one', 'two'])
@@ -120,7 +120,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:velocity|-||-|{{html}}
+<!--startmacro:velocity|-||-|{{html wiki="true"}}
 <div>
   #set ($name = "John")
   #set ($list = ['one', 'two'])

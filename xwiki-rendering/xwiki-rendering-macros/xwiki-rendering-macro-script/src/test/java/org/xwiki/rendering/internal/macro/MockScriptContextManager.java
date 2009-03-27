@@ -45,7 +45,6 @@ public class MockScriptContextManager implements ScriptContextManager
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
 
         componentDescriptor.setRole(ScriptContextManager.ROLE);
-        componentDescriptor.setRoleHint("default");
         componentDescriptor.setImplementation(MockScriptContextManager.class.getName());
 
         return componentDescriptor;

@@ -34,5 +34,21 @@
   <name>XWiki Platform - Core - Component</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Component</description>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <includes>
+            **/annotation/ComponentAnnotationLoader.java,
+            **/annotation/ComponentRole.java,
+            **/annotation/Requirement.java
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
        

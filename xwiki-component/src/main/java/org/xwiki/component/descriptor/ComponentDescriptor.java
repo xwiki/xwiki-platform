@@ -32,7 +32,7 @@ public interface ComponentDescriptor extends ComponentDependency
 {
     String getImplementation();
 
-    String getInstantiationStrategy();
+    ComponentInstantiationStrategy getInstantiationStrategy();
 
     Collection<ComponentDependency> getComponentDependencies();
 

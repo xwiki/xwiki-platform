@@ -159,7 +159,14 @@ public class PlexusComponentManager implements ComponentManager
         pcd.setRole(componentDescriptor.getRole());
         pcd.setRoleHint(componentDescriptor.getRoleHint());
         pcd.setImplementation(componentDescriptor.getImplementation());
-        pcd.setInstantiationStrategy(componentDescriptor.getInstantiationStrategy());
+        
+        switch (componentDescriptor.getInstantiationStrategy()) {
+            case PER_LOOKUP:
+                pcd.setInstantiationStrategy("per-lookup");
+                break;
+            default:
+                pcd.setInstantiationStrategy("singleton");
+        }
 
         Collection<ComponentProperty> componentConfiguration = componentDescriptor.getComponentConfiguration();
         if (!componentConfiguration.isEmpty()) {

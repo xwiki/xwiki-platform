@@ -34,7 +34,7 @@ public class DefaultComponentDescriptor extends DefaultComponentDependency imple
 {
     private String implementation;
 
-    private String instantiationStrategy;
+    private ComponentInstantiationStrategy instantiationStrategy;
 
     private List<ComponentProperty> componentConfiguration = new ArrayList<ComponentProperty>();
 
@@ -50,12 +50,12 @@ public class DefaultComponentDescriptor extends DefaultComponentDependency imple
         return implementation;
     }
 
-    public void setInstantiationStrategy(String instantiationStrategy)
+    public void setInstantiationStrategy(ComponentInstantiationStrategy instantiationStrategy)
     {
         this.instantiationStrategy = instantiationStrategy;
     }
 
-    public String getInstantiationStrategy()
+    public ComponentInstantiationStrategy getInstantiationStrategy()
     {
         return this.instantiationStrategy;
     }

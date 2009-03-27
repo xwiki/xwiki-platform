@@ -28,6 +28,8 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+
 /**
  * Defines the instantiation strategy for this component (Singleton, per lookup). 
  *
@@ -40,21 +42,5 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface InstantiationStrategy
 {
-    enum StrategyType {
-        SINGLETON("singleton"), PER_LOOKUP("per-lookup");
-        
-        private String type;
-        
-        private StrategyType(String type)
-        {
-            this.type = type;
-        }
-        
-        public String getType()
-        {
-            return this.type;
-        }
-    }
-    
-    StrategyType value();
+    ComponentInstantiationStrategy value();
 }

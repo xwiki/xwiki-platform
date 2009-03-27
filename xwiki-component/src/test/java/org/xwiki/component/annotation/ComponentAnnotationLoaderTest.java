@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 import junit.framework.TestCase;
 
@@ -77,7 +78,7 @@ public class ComponentAnnotationLoaderTest extends TestCase
         assertEquals(RoleImpl.class.getName(), descriptor.getImplementation());
         assertEquals(ExtendedRole.class.getName(), descriptor.getRole());
         assertEquals("default", descriptor.getRoleHint());
-        assertEquals("singleton", descriptor.getInstantiationStrategy());
+        assertEquals(ComponentInstantiationStrategy.SINGLETON, descriptor.getInstantiationStrategy());
         Collection<ComponentDependency> deps = descriptor.getComponentDependencies(); 
         assertEquals(1, deps.size());
         ComponentDependency dep = deps.iterator().next(); 

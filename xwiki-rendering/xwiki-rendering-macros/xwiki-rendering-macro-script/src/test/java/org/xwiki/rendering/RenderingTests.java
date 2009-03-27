@@ -38,6 +38,7 @@ public class RenderingTests extends TestCase
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
 
         suite.addTestsFromResource("macroscript1", true);
+        suite.addTestsFromResource("macroscript2", true);
 
         return new ScriptRenderingPlexusTestSetup(suite);
     }

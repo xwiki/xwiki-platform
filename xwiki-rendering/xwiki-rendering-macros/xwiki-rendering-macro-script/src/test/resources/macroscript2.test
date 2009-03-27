@@ -1,0 +1,26 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{script output=false}}
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+{{/script}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [script] [output=false] [
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+]
+endMacroMarkerStandalone [script] [output=false] [
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+]
+endDocument

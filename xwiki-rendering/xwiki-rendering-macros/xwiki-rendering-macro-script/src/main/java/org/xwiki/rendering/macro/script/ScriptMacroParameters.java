@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.script;
 
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+
 /**
  * Parameters for the {@link AbstractScriptMacro} Macro.
  * 
@@ -27,5 +29,25 @@ package org.xwiki.rendering.macro.script;
  */
 public class ScriptMacroParameters
 {
+    /**
+     * Indicate the output result has to be inserted back in the document.
+     */
+    private boolean output = true;
 
+    /**
+     * @param output indicate the output result has to be inserted back in the document.
+     */
+    @ParameterDescription("indicate the output result has to be inserted back in the document")
+    public void setOutput(boolean output)
+    {
+        this.output = output;
+    }
+
+    /**
+     * @return indicate the output result has to be inserted back in the document.
+     */
+    public boolean isOutput()
+    {
+        return this.output;
+    }
 }

@@ -38,6 +38,9 @@ import org.xwiki.rendering.block.WordBlock;
  */
 public class ParserUtils
 {
+    /**
+     * The characters which are considered as "special" symbols for {@link SpecialSymbolBlock}.
+     */
     private static final Pattern SPECIALSYMBOL_PATTERN = Pattern.compile("[!\"#$%&'()*+,-./:;<=>?@\\[\\]^_`{|}~]");
 
     /**

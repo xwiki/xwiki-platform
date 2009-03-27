@@ -32,8 +32,15 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public abstract class AbstractChainingPrintRenderer extends AbstractChainingListener implements PrintRenderer
 {
+    /**
+     * The printer stack. Can be used to print in a specific printer and then easily return to the previous one.
+     */
     private Stack<WikiPrinter> printers = new Stack<WikiPrinter>();
-    
+
+    /**
+     * @param printer the main printer
+     * @param listenerChain the entry point of the chain of listeners
+     */
     public AbstractChainingPrintRenderer(WikiPrinter printer, ListenerChain listenerChain)
     {
         super(listenerChain);

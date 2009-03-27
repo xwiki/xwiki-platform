@@ -27,5 +27,13 @@ package org.xwiki.rendering.listener;
  */
 public enum ImageType
 {
-    DOCUMENT, URL
+    /**
+     * The image is attached to a document.
+     */
+    DOCUMENT,
+
+    /**
+     * The image is behind an URL.
+     */
+    URL
 }

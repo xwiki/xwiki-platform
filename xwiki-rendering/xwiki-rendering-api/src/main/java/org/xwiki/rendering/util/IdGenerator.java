@@ -31,6 +31,9 @@ import java.util.Set;
  */
 public class IdGenerator
 {
+    /**
+     * Contains the already generated ids.
+     */
     private Set<String> generatedIds = new HashSet<String>();
 
     /**
@@ -44,13 +47,37 @@ public class IdGenerator
      * value can contain any alpha/numeric character." </quote>
      * </p>
      * 
-     * @param text the text used to generate the unique id. For example "Hello" will generate "HHello".
+     * @param text the text used to generate the unique id. For example "Hello world" will generate "Helloworld".
      * @return the unique id
      */
     public String generateUniqueId(String text)
     {
+        return generateUniqueId("I", text);
+    }
+
+    /**
+     * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML
+     * specification. Extract from <a
+     * href="http://www.devguru.com/technologies/xhtml/QuickRef/xhtml_attribute_id.html">DevGuru</a>:
+     * <p>
+     * <quote> "The id attribute is used to assign a identifier value to a tag. Each id must be unique within the
+     * document and each element can only have one id. In XHTML, the id attribute has essentially replaced the use of
+     * the name attribute. The value of the id must start with an alphabetic letter or an underscore. The rest of the
+     * value can contain any alpha/numeric character." </quote>
+     * </p>
+     * 
+     * @param prefix the prefix of the identifier. Has to match [a-zA-Z].
+     * @param text the text used to generate the unique id. For example "Hello world" will generate "Helloworld".
+     * @return the unique id
+     */
+    public String generateUniqueId(String prefix, String text)
+    {
         // Remove all non alpha numeric characters to make a nice compact id which respect the XHTML specification.
-        String idPrefix = text.replaceAll("[^a-zA-Z0-9]", "");
+        String idPrefix;
+        if (prefix != null) {
+            idPrefix = prefix;
+        }
+        idPrefix = text.replaceAll("[^a-zA-Z0-9]", "");
 
         int occurence = 0;
         String id = idPrefix;

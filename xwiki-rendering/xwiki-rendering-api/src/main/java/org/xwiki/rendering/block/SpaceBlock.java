@@ -27,15 +27,37 @@ import org.xwiki.rendering.listener.Listener;
  */
 public final class SpaceBlock extends AbstractBlock
 {
+    /**
+     * A unique instance of {@link SpaceBlock}.
+     */
     public static final SpaceBlock SPACE_BLOCK = new SpaceBlock();
-    
+
+    /**
+     * Use {@link #SPACE_BLOCK} instead.
+     */
     private SpaceBlock()
     {
         // We need to keep this constructor to override the ones in AbstractBlock
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#traverse(org.xwiki.rendering.listener.Listener)
+     */
     public void traverse(Listener listener)
     {
         listener.onSpace();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.AbstractBlock#clone()
+     */
+    @Override
+    public Block clone()
+    {
+        return this;
     }
 }

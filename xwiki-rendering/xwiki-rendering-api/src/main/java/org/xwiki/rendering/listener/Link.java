@@ -72,11 +72,19 @@ public class Link implements Cloneable
         return this.reference;
     }
 
+    /**
+     * @return the type of link
+     * @see LinkType
+     */
     public LinkType getType()
     {
         return this.type;
     }
 
+    /**
+     * @param type the type of link
+     * @see LinkType
+     */
     public void setType(LinkType type)
     {
         this.type = type;
@@ -144,8 +152,12 @@ public class Link implements Cloneable
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
      * The output is syntax independent since this class is used for all syntaxes. Specific syntaxes should extend this
      * class and override this method to perform syntax-dependent formatting.
+     * 
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString()
@@ -175,9 +187,10 @@ public class Link implements Cloneable
 
         return sb.toString();
     }
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see Object#clone()
      */
     @Override

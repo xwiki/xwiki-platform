@@ -26,6 +26,7 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
+ * @param <P> the type of the macro parameters bean
  * @version $Id$
  * @since 1.5M2
  */
@@ -44,15 +45,25 @@ public interface Macro<P> extends Comparable<Macro< ? >>
      */
     int getPriority();
 
+    /**
+     * @return the macro descriptor
+     */
     MacroDescriptor getDescriptor();
 
     /**
-     * @return true if the macro can be inserted in some existing content such as a paragraph, a list item etc.
-     *         For example if I have <code>== hello {{velocity}}world{{/velocity}}</code> then the Velocity macro
-     *         must support the inline mode and not generate a paragraph.
+     * @return true if the macro can be inserted in some existing content such as a paragraph, a list item etc. For
+     *         example if I have <code>== hello {{velocity}}world{{/velocity}}</code> then the Velocity macro must
+     *         support the inline mode and not generate a paragraph.
      */
     boolean supportsInlineMode();
-    
+
+    /**
+     * @param parameters the macro parameters in the forma of a bean defined by the {@link Macro} implementation
+     * @param content the content of the macro
+     * @param context the context of the macros transformation process
+     * @return the result of the macro execution
+     * @throws MacroExecutionException error when executing the macro
+     */
     List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException;
 }

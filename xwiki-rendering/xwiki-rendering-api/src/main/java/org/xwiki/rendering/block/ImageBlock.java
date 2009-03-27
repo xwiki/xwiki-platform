@@ -33,6 +33,9 @@ import org.xwiki.rendering.listener.Listener;
  */
 public class ImageBlock extends AbstractBlock
 {
+    /**
+     * The image.
+     */
     private Image image;
 
     /**
@@ -40,11 +43,22 @@ public class ImageBlock extends AbstractBlock
      */
     private boolean isFreeStandingURI;
 
+    /**
+     * @param image the image
+     * @param isFreeStandingURI indicate if the image syntax is simple a full descriptive syntax (detail depending of
+     *            the syntax)
+     */
     public ImageBlock(Image image, boolean isFreeStandingURI)
     {
         this(image, isFreeStandingURI, Collections.<String, String> emptyMap());
     }
 
+    /**
+     * @param image the image
+     * @param isFreeStandingURI indicate if the image syntax is simple a full descriptive syntax (detail depending of
+     *            the syntax)
+     * @param parameters the custom parameters
+     */
     public ImageBlock(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         super(parameters);
@@ -53,6 +67,9 @@ public class ImageBlock extends AbstractBlock
         this.isFreeStandingURI = isFreeStandingURI;
     }
 
+    /**
+     * @return the image.
+     */
     public Image getImage()
     {
         return this.image;
@@ -66,6 +83,11 @@ public class ImageBlock extends AbstractBlock
         return this.isFreeStandingURI;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#traverse(org.xwiki.rendering.listener.Listener)
+     */
     public void traverse(Listener listener)
     {
         listener.onImage(getImage(), isFreeStandingURI(), getParameters());

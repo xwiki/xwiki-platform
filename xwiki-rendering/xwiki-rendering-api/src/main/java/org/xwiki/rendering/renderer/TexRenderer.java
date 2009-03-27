@@ -25,20 +25,32 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelGeneratorListener;
 import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelPrinterAdapter;
 
+/**
+ * Print in LaTeX syntax.
+ * 
+ * @version $Id: $
+ */
 public class TexRenderer extends WrappingListener implements PrintRenderer
 {
+    /**
+     * The printer.
+     */
     private WikiPrinter printer;
 
+    /**
+     * @param printer the printer.
+     */
     public TexRenderer(WikiPrinter printer)
     {
         this.printer = printer;
-        setWrappedListener(new WikiModelGeneratorListener(
-            new TexSerializer(new WikiModelPrinterAdapter(getPrinter()), null, null, null)));
+        setWrappedListener(new WikiModelGeneratorListener(new TexSerializer(new WikiModelPrinterAdapter(getPrinter()),
+            null, null, null)));
     }
 
     /**
      * {@inheritDoc}
-     * @see PrintRenderer#getPrinter()
+     * 
+     * @see org.xwiki.rendering.renderer.PrintRenderer#getPrinter()
      */
     public WikiPrinter getPrinter()
     {

@@ -35,11 +35,15 @@ import org.xwiki.rendering.parser.Syntax;
  */
 public interface MacroManager extends Comparable<MacroManager>
 {
-    /** The component role under which the implementations of this interface can be looked up. */
+    /**
+     * The component role under which the implementations of this interface can be looked up.
+     */
     String ROLE = MacroManager.class.getName();
 
     /**
+     * @param syntax the desired syntax
      * @return all macro available as a Map with name as key macro as value for the desired syntax.
+     * @throws MacroLookupException error when lookup macros
      */
     Map<String, Macro< ? >> getAllMacros(Syntax syntax) throws MacroLookupException;
 
@@ -48,16 +52,15 @@ public interface MacroManager extends Comparable<MacroManager>
      * @param syntax the syntax of the macro looked up
      * @return the macro if found, looked-up first as macro for the desired syntax identifier, and then in macro
      *         registered for all syntaxes if not found.
-     * @throws MacroNotFoundException when no macro with such name was found in both the list of macro for the specified
+     * @throws MacroLookupException when no macro with such name was found in both the list of macro for the specified
      *             syntax identifier and in for all syntaxes.
      */
     Macro< ? > getMacro(String macroName, Syntax syntax) throws MacroLookupException;
 
     /**
      * @param macroName the name of the macro to lookup
-     * @param syntaxId the desired syntax
      * @return the macro if found, looked-up in the list of macro registered for all syntaxes.
-     * @throws MacroNotFoundException when no macro with such name was found in the list of macro for all syntaxes.
+     * @throws MacroLookupException when no macro with such name was found in the list of macro for all syntaxes.
      */
     Macro< ? > getMacro(String macroName) throws MacroLookupException;
 
@@ -70,14 +73,12 @@ public interface MacroManager extends Comparable<MacroManager>
 
     /**
      * @param macroName the name of the macro
-     * @param syntax the syntax of the macro
      * @return true if the manager can return a macro with given name for all syntaxes, false otherwise
      */
     boolean exists(String macroName);
 
     /**
-     * The priority of this manager. Used to sort manager when macros are defined in several.
+     * @return the priority of this manager. Used to sort manager when macros are defined in several.
      */
     int getPriority();
-
 }

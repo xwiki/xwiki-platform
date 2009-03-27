@@ -27,13 +27,22 @@ package org.xwiki.rendering.listener;
  */
 public class URLImage extends AbstractImage
 {
+    /**
+     * The URL where the image is located.
+     */
     private String url;
-    
+
+    /**
+     * @param url the URL where the image is located.
+     */
     public URLImage(String url)
     {
         this.url = url;
     }
-    
+
+    /**
+     * @return the URL where the image is located.
+     */
     public String getURL()
     {
         return this.url;
@@ -41,7 +50,8 @@ public class URLImage extends AbstractImage
 
     /**
      * {@inheritDoc}
-     * @see AbstractImage#getType()
+     * 
+     * @see org.xwiki.rendering.listener.Image#getType()
      */
     public ImageType getType()
     {
@@ -50,7 +60,8 @@ public class URLImage extends AbstractImage
 
     /**
      * {@inheritDoc}
-     * @see AbstractImage#getName()
+     * 
+     * @see org.xwiki.rendering.listener.Image#getName()
      */
     public String getName()
     {
@@ -59,7 +70,8 @@ public class URLImage extends AbstractImage
 
     /**
      * {@inheritDoc}
-     * @see Object#toString()
+     * 
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString()

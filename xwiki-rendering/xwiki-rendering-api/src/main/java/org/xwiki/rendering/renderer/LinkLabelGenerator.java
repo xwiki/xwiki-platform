@@ -23,11 +23,17 @@ import org.xwiki.rendering.listener.Link;
 
 /**
  * Generate Link label. Used when no label has been specified by the user for links.
- *
+ * 
  * @version $Id: $
  * @since 1.8RC2
  */
 public interface LinkLabelGenerator
 {
+    /**
+     * Generate a clean String label for the provided {@link Link}.
+     * 
+     * @param link the link
+     * @return the generated label
+     */
     String generate(Link link);
 }

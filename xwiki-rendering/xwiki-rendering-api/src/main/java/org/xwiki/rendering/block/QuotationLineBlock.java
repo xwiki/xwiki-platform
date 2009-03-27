@@ -19,28 +19,41 @@
  */
 package org.xwiki.rendering.block;
 
-import org.xwiki.rendering.listener.Listener;
-
 import java.util.List;
+
+import org.xwiki.rendering.listener.Listener;
 
 /**
  * Represents a quotation line. There can be several quotation lines in a quotation block.
- *
+ * 
  * @version $Id: $
  * @since 1.6M2
  */
 public class QuotationLineBlock extends AbstractFatherBlock
 {
-    public QuotationLineBlock(List<Block> blocks) throws IllegalArgumentException
+    /**
+     * @param blocks the children of the quotation line
+     */
+    public QuotationLineBlock(List<Block> blocks)
     {
         super(blocks);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginQuotationLine();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     */
     public void after(Listener listener)
     {
         listener.endQuotationLine();

@@ -30,11 +30,18 @@ import org.xwiki.rendering.listener.Listener;
  */
 public class SectionBlock extends AbstractFatherBlock
 {
+    /**
+     * @param childBlocks the children of the section
+     */
     public SectionBlock(List<Block> childBlocks)
     {
         super(childBlocks);
     }
 
+    /**
+     * @param childBlocks the children of the section
+     * @param parameters the parameters of the section
+     */
     public SectionBlock(List<Block> childBlocks, Map<String, String> parameters)
     {
         super(childBlocks, parameters);

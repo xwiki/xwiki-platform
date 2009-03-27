@@ -28,22 +28,23 @@ package org.xwiki.rendering.macro.descriptor;
 public class DefaultParameterDescriptor implements ParameterDescriptor
 {
     /**
-     * The name of the parameter
+     * The name of the parameter.
      */
-    String name;
+    private String name;
 
     /**
      * The description of the parameter.
      */
-    String description;
+    private String description;
 
     /**
      * The type of the parameter.
      */
-    Class< ? > type;
+    private Class< ? > type;
 
     /**
      * Indicate if the parameter is mandatory.
+     * 
      * @since 1.7
      */
     private boolean mandatory;

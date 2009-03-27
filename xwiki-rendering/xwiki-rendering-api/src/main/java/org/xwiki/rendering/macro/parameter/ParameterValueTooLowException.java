@@ -19,8 +19,16 @@
  */
 package org.xwiki.rendering.macro.parameter;
 
+/**
+ * Exception used when the macro parameter is two low.
+ * 
+ * @version $Id: $
+ */
 public class ParameterValueTooLowException extends MacroParameterException
 {
+    /**
+     * @param maxValue the minimum valid number
+     */
     public ParameterValueTooLowException(int maxValue)
     {
         super("The value is too low. The lowest allowed value is " + maxValue + ".");

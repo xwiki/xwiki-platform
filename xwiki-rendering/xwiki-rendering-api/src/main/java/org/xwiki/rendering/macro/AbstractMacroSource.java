@@ -23,21 +23,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
-
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
 
 /**
  * Abstract source of macros. Specific macro managers (implementing {@link MacroSource}) can extend this class to
- * benefit from the logic that deals with macros for all syntaxes versus macro for a specific syntax. Implementations that
- * extend this class are responsible to initialize and keep up to date the two maps {@link #allSyntaxesMacros and
+ * benefit from the logic that deals with macros for all syntaxes versus macro for a specific syntax. Implementations
+ * that extend this class are responsible to initialize and keep up to date the two maps {@link #allSyntaxesMacros} and
  * {@link #syntaxSpecificMacros}.
  * 
+ * @version $Id: AbstractMacro.java 12439 2008-09-05 14:19:58Z tmortagne $
  * @since 1.9M1
  */
 public abstract class AbstractMacroSource extends AbstractLogEnabled implements MacroSource
 {
-
     /**
      * Allows transforming a syntax specified as text into a {@link Syntax} object. Injected by the component manager
      * subsystem.
@@ -61,6 +60,9 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
      */
     protected int priority = 100;
 
+    /**
+     * Default constructor.
+     */
     public AbstractMacroSource()
     {
         // Create macro caches.
@@ -71,7 +73,7 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
     /**
      * {@inheritDoc}
      * 
-     * @see MacroSource#getAllMacros(Syntax)
+     * @see org.xwiki.rendering.macro.MacroManager#getAllMacros(org.xwiki.rendering.parser.Syntax)
      */
     public Map<String, Macro< ? >> getAllMacros(Syntax syntax)
     {
@@ -92,7 +94,7 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
     /**
      * {@inheritDoc}
      * 
-     * @see MacroSource#getMacro(String, Syntax)
+     * @see org.xwiki.rendering.macro.MacroManager#getMacro(java.lang.String, org.xwiki.rendering.parser.Syntax)
      */
     public Macro< ? > getMacro(String macroName, Syntax syntax) throws MacroLookupException
     {
@@ -101,6 +103,7 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
         if (macrosForSyntax != null && macrosForSyntax.containsKey(macroName)) {
             return macrosForSyntax.get(macroName);
         }
+
         // If not found, check in macros for all syntaxes
         return this.getMacro(macroName);
     }
@@ -108,23 +111,23 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
     /**
      * {@inheritDoc}
      * 
-     * @see MacroSource#getMacro(String)
+     * @see org.xwiki.rendering.macro.MacroManager#getMacro(java.lang.String)
      */
     public Macro< ? > getMacro(String macroName) throws MacroLookupException
     {
         if (this.allSyntaxesMacros.containsKey(macroName)) {
             return this.allSyntaxesMacros.get(macroName);
         }
+
         throw new MacroLookupException("No [" + macroName + "] could be found");
     }
 
     /**
-     * Register
+     * Register a macro for a specific syntax.
      * 
-     * @param macroName
-     * @param syntaxAsString
-     * @param macro
-     * @throws InitializationException
+     * @param macroName the name of the macro to register.
+     * @param syntax the syntax for which to register the macro. If null the macro is registered for all syntaxes.
+     * @param macro the macro to register
      */
     protected void registerMacroForSyntax(String macroName, Syntax syntax, Macro< ? > macro)
     {
@@ -133,9 +136,16 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
             macrosForSyntax = new HashMap<String, Macro< ? >>();
             this.syntaxSpecificMacros.put(syntax, macrosForSyntax);
         }
+
         macrosForSyntax.put(macroName, macro);
     }
 
+    /**
+     * Register a macro for all syntaxes.
+     * 
+     * @param macroName the name of the macro to register.
+     * @param macro the macro to register
+     */
     protected void registerMacroForAllSyntaxes(String macroName, Macro< ? > macro)
     {
         this.allSyntaxesMacros.put(macroName, macro);
@@ -144,7 +154,7 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
     /**
      * {@inheritDoc}
      * 
-     * @see MacroSource#getPriority()
+     * @see org.xwiki.rendering.macro.MacroManager#getPriority()
      */
     public int getPriority()
     {
@@ -161,13 +171,14 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
         if (getPriority() != manager.getPriority()) {
             return getPriority() - manager.getPriority();
         }
+
         return this.getClass().getSimpleName().compareTo(manager.getClass().getSimpleName());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see MacroManager#exists(String, Syntax)
+     * @see org.xwiki.rendering.macro.MacroManager#exists(java.lang.String, org.xwiki.rendering.parser.Syntax)
      */
     public boolean exists(String macroName, Syntax syntax)
     {
@@ -175,19 +186,21 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
             && this.syntaxSpecificMacros.get(syntax).get(macroName) != null) {
             return true;
         }
+
         return false;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see MacroManager#exists(String)
+     * @see org.xwiki.rendering.macro.MacroManager#exists(java.lang.String)
      */
     public boolean exists(String macroName)
     {
         if (this.allSyntaxesMacros.get(macroName) != null) {
             return true;
         }
+
         return false;
     }
 

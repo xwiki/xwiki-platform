@@ -47,6 +47,7 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see StackableChainingListener#createChainingListenerInstance()
      */
     public StackableChainingListener createChainingListenerInstance()

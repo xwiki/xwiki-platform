@@ -27,5 +27,18 @@ package org.xwiki.rendering.listener;
  */
 public enum LinkType
 {
-    DOCUMENT, URI, INTERWIKI
+    /**
+     * The link target a local document.
+     */
+    DOCUMENT,
+
+    /**
+     * The link is an URL.
+     */
+    URI,
+
+    /**
+     * The link target a document in another wiki.
+     */
+    INTERWIKI
 }

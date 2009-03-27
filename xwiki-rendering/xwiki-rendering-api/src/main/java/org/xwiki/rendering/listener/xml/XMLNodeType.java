@@ -27,5 +27,23 @@ package org.xwiki.rendering.listener.xml;
  */
 public enum XMLNodeType
 {
-    ELEMENT, COMMENT, CDATA, UNKNOWN;
+    /**
+     * The XML node is an element.
+     */
+    ELEMENT,
+
+    /**
+     * The XML node is a comment.
+     */
+    COMMENT,
+
+    /**
+     * The XML node is a CDATA verbatim text.
+     */
+    CDATA,
+
+    /**
+     * The XML node is none of the known types.
+     */
+    UNKNOWN;
 }

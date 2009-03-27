@@ -19,9 +19,9 @@
  */
 package org.xwiki.rendering.block;
 
-import org.xwiki.rendering.listener.Listener;
-
 import java.util.Map;
+
+import org.xwiki.rendering.listener.Listener;
 
 /**
  * Represents a Macro (standalone or inline) defined in a page.
@@ -44,13 +44,24 @@ public class MacroBlock extends AbstractBlock
     /**
      * The macro is located in a inline content (like paragraph, etc.).
      */
-    boolean isInline;
+    private boolean isInline;
 
+    /**
+     * @param name the name of the macro
+     * @param parameters the parameters of the macro
+     * @param isInline indicate if the macro is located in a inline content (like paragraph, etc.)
+     */
     public MacroBlock(String name, Map<String, String> parameters, boolean isInline)
     {
         this(name, parameters, null, isInline);
     }
 
+    /**
+     * @param name the name of the macro
+     * @param parameters the parameters of the macro
+     * @param content the content of the macro. Null if the macro does not have content
+     * @param isInline indicate if the macro is located in a inline content (like paragraph, etc.)
+     */
     public MacroBlock(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         super(parameters);
@@ -61,9 +72,7 @@ public class MacroBlock extends AbstractBlock
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see MacroBlock#getName()
+     * @return the macro name.
      */
     public String getName()
     {
@@ -71,9 +80,7 @@ public class MacroBlock extends AbstractBlock
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see MacroBlock#getContent()
+     * @return the macro content.
      */
     public String getContent()
     {
@@ -81,9 +88,7 @@ public class MacroBlock extends AbstractBlock
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.block.MacroBlock#isInline()
+     * @return if true the macro is located in a inline content (like paragraph, etc.).
      */
     public boolean isInline()
     {

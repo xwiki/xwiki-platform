@@ -23,17 +23,25 @@ import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
- * Make it easy to create {@link PrintRenderer}. The main reason is because Print renderers cannot be components
- * since they have some state (the {@link WikiPrinter}). Thus all dependent components required to construct
- * a Print renderer have to be passed manually to its constructor. Since the implementation of this interface is a
- * component it's automatically injected all components required to construct the Print renderers.
- *
+ * Make it easy to create {@link PrintRenderer}. The main reason is because Print renderers cannot be components since
+ * they have some state (the {@link WikiPrinter}). Thus all dependent components required to construct a Print renderer
+ * have to be passed manually to its constructor. Since the implementation of this interface is a component it's
+ * automatically injected all components required to construct the Print renderers.
+ * 
  * @version $Id: $
  * @since 1.6M2
  */
 public interface PrintRendererFactory
 {
+    /**
+     * This component's role, used when code needs to look it up.
+     */
     String ROLE = PrintRendererFactory.class.getName();
-    
+
+    /**
+     * @param targetSyntax the syntax identifier of the renderer.
+     * @param printer used by the renderer use to print.
+     * @return the {@link PrintRenderer}
+     */
     PrintRenderer createRenderer(Syntax targetSyntax, WikiPrinter printer);
 }

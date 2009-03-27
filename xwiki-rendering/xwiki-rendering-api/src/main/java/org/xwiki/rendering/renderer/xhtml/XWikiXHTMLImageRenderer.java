@@ -43,10 +43,19 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
      */
     private XHTMLWikiPrinter xhtmlPrinter;
 
+    /**
+     * Use to resolve local image URL when the image is attached to a document.
+     */
     private DocumentAccessBridge documentAccessBridge;
 
+    /**
+     * Used to get the original image reference syntax.
+     */
     private XWikiSyntaxImageRenderer imageRenderer;
 
+    /**
+     * @param documentAccessBridge the {@link DocumentAccessBridge}.
+     */
     public XWikiXHTMLImageRenderer(DocumentAccessBridge documentAccessBridge)
     {
         this.documentAccessBridge = documentAccessBridge;
@@ -55,6 +64,7 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLImageRenderer#setXHTMLWikiPrinter(XHTMLWikiPrinter)
      */
     public void setXHTMLWikiPrinter(XHTMLWikiPrinter printer)
@@ -64,6 +74,7 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLImageRenderer#onImage(Image, boolean, Map)
      */
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -72,8 +83,9 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
         String imageURL;
         if (image.getType() == ImageType.DOCUMENT) {
             DocumentImage documentImage = (DocumentImage) image;
-            imageURL = this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), 
-                documentImage.getAttachmentName());
+            imageURL =
+                this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), documentImage
+                    .getAttachmentName());
         } else {
             URLImage urlImage = (URLImage) image;
             imageURL = urlImage.getURL();
@@ -81,7 +93,7 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
 
         // Then add it as an attribute of the IMG element.
         Map<String, String> attributes = new LinkedHashMap<String, String>();
-        attributes.put("src", imageURL);
+        attributes.put(SRC, imageURL);
 
         // Add the class if we're on a freestanding uri
         if (isFreeStandingURI) {
@@ -92,14 +104,14 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
         attributes.putAll(parameters);
 
         // If not ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
-        if (!parameters.containsKey("alt")) {
-            attributes.put("alt", image.getName());
+        if (!parameters.containsKey(ALTERNATE)) {
+            attributes.put(ALTERNATE, image.getName());
         }
 
         // And generate the XHTML IMG element. We need to save the image location in XML comment so that
         // it can be reconstructed later on when moving from XHTML to wiki syntax.
         this.xhtmlPrinter.printXMLComment("startimage:" + this.imageRenderer.renderImage(image));
-        this.xhtmlPrinter.printXMLElement("img", attributes);
+        this.xhtmlPrinter.printXMLElement(IMG, attributes);
         this.xhtmlPrinter.printXMLComment("stopimage");
     }
 }

@@ -19,35 +19,52 @@
  */
 package org.xwiki.rendering.block;
 
-import org.xwiki.rendering.listener.Listener;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
+
+import org.xwiki.rendering.listener.Listener;
 
 /**
  * Represents a quotation. There are one or several quotation lines inside a quotation block.
- *
+ * 
  * @version $Id$
  * @since 1.6M2
  */
 public class QuotationBlock extends AbstractFatherBlock
 {
-    public QuotationBlock(List<Block> blocks) throws IllegalArgumentException
+    /**
+     * @param blocks the children of the quotation
+     */
+    public QuotationBlock(List<Block> blocks)
     {
         super(blocks, Collections.<String, String> emptyMap());
     }
 
-    public QuotationBlock(List<Block> blocks, Map<String, String> parameters) throws IllegalArgumentException
+    /**
+     * @param blocks the children of the quotation
+     * @param parameters the parameters of the quotation
+     */
+    public QuotationBlock(List<Block> blocks, Map<String, String> parameters)
     {
         super(blocks, parameters);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginQuotation(getParameters());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     */
     public void after(Listener listener)
     {
         listener.endQuotation(getParameters());

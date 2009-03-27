@@ -27,9 +27,13 @@ package org.xwiki.rendering.listener;
  */
 public class DocumentImage extends AbstractImage implements Attachment
 {
+    /**
+     * The attachment containing the image.
+     */
     private Attachment attachment;
 
     /**
+     * @param attachment the attachment containing the image
      * @since 1.7.1
      */
     public DocumentImage(Attachment attachment)
@@ -60,7 +64,7 @@ public class DocumentImage extends AbstractImage implements Attachment
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractImage#getType()
+     * @see org.xwiki.rendering.listener.Image#getType()
      */
     public ImageType getType()
     {
@@ -70,7 +74,7 @@ public class DocumentImage extends AbstractImage implements Attachment
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractImage#getName()
+     * @see org.xwiki.rendering.listener.Image#getName()
      */
     public String getName()
     {
@@ -80,7 +84,7 @@ public class DocumentImage extends AbstractImage implements Attachment
     /**
      * {@inheritDoc}
      * 
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString()

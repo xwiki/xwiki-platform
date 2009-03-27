@@ -29,18 +29,26 @@ public class MacroLookupException extends Exception
 {
 
     /**
-     * For serialization
+     * For serialization.
      */
     private static final long serialVersionUID = -5252067975654888225L;
 
+    /**
+     * @param message the detail message.
+     */
     public MacroLookupException(String message)
     {
         super(message);
     }
-    
+
+    /**
+     * @param message the detail message.
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
+     *            value is permitted, and indicates that the cause is nonexistent or unknown.)
+     */
     public MacroLookupException(String message, Throwable cause)
     {
         super(message, cause);
     }
-    
+
 }

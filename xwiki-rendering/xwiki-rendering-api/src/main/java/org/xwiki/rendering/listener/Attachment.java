@@ -30,10 +30,10 @@ public interface Attachment extends Cloneable
     /**
      * @return the name of the document containing the attachment.
      */
-    public String getDocumentName();
+    String getDocumentName();
 
     /**
      * @return the name of the attachment.
      */
-    public String getAttachmentName();
+    String getAttachmentName();
 }

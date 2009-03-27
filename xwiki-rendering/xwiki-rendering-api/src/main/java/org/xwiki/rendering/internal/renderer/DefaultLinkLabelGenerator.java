@@ -23,6 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
@@ -34,10 +36,13 @@ import org.xwiki.rendering.renderer.LinkLabelGenerator;
  * @version $Id: $
  * @since 1.6M1
  */
+@Component
 public class DefaultLinkLabelGenerator implements LinkLabelGenerator
 {
+    @Requirement
     private RenderingConfiguration configuration;
     
+    @Requirement
     private DocumentAccessBridge bridge;
     
     public String generate(Link link)

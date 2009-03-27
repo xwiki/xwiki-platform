@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -40,6 +41,7 @@ import org.xwiki.rendering.parser.SyntaxType;
  * @version $Id$
  * @since 1.5M2
  */
+@Component
 public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFactory, Composable, Initializable
 {
     /**

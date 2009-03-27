@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.DefaultAttachement;
 import org.xwiki.rendering.parser.AttachmentParser;
@@ -30,6 +31,7 @@ import org.xwiki.rendering.parser.AttachmentParser;
  * @version $Id$
  * @since 1.7.1
  */
+@Component
 public class DefaultAttachmentParser implements AttachmentParser
 {
     /**

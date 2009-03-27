@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.renderer;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.listener.Link;
 
 /**
@@ -27,6 +28,7 @@ import org.xwiki.rendering.listener.Link;
  * @version $Id: $
  * @since 1.8RC2
  */
+@ComponentRole
 public interface LinkLabelGenerator
 {
     /**

@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.parser.LinkParser;
 
@@ -30,6 +31,7 @@ import org.xwiki.rendering.parser.LinkParser;
  * @version $Id$
  * @since 1.6RC1
  */
+@Component
 public class GenericLinkParser implements LinkParser
 {
     /**

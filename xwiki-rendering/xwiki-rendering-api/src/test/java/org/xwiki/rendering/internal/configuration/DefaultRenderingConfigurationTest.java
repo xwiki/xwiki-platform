@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
@@ -28,6 +29,7 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
  * @version $Id: $
  * @since 1.6M2
  */
+@Component
 public class DefaultRenderingConfigurationTest extends AbstractRenderingTestCase
 {
     public void testDefaultConfiguration() throws Exception

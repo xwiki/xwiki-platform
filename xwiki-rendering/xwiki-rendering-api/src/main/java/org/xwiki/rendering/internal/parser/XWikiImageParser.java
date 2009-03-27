@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
@@ -33,11 +35,13 @@ import org.xwiki.rendering.parser.ImageParser;
  * @version $Id$
  * @since 1.7M3
  */
+@Component("xwiki/2.0")
 public class XWikiImageParser implements ImageParser
 {
     /**
      * Used to parse the attachment syntax to extract document name and attachment name.
      */
+    @Requirement
     private AttachmentParser attachmentParser;
 
     /**

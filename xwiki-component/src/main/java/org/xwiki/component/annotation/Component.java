@@ -29,7 +29,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Defines a hint implemented by the class marked with this annotation.
+ * Defines a component implementation. A hint can be specified to differentiate this implementation from 
+ * another one.
  *
  * @version $Id: $
  * @since 1.8.1
@@ -38,11 +39,11 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(TYPE)
 @Inherited
-public @interface ComponentHint
+public @interface Component
 {
     /**
      * The hint value. Can be any text value. It's used to differentiate one component implementation
      * from another one.
      */
-    String value();
+    String value() default "";
 }

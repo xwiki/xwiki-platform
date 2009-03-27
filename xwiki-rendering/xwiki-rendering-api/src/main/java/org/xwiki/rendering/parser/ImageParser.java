@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.parser;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.listener.Image;
 
 /**
@@ -27,6 +28,7 @@ import org.xwiki.rendering.listener.Image;
  * @version $Id $
  * @since 1.7M3
  */
+@ComponentRole
 public interface ImageParser
 {
     Image parse(String imageLocation);

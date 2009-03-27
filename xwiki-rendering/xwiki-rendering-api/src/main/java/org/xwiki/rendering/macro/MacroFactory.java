@@ -20,11 +20,13 @@
 package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
+@ComponentRole
 public interface MacroFactory
 {
     /**

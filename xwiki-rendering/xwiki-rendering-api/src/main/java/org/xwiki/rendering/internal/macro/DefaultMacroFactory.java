@@ -22,6 +22,8 @@ package org.xwiki.rendering.internal.macro;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -43,6 +45,7 @@ import org.xwiki.rendering.macro.MacroNotFoundException;
  * @version $Id$
  * @since 1.5M2
  */
+@Component
 public class DefaultMacroFactory extends AbstractLogEnabled implements MacroFactory, Composable, Initializable
 {
     /**
@@ -54,6 +57,7 @@ public class DefaultMacroFactory extends AbstractLogEnabled implements MacroFact
      * Allows transforming a syntax specified as text into a {@link Syntax} object.
      * Injected by the component manager subsystem.
      */
+    @Requirement
     private SyntaxFactory syntaxFactory;
     
     /**

@@ -1,1 +1,11 @@
+org.xwiki.rendering.internal.parser.GenericLinkParser
+org.xwiki.rendering.internal.parser.XWikiLinkParser
+org.xwiki.rendering.internal.parser.GenericImageParser
+org.xwiki.rendering.internal.parser.XWikiImageParser
+org.xwiki.rendering.internal.parser.DefaultAttachmentParser
+org.xwiki.rendering.internal.transformation.MacroTransformation
 org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration
+org.xwiki.rendering.internal.parser.DefaultSyntaxFactory
+org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory
+org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator
+org.xwiki.rendering.internal.macro.DefaultMacroFactory

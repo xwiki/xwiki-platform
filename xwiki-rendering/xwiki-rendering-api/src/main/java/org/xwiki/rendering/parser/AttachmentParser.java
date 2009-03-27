@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.parser;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.listener.Attachment;
 
 /**
@@ -27,6 +28,7 @@ import org.xwiki.rendering.listener.Attachment;
  * @version $Id $
  * @since 1.7.1
  */
+@ComponentRole
 public interface AttachmentParser
 {
     /**

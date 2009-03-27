@@ -21,6 +21,7 @@
 package org.xwiki.component.annotation;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.xwiki.component.descriptor.ComponentDependency;
@@ -42,10 +43,16 @@ public class ComponentAnnotationLoaderTest extends TestCase
     {
     }
 
+    @Component
     public class FieldroleImpl implements FieldRole
     {
     }
     
+    @Component("special")
+    public class SpecialFieldRoleImpl implements FieldRole
+    {
+    }
+
     @ComponentRole
     public interface Role
     {
@@ -56,10 +63,20 @@ public class ComponentAnnotationLoaderTest extends TestCase
     {
     }
 
+    @Component
     public class RoleImpl implements ExtendedRole
     {
         @Requirement
         private FieldRole fieldRole;
+        
+        @Requirement("special")
+        private FieldRole specialFieldRole;
+        
+    }
+
+    @Component
+    public class SuperRoleImpl extends RoleImpl
+    {
     }
 
     public void testFindComponentRoleClasses()
@@ -70,7 +87,16 @@ public class ComponentAnnotationLoaderTest extends TestCase
         assertEquals(Role.class.getName(), classes.get(0).getName());
         assertEquals(ExtendedRole.class.getName(), classes.get(1).getName());
     }
-    
+
+    public void testFindComponentRoleClasseWhenClassExtension()
+    {
+        ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
+        List<Class<?>> classes = loader.findComponentRoleClasses(SuperRoleImpl.class);
+        assertEquals(2, classes.size());
+        assertEquals(Role.class.getName(), classes.get(0).getName());
+        assertEquals(ExtendedRole.class.getName(), classes.get(1).getName());
+    }
+
     public void testCreateComponentDescriptor()
     {
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
@@ -80,9 +106,13 @@ public class ComponentAnnotationLoaderTest extends TestCase
         assertEquals("default", descriptor.getRoleHint());
         assertEquals(ComponentInstantiationStrategy.SINGLETON, descriptor.getInstantiationStrategy());
         Collection<ComponentDependency> deps = descriptor.getComponentDependencies(); 
-        assertEquals(1, deps.size());
-        ComponentDependency dep = deps.iterator().next(); 
+        assertEquals(2, deps.size());
+        Iterator<ComponentDependency> it = deps.iterator();
+        ComponentDependency dep = it.next(); 
         assertEquals(FieldRole.class.getName(), dep.getRole());
         assertEquals("default", dep.getRoleHint());
+        dep = it.next();
+        assertEquals(FieldRole.class.getName(), dep.getRole());
+        assertEquals("special", dep.getRoleHint());
     }
 }

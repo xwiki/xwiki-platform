@@ -30,7 +30,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Defines a field or method that needs to be injected with a component.
+ * Defines a field or method that needs to be injected with a component. 
+ * A hint can be specified to differentiate this implementation from another one.
  *
  * @version $Id: $
  * @since 1.8.1
@@ -41,4 +42,8 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface Requirement
 {
+    /**
+     * The hint value specifying a specific component implementation to use.
+     */
+    String value() default "";
 }

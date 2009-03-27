@@ -106,9 +106,9 @@ public class ComponentAnnotationLoader
         InstantiationStrategy instantiationStrategy = 
             componentClass.getAnnotation(InstantiationStrategy.class);
         if (instantiationStrategy != null) {
-            descriptor.setInstantiationStrategy(instantiationStrategy.value());
+            descriptor.setInstantiationStrategy(instantiationStrategy.value().getType());
         } else {
-            descriptor.setInstantiationStrategy("singleton");
+            descriptor.setInstantiationStrategy(InstantiationStrategy.StrategyType.SINGLETON.getType());
         }
         
         // Set the requirements

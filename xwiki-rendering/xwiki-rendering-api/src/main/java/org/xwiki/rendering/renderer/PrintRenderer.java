@@ -23,16 +23,16 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
  * A Print Renderer is a {@link Renderer} that outputs its results to a {@link WikiPrinter}.
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
 public interface PrintRenderer extends Renderer
 {
     /**
-     * @return the printer to which events generate results in. For example the XHTML print renderer outputs XHTML
-     *         to a {@link WikiPrinter} and the resulting XHTML can be retrieved by calling
-     *         {@link org.xwiki.rendering.renderer.printer.WikiPrinter#toString()} 
+     * @return the printer to which events generate results in. For example the XHTML print renderer outputs XHTML to a
+     *         {@link WikiPrinter} and the resulting XHTML can be retrieved by calling
+     *         {@link org.xwiki.rendering.renderer.printer.WikiPrinter#toString()}
      */
-    public WikiPrinter getPrinter();
+    WikiPrinter getPrinter();
 }

@@ -24,13 +24,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.xwiki.rendering.listener.DefaultAttachement;
 import org.xwiki.rendering.listener.DocumentImage;
-import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.xml.XMLElement;
-
-import junit.framework.TestCase;
 
 /**
  * Unit tests for Block manipulation, testing {@link AbstractBlock}.

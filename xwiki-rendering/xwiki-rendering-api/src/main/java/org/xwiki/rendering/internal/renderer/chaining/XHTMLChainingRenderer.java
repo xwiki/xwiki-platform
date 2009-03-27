@@ -439,6 +439,8 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
                 XMLElement elementNode = (XMLElement) node;
                 getXHTMLWikiPrinter().printXMLStartElement(elementNode.getName(), elementNode.getAttributes());
                 break;
+            default:
+                break;
         }
     }
 

@@ -134,13 +134,13 @@ public abstract class AbstractBlock implements Block
      */
     public void replace(List<Block> newBlocks)
     {
-        List<Block> childrenBlocks = getParent().getChildren();
-        int pos = childrenBlocks.indexOf(this);
+        List<Block> blocks = getParent().getChildren();
+        int pos = blocks.indexOf(this);
         for (Block block : newBlocks) {
             block.setParent(getParent());
         }
-        childrenBlocks.addAll(pos, newBlocks);
-        childrenBlocks.remove(pos + newBlocks.size());
+        blocks.addAll(pos, newBlocks);
+        blocks.remove(pos + newBlocks.size());
     }
 
     /**
@@ -334,7 +334,7 @@ public abstract class AbstractBlock implements Block
      */
     public Block clone(BlockFilter blockFilter)
     {
-        AbstractBlock block;
+        Block block;
         try {
             block = (AbstractBlock) super.clone();
         } catch (CloneNotSupportedException e) {
@@ -342,37 +342,10 @@ public abstract class AbstractBlock implements Block
             throw new RuntimeException("Failed to clone object", e);
         }
 
-        clone(block, blockFilter);
+        ((AbstractBlock) block).parameters = new LinkedHashMap<String, String>(this.parameters);
 
-        return block;
-    }
-
-    /**
-     * Clone provided block.
-     * 
-     * @param block the block.
-     * @param blockFilter filter to apply on block children.
-     * @since 1.8RC2
-     */
-    private void clone(AbstractBlock block, BlockFilter blockFilter)
-    {
-        block.parameters = new LinkedHashMap<String, String>(block.getParameters());
-
-        // Clone all children blocks.
-        cloneChildren(block, blockFilter);
-    }
-
-    /**
-     * Clone block children.
-     * 
-     * @param block the block.
-     * @param blockFilter the filter to apply on children.
-     * @since 1.8RC2
-     */
-    private void cloneChildren(AbstractBlock block, BlockFilter blockFilter)
-    {
-        block.childrenBlocks = new ArrayList<Block>();
-        for (Block childBlock : getChildren()) {
+        ((AbstractBlock) block).childrenBlocks = new ArrayList<Block>(this.childrenBlocks.size());
+        for (Block childBlock : this.childrenBlocks) {
             if (blockFilter != null) {
                 Block clonedChildBlocks = childBlock.clone(blockFilter);
 
@@ -387,5 +360,7 @@ public abstract class AbstractBlock implements Block
                 block.addChild(childBlock.clone());
             }
         }
+
+        return block;
     }
 }

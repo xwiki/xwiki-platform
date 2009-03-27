@@ -42,6 +42,7 @@ public class SimpleXHTMLImageRenderer implements XHTMLImageRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLImageRenderer#setXHTMLWikiPrinter(XHTMLWikiPrinter)
      */
     public void setXHTMLWikiPrinter(XHTMLWikiPrinter printer)
@@ -51,6 +52,7 @@ public class SimpleXHTMLImageRenderer implements XHTMLImageRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLImageRenderer#onImage(Image, boolean, Map)
      */
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -61,17 +63,17 @@ public class SimpleXHTMLImageRenderer implements XHTMLImageRenderer
 
             // Then add it as an attribute of the IMG element.
             Map<String, String> attributes = new LinkedHashMap<String, String>();
-            attributes.put("src", imageURL);
+            attributes.put(SRC, imageURL);
 
             // Add the other parameters as attributes
             attributes.putAll(parameters);
 
             // If not ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
-            if (!parameters.containsKey("alt")) {
-                attributes.put("alt", image.getName());
+            if (!parameters.containsKey(ALTERNATE)) {
+                attributes.put(ALTERNATE, image.getName());
             }
 
-            this.xhtmlPrinter.printXMLElement("img", attributes);
+            this.xhtmlPrinter.printXMLElement(IMG, attributes);
         }
     }
 }

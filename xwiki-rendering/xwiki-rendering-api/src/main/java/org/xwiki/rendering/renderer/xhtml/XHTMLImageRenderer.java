@@ -31,6 +31,21 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 public interface XHTMLImageRenderer extends ImageListener
 {
     /**
+     * The name of the XHTML image element.
+     */
+    String IMG = "img";
+    
+    /**
+     * <code>img</code> XHTML element parameter to indicate an alternate description to the image.
+     */
+    String ALTERNATE = "alt";
+    
+    /**
+     * <code>img</code> XHTML element parameter to indicate where theimage is located.
+     */
+    String SRC = "src";
+
+    /**
      * @param printer the XHTML printer to use to output links as XHTML
      */
     void setXHTMLWikiPrinter(XHTMLWikiPrinter printer);

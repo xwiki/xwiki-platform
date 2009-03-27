@@ -31,17 +31,19 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  * label like in a TOC.
  * 
  * @version $Id$
- * @since 1.8.1
+ * @since 1.9M1
  */
 public class PlainTextRenderer extends AbstractChainingPrintRenderer
 {
     /**
-     * @param printer the object where the XWiki Syntax output will be printed to 
+     * @param printer the object where the XWiki Syntax output will be printed to
+     * @param linkLabelGenerator the plain text renderer only print link label so it need LinkLabelGenerator to generate
+     *            it when there is not explicit one. If null the reference is printed.
      */
     public PlainTextRenderer(WikiPrinter printer, LinkLabelGenerator linkLabelGenerator)
     {
         super(printer, new ListenerChain());
-        
+
         new BlockStateChainingListener(getListenerChain());
         new PlainTextChainingRenderer(printer, linkLabelGenerator, getListenerChain());
     }

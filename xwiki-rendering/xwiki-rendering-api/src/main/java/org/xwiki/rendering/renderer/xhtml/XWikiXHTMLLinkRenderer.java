@@ -41,23 +41,56 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
 {
     /**
-     * @see #setXHTMLWikiPrinter(XHTMLWikiPrinter)
+     * The XHTML element <code>class</code> parameter.
      */
-	private XHTMLWikiPrinter xhtmlPrinter;
-	
+    private static final String CLASS = "class";
+
+    /**
+     * The name of the XHTML format element.
+     */
+    private static final String SPAN = "span";
+
+    /**
+     * The link reference prefix indicating that the link is targeting an attachment.
+     */
+    private static final String ATTACH = "attach:";
+
+    /**
+     * The XHTML printer to use to output links as XHTML.
+     */
+    private XHTMLWikiPrinter xhtmlPrinter;
+
     /**
      * @see #setHasLabel(boolean)
      */
-	private boolean hasLabel;
-	
+    private boolean hasLabel;
+
+    /**
+     * Used to generate the link targeting a local document.
+     */
     private DocumentAccessBridge documentAccessBridge;
 
+    /**
+     * Used to generate a link label.
+     */
     private LinkLabelGenerator linkLabelGenerator;
 
+    /**
+     * Used to extract the attachment information form the reference if the link is targeting an attachment.
+     */
     private AttachmentParser attachmentParser;
 
+    /**
+     * Used to save the original syntax of the link reference.
+     */
     private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
 
+    /**
+     * @param documentAccessBridge used to generate the link targeting a local document.
+     * @param linkLabelGenerator used to generate a link label.
+     * @param attachmentParser used to extract the attachment information form the reference if the link is targeting an
+     *            attachment.
+     */
     public XWikiXHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, LinkLabelGenerator linkLabelGenerator,
         AttachmentParser attachmentParser)
     {
@@ -69,6 +102,7 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLLinkRenderer#setHasLabel(boolean)
      */
     public void setHasLabel(boolean hasLabel)
@@ -78,6 +112,7 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLLinkRenderer#setXHTMLWikiPrinter(XHTMLWikiPrinter)
      */
     public void setXHTMLWikiPrinter(XHTMLWikiPrinter printer)
@@ -87,6 +122,7 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLLinkRenderer#beginLink(Link, boolean, Map)
      */
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -103,68 +139,68 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
         aAttributes.putAll(parameters);
 
         if (link.isExternalLink()) {
-            spanAttributes.put("class", "wikiexternallink");
+            spanAttributes.put(CLASS, "wikiexternallink");
             if (isFreeStandingURI) {
-                aAttributes.put("class", "wikimodel-freestanding");
+                aAttributes.put(CLASS, "wikimodel-freestanding");
             }
 
             // href attribute
             if (link.getType() == LinkType.INTERWIKI) {
                 // TODO: Resolve the Interwiki link
             } else {
-                if ((link.getType() == LinkType.URI) && link.getReference().startsWith("attach:")) {
+                if ((link.getType() == LinkType.URI) && link.getReference().startsWith(ATTACH)) {
                     // use the default attachment syntax parser to extract document name and attachment name
-                    Attachment attachment =
-                        this.attachmentParser.parse(link.getReference().substring("attach:".length()));
-                    aAttributes.put("href", this.documentAccessBridge.getAttachmentURL(attachment.getDocumentName(),
+                    Attachment attachment = this.attachmentParser.parse(link.getReference().substring(ATTACH.length()));
+                    aAttributes.put(HREF, this.documentAccessBridge.getAttachmentURL(attachment.getDocumentName(),
                         attachment.getAttachmentName()));
                 } else {
-                    aAttributes.put("href", link.getReference());
+                    aAttributes.put(HREF, link.getReference());
                 }
             }
 
-            this.xhtmlPrinter.printXMLStartElement("span", spanAttributes);
-            this.xhtmlPrinter.printXMLStartElement("a", aAttributes);
+            this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
+            this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
         } else {
             // This is a link to a document.
 
             // Check for the document existence.
             if (StringUtils.isEmpty(link.getReference()) || this.documentAccessBridge.exists(link.getReference())) {
-                spanAttributes.put("class", "wikilink");
-                aAttributes.put("href", this.documentAccessBridge.getURL(link.getReference(), "view", link
+                spanAttributes.put(CLASS, "wikilink");
+                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "view", link
                     .getQueryString(), link.getAnchor()));
-                this.xhtmlPrinter.printXMLStartElement("span", spanAttributes);
-                this.xhtmlPrinter.printXMLStartElement("a", aAttributes);
+                this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
+                this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
             } else {
-                spanAttributes.put("class", "wikicreatelink");
-                aAttributes.put("href", this.documentAccessBridge.getURL(link.getReference(), "edit", link
+                spanAttributes.put(CLASS, "wikicreatelink");
+                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", link
                     .getQueryString(), link.getAnchor()));
 
-                this.xhtmlPrinter.printXMLStartElement("span", spanAttributes);
-                this.xhtmlPrinter.printXMLStartElement("a", aAttributes);
+                this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
+                this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
             }
         }
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLLinkRenderer#endLink(Link, boolean, Map)
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // If there was no link content then generate it based on the passed reference
         if (!this.hasLabel) {
-            this.xhtmlPrinter.printXMLStartElement("span", new String[][] {{"class", "wikigeneratedlinkcontent"}});
+            this.xhtmlPrinter.printXMLStartElement(SPAN, new String[][] {{CLASS, "wikigeneratedlinkcontent"}});
             if (link.getType() == LinkType.DOCUMENT) {
                 this.xhtmlPrinter.printXML(this.linkLabelGenerator.generate(link));
             } else {
                 this.xhtmlPrinter.printXML(link.getReference());
             }
-            this.xhtmlPrinter.printXMLEndElement("span");
+            this.xhtmlPrinter.printXMLEndElement(SPAN);
         }
 
-        this.xhtmlPrinter.printXMLEndElement("a");
-        this.xhtmlPrinter.printXMLEndElement("span");
+        this.xhtmlPrinter.printXMLEndElement(ANCHOR);
+        this.xhtmlPrinter.printXMLEndElement(SPAN);
 
         // Add a XML comment to signify the end of the link.
         this.xhtmlPrinter.printXMLComment("stopwikilink");

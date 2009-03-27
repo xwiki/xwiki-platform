@@ -31,7 +31,12 @@ public interface TransformationManager
     /**
      * This component's role, used when code needs to look it up.
      */
-    public static final String ROLE = TransformationManager.class.getName();
+    String ROLE = TransformationManager.class.getName();
 
+    /**
+     * @param dom the XDOM on which apply transformations
+     * @param syntax the syntax of the source from where this XDOM as been generated
+     * @throws TransformationException error when applying transformations
+     */
     void performTransformations(XDOM dom, Syntax syntax) throws TransformationException;
 }

@@ -34,7 +34,8 @@ import org.xwiki.rendering.listener.xml.XMLNode;
  * @version $Id; $
  * @since 1.8RC1
  */
-public class ConsecutiveNewLineStateChainingListener extends AbstractChainingListener implements StackableChainingListener
+public class ConsecutiveNewLineStateChainingListener extends AbstractChainingListener implements
+    StackableChainingListener
 {
     private int newLineCount = 0;
 
@@ -45,6 +46,7 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
 
     /**
      * {@inheritDoc}
+     * 
      * @see StackableChainingListener#createChainingListenerInstance()
      */
     public StackableChainingListener createChainingListenerInstance()

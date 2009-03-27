@@ -36,14 +36,26 @@ public class VerbatimBlock extends AbstractBlock
      */
     private String protectedString;
 
-    boolean isInline;
+    /**
+     * If true the macro is located in a inline content (like paragraph, etc.).
+     */
+    private boolean isInline;
 
+    /**
+     * @param protectedString the string to protect from rendering.
+     * @param isInline if true the macro is located in a inline content (like paragraph, etc.).
+     */
     public VerbatimBlock(String protectedString, boolean isInline)
     {
         this.protectedString = protectedString;
         this.isInline = isInline;
     }
 
+    /**
+     * @param protectedString the string to protect from rendering.
+     * @param parameters the custom parameters
+     * @param isInline if true the macro is located in a inline content (like paragraph, etc.).
+     */
     public VerbatimBlock(String protectedString, Map<String, String> parameters, boolean isInline)
     {
         super(parameters);
@@ -60,6 +72,9 @@ public class VerbatimBlock extends AbstractBlock
         return this.protectedString;
     }
 
+    /**
+     * @return if true the macro is located in a inline content (like paragraph, etc.).
+     */
     public boolean isInline()
     {
         return isInline;

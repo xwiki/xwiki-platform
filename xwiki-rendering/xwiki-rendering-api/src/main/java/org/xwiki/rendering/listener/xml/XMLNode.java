@@ -27,14 +27,19 @@ package org.xwiki.rendering.listener.xml;
  */
 public class XMLNode implements Cloneable
 {
+    /**
+     * @return the type of the XML node.
+     * @see XMLNodeType
+     */
     public XMLNodeType getNodeType()
     {
         return XMLNodeType.UNKNOWN;
     }
-    
+
     /**
      * {@inheritDoc}
-     * @see Object#clone()
+     * 
+     * @see java.lang.Object#clone()
      */
     @Override
     public XMLNode clone()

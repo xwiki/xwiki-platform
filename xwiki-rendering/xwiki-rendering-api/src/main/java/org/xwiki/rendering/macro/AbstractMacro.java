@@ -25,6 +25,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 
 /**
+ * @param <P> the type of the macro parameters bean
  * @version $Id$
  * @since 1.5M2
  */
@@ -40,11 +41,22 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      */
     private int priority = 1000;
 
+    /**
+     * @param macroDescriptor the {@link MacroDescriptor}.
+     */
     public AbstractMacro(MacroDescriptor macroDescriptor)
     {
         this.macroDescriptor = macroDescriptor;
     }
 
+    /**
+     * Register a converter for a specific type used by the macro parameters bean.
+     * <p>
+     * Note: each enum type used has to be registered because BeanUtil does not support generic types.
+     * 
+     * @param converter the BeanUtil {@link Converter}
+     * @param clazz the class for which to assign the {@link Converter}
+     */
     protected void registerConverter(Converter converter, Class< ? > clazz)
     {
         ConvertUtils.register(converter, clazz);

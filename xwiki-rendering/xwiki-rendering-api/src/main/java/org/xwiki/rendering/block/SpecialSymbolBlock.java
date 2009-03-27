@@ -22,23 +22,39 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Listener;
 
 /**
+ * Represent a non-alphanumeric and non-space symbol (>, ]...).
+ * 
  * @version $Id$
  * @since 1.5M2
  */
 public class SpecialSymbolBlock extends AbstractBlock
 {
+    /**
+     * The symbol.
+     */
     private char symbol;
 
+    /**
+     * @param symbol the symbol
+     */
     public SpecialSymbolBlock(char symbol)
     {
         this.symbol = symbol;
     }
 
+    /**
+     * @return the symbol
+     */
     public char getSymbol()
     {
         return this.symbol;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#traverse(org.xwiki.rendering.listener.Listener)
+     */
     public void traverse(Listener listener)
     {
         listener.onSpecialSymbol(getSymbol());

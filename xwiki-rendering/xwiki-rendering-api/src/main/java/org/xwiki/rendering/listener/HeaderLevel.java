@@ -25,18 +25,42 @@ package org.xwiki.rendering.listener;
  */
 public enum HeaderLevel
 {
-    LEVEL1(1), LEVEL2(2), LEVEL3(3), LEVEL4(4), LEVEL5(5), LEVEL6(6);
+    /**
+     * Header of level 1.
+     */
+    LEVEL1,
 
-    private int value;
+    /**
+     * Header of level 2.
+     */
+    LEVEL2,
 
-    private HeaderLevel(int value)
-    {
-        this.value = value;
-    }
+    /**
+     * Header of level 3.
+     */
+    LEVEL3,
 
+    /**
+     * Header of level 4.
+     */
+    LEVEL4,
+
+    /**
+     * Header of level 5.
+     */
+    LEVEL5,
+
+    /**
+     * Header of level 6.
+     */
+    LEVEL6;
+
+    /**
+     * @return the header level as integer
+     */
     public int getAsInt()
     {
-        return this.value;
+        return this.ordinal() + 1;
     }
 
     /**
@@ -50,6 +74,12 @@ public enum HeaderLevel
         return "" + getAsInt();
     }
 
+    /**
+     * Convert provided integer into the corresponding header level enum entry.
+     * 
+     * @param value the header level as integer
+     * @return the header level as enum entry
+     */
     public static HeaderLevel parseInt(int value)
     {
         HeaderLevel result;
@@ -75,6 +105,7 @@ public enum HeaderLevel
             default:
                 throw new IllegalArgumentException("Invalid level [" + value + "]. Only levels 1 to 6 are allowed.");
         }
+
         return result;
     }
 }

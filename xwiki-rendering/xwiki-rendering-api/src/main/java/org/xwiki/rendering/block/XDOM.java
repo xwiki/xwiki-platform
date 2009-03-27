@@ -47,9 +47,8 @@ public class XDOM extends AbstractFatherBlock
     private IdGenerator idGenerator;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     * @param childBlocks the list of children blocks of the block to construct
+     * @see AbstractFatherBlock#AbstractFatherBlock(List)
      */
     public XDOM(List<Block> childBlocks)
     {
@@ -58,6 +57,10 @@ public class XDOM extends AbstractFatherBlock
         this.idGenerator = new IdGenerator();
     }
 
+    /**
+     * @param childBlocks the list of children blocks of the block to construct
+     * @param idGenerator a sateful id generator for this document
+     */
     public XDOM(List<Block> childBlocks, IdGenerator idGenerator)
     {
         super(childBlocks);

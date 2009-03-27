@@ -36,6 +36,9 @@ public interface Image extends Cloneable
      * @return a name representing the image (it's used for example as the ALT text in the XHTML renderer)
      */
     String getName();
-    
+
+    /**
+     * @return a copy of the image
+     */
     Image clone();
 }

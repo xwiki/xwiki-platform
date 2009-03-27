@@ -33,10 +33,25 @@ import org.xwiki.rendering.util.RenderersUtils;
  */
 public class HeaderBlock extends AbstractFatherBlock
 {
+    /**
+     * Header identifier prefix. This is to make sure the identifier complies with the XHTML specification.
+     */
+    private static final String ID_PREFIX = "H";
+
+    /**
+     * The level of the header.
+     */
     private HeaderLevel level;
 
+    /**
+     * The id of the header.
+     */
     private String id;
 
+    /**
+     * @param childBlocks the children of the header.
+     * @param level the level of the header
+     */
     public HeaderBlock(List<Block> childBlocks, HeaderLevel level)
     {
         super(childBlocks);
@@ -44,6 +59,11 @@ public class HeaderBlock extends AbstractFatherBlock
         this.level = level;
     }
 
+    /**
+     * @param childBlocks the children of the header.
+     * @param level the level of the header
+     * @param parameters the parameters of the header
+     */
     public HeaderBlock(List<Block> childBlocks, HeaderLevel level, Map<String, String> parameters)
     {
         super(childBlocks, parameters);
@@ -51,6 +71,11 @@ public class HeaderBlock extends AbstractFatherBlock
         this.level = level;
     }
 
+    /**
+     * @param childBlocks the children of the header.
+     * @param level the level of the header
+     * @param id the id of the header.
+     */
     public HeaderBlock(List<Block> childBlocks, HeaderLevel level, String id)
     {
         this(childBlocks, level);
@@ -58,6 +83,12 @@ public class HeaderBlock extends AbstractFatherBlock
         this.id = id;
     }
 
+    /**
+     * @param childBlocks the children of the header.
+     * @param level the level of the header
+     * @param parameters the parameters of the header
+     * @param id the id of the header.
+     */
     public HeaderBlock(List<Block> childBlocks, HeaderLevel level, Map<String, String> parameters, String id)
     {
         this(childBlocks, level, parameters);
@@ -65,19 +96,28 @@ public class HeaderBlock extends AbstractFatherBlock
         this.id = id;
     }
 
+    /**
+     * @return the level of the header
+     */
     public HeaderLevel getLevel()
     {
         return this.level;
     }
 
-    public SectionBlock getSection()
-    {
-        return (SectionBlock) getParent();
-    }
-
+    /**
+     * @return the id of the header.
+     */
     public String getId()
     {
         return this.id;
+    }
+
+    /**
+     * @return the {@link SectionBlock} corresponding to this header
+     */
+    public SectionBlock getSection()
+    {
+        return (SectionBlock) getParent();
     }
 
     /**
@@ -95,16 +135,32 @@ public class HeaderBlock extends AbstractFatherBlock
                 idGenerator.remove(this.id);
             }
 
-            if (idGenerator != null) {
-                this.id = "H" + idGenerator.generateUniqueId(getPlainTextTitle());
-            } else {
-                this.id = "H" + getPlainTextTitle();
-            }
+            generateId(idGenerator);
         } else {
-            this.id = "H" + getPlainTextTitle();
+            generateId(null);
         }
     }
 
+    /**
+     * Generate header identifier. If idGenerator is null the id is generated based on "H" prefix and a cleaned (with
+     * only characters matching [a-zA-Z0-9]) plain text title.
+     * 
+     * @param idGenerator the id generator.
+     */
+    private void generateId(IdGenerator idGenerator)
+    {
+        if (idGenerator != null) {
+            this.id = idGenerator.generateUniqueId(ID_PREFIX, getPlainTextTitle());
+        } else {
+            this.id = ID_PREFIX + getPlainTextTitle().replaceAll("[^a-zA-Z0-9]", "");
+        }
+    }
+
+    /**
+     * Generate a plain text title from header children blocks.
+     * 
+     * @return the plain text title.
+     */
     public String getPlainTextTitle()
     {
         RenderersUtils renderersUtils = new RenderersUtils();
@@ -127,11 +183,21 @@ public class HeaderBlock extends AbstractFatherBlock
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginHeader(getLevel(), getId(), getParameters());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     */
     public void after(Listener listener)
     {
         listener.endHeader(getLevel(), getId(), getParameters());

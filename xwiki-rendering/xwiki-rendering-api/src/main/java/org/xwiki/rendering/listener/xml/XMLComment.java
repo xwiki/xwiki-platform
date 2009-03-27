@@ -27,23 +27,43 @@ package org.xwiki.rendering.listener.xml;
  */
 public class XMLComment extends XMLNode
 {
+    /**
+     * The comment.
+     */
     private String comment;
-    
+
+    /**
+     * @param comment the comment
+     */
     public XMLComment(String comment)
     {
         this.comment = comment;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.xml.XMLNode#getNodeType()
+     */
+    @Override
     public XMLNodeType getNodeType()
     {
         return XMLNodeType.COMMENT;
     }
-    
+
+    /**
+     * @return the comment
+     */
     public String getComment()
     {
         return this.comment;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString()
     {

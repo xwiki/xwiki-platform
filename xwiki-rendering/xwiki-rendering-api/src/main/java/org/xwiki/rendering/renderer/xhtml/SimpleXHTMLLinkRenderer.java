@@ -26,8 +26,8 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
- * Simple implementation that considers all links external links and thus that adds the link reference as the 
- * XHTML HREF value.
+ * Simple implementation that considers all links external links and thus that adds the link reference as the XHTML HREF
+ * value.
  * 
  * @version $Id: $
  * @since 1.8RC3
@@ -41,6 +41,7 @@ public class SimpleXHTMLLinkRenderer implements XHTMLLinkRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLLinkRenderer#setHasLabel(boolean)
      */
     public void setHasLabel(boolean hasLabel)
@@ -50,6 +51,7 @@ public class SimpleXHTMLLinkRenderer implements XHTMLLinkRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLLinkRenderer#setWikiPrinter(XHTMLWikiPrinter)
      */
     public void setXHTMLWikiPrinter(XHTMLWikiPrinter printer)
@@ -59,6 +61,7 @@ public class SimpleXHTMLLinkRenderer implements XHTMLLinkRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLLinkRenderer#beginLink(Link, boolean, Map)
      */
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -68,17 +71,18 @@ public class SimpleXHTMLLinkRenderer implements XHTMLLinkRenderer
             // Add all parameters to the A attributes
             Map<String, String> aAttributes = new LinkedHashMap<String, String>();
             aAttributes.putAll(parameters);
-            aAttributes.put("href", link.getReference());
-            this.xhtmlPrinter.printXMLStartElement("a", aAttributes);
+            aAttributes.put(HREF, link.getReference());
+            this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
         }
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLLinkRenderer#endLink(Link, boolean, Map)
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.xhtmlPrinter.printXMLEndElement("a");
+        this.xhtmlPrinter.printXMLEndElement(ANCHOR);
     }
 }

@@ -19,8 +19,16 @@
  */
 package org.xwiki.rendering.macro.parameter;
 
+/**
+ * Exception used when the macro parameter is two high.
+ * 
+ * @version $Id: $
+ */
 public class ParameterValueTooHighException extends MacroParameterException
 {
+    /**
+     * @param maxValue the maximum valid number
+     */
     public ParameterValueTooHighException(int maxValue)
     {
         super("The value is too high. The highest allowed value is " + maxValue + ".");

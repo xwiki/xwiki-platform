@@ -21,18 +21,49 @@ package org.xwiki.rendering.listener;
 
 /**
  * Represents a text formatting (bold, italic, etc).
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
 public enum Format
 {
+    /**
+     * Bold style.
+     */
     BOLD,
+
+    /**
+     * Italic style.
+     */
     ITALIC,
+
+    /**
+     * Underlined style.
+     */
     UNDERLINED,
+
+    /**
+     * Strikedout style.
+     */
     STRIKEDOUT,
+
+    /**
+     * Superscript style.
+     */
     SUPERSCRIPT,
+
+    /**
+     * Subscript style.
+     */
     SUBSCRIPT,
+
+    /**
+     * Monospace style.
+     */
     MONOSPACE,
+
+    /**
+     * No style.
+     */
     NONE
 }

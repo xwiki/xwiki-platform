@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.renderer;
 
-import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ConsecutiveNewLineStateChainingListener;
 import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
@@ -29,32 +28,47 @@ import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
 
 /**
  * Provides convenient access to listeners in the chain used for the {@link XWikiSyntaxImageRenderer}.
- *  
+ * 
  * @version $Id$
  * @since 1.8RC1
  */
 public class XWikiSyntaxListenerChain extends ListenerChain
 {
+    /**
+     * @return the stateful {@link LookaheadChainingListener} for this rendering session.
+     */
     public LookaheadChainingListener getLookaheadChainingListener()
     {
         return (LookaheadChainingListener) getListener(LookaheadChainingListener.class);
     }
 
+    /**
+     * @return the stateful {@link BlockStateChainingListener} for this rendering session.
+     */
     public BlockStateChainingListener getBlockStateChainingListener()
     {
         return (BlockStateChainingListener) getListener(BlockStateChainingListener.class);
     }
 
+    /**
+     * @return the stateful {@link ConsecutiveNewLineStateChainingListener} for this rendering session.
+     */
     public ConsecutiveNewLineStateChainingListener getConsecutiveNewLineStateChainingListener()
     {
         return (ConsecutiveNewLineStateChainingListener) getListener(ConsecutiveNewLineStateChainingListener.class);
     }
 
+    /**
+     * @return the stateful {@link TextOnNewLineStateChainingListener} for this rendering session.
+     */
     public TextOnNewLineStateChainingListener getTextOnNewLineStateChainingListener()
     {
         return (TextOnNewLineStateChainingListener) getListener(TextOnNewLineStateChainingListener.class);
     }
-    
+
+    /**
+     * @return the stateful {@link DocumentStateChainingListener} for this rendering session.
+     */
     public DocumentStateChainingListener getDocumentStateChainingListener()
     {
         return (DocumentStateChainingListener) getListener(DocumentStateChainingListener.class);

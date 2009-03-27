@@ -27,11 +27,22 @@ package org.xwiki.rendering.listener.xml;
  */
 public class XMLCData extends XMLNode
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.xml.XMLNode#getNodeType()
+     */
+    @Override
     public XMLNodeType getNodeType()
     {
         return XMLNodeType.CDATA;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString()
     {

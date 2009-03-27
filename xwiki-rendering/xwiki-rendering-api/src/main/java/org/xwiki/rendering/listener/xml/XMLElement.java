@@ -32,15 +32,28 @@ import java.util.Map;
  */
 public class XMLElement extends XMLNode
 {
+    /**
+     * The name of the element.
+     */
     private String name;
-    
+
+    /**
+     * The attributes of the element.
+     */
     private Map<String, String> attributes;
 
+    /**
+     * @param name the name of the element.
+     */
     public XMLElement(String name)
     {
-        this(name, Collections.<String, String>emptyMap());
+        this(name, Collections.<String, String> emptyMap());
     }
-    
+
+    /**
+     * @param name the name of the element.
+     * @param attributes the attributes of the element.
+     */
     public XMLElement(String name, Map<String, String> attributes)
     {
         super();
@@ -50,26 +63,47 @@ public class XMLElement extends XMLNode
         this.attributes = new LinkedHashMap<String, String>(attributes);
     }
 
+    /**
+     * @return the name of the element.
+     */
     public String getName()
     {
         return this.name;
     }
-    
-    public Map<String, String> getAttributes() 
+
+    /**
+     * @return the attributes of the element
+     */
+    public Map<String, String> getAttributes()
     {
         return Collections.unmodifiableMap(this.attributes);
     }
 
+    /**
+     * @param name the name of the attribute to add/modify.
+     * @param value the value of the attribute to add/modify.
+     */
     public void setAttribute(String name, String value)
     {
         this.attributes.put(name, value);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.xml.XMLNode#getNodeType()
+     */
+    @Override
     public XMLNodeType getNodeType()
     {
         return XMLNodeType.ELEMENT;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString()
     {
@@ -86,18 +120,21 @@ public class XMLElement extends XMLNode
             }
             buffer.append(']');
         }
+
         return buffer.toString();
     }
-    
+
     /**
      * {@inheritDoc}
-     * @see Object#clone()
+     * 
+     * @see org.xwiki.rendering.listener.xml.XMLNode#clone()
      */
     @Override
     public XMLNode clone()
     {
         XMLElement node = (XMLElement) super.clone();
         node.attributes = new LinkedHashMap<String, String>(getAttributes());
+
         return node;
     }
 }

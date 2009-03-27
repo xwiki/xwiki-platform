@@ -24,11 +24,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
-
 /**
  * Use this annotation to indicate a method is not part of the macro parameter public api. For example this will not be
- * in the generated {@link MacroDescriptor}.
+ * in the generated {@link org.xwiki.rendering.macro.descriptor.MacroDescriptor}.
  * 
  * @version $Id$
  * @since 1.9M1

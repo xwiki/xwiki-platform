@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.block;
 
-import org.xwiki.rendering.listener.Listener;
-
 import java.util.List;
 import java.util.Map;
+
+import org.xwiki.rendering.listener.Listener;
 
 /**
  * @version $Id$
@@ -30,21 +30,38 @@ import java.util.Map;
  */
 public class ParagraphBlock extends AbstractFatherBlock
 {
-    public ParagraphBlock(List<Block> blocks) throws IllegalArgumentException
+    /**
+     * @param blocks the children blocks of the paragraph
+     */
+    public ParagraphBlock(List<Block> blocks)
     {
         super(blocks);
     }
 
-    public ParagraphBlock(List<Block> blocks, Map<String, String> parameters) throws IllegalArgumentException
+    /**
+     * @param blocks the children blocks of the paragraph
+     * @param parameters the parameters of the paragraph
+     */
+    public ParagraphBlock(List<Block> blocks, Map<String, String> parameters)
     {
         super(blocks, parameters);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginParagraph(getParameters());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     */
     public void after(Listener listener)
     {
         listener.endParagraph(getParameters());

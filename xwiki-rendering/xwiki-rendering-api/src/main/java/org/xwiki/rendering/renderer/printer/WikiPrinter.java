@@ -19,17 +19,21 @@
  */
 package org.xwiki.rendering.renderer.printer;
 
-import org.xwiki.rendering.renderer.PrintRenderer;
-
 /**
- * Printer for {@link PrintRenderer}s.
- *
- * @version $Id: $ 
+ * Printer for {@link org.xwiki.rendering.renderer.PrintRenderer}s.
+ * 
+ * @version $Id: $
  * @since 1.6M1
  */
 public interface WikiPrinter
 {
+    /**
+     * @param text print the provided {@link String}.
+     */
     void print(String text);
 
+    /**
+     * @param text print the provided {@link String} and add a new line.
+     */
     void println(String text);
 }

@@ -27,18 +27,30 @@ package org.xwiki.rendering.renderer.printer;
  */
 public class DefaultWikiPrinter implements WikiPrinter
 {
+    /**
+     * The buffer where to put the provided {@link String}s.
+     */
     private StringBuffer buffer;
 
+    /**
+     * The default constructor. It initialize a new empty {@link StringBuffer}.
+     */
     public DefaultWikiPrinter()
     {
         this(new StringBuffer());
     }
 
+    /**
+     * @param buffer the {@link StringBuffer} to where to put the provided {@link String}s.
+     */
     public DefaultWikiPrinter(StringBuffer buffer)
     {
         this.buffer = buffer;
     }
 
+    /**
+     * @return the buffer containing the printed {@link String}s.
+     */
     public StringBuffer getBuffer()
     {
         return this.buffer;
@@ -84,7 +96,7 @@ public class DefaultWikiPrinter implements WikiPrinter
     {
         return getBuffer().toString();
     }
-    
+
     /**
      * Removes the buffer's content which allows the printer to be reused.
      */

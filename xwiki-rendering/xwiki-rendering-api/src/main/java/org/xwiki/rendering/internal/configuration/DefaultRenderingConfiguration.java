@@ -53,6 +53,7 @@ public class DefaultRenderingConfiguration implements Initializable, RenderingCo
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.component.phase.Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -62,6 +63,8 @@ public class DefaultRenderingConfiguration implements Initializable, RenderingCo
     }
 
     /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.configuration.RenderingConfiguration#getLinkLabelFormat()
      */
     public String getLinkLabelFormat()
@@ -69,6 +72,9 @@ public class DefaultRenderingConfiguration implements Initializable, RenderingCo
         return this.linkLabelFormat;
     }
 
+    /**
+     * @param linkLabelFormat the format used to decide how to display links that have no label
+     */
     public void setLinkLabelFormat(String linkLabelFormat)
     {
         this.linkLabelFormat = linkLabelFormat;

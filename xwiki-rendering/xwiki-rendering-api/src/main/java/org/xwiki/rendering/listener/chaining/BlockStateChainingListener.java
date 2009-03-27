@@ -38,7 +38,37 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
 {
     public enum Event
     {
-        NONE, DEFINITION_DESCRIPTION, DEFINITION_TERM, DEFINITION_LIST, DOCUMENT, FORMAT, HEADER, LINK, LIST, LIST_ITEM, MACRO_MARKER, PARAGRAPH, QUOTATION, QUOTATION_LINE, SECTION, TABLE, TABLE_CELL, TABLE_HEAD_CELL, TABLE_ROW, XML_NODE, EMPTY_LINES, HORIZONTAL_LINE, ID, IMAGE, NEW_LINE, SPACE, SPECIAL_SYMBOL, MACRO, VERBATIM_INLINE, VERBATIM_STANDALONE, WORD
+        NONE,
+        DEFINITION_DESCRIPTION,
+        DEFINITION_TERM,
+        DEFINITION_LIST,
+        DOCUMENT,
+        FORMAT,
+        HEADER,
+        LINK,
+        LIST,
+        LIST_ITEM,
+        MACRO_MARKER,
+        PARAGRAPH,
+        QUOTATION,
+        QUOTATION_LINE,
+        SECTION,
+        TABLE,
+        TABLE_CELL,
+        TABLE_HEAD_CELL,
+        TABLE_ROW,
+        XML_NODE,
+        EMPTY_LINES,
+        HORIZONTAL_LINE,
+        ID,
+        IMAGE,
+        NEW_LINE,
+        SPACE,
+        SPECIAL_SYMBOL,
+        MACRO,
+        VERBATIM_INLINE,
+        VERBATIM_STANDALONE,
+        WORD
     }
 
     private Event previousEvent = Event.NONE;
@@ -56,9 +86,9 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     private boolean isInTableCell;
 
     private int definitionListDepth;
-    
+
     private int definitionDescriptionDepth;
-    
+
     private int definitionListItemIndex = -1;
 
     private int listDepth;
@@ -153,17 +183,17 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     {
         return this.definitionDescriptionDepth;
     }
-    
+
     public boolean isInDefinitionDescription()
     {
         return getDefinitionDescriptionDepth() > 0;
     }
-    
+
     public int getDefinitionListItemIndex()
     {
         return definitionListItemIndex;
     }
-    
+
     public int getListDepth()
     {
         return this.listDepth;

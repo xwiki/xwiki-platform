@@ -31,29 +31,54 @@ import org.xwiki.rendering.listener.xml.XMLNode;
  */
 public class XMLBlock extends AbstractFatherBlock
 {
+    /**
+     * The XML node.
+     * 
+     * @see XMLNode
+     */
     private XMLNode node;
 
+    /**
+     * @param childrenBlocks the children blocks of the XML node
+     * @param node the XML node
+     */
     public XMLBlock(List<Block> childrenBlocks, XMLNode node)
     {
         super(childrenBlocks);
         this.node = node;
     }
 
+    /**
+     * @param node the XML node
+     */
     public XMLBlock(XMLNode node)
     {
         this(Collections.<Block> emptyList(), node);
     }
 
+    /**
+     * @return the XML node
+     */
     public XMLNode getXMLNode()
     {
         return this.node;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginXMLNode(getXMLNode());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     */
     public void after(Listener listener)
     {
         listener.endXMLNode(getXMLNode());

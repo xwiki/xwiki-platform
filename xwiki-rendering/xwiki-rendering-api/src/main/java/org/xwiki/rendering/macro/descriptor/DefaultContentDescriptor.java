@@ -30,27 +30,40 @@ public class DefaultContentDescriptor implements ContentDescriptor
     /**
      * The description of the content.
      */
-    String description;
+    private String description;
 
     /**
      * Indicate if the content is mandatory.
      */
     private boolean mandatory = true;
 
+    /**
+     * Default constructor.
+     */
     public DefaultContentDescriptor()
     {
     }
 
+    /**
+     * @param description the description of the content.
+     */
     public DefaultContentDescriptor(String description)
     {
         this.description = description;
     }
 
+    /**
+     * @param mandatory indicate if the content is mandatory.
+     */
     public DefaultContentDescriptor(boolean mandatory)
     {
         this.mandatory = mandatory;
     }
 
+    /**
+     * @param description the description of the content.
+     * @param mandatory indicate if the content is mandatory.
+     */
     public DefaultContentDescriptor(String description, boolean mandatory)
     {
         this.description = description;

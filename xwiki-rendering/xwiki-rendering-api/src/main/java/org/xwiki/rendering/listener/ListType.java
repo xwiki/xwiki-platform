@@ -25,5 +25,13 @@ package org.xwiki.rendering.listener;
  */
 public enum ListType
 {
-    NUMBERED, BULLETED;
+    /**
+     * Each list item start with an incremented number.
+     */
+    NUMBERED,
+
+    /**
+     * Each list item start with a bullet.
+     */
+    BULLETED;
 }

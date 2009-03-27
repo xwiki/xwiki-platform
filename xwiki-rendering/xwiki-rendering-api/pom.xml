@@ -120,32 +120,22 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <includes>
-            **/Listener.java
-            **/listener/chaining/AbstractChainingListener.java
-            **/listener/chaining/ChainingListener.java
-            **/listener/chaining/StackableChainingListener.java
-            **/renderer/XWikiSyntaxRenderer.java
-            **/renderer/EventsRenderer.java
-            **/renderer/XHTMLRenderer.java
-            **/block/Block.java
-            **/block/FatherBlock.java
-            **/block/AbstractFatherBlock.java
-            **/block/AbstractMacroBlock.java
-            **/block/AbstractVerbatimBlock.java
-            **/block/*ListBlock.java
-            **/block/FormatBlock.java
-            **/block/EscapeBlock.java
-            **/block/HorizontalLineBlock.java
-            **/block/IdBlock.java
-            **/block/LineBreakBlock.java
-            **/block/LinkBlock.java
-            **/block/ListItemBlock.java
-            **/block/NewLineBlock.java
-            **/block/MacroBlock.java
-            **/block/XDOM.java
-            **/block/Table*.java
-            **/block/ErrorBlock.java
-            **/block/WordBlock.java
+            **/block/*.java,
+            **/configuration/*.java,
+            **/configuration/*.java,
+            **/rendering/listener/*.java,
+            **/rendering/listener/chaining/AbstractChainingListener.java,
+            **/rendering/listener/chaining/ChainingListener.java,
+            **/rendering/listener/chaining/StackableChainingListener.java,
+            **/rendering/listener/xml/*.java,
+            **/rendering/macro/**/*.java,
+            **/rendering/renderer/*.java,
+            **/rendering/renderer/chaining/*.java,
+            **/rendering/renderer/printer/DefaultWikiPrinter.java,
+            **/rendering/renderer/printer/WikiPrinter.java,
+            **/rendering/renderer/xhtml/*.java,
+            **/rendering/transformation/*.java,
+            **/rendering/util/*.java
           </includes>
         </configuration>
       </plugin>

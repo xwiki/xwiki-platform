@@ -20,15 +20,15 @@
 package org.xwiki.rendering.listener.chaining;
 
 /**
- * Provides information on document state: whether we are inside a document, an embedded document and the depth of 
- * embedding. Note that this listener is separated from the 
- * {@link org.xwiki.rendering.listener.chaining.BlockStateChainingListener} class because we don't want this listener
- * to be stackable (since we need to know the embedding depth even if we're inside an embedded document. 
- *  
+ * Provides information on document state: whether we are inside a document, an embedded document and the depth of
+ * embedding. Note that this listener is separated from the
+ * {@link org.xwiki.rendering.listener.chaining.BlockStateChainingListener} class because we don't want this listener to
+ * be stackable (since we need to know the embedding depth even if we're inside an embedded document.
+ * 
  * @version $Id$
  * @since 1.8RC1
  */
-public class DocumentStateChainingListener extends AbstractChainingListener 
+public class DocumentStateChainingListener extends AbstractChainingListener
 {
     private int documentDepth = 0;
 
@@ -53,7 +53,7 @@ public class DocumentStateChainingListener extends AbstractChainingListener
     }
 
     // Events
-    
+
     public void beginDocument()
     {
         ++this.documentDepth;

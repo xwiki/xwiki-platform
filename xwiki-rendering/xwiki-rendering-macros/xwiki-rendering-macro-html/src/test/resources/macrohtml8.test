@@ -2,7 +2,7 @@
 .input|xwiki/2.0
 .# Verify that the HTML Macro knows how to handle XML comments and that they are not lost.
 .#-----------------------------------------------------------------------------------------
-{{html}}
+{{html wiki="true"}}
 <!-- comment1 -->
 <p>hello</p>
 <!-- comment2 -->
@@ -11,7 +11,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [] [
+beginMacroMarkerStandalone [html] [wiki=true] [
 <!-- comment1 -->
 <p>hello</p>
 <!-- comment2 -->
@@ -23,7 +23,7 @@ onWord [hello]
 endXMLNode [p]
 beginXMLNode [ comment2 ]
 endXMLNode [ comment2 ]
-endMacroMarkerStandalone [html] [] [
+endMacroMarkerStandalone [html] [wiki=true] [
 <!-- comment1 -->
 <p>hello</p>
 <!-- comment2 -->
@@ -32,7 +32,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:html|-||-|
+<!--startmacro:html|-|wiki="true"|-|
 <!-- comment1 -->
 <p>hello</p>
 <!-- comment2 -->

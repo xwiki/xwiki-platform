@@ -29,7 +29,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Defines the instantiation strategy for this component ("singleton", "per-lookup"). 
+ * Defines the instantiation strategy for this component (Singleton, per lookup). 
  *
  * @version $Id: $
  * @since 1.8.1
@@ -40,5 +40,21 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface InstantiationStrategy
 {
-    String value() default "singleton";
+    enum StrategyType {
+        SINGLETON("singleton"), PER_LOOKUP("per-lookup");
+        
+        private String type;
+        
+        private StrategyType(String type)
+        {
+            this.type = type;
+        }
+        
+        public String getType()
+        {
+            return this.type;
+        }
+    }
+    
+    StrategyType value();
 }

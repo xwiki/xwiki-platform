@@ -40,5 +40,5 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface ComponentHint
 {
-    String value() default "default";
+    String value();
 }

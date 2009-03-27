@@ -41,5 +41,5 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface RequirementHint
 {
-    String value() default "default";
+    String value();
 }

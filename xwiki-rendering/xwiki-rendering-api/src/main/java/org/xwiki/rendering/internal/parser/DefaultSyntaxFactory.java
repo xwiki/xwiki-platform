@@ -19,22 +19,22 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.parser.SyntaxType;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * @version $Id$
@@ -42,10 +42,19 @@ import java.util.ArrayList;
  */
 public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFactory, Composable, Initializable
 {
+    /**
+     * Used to cut the syntax identifier into syntax name and syntax version.
+     */
     private static final Pattern SYNTAX_PATTERN = Pattern.compile("(.*)\\/(.*)");
 
+    /**
+     * Used to lookup all the parsers.
+     */
     private ComponentManager componentManager;
 
+    /**
+     * The list of available syntaxes.
+     */
     private List<Syntax> syntaxes;
 
     /**
@@ -80,6 +89,11 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
         this.syntaxes = syntaxList;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.SyntaxFactory#createSyntaxFromIdString(java.lang.String)
+     */
     public Syntax createSyntaxFromIdString(String syntaxIdAsString) throws ParseException
     {
         Matcher matcher = SYNTAX_PATTERN.matcher(syntaxIdAsString);
@@ -95,6 +109,11 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
         return new Syntax(syntaxType, version);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.SyntaxFactory#getAvailableSyntaxes()
+     */
     public List<Syntax> getAvailableSyntaxes()
     {
         return this.syntaxes;

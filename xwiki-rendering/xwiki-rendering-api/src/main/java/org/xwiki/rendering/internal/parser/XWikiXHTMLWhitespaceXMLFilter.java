@@ -36,22 +36,29 @@ import org.xml.sax.XMLReader;
  */
 public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
 {
+    /**
+     * The leading and trainling white spaces matching pattern.
+     */
     private static final Pattern HTML_WHITESPACE_BOUNDARIES_PATTERN = Pattern.compile("^\\s+|\\s+$");
 
+    /**
+     * Indicate if the element can contain wiki syntax.
+     */
     private boolean containsWikiSyntax;
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLWhitespaceXMLFilter#XHTMLWhitespaceXMLFilter()
      */
     public XWikiXHTMLWhitespaceXMLFilter(boolean containsWikiSyntax)
     {
-        super();
         this.containsWikiSyntax = containsWikiSyntax;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLWhitespaceXMLFilter#XHTMLWhitespaceXMLFilter(XMLReader)
      */
     public XWikiXHTMLWhitespaceXMLFilter(XMLReader reader, boolean containsWikiSyntax)
@@ -62,12 +69,13 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLWhitespaceXMLFilter#endCDATA()
      */
     @Override
     public void endCDATA() throws SAXException
     {
-        if (getContent().length() > 0) {        
+        if (getContent().length() > 0) {
             if (this.containsWikiSyntax) {
                 // Make sure we clean head/trail white spaces
                 trimLeadingWhiteSpaces();
@@ -80,17 +88,20 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLWhitespaceXMLFilter#shouldRemoveWhiteSpaces()
      */
     @Override
     protected boolean shouldRemoveWhiteSpaces()
     {
-        // Always remove leading/trailing white spaces if we're in wiki mode even if we're inside CDATA and PRE elements.
+        // Always remove leading/trailing white spaces if we're in wiki mode even if we're inside CDATA and PRE
+        // elements.
         return this.containsWikiSyntax ? true : super.shouldRemoveWhiteSpaces();
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLWhitespaceXMLFilter#cleanExtraWhiteSpaces()
      */
     @Override
@@ -98,7 +109,7 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
     {
         // If the element texts can contain wiki syntax only clean whitespaces at beginning and end of texts.
         if (this.containsWikiSyntax) {
-            if (getContent().length() > 0) {        
+            if (getContent().length() > 0) {
                 Matcher matcher = HTML_WHITESPACE_BOUNDARIES_PATTERN.matcher(getContent());
                 String result = matcher.replaceAll(" ");
                 getContent().setLength(0);
@@ -111,12 +122,17 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
 
     /**
      * {@inheritDoc}
+     * 
      * @see XHTMLWhitespaceXMLFilter#isSemanticComment(String)
      */
     @Override
     protected boolean isSemanticComment(String comment)
     {
-        return super.isSemanticComment(comment) || comment.startsWith("startwikilink:") || comment.startsWith("stopwikilink")
+        if (super.isSemanticComment(comment)) {
+            return true;
+        }
+
+        return comment.startsWith("startwikilink:") || comment.startsWith("stopwikilink")
             || comment.startsWith("startimage:") || comment.startsWith("stopimage");
     }
 }

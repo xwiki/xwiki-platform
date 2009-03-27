@@ -32,18 +32,18 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.Attributes2;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.XMLBlock;
+import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.block.AbstractBlock;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.xml.XMLCData;
 import org.xwiki.rendering.listener.xml.XMLComment;
 import org.xwiki.rendering.listener.xml.XMLElement;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * XML SAX handler that converts XML events into Blocks.
@@ -53,12 +53,21 @@ import org.xwiki.rendering.listener.xml.XMLElement;
  */
 public class XMLBlockConverterHandler extends DefaultHandler implements LexicalHandler
 {
+    /**
+     * The parser to use to interpret the wiki syntax.
+     */
     private Parser parser;
 
+    /**
+     * Indicate if the wiki syntax need to be interpreted.
+     */
     private boolean interpretWikiSyntax;
 
     private Stack<Block> stack = new Stack<Block>();
 
+    /**
+     * Used to parse inline content.
+     */
     private ParserUtils inlineConverter = new ParserUtils();
 
     private final MarkerBlock marker = new MarkerBlock();
@@ -70,12 +79,19 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
         }
     }
 
+    /**
+     * @param parser the parser to use to interpret the wiki syntax.
+     * @param interpretWikiSyntax indicate if the wiki syntax need to be interpreted.
+     */
     public XMLBlockConverterHandler(Parser parser, boolean interpretWikiSyntax)
     {
         this.parser = parser;
         this.interpretWikiSyntax = interpretWikiSyntax;
     }
 
+    /**
+     * @return the root block.
+     */
     public Block getRootBlock()
     {
         return this.stack.peek();
@@ -90,7 +106,7 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     public void characters(char[] ch, int start, int length) throws SAXException
     {
         String content = new String(ch, start, length);
-        
+
         // If we've been told by the user to not render wiki syntax we simply pass the text as a Word block as is
         if (!this.interpretWikiSyntax) {
             this.stack.push(new WordBlock(content));
@@ -159,6 +175,11 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
         this.stack.peek().addChildren(nestedBlocks);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xml.sax.ext.LexicalHandler#comment(char[], int, int)
+     */
     public void comment(char[] value, int offset, int count) throws SAXException
     {
         this.stack.push(new XMLBlock(new XMLComment(new String(value, offset, count))));
@@ -166,6 +187,7 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
 
     /**
      * {@inheritDoc}
+     * 
      * @see LexicalHandler#startCDATA()
      */
     public void startCDATA() throws SAXException
@@ -176,6 +198,7 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
 
     /**
      * {@inheritDoc}
+     * 
      * @see LexicalHandler#endCDATA()
      */
     public void endCDATA() throws SAXException
@@ -185,21 +208,41 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
         this.stack.peek().addChildren(nestedBlocks);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xml.sax.ext.LexicalHandler#startDTD(java.lang.String, java.lang.String, java.lang.String)
+     */
     public void startDTD(String arg0, String arg1, String arg2) throws SAXException
     {
         // Nothing to do
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xml.sax.ext.LexicalHandler#endDTD()
+     */
     public void endDTD() throws SAXException
     {
         // Nothing to do
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xml.sax.ext.LexicalHandler#startEntity(java.lang.String)
+     */
     public void startEntity(String arg0) throws SAXException
     {
         // Nothing to do since an entity definition shouldn't be present in a XHTML macro content
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xml.sax.ext.LexicalHandler#endEntity(java.lang.String)
+     */
     public void endEntity(String arg0) throws SAXException
     {
         // Nothing to do since an entity definition shouldn't be present in a XHTML macro content

@@ -43,7 +43,7 @@ public class DefaultOpenOfficeConfigurationTest extends AbstractXWikiComponentTe
      */
     protected void setUp() throws Exception
     {        
-        getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();        
         configuration = (OpenOfficeServerConfiguration) getComponentManager().lookup(OpenOfficeServerConfiguration.ROLE, "default");
     }

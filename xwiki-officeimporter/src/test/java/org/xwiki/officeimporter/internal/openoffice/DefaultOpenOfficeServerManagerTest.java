@@ -42,7 +42,7 @@ public class DefaultOpenOfficeServerManagerTest extends AbstractXWikiComponentTe
      */
     protected void setUp() throws Exception
     {
-        getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();
         manager = (OpenOfficeServerManager) getComponentManager().lookup(OpenOfficeServerManager.ROLE, "default");
     }

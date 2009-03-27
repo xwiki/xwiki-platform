@@ -41,7 +41,7 @@ public class UserAvatarRenderingPlexusTestSetup extends RenderingPlexusTestSetup
     {
         super.setUp();
 
-        getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
-        getComponentManager().registerComponentDescriptor(MockSkinAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponent(MockSkinAccessBridge.getComponentDescriptor());
     }
 }

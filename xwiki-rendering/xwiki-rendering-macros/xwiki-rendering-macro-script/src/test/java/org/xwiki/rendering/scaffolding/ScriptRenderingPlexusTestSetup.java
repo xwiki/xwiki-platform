@@ -40,6 +40,6 @@ public class ScriptRenderingPlexusTestSetup extends RenderingPlexusTestSetup
     {
         super.setUp();
 
-        getComponentManager().registerComponentDescriptor(MockScriptContextManager.getComponentDescriptor());
+        getComponentManager().registerComponent(MockScriptContextManager.getComponentDescriptor());
     }
 }

@@ -86,9 +86,9 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
     {
         super.setUp();
 
-        getComponentManager().registerComponentDescriptor(
+        getComponentManager().registerComponent(
             ConfigurationManagerMock.getComponentDescriptor(this.roleHint, null));
-        getComponentManager().registerComponentDescriptor(ConfigurationSourceCollectionMock.getComponentDescriptor());
+        getComponentManager().registerComponent(ConfigurationSourceCollectionMock.getComponentDescriptor());
     }
 
     /**

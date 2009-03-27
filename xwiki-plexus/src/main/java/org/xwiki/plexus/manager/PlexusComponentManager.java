@@ -188,9 +188,9 @@ public class PlexusComponentManager implements ComponentManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentManager#registerComponentDescriptor(org.xwiki.component.descriptor.ComponentDescriptor)
+     * @see org.xwiki.component.manager.ComponentManager#registerComponent(org.xwiki.component.descriptor.ComponentDescriptor)
      */
-    public void registerComponentDescriptor(ComponentDescriptor componentDescriptor)
+    public void registerComponent(ComponentDescriptor componentDescriptor)
         throws ComponentRepositoryException
     {
         org.codehaus.plexus.component.repository.ComponentDescriptor pcd =

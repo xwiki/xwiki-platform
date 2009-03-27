@@ -43,6 +43,6 @@ public abstract class AbstractScriptRenderingTestCase extends AbstractRenderingT
     {
         super.setUp();
 
-        getComponentManager().registerComponentDescriptor(MockScriptContextManager.getComponentDescriptor());
+        getComponentManager().registerComponent(MockScriptContextManager.getComponentDescriptor());
     }
 }

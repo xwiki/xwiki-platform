@@ -34,7 +34,7 @@ public class OfficeImporterFileStorageTest extends AbstractXWikiComponentTestCas
      */
     protected void setUp() throws Exception
     {
-        getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();
     }
 

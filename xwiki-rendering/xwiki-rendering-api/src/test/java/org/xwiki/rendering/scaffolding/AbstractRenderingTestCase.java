@@ -61,7 +61,7 @@ public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTe
     {
         super.setUp();
 
-        getComponentManager().registerComponentDescriptor(MockDocumentAccessBridge.getComponentDescriptor());
-        getComponentManager().registerComponentDescriptor(MockConfigurationSourceCollection.getComponentDescriptor());
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponent(MockConfigurationSourceCollection.getComponentDescriptor());
     }
 }

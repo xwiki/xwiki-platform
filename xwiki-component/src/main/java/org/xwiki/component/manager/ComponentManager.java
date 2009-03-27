@@ -51,5 +51,5 @@ public interface ComponentManager
      * @throws ComponentRepositoryException error when registering component descriptor.
      * @since 1.7M1
      */
-    void registerComponentDescriptor(ComponentDescriptor componentDescriptor) throws ComponentRepositoryException;
+    void registerComponent(ComponentDescriptor componentDescriptor) throws ComponentRepositoryException;
 }

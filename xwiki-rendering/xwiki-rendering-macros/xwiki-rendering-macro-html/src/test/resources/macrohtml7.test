@@ -3,7 +3,7 @@
 .# Verify that the HTML Macro knows how to handle CDATA and that they are not lost.
 .# Also verify that characters are not escaped when inside the CDATA section.
 .#----------------------------------------------------------------------------------
-{{html wiki="false"}}
+{{html}}
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)
@@ -15,7 +15,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [wiki=false] [
+beginMacroMarkerStandalone [html] [] [
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)
@@ -32,7 +32,7 @@ onWord [
    // ]
 endXMLNode [CDATA]
 endXMLNode [script] [type=text/javascript]
-endMacroMarkerStandalone [html] [wiki=false] [
+endMacroMarkerStandalone [html] [] [
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)
@@ -44,7 +44,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:html|-|wiki="false"|-|
+<!--startmacro:html|-||-|
 <script type="text/javascript">
    //<![CDATA[
          if (2 > 1)

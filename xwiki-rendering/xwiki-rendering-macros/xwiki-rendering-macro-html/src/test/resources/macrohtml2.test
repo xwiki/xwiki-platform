@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{html}}
+{{html wiki="true"}}
 <table>
 <tr>
 <td>
@@ -14,7 +14,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [] [
+beginMacroMarkerStandalone [html] [wiki=true] [
 <table>
 <tr>
 <td>
@@ -36,7 +36,7 @@ endXMLNode [td]
 endXMLNode [tr]
 endXMLNode [tbody]
 endXMLNode [table]
-endMacroMarkerStandalone [html] [] [
+endMacroMarkerStandalone [html] [wiki=true] [
 <table>
 <tr>
 <td>

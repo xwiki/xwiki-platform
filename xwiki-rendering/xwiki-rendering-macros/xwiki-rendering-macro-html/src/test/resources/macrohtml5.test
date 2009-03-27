@@ -2,7 +2,7 @@
 .input|xwiki/2.0
 .# Verify trimming of whitespaces/new lines when in non-wiki mode (wiki syntax NOT allowed in element content)
 .#------------------------------------------------------------------------------------------------------------
-{{html wiki="false"}}
+{{html}}
 <pre>
   newline
   newline
@@ -18,7 +18,7 @@ hello  world
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [wiki=false] [
+beginMacroMarkerStandalone [html] [] [
 <pre>
   newline
   newline
@@ -50,7 +50,7 @@ hello  world
    ]
 endXMLNode [CDATA]
 endXMLNode [p]
-endMacroMarkerStandalone [html] [wiki=false] [
+endMacroMarkerStandalone [html] [] [
 <pre>
   newline
   newline

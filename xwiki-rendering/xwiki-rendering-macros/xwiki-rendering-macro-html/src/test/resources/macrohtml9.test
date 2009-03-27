@@ -2,7 +2,7 @@
 .input|xwiki/2.0
 .# Verify XML declarations, DOCTYPE and HTML envelope are ignored
 .#---------------------------------------------------------------
-{{html}}
+{{html wiki="true"}}
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html><head /><body>test</body></html>
@@ -10,7 +10,7 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{html}}
+{{html wiki="true"}}
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html><head /><body>test</body></html>
@@ -18,7 +18,7 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:html|-||-|
+<!--startmacro:html|-|wiki="true"|-|
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html><head /><body>test</body></html>

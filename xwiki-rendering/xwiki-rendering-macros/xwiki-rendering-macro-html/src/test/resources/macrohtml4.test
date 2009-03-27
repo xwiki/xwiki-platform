@@ -3,7 +3,7 @@
 .# Verify trimming of whitespaces/new lines when in wiki mode (wiki syntax allowed in element content)
 .# Note: whitespaces in PRE and CDATA element are preserved (except for leading and trailing ones)
 .#----------------------------------------------------------------------------------------------------
-{{html}}
+{{html wiki="true"}}
 .# Verify that white spaces are correctly handled in an implicit paragraph (i.e. invalid XHTML fixed
 .# by the HTML cleaner and transformed into a valid XHTML paragraph)
 a <strong>b</strong> c 
@@ -22,7 +22,7 @@ hello  world
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [] [
+beginMacroMarkerStandalone [html] [wiki=true] [
 a <strong>b</strong> c 
 <pre>
   newline
@@ -69,7 +69,7 @@ onSpace
 onWord [world]
 endXMLNode [CDATA]
 endXMLNode [p]
-endMacroMarkerStandalone [html] [] [
+endMacroMarkerStandalone [html] [wiki=true] [
 a <strong>b</strong> c 
 <pre>
   newline

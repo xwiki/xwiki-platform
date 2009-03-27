@@ -32,15 +32,15 @@ public class HTMLMacroParameters
     /**
      * Indicate if the user has asked to interpret wiki syntax or not.
      */
-    private boolean wiki = true;
+    private boolean wiki;
 
     /**
-     * @param interpretWikiSyntax indicate if the user has asked to interpret wiki syntax or not
+     * @param wiki indicate if the user has asked to interpret wiki syntax or not
      */
     @ParameterDescription("indicate if the wiki syntax in the macro will be interpreted or not")
-    public void setWiki(boolean interpretWikiSyntax)
+    public void setWiki(boolean wiki)
     {
-        this.wiki = interpretWikiSyntax;
+        this.wiki = wiki;
     }
 
     /**

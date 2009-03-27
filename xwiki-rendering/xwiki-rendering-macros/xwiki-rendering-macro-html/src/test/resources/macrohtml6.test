@@ -3,20 +3,20 @@
 .# Verify that HTML entities are supported and can be parsed.
 .# Note that (((xxx))) is a special notation to display non ascii printable chars 
 .#-------------------------------------------------------------------------------
-{{html}}
+{{html wiki="true"}}
 &nbsp;
 {{/html}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [] [
+beginMacroMarkerStandalone [html] [wiki=true] [
 &nbsp;
 ]
 beginXMLNode [p]
 onWord [(((160)))]
 endXMLNode [p]
-endMacroMarkerStandalone [html] [] [
+endMacroMarkerStandalone [html] [wiki=true] [
 &nbsp;
 ]
 endDocument

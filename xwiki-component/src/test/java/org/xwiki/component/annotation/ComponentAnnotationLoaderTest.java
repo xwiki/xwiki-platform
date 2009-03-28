@@ -81,27 +81,46 @@ public class ComponentAnnotationLoaderTest extends TestCase
 
     public void testFindComponentRoleClasses()
     {
-        ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-        List<Class<?>> classes = loader.findComponentRoleClasses(RoleImpl.class);
-        assertEquals(2, classes.size());
-        assertEquals(Role.class.getName(), classes.get(0).getName());
-        assertEquals(ExtendedRole.class.getName(), classes.get(1).getName());
+        assertComponentRoleClasses(RoleImpl.class);
     }
 
+    /**
+     * Verify that we get the same result when we use a class that extends another class (i.e. inheritance
+     * works).
+     */
     public void testFindComponentRoleClasseWhenClassExtension()
     {
-        ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-        List<Class<?>> classes = loader.findComponentRoleClasses(SuperRoleImpl.class);
-        assertEquals(2, classes.size());
-        assertEquals(Role.class.getName(), classes.get(0).getName());
-        assertEquals(ExtendedRole.class.getName(), classes.get(1).getName());
+        assertComponentRoleClasses(SuperRoleImpl.class);
     }
 
     public void testCreateComponentDescriptor()
     {
+        assertComponentDescriptor(RoleImpl.class);
+    }
+    
+    /**
+     * Verify that we get the same result when we use a class that extends another class (i.e. inheritance
+     * works).
+     */
+    public void testCreateComponentDescriptorWhenClassExtension()
+    {
+        assertComponentDescriptor(SuperRoleImpl.class);
+    }
+    
+    private void assertComponentRoleClasses(Class< ? > componentClass)
+    {
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-        ComponentDescriptor descriptor = loader.createComponentDescriptor(RoleImpl.class, ExtendedRole.class);
-        assertEquals(RoleImpl.class.getName(), descriptor.getImplementation());
+        List<Class<?>> classes = loader.findComponentRoleClasses(componentClass);
+        assertEquals(2, classes.size());
+        assertEquals(Role.class.getName(), classes.get(0).getName());
+        assertEquals(ExtendedRole.class.getName(), classes.get(1).getName());
+    }
+    
+    private void assertComponentDescriptor(Class< ? > componentClass)
+    {
+        ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
+        ComponentDescriptor descriptor = loader.createComponentDescriptor(componentClass, ExtendedRole.class);
+        assertEquals(componentClass.getName(), descriptor.getImplementation());
         assertEquals(ExtendedRole.class.getName(), descriptor.getRole());
         assertEquals("default", descriptor.getRoleHint());
         assertEquals(ComponentInstantiationStrategy.SINGLETON, descriptor.getInstantiationStrategy());

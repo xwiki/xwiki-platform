@@ -27,6 +27,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -111,8 +112,11 @@ public class ComponentAnnotationLoader
             descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
         }
         
-        // Set the requirements
-        for (Field field : componentClass.getDeclaredFields()) {
+        // Set the requirements.
+        // Note: that we need to find all fields since we can have some inherited fields which are annotated in a 
+        // superclass. Since Java doesn't offer a method to return all fields we have to traverse all parent classes
+        // looking for declared fields.
+        for (Field field : getAllFields(componentClass)) {
             Requirement requirement = field.getAnnotation(Requirement.class);
             if (requirement != null) {
                 DefaultComponentDependency dependency = new DefaultComponentDependency();
@@ -127,6 +131,22 @@ public class ComponentAnnotationLoader
         }
         
         return descriptor;
+    }
+
+    /**
+     * @param componentClass the class for which to return all fields
+     * @return all fields declared by the passed class and its superclasses
+     */
+    private List<Field> getAllFields(Class< ? > componentClass)
+    {
+        List<Field> fields = new ArrayList<Field>();
+        Class< ? > targetClass = componentClass;
+        while (targetClass != null) {
+            Field[] declaredFields = targetClass.getDeclaredFields();
+            fields.addAll(Arrays.asList(declaredFields));
+            targetClass = targetClass.getSuperclass();
+        }
+        return fields;
     }
     
     /**

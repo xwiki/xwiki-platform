@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro;
 
 import java.util.Map;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
@@ -36,10 +37,13 @@ import org.xwiki.rendering.parser.Syntax;
  * Default {@link MacroSource} implementation. 
  * This specific macro manager retrieves all {@link Macro} implementations that are registered
  * against XWiki's component manager.
+ * 
+ * @version $Id: $
+ * @since 1.9M1
  */
+@Component
 public class RealmMacroSource extends AbstractMacroSource implements Initializable, Composable
 {
-
     /**
      * The component manager we use to lookup macro implementations registered as components.
      */
@@ -50,8 +54,22 @@ public class RealmMacroSource extends AbstractMacroSource implements Initializab
      * 
      * @see Initializable#initialize()
      */
-    @SuppressWarnings("unchecked")
     public void initialize() throws InitializationException
+    {
+        registerMacros();
+        
+        // Set a lower priority for this source than the default to ensure other sources such as
+        // a source that would take its macro from wiki pages would run first.
+        this.priority = 10;
+    }
+
+    /**
+     * REgister all macros (macros for all syntaxes, macros for a given syntax).
+     * 
+     * @throws InitializationException in case of an error when registering a macro
+     */
+    @SuppressWarnings("unchecked")
+    private void registerMacros() throws InitializationException
     {
         // Find all registered macros
         Map<String, Macro< ? >> allMacros;
@@ -94,7 +112,7 @@ public class RealmMacroSource extends AbstractMacroSource implements Initializab
             }
         }
     }
-
+    
     /**
      * {@inheritDoc}
      * 

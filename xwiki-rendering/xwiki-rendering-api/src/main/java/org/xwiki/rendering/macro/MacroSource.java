@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Tag interface representing an aggregated {@link MacroManager}. A macro source is a specific macro manager that knows
@@ -33,10 +34,9 @@ package org.xwiki.rendering.macro;
  * @since 1.9M1
  * @version $Id$
  */
+@ComponentRole
 public interface MacroSource extends MacroManager
 {
-
     /** The component role under which the implementations of this interface can be looked up. */
     String ROLE = MacroSource.class.getName();
-
 }

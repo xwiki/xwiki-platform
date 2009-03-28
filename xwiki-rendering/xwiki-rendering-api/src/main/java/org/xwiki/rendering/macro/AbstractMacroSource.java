@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
@@ -41,6 +42,7 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
      * Allows transforming a syntax specified as text into a {@link Syntax} object. Injected by the component manager
      * subsystem.
      */
+    @Requirement
     protected SyntaxFactory syntaxFactory;
 
     /**
@@ -183,7 +185,8 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
     public boolean exists(String macroName, Syntax syntax)
     {
         if (this.syntaxSpecificMacros.get(syntax) != null
-            && this.syntaxSpecificMacros.get(syntax).get(macroName) != null) {
+            && this.syntaxSpecificMacros.get(syntax).get(macroName) != null)
+        {
             return true;
         }
 

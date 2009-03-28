@@ -37,20 +37,6 @@
       </requirements>
     </component>
     <component>
-      <role>org.xwiki.rendering.macro.MacroSource</role>
-      <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.internal.macro.RealmMacroSource</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.rendering.parser.SyntaxFactory</role>
-        </requirement>
-      </requirements>
-      <configuration>
-        <priority>10</priority>
-      </configuration>
-    </component>
-    <component>
       <role>org.xwiki.rendering.transformation.TransformationManager</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.rendering.internal.transformation.DefaultTransformationManager</implementation>

@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.VerbatimBlock;
@@ -41,6 +42,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.7RC1
  */
+@Component("code")
 public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
 {
     /**

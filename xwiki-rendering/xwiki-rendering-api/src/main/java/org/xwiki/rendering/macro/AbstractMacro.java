@@ -37,7 +37,7 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
     private MacroDescriptor macroDescriptor;
 
     /**
-     * Injected by the Component Manager.
+     * @see Macro#getPriority()
      */
     private int priority = 1000;
 
@@ -72,6 +72,14 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
         return this.priority;
     }
 
+    /**
+     * @param priority the macro priority to use (lower means execute before others) 
+     */
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
+    }
+    
     /**
      * {@inheritDoc}
      * 

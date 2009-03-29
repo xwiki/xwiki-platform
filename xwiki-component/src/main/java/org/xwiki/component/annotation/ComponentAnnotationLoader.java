@@ -195,7 +195,8 @@ public class ComponentAnnotationLoader
     
     /**
      * Finds the interfaces that implement component roles by looking recursively in all interfaces of
-     * the passed component implementation class.
+     * the passed component implementation class. If the roles annotation value is specified then use 
+     * the specified list instead of doing auto-discovery.
      * 
      * @param componentClass the component implementation class for which to find the component roles it implements 
      * @return the list of component role classes implemented
@@ -203,22 +204,29 @@ public class ComponentAnnotationLoader
     protected List<Class< ? >> findComponentRoleClasses(Class< ? > componentClass)
     {
         List<Class< ? >> classes = new ArrayList<Class< ? >>();
+       
+        Component component = componentClass.getAnnotation(Component.class);
+        if (component != null && component.roles().length > 0) {
+            classes.addAll(Arrays.asList(component.roles()));
+        } else {
         
-        // Look in both superclass and interfaces for @ComponentRole.
-        for (Class< ? > interfaceClass : componentClass.getInterfaces()) {
-            classes.addAll(findComponentRoleClasses(interfaceClass));
-            for (Annotation annotation : interfaceClass.getDeclaredAnnotations()) {
-                if (annotation.annotationType().getName().equals(ComponentRole.class.getName())) {
-                    classes.add(interfaceClass);
+            // Look in both superclass and interfaces for @ComponentRole.
+            for (Class< ? > interfaceClass : componentClass.getInterfaces()) {
+                classes.addAll(findComponentRoleClasses(interfaceClass));
+                for (Annotation annotation : interfaceClass.getDeclaredAnnotations()) {
+                    if (annotation.annotationType().getName().equals(ComponentRole.class.getName())) {
+                        classes.add(interfaceClass);
+                    }
                 }
             }
-        }
-        
-        // Note that we need to look into the superclass since the super class can itself implements an interface 
-        // that has the @ComponentRole annotation.
-        Class< ? > superClass = componentClass.getSuperclass();
-        if (superClass != null && !superClass.getName().equals(Object.class.getName())) {
-            classes.addAll(findComponentRoleClasses(superClass));
+            
+            // Note that we need to look into the superclass since the super class can itself implements an interface 
+            // that has the @ComponentRole annotation.
+            Class< ? > superClass = componentClass.getSuperclass();
+            if (superClass != null && !superClass.getName().equals(Object.class.getName())) {
+                classes.addAll(findComponentRoleClasses(superClass));
+            }
+
         }
         
         return classes;

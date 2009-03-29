@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.macro.box;
 import java.io.StringReader;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
@@ -40,6 +41,7 @@ import org.xwiki.rendering.util.ParserUtils;
  * @version $Id$
  * @since 1.7
  */
+@Component("box")
 public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMacro<P>
 {
     /**

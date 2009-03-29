@@ -21,12 +21,14 @@ package org.xwiki.rendering.parser;
 
 import java.io.Reader;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.block.XDOM;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
+@ComponentRole
 public interface Parser
 {
     /**

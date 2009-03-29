@@ -34,11 +34,13 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.util.PythonInterpreter;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.parser.AbstractHighlightParser;
+import org.xwiki.rendering.parser.HighlightParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -46,9 +48,13 @@ import org.xwiki.rendering.parser.SyntaxType;
 /**
  * Highlight provided source using Pygments.
  * 
+ * Note that we force the Component annotation so that this component is only registered as a Highlight Parser
+ * and not a Parser too since we don't want this parser to be visible to users as a valid standard input parser.
+ * 
  * @version $Id$
  * @since 1.7RC1
  */
+@Component(roles = { HighlightParser.class })
 public class PygmentsParser extends AbstractHighlightParser implements Initializable
 {
     /**

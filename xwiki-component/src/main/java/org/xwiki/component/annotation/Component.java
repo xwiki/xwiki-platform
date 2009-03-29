@@ -46,4 +46,11 @@ public @interface Component
      * from another one.
      */
     String value() default "";
+
+    /**
+     * When specified forces the component to be registered as many times as there are roles specified. Otherwise
+     * the superclass/interface hierarchy is scanned for ComponentRole annotations and the component is registered
+     * under all roles found. 
+     */
+    Class< ? >[] roles() default { };
 }

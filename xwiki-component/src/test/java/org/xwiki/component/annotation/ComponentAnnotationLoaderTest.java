@@ -71,7 +71,18 @@ public class ComponentAnnotationLoaderTest extends TestCase
         
         @Requirement("special")
         private FieldRole specialFieldRole;
-        
+
+        /**
+         * Inject all implementation of the FieldRole role. 
+         */
+        @Requirement(role = FieldRole.class)
+        private List<FieldRole> roles;
+
+        /**
+         * Only inject FieldRole implementation with a "special" hint.
+         */
+        @Requirement(role = FieldRole.class, hints = {"special"})
+        private List<FieldRole> specialRoles;
     }
 
     @Component
@@ -124,14 +135,33 @@ public class ComponentAnnotationLoaderTest extends TestCase
         assertEquals(ExtendedRole.class.getName(), descriptor.getRole());
         assertEquals("default", descriptor.getRoleHint());
         assertEquals(ComponentInstantiationStrategy.SINGLETON, descriptor.getInstantiationStrategy());
+
         Collection<ComponentDependency> deps = descriptor.getComponentDependencies(); 
-        assertEquals(2, deps.size());
+        assertEquals(4, deps.size());
         Iterator<ComponentDependency> it = deps.iterator();
+
         ComponentDependency dep = it.next(); 
         assertEquals(FieldRole.class.getName(), dep.getRole());
         assertEquals("default", dep.getRoleHint());
+        assertEquals(FieldRole.class.getName(), dep.getMappingType().getName());
+        assertEquals("fieldRole", dep.getName());
+        
         dep = it.next();
         assertEquals(FieldRole.class.getName(), dep.getRole());
         assertEquals("special", dep.getRoleHint());
+        assertEquals(FieldRole.class.getName(), dep.getMappingType().getName());
+        assertEquals("specialFieldRole", dep.getName());
+        
+        dep = it.next();
+        assertEquals(FieldRole.class.getName(), dep.getRole());
+        assertEquals("default", dep.getRoleHint());
+        assertEquals(List.class.getName(), dep.getMappingType().getName());
+        assertEquals("roles", dep.getName());
+
+        dep = it.next();
+        assertEquals(FieldRole.class.getName(), dep.getRole());
+        assertEquals("default", dep.getRoleHint());
+        assertEquals(List.class.getName(), dep.getMappingType().getName());
+        assertEquals("specialRoles", dep.getName());
     }
 }

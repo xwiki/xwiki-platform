@@ -26,9 +26,22 @@ package org.xwiki.component.descriptor;
  * @version $Id$
  * @since 1.7M1
  */
-public interface ComponentDependency
+public interface ComponentDependency extends ComponentRole
 {
-    String getRole();
+    /**
+     * @return the name of the injection point (can be the name of the field for field injection or the name
+     *         of the method for method injection
+     */
+    String getName();
+    
+    /**
+     * @return the class of the type for the injection (java.lang.String, java.util.List, etc)
+     */
+    Class< ? > getMappingType();
 
-    String getRoleHint();
+    /**
+     * @return a list of hints used when the mapping type is a collection or map so that only component implementations
+     *         matching passed hints are injected
+     */
+    String[] getHints();
 }

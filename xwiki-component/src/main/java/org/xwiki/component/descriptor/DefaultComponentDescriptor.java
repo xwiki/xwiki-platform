@@ -30,7 +30,7 @@ import java.util.List;
  * @version $Id$
  * @since 1.7M1
  */
-public class DefaultComponentDescriptor extends DefaultComponentDependency implements ComponentDescriptor
+public class DefaultComponentDescriptor extends DefaultComponentRole implements ComponentDescriptor
 {
     private String implementation;
 

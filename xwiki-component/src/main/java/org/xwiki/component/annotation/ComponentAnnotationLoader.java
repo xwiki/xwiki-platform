@@ -28,9 +28,12 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 
+import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.DefaultComponentDependency;
@@ -117,20 +120,61 @@ public class ComponentAnnotationLoader
         // superclass. Since Java doesn't offer a method to return all fields we have to traverse all parent classes
         // looking for declared fields.
         for (Field field : getAllFields(componentClass)) {
-            Requirement requirement = field.getAnnotation(Requirement.class);
-            if (requirement != null) {
-                DefaultComponentDependency dependency = new DefaultComponentDependency();
-                dependency.setRole(field.getType().getName());
-
-                if (requirement.value().trim().length() > 0) {
-                    dependency.setRoleHint(requirement.value());
-                }
-                
+            ComponentDependency dependency = createComponentDependency(field);
+            if (dependency != null) {
                 descriptor.addComponentDependency(dependency);
             }
         }
         
         return descriptor;
+    }
+
+    /**
+     * @param field the field for which to extract a Component Dependency
+     * @return the Component Dependency instance created from the passed field
+     */
+    private ComponentDependency createComponentDependency(Field field)
+    {
+        DefaultComponentDependency dependency = null;
+        Requirement requirement = field.getAnnotation(Requirement.class);
+        if (requirement != null) {
+            dependency = new DefaultComponentDependency();
+            dependency.setMappingType(field.getType());
+            dependency.setName(field.getName());
+
+            // Handle case of list or map
+            if (isRequirementListType(field.getType())) {
+                // Only add the field to the descriptor if the user has specified a role class different than an
+                // Object since we use Object as the default value when no role is specified.
+                if (!requirement.role().getName().equals(Object.class.getName())) {
+                    dependency.setRole(requirement.role().getName());
+                } else {
+                    return null;
+                }
+            } else {
+                dependency.setRole(field.getType().getName());
+            }
+
+            if (requirement.value().trim().length() > 0) {
+                dependency.setRoleHint(requirement.value());
+            }
+
+            // Handle hints list when specified
+            if (requirement.hints().length > 0) {
+                dependency.setHints(requirement.hints());
+            }
+        }
+
+        return dependency;
+    }
+    
+    /**
+     * @param type the type for which to verify if it's a list or not
+     * @return true if the type is a list (Collection or Map), false otherwise
+     */
+    private boolean isRequirementListType(Class< ? > type)
+    {
+        return Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type);
     }
 
     /**

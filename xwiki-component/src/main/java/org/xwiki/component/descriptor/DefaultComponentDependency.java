@@ -26,29 +26,41 @@ package org.xwiki.component.descriptor;
  * @version $Id$
  * @since 1.7M1
  */
-public class DefaultComponentDependency implements ComponentDependency
+public class DefaultComponentDependency extends DefaultComponentRole implements ComponentDependency
 {
-    private String role;
+    private Class< ? > mappingType;
+    
+    private String name;
 
-    private String roleHint = "default";
-
-    public void setRole(String role)
+    private String[] hints;
+    
+    public Class< ? > getMappingType()
     {
-        this.role = role;
+        return this.mappingType;
     }
 
-    public String getRole()
+    public String getName()
     {
-        return role;
+        return this.name;
     }
-
-    public void setRoleHint(String roleHint)
+    
+    public void setMappingType(Class< ? > mappingType)
     {
-        this.roleHint = roleHint;
+        this.mappingType = mappingType;
     }
-
-    public String getRoleHint()
+    
+    public void setName(String name)
     {
-        return roleHint;
+        this.name = name;
+    }
+    
+    public void setHints(String[] hints)
+    {
+        this.hints = hints;
+    }
+    
+    public String[] getHints()
+    {
+        return this.hints;
     }
 }

@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -38,16 +40,15 @@ import org.xwiki.rendering.parser.Syntax;
  * The default macro manager is an aggregator of {@link MacroSource} specific macro managers.
  * Gets its sources of macros injected by the component engine.
  */
+@Component
 public class DefaultMacroManager extends AbstractLogEnabled implements MacroManager, Initializable
 {
     /**
-     * Injected or setted.
+     * List of macro sources, ie locations where macros can be found. 
      */
+    @Requirement(role = MacroSource.class)
     private List<MacroSource> macroSources;
 
-    /**
-     * Injected, setted or default.
-     */
     private int priority = 10;
     
     /**

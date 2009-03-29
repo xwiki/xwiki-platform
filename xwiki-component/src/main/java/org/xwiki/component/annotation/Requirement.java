@@ -46,4 +46,17 @@ public @interface Requirement
      * The hint value specifying a specific component implementation to use.
      */
     String value() default "";
+    
+    /**
+     * The role for the component to inject. Note that the role can usually be guessed from the field
+     * type or method parameter type. However for Lists or Maps we need to pass it since Java doesn't
+     * allow getting it using reflection.
+     */
+    Class< ? > role() default Object.class;
+    
+    /**
+     * Allows specifying a discrete list of hints to inject. If these are not specified then all implementations for
+     * the specified role will be injected.  
+     */
+    String[] hints() default { };
 }

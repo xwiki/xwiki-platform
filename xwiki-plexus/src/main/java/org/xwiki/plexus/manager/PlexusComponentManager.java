@@ -181,9 +181,30 @@ public class PlexusComponentManager implements ComponentManager
 
         Collection<ComponentDependency> componentDependencies = componentDescriptor.getComponentDependencies();
         for (ComponentDependency dependency : componentDependencies) {
-            ComponentRequirement requirement = new ComponentRequirement();
+            ComponentRequirement requirement;
+            
+            // Handles several hints in case of lists (collections or maps)
+            if (Collection.class.isAssignableFrom(dependency.getMappingType())
+                || Map.class.isAssignableFrom(dependency.getMappingType()))
+            {
+                // TODO: Uncomment when we move to a more recent Plexus version which implements
+                // ComponentRequirementList.
+                /*
+                String[] hints = dependency.getHints();
+                if (hints != null && hints.length > 0) {
+                    ((ComponentRequirementList)requirement).setRoleHints(Arrays.asList(hints));
+                }
+                */
+                requirement = new ComponentRequirement();
+            } else {
+                requirement = new ComponentRequirement();
+            }
+
             requirement.setRole(dependency.getRole());
             requirement.setRoleHint(dependency.getRoleHint());
+            requirement.setFieldMappingType(dependency.getMappingType().getName());
+            requirement.setFieldName(dependency.getName());
+            
             pcd.addRequirement(requirement);
         }
 

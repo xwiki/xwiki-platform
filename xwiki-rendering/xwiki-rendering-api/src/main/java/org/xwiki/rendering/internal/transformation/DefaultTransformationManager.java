@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.XDOM;
@@ -38,11 +40,13 @@ import org.xwiki.rendering.transformation.TransformationException;
  * @version $Id$
  * @since 1.5M2
  */
+@Component
 public class DefaultTransformationManager implements TransformationManager, Initializable
 {
     /**
-     * Holds the list of transformations to apply, sorted by priority.
+     * Holds the list of transformations to apply, sorted by priority in {@link #initialize()}.
      */
+    @Requirement(role = Transformation.class)
     private List<Transformation> transformations = new ArrayList<Transformation>();
 
     /**

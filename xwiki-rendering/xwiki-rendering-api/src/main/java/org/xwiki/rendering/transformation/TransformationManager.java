@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.transformation;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Syntax;
 
@@ -26,6 +27,7 @@ import org.xwiki.rendering.parser.Syntax;
  * @version $Id$
  * @since 1.5M2
  */
+@ComponentRole
 public interface TransformationManager
 {
     /**

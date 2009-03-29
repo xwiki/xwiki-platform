@@ -9,3 +9,5 @@ org.xwiki.rendering.internal.parser.DefaultSyntaxFactory
 org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory
 org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator
 org.xwiki.rendering.internal.macro.RealmMacroSource
+org.xwiki.rendering.internal.macro.DefaultMacroManager
+org.xwiki.rendering.internal.transformation.DefaultTransformationManager

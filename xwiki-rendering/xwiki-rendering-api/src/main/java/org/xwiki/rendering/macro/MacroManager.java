@@ -21,6 +21,7 @@ package org.xwiki.rendering.macro;
 
 import java.util.Map;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.parser.Syntax;
 
 /**
@@ -33,6 +34,7 @@ import org.xwiki.rendering.parser.Syntax;
  * @see also {@link MacroSource}, a tag interface that extends MacroManager for specific macro managers that can be
  *      aggregated.
  */
+@ComponentRole
 public interface MacroManager extends Comparable<MacroManager>
 {
     /**

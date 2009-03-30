@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * Defines a component implementation. A hint can be specified to differentiate this implementation from 
  * another one.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 @Documented

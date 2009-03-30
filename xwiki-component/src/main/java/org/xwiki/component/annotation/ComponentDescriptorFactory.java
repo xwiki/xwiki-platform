@@ -34,7 +34,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 /**
  * Constructs a Component Descriptor out of a class definition that contains Annotations.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  * @see ComponentAnnotationLoader
  */

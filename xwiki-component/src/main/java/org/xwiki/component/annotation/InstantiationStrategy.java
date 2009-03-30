@@ -33,7 +33,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 /**
  * Defines the instantiation strategy for this component (Singleton, per lookup). 
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 @Documented

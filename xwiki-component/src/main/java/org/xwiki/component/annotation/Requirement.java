@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  * Defines a field or method that needs to be injected with a component. 
  * A hint can be specified to differentiate this implementation from another one.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 @Documented

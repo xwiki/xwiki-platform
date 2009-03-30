@@ -36,7 +36,7 @@ import org.xwiki.component.manager.ComponentManager;
 /**
  * Dynamically loads all components defined using Annotations.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 public class ComponentAnnotationLoader

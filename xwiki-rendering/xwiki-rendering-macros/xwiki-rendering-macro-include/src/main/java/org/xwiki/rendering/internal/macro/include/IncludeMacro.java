@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.context.Execution;
@@ -46,6 +48,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("include")
 public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implements Composable
 {
     /**
@@ -59,18 +62,23 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
     private ComponentManager componentManager;
 
     /**
-     * Injected by the Component Manager.
+     * Used to get the current context that we clone if the users asks to execute the included page in its
+     * own context.
      */
+    @Requirement
     private Execution execution;
 
     /**
-     * Injected by the Component Manager.
+     * Used in order to clone the execution context when the user asks to execute the included page in its
+     * own context.
      */
+    @Requirement
     private ExecutionContextManager executionContextManager;
 
     /**
-     * USed to access document content and check view acces right.
+     * Used to access document content and check view access right.
      */
+    @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
     /**
@@ -81,6 +89,10 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
         super(new DefaultMacroDescriptor(DESCRIPTION, null, IncludeMacroParameters.class));
 
         registerConverter(new EnumConverter(Context.class), Context.class);
+        
+        // The include macro must execute first since if it runs with the current context it needs to bring
+        // all the macros from the included page before the other macros are executed.
+        setPriority(10);
     }
 
     /**

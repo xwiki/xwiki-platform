@@ -28,6 +28,8 @@ import org.wikimodel.wem.xhtml.filter.DTDXMLFilter;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.parser.XMLBlockConverterHandler;
 import org.xwiki.rendering.internal.parser.XWikiXHTMLWhitespaceXMLFilter;
@@ -50,6 +52,7 @@ import org.xwiki.xml.html.HTMLCleaner;
  * @version $Id$
  * @since 1.6M1
  */
+@Component("html")
 public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
 {
     /**
@@ -63,26 +66,29 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
     private static final String CONTENT_DESCRIPTION = "the html content to insert in the page";
 
     /**
-     * In order to speed up DTD loading/validation we use an entity resolver that can resolve DTDs locally. Injected by
-     * the Component Manager.
+     * In order to speed up DTD loading/validation we use an entity resolver that can resolve DTDs locally.
      */
+    @Requirement
     protected EntityResolver entityResolver;
 
     /**
-     * Injected by the Component Manager.
+     * To clean the passed HTML so that it's valid XHTML (this is required since we use an XML parser to parse it).
      */
+    @Requirement
     private HTMLCleaner htmlCleaner;
 
     /**
      * Used to create an optimized SAX XML Reader. In general SAX parsers don't cache DTD grammars and as a consequence
-     * parsing a document with a grammar such as the XHTML DTD takes a lot more time than required. Injected by the
-     * Component Manager.
+     * parsing a document with a grammar such as the XHTML DTD takes a lot more time than required.
      */
+    @Requirement
     private XMLReaderFactory xmlReaderFactory;
 
     /**
-     * Injected by the Component Manager.
+     * The parser to use when the user specifies that HTML content should be parsed in wiki syntax.
+     * @todo make this generic by loading the parser dynamically from the Macro execution context syntax
      */
+    @Requirement("xwiki/2.0")
     private Parser parser;
 
     /**

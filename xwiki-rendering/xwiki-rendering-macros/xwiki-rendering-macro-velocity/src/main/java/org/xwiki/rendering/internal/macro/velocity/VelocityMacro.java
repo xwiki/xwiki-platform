@@ -21,6 +21,8 @@ package org.xwiki.rendering.internal.macro.velocity;
 
 import java.io.StringWriter;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.AbstractScriptMacro;
@@ -33,6 +35,7 @@ import org.xwiki.velocity.XWikiVelocityException;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("velocity")
 public class VelocityMacro extends AbstractScriptMacro<ScriptMacroParameters>
 {
     /**
@@ -46,8 +49,9 @@ public class VelocityMacro extends AbstractScriptMacro<ScriptMacroParameters>
     private static final String CONTENT_DESCRIPTION = "the velocity script to execute";
 
     /**
-     * Injected by the Component Manager.
+     * Used to get the Velocity Engine and Velocity Context to use to evaluate the passed Velocity script.
      */
+    @Requirement
     private VelocityManager velocityManager;
 
     /**

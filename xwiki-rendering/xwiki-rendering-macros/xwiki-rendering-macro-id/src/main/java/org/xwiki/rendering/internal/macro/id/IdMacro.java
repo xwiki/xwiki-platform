@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.id;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.IdBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -37,6 +38,7 @@ import java.util.List;
  * @version $Id$
  * @since 1.6M1
  */
+@Component("id")
 public class IdMacro extends AbstractMacro<IdMacroParameters>
 {
     /**
@@ -52,6 +54,9 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
     public IdMacro()
     {
         super(new DefaultMacroDescriptor(DESCRIPTION, null, IdMacroParameters.class));
+        
+        // Set a high priority so that this macro executes before most others.
+        setPriority(20);
     }
 
     /**

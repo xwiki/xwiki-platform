@@ -279,27 +279,10 @@ span.edit_section {
     font-size: inherit;
 }
 
-#xwikimaincontainerinner .box {
-	margin: 1em 0;
-	padding: 0 1px;
-	overflow: auto;
-	background-color: #F1F7FF;
-	border: 1px dotted #555555;
-}
-
 #xwikimaincontainerinner .rssfeed {
 	padding: 8px;
 	background-color:transparent;
 }
-
-.rsschanneltitle {
-       background: url($xwiki.getSkinFile('icons/black-rss.png')) #F4F9FE no-repeat right center;
-       font-size:14px;
-       font-weight:bold;
-       margin-bottom:10px;
-       padding:5px;
-       text-align:left;
-}  
 
 #xwikimaincontainerinner .code {
 	font-family: courier, courier new, monospace;
@@ -3061,33 +3044,6 @@ Messages
     color: #c82;
 }
 
-div.errormessage, div.warningmessage, .infomessage, div.plainmessage {
-    margin: 4px 0px 4px;
-    border: 1px solid #DDD;
-    padding: 8px 8px 8px 28px;
-    background: #F5F5F5 url( icons/msg.png ) 8px 8px no-repeat;
-    text-align: left;
-}
-
-.infomessage {
-    background-image: url( icons/msginfo.png );
-    color: #369;
-}
-
-div.plainmessage {
-    background-image: none;
-    color: #369;
-}
-
-div.warningmessage {
-    background-image: url( icons/msgwarning.png );
-    color: #c82;
-}
-
-div.errormessage {
-    background-image: url( icons/msgerror.png );
-    color: #F00;
-}
 
 span.messagetype {
     display: none;
@@ -3409,25 +3365,23 @@ div.changes-info-title {
     padding: 1px;
 }
 
-#lb-content .xwikiuserblog .rssfeed,
-    .xwikiuserblog .rssfeed {
+#lb-content .xwikiuserblog,
+    .xwikiuserblog {
     clear: both;
     position: relative;
     float: right;
     width: 250px;
-    background-color: #FAFAFD;
+    background-color: white;
 }
 
-#lb-content .xwikiuserblog .rssfeed div.rsschanneltitle,
-    .xwikiuserblog .rssfeed div.rsschanneltitle {
+#lb-content .xwikiuserblog, .xwikiuserblog  {
     padding: 5px;
     text-align: center;
     font-weight: bold;
     border-bottom: 1px solid #ddd;
 }
 
-#lb-content .xwikiuserblog .rssfeed .rssitem,
-    .xwikiuserblog .rssfeed .rssitem {
+#lb-content .xwikiuserblog, .xwikiuserblog {
     padding: 5px;
 }
 
@@ -3702,10 +3656,6 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
     border-collapse: collapse;
 }
 
-.rsschanneltitle {
-    background-color: #f4f9fe;
-}
-
 /*
 ** Doc extra
 */
@@ -3815,3 +3765,72 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   text-indent: 0em;
 }
 
+.rssfeed .rssitem .rsschanneltitle,
+ .rssitemdescription .rssitemtitle .rsschanneltitle {
+ 	background-color: white;
+}
+.box {
+	margin: 1em 0;
+	padding: 0 1px;
+	overflow: auto;
+	background-color: #F1F7FF;
+	border: 1px dotted #555555;
+}
+
+ .rssfeed {
+    clear: both;
+    position: relative;
+    width:30%;
+    border: 1px dotted #003366;
+    background-color: white;
+}
+
+.rssfeed div.rsschanneltitle,
+    .rssfeed div.rsschanneltitle {
+    padding: 5px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+}
+
+.rssfeed .rssitem {
+    padding: 5px;
+}
+
+
+.rsschanneltitle {
+	background-color:#F4F9FE;
+	font-size:14px;
+	font-weight:bold;
+	margin-bottom:10px;
+	padding:5px;
+	text-align:center;
+} 	
+
+.errormessage, .warningmessage, .infomessage, .plainmessage {
+    margin: 4px 0px 4px;
+    border: 1px solid #DDD;
+    padding: 8px 8px 8px 28px;
+    background: #F5F5F5 url( icons/msg.png ) 8px 8px no-repeat;
+    text-align: left;
+}
+
+.infomessage {
+    background-image: url( icons/msginfo.png );
+    color: #369;
+}
+
+.plainmessage {
+    background-image: none;
+    color: #369;
+}
+
+.warningmessage {
+    background-image: url( icons/msgwarning.png );
+    color: #c82;
+}
+
+.errormessage {
+    background-image: url( icons/msgerror.png );
+    color: #F00;
+}

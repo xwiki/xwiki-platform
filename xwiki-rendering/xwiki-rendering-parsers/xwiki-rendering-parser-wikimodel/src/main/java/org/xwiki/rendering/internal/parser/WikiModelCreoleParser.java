@@ -21,6 +21,10 @@ package org.xwiki.rendering.internal.parser;
 
 import org.wikimodel.wem.IWikiParser;
 import org.wikimodel.wem.creole.CreoleWikiParser;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.rendering.parser.ImageParser;
+import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
@@ -29,9 +33,23 @@ import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("creole/1.0")
 public class WikiModelCreoleParser extends AbstractWikiModelParser
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.CREOLE, "1.0");
+
+    /**
+     * @see #getLinkParser()
+     */
+    @Requirement
+    private LinkParser linkParser;
+
+    /**
+     * @see #getImageParser()
+     */
+    @Requirement
+    private ImageParser imageParser;
+
 
     /**
      * {@inheritDoc}
@@ -52,5 +70,25 @@ public class WikiModelCreoleParser extends AbstractWikiModelParser
     public IWikiParser createWikiModelParser()
     {
         return new CreoleWikiParser();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see AbstractWikiModelParser#getImageParser()
+     */
+    @Override
+    public ImageParser getImageParser()
+    {
+        return this.imageParser;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractWikiModelParser#getLinkParser()
+     */
+    @Override
+    public LinkParser getLinkParser()
+    {
+        return this.linkParser;
     }
 }

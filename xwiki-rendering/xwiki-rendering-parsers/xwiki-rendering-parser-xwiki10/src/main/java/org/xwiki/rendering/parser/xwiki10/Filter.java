@@ -19,12 +19,15 @@
  */
 package org.xwiki.rendering.parser.xwiki10;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Filter provided content into another content.
  * 
  * @version $Id$
  * @since 1.8M1
  */
+@ComponentRole
 public interface Filter
 {
     /**

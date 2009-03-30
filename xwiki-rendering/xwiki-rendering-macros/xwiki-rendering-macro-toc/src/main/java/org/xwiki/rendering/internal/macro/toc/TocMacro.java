@@ -78,6 +78,11 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
         super(new DefaultMacroDescriptor(DESCRIPTION, null, TocMacroParameters.class));
 
         registerConverter(new EnumConverter(Scope.class), Scope.class);
+        
+        // Make sure this macro is executed as one of the last macros to be executed since
+        // other macros can generate headers which need to be taken into account by the TOC
+        // macro.
+        setPriority(2000);
     }
 
     /**

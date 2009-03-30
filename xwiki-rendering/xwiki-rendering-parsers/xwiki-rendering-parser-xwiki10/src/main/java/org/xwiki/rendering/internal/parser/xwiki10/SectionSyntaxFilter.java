@@ -23,6 +23,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
@@ -32,10 +35,20 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  * @version $Id$
  * @since 1.8M1
  */
-public class SectionSyntaxFilter extends AbstractFilter
+@Component("section")
+public class SectionSyntaxFilter extends AbstractFilter implements Initializable
 {
     private static final Pattern SECTIONSYNTAX_PATTERN =
         Pattern.compile("^[ \\t]*+(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        setPriority(1000);
+    }
 
     public String filter(String content, FilterContext filterContext)
     {

@@ -21,12 +21,15 @@ package org.xwiki.rendering.parser.xwiki10.macro;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Convert velocity macro to XWiki 2.0 syntax or macro.
  * 
  * @version $Id$
  * @since 1.8M1
  */
+@ComponentRole
 public interface VelocityMacroConverter
 {
     /**

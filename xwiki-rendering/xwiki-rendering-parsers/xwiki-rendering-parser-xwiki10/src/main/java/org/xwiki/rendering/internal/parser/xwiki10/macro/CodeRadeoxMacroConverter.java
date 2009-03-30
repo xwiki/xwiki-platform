@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
 import java.util.Map;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
 
 /**
@@ -28,6 +29,7 @@ import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
  * @version $Id$
  * @since 1.8M1
  */
+@Component("code")
 public class CodeRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 {
     public CodeRadeoxMacroConverter()

@@ -19,13 +19,14 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractVelocityMacroConverter;
 
 /**
- * 
  * @version $Id$
  * @since 1.8M1
  */
+@Component("includeInContext")
 public class IncludeInContextVelocityMacroConverter extends AbstractVelocityMacroConverter
 {
     public IncludeInContextVelocityMacroConverter()

@@ -22,6 +22,8 @@ package org.xwiki.rendering.internal.parser;
 import java.io.Reader;
 import java.io.StringReader;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Syntax;
@@ -35,6 +37,7 @@ import org.xwiki.xml.html.HTMLCleaner;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("html/4.01")
 public class WikiModelHTMLParser extends WikiModelXHTMLParser
 {
     /**
@@ -45,6 +48,7 @@ public class WikiModelHTMLParser extends WikiModelXHTMLParser
     /**
      * Used to clean the HTML into valid XHTML. Injected by the Component Manager.
      */
+    @Requirement
     private HTMLCleaner htmlCleaner;
 
     /**

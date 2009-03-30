@@ -29,10 +29,15 @@ import org.xwiki.component.logging.AbstractLogEnabled;
  */
 public abstract class AbstractFilter extends AbstractLogEnabled implements Filter
 {
-    int priority;
+    private int priority;
 
     public int getPriority()
     {
         return this.priority;
+    }
+    
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
     }
 }

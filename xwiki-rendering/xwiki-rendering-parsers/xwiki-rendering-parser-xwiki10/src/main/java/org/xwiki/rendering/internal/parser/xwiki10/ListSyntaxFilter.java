@@ -24,6 +24,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
@@ -32,7 +35,8 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  * @version $Id$
  * @since 1.8M1
  */
-public class ListSyntaxFilter extends AbstractFilter
+@Component("list")
+public class ListSyntaxFilter extends AbstractFilter implements Initializable
 {
     private static final Pattern LISTYNTAX_PATTERN =
         Pattern.compile("(^[\\p{Blank}]*+([-#*]++|[-#*iIaA1ghHkKj]++\\.)[\\p{Blank}]++[^\r\n]++([ \t]*+[\r\n]++)*+)++",
@@ -41,6 +45,15 @@ public class ListSyntaxFilter extends AbstractFilter
     private static final Pattern LISTITEMSYNTAX_PATTERN =
         Pattern.compile("^([\\p{Blank}]*+)([-#*]++|[-#*iIaA1ghHkKj]++\\.)([\\p{Blank}]++[^\r\n]++)([ \t]*+[\r\n]++)*+",
             Pattern.MULTILINE);
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        setPriority(900);
+    }
 
     public String filter(String content, FilterContext filterContext)
     {

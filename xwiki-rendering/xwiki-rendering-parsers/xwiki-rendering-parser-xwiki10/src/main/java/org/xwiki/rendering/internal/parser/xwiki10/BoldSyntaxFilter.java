@@ -21,6 +21,9 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 
 import java.util.regex.Pattern;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractSyntaxFilter;
 
 /**
@@ -29,10 +32,20 @@ import org.xwiki.rendering.parser.xwiki10.AbstractSyntaxFilter;
  * @version $Id$
  * @since 1.8M1
  */
-public class BoldSyntaxFilter extends AbstractSyntaxFilter
+@Component("bold")
+public class BoldSyntaxFilter extends AbstractSyntaxFilter implements Initializable
 {
     private static final Pattern BOLDSYNTAX_PATTERN =
         Pattern.compile("(?<!\\*)\\*([^\\p{Space}](?:[^*\n]*+|\\*)*?(?<=[^\\p{Space}]))\\*(?!\\*)");
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        setPriority(1000);
+    }
 
     public BoldSyntaxFilter()
     {

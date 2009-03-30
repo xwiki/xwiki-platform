@@ -21,6 +21,8 @@ package org.xwiki.rendering.macro;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -75,19 +77,19 @@ public abstract class AbstractMacroSource extends AbstractLogEnabled implements 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.MacroManager#getAllMacros(org.xwiki.rendering.parser.Syntax)
+     * @see org.xwiki.rendering.macro.MacroManager#getMacroNames(Syntax)
      */
-    public Map<String, Macro< ? >> getAllMacros(Syntax syntax)
+    public Set<String> getMacroNames(Syntax syntax)
     {
-        Map<String, Macro< ? >> result = new HashMap<String, Macro< ? >>();
+        Set<String> result = new TreeSet<String>();
 
         // first we put the macros that are not specific to any syntax.
-        result.putAll(this.allSyntaxesMacros);
+        result.addAll(this.allSyntaxesMacros.keySet());
 
         // then we add macros for this syntax in particular if any.
         // if macro with same name is defined for both, the one specific to the desired syntax wins.
         if (this.syntaxSpecificMacros.containsKey(syntax)) {
-            result.putAll(this.syntaxSpecificMacros.get(syntax));
+            result.addAll(this.syntaxSpecificMacros.get(syntax).keySet());
         }
 
         return result;

@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.parser.Syntax;
@@ -44,10 +44,10 @@ public interface MacroManager extends Comparable<MacroManager>
 
     /**
      * @param syntax the desired syntax
-     * @return all macro available as a Map with name as key macro as value for the desired syntax.
+     * @return a set of all names of available macros for the desired syntax.
      * @throws MacroLookupException error when lookup macros
      */
-    Map<String, Macro< ? >> getAllMacros(Syntax syntax) throws MacroLookupException;
+    Set<String> getMacroNames(Syntax syntax) throws MacroLookupException;
 
     /**
      * @param macroName the name of the macro looked up

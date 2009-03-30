@@ -22,8 +22,11 @@ package org.xwiki.rendering.internal.macro;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -74,25 +77,25 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
     /**
      * {@inheritDoc}
      * 
-     * @see MacroManager#getAllMacros(String)
+     * @see MacroManager#getMacroNames(Syntax)
      */
-    public Map<String, Macro< ? >> getAllMacros(Syntax syntax) throws MacroLookupException
+    public Set<String> getMacroNames(Syntax syntax) throws MacroLookupException
     {
-        Map<String, Macro< ? >> result = new HashMap<String, Macro< ? >>();
+        Set<String> result = new TreeSet<String>();
 
         List<MacroSource> reversedList = new ArrayList<MacroSource>();
         reversedList.addAll(macroSources);
         Collections.sort(reversedList, Collections.reverseOrder());
 
         for (MacroSource provider : reversedList) {
-            result.putAll(provider.getAllMacros(syntax));
+            result.addAll(provider.getMacroNames(syntax));
         }
 
         if (result.isEmpty()) {
             throw new MacroLookupException("Could not find any macro for syntax [" + syntax.toIdString() + "]");
         }
 
-        return result;
+        return Collections.unmodifiableSet(result);
     }
 
     /**

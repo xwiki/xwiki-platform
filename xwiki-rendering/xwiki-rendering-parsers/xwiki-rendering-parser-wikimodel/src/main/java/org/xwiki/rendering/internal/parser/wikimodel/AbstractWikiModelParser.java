@@ -38,21 +38,23 @@ import java.io.Reader;
 public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser
 {
     /**
-     * @see #setLinkParser(LinkParser)
-     */
-    protected LinkParser linkParser;
-
-    /**
-     * @see #setImageParser(ImageParser)
-     */
-    protected ImageParser imageParser;
-
-    /**
      * @return the WikiModel parser instance to use to parse input content.
      * @throws ParseException when there's a problem creating an instance of the parser to use
      */
     public abstract IWikiParser createWikiModelParser() throws ParseException;
 
+    /**
+     * @return the parser to use when parsing links. We need to parse links to transform a link reference passed as
+     *         a raw string by WikiModel into a {@link org.xwiki.rendering.listener.Link} object.
+     */
+    public abstract LinkParser getLinkParser();
+
+    /**
+     * @return the parser to use when parsing image references (eg "Space.Doc@image.png" in XWiki Syntax 2.0). 
+     *         We transform a raw image reference into a {@link org.xwiki.rendering.listener.Image} object.
+     */
+    public abstract ImageParser getImageParser();
+    
     /**
      * @return the syntax parser to use for parsing link labels, since wikimodel does not support wiki syntax 
      *         in links and they need to be handled in the XDOMGeneratorListener. By default, the link label 
@@ -77,7 +79,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
 
         // We pass the LinkParser corresponding to the syntax.
         XDOMGeneratorListener listener =
-            new XDOMGeneratorListener(this.getLinkLabelParser(), this.linkParser, this.imageParser);
+            new XDOMGeneratorListener(this.getLinkLabelParser(), getLinkParser(), getImageParser());
 
         try {
             parser.parse(source, listener);
@@ -85,27 +87,5 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
             throw new ParseException("Failed to parse input source", e);
         }
         return listener.getXDOM();
-    }
-    
-    /**
-     * Sets the parser to use when parsing links. We need to parse links to transform a link reference passed as a raw
-     * string by WikiModel into a {@link org.xwiki.rendering.listener.Link} object.
-     *  
-     * @param linkParser the link parser to use
-     */
-    public void setLinkParser(LinkParser linkParser)
-    {
-        this.linkParser = linkParser;
-    }
-
-    /**
-     * Sets the parser to use when parsing image references (eg "Space.Doc@image.png" in XWiki Syntax 2.0). 
-     * We transform a raw image reference into a {@link org.xwiki.rendering.listener.Image} object.
-     *
-     * @param imageParser the image parser to use
-     */
-    public void setImageParser(ImageParser imageParser)
-    {
-        this.imageParser = imageParser;
     }
 }

@@ -21,16 +21,29 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 
 import java.util.regex.Pattern;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractSyntaxFilter;
 
 /**
  * @version $Id$
  * @since 1.8M1
  */
-public class UnderlineSyntaxFilter extends AbstractSyntaxFilter
+@Component("underline")
+public class UnderlineSyntaxFilter extends AbstractSyntaxFilter implements Initializable
 {
     private static final Pattern UNDERLINESYNTAX_PATTERN =
         Pattern.compile("(?<!_)__([^\\p{Space}](?:[^_\n]*+|_)*?(?<=[^\\p{Space}]))__(?!_)");
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        setPriority(1000);
+    }
 
     public UnderlineSyntaxFilter()
     {

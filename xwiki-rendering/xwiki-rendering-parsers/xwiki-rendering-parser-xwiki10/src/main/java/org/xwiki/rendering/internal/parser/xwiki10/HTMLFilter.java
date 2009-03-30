@@ -24,6 +24,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 
@@ -33,13 +36,23 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
  * @version $Id$
  * @since 1.8M1
  */
-public class HTMLFilter extends AbstractFilter
+@Component("htmlmacro")
+public class HTMLFilter extends AbstractFilter implements Initializable
 {
     public static final String HTML_PATTERN = "([\\<\\>])";
 
     public static final Pattern HTMLVELOCITY_PATTERN =
         Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN + "|" + VelocityFilter.VELOCITYCLOSE_SPATTERN + "|"
             + HTML_PATTERN);
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        setPriority(3000);
+    }
 
     public String filter(String content, FilterContext filterContext)
     {

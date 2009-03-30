@@ -21,6 +21,9 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 
 import java.util.regex.Pattern;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 
@@ -29,9 +32,19 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
  * @version $Id$
  * @since 1.8M1
  */
-public class NewLineFilter extends AbstractFilter
+@Component("nl")
+public class NewLineFilter extends AbstractFilter implements Initializable
 {
     private static final Pattern MSNEWLINE_PATTERN = Pattern.compile("\\r\\n|\\r");
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        setPriority(0);
+    }
 
     public String filter(String content, FilterContext filterContext)
     {

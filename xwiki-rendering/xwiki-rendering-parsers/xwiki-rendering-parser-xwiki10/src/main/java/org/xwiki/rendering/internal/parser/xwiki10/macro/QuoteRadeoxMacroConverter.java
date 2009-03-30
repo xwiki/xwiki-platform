@@ -20,14 +20,18 @@
 package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.parser.xwiki10.Filter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
+@Component("quote")
 public class QuoteRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 {
+    @Requirement("standalonenewlinecleanning")
     private Filter standaloneNewLineCleaningFilter;
 
     @Override

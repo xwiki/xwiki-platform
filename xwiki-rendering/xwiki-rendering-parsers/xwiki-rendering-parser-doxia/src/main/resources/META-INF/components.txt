@@ -1,0 +1,2 @@
+org.xwiki.rendering.internal.parser.DoxiaConfluenceParser
+org.xwiki.rendering.internal.parser.DoxiaTWikiParser

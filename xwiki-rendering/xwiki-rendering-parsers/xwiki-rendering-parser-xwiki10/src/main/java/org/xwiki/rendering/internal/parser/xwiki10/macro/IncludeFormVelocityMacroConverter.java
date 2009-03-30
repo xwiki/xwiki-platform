@@ -17,32 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.parser.xwiki10.macro;
+package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.parser.xwiki10.FilterContext;
+import org.xwiki.component.annotation.Component;
 
 /**
- * Convert Velocity macro to XWiki 2.0 syntax or macro.
- * 
- * @version $Id$
- * @since 1.8M1
+ * @version $Id: $
+ * @since 1.8.1
  */
-@ComponentRole
-public interface RadeoxMacroConverter
+@Component("includeForm")
+public class IncludeFormVelocityMacroConverter extends IncludeInContextVelocityMacroConverter
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = RadeoxMacroConverter.class.getName();
-
-    public String getParameterName(int parameterIndex);
-
-    boolean supportContent();
-
-    boolean protectResult();
-
-    boolean isInline();
-
-    String convert(String name, RadeoxMacroParameters parameters, String content, FilterContext filterContext);
 }

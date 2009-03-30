@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractVelocityMacroConverter;
 
 /**
@@ -26,6 +27,7 @@ import org.xwiki.rendering.parser.xwiki10.macro.AbstractVelocityMacroConverter;
  * @version $Id$
  * @since 1.8M1
  */
+@Component("toc")
 public class TocVelocityMacroConverter extends AbstractVelocityMacroConverter
 {
     public TocVelocityMacroConverter()

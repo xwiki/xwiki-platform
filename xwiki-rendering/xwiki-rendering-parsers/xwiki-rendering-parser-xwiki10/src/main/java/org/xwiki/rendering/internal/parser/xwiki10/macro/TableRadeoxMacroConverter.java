@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
 import java.util.StringTokenizer;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
@@ -29,6 +30,7 @@ import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
  * @version $Id$
  * @since 1.8M1
  */
+@Component("table")
 public class TableRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 {
     @Override

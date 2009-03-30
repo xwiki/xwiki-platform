@@ -21,6 +21,10 @@ package org.xwiki.rendering.internal.parser;
 
 import org.wikimodel.wem.IWikiParser;
 import org.wikimodel.wem.xwiki.XWikiParser;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.rendering.parser.ImageParser;
+import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -30,8 +34,21 @@ import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("xwiki/2.0")
 public class WikiModelXWikiParser extends AbstractWikiModelParser
 {
+    /**
+     * @see #getLinkParser()
+     */
+    @Requirement("xwiki/2.0")
+    private LinkParser linkParser;
+
+    /**
+     * @see #getImageParser()
+     */
+    @Requirement("xwiki/2.0")
+    private ImageParser imageParser;
+
     /**
      * XWiki 2.0 Syntax.
      */
@@ -56,5 +73,25 @@ public class WikiModelXWikiParser extends AbstractWikiModelParser
     public IWikiParser createWikiModelParser()
     {
         return new XWikiParser();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractWikiModelParser#getImageParser()
+     */
+    @Override
+    public ImageParser getImageParser()
+    {
+        return this.imageParser;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractWikiModelParser#getLinkParser()
+     */
+    @Override
+    public LinkParser getLinkParser()
+    {
+        return this.linkParser;
     }
 }

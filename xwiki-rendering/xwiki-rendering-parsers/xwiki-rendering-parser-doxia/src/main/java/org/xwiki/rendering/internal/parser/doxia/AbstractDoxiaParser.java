@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.doxia;
 
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.doxia.XDOMGeneratorSink;
@@ -35,8 +36,10 @@ import java.io.Reader;
  */
 public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements Parser
 {
+    @Requirement
     private LinkParser linkParser;
 
+    @Requirement
     protected ImageParser imageParser;
 
     public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();

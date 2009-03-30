@@ -30,6 +30,10 @@ import org.wikimodel.wem.xhtml.filter.DTDXMLFilter;
 import org.wikimodel.wem.xhtml.filter.XHTMLWhitespaceXMLFilter;
 import org.wikimodel.wem.xhtml.handler.TagHandler;
 import org.xml.sax.XMLReader;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.rendering.parser.ImageParser;
+import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
@@ -51,6 +55,7 @@ import org.xwiki.xml.XMLReaderFactory;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("xhtml/1.0")
 public class WikiModelXHTMLParser extends AbstractWikiModelParser
 {
     /**
@@ -58,23 +63,38 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
      */
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XHTML, "1.0");
 
-    private PrintRendererFactory printRendererFactory;
-
-    /**
-     * Used to create an optimized SAX XML Reader. In general SAX parsers don't cache DTD grammars and
-     * as a consequence parsing a document with a grammar such as the XHTML DTD takes a lot more time
-     * than required. Injected by the Component Manager. 
-     */
-    private XMLReaderFactory xmlReaderFactory;
-    
     /**
      * The parser used for the link label parsing. For (x)html parsing, this will be an xwiki 2.0 parser, since it's 
      * more convenient to pass link labels in xwiki syntax. See referred resource for more details.
      * 
      * @see XWikiCommentHandler#handleLinkCommentStop(String, TagStack)
      */
+    @Requirement("xwiki/2.0")
     private Parser xwikiParser;
 
+    /**
+     * @see #getLinkParser()
+     */
+    @Requirement("xwiki/2.0")
+    private LinkParser linkParser;
+
+    /**
+     * @see #getImageParser()
+     */
+    @Requirement("xwiki/2.0")
+    private ImageParser imageParser;
+
+    @Requirement
+    private PrintRendererFactory printRendererFactory;
+
+    /**
+     * Used to create an optimized SAX XML Reader. In general SAX parsers don't cache DTD grammars and
+     * as a consequence parsing a document with a grammar such as the XHTML DTD takes a lot more time
+     * than required. 
+     */
+    @Requirement
+    private XMLReaderFactory xmlReaderFactory;
+    
     /**
      * {@inheritDoc}
      * 
@@ -174,5 +194,25 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
         }
         
         return xmlReader;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see AbstractWikiModelParser#getImageParser()
+     */
+    @Override
+    public ImageParser getImageParser()
+    {
+        return this.imageParser;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractWikiModelParser#getLinkParser()
+     */
+    @Override
+    public LinkParser getLinkParser()
+    {
+        return this.linkParser;
     }
 }

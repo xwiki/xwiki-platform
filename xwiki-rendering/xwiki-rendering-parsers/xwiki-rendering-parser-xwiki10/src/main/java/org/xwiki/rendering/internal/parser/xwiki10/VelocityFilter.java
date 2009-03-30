@@ -25,9 +25,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.VelocityMacroConverter;
@@ -35,11 +38,14 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
  * Register all Velocity comments in order to protect them from following filters.
+ * Protect velocity comments, convert velocity macro into 2.0 macros/syntax and add needed 2.0 velocity macros
+ * and convert.
  * 
  * @version $Id$
  * @since 1.8M1
  */
-public class VelocityFilter extends AbstractFilter implements Composable
+@Component("velocity")
+public class VelocityFilter extends AbstractFilter implements Composable, Initializable
 {
     public static final String VELOCITYOPEN_SUFFIX = "velocityopen";
 
@@ -70,6 +76,15 @@ public class VelocityFilter extends AbstractFilter implements Composable
 
     private ComponentManager componentManager;
 
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        setPriority(20);
+    }
+    
     /**
      * {@inheritDoc}
      * 

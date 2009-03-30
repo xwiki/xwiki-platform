@@ -22,9 +22,12 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroConverter;
@@ -37,7 +40,8 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  * @version $Id$
  * @since 1.8M1
  */
-public class RadeoxMacrosFilter extends AbstractFilter implements Composable
+@Component("radeoxmacros")
+public class RadeoxMacrosFilter extends AbstractFilter implements Composable, Initializable
 {
     /**
      * Regex pattern for matching macros that are written on single line.
@@ -53,6 +57,15 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable
         Pattern.compile("\\{(\\w+)(:(.+?))?\\}(.+?)\\{\\1\\}", Pattern.DOTALL);
 
     private ComponentManager componentManager;
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        setPriority(100);
+    }
 
     /**
      * {@inheritDoc}

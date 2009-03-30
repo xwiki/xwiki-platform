@@ -22,6 +22,9 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
@@ -30,11 +33,21 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  * @version $Id$
  * @since 1.8M1
  */
-public class UrlFilter extends AbstractFilter
+@Component("url")
+public class UrlFilter extends AbstractFilter implements Initializable
 {
     private static final Pattern URL_PATTERN =
         Pattern
             .compile("(?<![\"'=])((?:ht|f)tps?)://((?:%[\\p{Digit}A-Fa-f][\\p{Digit}A-Fa-f]|[-_.!~*';/?:@#&=+$,\\p{Alnum}])++)(?!['\">])");
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        setPriority(1000);
+    }
 
     public String filter(String content, FilterContext filterContext)
     {

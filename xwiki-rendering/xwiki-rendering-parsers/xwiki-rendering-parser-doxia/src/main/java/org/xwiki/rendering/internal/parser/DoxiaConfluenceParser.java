@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.parser;
 
 import org.apache.maven.doxia.module.confluence.ConfluenceParser;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -29,6 +30,7 @@ import org.xwiki.rendering.internal.parser.doxia.AbstractDoxiaParser;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("confluence/1.0")
 public class DoxiaConfluenceParser extends AbstractDoxiaParser
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.CONFLUENCE, "1.0");

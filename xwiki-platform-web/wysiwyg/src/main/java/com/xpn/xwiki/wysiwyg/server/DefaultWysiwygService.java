@@ -547,8 +547,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         try {
             SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
             MacroManager manager = (MacroManager) Utils.getComponentManager().lookup(MacroManager.ROLE);
-            return new ArrayList<String>(manager.getAllMacros(syntaxFactory.createSyntaxFromIdString(syntaxId))
-                .keySet());
+            return new ArrayList<String>(manager.getMacroNames(syntaxFactory.createSyntaxFromIdString(syntaxId)));
         } catch (Throwable t) {
             LOG.error("Exception while retrieving the list of available macros.", t);
             throw new XWikiGWTException(t.getLocalizedMessage(), t.toString(), -1, -1);

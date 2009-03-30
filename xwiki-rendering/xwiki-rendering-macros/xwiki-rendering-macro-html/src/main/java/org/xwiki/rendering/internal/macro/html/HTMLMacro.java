@@ -31,8 +31,10 @@ import org.xml.sax.XMLReader;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.internal.parser.XMLBlockConverterHandler;
 import org.xwiki.rendering.internal.parser.XWikiXHTMLWhitespaceXMLFilter;
+import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -86,6 +88,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
 
     /**
      * The parser to use when the user specifies that HTML content should be parsed in wiki syntax.
+     * 
      * @todo make this generic by loading the parser dynamically from the Macro execution context syntax
      */
     @Requirement("xwiki/2.0")
@@ -176,7 +179,21 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             throw new MacroExecutionException("Failed to parse HTML content [" + content + "]", e);
         }
 
-        return handler.getRootBlock().getChildren();
+        List<Block> blocks = handler.getRootBlock().getChildren();
+
+        if (context.isInline()) {
+            if (blocks.size() == 1 && ((XMLBlock) blocks.get(0)).getXMLNode() instanceof XMLElement
+                && ((XMLElement) ((XMLBlock) blocks.get(0)).getXMLNode()).getName().equalsIgnoreCase("p")) {
+                blocks = blocks.get(0).getChildren();
+            } else {
+                throw new MacroExecutionException(
+                    "When using the HTML macro inline, you can only use inline HTML content."
+                        + " Block HTML content (such as tables) cannot be displayed."
+                        + " Try leaving an empty line before and after the html macro.");
+            }
+        }
+
+        return blocks;
     }
 
     /**

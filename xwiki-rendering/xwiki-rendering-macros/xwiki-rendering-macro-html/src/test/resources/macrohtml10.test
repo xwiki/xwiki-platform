@@ -1,0 +1,13 @@
+.#---------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify HTML macro work in inline mode
+.#---------------------------------------------------------------
+some {{html}}html content{{/html}} and non html content
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+some {{html}}html content{{/html}} and non html content
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p>some <!--startmacro:html|-||-|html content-->html content<!--stopmacro--> and non html content</p>

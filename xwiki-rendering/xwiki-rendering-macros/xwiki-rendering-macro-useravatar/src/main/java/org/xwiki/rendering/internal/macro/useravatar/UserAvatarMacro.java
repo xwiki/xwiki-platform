@@ -26,6 +26,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -44,6 +46,7 @@ import org.xwiki.rendering.listener.URLImage;
  * @version $Id: $
  * @since 1.8RC2
  */
+@Component("useravatar")
 public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
 {
     /**
@@ -52,13 +55,15 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     private static final String DESCRIPTION = "Allows displaying the avatar for a specific user.";
 
     /**
-     * Injected by the Component Manager.
+     * Used to get the user avatar picture from his profile.
      */
+    @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * Injected by the Component Manager.
+     * Used to get the default avatar picture when the user doesn't exist.
      */
+    @Requirement
     private SkinAccessBridge skinAccessBridge;
 
     /**

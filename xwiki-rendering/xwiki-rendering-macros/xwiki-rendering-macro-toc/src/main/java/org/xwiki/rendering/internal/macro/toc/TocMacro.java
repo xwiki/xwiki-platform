@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
@@ -49,6 +51,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
+@Component("toc")
 public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initializable
 {
     /**
@@ -64,6 +67,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
     /**
      * Generate link label.
      */
+    @Requirement
     private LinkLabelGenerator linkLabelGenerator;
 
     /**

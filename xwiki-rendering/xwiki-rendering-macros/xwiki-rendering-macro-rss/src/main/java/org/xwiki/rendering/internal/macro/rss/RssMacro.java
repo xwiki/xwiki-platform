@@ -30,6 +30,8 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -53,6 +55,7 @@ import org.xwiki.rendering.util.ParserUtils;
  * @version $Id: $
  * @since 1.8RC1
  */
+@Component("rss")
 public class RssMacro extends AbstractMacro<RssMacroParameters>
 {
     /**
@@ -66,14 +69,15 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     private static final String DESCRIPTION = "Output latest feed entries from a RSS feed.";
 
     /**
-     * Injected by the Component Manager.
+     * The Box macro is used to draw boxes around RSS feed items and for the main around the RSS feed list.
      */
+    @Requirement("box")
     protected Macro<BoxMacroParameters> boxMacro;
     
     /** 
      * Needed to parse the ordinary text. 
      */
-    private ParserUtils parserUtils;
+    private ParserUtils parserUtils = new ParserUtils();
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -81,18 +85,6 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     public RssMacro()
     {
         super(new DefaultMacroDescriptor(DESCRIPTION, null, RssMacroParameters.class));
-    }
-
-    /**
-     * Used for implementing the lazy initialization of the parseUtils.
-     * @return the parseUtils needed to parse the ordinary text
-     */
-    private ParserUtils getParserUtils()
-    {
-        if (parserUtils == null) {
-            parserUtils = new ParserUtils();
-        }
-        return parserUtils;
     }
 
     /**
@@ -119,8 +111,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             Link titleLink = new Link();
             titleLink.setType(LinkType.URI);
             titleLink.setReference(entry.getLink());
-            Block titleBlock = new LinkBlock(
-                getParserUtils().parsePlainText(entry.getTitle()), titleLink, true);
+            Block titleBlock = new LinkBlock(this.parserUtils.parsePlainText(entry.getTitle()), titleLink, true);
             ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
             paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
             parentBlock.addChild(paragraphTitleBlock);
@@ -206,12 +197,12 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         List<Block> titleBlocks = null;
         
         if (link == null) {
-            titleBlocks = getParserUtils().parsePlainText(title);
+            titleBlocks = this.parserUtils.parsePlainText(title);
         } else {
             Link titleLink = new Link();
             titleLink.setReference(link);
             titleLink.setType(LinkType.URI);
-            Block linkBlock = new LinkBlock(getParserUtils().parsePlainText(title), titleLink, true);
+            Block linkBlock = new LinkBlock(this.parserUtils.parsePlainText(title), titleLink, true);
             titleBlocks = Collections.singletonList(linkBlock);
         }
         ParagraphBlock titleBlock = new ParagraphBlock(titleBlocks);

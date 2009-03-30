@@ -31,6 +31,7 @@ import javax.script.ScriptException;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -52,11 +53,13 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
     /**
      * Used to get the current script context to give to script engine evaluation method.
      */
+    @Requirement
     private ScriptContextManager scriptContextManager;
 
     /**
      * Used to find if the current document's author has programming rights.
      */
+    @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
     /**

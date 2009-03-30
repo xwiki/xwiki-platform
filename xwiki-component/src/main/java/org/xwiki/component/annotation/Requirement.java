@@ -29,10 +29,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Defines a field or method that needs to be injected with a component. 
- * A hint can be specified to differentiate this implementation from another one.
- *
- * @version $Id: $
+ * Defines a field or method that needs to be injected with a component.
+ * A hint can be specified to choose which implementation to use.
+ * 
+ * @version $Id$
  * @since 1.8.1
  */
 @Documented
@@ -42,20 +42,20 @@ import java.lang.annotation.Target;
 public @interface Requirement
 {
     /**
-     * The hint value specifying a specific component implementation to use.
+     * The hint value selecting a specific component implementation to use.
      */
     String value() default "";
-    
+
     /**
      * The role for the component to inject. Note that the role can usually be guessed from the field
-     * type or method parameter type. However for Lists or Maps we need to pass it since Java doesn't
+     * type or method parameter type. However, for Lists or Maps we need to pass it since Java doesn't
      * allow getting it using reflection.
      */
     Class< ? > role() default Object.class;
-    
+
     /**
-     * Allows specifying a discrete list of hints to inject. If these are not specified then all implementations for
-     * the specified role will be injected.  
+     * When injecting a Collection of requirements, allows specifying a discrete list of hints to use. If these are
+     * not specified, then all implementations for the specified role will be injected.
      */
     String[] hints() default { };
 }

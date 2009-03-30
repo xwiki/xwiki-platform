@@ -36,7 +36,7 @@ import org.xwiki.component.manager.ComponentManager;
 /**
  * Dynamically loads all components defined using Annotations.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 public class ComponentAnnotationLoader
@@ -65,7 +65,7 @@ public class ComponentAnnotationLoader
             ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
             for (String componentClassName : componentClassNames) {
                 Class< ? > componentClass = cl.loadClass(componentClassName);
-                
+
                 // Look for ComponentRole annotations and register one component per ComponentRole found
                 for (Class< ? > componentRoleClass : findComponentRoleClasses(componentClass)) {
                     ComponentDescriptor descriptor = 
@@ -97,7 +97,6 @@ public class ComponentAnnotationLoader
         if (component != null && component.roles().length > 0) {
             classes.addAll(Arrays.asList(component.roles()));
         } else {
-        
             // Look in both superclass and interfaces for @ComponentRole.
             for (Class< ? > interfaceClass : componentClass.getInterfaces()) {
                 classes.addAll(findComponentRoleClasses(interfaceClass));
@@ -119,7 +118,7 @@ public class ComponentAnnotationLoader
         
         return classes;
     }
-    
+
     /**
      * Find all components defined using Annotations. These components are looked for in
      * {@link #COMPONENT_LIST} resources.

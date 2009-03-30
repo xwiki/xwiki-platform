@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
 /**
  * Marks a class as defining a component role.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 @Documented

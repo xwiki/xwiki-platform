@@ -90,13 +90,13 @@ getResource : function(fullName) {
 	};
 
 	// Extract wiki and set prefixedFullName.
-	if (fullName.contains(this.constants.wikiSpaceSeparator)) {
+	if (fullName.include(this.constants.wikiSpaceSeparator)) {
 	  	resource.wiki = fullName.substring(0, fullName.indexOf(this.constants.wikiSpaceSeparator));
 	  	// Remove wiki from fullName.
       	resource.fullName = fullName.substring(fullName.indexOf(this.constants.wikiSpaceSeparator) + 1, fullName.length);
 	  	resource.prefixedFullName = fullName;
 	} else {
-        if (fullName.contains(this.constants.spacePageSeparator)) {
+        if (fullName.include(this.constants.spacePageSeparator)) {
 		    // Fallback on current wiki.
 		    resource.wiki = this.constants.currentWiki;
 		    resource.prefixedFullName = resource.wiki + this.constants.wikiSpaceSeparator + fullName;
@@ -106,7 +106,7 @@ getResource : function(fullName) {
 	}
 
 	// Extract attachment and remove it from fullName and prefixedFullName if any.
-	if (resource.fullName.contains(this.constants.pageAttachmentSeparator)) {
+	if (resource.fullName.include(this.constants.pageAttachmentSeparator)) {
         // Attachment name.
 		resource.attachment = fullName.substring(fullName.indexOf(this.constants.pageAttachmentSeparator) + 1, fullName.length);
 		resource.fullName = resource.fullName.substring(0, resource.fullName.indexOf(this.constants.pageAttachmentSeparator));
@@ -115,7 +115,7 @@ getResource : function(fullName) {
 	}
 
 	// Extract anchor and remove it from fullName and prefixedFullName if any.
-	if (resource.fullName.contains(this.constants.anchorSeparator)) {
+	if (resource.fullName.include(this.constants.anchorSeparator)) {
 		resource.anchor = resource.fullName.substring(resource.fullName.indexOf(this.constants.anchorSeparator) + 1, resource.fullName.length);
 		resource.fullName = resource.fullName.substring(0, resource.fullName.indexOf(this.constants.anchorSeparator));
 		fullName = resource.fullName;
@@ -123,7 +123,7 @@ getResource : function(fullName) {
 	}
 
 	// Extract space and page name.
-	if (fullName.contains(this.constants.spacePageSeparator)) {
+	if (fullName.include(this.constants.spacePageSeparator)) {
 		// Space
 		resource.space = fullName.substring(fullName.indexOf(this.constants.wikiSpaceSeparator) + 1, fullName.indexOf(this.constants.spacePageSeparator));
 		resource.prefixedSpace = resource.wiki + this.constants.wikiSpaceSeparator + resource.space;

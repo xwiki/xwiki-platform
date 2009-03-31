@@ -15,13 +15,13 @@ import junit.framework.TestCase;
  */
 public class DefaultMacroDescriptorTest extends TestCase
 {
-    private static class ParametersTests
+    public static class ParametersTests
     {
         private String lowerparam;
 
         private String upperParam;
 
-        private String param1;
+        private String param1 = "defaultparam1";
 
         private int param2;
 
@@ -110,7 +110,12 @@ public class DefaultMacroDescriptorTest extends TestCase
         assertEquals("lowerparam", lowerParamDescriptor.getName());
         assertEquals("lowerparam", lowerParamDescriptor.getDescription());
         assertSame(String.class, lowerParamDescriptor.getType());
+        assertEquals(null, lowerParamDescriptor.getDefaultValue());
         assertEquals(false, lowerParamDescriptor.isMandatory());
+
+        ParameterDescriptor param1Descriptor = map.get("param1");
+
+        assertEquals("defaultparam1", param1Descriptor.getDefaultValue());
     }
 
     public void testParameterDescriptorWithUpperCase()

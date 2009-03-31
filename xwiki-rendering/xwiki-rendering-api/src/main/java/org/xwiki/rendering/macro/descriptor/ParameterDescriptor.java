@@ -43,6 +43,11 @@ public interface ParameterDescriptor
     Class< ? > getType();
 
     /**
+     * @return the default value of the parameter.
+     */
+    Object getDefaultValue();
+
+    /**
      * @return indicate if the parameter is mandatory.
      * @since 1.7
      */

@@ -95,7 +95,9 @@ Lightbox = Class.create({
 
   lbClose: function() {
     this.lbHide();
-    window.location = this.redirectUrl;
+    if (this.redirectUrl !== undefined) {
+      window.location = this.redirectUrl;
+    }
   },
 
   lbSetNext: function(nextURL) {

@@ -75,7 +75,7 @@ public class XWikiComponentInitializer
             DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
             this.componentManager = new PlexusComponentManager(container);
             // Initialize dynamically all components defined using annotations
-            this.componentAnnotationInitializer.initialize(this.componentManager);
+            this.componentAnnotationInitializer.initialize(this.componentManager, this.getClass().getClassLoader());
         }
 
         return this.componentManager;

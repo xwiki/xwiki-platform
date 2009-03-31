@@ -46,7 +46,7 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         PlexusContainer plexusContainer =
             PlexusServletUtils.getPlexusContainer(servletContextEvent.getServletContext());
         org.xwiki.component.manager.ComponentManager xwikiManager = new PlexusComponentManager(plexusContainer);
-        new ComponentAnnotationLoader().initialize(xwikiManager);
+        new ComponentAnnotationLoader().initialize(xwikiManager, this.getClass().getClassLoader());
         
         // Initializes XWiki's Container with the Servlet Context.
         try {

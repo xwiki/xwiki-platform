@@ -34,7 +34,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
- * Dynamically loads all components defined using Annotations.
+ * Dynamically loads all components defined using Annotations and declared in META-INF/components.txt files.
  * 
  * @version $Id$
  * @since 1.8.1
@@ -51,20 +51,20 @@ public class ComponentAnnotationLoader
      * Loads all components defined using annotations.
      * 
      * @param manager the component manager to use to dynamically register components
+     * @param classLoader the classloader to use to look for the Component list declaration file 
+     *        ({@code META-INF/components.txt})
      */
-    public void initialize(ComponentManager manager)
+    public void initialize(ComponentManager manager, ClassLoader classLoader)
     {
-        ClassLoader cl = ComponentAnnotationLoader.class.getClassLoader();
-        
         try {
             // 1) Find all components by retrieving the list defined in COMPONENT_LIST
-            List<String> componentClassNames = findAnnotatedComponentClasses(cl);
+            List<String> componentClassNames = findAnnotatedComponentClasses(classLoader);
 
             // 2) For each component class name found, load its class and use introspection to find the necessary 
             //    annotations required to register it as a component
             ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
             for (String componentClassName : componentClassNames) {
-                Class< ? > componentClass = cl.loadClass(componentClassName);
+                Class< ? > componentClass = classLoader.loadClass(componentClassName);
 
                 // Look for ComponentRole annotations and register one component per ComponentRole found
                 for (Class< ? > componentRoleClass : findComponentRoleClasses(componentClass)) {

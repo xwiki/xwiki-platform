@@ -49,9 +49,24 @@
       <!-- Standard dependencies used in several modules -->
       <!-- Groovy engine -->
       <dependency>
-        <groupId>com.sun.script</groupId>
-        <artifactId>groovy-engine</artifactId>
-        <version>1.6.0-xwiki</version>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-all</artifactId>
+        <version>1.6.0</version>
+        <!-- Remove Transitive dependencies drawn by Groovy that we don't want -->
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

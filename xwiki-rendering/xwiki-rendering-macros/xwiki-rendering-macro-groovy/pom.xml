@@ -39,8 +39,8 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.script</groupId>
-      <artifactId>groovy-engine</artifactId>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
     </dependency>
 
     <!-- Testing dependencies -->

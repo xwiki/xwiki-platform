@@ -530,8 +530,8 @@
     </dependency>
     <!-- Used by XWiki 1.0 Groovy macro -->
     <dependency>
-      <groupId>com.sun.script</groupId>
-      <artifactId>groovy-engine</artifactId>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
     </dependency>
 
     <!-- Other XWiki modules -->

@@ -315,6 +315,8 @@
 
     <module name="StringLiteralEquality"/>
 
+    <!-- We allow clone() implementations that don't call super.clone(), since
+         some of our classes have this call nested in another method. -->
     <!--<module name="SuperClone"/>-->
 
     <module name="SuperFinalize"/>

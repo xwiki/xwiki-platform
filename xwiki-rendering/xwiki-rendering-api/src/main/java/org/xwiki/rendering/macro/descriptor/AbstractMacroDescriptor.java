@@ -20,7 +20,6 @@
 package org.xwiki.rendering.macro.descriptor;
 
 import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -92,11 +91,11 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
                 for (int i = 0; i < propertyDescriptors.length; i++) {
                     PropertyDescriptor propertyDescriptor = propertyDescriptors[i];
                     if (propertyDescriptor != null) {
-                        extractParameterDescriptor(propertyDescriptor);
+                        extractParameterDescriptor(propertyDescriptor, getParametersBeanClass().newInstance());
                     }
                 }
             }
-        } catch (IntrospectionException e) {
+        } catch (Exception e) {
             // TODO: add error log here
         }
     }
@@ -105,9 +104,10 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
      * Extract provided parameters informations and insert it in {@link #parameterDescriptorMap}.
      * 
      * @param propertyDescriptor the JAVA bean property descriptor.
+     * @param defaultInstance the default instance of bean class.
      * @since 1.7M2
      */
-    protected void extractParameterDescriptor(PropertyDescriptor propertyDescriptor)
+    protected void extractParameterDescriptor(PropertyDescriptor propertyDescriptor, Object defaultInstance)
     {
         DefaultParameterDescriptor desc = new DefaultParameterDescriptor();
         desc.setName(propertyDescriptor.getName());
@@ -118,20 +118,30 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
         if (writeMethod != null) {
             Method readMethod = propertyDescriptor.getReadMethod();
 
+            // is parameter hidden
             ParameterHidden parameterHidden =
                 extractParameterAnnotation(writeMethod, readMethod, ParameterHidden.class);
 
             if (parameterHidden == null) {
+                // get parameter description
                 ParameterDescription parameterDescription =
                     extractParameterAnnotation(writeMethod, readMethod, ParameterDescription.class);
 
                 desc.setDescription(parameterDescription != null ? parameterDescription.value() : propertyDescriptor
                     .getShortDescription());
 
+                // is parameter mandatory
                 ParameterMandatory parameterMandatory =
                     extractParameterAnnotation(writeMethod, readMethod, ParameterMandatory.class);
 
                 desc.setMandatory(parameterMandatory != null);
+
+                // get default value
+                try {
+                    desc.setDefaultValue(readMethod.invoke(defaultInstance));
+                } catch (Exception e) {
+                    // TODO add some log.
+                }
 
                 this.parameterDescriptorMap.put(desc.getName().toLowerCase(), desc);
             }

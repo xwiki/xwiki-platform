@@ -43,6 +43,11 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
     private Class< ? > type;
 
     /**
+     * The default value of the parameter.
+     */
+    private Object defaultValue;
+
+    /**
      * Indicate if the parameter is mandatory.
      * 
      * @since 1.7
@@ -101,6 +106,24 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
     public void setType(Class< ? > type)
     {
         this.type = type;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getDefaultValue()
+     */
+    public Object getDefaultValue()
+    {
+        return this.defaultValue;
+    }
+
+    /**
+     * @param defaultValue the default value of the parameter.
+     */
+    public void setDefaultValue(Object defaultValue)
+    {
+        this.defaultValue = defaultValue;
     }
 
     /**

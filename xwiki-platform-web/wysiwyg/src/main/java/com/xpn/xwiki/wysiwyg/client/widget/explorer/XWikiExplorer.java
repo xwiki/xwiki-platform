@@ -20,6 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.widget.explorer;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.TextBox;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.BaseWidget;
 
@@ -105,6 +107,15 @@ public class XWikiExplorer extends TreeGrid
     }
 
     /**
+     * @param value Set XWikiExplorer suggest input value.
+     */
+    public void setValue(String value)
+    {
+        TextBox input = TextBox.wrap(DOM.getElementById(this.getID() + "_Input"));                 
+        input.setText(value);
+    }
+
+    /**
      * @param displaySuggest displaySuggest, Default value is true.
      */
     public void setDisplaySuggest(boolean displaySuggest)
@@ -117,7 +128,7 @@ public class XWikiExplorer extends TreeGrid
      */
     public void setDisplayLinks(boolean displayLinks)
     {
-        setAttribute("XWE_displayLinks", displayLinks, true);
+        setAttribute("displayLinks", displayLinks, true);
     }
 
     /**
@@ -125,7 +136,7 @@ public class XWikiExplorer extends TreeGrid
      */
     public void setDisplayAttachments(boolean displayAttachments)
     {
-        setAttribute("XWE_displayAttachments", displayAttachments, true);
+        setAttribute("displayAttachments", displayAttachments, true);
     }
 
     /**
@@ -133,7 +144,7 @@ public class XWikiExplorer extends TreeGrid
      */
     public void setDisplayAttachmentsOnTop(boolean displayAttachmentsOnTop)
     {
-        setAttribute("XWE_displayAttachmentsOnTop", displayAttachmentsOnTop, true);
+        setAttribute("displayAttachmentsOnTop", displayAttachmentsOnTop, true);
     }
 
     /**
@@ -141,7 +152,7 @@ public class XWikiExplorer extends TreeGrid
      */
     public void setDisplayAttachmentsWhenEmpty(boolean displayAttachmentsWhenEmpty)
     {
-        setAttribute("XWE_displayAttachmentsWhenEmpty", displayAttachmentsWhenEmpty, true);
+        setAttribute("displayAttachmentsWhenEmpty", displayAttachmentsWhenEmpty, true);
     }
 
     /**

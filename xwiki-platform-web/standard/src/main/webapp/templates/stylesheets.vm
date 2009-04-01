@@ -6,6 +6,10 @@
 #set( $defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true) )
 <link href="$defaultStyleURL" rel="stylesheet" type="text/css" media="all" />
 <link href="$xwiki.getSkinFile("print.css", true)" rel="stylesheet" type="text/css" media="print" />
+## If we're in print view enable the print CSS so that it's applied in view mode
+#if ($printss)
+  <link href="$xwiki.getSkinFile("print.css", true)" rel="stylesheet" type="text/css" media="all" />
+#end
 ## The stylesheets configuration option allows to override the alternate stylesheets
 ## style1.css, style2.css and style3.css
 #set ( $stylesheets = $xwiki.getWebPreference("stylesheets") )

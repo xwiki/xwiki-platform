@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 
-import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
 
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FocusListener;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
@@ -43,7 +44,7 @@ public class RefreshExecutable extends AbstractExecutable
     /**
      * Used to prevent typing in the rich text area while waiting for the updated content from the server.
      */
-    private final Element waiting;
+    private final FocusPanel waiting;
 
     /**
      * Creates a new refresh executable.
@@ -54,9 +55,9 @@ public class RefreshExecutable extends AbstractExecutable
     {
         this.syntax = syntax;
 
-        waiting = (Element) Document.get().createDivElement().cast();
-        waiting.getStyle().setProperty(Style.POSITION, Style.Position.ABSOLUTE);
-        waiting.setClassName("loading");
+        waiting = new FocusPanel();
+        waiting.addStyleName("loading");
+        waiting.getElement().getStyle().setProperty(Style.POSITION, Style.Position.ABSOLUTE);
     }
 
     /**
@@ -69,37 +70,56 @@ public class RefreshExecutable extends AbstractExecutable
         // Check if there is a refresh in progress.
         // NOTE: We don't test the parent but the next sibling because in IE the parent of an orphan node is sometimes a
         // document fragment, thus not null.
-        if (waiting.getNextSibling() != null) {
+        if (waiting.getElement().getNextSibling() != null) {
             return false;
         }
 
-        // We have to blur the rich text area first in order to trigger some client-side DOM clean-up.
-        rta.setFocus(false);
-
         // Prevent typing while waiting for the updated content.
-        waiting.getStyle().setPropertyPx(Style.WIDTH, rta.getOffsetWidth());
-        waiting.getStyle().setPropertyPx(Style.HEIGHT, rta.getOffsetHeight());
-        waiting.getStyle().setPropertyPx(Style.LEFT, rta.getElement().getOffsetLeft());
-        waiting.getStyle().setPropertyPx(Style.TOP, rta.getElement().getOffsetTop());
-        rta.getElement().getParentNode().insertBefore(waiting, rta.getElement());
+        waiting.getElement().getStyle().setPropertyPx(Style.WIDTH, rta.getOffsetWidth());
+        waiting.getElement().getStyle().setPropertyPx(Style.HEIGHT, rta.getOffsetHeight());
+        waiting.getElement().getStyle().setPropertyPx(Style.LEFT, rta.getElement().getOffsetLeft());
+        waiting.getElement().getStyle().setPropertyPx(Style.TOP, rta.getElement().getOffsetTop());
+        rta.getElement().getParentNode().insertBefore(waiting.getElement(), rta.getElement());
 
-        // Request the updated content.
+        // We have to blur the rich text area first in order to trigger some client-side DOM clean-up. In consequence,
+        // we wait to be notified of the blur event before refreshing the content of the rich text area.
+        rta.addFocusListener(new FocusListener()
+        {
+            public void onFocus(Widget sender)
+            {
+                // ignore
+            }
+
+            public void onLostFocus(Widget sender)
+            {
+                rta.removeFocusListener(this);
+                refresh(rta);
+            }
+        });
+        waiting.setFocus(true);
+
+        return true;
+    }
+
+    /**
+     * Sends a request to the server to parse and re-render the current content of the given rich text area.
+     * 
+     * @param rta the rich text area whose content will be refreshed
+     */
+    private void refresh(final RichTextArea rta)
+    {
         WysiwygService.Singleton.getInstance().parseAndRender(rta.getHTML(), syntax, new AsyncCallback<String>()
         {
             public void onFailure(Throwable caught)
             {
-                waiting.getParentNode().removeChild(waiting);
+                waiting.getElement().getParentNode().removeChild(waiting.getElement());
             }
 
             public void onSuccess(String result)
             {
                 rta.setHTML(result);
-                waiting.getParentNode().removeChild(waiting);
+                waiting.getElement().getParentNode().removeChild(waiting.getElement());
             }
         });
-
-        // Give the focus back to the rich text area.
-        rta.setFocus(true);
-        return true;
     }
 }

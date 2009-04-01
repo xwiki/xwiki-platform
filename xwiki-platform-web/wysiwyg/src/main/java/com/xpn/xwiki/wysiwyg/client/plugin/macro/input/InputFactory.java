@@ -19,9 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.input;
 
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
  * Creates input controls for specific data types.
@@ -52,12 +54,40 @@ public final class InputFactory
             // Large string, let's use a text area.
             return new TextInput(new TextArea());
         } else if (boolean.class.getName().equals(type) || Boolean.class.getName().equals(type)) {
-            return new BooleanInput();
+            return createBooleanInput();
+        } else if (type.startsWith("enum[")) {
+            return createChoiceInput(type.substring(5, type.length() - 1).split("\\s*,\\s*"));
         } else {
             // By default we use an input box.
             Widget input = new TextInput(new TextBox());
             input.addStyleName("textInput");
             return input;
         }
+    }
+
+    /**
+     * Creates a choice input based on the given options.
+     * 
+     * @param options the options the user has to choose from
+     * @return the newly created choice input
+     */
+    protected static ChoiceInput createChoiceInput(String[] options)
+    {
+        ListBox list = new ListBox();
+        for (int i = 0; i < options.length; i++) {
+            list.addItem(options[i].toLowerCase());
+        }
+        return new ChoiceInput(list);
+    }
+
+    /**
+     * @return a new boolean input
+     */
+    protected static ChoiceInput createBooleanInput()
+    {
+        ListBox list = new ListBox();
+        list.addItem(Strings.INSTANCE.yes(), String.valueOf(true));
+        list.addItem(Strings.INSTANCE.no(), String.valueOf(false));
+        return new ChoiceInput(list);
     }
 }

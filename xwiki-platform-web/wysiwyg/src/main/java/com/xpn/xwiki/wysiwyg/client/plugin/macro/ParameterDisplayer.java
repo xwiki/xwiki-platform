@@ -65,10 +65,15 @@ public class ParameterDisplayer
         this.descriptor = descriptor;
 
         Label label = new Label(descriptor.getName());
-        label.addStyleName("xMacroParameterLabel");
+        label.setStylePrimaryName("xMacroParameterLabel");
+        if (descriptor.isMandatory()) {
+            label.addStyleDependentName("mandatory");
+        }
+
+        Label description = new Label(descriptor.getDescription());
+        description.addStyleName("xMacroParameterDescription");
 
         input = InputFactory.createInput(descriptor.getType());
-        input.setTitle(descriptor.getDescription());
         // Specify an id for debugging and testing.
         if (StringUtils.isEmpty(input.getElement().getId())) {
             input.getElement().setId("pd-" + descriptor.getName() + "-input");
@@ -81,6 +86,7 @@ public class ParameterDisplayer
         container = new FlowPanel();
         container.addStyleName("xMacroParameter");
         container.add(label);
+        container.add(description);
         container.add(validationMessage);
         container.add(input);
     }

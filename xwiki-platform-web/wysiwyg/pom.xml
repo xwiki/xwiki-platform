@@ -74,6 +74,7 @@
       <groupId>com.smartgwt</groupId>
       <artifactId>smartgwt</artifactId>
       <version>${smartgwt.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>

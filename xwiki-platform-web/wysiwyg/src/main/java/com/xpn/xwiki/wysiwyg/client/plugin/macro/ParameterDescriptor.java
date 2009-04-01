@@ -44,6 +44,11 @@ public class ParameterDescriptor implements IsSerializable
     private String type;
 
     /**
+     * The {@link String} representation of this parameter's default value.
+     */
+    private String defaultValue;
+
+    /**
      * Flag indicating if this parameter is required or not.
      */
     private boolean mandatory;
@@ -103,6 +108,24 @@ public class ParameterDescriptor implements IsSerializable
     public void setType(String type)
     {
         this.type = type;
+    }
+
+    /**
+     * @return the default value of the parameter
+     */
+    public String getDefaultValue()
+    {
+        return defaultValue;
+    }
+
+    /**
+     * Sets the default value of the parameter.
+     * 
+     * @param defaultValue a {@link String} representing the default value of the parameter
+     */
+    public void setDefaultValue(String defaultValue)
+    {
+        this.defaultValue = defaultValue;
     }
 
     /**

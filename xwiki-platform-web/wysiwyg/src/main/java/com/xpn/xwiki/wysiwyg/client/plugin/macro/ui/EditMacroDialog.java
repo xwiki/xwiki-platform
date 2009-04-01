@@ -155,35 +155,35 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
         // First get the dialog out of the loading state.
         setLoading(false);
 
-        // Set the macro description as the tool tip for the title.
-        title.setTitle(macroDescriptor.getDescription());
+        // Display the macro description.
+        Label macroDescription = new Label(macroDescriptor.getDescription());
+        macroDescription.addStyleName("xMacroDescription");
+        getBody().add(macroDescription);
 
         // Display the macro parameters.
         for (Map.Entry<String, ParameterDescriptor> entry : macroDescriptor.getParameterDescriptorMap().entrySet()) {
             ParameterDisplayer displayer = new ParameterDisplayer(entry.getValue());
-            displayer.setValue(macroCall.getArgument(entry.getKey()));
+            String value = macroCall.getArgument(entry.getKey());
+            if (value == null) {
+                // Display the default value if the macro call doesn't specify one.
+                value = entry.getValue().getDefaultValue();
+            }
+            displayer.setValue(value);
             parameterDisplayers.add(displayer);
             getBody().add(displayer.getWidget());
         }
 
         // Display the content of the macro.
-        // The rendering doesn't provide a content descriptor so we fake one.
-        ParameterDescriptor contentDescriptor = new ParameterDescriptor();
-        contentDescriptor.setDescription("");
-        // The macro descriptor doesn't specify if the content is mandatory or not. We suppose it isn't.
-        contentDescriptor.setMandatory(false);
-        contentDescriptor.setName("content");
-        // Just a hack to distinguish between regular strings and large strings.
-        contentDescriptor.setType(StringBuffer.class.getName());
-
-        contentDisplayer = new ParameterDisplayer(contentDescriptor);
-        contentDisplayer.setValue(macroCall.getContent());
-        getBody().add(contentDisplayer.getWidget());
+        if (macroDescriptor.getContentDescriptor() != null) {
+            contentDisplayer = new ParameterDisplayer(macroDescriptor.getContentDescriptor());
+            contentDisplayer.setValue(macroCall.getContent());
+            getBody().add(contentDisplayer.getWidget());
+        }
 
         // Focus the first input control.
         if (parameterDisplayers.size() > 0) {
             parameterDisplayers.get(0).setFocused(true);
-        } else {
+        } else if (contentDisplayer != null) {
             contentDisplayer.setFocused(true);
         }
 
@@ -211,6 +211,7 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
         // Clear the dialog.
         getBody().clear();
         parameterDisplayers.clear();
+        contentDisplayer = null;
 
         // Update the title of the dialog.
         title.setText("Macro : " + macroCall.getName());
@@ -247,7 +248,7 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
      */
     private boolean validate()
     {
-        ParameterDisplayer failed = contentDisplayer.validate() ? null : contentDisplayer;
+        ParameterDisplayer failed = contentDisplayer == null || contentDisplayer.validate() ? null : contentDisplayer;
         for (int i = parameterDisplayers.size() - 1; i >= 0; i--) {
             ParameterDisplayer displayer = parameterDisplayers.get(i);
             if (!displayer.validate()) {
@@ -267,12 +268,16 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
     private void updateMacroCall()
     {
         for (ParameterDisplayer displayer : parameterDisplayers) {
-            if (StringUtils.isEmpty(displayer.getValue())) {
-                macroCall.removeArgument(displayer.getDescriptor().getName());
+            String value = displayer.getValue();
+            ParameterDescriptor descriptor = displayer.getDescriptor();
+            if (StringUtils.isEmpty(value) || value.equalsIgnoreCase(descriptor.getDefaultValue())) {
+                macroCall.removeArgument(descriptor.getName());
             } else {
-                macroCall.setArgument(displayer.getDescriptor().getName(), displayer.getValue());
+                macroCall.setArgument(descriptor.getName(), value);
             }
         }
-        macroCall.setContent(contentDisplayer.getValue());
+        if (contentDisplayer != null) {
+            macroCall.setContent(contentDisplayer.getValue());
+        }
     }
 }

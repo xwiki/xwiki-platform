@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -26,13 +27,16 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
+import com.xpn.xwiki.wysiwyg.client.util.CancelableAsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
+import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
+import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
 
 /**
  * Dialog for selecting one of the available macros.
@@ -41,49 +45,6 @@ import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
  */
 public class SelectMacroDialog extends ComplexDialogBox implements ClickListener, ChangeListener
 {
-    /**
-     * The call-back used by the select macro dialog to be notified when the list of available macro names is being
-     * received from the server. Only the last request for the list of available macros triggers an update of the select
-     * macro dialog.
-     */
-    private class MacrosAsyncCallback implements AsyncCallback<List<String>>
-    {
-        /**
-         * The index of the request.
-         */
-        private int index;
-
-        /**
-         * Creates a new call-back for the request with the specified index.
-         */
-        public MacrosAsyncCallback()
-        {
-            this.index = ++SelectMacroDialog.this.macrosRequestIndex;
-        }
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see AsyncCallback#onFailure(Throwable)
-         */
-        public void onFailure(Throwable caught)
-        {
-            showError(caught);
-        }
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see AsyncCallback#onSuccess(Object)
-         */
-        public void onSuccess(List<String> result)
-        {
-            if (index == SelectMacroDialog.this.macrosRequestIndex) {
-                fill(result);
-            }
-        }
-    }
-
     /**
      * The button that selects the chosen macro.
      */
@@ -100,9 +61,17 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickListener
     private final Config config;
 
     /**
-     * The index of the last request for the list of available macros.
+     * Used to be notified when macro descriptors are retrieved form the server. This objects represent pending requests
+     * for macro descriptors.
      */
-    private int macrosRequestIndex = -1;
+    private final List<CancelableAsyncCallback<MacroDescriptor>> macroDescriptorCallbackList =
+        new ArrayList<CancelableAsyncCallback<MacroDescriptor>>();
+
+    /**
+     * Used to be notified when the list of available macros is retrieved from the server. This object represents the
+     * current pending request for the list of available macros.
+     */
+    private CancelableAsyncCallback<List<String>> macroListCallback;
 
     /**
      * Creates a new dialog for selecting one of the available macros. The dialog is modal.
@@ -121,13 +90,19 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickListener
         getHeader().add(new Label(Strings.INSTANCE.macroInsertDialogTitle()));
 
         macroList = new ListBox();
-        macroList.setVisibleItemCount(2);
         macroList.addChangeListener(this);
-        macroList.addStyleName("xMacroList");
 
         select = new Button(Strings.INSTANCE.select());
         select.addClickListener(this);
         getFooter().add(select);
+    }
+
+    /**
+     * @return the string identifier for the storage syntax
+     */
+    private String getSyntax()
+    {
+        return config.getParameter("syntax");
     }
 
     /**
@@ -160,9 +135,32 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickListener
         setLoading(true);
 
         // Request the list of available macros.
-        WysiwygService.Singleton.getInstance().getMacros(config.getParameter("syntax"), new MacrosAsyncCallback());
+        macroListCallback = new CancelableAsyncCallback<List<String>>(new AsyncCallback<List<String>>()
+        {
+            public void onFailure(Throwable caught)
+            {
+                showError(caught);
+            }
+
+            public void onSuccess(List<String> result)
+            {
+                fill(result);
+            }
+        });
+        WysiwygService.Singleton.getInstance().getMacros(getSyntax(), macroListCallback);
 
         super.center();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ComplexDialogBox#hide()
+     */
+    public void hide()
+    {
+        cancelPendingRequests();
+        super.hide();
     }
 
     /**
@@ -172,14 +170,68 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickListener
      */
     private void fill(List<String> macros)
     {
-        // First get the dialog out of the loading state.
-        setLoading(false);
-
         macroList.clear();
         for (String macro : macros) {
-            macroList.addItem(macro);
+            Label name = new Label(macro);
+            name.addStyleName("xMacroLabel");
+
+            final ListItem item = new ListItem();
+            item.addStyleName("xMacro");
+            item.add(name);
+
+            macroList.addItem(item);
+
+            // Request the macro descriptor to fill the macro description.
+            AsyncCallback<MacroDescriptor> callback = new AsyncCallback<MacroDescriptor>()
+            {
+                public void onFailure(Throwable caught)
+                {
+                    // ignore
+                }
+
+                public void onSuccess(MacroDescriptor result)
+                {
+                    Label description = new Label(result.getDescription());
+                    description.addStyleName("xMacroDescription");
+                    item.add(description);
+                }
+            };
+            CancelableAsyncCallback<MacroDescriptor> cancelableCallback =
+                new CancelableAsyncCallback<MacroDescriptor>(callback)
+                {
+                    public void onFailure(Throwable caught)
+                    {
+                        super.onFailure(caught);
+                        if (!isCanceled()) {
+                            mayFinishLoading(this);
+                        }
+                    }
+
+                    public void onSuccess(MacroDescriptor result)
+                    {
+                        super.onSuccess(result);
+                        if (!isCanceled()) {
+                            mayFinishLoading(this);
+                        }
+                    }
+                };
+            macroDescriptorCallbackList.add(cancelableCallback);
+            WysiwygService.Singleton.getInstance().getMacroDescriptor(macro, getSyntax(), cancelableCallback);
         }
-        getBody().add(macroList);
+    }
+
+    /**
+     * Counts the given callback and finishes the loading process if it's the last one expected.
+     * 
+     * @param callback a callback for a macro descriptor
+     */
+    private void mayFinishLoading(CancelableAsyncCallback<MacroDescriptor> callback)
+    {
+        macroDescriptorCallbackList.remove(callback);
+        if (macroDescriptorCallbackList.isEmpty()) {
+            setLoading(false);
+            getBody().add(macroList);
+        }
     }
 
     /**
@@ -187,7 +239,8 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickListener
      */
     public String getSelectedMacro()
     {
-        return macroList.getSelectedIndex() < 0 ? null : macroList.getItemText(macroList.getSelectedIndex());
+        return macroList.getSelectedItem() == null ? null : ((Label) macroList.getSelectedItem().getWidget(0))
+            .getText();
     }
 
     /**
@@ -198,7 +251,19 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickListener
     public void onChange(Widget sender)
     {
         if (sender == macroList) {
-            select.setEnabled(macroList.getSelectedIndex() >= 0);
+            select.setEnabled(macroList.getSelectedItem() != null);
         }
+    }
+
+    /**
+     * Cancels the pending requests.
+     */
+    protected void cancelPendingRequests()
+    {
+        macroListCallback.setCanceled(true);
+        for (CancelableAsyncCallback<MacroDescriptor> callback : macroDescriptorCallbackList) {
+            callback.setCanceled(true);
+        }
+        macroDescriptorCallbackList.clear();
     }
 }

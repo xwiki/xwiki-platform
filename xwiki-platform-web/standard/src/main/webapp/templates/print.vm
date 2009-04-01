@@ -1,25 +1,6 @@
-#template("xwikivars.vm")
-#template("layoutvars.vm")
+## Don't display panels in print view
 #set($showLeftPanels = "0")
 #set($showRightPanels = "0")
+## Set a flag stating we're in print view so that we can use the print.css CSS in stylesheet.vm
 #set($printss = true)
-#template("htmlheader.vm")
-<div id="printheader" class="layoutsection">
-  <div id="companylogo">
-    <a href="$xwiki.getURL("Main.WebHome", "view")" title="Home">
-#set($logo = $!prefdoc.getAttachment("logo"))
-#if(!$logo)
-#set($logourl = $xwiki.getSkinFile("logo.png"))
-      <img src="$logourl" alt="XWiki logo" style="width: 215px;height: 74px;"/>
-#else
-#set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
-      <img src="$logourl" alt="XWiki logo"/>
-#end
-    </a>
-  </div>
-</div>
-<div id="printcontainer">
-#template("contentview.vm")
-<div class="clearfloats"></div>
-</div>## printcontainer
-#template("htmlfooter.vm")
+#template("view.vm")

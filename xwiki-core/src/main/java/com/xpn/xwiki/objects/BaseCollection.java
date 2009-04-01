@@ -438,14 +438,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public Object[] getProperties()
     {
-        Object[] array = getFields().values().toArray();
-        return array;
+        return getFields().values().toArray();
     }
 
     public String[] getPropertyNames()
     {
-        String[] array = getFields().keySet().toArray(new String[0]);
-        return array;
+        return getFields().keySet().toArray(new String[0]);
     }
 
     /**

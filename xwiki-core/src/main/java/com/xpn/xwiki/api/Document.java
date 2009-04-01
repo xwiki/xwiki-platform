@@ -2020,7 +2020,7 @@ public class Document extends Api
     public boolean convertSyntax(String targetSyntaxId) throws XWikiException
     {
         try {
-            getDoc().convertSyntax(targetSyntaxId);
+            getDoc().convertSyntax(targetSyntaxId, this.context);
         } catch (Exception ex) {
             return false;
         }

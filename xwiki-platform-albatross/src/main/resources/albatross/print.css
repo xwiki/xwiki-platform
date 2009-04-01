@@ -9,7 +9,7 @@
   overflow: visible !important;
 }
 .edit_section{
-  display: none;
+  display: none !important;
 }
 #printcontainer {
 	overflow: visible !important; 

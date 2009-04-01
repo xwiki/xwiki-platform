@@ -437,7 +437,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         }
 
         print(this.listStyle.toString());
-        if (this.listStyle.charAt(0) == '1') {
+        if (StringUtils.contains(this.listStyle.toString(), '1')) {
             print(".");
         }
         print(" ");

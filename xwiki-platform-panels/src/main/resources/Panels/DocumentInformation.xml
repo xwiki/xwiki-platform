@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1154086661000</creationDate>
-<date>1231859189000</date>
-<contentUpdateDate>1231859189000</contentUpdateDate>
-<version>1.1</version>
+<date>1238589837000</date>
+<contentUpdateDate>1238589837000</contentUpdateDate>
+<version>3.1</version>
 <title>Document Information</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -306,7 +306,7 @@ XWiki.SyntaxConverter = Class.create({
     if (this.validSourceSyntaxes.indexOf(this.originalSyntax) == -1 || this.validTargetSyntaxes.indexOf(syntax) == -1) {
       // Server does not support this conversion. Simply accept the new syntax.
     } else if (!this.contentField.value.blank()) {
-      if (confirm("Do you want to also convert the document's content to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content.")) {
+      if (confirm("Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.")) {
         this.disableEditingArea();
         var url = '$doc.getURL('view', 'action=convertSyntax&amp;xpage=plain&amp;documentName=')' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
         new Ajax.Request(
@@ -398,13 +398,15 @@ document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</co
 </property>
 </object>
 <content>#if("$!{request.action}" == "convertSyntax")
+  #set($oldSyntax = $request.oldSyntaxId)
+  #set($newSyntaxId = $request.newSyntaxId)
   #set($theDoc = $xwiki.getDocument($request.documentName))
   ## Use the syntax and content received from the client, as the user might have made some changes that are not on saved yet.
-  $theDoc.setSyntaxId($request.oldSyntaxId)##
+  $theDoc.setSyntaxId($oldSyntax)##
   $theDoc.setContent($request.content)##
-  #if($theDoc.convertSyntax($request.newSyntaxId))
+  #if($theDoc.convertSyntax($newSyntaxId))
     ## Conversion successful. The "ok:" prefix is needed, since otherwise an empty content will result in a "This template does not exist" exception.
-    ok:{pre}$theDoc.content{/pre}
+    ok:{pre}$theDoc.content{/pre}#set($void = $theDoc.save("Document converted form syntax $oldSyntax to syntax $newSyntaxId"))
   #else
     $response.setStatus(501)
     ## TODO: Find a way to put the exception in the context and send it to the client.

@@ -3089,10 +3089,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     public List<String> getChildren(XWikiContext context) throws XWikiException
     {
-        String hql =
-            "select doc.fullName from XWikiDocument doc " + "where doc.parent='" + getFullName()
-                + "' order by doc.fullName";
-        return context.getWiki().search(hql, context);
+        String query = "select distinct doc.fullName from XWikiDocument as doc";
+        Object[][] whereParameters = new Object[][] { {"doc.parent", this.getFullName()} };
+        return context.getWiki().search(query, whereParameters, context);
     }
 
     public void renameProperties(String className, Map fieldsToRename)

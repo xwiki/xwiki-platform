@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.server;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -517,23 +518,57 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             Macro< ? > macro = manager.getMacro(macroName, syntaxFactory.createSyntaxFromIdString(syntaxId));
             org.xwiki.rendering.macro.descriptor.MacroDescriptor descriptor = macro.getDescriptor();
 
-            MacroDescriptor result = new MacroDescriptor();
-            result.setDescription(descriptor.getDescription());
+            ParameterDescriptor contentDescriptor = null;
+            if (descriptor.getContentDescriptor() != null) {
+                contentDescriptor = new ParameterDescriptor();
+                contentDescriptor.setName("content");
+                contentDescriptor.setDescription(descriptor.getContentDescriptor().getDescription());
+                // Just a hack to distinguish between regular strings and large strings.
+                contentDescriptor.setType(StringBuffer.class.getName());
+                contentDescriptor.setMandatory(descriptor.getContentDescriptor().isMandatory());
+            }
+
             Map<String, ParameterDescriptor> parameterDescriptorMap = new HashMap<String, ParameterDescriptor>();
             for (Map.Entry<String, org.xwiki.rendering.macro.descriptor.ParameterDescriptor> entry : descriptor
                 .getParameterDescriptorMap().entrySet()) {
                 ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
                 parameterDescriptor.setName(entry.getValue().getName());
                 parameterDescriptor.setDescription(entry.getValue().getDescription());
-                parameterDescriptor.setType(entry.getValue().getType().getName());
+                parameterDescriptor.setType(getMacroParameterType(entry.getValue().getType()));
+                Object defaultValue = entry.getValue().getDefaultValue();
+                if (defaultValue != null) {
+                    parameterDescriptor.setDefaultValue(String.valueOf(defaultValue));
+                }
                 parameterDescriptor.setMandatory(entry.getValue().isMandatory());
                 parameterDescriptorMap.put(entry.getKey(), parameterDescriptor);
             }
+
+            MacroDescriptor result = new MacroDescriptor();
+            result.setDescription(descriptor.getDescription());
+            result.setContentDescriptor(contentDescriptor);
             result.setParameterDescriptorMap(parameterDescriptorMap);
+
             return result;
         } catch (Throwable t) {
             LOG.error("Exception while retrieving macro descriptor.", t);
             throw new XWikiGWTException(t.getLocalizedMessage(), t.toString(), -1, -1);
+        }
+    }
+
+    /**
+     * NOTE: We can't send the {@link Class} instance to the client side because it isn't serializable, its source file
+     * is not available at build time and currently GWT doesn't support reflection.
+     * 
+     * @param parameterClass a {@link Class} that defines the values a macro parameter can have
+     * @return a {@link String} representation of the specified class that can be used on the client side to assert that
+     *         a value is of this type
+     */
+    private String getMacroParameterType(Class< ? > parameterClass)
+    {
+        if (parameterClass.isEnum()) {
+            return "enum" + Arrays.asList(parameterClass.getEnumConstants());
+        } else {
+            return parameterClass.getName();
         }
     }
 

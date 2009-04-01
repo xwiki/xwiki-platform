@@ -43,6 +43,11 @@ public class MacroDescriptor implements IsSerializable
     private Map<String, ParameterDescriptor> parameterDescriptorMap;
 
     /**
+     * Describes the content of the macro.
+     */
+    private ParameterDescriptor contentDescriptor;
+
+    /**
      * @return the description of the macro
      */
     public String getDescription()
@@ -76,5 +81,23 @@ public class MacroDescriptor implements IsSerializable
     public void setParameterDescriptorMap(Map<String, ParameterDescriptor> parameterDescriptorMap)
     {
         this.parameterDescriptorMap = parameterDescriptorMap;
+    }
+
+    /**
+     * @return the content descriptor
+     */
+    public ParameterDescriptor getContentDescriptor()
+    {
+        return contentDescriptor;
+    }
+
+    /**
+     * Sets the content descriptor.
+     * 
+     * @param contentDescriptor the object describing the content of the macro
+     */
+    public void setContentDescriptor(ParameterDescriptor contentDescriptor)
+    {
+        this.contentDescriptor = contentDescriptor;
     }
 }

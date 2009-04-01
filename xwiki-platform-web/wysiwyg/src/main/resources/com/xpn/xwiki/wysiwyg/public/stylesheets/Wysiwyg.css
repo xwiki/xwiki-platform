@@ -18,3 +18,13 @@
   margin:0;
   padding:0;
 }
+
+.xListBox {
+}
+
+.xListItem {
+}
+
+.xListItem-selected {
+  background-color: #FFA;
+}

@@ -20,26 +20,21 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.input;
 
 import com.google.gwt.user.client.ui.ListBox;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
- * A concrete input control used to collect a boolean value from the user.
+ * A concrete input control that allows the user to choose one of the available options.
  * 
  * @version $Id$
  */
-public class BooleanInput extends AbstractInput
+public class ChoiceInput extends AbstractInput
 {
     /**
-     * Creates a new boolean input control.
+     * Creates a new choice input control that wraps the given {@link ListBox} widget.
+     * 
+     * @param list the list box widget to be wrapped
      */
-    public BooleanInput()
+    public ChoiceInput(ListBox list)
     {
-        ListBox list = new ListBox();
-        list.addItem("");
-        list.addItem(Strings.INSTANCE.yes());
-        list.addItem(Strings.INSTANCE.no());
-
         initWidget(list);
     }
 
@@ -61,14 +56,7 @@ public class BooleanInput extends AbstractInput
     public String getValue()
     {
         ListBox list = (ListBox) getWidget();
-        switch (list.getSelectedIndex()) {
-            case 1:
-                return Boolean.TRUE.toString();
-            case 2:
-                return Boolean.FALSE.toString();
-            default:
-                return "";
-        }
+        return list.getSelectedIndex() < 0 ? null : list.getValue(list.getSelectedIndex());
     }
 
     /**
@@ -78,13 +66,23 @@ public class BooleanInput extends AbstractInput
      */
     public void setValue(String value)
     {
+        ((ListBox) getWidget()).setSelectedIndex(indexOf(value));
+    }
+
+    /**
+     * Searches for the given value in the list of options.
+     * 
+     * @param value the value to search for
+     * @return the index of the value in the list, if found, {@code -1} otherwise
+     */
+    protected int indexOf(String value)
+    {
         ListBox list = (ListBox) getWidget();
-        if (StringUtils.isEmpty(value)) {
-            list.setSelectedIndex(0);
-        } else if (Boolean.valueOf(value)) {
-            list.setSelectedIndex(1);
-        } else {
-            list.setSelectedIndex(2);
+        for (int i = 0; i < list.getItemCount(); i++) {
+            if (list.getValue(i).equalsIgnoreCase(value)) {
+                return i;
+            }
         }
+        return -1;
     }
 }

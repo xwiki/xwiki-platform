@@ -33,6 +33,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -61,6 +62,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockXWikiVersioningStore;
 
     private BaseClass baseClass;
+
+    private BaseObject baseObject;
 
     @Override
     protected void setUp() throws Exception
@@ -92,6 +95,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.baseClass = this.document.getxWikiClass();
         this.baseClass.addTextField("string", "String", 30);
         this.baseClass.addTextAreaField("area", "Area", 10, 10);
+        this.baseClass.addTextAreaField("puretextarea", "Pure text area", 10, 10);
+        // set the text areas an non interpreted content
+        ((TextAreaClass) this.baseClass.getField("puretextarea")).setContentType("puretext");
         this.baseClass.addPasswordField("passwd", "Password", 30);
         this.baseClass.addBooleanField("boolean", "Boolean", "yesno");
         this.baseClass.addNumberField("int", "Int", 10, "integer");
@@ -99,13 +105,13 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWiki.stubs().method("getClass").will(returnValue(this.baseClass));
 
-        BaseObject baseObject = this.document.newObject(CLASSNAME, getContext());
-        baseObject.setStringValue("string", "string");
-        baseObject.setLargeStringValue("area", "area");
-        baseObject.setStringValue("passwd", "passwd");
-        baseObject.setIntValue("boolean", 1);
-        baseObject.setIntValue("int", 42);
-        baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
+        this.baseObject = this.document.newObject(CLASSNAME, getContext());
+        this.baseObject.setStringValue("string", "string");
+        this.baseObject.setLargeStringValue("area", "area");
+        this.baseObject.setStringValue("passwd", "passwd");
+        this.baseObject.setIntValue("boolean", 1);
+        this.baseObject.setIntValue("int", 42);
+        this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
     }
 
     public void testGetDisplayTitleWhenNoTitleAndNoContent()
@@ -596,5 +602,25 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setContent("content not in section\n");
 
         assertEquals("", this.document.extractTitle());
+    }
+
+    public void testConvertSyntax() throws XWikiException
+    {
+        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
+            + "1.1 header 2\nheader 2 content");
+        this.baseObject.setLargeStringValue("area", "object content not in section\n"
+            + "1 object header 1\nobject header 1 content\n" + "1.1 object header 2\nobject header 2 content");
+        this.baseObject.setLargeStringValue("puretextarea", "object content not in section\n"
+            + "1 object header 1\nobject header 1 content\n" + "1.1 object header 2\nobject header 2 content");
+
+        this.document.convertSyntax("xwiki/2.0", getContext());
+
+        assertEquals("content not in section\n\n" + "= header 1 =\n\nheader 1 content\n\n"
+            + "== header 2 ==\n\nheader 2 content", this.document.getContent());
+        assertEquals("object content not in section\n\n" + "= object header 1 =\n\nobject header 1 content\n\n"
+            + "== object header 2 ==\n\nobject header 2 content", this.baseObject.getStringValue("area"));
+        assertEquals("object content not in section\n" + "1 object header 1\nobject header 1 content\n"
+            + "1.1 object header 2\nobject header 2 content", this.baseObject.getStringValue("puretextarea"));
+        assertEquals("xwiki/2.0", this.document.getSyntaxId());
     }
 }

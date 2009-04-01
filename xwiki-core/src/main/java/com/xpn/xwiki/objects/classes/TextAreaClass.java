@@ -32,43 +32,65 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class TextAreaClass extends StringClass
 {
-    public TextAreaClass(PropertyMetaClass wclass) {
+    public TextAreaClass(PropertyMetaClass wclass)
+    {
         super("textarea", "Text Area", wclass);
+
         setSize(40);
         setRows(5);
     }
 
-    public TextAreaClass() {
+    public TextAreaClass()
+    {
         this(null);
     }
 
-    public BaseProperty newProperty() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.classes.StringClass#newProperty()
+     */
+    @Override
+    public BaseProperty newProperty()
+    {
         BaseProperty property = new LargeStringProperty();
         property.setName(getName());
+
         return property;
     }
 
-    public int getRows() {
+    public int getRows()
+    {
         return getIntValue("rows");
     }
 
-    public void setRows(int rows) {
+    public void setRows(int rows)
+    {
         setIntValue("rows", rows);
     }
 
-    public String getEditor() {
+    public String getEditor()
+    {
         return getStringValue("editor").toLowerCase();
     }
 
-    public String getContentType() {
+    public String getContentType()
+    {
         String result = getStringValue("contenttype").toLowerCase();
         if (result.equals("")) {
             result = "fullyrenderedtext";
         }
+
         return result;
     }
 
-    public boolean isWysiwyg(XWikiContext context) {
+    public void setContentType(String contentType)
+    {
+        setStringValue("contenttype", contentType);
+    }
+
+    public boolean isWysiwyg(XWikiContext context)
+    {
         String editor = null;
         if ((context != null) && (context.getRequest() != null)) {
             editor = context.getRequest().get("xeditmode");
@@ -110,7 +132,29 @@ public class TextAreaClass extends StringClass
         return false;
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    /**
+     * @return true if the content of this text area is not a wiki syntax content
+     */
+    public boolean isWikiContent()
+    {
+        String contentType = getContentType();
+
+        if (contentType != null && !contentType.equals("puretext") && !contentType.equals("velocitycode")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.classes.StringClass#displayEdit(java.lang.StringBuffer, java.lang.String,
+     *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    {
         boolean isWysiwyg = isWysiwyg(context);
         textarea textarea = new textarea();
         String tname = prefix + name;
@@ -145,6 +189,13 @@ public class TextAreaClass extends StringClass
         buffer.append(textarea.toString());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.classes.PropertyClass#displayView(java.lang.StringBuffer, java.lang.String,
+     *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
+     */
+    @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         String contentType = getContentType();

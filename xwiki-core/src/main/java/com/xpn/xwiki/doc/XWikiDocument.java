@@ -106,12 +106,14 @@ import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
@@ -4578,7 +4580,7 @@ public class XWikiDocument implements DocumentModelBridge
             content = updateDocumentSection10(sectionNumber, newSectionContent);
         } else {
             XDOM xdom = getXDOM();
-            
+
             // Get the current section block
             HeaderBlock header = xdom.getChildrenByType(HeaderBlock.class, true).get(sectionNumber - 1);
 
@@ -4973,9 +4975,30 @@ public class XWikiDocument implements DocumentModelBridge
      * @param targetSyntaxId the syntax to convert to (eg "xwiki/2.0", "xhtml/1.0", etc)
      * @throws XWikiException if an exception occurred during the conversion process
      */
-    public void convertSyntax(String targetSyntaxId) throws XWikiException
+    public void convertSyntax(String targetSyntaxId, XWikiContext context) throws XWikiException
     {
+        // convert content
         setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntaxId, false));
+
+        // convert objects
+        Map<String, Vector<BaseObject>> objectsByClass = getxWikiObjects();
+
+        for (Vector<BaseObject> objects : objectsByClass.values()) {
+            for (BaseObject bobject : objects) {
+                BaseClass bclass = bobject.getxWikiClass(context);
+                for (Object fieldClass : bclass.getProperties()) {
+                    if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
+                        TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
+                        LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
+
+                        field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntaxId, false));
+                    }
+                }
+            }
+        }
+
+        // change syntax id
+        setSyntaxId(targetSyntaxId);
     }
 
     /**

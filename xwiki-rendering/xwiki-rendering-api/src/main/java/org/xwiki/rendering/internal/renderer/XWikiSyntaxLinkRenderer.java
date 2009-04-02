@@ -69,37 +69,9 @@ public class XWikiSyntaxLinkRenderer
     {
         // If there was some link content specified then output the character separator ">>".
         if (!StringUtils.isEmpty(wikiSyntaxContent)) {
-            printer.print(escapeContent(wikiSyntaxContent));
+            printer.print(wikiSyntaxContent);
             printer.print(">>");
         }
-    }
-
-    public String escapeContent(String wikiSyntaxContent)
-    {
-        StringBuffer escaped = new StringBuffer();
-
-        int linkDepth = 0;
-        char[] array = wikiSyntaxContent.toCharArray();
-
-        for (int i = 0; i < array.length; ++i) {
-            char c = array[i];
-
-            if (c == '[' && i + 1 < array.length && array[i + 1] == '[') {
-                ++linkDepth;
-            } else if (c == ']' && i + 1 < array.length && array[i + 1] == ']') {
-                --linkDepth;
-            } else if (linkDepth == 0) {
-                if (c == '>' && i + 1 < array.length && array[i + 1] == '>') {
-                    escaped.append('~');
-                } else if (c == '|' && i + 1 < array.length && array[i + 1] == '|') {
-                    escaped.append('~');
-                }
-            }
-
-            escaped.append(c);
-        }
-
-        return escaped.toString();
     }
 
     public void endRenderLink(WikiPrinter printer, Link link, boolean isFreeStandingURI, Map<String, String> parameters)

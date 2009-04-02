@@ -88,8 +88,13 @@ public class XWikiSyntaxEscapeHandler
         }
 
         // Escape "[[" if not in a link.
+        //replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
         if (!blockStateListener.isInLink()) {
             replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
+        } else {
+            replaceAll(accumulatedBuffer, "]]", ESCAPE_CHAR + "]" + ESCAPE_CHAR + "]");
+            replaceAll(accumulatedBuffer, ">>", ESCAPE_CHAR + ">" + ESCAPE_CHAR + ">");
+            replaceAll(accumulatedBuffer, "||", ESCAPE_CHAR + "|" + ESCAPE_CHAR + "|");
         }
 
         // Escape verbatim "{{{"

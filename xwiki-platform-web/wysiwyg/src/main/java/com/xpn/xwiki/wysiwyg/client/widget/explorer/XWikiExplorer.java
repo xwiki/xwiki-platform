@@ -132,6 +132,22 @@ public class XWikiExplorer extends TreeGrid
     }
 
     /**
+     * @param displayAddPage displayAddPage, Default value is false.
+     */
+    public void setDisplayAddPage(boolean displayAddPage)
+    {
+        setAttribute("displayAddPage", displayAddPage, true);
+    }
+
+    /**
+     * @param displayAddPageOnTop displayAddPageOnTop, Default value is true.
+     */
+    public void setDisplayAddPageOnTop(boolean displayAddPageOnTop)
+    {
+        setAttribute("displayAddPageOnTop", displayAddPageOnTop, true);
+    }
+
+    /**
      * @param displayAttachments displayAttachments, Default value is true.
      */
     public void setDisplayAttachments(boolean displayAttachments)
@@ -156,6 +172,22 @@ public class XWikiExplorer extends TreeGrid
     }
 
     /**
+     * @param displayAddAttachment displayAddAttachment, Default value is false.
+     */
+    public void setDisplayAddAttachment(boolean displayAddAttachment)
+    {
+        setAttribute("displayAddAttachment", displayAddAttachment, true);
+    }
+
+    /**
+     * @param displayAddAttachmentOnTop displayAddAttachmentOnTop, Default value is false.
+     */
+    public void setDisplayAddAttachmentOnTop(boolean displayAddAttachmentOnTop)
+    {
+        setAttribute("displayAddAttachmentOnTop", displayAddAttachmentOnTop, true);
+    }
+
+    /**
      * Get the name of the resource selected in the Tree.
      * Examples: "xwiki", "xwiki:Main", "xwiki:Main.WebHome".
      *
@@ -164,7 +196,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getValue()
         /*-{
             var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.XWE_getValue();
+            return self.getValue();
         }-*/;
 
     /**
@@ -175,7 +207,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedWiki()
         /*-{
             var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.XWE_getSelectedWiki();
+            return self.getSelectedWiki();
         }-*/;
 
     /**
@@ -186,7 +218,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedSpace()
         /*-{
             var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.XWE_getSelectedSpace();
+            return self.getSelectedSpace();
         }-*/;
 
     /**
@@ -197,7 +229,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedPage()
         /*-{
             var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.XWE_getSelectedPage();
+            return self.getSelectedPage();
         }-*/;
 
     /**
@@ -208,7 +240,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedAttachment()
         /*-{
             var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.XWE_getSelectedAttachment();
+            return self.getSelectedAttachment();
         }-*/;
 
     /**
@@ -219,7 +251,29 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedAnchor()
         /*-{
             var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.XWE_getSelectedAnchor();
+            return self.getSelectedAnchor();
+        }-*/;
+
+    /**
+     * Is the selected resource a new page.
+     *
+     * @return true if the selected node is a new page.
+     */
+    public native boolean isNewPage()
+        /*-{
+            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+            return self.isNewPage();
+        }-*/;
+
+    /**
+     * Is the selected resource a new attachment.
+     *
+     * @return true if the selected node is a new Attachment.
+     */
+    public native boolean isNewAttachment()
+        /*-{
+            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+            return self.isNewAttachment();
         }-*/;
 
 };

@@ -58,6 +58,15 @@ XWiki.constants.rest = {
  */
 isc.ClassFactory.defineClass("XWEResultTree", isc.ResultTree);
 
+isc.XWEResultTree.addClassProperties({
+    constants : {
+        addNodeSuffix : "..new",
+        attachmentsTitle : "$msg.get('xwikiexplorer.attachments.title')",
+        addPageTitle : "$msg.get('xwikiexplorer.addpage.title')",
+        addAttachmentTitle : "$msg.get('xwikiexplorer.addattachment.title')"
+    }
+});
+
 isc.XWEResultTree.addProperties({
 
     multiDSTree : true, // Use multiple datasources.
@@ -83,7 +92,7 @@ isc.XWEResultTree.addProperties({
     displayAddPage: false, // Display a "Add page" node in spaces.
     displayAddPageOnTop: true, // Display the "Add page" node on top.
     displayAttachments: true, // Display attachments of pages.
-    displayAttachmentsOnTop: false, // Display attachments before children pages.    
+    displayAttachmentsOnTop: false, // Display attachments before children pages.
     displayAttachmentsWhenEmpty: false, // Display attachments meta-node even if there's no attachments.
     displayAddAttachment: false, // Display a "Add Attachment" node in each Attachments meta-node.
     displayAddAttachmentOnTop: true, // Display the "Add Attachment" node on top.
@@ -114,7 +123,7 @@ isc.XWEResultTree.addMethods({
         var treeRelations = this.treeRelations, childDataSources = nodeDS.getChildDataSources();
         // manage XWiki dynamic DS instantiation
         // it can't be managed with getChildDataSources since it needs the node to be created.
-        var xwikiRecordsType = nodeDS.XWE_recordsType;
+        var xwikiRecordsType = nodeDS.recordsType;
         var resource = XWiki.getResource(node.id);
         node["resource"] = resource;
         if (xwikiRecordsType != null && xwikiRecordsType != "") {
@@ -162,11 +171,10 @@ isc.XWEResultTree.addMethods({
             // Overwrite node properties.
             isc.addProperties(children[i], {
                 // Overwrite children icon with the one defined in the XWiki DataSource.
-                icon: currentDS.XWE_icon,
-                canDrag: currentDS.xwikiCanDragNodes,
-                canAcceptDrop: currentDS.xwikiCanAcceptDropNodes,
-                //resource: XWiki.getResource(children[i].id),
-                title: title
+                icon: currentDS.icon,
+                title: title,
+                isNewPage: false,
+                isNewAttachment: false
             });
         }
 
@@ -175,23 +183,23 @@ isc.XWEResultTree.addMethods({
             var parentDS = this.getNodeDataSource(parentNode);
 
             // Remove blacklisted spaces.
-            if (parentDS.XWE_recordsType == "wiki") {
-                this.XWE_remove_blacklistedSpaces(children);
+            if (parentDS.recordsType == "wiki") {
+                this.remove_blacklistedSpaces(children);
             }
 
-            if (parentDS.XWE_recordsType == "space" && this.displayAddPage == true) {
-                this.XWE_addAddPageNode(parentNode);
+            if (parentDS.recordsType == "space" && this.displayAddPage == true) {
+                this.addAddPageNode(parentNode);
             }
 
             // Add an attachments child to the parentNode if the parentNode is a page and showAttachments is activated.
-            if (parentDS.XWE_recordsType == "page" && this.displayAttachments == true
+            if (parentDS.recordsType == "page" && this.displayAttachments == true
                     && !parentNode.isXWikiAttachment) {
-                this.XWE_addAttachmentsNode(parentNode);
+                this.addAttachmentsNode(parentNode);
             }
 
             // Add an attachments child to the parentNode if the parentNode is a page and showAttachments is activated.
             if (parentNode.isXWikiAttachment && this.displayAddAttachment == true) {
-                this.XWE_addAddAttachmentsNode(parentNode);
+                this.addAddAttachmentsNode(parentNode);
             }
         }
 
@@ -208,7 +216,7 @@ isc.XWEResultTree.addMethods({
     isFolder : function (node) {
         var nodeDS = this.getNodeDataSource(node);
         if (nodeDS != null) {
-            var xwikiRecordsType = nodeDS.XWE_recordsType;
+            var xwikiRecordsType = nodeDS.recordsType;
             if (xwikiRecordsType != null && xwikiRecordsType != "") {
                 if (xwikiRecordsType == "wiki") {
                     // If the node is a wiki it necessarily has children.
@@ -244,7 +252,7 @@ isc.XWEResultTree.addMethods({
     /**
      * Get children node matching the given name.
      */
-    XWE_getChildNodeByName : function(parent, name) {
+    getChildNodeByName : function(parent, name) {
         var children = this.getChildren(parent);
         if (children != null) {
             for (var i = 0; i < children.length; i++) {
@@ -260,27 +268,30 @@ isc.XWEResultTree.addMethods({
      * This method looks for space nodes in the list and remove blacklisted space from the ResultTree.
      * See dataArrived() bellow.
      */
-    XWE_remove_blacklistedSpaces : function(nodes) {
+    remove_blacklistedSpaces : function(nodes) {
         for (var i = 0; i < nodes.length; i++) {
             var currentDS = this.getNodeDataSource(nodes[i]);
-            if (currentDS.XWE_recordsType == "space") {
-                if (this.XWE_blacklistedSpaces != "" && this.XWE_blacklistedSpaces[nodes[i].name] == true) {
+            if (currentDS.recordsType == "space") {
+                if (this.blacklistedSpaces != "" && this.blacklistedSpaces[nodes[i].name] == true) {
                     this.remove(nodes[i]);
                 }
             }
         }
     },
 
-    XWE_addAddPageNode : function(node) {
+    addAddPageNode : function(node) {
         var newNode = {
-            id: node.id + "_AddPage",
+            id: node.id + isc.XWEResultTree.constants.addNodeSuffix,
             wiki: node.wiki,
             space: node.space,
-            title: "New page ...",
+            title: isc.XWEResultTree.constants.addPageTitle,
             parentId: node.id,
             parent: node.fullName,
             icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
-            resource: node.resource
+            resource: node.resource,
+            isNewPage: true,
+            isNewAttachment: false,
+            clickCallback: function(viewer, node, recordNum) { viewer.input.value = '' }
         };
 
         // Determine node position in the children list.
@@ -296,16 +307,19 @@ isc.XWEResultTree.addMethods({
         this.add(newNode, node, index);
     },
 
-    XWE_addAddAttachmentsNode : function(node) {
+    addAddAttachmentsNode : function(node) {
         var newNode = {
-            id: node.id + "_AddAttachment",
+            id: node.id + isc.XWEResultTree.constants.addNodeSuffix,
             wiki: node.wiki,
             space: node.space,
-            title: "Upload file ...",
+            title: isc.XWEResultTree.constants.addAttachmentTitle,
             parentId: node.id,
             parent: node.fullName,
             icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
-            resource: node.resource
+            resource: node.resource,
+            isNewPage: false,
+            isNewAttachment: true,
+            clickCallback: function(viewer, node, recordNum) { viewer.input.value = '' }
         };
 
         // Determine node position in the children list.
@@ -327,7 +341,7 @@ isc.XWEResultTree.addMethods({
      *  - or if displayAttachmentsWhenEmpty is set to true.
      * See dataArrived() bellow.
      */
-    XWE_addAttachmentsNode : function(node) {
+    addAttachmentsNode : function(node) {
         var hasAttachments = false;
         var nodeDS = this.getNodeDataSource(node);
 
@@ -350,7 +364,7 @@ isc.XWEResultTree.addMethods({
         if (hasAttachments == true) {
 
             // Create attachments container node title.
-            var title = "Attachments (" + node.name + ")";
+            var title = isc.XWEResultTree.constants.attachmentsTitle + " (" + node.name + ")";
             if (this.displayLinks == true) {
                 title = "<a href='" + node.xwikiUrl + XWiki.constants.docextraAttachmentsAnchor + "'>"
                         + title + "</a>"
@@ -369,7 +383,9 @@ isc.XWEResultTree.addMethods({
                 xwikiRelativeURL: node.xwikiRelativeURL + XWiki.constants.docextraAttachmentsAnchor,
                 icon: "$xwiki.getSkinFile('icons/silk/page_white_zip.gif')",
                 resource: XWiki.getResource(node.id + XWiki.constants.docextraAttachmentsAnchor),
-                isXWikiAttachment: true
+                isXWikiAttachment: true,
+                isNewPage: false,
+                isNewAttachment: false
             };
 
             // Determine attachments node position in the children list.
@@ -425,8 +441,8 @@ isc.XWEDataSource.addProperties({
     /*
      * XWiki Explorer (XWE) per-DataSource type (will be overriden) options.
      */
-    XWE_recordsType :  "wiki",
-    XWE_icon : "$xwiki.getSkinFile('icons/silk/database.gif')",
+    recordsType :  "wiki",
+    icon : "$xwiki.getSkinFile('icons/silk/database.gif')",
 
     /**
      * Properties passed to the RPCManager when request are performed.
@@ -469,8 +485,8 @@ isc.XWEWikiDataSource.addProperties({
         { name:"title", type: "text" },
         { name:"xwikiUrl", type: "text" }
     ],
-    XWE_recordsType : "space",
-    XWE_icon : "$xwiki.getSkinFile('icons/silk/folder.gif')"
+    recordsType : "space",
+    icon : "$xwiki.getSkinFile('icons/silk/folder.gif')"
 });
 
 isc.XWEWikiDataSource.addMethods({
@@ -511,8 +527,8 @@ isc.XWESpaceDataSource.addProperties({
         { name:"link", propertiesOnly: true },
         { name:"parent", required: true, type: "text", foreignKey: "fullName" }
     ],
-    XWE_recordsType : "page",
-    XWE_icon : "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
+    recordsType : "page",
+    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
 });
 
 isc.XWESpaceDataSource.addMethods({
@@ -562,8 +578,8 @@ isc.XWEPageDataSource.addProperties({
         { name:"parent", required: true, type: "text" },
         { name:"link", propertiesOnly: true }
     ],
-    XWE_recordsType : "page",
-    XWE_icon : "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
+    recordsType : "page",
+    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
 });
 
 isc.XWEPageDataSource.addMethods({
@@ -601,8 +617,8 @@ isc.XWEAttachmentsDataSource.addProperties({
         { name:"title", type: "text" },
         { name:"xwikiUrl", type: "text" }
     ],
-    XWE_recordsType : "attachment",
-    XWE_icon : "$xwiki.getSkinFile('icons/silk/attach.gif')"
+    recordsType : "attachment",
+    icon : "$xwiki.getSkinFile('icons/silk/attach.gif')"
 });
 
 isc.XWEAttachmentsDataSource.addMethods({
@@ -630,7 +646,7 @@ isc.XWETreeGrid.addProperties({
     autoFetchData : true, // Load data automatically on node opening.
     // Callbacks:
     nodeClick : function(viewer, node, recordNum) {
-        this.XWE_nodeClickCallback(viewer, node, recordNum)
+        this.nodeClickCallback(viewer, node, recordNum)
     },
     // Style:
     showHeader: false, // Hide the sort header.
@@ -667,7 +683,7 @@ isc.XWETreeGrid.addMethods({
 
         // Create suggest input.
         if (typeof this.input == "undefined" || this.input == null) {
-            this.XWE_drawInput();
+            this.drawInput();
         }
 
         // Propagate XWE ResultTree display options (displayLinks, etc) to the ResultTree.
@@ -700,12 +716,12 @@ isc.XWETreeGrid.addMethods({
      * @param nodeId id of the node to open.
      * @param fireCallback if true this method will call inputObserver back after loading completion.
      */
-    XWE_openNode : function (rt, nodeId, fireCallback) {
+    openNode : function (rt, nodeId, fireCallback) {
         // Callback the calls xwikiExplorerObserver again when a node has been opened.
         var daCallback = {
             treeId : this.getID(),
             callback : function() {
-                window[this.treeId].XWE_openNodesFromInput();
+                window[this.treeId].openNodesFromInput();
             }
         };
 
@@ -723,17 +739,22 @@ isc.XWETreeGrid.addMethods({
             }
 
             // Select node
-            this.deselectAllRecords();
-            this.selectRecord(node);
-            // Scroll to the newly selected node
-            nodeYPos = this.getFocusRow() * this.getRowHeight();
-            this.body.scrollTo(this.body.getScrollLeft(), nodeYPos);
+            this.selectNodeAndScroll(node);
 
             // Return the node object if it is already opened
             return node;
         }
 
         return null;
+    },
+
+
+    selectNodeAndScroll : function(node) {
+        this.deselectAllRecords();
+        this.selectRecord(node);
+        // Scroll to the newly selected node
+        nodeYPos = this.getFocusRow() * this.getRowHeight();
+        this.body.scrollTo(this.body.getScrollLeft(), nodeYPos);
     },
 
 
@@ -744,7 +765,7 @@ isc.XWETreeGrid.addMethods({
      * @param rt XWEResultTree.
      * @param resource Object representing a XWiki resource (see XWiki.getResource()).
      */
-    XWE_openParent : function(rt, resource) {
+    openParent : function(rt, resource) {
         if (resource.name != "") {
             // Look for the parent/child relationship in the cache.
             if (rt.parentMap[resource.prefixedFullName] == null) {
@@ -763,10 +784,17 @@ isc.XWETreeGrid.addMethods({
                         rt.parentMap[resource.prefixedFullName] = parentRes;
                         if (rt.findById(parentRes.prefixedFullName) != null) {
                             // The node exists, open it.
-                            this.XWE_openNode(rt, parentRes.prefixedFullName, true);
+                            this.openNode(rt, parentRes.prefixedFullName, true);
                         } else {
                             // The node does not exist, call the openParent method again with the parent we've found.
-                            this.XWE_openParent(rt, parentRes);
+                            this.openParent(rt, parentRes);
+                        }
+                    } else {
+                        if (this.displayAddPage == true) {                            
+                            var addPageNode = this.getData().findById(resource.prefixedSpace 
+                                                                      + isc.XWEResultTree.constants.addNodeSuffix);
+                            addPageNode.resource = resource;
+                            this.selectNodeAndScroll(addPageNode);
                         }
                     }
                 }.bind(this);
@@ -777,10 +805,10 @@ isc.XWETreeGrid.addMethods({
                 var parentRes = rt.parentMap[resource.prefixedFullName];
                 if (rt.findById(parentRes.prefixedFullName) != null) {
                     // The node exists, open it.
-                    this.XWE_openNode(rt, parentRes.prefixedFullName, true);
+                    this.openNode(rt, parentRes.prefixedFullName, true);
                 } else {
                     // The node does not exist, call the openParent method again with the parent we've found.
-                    this.XWE_openParent(rt, parentRes);
+                    this.openParent(rt, parentRes);
                 }
             }
         }
@@ -796,7 +824,7 @@ isc.XWETreeGrid.addMethods({
      *
      * With the value "xwiki:Main.RecentChanges@lquo.gif", nodes "xwiki", "Main", "WebHome" and "lquo.gif" will be opened.
      */
-    XWE_openNodesFromInput : function() {
+    openNodesFromInput : function() {
 
         // Build resource, selectedResource and get XWEResultTree.
         var resource = XWiki.getResource(this.input.value);
@@ -810,7 +838,7 @@ isc.XWETreeGrid.addMethods({
 
         // Open wiki node if the tree is displaying multiple wikis.
         if (this.wiki == "all" && selectedRes.wiki != resource.wiki) {
-            var wikiNode = this.XWE_openNode(rt, resource.wiki, true);
+            var wikiNode = this.openNode(rt, resource.wiki, true);
             if (wikiNode == null) {
                 return;
             }
@@ -818,7 +846,7 @@ isc.XWETreeGrid.addMethods({
 
         // Open space node.
         if (resource.prefixedSpace != "" && selectedRes.prefixedSpace != resource.prefixedSpace) {
-            var spaceNode = this.XWE_openNode(rt, resource.prefixedSpace, true);
+            var spaceNode = this.openNode(rt, resource.prefixedSpace, true);
             if (spaceNode == null) {
                 return;
             }
@@ -826,28 +854,28 @@ isc.XWETreeGrid.addMethods({
 
         // Open page node.
         if (selectedRes.prefixedFullName != resource.prefixedFullName) {
-            var pageNode = this.XWE_openNode(rt, resource.prefixedFullName, true);
+            var pageNode = this.openNode(rt, resource.prefixedFullName, true);
             if (pageNode == null) {
                 // Pages are a bit complex since their representation is flat within a space but they are
                 // organized in a tree here (parent/child relationships). We must manualy try to get the page
                 // REST representation and if that page exist we must climb the tree until we find an already
                 // loaded node. When this node is found we must go down the tree and open all the node we've
                 // found in between.
-                this.XWE_openParent(rt, resource);
+                this.openParent(rt, resource);
             }
         }
 
         // Open attachment node.
         if (selectedRes.attachment != resource.attachment) {
             var attachmentsNodeName = resource.prefixedFullName + XWiki.constants.docextraAttachmentsAnchor;
-            var attachmentsNode = this.XWE_openNode(rt, attachmentsNodeName, true);
+            var attachmentsNode = this.openNode(rt, attachmentsNodeName, true);
             if (attachmentsNode == null) {
                 return;
             }
 
             // Open attachment node, attachments are leafs of our tree so this opening doesn't have to trigger a callback.
             var attachmentNodeName = resource.prefixedFullName + XWiki.constants.pageAttachmentSeparator + resource.attachment;
-            var attachmentNode = this.XWE_openNode(rt, attachmentNodeName, false);
+            var attachmentNode = this.openNode(rt, attachmentNodeName, false);
         }
 
         return;
@@ -857,17 +885,17 @@ isc.XWETreeGrid.addMethods({
      * This method is called every 2s to check if the user has modified the input.
      * If so we try to open the corresponding nodes with openNodesFromInput().
      */
-    XWE_inputObserver : function() {
+    inputObserver : function() {
         var inputValue = this.input.value;
         // If the value of the input has changed during the last 2s.
         if (inputValue != "" && inputValue != this.inputValueCache) {
             // Open nodes.
-            this.XWE_openNodesFromInput();
+            this.openNodesFromInput();
             // Set the cache to the new value.
             this.inputValueCache = inputValue;
         }
         // Indefinitely recall this method every 2s.
-        setTimeout(this.XWE_inputObserver.bind(this), 2000);
+        setTimeout(this.inputObserver.bind(this), 2000);
     },
 
     /**
@@ -875,7 +903,7 @@ isc.XWETreeGrid.addMethods({
      * The modifications on this input will be observed and the resource entered in the input,
      * like Main.Dashboard for example, will be opened in the tree.
      */
-    XWE_drawInput : function() {
+    drawInput : function() {
 
         // Add input to the document
         var type = (this.displaySuggest == false) ? "hidden" : "text";
@@ -928,7 +956,7 @@ isc.XWETreeGrid.addMethods({
             var daCallback = {
                 treeId : this.getID(),
                 callback : function() {
-                    window[this.treeId].XWE_inputObserver();
+                    window[this.treeId].inputObserver();
                 }
             };
 
@@ -939,27 +967,31 @@ isc.XWETreeGrid.addMethods({
     /**
      * Callback modifying the input value with the id (prefixedFullName) of the clicked node.
      */
-    XWE_nodeClickCallback : function(viewer, node, recordNum) {
-        if (this.wiki == "all") {
-            this.input.value = node.id;
+    nodeClickCallback : function(viewer, node, recordNum) {
+        if (node.clickCallback == null) {
+            if (this.wiki == "all") {
+                this.input.value = node.id;
+            } else {
+                var resId = node.id;
+                resId = resId.substring(resId.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, resId.length);
+                this.input.value = resId;
+            }
         } else {
-            var resId = node.id;
-            resId = resId.substring(resId.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, resId.length);
-            this.input.value = resId;
+            node.clickCallback(viewer, node, recordNum);
         }
     },
 
     /**
      * Get the fullName of the resource selected in the tree.
      */
-    XWE_setValue : function(value) {
+    setValue : function(value) {
         this.input.value = value;
     },
 
     /**
      * Get the fullName of the resource selected in the tree.
      */
-    XWE_getValue : function() {
+    getValue : function() {
         return this.input.value;
     },
 
@@ -967,7 +999,7 @@ isc.XWETreeGrid.addMethods({
      * Get the URL of the resource selected in the tree.
      * Empty string if none selected.
      */
-    XWE_getSelectedUrl : function() {
+    getSelectedUrl : function() {
         return this.getSelectedRecord().xwikiRelativeUrl;
     },
 
@@ -975,7 +1007,7 @@ isc.XWETreeGrid.addMethods({
      * Get the wiki of the resource selected in the tree.
      * Empty string if none selected.
      */
-    XWE_getSelectedWiki : function() {
+    getSelectedWiki : function() {
         return this.getSelectedRecord().resource["wiki"];
     },
 
@@ -983,7 +1015,7 @@ isc.XWETreeGrid.addMethods({
      * Get the space of the resource selected in the tree.
      * Empty string if none selected.
      */
-    XWE_getSelectedSpace : function() {
+    getSelectedSpace : function() {
         return this.getSelectedRecord().resource["space"];
     },
 
@@ -991,7 +1023,7 @@ isc.XWETreeGrid.addMethods({
      * Get the name (page name) of the resource selected in the tree.
      * Empty string if none selected.
      */
-    XWE_getSelectedPage : function() {
+    getSelectedPage : function() {
         return this.getSelectedRecord().resource["name"];
     },
 
@@ -999,7 +1031,7 @@ isc.XWETreeGrid.addMethods({
      * Get the attachment name of the resource selected in the tree.
      * Empty string if none selected.
      */
-    XWE_getSelectedAttachment : function() {
+    getSelectedAttachment : function() {
         return this.getSelectedRecord().resource["attachment"];
     },
 
@@ -1007,7 +1039,21 @@ isc.XWETreeGrid.addMethods({
      * Get the anchor of the resource selected in the tree.
      * Empty string if none selected.
      */
-    XWE_getSelectedAnchor : function() {
+    getSelectedAnchor : function() {
         return this.getSelectedRecord().resource["anchor"];
+    },
+
+    /**
+     * Is the selected resource a new page.
+     */
+    isNewPage : function() {
+        return this.getSelectedRecord().isNewPage;
+    },
+
+    /**
+     * Is the selected resource a new attachment.
+     */
+    isNewAttachment : function() {
+        return this.getSelectedRecord().isNewAttachment;
     }
 });

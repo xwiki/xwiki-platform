@@ -2,7 +2,7 @@
 .input|xwiki/2.0
 .# Verify that internal link syntax is escaped
 .#---------------------------------------------------------------------------------------------------------
-[[lab~>~>el>>refe~|~|rence||param=value]]
+[[lab~>>el~~>>refe~|~|rence||param=value]]
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -13,18 +13,19 @@ onWord [lab]
 onSpecialSymbol [>]
 onSpecialSymbol [>]
 onWord [el]
+onSpecialSymbol [~]
 endLink [Reference = [refe||rence]] [false] [[param]=[value]]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:refe~|~|rence--><span class="wikicreatelink"><a param="value" href="/xwiki/bin/view/refe||rence">lab&gt;&gt;el</a></span><!--stopwikilink--></p>
+<p><!--startwikilink:refe~|~|rence--><span class="wikicreatelink"><a param="value" href="/xwiki/bin/view/refe||rence">lab&gt;&gt;el~</a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-[[lab~>>el>>refe~|~|rence||param="value"]]
+[[lab~>~>el~~>>refe~|~|rence||param="value"]]
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:refe~|~|rence--><span class="wikicreatelink"><a param="value" href="/xwiki/bin/view/refe||rence">lab&gt;&gt;el</a></span><!--stopwikilink--></p></html>
+<html><p><!--startwikilink:refe~|~|rence--><span class="wikicreatelink"><a param="value" href="/xwiki/bin/view/refe||rence">lab&gt;&gt;el~</a></span><!--stopwikilink--></p></html>

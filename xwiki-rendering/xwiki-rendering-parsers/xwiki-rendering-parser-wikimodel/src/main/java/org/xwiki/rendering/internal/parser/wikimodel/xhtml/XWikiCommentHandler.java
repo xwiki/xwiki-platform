@@ -28,8 +28,8 @@ import org.wikimodel.wem.WikiReferenceParser;
 import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.wikimodel.wem.xwiki.XWikiReferenceParser;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
-import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
@@ -37,6 +37,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
@@ -60,8 +61,6 @@ public class XWikiCommentHandler extends CommentHandler
 
     private WikiReferenceParser referenceParser;
 
-    private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
-    
     /**
      * We're using a stack so that we can have nested comment handling. For example when we have a link to an image we
      * need nested comment support.
@@ -75,7 +74,6 @@ public class XWikiCommentHandler extends CommentHandler
         this.linkParser = linkParser;
         this.printRendererFactory = printRendererFactory;
         this.referenceParser = new XWikiReferenceParser();
-        this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
         this.imageParser = imageParser;
     }
 
@@ -129,22 +127,29 @@ public class XWikiCommentHandler extends CommentHandler
             (XWikiSyntaxRenderer) this.printRendererFactory
                 .createRenderer(new Syntax(SyntaxType.XWIKI, "2.0"), printer);
         XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.getStackParameter("xdomGeneratorListener");
-        listener.getXDOM().traverse(renderer);
+
+        renderer.beginDocument();
+        // We make sure we have the right states to have the right escaping but we want only the label so we can't
+        // simply traverse a LinkBlock
+        ((XWikiSyntaxListenerChain) renderer.getListenerChain()).getBlockStateChainingListener().pushLinkDepth();
+        for (Block block : listener.getXDOM().getChildren()) {
+            block.traverse(renderer);
+        }
+        renderer.endDocument();
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
-        WikiParameters params = (WikiParameters) stack.getStackParameter("linkParameters");
         String linkComment = this.commentContentStack.pop();
         if (isFreeStandingLink) {
             stack.getScannerContext().onReference(linkComment);
         } else {
-            String label = this.xwikiSyntaxLinkRenderer.escapeContent(printer.toString());
-                
-            WikiReference wikiReference =
-                this.referenceParser.parse((label.length() > 0 ? label + ">>" : "")
-                    + linkComment + (params.getSize() > 0 ? "||" + params.toString() : ""));
+            String label = printer.toString();
+            String reference = linkComment;
+            WikiParameters params = (WikiParameters) stack.getStackParameter("linkParameters");
 
-            /*WikiReference wikiReference =
-                new WikiReference(linkComment, printer.toString(), WikiParameters.newWikiParameters(params.toString()));*/
+            WikiReference wikiReference =
+                this.referenceParser.parse((label.length() > 0 ? label + ">>" : "") + reference
+                    + (params.getSize() > 0 ? "||" + params.toString() : ""));
+
             stack.getScannerContext().onReference(wikiReference);
         }
 

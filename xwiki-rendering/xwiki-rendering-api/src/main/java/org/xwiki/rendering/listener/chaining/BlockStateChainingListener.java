@@ -219,6 +219,16 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         return this.listItemIndex;
     }
 
+    public void pushLinkDepth()
+    {
+        ++this.linkDepth;
+    }
+
+    public void popLinkDepth()
+    {
+        --this.linkDepth;
+    }
+
     public int getLinkDepth()
     {
         return this.linkDepth;

@@ -1868,7 +1868,7 @@ Your account on $wikiname has been successfully activated. You can now login at 
 ## protected. In addition it makes the login redirect to the feeds page in some cases.
 #if($doc.fullName != "XWiki.XWikiLogin")
 &lt;link rel="alternate" type="application/rss+xml" title="Wiki Feed RSS" href="$xwiki.getURL('Main.WebRss', 'view', 'xpage=rdf')" /&gt;
-&lt;link rel="alternate" type="application/rss+xml" title="Blog RSS Feed" href="$xwiki.getURL('Main.BlogRss', 'view', 'xpage=rdf')" /&gt;
+&lt;link rel="alternate" type="application/rss+xml" title="Blog RSS Feed" href="$xwiki.getURL('Blog.GlobalBlogRss', 'view', 'xpage=plain')" /&gt;
 #end</meta>
 </property>
 <property>

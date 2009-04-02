@@ -1,0 +1,61 @@
+.#---------------------------------------------------------------------------------------------------------
+.input|xhtml/1.0
+.# Verify that standalone block elements inside inline elements are rendered using embedded document syntax
+.#---------------------------------------------------------------------------------------------------------
+<html><table><tr><th><p>head1</p><p>head2</p></th></tr><tr><td><ul><li>item</li></ul></td></tr></table><ul><li><table><tr><td>cell</td></tr></table></li></ul></html>
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginTable
+beginTableRow
+beginTableHeadCell
+beginDocument
+beginParagraph
+onWord [head1]
+endParagraph
+beginParagraph
+onWord [head2]
+endParagraph
+endDocument
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableCell
+beginDocument
+beginList [BULLETED]
+beginListItem
+onWord [item]
+endListItem
+endList [BULLETED]
+endDocument
+endTableCell
+endTableRow
+endTable
+beginList [BULLETED]
+beginListItem
+beginDocument
+beginTable
+beginTableRow
+beginTableCell
+onWord [cell]
+endTableCell
+endTableRow
+endTable
+endDocument
+endListItem
+endList [BULLETED]
+endDocument
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+|=(((head1
+
+head2)))
+|(((* item)))
+
+* (((|cell)))
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<table><tr><th><div class="xwiki-document"><p>head1</p><p>head2</p></div></th></tr><tr><td><div class="xwiki-document"><ul><li>item</li></ul></div></td></tr></table><ul><li><div class="xwiki-document"><table><tr><td>cell</td></tr></table></div></li></ul>

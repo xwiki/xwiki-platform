@@ -29,6 +29,7 @@ import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.wikimodel.wem.xwiki.XWikiReferenceParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
+import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
@@ -59,6 +60,8 @@ public class XWikiCommentHandler extends CommentHandler
 
     private WikiReferenceParser referenceParser;
 
+    private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
+    
     /**
      * We're using a stack so that we can have nested comment handling. For example when we have a link to an image we
      * need nested comment support.
@@ -72,6 +75,7 @@ public class XWikiCommentHandler extends CommentHandler
         this.linkParser = linkParser;
         this.printRendererFactory = printRendererFactory;
         this.referenceParser = new XWikiReferenceParser();
+        this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
         this.imageParser = imageParser;
     }
 
@@ -133,9 +137,14 @@ public class XWikiCommentHandler extends CommentHandler
         if (isFreeStandingLink) {
             stack.getScannerContext().onReference(linkComment);
         } else {
+            String label = this.xwikiSyntaxLinkRenderer.escapeContent(printer.toString());
+                
             WikiReference wikiReference =
-                this.referenceParser.parse((printer.toString().length() > 0 ? printer.toString() + ">>" : "")
+                this.referenceParser.parse((label.length() > 0 ? label + ">>" : "")
                     + linkComment + (params.getSize() > 0 ? "||" + params.toString() : ""));
+
+            /*WikiReference wikiReference =
+                new WikiReference(linkComment, printer.toString(), WikiParameters.newWikiParameters(params.toString()));*/
             stack.getScannerContext().onReference(wikiReference);
         }
 

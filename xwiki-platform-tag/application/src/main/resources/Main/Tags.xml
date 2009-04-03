@@ -210,12 +210,12 @@ $xwiki.ssx.use("Main.Tags")
 ##
 ## Set application variables (action and tag) from URL parameters.
 ##
-#set($action = $request.get("action"))
-#if("$!action" == "")
-  #set($action = "")
-#else  
+#set($do = $request.get("do"))
+#if("$!do" == "")
+  #set($do = "")
+#else
   #set($tag = $request.get("tag"))
-  ## If the action is related to a tag (view, rename or delete) 
+  ## If the action is related to a tag (view, rename or delete)
   ## but this tag is not set in the request, fallback on cloud.
   #if("$!tag" == "")
     #set($tag = "")
@@ -229,11 +229,13 @@ $xwiki.ssx.use("Main.Tags")
     &lt;span&gt;
       &lt;a href="$doc.getURL("view")"&gt;$msg.get("xe.tag.tags")&lt;/a&gt;
       #if("$!tag" != "")
-        / 
+        /
       &lt;span class="highlight tag"&gt;
-        &lt;a href="$doc.getURL("view", "action=viewTag&amp;amp;tag=${tag}")"&gt;$tag&lt;/a&gt;   
-        #if($xwiki.hasAdminRights() &amp;&amp; $displayButtons) 
-          &lt;a href="$doc.getURL("view", "action=prepareRename&amp;amp;tag=${tag}")" class="button rename"&gt;Rename&lt;/a&gt;&amp;nbsp;&lt;a href="$doc.getURL("view", "action=prepareDelete&amp;amp;tag=${tag}")" class="button delete"&gt;Delete&lt;/a&gt;
+
+        &lt;a href="$doc.getURL("view", "do=viewTag&amp;amp;tag=${tag}")"&gt;$tag&lt;/a&gt;
+        #if($xwiki.hasAdminRights() &amp;&amp; $displayButtons)
+          &lt;a href="$doc.getURL("view", "do=prepareRename&amp;amp;tag=${tag}")" class="button rename"&gt;Rename&lt;/a&gt;&amp;nbsp;&lt;a href="$doc.getURL("view", "do=prepareDelete&amp;amp;tag=${tag}")" class="button delete"&gt;Delete&lt;/a&gt;
+
         #end
       &lt;/span&gt;
      #end
@@ -244,42 +246,42 @@ $xwiki.ssx.use("Main.Tags")
 ## Switch between all possible actions:
 ## viewTag, prepareRename, rename, prepareDelete, delete, default (Tag cloud)
 ##
-#if($action == "viewTag")
+#if($do == "viewTag")
   ##
   ## View tag
-  ##  
+  ##
   #displayTagAppTitle($tag true)
   #if("$!request.get('renamedTag')" != "")
     #info("$msg.get('xe.tag.rename.success', [$request.get('renamedTag')])")
-  #end 
+  #end
   #set ($list = $xwiki.tag.getDocumentsWithTag($tag))
   &lt;div&gt;
     &lt;div id="dashboardleft" style="float:left; width: 44.9%;"&gt;
-      &lt;div style="padding-right:20px;"&gt;      
-        &lt;h3 class="xapp"&gt;$msg.get("xe.tag.alldocs", [$tag])&lt;/span&gt;&lt;/h3&gt;        
+      &lt;div style="padding-right:20px;"&gt;
+        &lt;h3 class="xapp"&gt;$msg.get("xe.tag.alldocs", [$tag])&lt;/span&gt;&lt;/h3&gt;
         #displayDocumentList($list true $blacklistedSpaces)
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;div id="dashboardright" style="float:left; width: 55.1%;"&gt;
       &lt;div style="padding-left: 20px;"&gt;
-        &lt;h3 class="xapp"&gt;$msg.get("xe.tag.recentchanges", [$tag])&lt;/span&gt;&lt;/h3&gt;      
+        &lt;h3 class="xapp"&gt;$msg.get("xe.tag.recentchanges", [$tag])&lt;/span&gt;&lt;/h3&gt;
         #set($rcTag = [$tag])
         #includeInContext('Main.RecentChanges')
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div style="clear:both; margin-bottom: 40px;"&gt;&lt;!-- --&gt;&lt;/div&gt;
-&lt;/div&gt;  
-#elseif($action == "prepareRename")
+&lt;/div&gt;
+#elseif($do == "prepareRename")
   ##
   ## Prepare rename tag
   ##
   #displayTagAppTitle($tag false)
   &lt;form id="renameForm" action="no-follow" method="post"&gt;
-    &lt;input name="action" type="hidden" value="renameTag" /&gt;
+    &lt;input name="do" type="hidden" value="renameTag" /&gt;
     &lt;input name="tag" type="hidden" value="$tag" /&gt;
     $msg.get("xe.tag.rename.renameto", [$tag]) &lt;input type="text" name="renameTo" /&gt; &lt;input type="submit" value="$msg.get("xe.tag.rename")" onclick="$('renameForm').action='$doc.getURL("view")'; return true;" /&gt;
   &lt;/form&gt;
-#elseif($action == "renameTag")
+#elseif($do == "renameTag")
   ##
   ## Rename tag
   ##
@@ -289,24 +291,24 @@ $xwiki.ssx.use("Main.Tags")
     #set($success = $xwiki.tag.renameTag($tag, $renameTo))
   #end
   #if ($success == true)
-    $response.sendRedirect($doc.getURL("view", "action=viewTag&amp;tag=${renameTo}&amp;renamedTag=${tag}"))
+    $response.sendRedirect($doc.getURL("view", "do=viewTag&amp;tag=${renameTo}&amp;renamedTag=${tag}"))
   #else
     #error("$msg.get('xe.tag.renane.failure', [$tag, $renameTo])")
   #end
-#elseif($action == "prepareDelete")
+#elseif($do == "prepareDelete")
   ##
   ## Prepare delete tag
   ##
   #displayTagAppTitle($tag false)
   &lt;form id="deleteForm" action="no-follow" method="post"&gt;
-    &lt;input name="action" type="hidden" value="deleteTag" /&gt;
+    &lt;input name="do" type="hidden" value="deleteTag" /&gt;
     &lt;input name="tag" type="hidden" value="$tag" /&gt;
     &lt;input type="submit" value="$msg.get("xe.tag.delete", [$tag])" onclick="$('deleteForm').action='$doc.getURL("view")'; return true;" /&gt;
   &lt;/form&gt;
-#elseif($action == "deleteTag")
+#elseif($do == "deleteTag")
   ##
   ## Delete tag
-  ##  
+  ##
   #set($success = $xwiki.tag.deleteTag($tag))
   #if ($success == true)
     $response.sendRedirect($doc.getURL("view", "deletedTag=${tag}"))
@@ -323,7 +325,7 @@ $xwiki.ssx.use("Main.Tags")
   #if("$!request.get('deletedTag')" != "")
     #info("$msg.get('xe.tag.delete.success', [$request.get('deletedTag')])")
   #end
-  #set($docextras = [])  
-  #includeInContext("XWiki.TagCloud")  
+  #set($docextras = [])
+  #includeInContext("XWiki.TagCloud")
 #end</content>
 </xwikidoc>

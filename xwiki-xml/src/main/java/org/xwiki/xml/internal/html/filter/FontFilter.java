@@ -19,6 +19,7 @@
  */
 package org.xwiki.xml.internal.html.filter;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,26 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 public class FontFilter extends AbstractHTMLFilter
 {
     /**
+     * A map holding the translation from 'size' attribute of html font tag to 'font-size' css property. 
+     */
+    private Map<String, String> fontSizeMap;
+    
+    /**
+     * Constructs a {@link FontFilter}.
+     */
+    public FontFilter()
+    {
+        fontSizeMap = new HashMap<String, String>();
+        fontSizeMap.put("1", "8");
+        fontSizeMap.put("2", "10");
+        fontSizeMap.put("3", "12");
+        fontSizeMap.put("4", "14");
+        fontSizeMap.put("5", "18");
+        fontSizeMap.put("6", "24");
+        fontSizeMap.put("7", "36");
+    }
+    
+    /**
      * {@inheritDoc}
      * 
      * <p>The {@link FontFilter} does not use any cleaningParameters passed in.</p>
@@ -50,10 +71,13 @@ public class FontFilter extends AbstractHTMLFilter
                 buffer.append(String.format("color:%s;", fontTag.getAttribute(ATTRIBUTE_FONTCOLOR)));
             }
             if (fontTag.hasAttribute(ATTRIBUTE_FONTFACE)) {
-                buffer.append(String.format("font-family=%s;", fontTag.getAttribute(ATTRIBUTE_FONTFACE)));
+                buffer.append(String.format("font-family:%s;", fontTag.getAttribute(ATTRIBUTE_FONTFACE)));
             }
             if (fontTag.hasAttribute(ATTRIBUTE_FONTSIZE)) {
-                buffer.append(String.format("font-size=%spt;", fontTag.getAttribute(ATTRIBUTE_FONTSIZE)));
+                String fontSize = fontTag.getAttribute(ATTRIBUTE_FONTSIZE);
+                String fontSizeCss = fontSizeMap.get(fontSize);
+                fontSizeCss = (fontSizeCss != null) ? fontSizeCss : fontSize;
+                buffer.append(String.format("font-size:%spt;", fontSizeCss));
             }
             if (fontTag.hasAttribute(ATTRIBUTE_STYLE)) {
                 buffer.append(fontTag.getAttribute(ATTRIBUTE_STYLE));

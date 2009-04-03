@@ -19,31 +19,32 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.wizard;
 
+import java.util.ArrayList;
+
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
+
 /**
- * Navigation events listener.
+ * A collection of {@link NavigationListener} to be used by {@link SourcesNavigationEvents} to manage the list of
+ * listeners.
  * 
  * @version $Id$
  */
-public interface NavigationListener
+public class NavigationListenerCollection extends ArrayList<NavigationListener>
 {
     /**
-     * The navigation directions defined by this wizard.
-     * 
-     * @version $Id$
+     * Field required by all {@link java.io.Serializable} classes.
      */
-    public static enum NavigationDirection
-    {
-        /**
-         * The navigation directions defined by this wizard: cancel the whole wizard, go to previous step, go to next
-         * step and finish the whole wizard.
-         */
-        CANCEL, PREVIOUS, NEXT, FINISH
-    };
+    private static final long serialVersionUID = 3437895315610766686L;
 
     /**
-     * Triggered when a navigation event takes place.
+     * Fires a navigation event for all listeners in the collection.
      * 
-     * @param direction the direction of the navigation event
+     * @param direction the direction of the fired navigation event
      */
-    void onDirection(NavigationDirection direction);
+    public void fireNavigationEvent(NavigationDirection direction)
+    {
+        for (NavigationListener listener : this) {
+            listener.onDirection(direction);
+        }
+    }
 }

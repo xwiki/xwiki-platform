@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
@@ -54,115 +52,30 @@ public final class LinkHTMLGenerator
     }
 
     /**
-     * Generates link to an external url (web page or email address).
+     * Generates the link HTML block corresponding to the specified link configuration data.
      * 
-     * @param label link label
-     * @param externalURL external url to link to
-     * @return the html link block.
+     * @param config the link configuration data
+     * @return the String representing the link HTML block for the passed configuration data
      */
-    public String getExternalLink(String label, String externalURL)
+    public String getLinkHTML(LinkConfig config)
     {
-        return createLinkHTML(externalURL, "wikiexternallink", externalURL, label);
-    }
-
-    /**
-     * Generates link to a new wiki page.
-     * 
-     * @param label link label
-     * @param wikiName wiki of the targeted page
-     * @param spaceName space of the targeted page
-     * @param pageName name of the targeted page
-     * @param async callback to handle async call on the caller side
-     * @return the html link block.
-     */
-    public String getNewPageLink(final String label, final String wikiName, final String spaceName,
-        final String pageName, final AsyncCallback<String> async)
-    {
-        WysiwygService.Singleton.getInstance().getPageLink(wikiName, spaceName, pageName, null, null,
-            new AsyncCallback<LinkConfig>()
-            {
-                public void onFailure(Throwable t)
-                {
-                    async.onFailure(t);
-                }
-
-                public void onSuccess(LinkConfig result)
-                {
-                    String link =
-                        createLinkHTML(getWikiPageReference(result), "wikicreatelink", result.getUrl(), label);
-                    async.onSuccess(link);
-                }
-            });
-        return "";
-    }
-
-    /**
-     * Generates link to an existing page.
-     * 
-     * @param label link label
-     * @param wikiName wiki of the targeted page
-     * @param spaceName space of the targeted page
-     * @param pageName name of the targeted page
-     * @param revision version of the page to link to
-     * @param anchor anchor in the page to link to
-     * @param async callback to handle async call on the caller side
-     * @return the html link block.
-     */
-    public String getExistingPageLink(final String label, final String wikiName, final String spaceName,
-        final String pageName, String revision, String anchor, final AsyncCallback<String> async)
-    {
-        WysiwygService.Singleton.getInstance().getPageLink(wikiName, spaceName, pageName, revision, anchor,
-            new AsyncCallback<LinkConfig>()
-            {
-                public void onFailure(Throwable t)
-                {
-                    // pass it further
-                    async.onFailure(t);
-                }
-
-                public void onSuccess(LinkConfig result)
-                {
-                    String link = createLinkHTML(getWikiPageReference(result), "wikilink", result.getUrl(), label);
-                    async.onSuccess(link);
-                }
-            });
-        return "";
-    }
-
-    /**
-     * Builds the reference of a wiki link, from the link data as returned by the server.
-     * 
-     * @param config the link data, as returned by the server
-     * @return the wiki page reference, created from the returned data
-     */
-    private String getWikiPageReference(LinkConfig config)
-    {
-        String url = config.getUrl();
-        int paramsIndex = url.indexOf('?');
-        int hashIndex = url.indexOf('#');
-        // If the hash index is to the left of the qm index or the qm index is negative, copy from hash
-        if ((hashIndex < paramsIndex && hashIndex >= 0) || (paramsIndex < 0)) {
-            paramsIndex = hashIndex;
+        String spanClass = "";
+        switch (config.getType()) {
+            case WIKIPAGE:
+                spanClass = "wikilink";
+                break;
+            case NEW_WIKIPAGE:
+                spanClass = "wikicreatelink";
+                break;
+            case EMAIL:
+            case EXTERNAL:
+            default:
+                spanClass = "wikiexternallink";
         }
-        String params = "";
-        if (paramsIndex > 0) {
-            params = url.substring(paramsIndex);
-        }
-
-        return (!StringUtils.isEmpty(config.getWiki()) ? config.getWiki() + ":" : "") + config.getSpace() + "."
-            + config.getPage() + params;
-    }
-
-    /**
-     * @param linkReference the reference of the link to create
-     * @param wrappingSpanClassName the value of the class attribute of the wrapping span
-     * @param anchorHref the href of the link anchor
-     * @param label the label of the created link
-     * @return the link html, created for the specified parameters.
-     */
-    private String createLinkHTML(String linkReference, String wrappingSpanClassName, String anchorHref, String label)
-    {
-        return "<!--startwikilink:" + linkReference + "--><span class=\"" + wrappingSpanClassName + "\"><a href=\""
-            + anchorHref + "\">" + label + "</a></span><!--stopwikilink-->";
+        return "<!--startwikilink:" + config.getReference() + "--><span class=\"" + spanClass + "\"><a href=\""
+            + config.getUrl() + "\""
+            + (!StringUtils.isEmpty(config.getTooltip()) ? "title=\"" + config.getTooltip() + "\" " : "")
+            + (config.isOpenInNewWindow() ? "rel=\"__blank\" " : "") + ">" + config.getLabel()
+            + "</a></span><!--stopwikilink-->";
     }
 }

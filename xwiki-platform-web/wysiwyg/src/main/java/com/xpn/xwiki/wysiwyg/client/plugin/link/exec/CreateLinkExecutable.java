@@ -26,6 +26,7 @@ import org.xwiki.gwt.dom.client.Range;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
 
@@ -125,9 +126,7 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
             Node startComment = linkMetadata.getChildNodes().getItem(0);
             Element wrappingSpan = (Element) linkMetadata.getChildNodes().getItem(1);
             linkConfig.setType(parseLinkType(wrappingSpan, startComment.getNodeValue().substring(14)));
-            if (linkConfig.getType() == LinkType.NEW_PAGE || linkConfig.getType() == LinkType.EXISTING_PAGE) {
-                parseLinkReference(startComment.getNodeValue().substring(14), linkConfig);
-            }
+            linkConfig.setReference(startComment.getNodeValue().substring(14));
         } else {
             // it's an external link
             linkConfig.setType(LinkType.EXTERNAL);
@@ -136,27 +135,17 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
         linkConfig.setUrl(wrappingAnchor.getAttribute(HREF_ATTRIBUTE_NAME));
         linkConfig.setLabel(wrappingAnchor.getInnerHTML());
         linkConfig.setLabelText(wrappingAnchor.getInnerText());
+        // get the tooltip, if any, and the target
+        String linkTooltip = wrappingAnchor.getTitle();
+        if (!StringUtils.isEmpty(linkTooltip)) {
+            linkConfig.setTooltip(linkTooltip);
+        }
+        // check if the target is _blank
+        String relAttr = wrappingAnchor.getAttribute("rel");
+        if (!StringUtils.isEmpty(relAttr) && relAttr.equals("__blank")) {
+            linkConfig.setOpenInNewWindow(true);
+        }
         return linkConfig.toJSON();
-    }
-
-    /**
-     * Parses a link reference and extracts the reference components: the wiki, the space and the page name of the
-     * targeted page.
-     * 
-     * @param reference the reference to parse
-     * @param linkConfig the link config in which to store the extracted data
-     */
-    private void parseLinkReference(String reference, LinkConfig linkConfig)
-    {
-        int wikiSeparatorIndex = reference.indexOf(':');
-        int spaceSeparatorIndex = reference.indexOf('.');
-        if (wikiSeparatorIndex != -1) {
-            linkConfig.setWiki(reference.substring(0, wikiSeparatorIndex));
-        }
-        if (spaceSeparatorIndex != -1) {
-            linkConfig.setSpace(reference.substring(wikiSeparatorIndex + 1, spaceSeparatorIndex));
-        }
-        linkConfig.setPage(reference.substring(spaceSeparatorIndex + 1));
     }
 
     /**
@@ -170,10 +159,10 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
     {
         String wrappingSpanClass = wrappingSpan.getClassName();
         if (wrappingSpanClass.equals("wikilink")) {
-            return LinkType.EXISTING_PAGE;
+            return LinkType.WIKIPAGE;
         }
         if (wrappingSpanClass.equals("wikicreatelink")) {
-            return LinkType.NEW_PAGE;
+            return LinkType.NEW_WIKIPAGE;
         }
         if (wrappingSpanClass.equals("wikiexternallink") && reference.startsWith("mailto")) {
             return LinkType.EMAIL;

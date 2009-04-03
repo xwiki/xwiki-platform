@@ -36,28 +36,33 @@ import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 public class Wizard implements NavigationListener, PopupListener
 {
     /**
-     * The navigation directions defined by this wizard.
+     * Asynchronous callback adapter to handle the callback fails by displaying the error inside the dialog.
      * 
-     * @version $Id$
+     * @param <T> the return type of the callback
+     * @see AsyncCallback
      */
-    public static enum NavigationDirection
+    protected abstract class AbstractDefaultAsyncCallback<T> implements AsyncCallback<T>
     {
         /**
-         * The navigation directions defined by this wizard: cancel the whole wizard, go to previous step, go to next
-         * step and finish the whole wizard.
+         * {@inheritDoc}
+         * 
+         * @see AsyncCallback#onFailure(Throwable)
          */
-        CANCEL, PREVIOUS, NEXT, FINISH
-    };
+        public void onFailure(Throwable caught)
+        {
+            dialog.showError(caught);
+        }
+    }
 
     /**
      * The list of wizard listeners to be notified by this wizard on events.
      */
-    protected List<WizardListener> wizardListeners = new ArrayList<WizardListener>();
+    protected final List<WizardListener> wizardListeners = new ArrayList<WizardListener>();
 
     /**
      * Navigation stack to store the user's path through the chain of wizard steps.
      */
-    protected Stack<String> navigationStack = new Stack<String>();
+    protected final Stack<String> navigationStack = new Stack<String>();
 
     /**
      * The wizard step provider to get the steps for the next wizard dialogs.
@@ -67,7 +72,7 @@ public class Wizard implements NavigationListener, PopupListener
     /**
      * The dialog in which the wizard steps are loaded.
      */
-    protected WizardDialog dialog;
+    protected final WizardDialog dialog;
 
     /**
      * The current step of the wizard.
@@ -112,12 +117,14 @@ public class Wizard implements NavigationListener, PopupListener
      */
     public void start(String startStep, Object data)
     {
+        // start over
+        navigationStack.clear();
+
         currentStep = provider.getStep(startStep);
         if (currentStep == null) {
             onFinish();
             return;
         }
-
         navigationStack.push(startStep);
         initAndDisplayCurrentStep(data);
     }
@@ -131,18 +138,33 @@ public class Wizard implements NavigationListener, PopupListener
     {
         dialog.center();
         dialog.setLoading(true);
-        currentStep.init(data, new AbstractDefaultAsyncCallback<Boolean>()
+        currentStep.init(data, new AsyncCallback<Object>()
         {
-            public void onSuccess(Boolean result)
+            public void onSuccess(Object result)
             {
-                dialog.setLoading(false);
-                if (result) {
-                    dialog.displayStep(currentStep, navigationStack.size() > 1);
-                } else {
-                    dialog.displayError(new Throwable(""));
+                dialog.displayStep(currentStep, navigationStack.size() > 1);
+                if (currentStep instanceof SourcesNavigationEvents) {
+                    ((SourcesNavigationEvents) currentStep).addNavigationListener(Wizard.this);
                 }
             }
+
+            public void onFailure(Throwable caught)
+            {
+                dialog.showError(caught);
+            }
         });
+    }
+
+    /**
+     * Prepares the current step to be unloaded (remove all listeners, etc.), to be executed before loading a next (or
+     * previous) step.
+     */
+    protected void unloadCurrentStep()
+    {
+        if (currentStep instanceof SourcesNavigationEvents) {
+            // remove this from the list of listened navigation sources
+            ((SourcesNavigationEvents) currentStep).removeNavigationListener(this);
+        }
     }
 
     /**
@@ -201,6 +223,10 @@ public class Wizard implements NavigationListener, PopupListener
      */
     protected void onCancel()
     {
+        // unload current step
+        unloadCurrentStep();
+        currentStep = null;
+        // hide UIs
         dialog.hide();
         // notify listeners of cancel
         for (WizardListener wListener : wizardListeners) {
@@ -228,6 +254,7 @@ public class Wizard implements NavigationListener, PopupListener
         }
         // prepare previous step
         Object result = currentStep.getResult();
+        unloadCurrentStep();
         currentStep = previousStep;
         initAndDisplayCurrentStep(result);
     }
@@ -246,6 +273,7 @@ public class Wizard implements NavigationListener, PopupListener
         }
         // prepare next step
         Object result = currentStep.getResult();
+        unloadCurrentStep();
         currentStep = nextStep;
         navigationStack.push(nextStepName);
         initAndDisplayCurrentStep(result);
@@ -256,10 +284,15 @@ public class Wizard implements NavigationListener, PopupListener
      */
     protected void onFinish()
     {
+        // unload things from the dialog
+        unloadCurrentStep();
+        Object result = currentStep != null ? currentStep.getResult() : null;
+        currentStep = null;
+        // hide UIs
         dialog.hide();
         // fire the listeners
         for (WizardListener wListener : wizardListeners) {
-            wListener.onFinish(this, currentStep != null ? currentStep.getResult() : null);
+            wListener.onFinish(this, result);
         }
     }
 
@@ -293,26 +326,6 @@ public class Wizard implements NavigationListener, PopupListener
             for (WizardListener wListener : wizardListeners) {
                 wListener.onCancel(this);
             }
-        }
-    }
-
-    /**
-     * Asynchronous callback adapter to handle the callback fails by displaying the error inside the dialog.
-     * 
-     * @param <T> the return type of the callback
-     * @see AsyncCallback
-     */
-    protected abstract class AbstractDefaultAsyncCallback<T> implements AsyncCallback<T>
-    {
-        /**
-         * {@inheritDoc}
-         * 
-         * @see AsyncCallback#onFailure(Throwable)
-         */
-        public void onFailure(Throwable caught)
-        {
-            dialog.setLoading(false);
-            dialog.displayError(caught);
         }
     }
 }

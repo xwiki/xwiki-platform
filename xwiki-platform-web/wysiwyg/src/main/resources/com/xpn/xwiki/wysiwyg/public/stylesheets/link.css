@@ -1,26 +1,16 @@
-.xLinkToUrl .gwt-Label,
-.xLinkToNewPage .gwt-Label,
-.xLinkToExistingPage .gwt-Label {
+.xLinkToUrl .gwt-Label, .xLinkToWikiPage .gwt-Label {
   font-weight: bold;
   width: 300px;
   padding: 5px;
 }
 
-.xLinkToUrl .gwt-TextBox,
-.xLinkToNewPage .gwt-TextBox,
-.xLinkToExistingPage .gwt-TextBox { 
+.xLinkToUrl .gwt-TextBox, .xLinkToWikiPage .gwt-TextBox { 
   font-size: x-small;
   margin: 0 5px;
   width: 300px;
 }
 
-.xLinkToExistingPage .gwt-ListBox,
-.xLinkToNewPage .gwt-ListBox {
+.xLinkToUrl span.gwt-CheckBox, .xLinkToWikiPage span.gwt-CheckBox {
+  display: block;
   margin: 0 5px;
-}
-
-.xLinkToUrl .gwt-Button,
-.xLinkToNewPage .gwt-Button {
-  font-size: x-small;
-  margin: 8px;
 }

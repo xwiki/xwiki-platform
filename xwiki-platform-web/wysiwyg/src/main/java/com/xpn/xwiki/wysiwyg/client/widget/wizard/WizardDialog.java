@@ -28,11 +28,11 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard.NavigationDirection;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Wizard dialog class, used to display the current wizard step.
@@ -42,19 +42,14 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard.NavigationDirection;
 public class WizardDialog extends ComplexDialogBox implements SourcesNavigationEvents
 {
     /**
-     * The CSS class name used when the dialog is in loading state.
-     */
-    private static final String STYLE_NAME_LOADING = "loading";
-
-    /**
      * The set of navigation listeners to be handled by this dialog.
      */
-    private List<NavigationListener> navigationListeners = new ArrayList<NavigationListener>();
+    private final NavigationListenerCollection navigationListeners = new NavigationListenerCollection();
 
     /**
      * The list with all buttons currently displayed on this dialog.
      */
-    private List<Button> buttons = new ArrayList<Button>();
+    private final List<Button> buttons = new ArrayList<Button>();
 
     /**
      * Builds a wizard dialog with the passed title and icon.
@@ -79,6 +74,8 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
      */
     public void displayStep(WizardStep step, boolean hasPrevious)
     {
+        // first make sure the dialog exits the loading state
+        setLoading(false);
         getBody().clear();
         getBody().add(step.display());
         getHeader().clear();
@@ -100,11 +97,7 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
      */
     public void setLoading(boolean loading)
     {
-        if (loading) {
-            getBody().addStyleName(STYLE_NAME_LOADING);
-        } else {
-            getBody().removeStyleName(STYLE_NAME_LOADING);
-        }
+        super.setLoading(loading);
         // show or hide the dialog's main widget (the wizard step widget)
         if (getBody().getWidgetCount() > 0) {
             getBody().getWidget(0).setVisible(!loading);
@@ -116,22 +109,13 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
     }
 
     /**
-     * Displays an error message in this dialog.
+     * {@inheritDoc}. Expose the show error function to calling classes.
      * 
-     * @param caught the exception to display in this dialog.
+     * @see ComplexDialogBox#showError(Throwable)
      */
-    public void displayError(Throwable caught)
+    public void showError(Throwable caught)
     {
-        String message = caught.getLocalizedMessage();
-        if (StringUtils.isEmpty(message)) {
-            // Use a default error message.
-            message = Strings.INSTANCE.errorServerRequestFailed();
-        }
-
-        Label error = new Label(message);
-        error.addStyleName("errormessage");
-
-        getBody().add(error);
+        super.showError(caught);
     }
 
     /**
@@ -150,6 +134,8 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
         // add the buttons
         // add here the cancel button if you want one on the form
 
+        // special handling of the previous button since it needs to be added only if wizard allows it and placed in
+        // special containers
         if (hasPrevious && validDirections.contains(NavigationDirection.PREVIOUS)) {
             String previousLabel = step.getDirectionName(NavigationDirection.PREVIOUS);
             if (previousLabel == null) {
@@ -160,7 +146,7 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
             {
                 public void onClick(Widget sender)
                 {
-                    fireNavigationEvent(NavigationDirection.PREVIOUS);
+                    navigationListeners.fireNavigationEvent(NavigationDirection.PREVIOUS);
                 }
             });
             // wrap the previous button in a div for the sake of styling
@@ -173,38 +159,38 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
         }
 
         if (validDirections.contains(NavigationDirection.NEXT)) {
-            String nextLabel = step.getDirectionName(NavigationDirection.NEXT);
-            if (nextLabel == null) {
-                nextLabel = Strings.INSTANCE.wizardNext();
-            }
-            Button nextButton = new Button(nextLabel);
-            nextButton.addClickListener(new ClickListener()
-            {
-                public void onClick(Widget sender)
-                {
-                    fireNavigationEvent(NavigationDirection.NEXT);
-                }
-            });
-            getFooter().add(nextButton);
-            buttons.add(nextButton);
+            addButton(step, NavigationDirection.NEXT, getFooter(), Strings.INSTANCE.wizardNext());
         }
 
         if (validDirections.contains(NavigationDirection.FINISH)) {
-            String finishLabel = step.getDirectionName(NavigationDirection.FINISH);
-            if (finishLabel == null) {
-                finishLabel = Strings.INSTANCE.wizardFinish();
-            }
-            Button finishButton = new Button(finishLabel);
-            finishButton.addClickListener(new ClickListener()
-            {
-                public void onClick(Widget sender)
-                {
-                    fireNavigationEvent(NavigationDirection.FINISH);
-                }
-            });
-            getFooter().add(finishButton);
-            buttons.add(finishButton);
+            addButton(step, NavigationDirection.FINISH, getFooter(), Strings.INSTANCE.wizardFinish());
         }
+    }
+
+    /**
+     * Adds the button for the specified direction for the step in the passed container.
+     * 
+     * @param step the step to process (add buttons for)
+     * @param direction the direction of the button to add
+     * @param container the UI container in which the button needs to be added
+     * @param defaultLabel the default label of the button, if the step does not specify any.
+     */
+    protected void addButton(WizardStep step, final NavigationDirection direction, Panel container, String defaultLabel)
+    {
+        String buttonLabel = step.getDirectionName(direction);
+        if (buttonLabel == null) {
+            buttonLabel = defaultLabel;
+        }
+        Button button = new Button(buttonLabel);
+        button.addClickListener(new ClickListener()
+        {
+            public void onClick(Widget sender)
+            {
+                navigationListeners.fireNavigationEvent(direction);
+            }
+        });
+        container.add(button);
+        buttons.add(button);
     }
 
     /**
@@ -224,20 +210,6 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
      */
     public void removeNavigationListener(NavigationListener listener)
     {
-        if (navigationListeners.contains(listener)) {
-            navigationListeners.remove(listener);
-        }
-    }
-
-    /**
-     * Fires the specified navigation event to all registered navigation listeners.
-     * 
-     * @param direction the direction of the navigation
-     */
-    protected void fireNavigationEvent(NavigationDirection direction)
-    {
-        for (NavigationListener listener : this.navigationListeners) {
-            listener.onDirection(direction);
-        }
+        navigationListeners.remove(listener);
     }
 }

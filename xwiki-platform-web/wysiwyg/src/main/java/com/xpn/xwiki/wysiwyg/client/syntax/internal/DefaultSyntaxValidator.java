@@ -80,8 +80,6 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("fontsize", Command.FONT_SIZE));
         addValidationRule(new DefaultValidationRule("forecolor", Command.FORE_COLOR));
         addValidationRule(new DefaultValidationRule("backcolor", Command.BACK_COLOR));
-        addValidationRule(new DefaultValidationRule("link", Command.CREATE_LINK));
-        addValidationRule(new DefaultValidationRule("unlink", Command.UNLINK));
         addValidationRule(new DefaultValidationRule("hr", Command.INSERT_HORIZONTAL_RULE));
         addValidationRule(new DefaultValidationRule("symbol", Command.INSERT_HTML));
         // FIXME : implement this in the table plugin when possible

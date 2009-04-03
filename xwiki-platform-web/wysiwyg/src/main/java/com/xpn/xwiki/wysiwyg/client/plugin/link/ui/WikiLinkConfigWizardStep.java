@@ -19,44 +19,39 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
- * Keyboard listener adapter to be able to automatically click a button when the enter key is pressed inside a
- * {@link SourcesKeyboardEvents}.
+ * Wizard step to configure the parameters for a wikilink.
  * 
  * @version $Id$
  */
-public class EnterListener extends KeyboardListenerAdapter
+public class WikiLinkConfigWizardStep extends AbstractLinkConfigWizardStep
 {
     /**
-     * The button which will be click when enter key will be press.
+     * Default constructor.
      */
-    private Button button;
-
-    /**
-     * Class constructor.
-     * 
-     * @param button which will be click when enter key will be press.
-     */
-    public EnterListener(Button button)
+    public WikiLinkConfigWizardStep()
     {
-        this.button = button;
+        // create the main panel of this config step,
+
+        getMainPanel().addStyleName("xLinkToWikiPage");
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see KeyboardListenerAdapter#onKeyPress(Widget, char, int)
      */
-    public void onKeyPress(Widget sender, char c, int i)
+    public Widget display()
     {
-        super.onKeyPress(sender, c, i);
-        // Check if it's the enter key that has been pressed
-        if (c == 13) {
-            button.click();
-        }
+        return getMainPanel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected String getLabelTextBoxTooltip()
+    {
+        return Strings.INSTANCE.linkWikiPageLabelTextBoxTooltip();
     }
 }

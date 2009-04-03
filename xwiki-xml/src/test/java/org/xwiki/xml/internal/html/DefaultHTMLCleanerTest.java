@@ -77,10 +77,10 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         assertHTML("<p><em>italic</em></p>", "<i>italic</i>");
         assertHTML("<del>strike</del>", "<strike>strike</strike>");
         assertHTML("<del>strike</del>", "<s>strike</s>");
-        assertHTML("<ins>strike</ins>", "<u>strike</u>");
+        assertHTML("<ins>strike</ins>", "<u>strike</u>");        
         assertHTML("<p style=\"text-align:center\">center</p>", "<center>center</center>");
-        assertHTML("<p><span style=\"color:red;font-family=arial;font-size=3pt;\">This is some text!</span></p>",
-            "<font face=\"arial\" size=\"3\" color=\"red\">This is some text!</font>");
+        assertHTML("<p><span style=\"color:red;font-family:Arial;font-size:12pt;\">This is some text!</span></p>",
+            "<font face=\"Arial\" size=\"3\" color=\"red\">This is some text!</font>");
     }
 
     public void testConvertImplicitParagraphs()

@@ -1,8 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-#includeInContext("Space.PageName")
-#includeTopic("Space.PageName")
+#includeInContext  ("Space.PageName")
+#includeTopic ("Space.PageName")
 #includeMacros("Space.PageName")
 
 #includeForm("Space.PageName")

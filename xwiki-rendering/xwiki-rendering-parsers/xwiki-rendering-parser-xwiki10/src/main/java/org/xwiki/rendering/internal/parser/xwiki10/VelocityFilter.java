@@ -53,7 +53,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
     public static final String VELOCITY_COMMENT_SPATTERN = "((?m)\\n?\\#\\#.*$)|((?s)\\#\\*(.*?)\\*\\#)";
 
-    public static final String VELOCITY_MACRO_SPATTERN = "\\#(\\w+)\\(([^)]*)\\)";
+    public static final String VELOCITY_MACRO_SPATTERN = "\\#(\\w+) *\\(([^)]*)\\)";
 
     public static final String VELOCITY_INTERNAL_SPATTERN = "\\#end";
 

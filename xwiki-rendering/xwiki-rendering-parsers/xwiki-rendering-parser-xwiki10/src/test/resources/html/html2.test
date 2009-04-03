@@ -13,6 +13,9 @@ some text
 
 #* commented *#
 
+#if ($var > 0)
+#end
+
 #*commented*#
 
 #*commented
@@ -59,6 +62,9 @@ some text{{velocity}}## commented
 \\## commented ## commented
 
 #* commented *#
+
+#if ($var > 0)
+#end
 
 #*commented*#
 

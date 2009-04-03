@@ -366,7 +366,7 @@ isc.XWEResultTree.addMethods({
             // Create attachments container node title.
             var title = isc.XWEResultTree.constants.attachmentsTitle + " (" + node.name + ")";
             if (this.displayLinks == true) {
-                title = "<a href='" + node.xwikiUrl + XWiki.constants.docextraAttachmentsAnchor + "'>"
+                title = "<a href='" + node.xwikiRelativeUrl + XWiki.constants.docextraAttachmentsAnchor + "'>"
                         + title + "</a>"
             }
 
@@ -435,7 +435,7 @@ isc.XWEDataSource.addProperties({
         { name:"id", required: true, type: "text", primaryKey:true },
         { name:"name", type: "text" },
         { name:"title", type: "text" },
-        { name:"xwikiUrl", type: "text" }
+        { name:"xwikiRelativeUrl", type: "text" }
     ],
 
     /*
@@ -483,7 +483,7 @@ isc.XWEWikiDataSource.addProperties({
         { name:"id", required: true, type: "text", primaryKey:true },
         { name:"name", required: true, type: "text" },
         { name:"title", type: "text" },
-        { name:"xwikiUrl", type: "text" }
+        { name:"xwikiRelativeUrl", type: "text" }
     ],
     recordsType : "space",
     icon : "$xwiki.getSkinFile('icons/silk/folder.gif')"
@@ -523,7 +523,7 @@ isc.XWESpaceDataSource.addProperties({
         { name:"space", required: true, type: "text" },
         { name:"name", required: true, type: "text" },
         { name:"title", required: true, type: "text" },
-        { name:"xwikiUrl", type: "text" },
+        { name:"xwikiRelativeUrl", type: "text" },
         { name:"link", propertiesOnly: true },
         { name:"parent", required: true, type: "text", foreignKey: "fullName" }
     ],
@@ -615,7 +615,7 @@ isc.XWEAttachmentsDataSource.addProperties({
         { name:"id", required: true, type: "text", primaryKey:true },
         { name:"name", required: true, type: "text" },
         { name:"title", type: "text" },
-        { name:"xwikiUrl", type: "text" }
+        { name:"xwikiRelativeUrl", type: "text" }
     ],
     recordsType : "attachment",
     icon : "$xwiki.getSkinFile('icons/silk/attach.gif')"

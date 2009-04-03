@@ -73,7 +73,7 @@
   text-align: right;
 }
 
-.xDialogFooter button {
+.xDialogFooter button, .xDialogHeader button {
   -moz-border-radius-bottomleft: 5px;
   -moz-border-radius-bottomright: 5px;
   -moz-border-radius-topleft: 5px;

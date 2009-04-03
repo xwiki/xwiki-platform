@@ -20,15 +20,13 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 /**
- * Tab to add to the link dialog to get user data and produce an URL to an email address.
+ * Wizard step to create a link to an email address (the mailto: protocol).
  * 
  * @version $Id$
  */
-public class LinkToEmailAddressTab extends AbstractExternalLinkTab
+public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
 {
     /**
      * URL protocol constant.
@@ -38,11 +36,11 @@ public class LinkToEmailAddressTab extends AbstractExternalLinkTab
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#buildUri()
+     * @see AbstractExternalLinkWizardStep#buildURL()
      */
-    protected String buildUri()
+    protected String buildURL()
     {
-        String emailAddress = getUriTextBox().getText().trim();
+        String emailAddress = getUrlTextBox().getText().trim();
         // If url does not start with the desired protocol, add it
         if (!emailAddress.startsWith(MAILTO)) {
             emailAddress = MAILTO + emailAddress;
@@ -53,27 +51,17 @@ public class LinkToEmailAddressTab extends AbstractExternalLinkTab
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getCreateLinkButtonTooltip()
+     * @see AbstractExternalLinkWizardStep#getURLTextBoxTooltip()
      */
-    protected String getCreateLinkButtonTooltip()
+    protected String getURLTextBoxTooltip()
     {
-        return Strings.INSTANCE.linkToEmailAddressButtonTooltip();
+        return Strings.INSTANCE.linkURLToEmailAddressTextBoxTooltip();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getUriTextBoxTooltip()
-     */
-    protected String getUriTextBoxTooltip()
-    {
-        return Strings.INSTANCE.linkUriToEmailAddressTextBoxTooltip();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkTab#getLabelTextBoxTooltip()
+     * @see AbstractExternalLinkWizardStep#getLabelTextBoxTooltip()
      */
     protected String getLabelTextBoxTooltip()
     {
@@ -83,7 +71,7 @@ public class LinkToEmailAddressTab extends AbstractExternalLinkTab
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getErrorMessage()
+     * @see AbstractExternalLinkWizardStep#getErrorMessage()
      */
     protected String getErrorMessage()
     {
@@ -93,7 +81,7 @@ public class LinkToEmailAddressTab extends AbstractExternalLinkTab
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getInputDefaultText()
+     * @see AbstractExternalLinkWizardStep#getInputDefaultText()
      */
     protected String getInputDefaultText()
     {
@@ -103,41 +91,18 @@ public class LinkToEmailAddressTab extends AbstractExternalLinkTab
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getURILabel()
+     * @see AbstractExternalLinkWizardStep#getURLLabel()
      */
-    protected String getURILabel()
+    protected String getURLLabel()
     {
         return Strings.INSTANCE.linkEmailLabel();
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkTab#setLinkConfig(LinkConfig)
      */
-    public void setLinkConfig(LinkConfig config)
+    public String getStepTitle()
     {
-        if (config.getType() == getLinkType()) {
-            super.setLinkConfig(config);
-            // strip protocol out of the external url
-            if (config.getUrl() != null) {
-                String url = config.getUrl();
-                if (url.startsWith(MAILTO)) {
-                    getUriTextBox().setText(url.substring(MAILTO.length()));
-                }
-            }
-        } else {
-            setLinkLabel(config);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkTab#getLinkType()
-     */
-    public LinkType getLinkType()
-    {
-        return LinkType.EMAIL;
+        return Strings.INSTANCE.linkToEmail();
     }
 }

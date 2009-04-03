@@ -17,53 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 /**
- * Tab to add to the link dialog to get user data and produce a link to an external web page.
+ * Wizard step to create a link to a web page (http protocol).
  * 
  * @version $Id$
  */
-public class LinkToWebPageTab extends AbstractExternalLinkTab
+public class WebPageLinkWizardStep extends AbstractExternalLinkWizardStep
 {
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#buildUri()
+     * @see AbstractExternalLinkTab#getURLTextBoxTooltip()
      */
-    protected String buildUri()
+    protected String getURLTextBoxTooltip()
     {
-        String webPageAddress = getUriTextBox().getText().trim();
-        // If no protocol is specified add http by default
-        if (!webPageAddress.contains("://")) {
-            webPageAddress = "http://" + webPageAddress;
-        }
-
-        return webPageAddress;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkTab#getCreateLinkButtonTooltip()
-     */
-    protected String getCreateLinkButtonTooltip()
-    {
-        return Strings.INSTANCE.linkToWebPageButtonTooltip();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkTab#getUriTextBoxTooltip()
-     */
-    protected String getUriTextBoxTooltip()
-    {
-        return Strings.INSTANCE.linkUriToWebPageTextBoxTooltip();
+        return Strings.INSTANCE.linkURLToWebPageTextBoxTooltip();
     }
 
     /**
@@ -99,9 +71,9 @@ public class LinkToWebPageTab extends AbstractExternalLinkTab
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getURILabel()
+     * @see AbstractExternalLinkTab#getURLLabel()
      */
-    protected String getURILabel()
+    protected String getURLLabel()
     {
         return Strings.INSTANCE.linkWebPageLabel();
     }
@@ -109,10 +81,24 @@ public class LinkToWebPageTab extends AbstractExternalLinkTab
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getLinkType()
+     * @see AbstractExternalLinkTab#buildURL()
      */
-    public LinkType getLinkType()
+    protected String buildURL()
     {
-        return LinkType.EXTERNAL;
+        String webPageAddress = getUrlTextBox().getText().trim();
+        // If no protocol is specified add http by default
+        if (!webPageAddress.contains("://")) {
+            webPageAddress = "http://" + webPageAddress;
+        }
+
+        return webPageAddress;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getStepTitle()
+    {
+        return Strings.INSTANCE.linkToWebPage();
     }
 }

@@ -146,8 +146,12 @@ public interface Strings extends Constants
     String chooseWiki();
 
     String chooseSpace();
+    
+    String selectSpace();    
 
     String choosePage();
+    
+    String selectPage();
 
     String chooseAnchor();
 
@@ -158,40 +162,30 @@ public interface Strings extends Constants
     String link();
 
     String unlink();
+    
+    String linkEdit();
 
-    String linkCreateLinkButon();
+    String linkCreateLinkButton();
 
-    String linkNewPageTab();
+    String linkToEmail();
 
-    String linkEmailTab();
+    String linkToWebPage();
 
-    String linkExistingPageTab();
-
-    String linkWebPageTab();
+    String linkToWikiPage();    
 
     String linkLabelLabel();
+    
+    String linkTooltipLabel();
+    
+    String linkOpenInNewWindowLabel();
 
     String linkWebPageLabel();
 
     String linkEmailLabel();
 
-    String linkNewSpaceLabel();
-
-    String linkNewPageLabel();
-
     String linkEmailAddressTextBox();
 
     String linkWebPageTextBox();
-
-    String linkNewSpaceTextBox();
-
-    String linkNewPageTextBox();
-
-    String linkCreateNewSpaceText();
-
-    String linkNewSpaceError();
-
-    String linkNewPageError();
 
     String linkEmailAddressError();
 
@@ -199,41 +193,19 @@ public interface Strings extends Constants
 
     String linkNoLabelError();
 
-    String linkToWikiButtonTooltip();
-
-    String linkToSpaceButtonTooltip();
-
-    String linkToNewPageButtonTooltip();
-
-    String linkToExistingPageButtonTooltip();
-
-    String linkToWebPageButtonTooltip();
-
-    String linkToEmailAddressButtonTooltip();
-
-    String linkWikiSelectorTooltip();
-
-    String linkSpaceSelectorTooltip();
-
-    String linkExistingSpacesListBoxTooltip();
-
-    String linkPageSelectorTooltip();
-
-    String linkExistingPageLabelTextBoxTooltip();
-
-    String linkNewPageLabelTextBoxTooltip();
+    String linkWikiPageLabelTextBoxTooltip();
 
     String linkWebPageLabelTextBoxTooltip();
 
     String linkEmailAddressLabelTextBoxTooltip();
 
-    String linkUriToEmailAddressTextBoxTooltip();
+    String linkURLToEmailAddressTextBoxTooltip();
 
-    String linkUriToWebPageTextBoxTooltip();
+    String linkURLToWebPageTextBoxTooltip();
 
-    String linkNewSpaceTextBoxTooltip();
-
-    String linkNewPageTextBoxTooltip();
+    String noPageSelectedError();
+    
+    String linkConfig();
 
     String image();
 

@@ -41,7 +41,7 @@ public class LinkConfig implements IsSerializable
          * Link types: external link (default for any unrecognized link), internal link targeting an existent page,
          * internal link targeting a new page, external link to an email address.
          */
-        EXTERNAL, NEW_PAGE, EXISTING_PAGE, EMAIL
+        EXTERNAL, NEW_WIKIPAGE, WIKIPAGE, EMAIL
     };
 
     /**
@@ -80,9 +80,26 @@ public class LinkConfig implements IsSerializable
     private String label;
 
     /**
+     * The link tooltip.
+     */
+    private String tooltip;
+
+    /**
      * The type of this link.
      */
     private LinkType type;
+
+    /**
+     * The reference of the link, in the {@code wikiname}:{@code spacename}.{@code pagename}@{@code filename} form.
+     * TODO: This is to replace storing the wiki, space, page fields once the link reference will be set on the server,
+     * when generating the page URL.
+     */
+    private String reference;
+
+    /**
+     * Specifies whether this link is to be opened in a new window or not.
+     */
+    private boolean openInNewWindow;
 
     /**
      * @return the url
@@ -213,16 +230,64 @@ public class LinkConfig implements IsSerializable
     }
 
     /**
+     * @return the reference
+     */
+    public String getReference()
+    {
+        return reference;
+    }
+
+    /**
+     * @param reference the reference to set
+     */
+    public void setReference(String reference)
+    {
+        this.reference = reference;
+    }
+
+    /**
+     * @return the openInNewWindow
+     */
+    public boolean isOpenInNewWindow()
+    {
+        return openInNewWindow;
+    }
+
+    /**
+     * @param openInNewWindow the openInNewWindow to set
+     */
+    public void setOpenInNewWindow(boolean openInNewWindow)
+    {
+        this.openInNewWindow = openInNewWindow;
+    }
+
+    /**
+     * @return the tooltip
+     */
+    public String getTooltip()
+    {
+        return tooltip;
+    }
+
+    /**
+     * @param tooltip the tooltip to set
+     */
+    public void setTooltip(String tooltip)
+    {
+        this.tooltip = tooltip;
+    }
+
+    /**
      * @return the JSON representation of this ImageConfig
      */
     public String toJSON()
     {
         String jsonString =
             "{ " + formatValue("wiki", getWiki()) + formatValue("space", getSpace()) + formatValue("page", getPage())
-                + formatValue("url", getUrl()) + formatValue("label", getLabel())
-                + formatValue("labeltext", getLabelText())
-                + formatValue("readonlylabel", isReadOnlyLabel() ? null : isReadOnlyLabel())
-                + formatValue("type", getType());
+                + formatValue("reference", getReference()) + formatValue("url", getUrl())
+                + formatValue("label", getLabel()) + formatValue("labeltext", getLabelText())
+                + formatValue("readonlylabel", isReadOnlyLabel() ? true : null) + formatValue("type", getType())
+                + formatValue("newwindow", isOpenInNewWindow() ? true : null) + formatValue("tooltip", getTooltip());
         // Remove last comma
         if (jsonString.length() > 4) {
             jsonString = jsonString.substring(0, jsonString.length() - 2);
@@ -242,7 +307,7 @@ public class LinkConfig implements IsSerializable
      */
     private String formatValue(String key, Object value)
     {
-        return value != null ? key + ": '" + value + "', " : "";
+        return value != null ? key + ": '" + value.toString().replaceAll("'", "\\'") + "', " : "";
     }
 
     /**
@@ -253,6 +318,7 @@ public class LinkConfig implements IsSerializable
     public void fromJSON(String json)
     {
         JavaScriptObject jsObj = JavaScriptObject.fromJson(json);
+        setReference((String) jsObj.get("reference"));
         setWiki((String) jsObj.get("wiki"));
         setSpace((String) jsObj.get("space"));
         setPage((String) jsObj.get("page"));
@@ -262,5 +328,8 @@ public class LinkConfig implements IsSerializable
         setReadOnlyLabel(jsObj.get("readonlylabel") != null ? Boolean.parseBoolean((String) jsObj.get("readonlylabel"))
             : false);
         setType(jsObj.get("type") != null ? LinkType.valueOf((String) jsObj.get("type")) : null);
+        setOpenInNewWindow(jsObj.get("newwindow") != null ? Boolean.parseBoolean((String) jsObj.get("newwindow"))
+            : false);
+        setTooltip((String) jsObj.get("tooltip"));
     }
 }

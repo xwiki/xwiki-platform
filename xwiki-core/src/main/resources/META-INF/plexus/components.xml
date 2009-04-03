@@ -51,7 +51,6 @@
       <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.doc.DefaultDocumentAccessBridge</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.context.Execution</role>
@@ -59,11 +58,27 @@
       </requirements>
     </component>
     <component>
+      <role>org.xwiki.bridge.DocumentNameFactory</role>
+      <role-hint>default</role-hint>
+      <implementation>com.xpn.xwiki.doc.DefaultDocumentNameFactory</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.context.Execution</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.bridge.DocumentNameSerializer</role>
+      <role-hint>default</role-hint>
+      <implementation>com.xpn.xwiki.doc.DefaultDocumentNameSerializer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
       <role>org.xwiki.bridge.SkinAccessBridge</role>
       <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.DefaultSkinAccessBridge</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.context.Execution</role>

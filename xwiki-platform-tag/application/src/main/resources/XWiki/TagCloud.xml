@@ -178,13 +178,13 @@ ol.tagCloud .ultraPopular {
 <content>##
 ## Tag cloud.
 ##
-## Configurable popularity levels. You must an even number of levels. Default: 6. 
+## Configurable popularity levels. You must an even number of levels. Default: 6.
 ##
 #set($popularityLevels = ["notPopular", "notVeryPopular", "somewhatPopular", "popular", "veryPopular", "ultraPopular"])
 $xwiki.ssx.use("XWiki.TagCloud")
 ##
 ## Get tag count map. Key: tag, value: number of occurrences.
-## Store the minimum number of occurrences for a tag. 
+## Store the minimum number of occurrences for a tag.
 ## Store the maximum number of occurrences for a tag.
 ##
 #set($tagCount = $xwiki.tag.getTagCount())
@@ -201,20 +201,20 @@ $xwiki.ssx.use("XWiki.TagCloud")
 #end
 ##
 ## Build popularity map using the difference between minimum maximum tag occurrences counts
-## and the average tag occurences count. 
+## and the average tag occurences count.
 ##
-#set($countAverage = $mathtool.div($totalTagNumber, $tagCount.size())) 
+#set($countAverage = $mathtool.div($totalTagNumber, $tagCount.size()))
 #set($levelsHalf = $popularityLevels.size() / 2)
-#set($firstHalfCountDelta = $mathtool.sub($countAverage, $minCount)) 
-#set($secondHalfCountDelta = $mathtool.sub($maxCount, $countAverage)) 
+#set($firstHalfCountDelta = $mathtool.sub($countAverage, $minCount))
+#set($secondHalfCountDelta = $mathtool.sub($maxCount, $countAverage))
 #set($popularityMap = $util.getHashMap())
-#set($firstHalfIntervalSize = $mathtool.div($firstHalfCountDelta, $levelsHalf)) 
-#set($secondHalfIntervalSize = $mathtool.div($secondHalfCountDelta, $levelsHalf)) 
+#set($firstHalfIntervalSize = $mathtool.div($firstHalfCountDelta, $levelsHalf))
+#set($secondHalfIntervalSize = $mathtool.div($secondHalfCountDelta, $levelsHalf))
 #set($previousPopularityMax = $minCount)
 #set($intervalSize = $firstHalfIntervalSize)
 #set($halfPassed = false)
 #foreach($popularityLevel in $popularityLevels)
-  #if($velocityCount &gt; $levelsHalf &amp;&amp; !$halfPassed)    
+  #if($velocityCount &gt; $levelsHalf &amp;&amp; !$halfPassed)
     #set($intervalSize = $secondHalfIntervalSize)
     #set($halfPassed = true)
   #end
@@ -224,20 +224,20 @@ $xwiki.ssx.use("XWiki.TagCloud")
 #end
 ##
 ## Display tag cloud.
-## 
+##
 #if($tagCount.size() &gt; 0)
   &lt;ol class="tagCloud"&gt;
-    #foreach($tag in $tagCount.keySet())  
+    #foreach($tag in $tagCount.keySet())
       ## This hackish loop could be made simpler with #break (introduced in velocity 1.6)
       #set($classSet = false)
       #foreach($popularityMax in $sorttool.sort($popularityMap.keySet()))
-        #if($tagCount.get($tag) &gt; $popularityMax)      
+        #if($tagCount.get($tag) &gt; $popularityMax)
         #elseif(!$classSet)
           #set($liClass = $popularityMap.get($popularityMax))
-          #set($classSet = true)      
+          #set($classSet = true)
         #end
       #end
-      &lt;li class="$liClass"&gt;&lt;a class="tag" href="$xwiki.getURL("Main.Tags", "view", "action=viewTag&amp;amp;tag=$tag")" title="$msg.get("xe.tag.tooltip", ["${tagCount.get($tag)}"])"&gt;$tag&lt;/a&gt;&lt;/li&gt;
+      &lt;li class="$liClass"&gt;&lt;a class="tag" href="$xwiki.getURL("Main.Tags", "view", "do=viewTag&amp;amp;tag=$tag")" title="$msg.get("xe.tag.tooltip", ["${tagCount.get($tag)}"])"&gt;$tag&lt;/a&gt;&lt;/li&gt;
     #end
   &lt;/ol&gt;
 #else

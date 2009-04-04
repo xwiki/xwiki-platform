@@ -113,7 +113,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     private HTMLCleaner getHTMLCleaner()
     {
-        return (HTMLCleaner) Utils.getComponent(HTMLCleaner.ROLE);
+        return (HTMLCleaner) Utils.getComponent(HTMLCleaner.class);
     }
 
     /**
@@ -122,7 +122,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     private HTMLConverter getHTMLConverter(String syntax)
     {
-        return (HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax);
+        return (HTMLConverter) Utils.getComponent(HTMLConverter.class, syntax);
     }
 
     /**
@@ -130,7 +130,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     private DocumentAccessBridge getDocumentAccessBridge()
     {
-        return (DocumentAccessBridge) Utils.getComponent(DocumentAccessBridge.ROLE);
+        return (DocumentAccessBridge) Utils.getComponent(DocumentAccessBridge.class);
     }
 
     /**
@@ -174,17 +174,17 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             Syntax xhtmlSyntax = new Syntax(SyntaxType.XHTML, "1.0");
 
             // Parse
-            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, xhtmlSyntax.toIdString());
+            Parser parser = (Parser) Utils.getComponent(Parser.class, xhtmlSyntax.toIdString());
             XDOM dom = parser.parse(new StringReader(cleanHTML(html)));
 
             // Execute macros
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
-            TransformationManager txManager = (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
+            TransformationManager txManager = (TransformationManager) Utils.getComponent(TransformationManager.class);
             txManager.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(syntax));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
+            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
             XHTMLRenderer renderer = (XHTMLRenderer) factory.createRenderer(xhtmlSyntax, printer);
             dom.traverse(renderer);
 
@@ -204,7 +204,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
     {
         org.xwiki.xml.html.HTMLCleaner cleaner =
-            (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.ROLE, cleanerHint);
+            (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.class, cleanerHint);
         HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
         configuration.setParameters(cleaningParams);
         return XMLUtils.toString(cleaner.clean(new StringReader(htmlPaste), configuration));
@@ -217,7 +217,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     public String officeToXHTML(String pageName, Map<String, String> cleaningParams) throws XWikiGWTException
     {
-        OfficeImporter officeImporter = (OfficeImporter) Utils.getComponent(OfficeImporter.ROLE);
+        OfficeImporter officeImporter = (OfficeImporter) Utils.getComponent(OfficeImporter.class);
         XWikiContext context = getXWikiContext();
         try {
             List<XWikiAttachment> attachments = context.getWiki().getDocument(pageName, context).getAttachmentList();
@@ -513,8 +513,8 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public MacroDescriptor getMacroDescriptor(String macroName, String syntaxId) throws XWikiGWTException
     {
         try {
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
-            MacroManager manager = (MacroManager) Utils.getComponentManager().lookup(MacroManager.ROLE);
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
+            MacroManager manager = (MacroManager) Utils.getComponentManager().lookup(MacroManager.class);
             Macro< ? > macro = manager.getMacro(macroName, syntaxFactory.createSyntaxFromIdString(syntaxId));
             org.xwiki.rendering.macro.descriptor.MacroDescriptor descriptor = macro.getDescriptor();
 
@@ -580,8 +580,8 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public List<String> getMacros(String syntaxId) throws XWikiGWTException
     {
         try {
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
-            MacroManager manager = (MacroManager) Utils.getComponentManager().lookup(MacroManager.ROLE);
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
+            MacroManager manager = (MacroManager) Utils.getComponentManager().lookup(MacroManager.class);
             return new ArrayList<String>(manager.getMacroNames(syntaxFactory.createSyntaxFromIdString(syntaxId)));
         } catch (Throwable t) {
             LOG.error("Exception while retrieving the list of available macros.", t);

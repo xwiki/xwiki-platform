@@ -28,11 +28,6 @@ package com.xpn.xwiki.wysiwyg.server.cleaner;
 public interface HTMLCleaner
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = HTMLCleaner.class.getName();
-
-    /**
      * @param dirtyHTML the string containing the HTML output of the WYSIWYG editor
      * @return the cleaned HTML
      */

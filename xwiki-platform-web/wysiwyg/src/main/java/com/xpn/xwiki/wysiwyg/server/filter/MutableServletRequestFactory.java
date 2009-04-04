@@ -31,11 +31,6 @@ import javax.servlet.ServletRequest;
 public interface MutableServletRequestFactory
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = MutableServletRequestFactory.class.getName();
-
-    /**
      * Creates a new mutable servlet request.
      * 
      * @param request The original servlet request to wrap.

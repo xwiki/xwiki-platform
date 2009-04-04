@@ -52,7 +52,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner
     public String clean(String dirtyHTML)
     {
         org.xwiki.xml.html.HTMLCleaner cleaner =
-            (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.ROLE);
+            (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.class);
 
         // We have to remove or replace the HTML elements that were added by the WYSIWYG editor only for internal
         // reasons, before any cleaning filter is applied. Otherwise cleaning filters might transform these

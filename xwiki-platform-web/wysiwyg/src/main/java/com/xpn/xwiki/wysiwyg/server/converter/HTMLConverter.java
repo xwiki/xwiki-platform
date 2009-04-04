@@ -27,11 +27,6 @@ package com.xpn.xwiki.wysiwyg.server.converter;
 public interface HTMLConverter
 {
     /**
-     * The role of this component, used to look up implementations.
-     */
-    String ROLE = HTMLConverter.class.getName();
-
-    /**
      * Converts to HTML the specified source text. The converter expects the source text to have a specific known
      * syntax.
      * 

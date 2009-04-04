@@ -46,7 +46,7 @@ public class EventsHTMLConverter implements HTMLConverter
     public String fromHTML(String html)
     {
         try {
-            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xhtml/1.0");
+            Parser parser = (Parser) Utils.getComponent(Parser.class, "xhtml/1.0");
             XDOM dom = parser.parse(new StringReader(html));
             WikiPrinter printer = new DefaultWikiPrinter();
             EventsRenderer eventsRenderer = new EventsRenderer(printer);

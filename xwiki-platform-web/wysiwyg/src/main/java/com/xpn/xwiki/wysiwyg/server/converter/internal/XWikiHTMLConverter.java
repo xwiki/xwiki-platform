@@ -51,7 +51,7 @@ public class XWikiHTMLConverter implements HTMLConverter
     public String fromHTML(String html)
     {
         try {
-            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xhtml/1.0");
+            Parser parser = (Parser) Utils.getComponent(Parser.class, "xhtml/1.0");
             XDOM dom = parser.parse(new StringReader(html));
             WikiPrinter printer = new DefaultWikiPrinter();
             XWikiSyntaxRenderer renderer = new XWikiSyntaxRenderer(printer);
@@ -70,14 +70,14 @@ public class XWikiHTMLConverter implements HTMLConverter
     public String toHTML(String source)
     {
         try {
-            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xwiki/2.0");
+            Parser parser = (Parser) Utils.getComponent(Parser.class, "xwiki/2.0");
             XDOM dom = parser.parse(new StringReader(source));
 
-            TransformationManager txManager = (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+            TransformationManager txManager = (TransformationManager) Utils.getComponent(TransformationManager.class);
             txManager.performTransformations(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
             WikiPrinter printer = new DefaultWikiPrinter();
-            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
+            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
             XHTMLRenderer renderer =
                 (XHTMLRenderer) factory.createRenderer(new Syntax(SyntaxType.XHTML, "1.0"), printer);
             dom.traverse(renderer);

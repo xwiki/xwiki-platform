@@ -100,8 +100,8 @@ public class ConversionFilter implements Filter
     {
         String[] wysiwygNames = req.getParameterValues(WYSIWYG_NAME);
         if (wysiwygNames != null) {
-            MutableServletRequestFactory mreqFactory =
-                (MutableServletRequestFactory) Utils.getComponent(MutableServletRequestFactory.ROLE, req.getProtocol());
+            MutableServletRequestFactory mreqFactory = (MutableServletRequestFactory) Utils.getComponent(
+                MutableServletRequestFactory.class, req.getProtocol());
             MutableServletRequest mreq = mreqFactory.newInstance(req);
             // Remove the list of WYSIWYG names from this request to avoid recurrency.
             mreq.removeParameter(WYSIWYG_NAME);
@@ -115,8 +115,8 @@ public class ConversionFilter implements Filter
                 // Remove the syntax parameter from this request to avoid interference with further request processing.
                 String syntax = mreq.removeParameter(wysiwygName + "_syntax");
                 try {
-                    HTMLCleaner cleaner = (HTMLCleaner) Utils.getComponent(HTMLCleaner.ROLE);
-                    HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax);
+                    HTMLCleaner cleaner = (HTMLCleaner) Utils.getComponent(HTMLCleaner.class);
+                    HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.class, syntax);
                     mreq.setParameter(wysiwygName, converter.fromHTML(cleaner.clean(req.getParameter(wysiwygName))));
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);

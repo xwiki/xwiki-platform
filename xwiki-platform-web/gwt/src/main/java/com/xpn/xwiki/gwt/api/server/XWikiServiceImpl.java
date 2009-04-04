@@ -142,7 +142,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         // In the new component architecture we use ThreadLocal to transport the request, 
         // response and session to components which require them.
         ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE);
+            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class);
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
                 context);
@@ -155,8 +155,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
     private void cleanupContainerComponent(XWikiContext context)
     {
-        Container container = (Container) Utils.getComponent(Container.ROLE);
-        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+        Container container = (Container) Utils.getComponent(Container.class);
+        Execution execution = (Execution) Utils.getComponent(Execution.class);
 
         // We must ensure we clean the ThreadLocal variables located in the Container and Execution
         // components as otherwise we will have a potential memory leak.

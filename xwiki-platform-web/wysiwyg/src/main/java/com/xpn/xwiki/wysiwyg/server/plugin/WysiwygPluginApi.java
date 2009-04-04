@@ -80,7 +80,7 @@ public class WysiwygPluginApi extends Api
     public boolean isSyntaxSupported(String syntaxId)
     {
         try {
-            Utils.getComponent(HTMLConverter.ROLE, syntaxId);
+            Utils.getComponent(HTMLConverter.class, syntaxId);
             return true;
         } catch (RuntimeException e) {
             return false;
@@ -98,7 +98,7 @@ public class WysiwygPluginApi extends Api
      */
     public String getInput(String id, String source, String syntax)
     {
-        String value = ((HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax)).toHTML(source);
+        String value = ((HTMLConverter) Utils.getComponent(HTMLConverter.class, syntax)).toHTML(source);
 
         Filter filter = new CharacterFilter();
         filter.removeAttribute("'");

@@ -26,9 +26,6 @@ package org.xwiki.localization;
  */
 public interface Bundle extends Comparable<Bundle>
 {
-    /** This component's role, used when code needs to look it up. */
-    String ROLE = Bundle.class.getCanonicalName();
-
     /**
      * When searching for a translation, the bundles are searched in order until one of these bundles contains a value
      * for the searched key. The bundle priority defines this order. Lower is better, meaning that a bundle with a

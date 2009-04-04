@@ -40,9 +40,6 @@ import java.util.List;
  */
 public interface LocalizationManager
 {
-    /** This component's role, used when code needs to look it up. */
-    String ROLE = LocalizationManager.class.getName();
-
     /**
      * Registers a resource location as a possible localization bundle that should be used in the current execution. The
      * order in which resource of the same type are considered when searching for a translation corresponds to the order

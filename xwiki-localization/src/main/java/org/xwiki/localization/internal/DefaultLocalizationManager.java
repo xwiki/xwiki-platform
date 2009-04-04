@@ -110,7 +110,7 @@ public class DefaultLocalizationManager extends AbstractLogEnabled implements Lo
     public void use(String bundleTypeHint, String bundleLocation)
     {
         try {
-            Bundle bundle = (Bundle) this.componentManager.lookup(Bundle.ROLE, bundleTypeHint);
+            Bundle bundle = (Bundle) this.componentManager.lookup(Bundle.class, bundleTypeHint);
             bundle.use(bundleLocation);
         } catch (ComponentLookupException e) {
             getLogger().warn("Unknown bundle type: {0}", bundleTypeHint);

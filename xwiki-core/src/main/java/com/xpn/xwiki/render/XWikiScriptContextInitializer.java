@@ -68,7 +68,7 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
         // Make the Syntax Factory component available from Script.
         // TODO: We need to decide how we want to expose components in general and how to protect users from
         // "dangerous" apis.
-        scriptContext.setAttribute("syntaxFactory", Utils.getComponent(SyntaxFactory.ROLE), ScriptContext.GLOBAL_SCOPE);
+        scriptContext.setAttribute("syntaxFactory", Utils.getComponent(SyntaxFactory.class), ScriptContext.GLOBAL_SCOPE);
 
         // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the
         // Script context there. However if we create a new Script context we need to populate it with

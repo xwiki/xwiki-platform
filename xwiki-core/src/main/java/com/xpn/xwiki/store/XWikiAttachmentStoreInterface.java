@@ -33,11 +33,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public interface XWikiAttachmentStoreInterface
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = XWikiAttachmentStoreInterface.class.getName();
-
     void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 

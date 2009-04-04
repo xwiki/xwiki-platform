@@ -28,11 +28,6 @@ package org.xwiki.context;
  */
 public interface Execution
 {
-    /**
-     * The role under which this component is saved in the Component Manager.
-     */
-    String ROLE = Execution.class.getName();
-
     ExecutionContext getContext();
     void setContext(ExecutionContext context);
     void pushContext(ExecutionContext context);

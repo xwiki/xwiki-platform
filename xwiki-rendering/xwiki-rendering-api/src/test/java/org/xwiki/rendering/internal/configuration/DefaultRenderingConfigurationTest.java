@@ -35,7 +35,7 @@ public class DefaultRenderingConfigurationTest extends AbstractRenderingTestCase
     public void testDefaultConfiguration() throws Exception
     {
         RenderingConfiguration configuration =
-            (RenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.ROLE);
+            (RenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
         assertEquals("%p", configuration.getLinkLabelFormat());
     }
 }

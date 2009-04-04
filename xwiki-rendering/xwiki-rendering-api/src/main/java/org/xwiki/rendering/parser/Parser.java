@@ -32,11 +32,6 @@ import org.xwiki.rendering.block.XDOM;
 public interface Parser
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = Parser.class.getName();
-
-    /**
      * @return the wiki syntax the parser is implementing
      */
     Syntax getSyntax();

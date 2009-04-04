@@ -103,7 +103,7 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
 
         if (this.container == null) {
             // Initialize the Container
-            Container c = (Container) cm.lookup(Container.ROLE);
+            Container c = (Container) cm.lookup(Container.class);
             c.setApplicationContext(this);
         }
 
@@ -146,7 +146,7 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
      */
     public CacheFactory getCacheFactory() throws Exception
     {
-        CacheManager cacheManager = (CacheManager) getComponentManager().lookup(CacheManager.ROLE, "default");
+        CacheManager cacheManager = (CacheManager) getComponentManager().lookup(CacheManager.class, "default");
 
         CacheFactory factory = cacheManager.getCacheFactory();
 

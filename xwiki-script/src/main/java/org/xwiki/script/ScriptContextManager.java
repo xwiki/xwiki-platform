@@ -29,11 +29,6 @@ import javax.script.ScriptContext;
 public interface ScriptContextManager
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = ScriptContextManager.class.getName();
-
-    /**
      * @return an initialized {@link ScriptContext}.
      */
     ScriptContext getScriptContext();

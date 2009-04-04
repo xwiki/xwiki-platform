@@ -685,7 +685,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         setConfig(config);
 
         XWikiStoreInterface basestore =
-            (XWikiStoreInterface) Utils.getComponent(XWikiStoreInterface.ROLE, Param("xwiki.store.main.hint"));
+            (XWikiStoreInterface) Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint"));
 
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
@@ -699,23 +699,23 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
             "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
-        setAttachmentStore((XWikiAttachmentStoreInterface) Utils.getComponent(XWikiAttachmentStoreInterface.ROLE,
+        setAttachmentStore((XWikiAttachmentStoreInterface) Utils.getComponent(XWikiAttachmentStoreInterface.class,
             Param("xwiki.store.attachment.hint")));
 
-        setVersioningStore((XWikiVersioningStoreInterface) Utils.getComponent(XWikiVersioningStoreInterface.ROLE,
+        setVersioningStore((XWikiVersioningStoreInterface) Utils.getComponent(XWikiVersioningStoreInterface.class,
             Param("xwiki.store.versioning.hint")));
 
-        setAttachmentVersioningStore((AttachmentVersioningStore) Utils.getComponent(AttachmentVersioningStore.ROLE,
+        setAttachmentVersioningStore((AttachmentVersioningStore) Utils.getComponent(AttachmentVersioningStore.class,
             hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint") : "void"));
 
         if (hasRecycleBin(context)) {
-            setRecycleBinStore((XWikiRecycleBinStoreInterface) Utils.getComponent(XWikiRecycleBinStoreInterface.ROLE,
+            setRecycleBinStore((XWikiRecycleBinStoreInterface) Utils.getComponent(XWikiRecycleBinStoreInterface.class,
                 Param("xwiki.store.recyclebin.hint")));
         }
 
         if (hasAttachmentRecycleBin(context)) {
             setAttachmentRecycleBinStore((AttachmentRecycleBinStore) Utils.getComponent(
-                AttachmentRecycleBinStore.ROLE, Param("xwiki.store.attachment.recyclebin.hint")));
+                AttachmentRecycleBinStore.class, Param("xwiki.store.attachment.recyclebin.hint")));
         }
 
         // Run migrations
@@ -1287,7 +1287,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             XWikiDocument newOriginal = doc.getOriginalDocument();
             try {
                 doc.setOriginalDocument(originalDocument);
-                ObservationManager om = (ObservationManager) Utils.getComponent(ObservationManager.ROLE);
+                ObservationManager om = (ObservationManager) Utils.getComponent(ObservationManager.class);
                 // Notify listeners about the document change
                 // The first call is for the old notification mechanism. It is kept here because it
                 // is in a deprecation stage. It will be removed later.
@@ -3777,7 +3777,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // changed in the future, when the whole platform will be written using components
             // and there won't be a need for the context. The old version is available using
             // doc.getOriginalDocument()
-            ObservationManager om = (ObservationManager) Utils.getComponent(ObservationManager.ROLE);
+            ObservationManager om = (ObservationManager) Utils.getComponent(ObservationManager.class);
             if (om != null) {
                 XWikiDocument blankDoc = new XWikiDocument(doc.getSpace(), doc.getName());
                 blankDoc.setOriginalDocument(doc);
@@ -5284,14 +5284,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         String cacheHint = Param("xwiki.cache.cachefactory.hint", null);
 
         if (cacheHint == null) {
-            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.ROLE, "default");
+            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.class, "default");
             try {
                 cacheFactory = cacheManager.getCacheFactory();
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to get cache factory component", e);
             }
         } else {
-            cacheFactory = (CacheFactory) Utils.getComponent(CacheFactory.ROLE, cacheHint);
+            cacheFactory = (CacheFactory) Utils.getComponent(CacheFactory.class, cacheHint);
         }
 
         return cacheFactory;
@@ -5309,15 +5309,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         String localCacheHint = Param("xwiki.cache.cachefactory.local.hint", null);
 
-        if ((CacheFactory) Utils.getComponent(CacheFactory.ROLE, localCacheHint) == null) {
-            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.ROLE, "default");
+        if ((CacheFactory) Utils.getComponent(CacheFactory.class, localCacheHint) == null) {
+            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.class, "default");
             try {
                 localCacheFactory = cacheManager.getLocalCacheFactory();
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to get local cache factory component", e);
             }
         } else {
-            localCacheFactory = (CacheFactory) Utils.getComponent(CacheFactory.ROLE, localCacheHint);
+            localCacheFactory = (CacheFactory) Utils.getComponent(CacheFactory.class, localCacheHint);
         }
 
         return localCacheFactory;

@@ -28,11 +28,6 @@ package org.xwiki.bridge;
 public interface SkinAccessBridge
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = SkinAccessBridge.class.getName();
-    
-    /**
      * Gets a specific file from the current skin.
      * @param fileName the required file
      * @return the file's URL

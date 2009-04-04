@@ -22,11 +22,6 @@ package org.xwiki.container;
 
 public interface ContainerFactory
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    public final static String ROLE = ContainerFactory.class.getName();
-
     Request createRequest(Object... objects);
     
     Response createResponse(Object... objects);

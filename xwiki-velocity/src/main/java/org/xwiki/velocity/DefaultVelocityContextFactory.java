@@ -105,7 +105,7 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
 
         // Call all components implementing the VelocityContextInitializer's role.
         try {
-            for (Object interceptor : this.componentManager.lookupList(VelocityContextInitializer.ROLE)) {
+            for (Object interceptor : this.componentManager.lookupList(VelocityContextInitializer.class)) {
                 ((VelocityContextInitializer) interceptor).initialize(context);
             }
         } catch (ComponentLookupException e) {

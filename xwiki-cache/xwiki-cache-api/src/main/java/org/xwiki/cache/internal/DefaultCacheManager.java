@@ -88,7 +88,7 @@ public class DefaultCacheManager implements CacheManager, Composable
      */
     public CacheFactory getCacheFactory(String cacheHint) throws ComponentLookupException
     {
-        return (CacheFactory) this.componentManager.lookup(CacheFactory.ROLE, cacheHint);
+        return (CacheFactory) this.componentManager.lookup(CacheFactory.class, cacheHint);
     }
 
     /**
@@ -124,7 +124,7 @@ public class DefaultCacheManager implements CacheManager, Composable
     {
         CacheFactory cacheFactory;
         try {
-            cacheFactory = (CacheFactory) this.componentManager.lookup(CacheFactory.ROLE, cacheHint);
+            cacheFactory = (CacheFactory) this.componentManager.lookup(CacheFactory.class, cacheHint);
         } catch (ComponentLookupException e) {
             throw new CacheException("Failed to get cache factory for role hint [" + cacheHint + "]", e);
         }

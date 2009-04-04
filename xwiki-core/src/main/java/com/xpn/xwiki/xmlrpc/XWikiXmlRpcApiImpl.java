@@ -653,7 +653,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         XWikiDocument baseDocument = this.xwiki.getDocument(extendedId.getBasePageId(), this.xwikiContext);
         this.xwikiContext.setDoc(baseDocument);
 
-        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
 
         this.xwiki.prepareDocuments(this.xwikiContext.getRequest(), this.xwikiContext, vcontext);
@@ -1208,7 +1208,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
                     "select doc.fullName, rcs.id, rcs.date, rcs.author from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId=doc.id and rcs.date > :date order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
                     order, order, order);
 
-        QueryManager queryManager = (QueryManager) Utils.getComponent(QueryManager.ROLE);
+        QueryManager queryManager = (QueryManager) Utils.getComponent(QueryManager.class);
         List<Object> queryResult =
             queryManager.createQuery(query, Query.XWQL).bindValue("date", date).setLimit(numberOfResults).setOffset(
                 start).execute();

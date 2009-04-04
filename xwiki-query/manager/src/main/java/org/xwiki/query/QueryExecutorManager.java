@@ -29,11 +29,6 @@ import java.util.Set;
 public interface QueryExecutorManager extends QueryExecutor
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = QueryExecutorManager.class.getName();
-
-    /**
      * @return supported languages
      */
     Set<String> getLanguages();

@@ -31,11 +31,6 @@ import org.apache.velocity.VelocityContext;
 public interface VelocityManager
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = VelocityManager.class.getName();
-
-    /**
      * @return the current Velocity Context retrieved from the Execution Context
      */
     VelocityContext getVelocityContext();

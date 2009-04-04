@@ -123,7 +123,7 @@ public class RootView extends AbstractDavView implements Composable
                 XWikiDavResource resource = null;
                 try {
                     String viewHint = viewHints.get(nextToken);
-                    resource = (XWikiDavResource) componentManager.lookup(ROLE, viewHint);
+                    resource = (XWikiDavResource) componentManager.lookup(XWikiDavResource.class, viewHint);
                     resource.init(this, nextToken, "/" + nextToken);
                     stack.push(resource);
                     resource.decode(stack, tokens, next + 1);
@@ -144,23 +144,23 @@ public class RootView extends AbstractDavView implements Composable
         List<DavResource> children = new ArrayList<DavResource>();
         try {
             XWikiDavResource homeView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.HOME);
+                (XWikiDavResource) componentManager.lookup(XWikiDavResource.class, ResourceHints.HOME);
             homeView.init(this, "home", "/home");
             children.add(homeView);
             XWikiDavResource pagesView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.PAGES);
+                (XWikiDavResource) componentManager.lookup(XWikiDavResource.class, ResourceHints.PAGES);
             pagesView.init(this, "spaces", "/spaces");
             children.add(pagesView);
             XWikiDavResource attachmentsView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.ATTACHMENTS);
+                (XWikiDavResource) componentManager.lookup(XWikiDavResource.class, ResourceHints.ATTACHMENTS);
             attachmentsView.init(this, "attachments", "/attachments");
             children.add(attachmentsView);
             XWikiDavResource orphansView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.ORPHANS);
+                (XWikiDavResource) componentManager.lookup(XWikiDavResource.class, ResourceHints.ORPHANS);
             orphansView.init(this, "orphans", "/orphans");
             children.add(orphansView);
             XWikiDavResource whatsnewView =
-                (XWikiDavResource) componentManager.lookup(ROLE, ResourceHints.WHATSNEW);
+                (XWikiDavResource) componentManager.lookup(XWikiDavResource.class, ResourceHints.WHATSNEW);
             whatsnewView.init(this, "whatsnew", "/whatsnew");
             children.add(whatsnewView);
         } catch (ComponentLookupException e) {

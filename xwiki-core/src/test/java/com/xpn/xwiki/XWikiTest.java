@@ -277,7 +277,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     public void testSaveDocumentSendsObservationEvents() throws Exception
     {
         TestSaveEventListener listener = new TestSaveEventListener();
-        ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.ROLE);
+        ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
         om.addListener(new DocumentSaveEvent("xwikitest:Some.Document"), listener);
 
         XWikiDocument document = new XWikiDocument("xwikitest", "Some", "Document");
@@ -294,7 +294,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     public void testDeleteDocumentSendsObservationEvents() throws Exception
     {
         TestDeleteEventListener listener = new TestDeleteEventListener();
-        ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.ROLE);
+        ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
         om.addListener(new DocumentDeleteEvent("xwikitest:Another.Document"), listener);
 
         XWikiDocument document = new XWikiDocument("xwikitest", "Another", "Document");

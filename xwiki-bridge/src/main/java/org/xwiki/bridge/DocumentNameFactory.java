@@ -28,11 +28,6 @@ package org.xwiki.bridge;
 public interface DocumentNameFactory
 {
     /**
-     * Role for looking up implementing components.
-     */
-    String ROLE = DocumentNameFactory.class.getName();
-    
-    /**
      * @param reference the document's name as a string using a textual format (eg {@code wiki:space.page}).
      *        The supported format is up to implementers of this method.
      * @return the object representing a document reference

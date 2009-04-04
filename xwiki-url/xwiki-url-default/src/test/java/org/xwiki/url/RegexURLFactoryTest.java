@@ -35,7 +35,7 @@ public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
     @Override
     protected void setUp() throws Exception
     {
-        this.factory = (XWikiURLFactory) getComponentManager().lookup(XWikiURLFactory.ROLE);
+        this.factory = (XWikiURLFactory) getComponentManager().lookup(XWikiURLFactory.class);
     }
 
     public void testCreateURL() throws Exception

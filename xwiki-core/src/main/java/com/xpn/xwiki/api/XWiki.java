@@ -2629,7 +2629,7 @@ public class XWiki extends Api
      */
     public QueryManager getQueryManager()
     {
-        return (QueryManager) Utils.getComponent(QueryManager.ROLE, "secure");
+        return (QueryManager) Utils.getComponent(QueryManager.class, "secure");
     }
 
     /**

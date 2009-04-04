@@ -31,11 +31,6 @@ import org.xwiki.cache.config.CacheConfiguration;
 public interface CacheFactory
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = CacheFactory.class.getName();
-
-    /**
      * Create and return a custom cache.
      * 
      * @param <T> the class of the data stored in the cache.

@@ -30,11 +30,6 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface SyntaxFactory
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = SyntaxFactory.class.getName();
-
     Syntax createSyntaxFromIdString(String syntaxAsIdString) throws ParseException;
 
     /**

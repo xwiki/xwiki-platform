@@ -48,7 +48,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     {
         super.setUp();
 
-        this.transformation = (MacroTransformation) getComponentManager().lookup(Transformation.ROLE, "macro");
+        this.transformation = (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
     }
 
     /**

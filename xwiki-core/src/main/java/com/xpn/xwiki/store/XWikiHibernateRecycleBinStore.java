@@ -41,7 +41,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
 {
     /**
      * @param context used for environment
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiRecycleBinStoreInterface.ROLE) instead.
+     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiRecycleBinStoreInterface.class) instead.
      */
     @Deprecated
     public XWikiHibernateRecycleBinStore(XWikiContext context)

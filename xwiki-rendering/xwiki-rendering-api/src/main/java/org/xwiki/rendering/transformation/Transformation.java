@@ -36,11 +36,6 @@ import org.xwiki.rendering.parser.Syntax;
 public interface Transformation extends Comparable<Transformation>
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = Transformation.class.getName();
-
-    /**
      * The priority of execution relative to the other transformations. The lowest values have the highest priorities
      * and execute first. For example a Transformation with a priority of 100 will execute before one with a priority
      * of 500. 

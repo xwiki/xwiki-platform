@@ -35,7 +35,7 @@ public class DefaultTransformationManagerTest extends AbstractRenderingTestCase
     public void testTransformations() throws Exception 
     {
         TransformationManager manager =
-            (TransformationManager) getComponentManager().lookup(TransformationManager.ROLE);
+            (TransformationManager) getComponentManager().lookup(TransformationManager.class);
          manager.performTransformations(XDOM.EMPTY, new Syntax(SyntaxType.XWIKI, "2.0"));
     }
 }

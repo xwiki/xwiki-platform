@@ -100,7 +100,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
             // Make the Syntax Factory component available from Velocity.
             // TODO: We need to decide how we want to expose components in general and how to protect users from
             // "dangerous" apis.
-            vcontext.put("syntaxFactory", Utils.getComponent(SyntaxFactory.ROLE));
+            vcontext.put("syntaxFactory", Utils.getComponent(SyntaxFactory.class));
 
             // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the
             // Velocity context there. However if we create a new Velocity context we need to populate it with
@@ -177,7 +177,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
         String cacheKey = getVelocityEngineCacheKey(skin, xcontext);
 
         // Get the Velocity Engine to use
-        VelocityFactory velocityFactory = (VelocityFactory) Utils.getComponent(VelocityFactory.ROLE);
+        VelocityFactory velocityFactory = (VelocityFactory) Utils.getComponent(VelocityFactory.class);
         VelocityEngine velocityEngine;
         if (velocityFactory.hasVelocityEngine(cacheKey)) {
             velocityEngine = velocityFactory.getVelocityEngine(cacheKey);

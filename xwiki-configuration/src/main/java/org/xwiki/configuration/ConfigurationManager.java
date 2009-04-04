@@ -29,11 +29,6 @@ import org.xwiki.component.phase.InitializationException;
  */
 public interface ConfigurationManager
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = ConfigurationManager.class.getName();
-
     void initializeConfiguration(Object configurationBean, List<ConfigurationSource> sources, String namespace)
         throws InitializationException;
 }

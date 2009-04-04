@@ -99,7 +99,7 @@ public class PdfExportImpl implements PdfExport
     static {
         fopFactory = FopFactory.newInstance();
         try {
-            fopFactory.setFontBaseURL(((Container) Utils.getComponent(Container.ROLE)).getApplicationContext()
+            fopFactory.setFontBaseURL(((Container) Utils.getComponent(Container.class)).getApplicationContext()
                 .getResource("/WEB-INF/fonts/").getPath());
         } catch (Throwable ex) {
             log.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
@@ -291,7 +291,7 @@ public class PdfExportImpl implements PdfExport
             docFactory.setNamespaceAware(true);
             docFactory.setValidating(false);
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            docBuilder.setEntityResolver((EntityResolver) Utils.getComponent(EntityResolver.class.getName()));
+            docBuilder.setEntityResolver((EntityResolver) Utils.getComponent(EntityResolver.class));
             Document xslt = docBuilder.parse(new InputSource(xsltinputstream));
             Document xmldoc = docBuilder.parse(new InputSource(xmlinputstream));
             Transformer transformer = TransformerFactory.newInstance().newTransformer(new DOMSource(xslt));

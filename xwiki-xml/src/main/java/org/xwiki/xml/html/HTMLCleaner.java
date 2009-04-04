@@ -32,11 +32,6 @@ import org.w3c.dom.Document;
 public interface HTMLCleaner
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = HTMLCleaner.class.getName();
-    
-    /**
      * Transforms any HTML content into valid XHTML that can be fed to the XHTML Parser for example.
      * A default configuration is applied for cleaning the original HTML (see {@link #getDefaultConfiguration()}).
      * 

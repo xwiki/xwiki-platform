@@ -28,11 +28,6 @@ package org.xwiki.container;
 public interface RequestInitializer
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = RequestInitializer.class.getName();
-
-    /**
      * Perform initializations here, such as storing objects in the Request.
      * 
      * @param request the XWiki Request object

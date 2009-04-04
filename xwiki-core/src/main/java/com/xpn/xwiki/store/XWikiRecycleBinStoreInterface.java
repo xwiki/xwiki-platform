@@ -35,11 +35,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface XWikiRecycleBinStoreInterface
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = XWikiRecycleBinStoreInterface.class.getName();
-
-    /**
      * Save document to recycle bin.
      * 
      * @param doc - document to save

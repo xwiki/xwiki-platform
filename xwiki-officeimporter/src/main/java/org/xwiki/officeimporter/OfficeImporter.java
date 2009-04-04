@@ -34,11 +34,6 @@ import org.xwiki.rendering.parser.SyntaxType;
 public interface OfficeImporter
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = OfficeImporter.class.getName();
-
-    /**
      * XHTML/1.0 syntax.
      */
     Syntax XHTML_10 = new Syntax(SyntaxType.XHTML, "1.0");

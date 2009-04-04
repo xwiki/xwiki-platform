@@ -38,7 +38,7 @@ public class DefaultConfigurationSourceCollectionTest extends AbstractXWikiCompo
     {
         // Verify that initialization works here.
         ConfigurationSourceCollection sources =
-            (ConfigurationSourceCollection) getComponentManager().lookup(ConfigurationSourceCollection.ROLE);
+            (ConfigurationSourceCollection) getComponentManager().lookup(ConfigurationSourceCollection.class);
 
         assertEquals(1, sources.getConfigurationSources().size());
     }

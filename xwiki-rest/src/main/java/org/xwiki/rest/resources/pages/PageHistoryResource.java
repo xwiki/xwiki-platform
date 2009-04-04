@@ -66,7 +66,7 @@ public class PageHistoryResource extends XWikiResource
                         "select doc.space, doc.name, rcs.id, rcs.date, rcs.author from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId=doc.id and doc.space=:space and doc.name=:name and doc.language=:language order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
                         order, order, order);
 
-            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.ROLE);
+            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
             List<Object> queryResult = null;
             queryResult =

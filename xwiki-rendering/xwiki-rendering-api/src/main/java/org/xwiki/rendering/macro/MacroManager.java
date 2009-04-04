@@ -38,11 +38,6 @@ import org.xwiki.rendering.parser.Syntax;
 public interface MacroManager extends Comparable<MacroManager>
 {
     /**
-     * The component role under which the implementations of this interface can be looked up.
-     */
-    String ROLE = MacroManager.class.getName();
-
-    /**
      * @param syntax the desired syntax
      * @return a set of all names of available macros for the desired syntax.
      * @throws MacroLookupException error when lookup macros

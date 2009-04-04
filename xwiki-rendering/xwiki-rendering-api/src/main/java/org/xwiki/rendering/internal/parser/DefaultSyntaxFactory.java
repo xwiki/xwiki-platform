@@ -79,7 +79,7 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
         List<Syntax> syntaxList = new ArrayList<Syntax>();
         List<Parser> parsers;
         try {
-            parsers = this.componentManager.lookupList(Parser.ROLE);
+            parsers = this.componentManager.lookupList(Parser.class);
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to lookup the list of available Syntaxes", e);
         }

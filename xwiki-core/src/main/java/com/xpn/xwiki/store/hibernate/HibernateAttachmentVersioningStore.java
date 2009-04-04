@@ -45,7 +45,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
 
     /**
      * @param context the current context.
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.ROLE) instead.
+     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.class) instead.
      */
     @Deprecated
     public HibernateAttachmentVersioningStore(XWikiContext context)

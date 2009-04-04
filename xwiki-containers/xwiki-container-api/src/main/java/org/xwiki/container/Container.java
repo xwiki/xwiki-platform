@@ -22,8 +22,6 @@ package org.xwiki.container;
 
 public interface Container
 {
-    String ROLE = Container.class.getName();
-
     ApplicationContext getApplicationContext();
 
     void setApplicationContext(ApplicationContext context);

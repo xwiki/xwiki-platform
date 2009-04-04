@@ -153,7 +153,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     protected Parser getSyntaxParser(MacroTransformationContext context) throws MacroExecutionException
     {
         try {
-            return (Parser) this.componentManager.lookup(Parser.ROLE, context.getSyntax().toIdString());
+            return (Parser) this.componentManager.lookup(Parser.class, context.getSyntax().toIdString());
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Failed to find source parser", e);
         }

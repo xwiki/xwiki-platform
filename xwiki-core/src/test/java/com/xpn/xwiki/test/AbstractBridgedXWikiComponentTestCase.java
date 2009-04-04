@@ -58,11 +58,11 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         Utils.setComponentManager(getComponentManager());
 
         // Bridge with old XWiki Context, required for old code.
-        Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
+        Execution execution = (Execution) getComponentManager().lookup(Execution.class);
         execution.getContext().setProperty("xwikicontext", this.context);
 
         // Set a simple application context, as some components fail to start without one.
-        Container c = (Container) getComponentManager().lookup(Container.ROLE);
+        Container c = (Container) getComponentManager().lookup(Container.class);
         c.setApplicationContext(new TestApplicationContext());
     }
 

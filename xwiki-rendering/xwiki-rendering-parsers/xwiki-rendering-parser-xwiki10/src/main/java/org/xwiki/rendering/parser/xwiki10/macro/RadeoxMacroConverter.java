@@ -31,11 +31,6 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 @ComponentRole
 public interface RadeoxMacroConverter
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = RadeoxMacroConverter.class.getName();
-
     public String getParameterName(int parameterIndex);
 
     boolean supportContent();

@@ -50,13 +50,13 @@ public class PlexusComponentManager implements ComponentManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentManager#lookup(java.lang.String)
+     * @see org.xwiki.component.manager.ComponentManager#lookup(Class)
      */
-    public Object lookup(String role) throws ComponentLookupException
+    public Object lookup(Class< ? > role) throws ComponentLookupException
     {
         Object result;
         try {
-            result = this.plexusContainer.lookup(role);
+            result = this.plexusContainer.lookup(role.getName());
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
             throw new ComponentLookupException("Failed to lookup component role [" + role + "]", e);
         }
@@ -67,13 +67,13 @@ public class PlexusComponentManager implements ComponentManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentManager#lookup(java.lang.String, java.lang.String)
+     * @see org.xwiki.component.manager.ComponentManager#lookup(Class, String)
      */
-    public Object lookup(String role, String roleHint) throws ComponentLookupException
+    public Object lookup(Class< ? > role, String roleHint) throws ComponentLookupException
     {
         Object result;
         try {
-            result = this.plexusContainer.lookup(role, roleHint);
+            result = this.plexusContainer.lookup(role.getName(), roleHint);
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
             throw new ComponentLookupException("Failed to lookup component role [" + role + "] for hint [" + roleHint
                 + "]", e);
@@ -85,13 +85,13 @@ public class PlexusComponentManager implements ComponentManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentManager#lookupMap(java.lang.String)
+     * @see org.xwiki.component.manager.ComponentManager#lookupMap(Class)
      */
-    public Map lookupMap(String role) throws ComponentLookupException
+    public Map<String, Object> lookupMap(Class< ? > role) throws ComponentLookupException
     {
-        Map result;
+        Map<String, Object> result;
         try {
-            result = this.plexusContainer.lookupMap(role);
+            result = this.plexusContainer.lookupMap(role.getName());
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
             throw new ComponentLookupException("Failed to lookup components for role [" + role + "]", e);
         }
@@ -102,13 +102,13 @@ public class PlexusComponentManager implements ComponentManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentManager#lookupList(java.lang.String)
+     * @see org.xwiki.component.manager.ComponentManager#lookupList(Class)
      */
-    public List lookupList(String role) throws ComponentLookupException
+    public List<Object> lookupList(Class< ? > role) throws ComponentLookupException
     {
-        List result;
+        List<Object> result;
         try {
-            result = this.plexusContainer.lookupList(role);
+            result = this.plexusContainer.lookupList(role.getName());
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
             throw new ComponentLookupException("Failed to lookup components for role [" + role + "]", e);
         }
@@ -133,21 +133,21 @@ public class PlexusComponentManager implements ComponentManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentManager#hasComponent(java.lang.String)
+     * @see org.xwiki.component.manager.ComponentManager#hasComponent(Class)
      */
-    public boolean hasComponent(String role)
+    public boolean hasComponent(Class< ? > role)
     {
-        return this.plexusContainer.hasComponent(role);
+        return this.plexusContainer.hasComponent(role.getName());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentManager#hasComponent(java.lang.String, java.lang.String)
+     * @see org.xwiki.component.manager.ComponentManager#hasComponent(Class, String)
      */
-    public boolean hasComponent(String role, String roleHint)
+    public boolean hasComponent(Class< ? > role, String roleHint)
     {
-        return this.plexusContainer.hasComponent(role, roleHint);
+        return this.plexusContainer.hasComponent(role.getName(), roleHint);
     }
 
     private org.codehaus.plexus.component.repository.ComponentDescriptor createPlexusComponentDescriptor(
@@ -156,7 +156,7 @@ public class PlexusComponentManager implements ComponentManager
         org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
             new org.codehaus.plexus.component.repository.ComponentDescriptor();
 
-        pcd.setRole(componentDescriptor.getRole());
+        pcd.setRole(componentDescriptor.getRole().getName());
         pcd.setRoleHint(componentDescriptor.getRoleHint());
         pcd.setImplementation(componentDescriptor.getImplementation());
         
@@ -200,7 +200,7 @@ public class PlexusComponentManager implements ComponentManager
                 requirement = new ComponentRequirement();
             }
 
-            requirement.setRole(dependency.getRole());
+            requirement.setRole(dependency.getRole().getName());
             requirement.setRoleHint(dependency.getRoleHint());
             requirement.setFieldMappingType(dependency.getMappingType().getName());
             requirement.setFieldName(dependency.getName());

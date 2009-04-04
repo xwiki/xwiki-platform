@@ -101,7 +101,7 @@ public class BaseSearchResult extends XWikiResource
 
         String query = f.toString();
 
-        QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.ROLE);
+        QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
         List<Object> queryResult = null;
 
@@ -180,7 +180,7 @@ public class BaseSearchResult extends XWikiResource
 
         System.out.format("Query: %s\n", query);
 
-        QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.ROLE);
+        QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
         List<Object> queryResult = null;
         if (space != null) {

@@ -41,7 +41,7 @@ public class MockSkinAccessBridge implements SkinAccessBridge
     {
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
 
-        componentDescriptor.setRole(SkinAccessBridge.ROLE);
+        componentDescriptor.setRole(SkinAccessBridge.class);
         componentDescriptor.setImplementation(MockSkinAccessBridge.class.getName());
 
         return componentDescriptor;

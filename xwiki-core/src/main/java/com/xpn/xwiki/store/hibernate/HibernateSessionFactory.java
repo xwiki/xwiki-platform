@@ -36,11 +36,6 @@ import com.xpn.xwiki.util.Util;
 public class HibernateSessionFactory
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    public static final String ROLE = HibernateSessionFactory.class.getName();
-
-    /**
      * Hibernate configuration object.
      */
     private Configuration configuration = new Configuration()

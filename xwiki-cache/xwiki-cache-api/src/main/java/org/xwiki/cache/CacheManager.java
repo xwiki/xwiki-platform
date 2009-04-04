@@ -32,11 +32,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 public interface CacheManager
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = CacheManager.class.getName();
-
-    /**
      * Lookup the cache creation component with provided hint return it.
      * 
      * @return the cache creation service to use.

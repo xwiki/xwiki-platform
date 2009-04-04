@@ -30,11 +30,6 @@ import net.sf.jodconverter.OfficeDocumentConverter;
 public interface OpenOfficeServerManager
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = OpenOfficeServerManager.class.getName();
-
-    /**
      * Enum type used to represent the state of the oo server process.
      * 
      * @version $Id$

@@ -45,7 +45,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
 
-        componentDescriptor.setRole(DocumentAccessBridge.ROLE);
+        componentDescriptor.setRole(DocumentAccessBridge.class);
         componentDescriptor.setImplementation(MockDocumentAccessBridge.class.getName());
 
         return componentDescriptor;

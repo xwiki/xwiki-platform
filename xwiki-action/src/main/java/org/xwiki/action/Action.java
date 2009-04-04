@@ -22,8 +22,6 @@ package org.xwiki.action;
 
 public interface Action
 {
-    String ROLE = Action.class.getName();
-
     void execute() throws ActionException;
 
     void execute(Object additionalData) throws ActionException;

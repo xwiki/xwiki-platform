@@ -29,11 +29,6 @@ package org.xwiki.bridge;
 public interface DocumentNameSerializer
 {
     /**
-     * Role for looking up implementing components.
-     */
-    String ROLE = DocumentNameSerializer.class.getName();
-    
-    /**
      * @param documentName the document name to serialize
      * @return the fully qualified document reference string (ie of the form {@code wiki:space.page})
      */

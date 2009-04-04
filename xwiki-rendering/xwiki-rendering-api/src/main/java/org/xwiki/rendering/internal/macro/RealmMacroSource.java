@@ -74,7 +74,7 @@ public class RealmMacroSource extends AbstractMacroSource implements Initializab
         // Find all registered macros
         Map<String, Macro< ? >> allMacros;
         try {
-            allMacros = this.componentManager.lookupMap(Macro.ROLE);
+            allMacros = this.componentManager.lookupMap(Macro.class);
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to lookup Macros", e);
         }

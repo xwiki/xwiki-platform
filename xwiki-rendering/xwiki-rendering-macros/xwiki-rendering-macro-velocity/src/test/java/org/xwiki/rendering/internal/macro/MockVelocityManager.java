@@ -54,7 +54,7 @@ public class MockVelocityManager implements VelocityManager, Composable
     {
         VelocityEngine engine;
         try {
-            engine = (VelocityEngine) this.componentManager.lookup(VelocityEngine.ROLE);
+            engine = (VelocityEngine) this.componentManager.lookup(VelocityEngine.class);
         } catch (ComponentLookupException e) {
             throw new XWikiVelocityException("Failed to look up Velocity Engine", e);
         }

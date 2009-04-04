@@ -31,11 +31,6 @@ import org.apache.velocity.VelocityContext;
 public interface VelocityContextInitializer
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = VelocityContextInitializer.class.getName();
-
-    /**
      * Allow initializing the Velocity Context by putting objects into it.
      * 
      * @param context the Velocity context to initialize

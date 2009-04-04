@@ -32,11 +32,6 @@ package org.xwiki.officeimporter.openoffice;
 public interface OpenOfficeServerConfiguration
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = OpenOfficeServerConfiguration.class.getName();
-
-    /**
      * @return path to openoffice server installation.
      */
     String getHomePath();

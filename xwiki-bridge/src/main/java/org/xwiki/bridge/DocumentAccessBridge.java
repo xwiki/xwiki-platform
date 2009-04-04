@@ -31,11 +31,6 @@ import java.util.Map;
 public interface DocumentAccessBridge
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = DocumentAccessBridge.class.getName();
-
-    /**
      * Get the document object associated with the passed document name.
      * 
      * @param documentName the name of the document to find

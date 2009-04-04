@@ -22,8 +22,6 @@ package org.xwiki.context;
 
 public interface ExecutionContextManager
 {
-    String ROLE = ExecutionContextManager.class.getName();
-
     void initialize(ExecutionContext context) throws ExecutionContextException;
     
     /**

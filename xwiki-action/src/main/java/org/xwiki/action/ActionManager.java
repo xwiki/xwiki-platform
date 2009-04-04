@@ -22,8 +22,6 @@ package org.xwiki.action;
 
 public interface ActionManager
 {
-    String ROLE = ActionManager.class.getName();
-
     /**
      * @exception ActionException when we haven't been able to use the error action to handle
      *            the original exception

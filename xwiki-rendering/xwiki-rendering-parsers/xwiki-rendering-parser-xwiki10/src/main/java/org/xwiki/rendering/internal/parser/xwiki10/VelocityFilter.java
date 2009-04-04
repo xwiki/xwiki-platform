@@ -126,7 +126,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
                 try {
                     currentMacro =
-                        (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.ROLE, macroName);
+                        (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.class, macroName);
 
                     if (!currentMacro.isInline()) {
                         nonVelocityContent = CleanUtil.setLastNewLines(nonVelocityContent, 2);

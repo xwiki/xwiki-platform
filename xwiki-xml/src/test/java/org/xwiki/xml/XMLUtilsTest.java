@@ -41,7 +41,7 @@ public class XMLUtilsTest extends AbstractXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "default");
+        cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "default");
     }
 
     public void testStripHTMLEnvelope() throws Exception

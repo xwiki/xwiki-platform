@@ -33,11 +33,6 @@ import org.apache.velocity.VelocityContext;
 public interface VelocityContextFactory
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = VelocityContextFactory.class.getName();
-
-    /**
      * Creates and initializes a new Velocity Context.
      * 
      * @return a new Velocity Context, populated with Tools and data pushed by {@link VelocityContextInitializer}s

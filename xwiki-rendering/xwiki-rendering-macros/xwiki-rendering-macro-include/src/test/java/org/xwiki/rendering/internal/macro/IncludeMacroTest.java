@@ -58,12 +58,12 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
         // Since it's not in the same context, we verify that a Velocity variable set in the including page is not
         // seen in the included page.
-        VelocityManager velocityManager = (VelocityManager) getComponentManager().lookup(VelocityManager.ROLE);
+        VelocityManager velocityManager = (VelocityManager) getComponentManager().lookup(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($myvar = 'hello')");
 
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.ROLE, "include");
+        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
         Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
         mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(
@@ -81,7 +81,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         // Create a Macro transformation context with the Macro transformation object defined so that the include
         // macro can transform included page which is using a new context.
         MacroTransformation macroTransformation = 
-            (MacroTransformation) getComponentManager().lookup(Transformation.ROLE, "macro");
+            (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
         MacroTransformationContext context = new MacroTransformationContext();
         context.setMacroTransformation(macroTransformation);
         
@@ -96,7 +96,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
             + "onMacroStandalone [someMacro] [] []\n"
             + "endDocument";
 
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.ROLE, "include");
+        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
         Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
         mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));

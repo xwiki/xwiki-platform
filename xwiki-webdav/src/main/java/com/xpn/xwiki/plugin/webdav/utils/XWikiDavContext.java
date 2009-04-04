@@ -88,7 +88,7 @@ public class XWikiDavContext implements LockManager
 
             ServletContainerInitializer containerInitializer =
                 (ServletContainerInitializer) Utils
-                    .getComponent(ServletContainerInitializer.ROLE);
+                    .getComponent(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(xwikiContext.getRequest()
                 .getHttpServletRequest(), xwikiContext);
             containerInitializer.initializeResponse(xwikiContext.getResponse()
@@ -130,7 +130,7 @@ public class XWikiDavContext implements LockManager
     {
         try {
             CacheManager cacheManager =
-                (CacheManager) Utils.getComponent(CacheManager.ROLE, "default");
+                (CacheManager) Utils.getComponent(CacheManager.class, "default");
             CacheFactory factory = cacheManager.getCacheFactory();
             CacheConfiguration conf = new CacheConfiguration();
             LRUEvictionConfiguration lec = new LRUEvictionConfiguration();

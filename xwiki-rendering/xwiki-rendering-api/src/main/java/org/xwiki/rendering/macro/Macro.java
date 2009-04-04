@@ -35,11 +35,6 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 public interface Macro<P> extends Comparable<Macro< ? >>
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = Macro.class.getName();
-
-    /**
      * The priority of execution relative to the other Macros. The lowest values have the highest priorities and execute
      * first. For example a Macro with a priority of 100 will execute before one with a priority of 500.
      * 

@@ -32,11 +32,6 @@ import org.w3c.dom.Document;
 public interface HTMLFilter
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = HTMLFilter.class.getName();
-    
-    /**
      * Performs cleaning of the html code stored in {@link Document}.
      * 
      * @param document The {@link Document} with html code

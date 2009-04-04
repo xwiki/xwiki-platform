@@ -67,7 +67,7 @@ public class ModificationsResource extends XWikiResource
                         "select doc.space, doc.name, doc.language, rcs.id, rcs.date, rcs.author from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId=doc.id and rcs.date > :date order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
                         order, order, order);
 
-            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.ROLE);
+            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
             List<Object> queryResult = null;
             queryResult =

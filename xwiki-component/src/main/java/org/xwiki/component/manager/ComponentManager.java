@@ -27,19 +27,37 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 
 public interface ComponentManager
 {
-    Object lookup(String role) throws ComponentLookupException;
+    /**
+     * Find a component instance that implements that passed interface class. If the component has a singleton
+     * lifecycle then this method always return the same instance.
+     *  
+     * @param role the class (aka role) that the component implements 
+     * @return the component instance
+     * @throws ComponentLookupException in case the component cannot be found 
+     */
+    Object lookup(Class< ? > role) throws ComponentLookupException;
+    
+    /**
+     * Find a component instance that implements that passed interface class. If the component has a singleton
+     * lifecycle then this method always return the same instance.
+     *  
+     * @param role the class (aka role) that the component implements
+     * @param roleHint the hint that differentiates a component implementation from another one (each component
+     *        is registered with a hint; the "default" hint being the default) 
+     * @return the component instance
+     * @throws ComponentLookupException in case the component cannot be found 
+     */
+    Object lookup(Class< ? > role, String roleHint) throws ComponentLookupException;
 
-    Object lookup(String role, String roleHint) throws ComponentLookupException;
+    boolean hasComponent(Class< ? > role);
 
-    boolean hasComponent(String role);
-
-    boolean hasComponent(String role, String roleHint);
+    boolean hasComponent(Class< ? > role, String roleHint);
 
     void release(Object component) throws ComponentLifecycleException;
 
-    Map lookupMap(String role) throws ComponentLookupException;
+    Map lookupMap(Class< ? > role) throws ComponentLookupException;
 
-    List lookupList(String role) throws ComponentLookupException;
+    List lookupList(Class< ? > role) throws ComponentLookupException;
 
     /**
      * Add a component in the component repository programmaticaly.

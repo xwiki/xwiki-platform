@@ -92,7 +92,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public void initialize() throws InitializationException
     {
-        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+        Execution execution = (Execution) Utils.getComponent(Execution.class);
         XWikiContext context = (XWikiContext) execution.getContext().getProperty("xwikicontext");
         setPath(context.getWiki().getConfig().getProperty("xwiki.store.hibernate.path", getPath()));
     }
@@ -159,7 +159,7 @@ public class XWikiHibernateBaseStore implements Initializable
             }
         }
         if (sessionFactory == null) {
-            sessionFactory = (HibernateSessionFactory) Utils.getComponent(HibernateSessionFactory.ROLE);
+            sessionFactory = (HibernateSessionFactory) Utils.getComponent(HibernateSessionFactory.class);
         }
 
         setSessionFactory(getConfiguration().buildSessionFactory());

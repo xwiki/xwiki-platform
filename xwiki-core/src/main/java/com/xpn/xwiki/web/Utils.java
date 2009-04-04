@@ -533,11 +533,11 @@ public class Utils
     /**
      * Lookup a XWiki component by role and hint.
      * 
-     * @param role the component's identity (usually the component's interface name as a String)
+     * @param role the class (aka role) that the component implements
      * @param hint a value to differentiate different component implementations for the same role
-     * @return the component's Object
+     * @return the component's instance
      */
-    public static Object getComponent(String role, String hint)
+    public static Object getComponent(Class< ? > role, String hint)
     {
         Object component = null;
         if (componentManager != null) {
@@ -557,10 +557,10 @@ public class Utils
     /**
      * Lookup a XWiki component by role (uses the default hint).
      * 
-     * @param role the component's identity (usually the component's interface name as a String)
-     * @return the component's Object
+     * @param role the class (aka role) that the component implements
+     * @return the component's instance
      */
-    public static Object getComponent(String role)
+    public static Object getComponent(Class< ? > role)
     {
         return getComponent(role, "default");
     }

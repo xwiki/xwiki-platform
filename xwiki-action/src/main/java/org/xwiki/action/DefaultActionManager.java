@@ -61,7 +61,7 @@ public class DefaultActionManager implements ActionManager, Composable
     {
         // Actions are registered with a role hint corresponding to the action name
         try {
-            Action action = (Action) this.componentManager.lookup(Action.ROLE, actionName);
+            Action action = (Action) this.componentManager.lookup(Action.class, actionName);
             action.execute(additionalData);
         } catch (Exception e) {
             this.errorAction.execute(e);

@@ -92,7 +92,7 @@ public class XWikiDavResourceFactory implements DavResourceFactory
         XWikiDavContext context =
             new XWikiDavContext(request, response, servletContext, this, session, lockManager);
         RootView rootView =
-            (RootView) Utils.getComponent(XWikiDavResource.ROLE, "root");
+            (RootView) Utils.getComponent(XWikiDavResource.class, "root");
         rootView.init("webdav", rootLocator, context);
         return rootView.decode(locator);
     }

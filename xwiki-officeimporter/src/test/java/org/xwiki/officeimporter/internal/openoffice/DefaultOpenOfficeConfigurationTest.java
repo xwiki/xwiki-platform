@@ -45,7 +45,8 @@ public class DefaultOpenOfficeConfigurationTest extends AbstractXWikiComponentTe
     {        
         getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();        
-        configuration = (OpenOfficeServerConfiguration) getComponentManager().lookup(OpenOfficeServerConfiguration.ROLE, "default");
+        configuration = (OpenOfficeServerConfiguration) getComponentManager().lookup(
+            OpenOfficeServerConfiguration.class, "default");
     }
     
     /**

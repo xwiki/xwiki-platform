@@ -26,11 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface ServletContainerInitializer
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = ServletContainerInitializer.class.getName();
-
     void initializeRequest(HttpServletRequest request, Object xwikiContext)
         throws ServletContainerException;
     

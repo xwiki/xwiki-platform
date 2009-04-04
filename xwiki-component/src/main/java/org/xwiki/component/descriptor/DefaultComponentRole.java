@@ -2,18 +2,18 @@ package org.xwiki.component.descriptor;
 
 public class DefaultComponentRole implements ComponentRole
 {
-    private String role;
+    private Class< ? > role;
 
     private String roleHint = "default";
 
-    public void setRole(String role)
+    public void setRole(Class< ? > role)
     {
         this.role = role;
     }
 
-    public String getRole()
+    public Class< ? > getRole()
     {
-        return role;
+        return this.role;
     }
 
     public void setRoleHint(String roleHint)

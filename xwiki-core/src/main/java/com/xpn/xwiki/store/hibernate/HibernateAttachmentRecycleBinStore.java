@@ -58,7 +58,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
      * Constructor used by {@link XWiki} during storage initialization.
      * 
      * @param context The current context.
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentRecycleBinStore.ROLE) instead.
+     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentRecycleBinStore.class) instead.
      */
     @Deprecated
     public HibernateAttachmentRecycleBinStore(XWikiContext context)

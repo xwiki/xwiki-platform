@@ -34,12 +34,12 @@ public class XWikiPlexusServlet extends PlexusServlet
     protected void service(HttpServletRequest httpServletRequest,
         HttpServletResponse httpServletResponse) throws ServletException, IOException
     {
-        ActionManager manager = (ActionManager) lookup(ActionManager.ROLE);
+        ActionManager manager = (ActionManager) lookup(ActionManager.class.getName());
 
         // Initializes XWiki's Container with the Servlet request/response/session so that
         // components needing them can depend on the Container component to get them.
         ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) lookup(ServletContainerInitializer.ROLE);
+            (ServletContainerInitializer) lookup(ServletContainerInitializer.class.getName());
         try {
             containerInitializer.initializeRequest(httpServletRequest);
             containerInitializer.initializeResponse(httpServletResponse);

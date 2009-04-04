@@ -73,7 +73,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
         // since some components are using the Container component (for example to access resource such as the XWiki 
         // configuration file).
     	// Tests can use the getter methods to access the mocks and configure them as needed.
-        Container container = (Container) getComponentManager().lookup(Container.ROLE);
+        Container container = (Container) getComponentManager().lookup(Container.class);
 
         this.mockApplicationContext = mock(ApplicationContext.class);
         this.mockApplicationContext.stubs().method("getResource").with(contains("xwiki.properties")).will(

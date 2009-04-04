@@ -24,11 +24,6 @@ import javax.portlet.PortletContext;
 
 public interface PortletContainerInitializer
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = PortletContainerInitializer.class.getName();
-
     void initializeRequest(javax.portlet.PortletRequest request, Object xwikiContext)
         throws PortletContainerException;
 

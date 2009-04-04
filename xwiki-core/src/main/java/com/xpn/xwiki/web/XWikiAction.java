@@ -182,7 +182,7 @@ public abstract class XWikiAction extends Action
             }
 
             VelocityManager velocityManager = 
-                (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+                (VelocityManager) Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
             
             try {
@@ -319,7 +319,7 @@ public abstract class XWikiAction extends Action
                 // and there won't be a need for the context.
                 try {
                     ObservationManager om =
-                        (ObservationManager) Utils.getComponent(ObservationManager.ROLE);
+                        (ObservationManager) Utils.getComponent(ObservationManager.class);
                     om.notify(new ActionExecutionEvent(context.getAction()), context.getDoc(), context);
                 } catch (Throwable ex) {
                     LOG.error("Cannot send action notifications for document [" + docName
@@ -394,7 +394,7 @@ public abstract class XWikiAction extends Action
         // response and session to components which require them.
         // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
         ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE);
+            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class);
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
@@ -408,8 +408,8 @@ public abstract class XWikiAction extends Action
     
     protected void cleanupComponents()
     {
-        Container container = (Container) Utils.getComponent(Container.ROLE);
-        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+        Container container = (Container) Utils.getComponent(Container.class);
+        Execution execution = (Execution) Utils.getComponent(Execution.class);
 
         // We must ensure we clean the ThreadLocal variables located in the Container and Execution
         // components as otherwise we will have a potential memory leak.

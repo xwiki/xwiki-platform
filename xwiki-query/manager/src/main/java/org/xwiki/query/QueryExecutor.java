@@ -31,11 +31,6 @@ import java.util.List;
 public interface QueryExecutor
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = QueryExecutor.class.getName();
-
-    /**
      * @param <T> expected type of elements in the result list
      * @param query query to execute
      * @return result list of the query

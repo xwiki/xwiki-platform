@@ -25,7 +25,7 @@ import java.util.HashMap;
  * This configuration class is used to add constraints in the configuration of the cache to create.
  * <p>
  * <code>
- * CacheFactory factory = (CacheFactory) getComponentManager().lookup(CacheFactory.ROLE, this.roleHint);
+ * CacheFactory factory = (CacheFactory) getComponentManager().lookup(CacheFactory.class, this.roleHint);
  *
  * CacheConfiguration conf = new CacheConfiguration();
  * LRUEvictionConfiguration lec = new LRUEvictionConfiguration();

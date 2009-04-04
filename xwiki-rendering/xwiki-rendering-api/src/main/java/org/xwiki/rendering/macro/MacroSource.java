@@ -37,6 +37,4 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface MacroSource extends MacroManager
 {
-    /** The component role under which the implementations of this interface can be looked up. */
-    String ROLE = MacroSource.class.getName();
 }

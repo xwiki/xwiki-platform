@@ -52,7 +52,7 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         try {
             ServletContainerInitializer containerInitializer =
                 (ServletContainerInitializer) PlexusServletUtils.lookup(servletContextEvent.getServletContext(),
-                    ServletContainerInitializer.ROLE);
+                    ServletContainerInitializer.class.getName());
             containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
         } catch (ServletException se) {
             throw new RuntimeException("Failed to initialize application contextt", se);

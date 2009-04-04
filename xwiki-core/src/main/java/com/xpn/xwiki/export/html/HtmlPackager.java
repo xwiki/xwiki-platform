@@ -195,8 +195,8 @@ public class HtmlPackager
         XWikiContext context) throws XWikiException, IOException
     {
         ExecutionContextManager ecim =
-            (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.ROLE);
-        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+            (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.class);
+        Execution execution = (Execution) Utils.getComponent(Execution.class);
 
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
@@ -218,7 +218,7 @@ public class HtmlPackager
             execution.pushContext(ec);
 
             VelocityManager velocityManager = 
-                (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+                (VelocityManager) Utils.getComponent(VelocityManager.class);
 
             // At this stage we have a clean Velocity Context
             VelocityContext vcontext = velocityManager.getVelocityContext();

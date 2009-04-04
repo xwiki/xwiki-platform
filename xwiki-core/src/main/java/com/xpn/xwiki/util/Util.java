@@ -886,7 +886,7 @@ public class Util
             LOG.debug("Failed load resource [" + resource + "] using a file path");
         }
         try {
-            Container container = (Container) Utils.getComponent(Container.ROLE);
+            Container container = (Container) Utils.getComponent(Container.class);
             InputStream res = container.getApplicationContext().getResourceAsStream(resource);
             if (res != null) {
                 return res;

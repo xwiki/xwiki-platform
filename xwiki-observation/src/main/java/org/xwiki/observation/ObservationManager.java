@@ -31,9 +31,6 @@ import org.xwiki.observation.event.Event;
  */
 public interface ObservationManager
 {
-    /** The component role under which the implementations of this interface can be looked up. */
-    String ROLE = ObservationManager.class.getName();
-
     /**
      * Add a listener.
      * 

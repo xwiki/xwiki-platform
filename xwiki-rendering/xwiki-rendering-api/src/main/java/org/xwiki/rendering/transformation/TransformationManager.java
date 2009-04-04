@@ -31,11 +31,6 @@ import org.xwiki.rendering.parser.Syntax;
 public interface TransformationManager
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = TransformationManager.class.getName();
-
-    /**
      * @param dom the XDOM on which apply transformations
      * @param syntax the syntax of the source from where this XDOM as been generated
      * @throws TransformationException error when applying transformations

@@ -35,11 +35,6 @@ import org.xwiki.rendering.block.Block;
 public interface HighlightParser extends Parser
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = HighlightParser.class.getName();
-
-    /**
      * Return a highlighted version of the provided content.
      * 
      * @param syntaxId the identifier of the source syntax.

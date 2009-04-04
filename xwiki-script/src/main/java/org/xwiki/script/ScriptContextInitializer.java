@@ -29,11 +29,6 @@ import javax.script.ScriptContext;
 public interface ScriptContextInitializer
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = ScriptContextInitializer.class.getName();
-
-    /**
      * Initialize provided {@link ScriptContext}.
      * 
      * @param context the {@link ScriptContext} to initialize.

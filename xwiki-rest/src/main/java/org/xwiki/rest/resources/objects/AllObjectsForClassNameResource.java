@@ -62,7 +62,7 @@ public class AllObjectsForClassNameResource extends XWikiResource
             String query =
                 "select doc, obj from BaseObject as obj, XWikiDocument as doc where obj.name=doc.fullName and obj.className=:className";
 
-            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.ROLE);
+            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
             List<Object> queryResult = null;
             queryResult =

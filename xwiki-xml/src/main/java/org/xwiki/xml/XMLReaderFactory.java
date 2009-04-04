@@ -36,11 +36,6 @@ import org.xml.sax.XMLReader;
 public interface XMLReaderFactory
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = XMLReaderFactory.class.getName();
-
-    /**
      * @return the optimised XML Reader instance
      * @throws SAXException in case of an error in the creation of the XML Reader instance
      * @throws ParserConfigurationException in case of an error in the creation of the XML Reader instance

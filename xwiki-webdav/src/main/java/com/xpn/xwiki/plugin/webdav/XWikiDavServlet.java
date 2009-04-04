@@ -227,8 +227,8 @@ public class XWikiDavServlet extends AbstractWebdavServlet
      */
     public void cleaUp(WebdavRequest request, XWikiDavContext context)
     {
-        Container container = (Container) Utils.getComponent(Container.ROLE);
-        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+        Container container = (Container) Utils.getComponent(Container.class);
+        Execution execution = (Execution) Utils.getComponent(Execution.class);
         container.removeRequest();
         container.removeResponse();
         container.removeSession();

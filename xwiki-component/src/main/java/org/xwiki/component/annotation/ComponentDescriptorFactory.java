@@ -50,7 +50,7 @@ public class ComponentDescriptorFactory
     public ComponentDescriptor createComponentDescriptor(Class< ? > componentClass, Class< ? > componentRoleClass)
     {
         DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor();
-        descriptor.setRole(componentRoleClass.getName());
+        descriptor.setRole(componentRoleClass);
         descriptor.setImplementation(componentClass.getName());
         
         // Set the hint if it exists
@@ -101,12 +101,12 @@ public class ComponentDescriptorFactory
                 // Only add the field to the descriptor if the user has specified a role class different than an
                 // Object since we use Object as the default value when no role is specified.
                 if (!requirement.role().getName().equals(Object.class.getName())) {
-                    dependency.setRole(requirement.role().getName());
+                    dependency.setRole(requirement.role());
                 } else {
                     return null;
                 }
             } else {
-                dependency.setRole(field.getType().getName());
+                dependency.setRole(field.getType());
             }
 
             if (requirement.value().trim().length() > 0) {

@@ -32,11 +32,6 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface VelocityMacroConverter
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = VelocityMacroConverter.class.getName();
-
     boolean protectResult();
 
     boolean isInline();

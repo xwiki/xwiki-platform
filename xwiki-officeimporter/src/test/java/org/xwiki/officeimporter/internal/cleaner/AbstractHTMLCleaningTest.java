@@ -58,8 +58,8 @@ public class AbstractHTMLCleaningTest extends AbstractXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-        openOfficeHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "openoffice");
-        wysiwygHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "wysiwyg");
+        openOfficeHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "openoffice");
+        wysiwygHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "wysiwyg");
         super.setUp();
     }
 }

@@ -85,7 +85,7 @@ public class DefaultComponentDescriptor extends DefaultComponentRole implements 
         this.componentDependencies.add(componentDependency);
     }
 
-    public void addComponentDependency(String role, String roleHint)
+    public void addComponentDependency(Class< ? > role, String roleHint)
     {
         DefaultComponentDependency componentDependency = new DefaultComponentDependency();
         componentDependency.setRole(role);

@@ -107,7 +107,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * 
      * @param xwiki
      * @param context
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.ROLE) instead.
+     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
      */
     @Deprecated
     public XWikiHibernateStore(XWiki xwiki, XWikiContext context)
@@ -120,7 +120,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * Initialize the storage engine with a specific path. This is used for tests.
      * 
      * @param hibpath
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.ROLE) instead.
+     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
      */
     @Deprecated
     public XWikiHibernateStore(String hibpath)
@@ -131,7 +131,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * @see #XWikiHibernateStore(XWiki, XWikiContext)
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.ROLE) instead.
+     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
      */
     @Deprecated
     public XWikiHibernateStore(XWikiContext context)

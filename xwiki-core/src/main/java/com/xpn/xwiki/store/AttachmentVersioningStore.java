@@ -33,11 +33,6 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 public interface AttachmentVersioningStore
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = AttachmentVersioningStore.class.getName();
-
-    /**
      * Load attachment archive from store.
      * 
      * @return attachment archive. not null. return empty archive if it is not exist in store.

@@ -19,11 +19,6 @@ import com.xpn.xwiki.plugin.webdav.utils.XWikiDavContext;
 public interface XWikiDavResource extends DavResource
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = XWikiDavResource.class.getName();
-
-    /**
      * This URI segment is used as the base workspace name.
      */
     public static final String BASE_URI = "/webdav";

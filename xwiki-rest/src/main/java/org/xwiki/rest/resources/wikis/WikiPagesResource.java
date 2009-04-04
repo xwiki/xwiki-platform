@@ -109,7 +109,7 @@ public class WikiPagesResource extends XWikiResource
             String queryString = f.toString();
 
             /* Execute the query by filling the parameters */
-            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.ROLE);
+            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
             Query query = queryManager.createQuery(queryString, Query.XWQL).setLimit(number).setOffset(start);
             for (String param : filters.keySet()) {
                 query.bindValue(param, String.format("%%%s%%", filters.get(param).toUpperCase()));

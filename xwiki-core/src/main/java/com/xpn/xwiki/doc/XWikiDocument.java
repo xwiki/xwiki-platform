@@ -4859,7 +4859,7 @@ public class XWikiDocument implements DocumentModelBridge
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
         backup.put("doc", context.getDoc());
-        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         if (vcontext != null) {
             backup.put("vdoc", vcontext.get("doc"));
@@ -4879,7 +4879,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (backup.get("doc") != null) {
             context.setDoc((XWikiDocument) backup.get("doc"));
         }
-        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         Map gcontext = (Map) context.get("gcontext");
         if (vcontext != null) {
@@ -4912,7 +4912,7 @@ public class XWikiDocument implements DocumentModelBridge
             context.setDoc(this);
             com.xpn.xwiki.api.Document apidoc = this.newDocument(context);
             com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
-            VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+            VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
             Map gcontext = (Map) context.get("gcontext");
             if (vcontext != null) {
@@ -5056,8 +5056,8 @@ public class XWikiDocument implements DocumentModelBridge
             if (transform) {
                 // Transform XDOM
                 TransformationManager transformations =
-                    (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
-                SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
+                    (TransformationManager) Utils.getComponent(TransformationManager.class);
+                SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
                 transformations
                     .performTransformations(content, syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
             }
@@ -5081,8 +5081,8 @@ public class XWikiDocument implements DocumentModelBridge
     private String renderXDOM(XDOM content, String targetSyntaxId) throws XWikiException
     {
         try {
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
-            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
+            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
 
             WikiPrinter printer = new DefaultWikiPrinter();
 
@@ -5104,7 +5104,7 @@ public class XWikiDocument implements DocumentModelBridge
     private XDOM parseContent(String syntaxId, String content) throws XWikiException
     {
         try {
-            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, syntaxId);
+            Parser parser = (Parser) Utils.getComponent(Parser.class, syntaxId);
             return parser.parse(new StringReader(content));
         } catch (ParseException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -5114,7 +5114,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     private String getDefaultDocumentSyntax()
     {
-        return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.ROLE)).getDefaultDocumentSyntax();
+        return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.class)).getDefaultDocumentSyntax();
     }
 
     /**

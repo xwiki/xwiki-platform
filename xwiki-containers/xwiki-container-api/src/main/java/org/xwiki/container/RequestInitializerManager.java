@@ -26,11 +26,6 @@ package org.xwiki.container;
 public interface RequestInitializerManager
 {
     /**
-     * Component's id so that it can be looked up.
-     */
-    String ROLE = RequestInitializerManager.class.getName();
-
-    /**
      * Call all components which implement the {@link org.xwiki.container.RequestInitializer} role so
      * that they can each perform their own initializations.
      *

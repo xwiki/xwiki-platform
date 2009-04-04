@@ -32,7 +32,5 @@ import java.util.List;
  */
 public interface ConfigurationSourceCollection
 {
-    String ROLE = ConfigurationSourceCollection.class.getName();
-
     List<ConfigurationSource> getConfigurationSources();
 }

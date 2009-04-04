@@ -36,11 +36,6 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 public interface PrintRendererFactory
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = PrintRendererFactory.class.getName();
-
-    /**
      * @param targetSyntax the syntax identifier of the renderer.
      * @param printer used by the renderer use to print.
      * @return the {@link PrintRenderer}

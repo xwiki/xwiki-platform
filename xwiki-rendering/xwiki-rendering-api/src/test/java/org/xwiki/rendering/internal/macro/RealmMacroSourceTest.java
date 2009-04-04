@@ -62,7 +62,7 @@ public class RealmMacroSourceTest extends AbstractRenderingTestCase
         this.mockLogger = mock(Logger.class);
         this.mockComponentManager = mock(ComponentManager.class);
 
-        this.source = (RealmMacroSource) getComponentManager().lookup(MacroSource.ROLE);
+        this.source = (RealmMacroSource) getComponentManager().lookup(MacroSource.class);
         this.source.enableLogging((Logger) this.mockLogger.proxy());
     }
 

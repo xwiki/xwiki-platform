@@ -35,11 +35,6 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface RenderingConfiguration
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = RenderingConfiguration.class.getName();
-    
-    /**
      * A link label format is the format used to decide how to display links that have no label.
      * By default the page name is displayed. However it's possible to customize it using the
      * following tokens:

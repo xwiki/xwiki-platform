@@ -30,11 +30,6 @@ import java.util.Set;
 public interface QueryManager
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = QueryManager.class.getName();
-
-    /**
      * Create query for given statement and language.
      * Use createQuery("statement", Query.LANGUAGE).
      * For example: createQuery("select doc.name from XWikiDocument doc", Query.HQL).

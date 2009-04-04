@@ -22,7 +22,5 @@ package org.xwiki.url;
 
 public interface XWikiURLFactory
 {
-    String ROLE = XWikiURLFactory.class.getName();
-
     XWikiURL createURL(String urlAsString) throws InvalidURLException;
 }

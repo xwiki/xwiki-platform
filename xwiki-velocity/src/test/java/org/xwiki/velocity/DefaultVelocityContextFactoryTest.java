@@ -37,7 +37,7 @@ public class DefaultVelocityContextFactoryTest extends AbstractXWikiComponentTes
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.factory = (VelocityContextFactory) getComponentManager().lookup(VelocityContextFactory.ROLE);
+        this.factory = (VelocityContextFactory) getComponentManager().lookup(VelocityContextFactory.class);
     }
 
     /**
@@ -64,7 +64,7 @@ public class DefaultVelocityContextFactoryTest extends AbstractXWikiComponentTes
         assertEquals("org.apache.velocity.tools.generic.ListTool", 
             context.get("listtool").getClass().getName());
         VelocityEngine engine = 
-            (VelocityEngine) getComponentManager().lookup(VelocityEngine.ROLE);
+            (VelocityEngine) getComponentManager().lookup(VelocityEngine.class);
         engine.initialize(new Properties());
         StringWriter writer = new StringWriter();
         engine.evaluate(context, writer, "mytemplate",

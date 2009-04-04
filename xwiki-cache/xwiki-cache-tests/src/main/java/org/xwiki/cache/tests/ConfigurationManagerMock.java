@@ -57,7 +57,7 @@ public class ConfigurationManagerMock extends AbstractLogEnabled implements Conf
     {
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
 
-        componentDescriptor.setRole(ConfigurationManager.ROLE);
+        componentDescriptor.setRole(ConfigurationManager.class);
         componentDescriptor.setImplementation(ConfigurationManagerMock.class.getName());
         componentDescriptor.addComponentProperty("cache", cache);
         componentDescriptor.addComponentProperty("localCache", localCache);

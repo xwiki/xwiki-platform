@@ -32,11 +32,6 @@ package com.xpn.xwiki;
 public interface CoreConfiguration
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = CoreConfiguration.class.getName();
-
-    /**
      * @return the default syntax to use for new documents
      */
     String getDefaultDocumentSyntax();

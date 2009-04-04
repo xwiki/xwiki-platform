@@ -33,11 +33,6 @@ import java.util.Properties;
 public interface VelocityFactory
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = VelocityFactory.class.getName();
-
-    /**
      * Check if an engine was already created for a certain key.
      * 
      * @param key the key under which the Velocity engine has been saved in cache. This is the key used when the

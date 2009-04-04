@@ -34,11 +34,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 public interface XWikiStoreInterface
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = XWikiStoreInterface.class.getName();
-
     void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;

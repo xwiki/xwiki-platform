@@ -37,7 +37,7 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.engine = (VelocityEngine) getComponentManager().lookup(VelocityEngine.ROLE);
+        this.engine = (VelocityEngine) getComponentManager().lookup(VelocityEngine.class);
     }
 
     public void testEvaluateReader() throws Exception

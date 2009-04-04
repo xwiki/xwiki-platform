@@ -79,7 +79,7 @@ public class PatchCreator implements EventListener, org.xwiki.platform.patchserv
 
     public void init(XWikiContext context)
     {
-        ObservationManager om = (ObservationManager) Utils.getComponent(ObservationManager.ROLE);
+        ObservationManager om = (ObservationManager) Utils.getComponent(ObservationManager.class);
         om.addListener(new DocumentSaveEvent(new RegexEventFilter(".*")), this);
         om.addListener(new DocumentUpdateEvent(new RegexEventFilter(".*")), this);
         om.addListener(new DocumentDeleteEvent(new RegexEventFilter(".*")), this);

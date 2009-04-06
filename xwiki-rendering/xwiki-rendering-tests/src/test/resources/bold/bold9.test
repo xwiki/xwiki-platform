@@ -1,0 +1,23 @@
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.# Verify that STRONG tag parameters are recognized.
+.#-----------------------------------------------------
+<html><p><strong a="b">something</strong></p></html>
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginFormat: [BOLD] [[a]=[b]]
+onWord [something]
+endFormat: [BOLD] [[a]=[b]]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p><strong><span a="b">something</span></strong></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+**(% a="b" %)something**

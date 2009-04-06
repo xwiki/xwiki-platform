@@ -56,6 +56,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("bold/bold6", false);
         suite.addTestsFromResource("bold/bold7", false);
         suite.addTestsFromResource("bold/bold8", false);
+        suite.addTestsFromResource("bold/bold9", false);
         suite.addTestsFromResource("italic/italic1", false);
         suite.addTestsFromResource("italic/italic2", false);
         suite.addTestsFromResource("italic/italic3", false);
@@ -63,14 +64,19 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("italic/italic5", false);
         suite.addTestsFromResource("italic/italic6", false);
         suite.addTestsFromResource("italic/italic7", false);
+        suite.addTestsFromResource("italic/italic8", false);
         suite.addTestsFromResource("underline/underline1", false);
         suite.addTestsFromResource("underline/underline2", false);
         suite.addTestsFromResource("strikedout/strikedout1", false);
         suite.addTestsFromResource("strikedout/strikedout2", false);
         suite.addTestsFromResource("strikedout/strikedout3", false);
+        suite.addTestsFromResource("strikedout/strikedout4", false);
         suite.addTestsFromResource("superscript/superscript1", false);
+        suite.addTestsFromResource("superscript/superscript2", false);
         suite.addTestsFromResource("subscript/subscript1", false);
+        suite.addTestsFromResource("subscript/subscript2", false);
         suite.addTestsFromResource("monospace/monospace1", false);
+        suite.addTestsFromResource("monospace/monospace2", false);
         suite.addTestsFromResource("verbatim/verbatim1", false);
         suite.addTestsFromResource("verbatim/verbatim2", false);
         suite.addTestsFromResource("verbatim/verbatim3", false);

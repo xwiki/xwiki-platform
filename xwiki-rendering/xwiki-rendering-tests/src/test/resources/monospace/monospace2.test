@@ -1,0 +1,23 @@
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.# Verify that TT tag parameters are recognized.
+.#-----------------------------------------------------
+<html><p><tt a="b">something</tt></p></html>
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginFormat: [MONOSPACE] [[a]=[b]]
+onWord [something]
+endFormat: [MONOSPACE] [[a]=[b]]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p><tt><span a="b">something</span></tt></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+##(% a="b" %)something##

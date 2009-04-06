@@ -1,10 +1,10 @@
-.xLinkToUrl .gwt-Label, .xLinkToWikiPage .gwt-Label {
+.xLinkToUrl .gwt-Label, .xLinkToWikiPage .gwt-Label, .xLinkToNewPage .gwt-Label {
   font-weight: bold;
   width: 300px;
   padding: 5px;
 }
 
-.xLinkToUrl .gwt-TextBox, .xLinkToWikiPage .gwt-TextBox { 
+.xLinkToUrl .gwt-TextBox, .xLinkToWikiPage .gwt-TextBox, xLinkToNewPage .gwt-Label { 
   font-size: x-small;
   margin: 0 5px;
   width: 300px;

@@ -58,26 +58,29 @@ public class LinkWizard extends Wizard implements WizardStepProvider
      */
     public WizardStep getStep(String name)
     {
-        WizardStep existingStep = stepsMap.get(name);
-        if (existingStep == null) {
+        WizardStep step = stepsMap.get(name);
+        if (step == null) {
             if ("webpage".equals(name)) {
-                existingStep = new WebPageLinkWizardStep();
+                step = new WebPageLinkWizardStep();
             }
             if ("email".equals(name)) {
-                existingStep = new EmailAddressLinkWizardStep();
+                step = new EmailAddressLinkWizardStep();
             }
             if ("wikipage".equals(name)) {
-                existingStep = new SelectorWizardStep();
+                step = new SelectorWizardStep();
+            }
+            if ("wikipagecreator".equals(name)) {
+                step = new CreateNewPageWizardStep();
             }
             if ("wikipageconfig".equals(name)) {
-                existingStep = new WikiLinkConfigWizardStep();
+                step = new WikiLinkConfigWizardStep();
             }
             // if something has been created, add it in the map
-            if (existingStep != null) {
-                stepsMap.put(name, existingStep);
+            if (step != null) {
+                stepsMap.put(name, step);
             }
         }
         // return the found or newly created step
-        return existingStep;
+        return step;
     }
 }

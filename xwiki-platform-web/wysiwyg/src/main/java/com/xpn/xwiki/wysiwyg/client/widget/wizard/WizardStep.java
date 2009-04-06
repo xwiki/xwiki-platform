@@ -85,6 +85,10 @@ public interface WizardStep
     // navigation responsibilities in the wizard step itself, but for the moment it would be a bit overengineered.
 
     /**
+     * Returns the key of the next step in the wizard. Note that this function is called after
+     * {@link #onSubmit(AsyncCallback)} has returned successfully, so the computing of the next step can be done safely
+     * at {@link #onSubmit(AsyncCallback)} time.
+     * 
      * @return the key of the next step in the wizard.
      */
     String getNextStep();

@@ -283,8 +283,7 @@ public class LinkConfig implements IsSerializable
     public String toJSON()
     {
         String jsonString =
-            "{ " + formatValue("wiki", getWiki()) + formatValue("space", getSpace()) + formatValue("page", getPage())
-                + formatValue("reference", getReference()) + formatValue("url", getUrl())
+            "{ " + formatValue("reference", getReference()) + formatValue("url", getUrl())
                 + formatValue("label", getLabel()) + formatValue("labeltext", getLabelText())
                 + formatValue("readonlylabel", isReadOnlyLabel() ? true : null) + formatValue("type", getType())
                 + formatValue("newwindow", isOpenInNewWindow() ? true : null) + formatValue("tooltip", getTooltip());
@@ -319,9 +318,6 @@ public class LinkConfig implements IsSerializable
     {
         JavaScriptObject jsObj = JavaScriptObject.fromJson(json);
         setReference((String) jsObj.get("reference"));
-        setWiki((String) jsObj.get("wiki"));
-        setSpace((String) jsObj.get("space"));
-        setPage((String) jsObj.get("page"));
         setUrl((String) jsObj.get("url"));
         setLabel((String) jsObj.get("label"));
         setLabelText((String) jsObj.get("labeltext"));

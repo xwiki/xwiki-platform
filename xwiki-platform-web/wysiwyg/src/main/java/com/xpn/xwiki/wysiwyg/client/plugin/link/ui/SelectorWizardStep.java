@@ -112,7 +112,11 @@ public class SelectorWizardStep implements WizardStep
      */
     public String getNextStep()
     {
-        return "wikipageconfig";
+        if (linkData.getType() == LinkType.NEW_WIKIPAGE && StringUtils.isEmpty(linkData.getPage())) {
+            return "wikipagecreator";
+        } else {
+            return "wikipageconfig";
+        }
     }
 
     /**
@@ -128,7 +132,7 @@ public class SelectorWizardStep implements WizardStep
      */
     public String getStepTitle()
     {
-        return Strings.INSTANCE.selectPage();
+        return Strings.INSTANCE.selectWikipageTitle();
     }
 
     /**
@@ -155,31 +159,40 @@ public class SelectorWizardStep implements WizardStep
         // should check that the selection is ok according to the desired type and to "commit" it in the link config
         String selectedValue = explorer.getValue();
         // selected resource should not be empty
-        if (StringUtils.isEmpty(selectedValue)) {
-            Window.alert(Strings.INSTANCE.noPageSelectedError());
+        if (StringUtils.isEmpty(selectedValue) && !explorer.isNewPage()) {
+            Window.alert(Strings.INSTANCE.linkNoPageSelectedError());
             async.onSuccess(false);
         } else {
             // commit the changes in the config
-            // create a link to a space if there is no page selected and there is a space selected
-            // TODO: remove this when the reference is set correctly from the explorer to an existing space
-            if (!StringUtils.isEmpty(explorer.getSelectedSpace()) && StringUtils.isEmpty(explorer.getSelectedPage())
-                && !explorer.isNewPage()) {
-                linkData.setReference(selectedValue + ".WebHome");
-            } else {
-                linkData.setReference(selectedValue);
-            }
-            // if indeed a new page is selected, make sure we commit the link type in the config
             if (explorer.isNewPage()) {
+                // if it's a new page to be created, set its parameters in the link config
                 linkData.setType(LinkType.NEW_WIKIPAGE);
+                linkData.setWiki(explorer.getSelectedWiki());
+                linkData.setSpace(explorer.getSelectedSpace());
+                linkData.setPage(explorer.getSelectedPage());
+                // if the selected page is not set in the tree, i.e. the "New page..." option was chosen, return
+                if (StringUtils.isEmpty(explorer.getSelectedPage())) {
+                    async.onSuccess(true);
+                    return;                    
+                }
+            } else {
+                // it's an existing page
+                linkData.setType(LinkType.WIKIPAGE);
+                // set the page space wiki on nothing, since the link will have a reference
+                linkData.setWiki(null);
+                linkData.setSpace(null);
+                linkData.setPage(null);
             }
-            // build the page url from the parameters in the explorer tree
-            // TODO: remove this when the explorer will return the selected resource URL
+            // build the link url and reference from the parameters.
+            // TODO: restrict this to new pages when the explorer will return the selected resource URL, and get the
+            // reference from the value of the tree
             WysiwygService.Singleton.getInstance().getPageLink(explorer.getSelectedWiki(), explorer.getSelectedSpace(),
                 explorer.getSelectedPage(), null, null, new AsyncCallback<LinkConfig>()
                 {
                     public void onSuccess(LinkConfig result)
                     {
                         linkData.setUrl(result.getUrl());
+                        linkData.setReference(result.getReference());
                         async.onSuccess(true);
                     }
 

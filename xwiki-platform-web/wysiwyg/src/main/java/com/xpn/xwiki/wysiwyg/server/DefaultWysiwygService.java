@@ -28,10 +28,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.rendering.block.XDOM;
@@ -234,9 +237,9 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                     if (firstAttachment.getAuthor().equals(currentAuthor)
                         && secondAttachment.getAuthor().equals(currentAuthor)) {
                         return firstAttachment.getDate().compareTo(secondAttachment.getDate());
-                    } else if(firstAttachment.getAuthor().equals(currentAuthor)) {
+                    } else if (firstAttachment.getAuthor().equals(currentAuthor)) {
                         return +1;
-                    } else if(secondAttachment.getAuthor().equals(currentAuthor)){
+                    } else if (secondAttachment.getAuthor().equals(currentAuthor)) {
                         return -1;
                     } else {
                         return 0;
@@ -396,73 +399,76 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     public LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor)
     {
-        XWikiContext context = getXWikiContext();
-        String database = context.getDatabase();
-        String newPageName = pageName;
-        String newSpaceName = spaceName;
-        String pageURL = null;
-        LinkConfig linkConfig = new LinkConfig();
-        try {
-            if (wikiName != null) {
-                context.setDatabase(wikiName);
-            }
-            // if we have no page name, link to the WebHome of whatever space
-            if (newPageName == null || newPageName.length() == 0) {
-                newPageName = "WebHome";
-            }
-            // if we have no space, link to the current doc's space
-            if (newSpaceName == null && newSpaceName.length() == 0) {
-                if ((newPageName == null || newPageName.length() == 0) && wikiName != null && wikiName.length() > 0) {
-                    // if we have no space set and no page but we have a wiki, then create a link to the mainpage of the
-                    // wiki
-                    newSpaceName = "Main";
-                } else {
-                    newSpaceName = context.getDoc().getSpace();
-                }
-            }
+        String queryString = StringUtils.isEmpty(revision) ? null : "rev=" + revision;
+        DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
+        // get the url to the targeted document from the bridge
+        DocumentNameSerializer serializer = (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class);
+        String pageReference = serializer.serialize(docName);
+        String pageURL = getDocumentAccessBridge().getURL(pageReference, "view", queryString, anchor);
 
-            // clear the page and space name, to make sure we link to the right page
-            newPageName = clearXWikiName(newPageName);
-            newSpaceName = clearXWikiName(newSpaceName);
-
-            XWikiDocument requestedDocument = context.getWiki().getDocument(newSpaceName + "." + newPageName, context);
-            pageURL = requestedDocument.getURL("view", context);
-            linkConfig.setUrl(pageURL);
-            linkConfig.setPage(requestedDocument.getName());
-            linkConfig.setSpace(requestedDocument.getSpace());
-            linkConfig.setWiki(wikiName);
-            // if we have revision, get document with revision, otherwise get simple document
-            if (revision != null && revision.length() > 0) {
-                requestedDocument = context.getWiki().getDocument(newSpaceName + "." + newPageName, context);
-                pageURL = requestedDocument.getURL("viewrev", "rev=" + revision, context);
-            }
-            if (anchor != null && anchor.length() > 0) {
-                pageURL += "#" + anchor;
-            }
-        } catch (XWikiException e) {
-            e.printStackTrace();
-        } finally {
-            if (wikiName != null) {
-                getXWikiContext().setDatabase(database);
-            }
+        // get a document name serializer to return the page reference
+        if (queryString != null) {
+            pageReference += "?" + queryString;
         }
+        if (!StringUtils.isEmpty(anchor)) {
+            pageReference += "#" + anchor;
+        }
+
+        // create the link reference
+        LinkConfig linkConfig = new LinkConfig();
+        linkConfig.setUrl(pageURL);
+        linkConfig.setReference(pageReference);
 
         return linkConfig;
     }
 
     /**
+     * Gets a document name from the passed parameters, handling the empty wiki, empty space or empty page name.
+     * 
+     * @param wiki the wiki of the document
+     * @param space the space of the document
+     * @param page the page name of the targeted document
+     * @return the completed {@link DocumentName} corresponding to the passed parameters, with all the missing values
+     *         completed with defaults
+     */
+    protected DocumentName prepareDocumentName(String wiki, String space, String page)
+    {
+        String newPageName = clearXWikiName(page);
+        String newSpaceName = clearXWikiName(space);
+        String newWikiName = clearXWikiName(wiki);
+        if (StringUtils.isEmpty(newWikiName)) {
+            newWikiName = "xwiki";
+        }
+        // if we have no page name, link to the WebHome of whatever space
+        if (StringUtils.isEmpty(newPageName)) {
+            newPageName = "WebHome";
+        }
+        // if we have no space, link to the current doc's space
+        if (StringUtils.isEmpty(newSpaceName)) {
+            if ((StringUtils.isEmpty(newPageName)) && !StringUtils.isEmpty(wiki)) {
+                // if we have no space set and no page but we have a wiki, then create a link to the mainpage of the
+                // wiki
+                newSpaceName = "Main";
+            } else {
+                newSpaceName = getXWikiContext().getDoc().getSpace();
+            }
+        }
+        return new DocumentName(newWikiName, newSpaceName, newPageName);
+    }
+
+    /**
      * Clears forbidden characters out of the passed name, in a way which is consistent with the algorithm used in the
-     * create page panel. <br /> FIXME: this function needs to be deleted when there will be a function to do this
-     * operation in a consistent manner across the whole xwiki, and all calls to this function should be replaced with
-     * calls to that function.
+     * create page panel. <br />
+     * FIXME: this function needs to be deleted when there will be a function to do this operation in a consistent
+     * manner across the whole xwiki, and all calls to this function should be replaced with calls to that function.
      * 
      * @param name the name to clear from forbidden characters and transform in a xwiki name.
      * @return the cleared up xwiki name, ready to be used as a page or space name.
      */
     private String clearXWikiName(String name)
     {
-        // replace all / with .
-        return name.replace('/', '.');
+        // remove all . since they're used as separators for space and page
+        return name.replaceAll("\\.", "");
     }
 
     /**

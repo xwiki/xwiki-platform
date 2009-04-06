@@ -1,11 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-{pre}
-## some velocity
-{/pre}
+$var.method("param1").method2($var3.method3("param3"), $var4.method4("param4"))
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{{{{velocity}}## some velocity
-{{/velocity}}}}}
+{{velocity}}$var.method("param1").method2($var3.method3("param3"), $var4.method4("param4")){{/velocity}}

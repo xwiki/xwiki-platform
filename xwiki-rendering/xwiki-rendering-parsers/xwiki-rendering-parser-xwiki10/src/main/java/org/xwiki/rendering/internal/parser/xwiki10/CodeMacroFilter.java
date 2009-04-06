@@ -55,6 +55,11 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
         setPriority(10);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String, org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
@@ -65,7 +70,7 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
             String before = content.substring(currentIndex, matcher.start());
 
             if (currentIndex > 0) {
-                before = CleanUtil.setFirstNewLines(before, 2);
+                before = CleanUtil.setLeadingNewLines(before, 2);
             }
 
             String macroResult =
@@ -80,7 +85,7 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
             return content;
         }
 
-        result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
+        result.append(CleanUtil.setLeadingNewLines(content.substring(currentIndex), 2));
 
         return result.toString();
     }

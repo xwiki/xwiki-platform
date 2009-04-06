@@ -42,6 +42,7 @@ public class StandaloneNewLineCleaningFilter extends AbstractFilter implements I
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -49,6 +50,12 @@ public class StandaloneNewLineCleaningFilter extends AbstractFilter implements I
         setPriority(2000);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();

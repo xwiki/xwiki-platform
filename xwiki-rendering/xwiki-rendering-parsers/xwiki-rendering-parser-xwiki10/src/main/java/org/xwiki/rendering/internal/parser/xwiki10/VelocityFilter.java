@@ -20,11 +20,11 @@
 package org.xwiki.rendering.internal.parser.xwiki10;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -37,9 +37,8 @@ import org.xwiki.rendering.parser.xwiki10.macro.VelocityMacroConverter;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
- * Register all Velocity comments in order to protect them from following filters.
- * Protect velocity comments, convert velocity macro into 2.0 macros/syntax and add needed 2.0 velocity macros
- * and convert.
+ * Register all Velocity comments in order to protect them from following filters. Protect velocity comments, convert
+ * velocity macro into 2.0 macros/syntax and add needed 2.0 velocity macros and convert.
  * 
  * @version $Id$
  * @since 1.8M1
@@ -51,20 +50,13 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
     public static final String VELOCITYCLOSE_SUFFIX = "velocityclose";
 
-    public static final String VELOCITY_COMMENT_SPATTERN = "((?m)\\n?\\#\\#.*$)|((?s)\\#\\*(.*?)\\*\\#)";
+    public static final Set<String> VELOCITY_BEGINBLOCK = new HashSet<String>(Arrays.asList("if", "foreach"));
 
-    public static final String VELOCITY_MACRO_SPATTERN = "\\#(\\w+) *\\(([^)]*)\\)";
+    public static final Set<String> VELOCITY_PARAMBLOCK = new HashSet<String>(Arrays.asList("if", "foreach", "set"));
 
-    public static final String VELOCITY_INTERNAL_SPATTERN = "\\#end";
+    public static final Set<String> VELOCITY_NOPARAMBLOCK = new HashSet<String>(Arrays.asList("else"));
 
-    public static final String VELOCITY_VARIABLEMETHOD_SPATTERN = "\\.\\p{Alpha}\\w*(\\(.*\\))?";
-
-    public static final String VELOCITY_VARIABLE_SPATTERN =
-        "\\$\\{?\\p{Alpha}\\w*(" + VELOCITY_VARIABLEMETHOD_SPATTERN + ")*\\}?";
-
-    public static final Pattern VELOCITY_PATTERN =
-        Pattern.compile(VELOCITY_COMMENT_SPATTERN + "|" + VELOCITY_INTERNAL_SPATTERN + "|" + VELOCITY_MACRO_SPATTERN
-            + "|" + VELOCITY_VARIABLE_SPATTERN);
+    public static final Set<String> VELOCITY_ENDBLOCK = new HashSet<String>(Arrays.asList("end"));
 
     public static final String VELOCITYOPEN_SPATTERN =
         "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VelocityFilter.VELOCITYOPEN_SUFFIX
@@ -74,17 +66,89 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VelocityFilter.VELOCITYCLOSE_SUFFIX
             + "[\\d]+" + FilterContext.XWIKI1020TOKEN_CP + ")";
 
+    /**
+     * Used to lookup macros converters.
+     */
     private ComponentManager componentManager;
+
+    private static class VelocityFilterContext
+    {
+        private boolean velocity = false;
+
+        private boolean inline = true;
+
+        private boolean conversion = false;
+
+        private int velocityDepth = 0;
+
+        private FilterContext filterContext;
+
+        public VelocityFilterContext(FilterContext filterContext)
+        {
+            this.filterContext = filterContext;
+        }
+
+        public boolean isVelocity()
+        {
+            return this.velocity;
+        }
+
+        public void setVelocity(boolean velocity)
+        {
+            this.velocity = velocity;
+        }
+
+        public boolean isConversion()
+        {
+            return this.conversion;
+        }
+
+        public void setConversion(boolean conversion)
+        {
+            this.conversion = conversion;
+        }
+
+        public boolean isInline()
+        {
+            return this.inline;
+        }
+
+        public void setInline(boolean inline)
+        {
+            this.inline = inline;
+        }
+
+        public int getVelocityDepth()
+        {
+            return this.velocityDepth;
+        }
+
+        public void pushVelocityDepth()
+        {
+            ++this.velocityDepth;
+        }
+
+        public void popVelocityDepth()
+        {
+            --this.velocityDepth;
+        }
+
+        public FilterContext getFilterContext()
+        {
+            return this.filterContext;
+        }
+    }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
         setPriority(20);
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -95,117 +159,415 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         this.componentManager = componentManager;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
-        content = filterMacros(content, filterContext);
-
-        return content;
-    }
-
-    private String filterMacros(String content, FilterContext filterContext)
-    {
         StringBuffer result = new StringBuffer();
-        Matcher matcher = VELOCITY_PATTERN.matcher(content);
+        char[] array = content.toCharArray();
 
-        int currentIndex = 0;
+        VelocityFilterContext context = new VelocityFilterContext(filterContext);
+        StringBuffer nonVelocityContent = new StringBuffer();
+        StringBuffer velocityContent = new StringBuffer();
 
         boolean inVelocityMacro = false;
-        VelocityMacroConverter currentMacro = null;
-        String nonVelocityContent = null;
-        for (; matcher.find(); currentIndex = matcher.end()) {
-            String before = content.substring(currentIndex, matcher.start());
-            nonVelocityContent = nonVelocityContent != null ? nonVelocityContent + before : before;
+        int nbNL = 0;
+        int i = 0;
 
-            String matchedContent = matcher.group(0);
+        for (; i < array.length;) {
+            char c = array[i];
 
-            String macroName = matcher.group(4);
+            context.setVelocity(false);
+            context.setConversion(false);
+            context.setInline(true);
+            velocityContent.setLength(0);
 
-            if (macroName != null) {
-                // If it's a velocity macro it can be converted in 2.0 syntax
-                String params = matcher.group(5);
+            if (c == '#') {
+                i = getKeyWord(array, i, velocityContent, context);
+            } else if (c == '$') {
+                i = getVar(array, i, velocityContent, context);
+            }
 
-                try {
-                    currentMacro =
-                        (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.class, macroName);
+            if (context.isConversion()) {
+                if (!context.isInline()) {
+                    CleanUtil.setTrailingNewLines(nonVelocityContent, 2);
+                }
 
-                    if (!currentMacro.isInline()) {
-                        nonVelocityContent = CleanUtil.setLastNewLines(nonVelocityContent, 2);
-                    } else {
-                        // A standalone new line is not interpreted by XWiki 1.0 rendering
-                        nonVelocityContent = CleanUtil.removeLastNewLines(nonVelocityContent, 1, true);
-                    }
-
-                    matchedContent = currentMacro.convert(macroName, getMacroParameters(params));
-                    if (currentMacro.protectResult()) {
-                        matchedContent = filterContext.addProtectedContent(matchedContent);
-                    }
-
-                    nonVelocityContent += matchedContent;
-                    continue;
-                } catch (ComponentLookupException e) {
-                    if (getLogger().isDebugEnabled()) {
-                        getLogger().debug("Can't find macro converter [" + macroName + "]", e);
-                    }
+                nonVelocityContent.append(filterContext.addProtectedContent(velocityContent.toString(), context.isInline()));
+            } else if (context.isVelocity()) {
+                result.append(nonVelocityContent);
+                nonVelocityContent.setLength(0);
+                nbNL = 0;
+                if (!inVelocityMacro) {
+                    appendVelocityOpen(result, filterContext);
+                    inVelocityMacro = true;
+                }
+                result.append(filterContext.addProtectedContent(velocityContent.toString()));
+            } else {
+                nonVelocityContent.append(c);
+                ++i;
+                if (c == '\n') {
+                    ++nbNL;
+                }
+                if (nbNL > 10 && inVelocityMacro && context.getVelocityDepth() <= 0) {
+                    appendVelocityClose(result, filterContext);
+                    result.append(nonVelocityContent);
+                    nonVelocityContent.setLength(0);
+                    nbNL = 0;
+                    inVelocityMacro = false;
                 }
             }
+        }
 
-            if (StringUtils.countMatches(nonVelocityContent, "\n") > 10) {
-                appendVelocityClose(result, filterContext);
-                inVelocityMacro = false;
-            }
-
+        if (context.getVelocityDepth() > 0) {
             result.append(nonVelocityContent);
 
-            if (!inVelocityMacro) {
-                appendVelocityOpen(result, filterContext);
-                matchedContent = CleanUtil.removeFirstNewLines(matchedContent, 1, false);
-                inVelocityMacro = true;
+            // fix unclosed velocity blocks
+            while (context.getVelocityDepth() > 0) {
+                result.append(filterContext.addProtectedContent("#end"));
             }
 
-            result.append(filterContext.addProtectedContent(matchedContent));
-
-            nonVelocityContent = null;
-            currentMacro = null;
-        }
-
-        if (currentIndex == 0) {
-            return content;
-        }
-
-        // Close velocity macro
-        if (inVelocityMacro) {
             appendVelocityClose(result, filterContext);
-        }
-
-        if (nonVelocityContent != null) {
-            result.append(nonVelocityContent);
-        }
-
-        // Make sure the last non inline macro is followed by 2 new lines
-        if (currentMacro != null && !currentMacro.isInline()) {
-            result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
         } else {
-            result.append(content.substring(currentIndex));
+            if (inVelocityMacro) {
+                appendVelocityClose(result, filterContext);
+            }
+            result.append(nonVelocityContent);
         }
 
         return result.toString();
     }
 
-    private List<String> getMacroParameters(String parameters)
+    private int getKeyWord(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
     {
-        List<String> parameterList = new ArrayList<String>();
+        int i = currentIndex + 1;
 
-        if (parameters != null) {
-            String[] parameterTable = parameters.split(" ");
+        context.setVelocity(true);
 
-            for (String parameterValue : parameterTable) {
-                if (parameterValue.length() > 0) {
-                    parameterList.add(parameterValue);
+        if (array[i] == '#') {
+            // A simple line comment
+            i = getSimpleComment(array, i, velocityBlock);
+        } else if (array[i] == '*') {
+            // A multi lines comment
+            i = getMultilinesComment(array, i, velocityBlock);
+        } else if (Character.isLetter(array[i])) {
+            // A macro
+            i = getMacro(array, i, velocityBlock, context);
+        } else {
+            context.setVelocity(false);
+            i = currentIndex;
+        }
+
+        return i;
+    }
+
+    private int getMacro(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
+    {
+        StringBuffer macroBlock = new StringBuffer("#");
+
+        int i = currentIndex;
+
+        // Get macro name
+        StringBuffer macroName = new StringBuffer();
+        for (; i < array.length && Character.isLetterOrDigit(array[i]); ++i) {
+            macroName.append(array[i]);
+        }
+        macroBlock.append(macroName);
+
+        if (VELOCITY_ENDBLOCK.contains(macroName.toString())) {
+            // #end
+            context.popVelocityDepth();
+        } else if (!VELOCITY_NOPARAMBLOCK.contains(macroName.toString())) {
+            if (VELOCITY_BEGINBLOCK.contains(macroName.toString())) {
+                // #if, #elseif, #foreach
+                context.pushVelocityDepth();
+            }
+
+            // Skip spaces
+            for (; i < array.length && array[i] == ' '; ++i) {
+                macroBlock.append(array[i]);
+            }
+
+            if (array[i] == '(') {
+                if (VELOCITY_PARAMBLOCK.contains(macroName.toString())) {
+                    // Skip condition
+                    i = getMethodParameters(array, i, macroBlock, context);
+                } else {
+                    List<String> parameters = new ArrayList<String>();
+                    // Get condition
+                    i = getMacroParameters(array, i, macroBlock, parameters, context);
+                    convertMacro(macroName.toString(), parameters, macroBlock, context);
                 }
             }
         }
 
-        return parameterList;
+        velocityBlock.append(macroBlock);
+
+        return i;
+    }
+
+    private void convertMacro(String name, List<String> parameters, StringBuffer macroBlock,
+        VelocityFilterContext context)
+    {
+        try {
+            VelocityMacroConverter currentMacro =
+                (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.class, name);
+
+            String convertedMacro = currentMacro.convert(name, parameters);
+
+            // Apply conversion
+            macroBlock.setLength(0);
+            macroBlock.append(convertedMacro);
+
+            context.setInline(currentMacro.isInline());
+
+            context.setConversion(true);
+        } catch (ComponentLookupException e) {
+            if (getLogger().isDebugEnabled()) {
+                getLogger().debug("Can't find macro converter [" + macroBlock + "]", e);
+            }
+        } catch (Exception e) {
+            if (getLogger().isDebugEnabled()) {
+                getLogger().debug("Failed to convert macro [" + macroBlock + "]", e);
+            }
+        }
+    }
+
+    private int getMacroParameters(char[] array, int currentIndex, StringBuffer velocityBlock,
+        List<String> parameterList, VelocityFilterContext context)
+    {
+        velocityBlock.append('(');
+        
+        int i = currentIndex + 1;
+
+        boolean isVelocity = false;
+
+        for (; i < array.length;) {
+            // Skip \s
+            for (; i < array.length && Character.isWhitespace(array[i]); ++i) {
+                velocityBlock.append(array[i]);
+            }
+
+            // If ')' it's the end of parameters
+            if (array[i] == ')') {
+                velocityBlock.append(')');
+                ++i;
+                break;
+            }
+
+            // Skip parameter
+            StringBuffer parameterBlock = new StringBuffer();
+            i = getParameter(array, i, parameterBlock, context);
+            isVelocity |= context.isVelocity();
+            parameterList.add(parameterBlock.toString());
+
+            velocityBlock.append(parameterBlock);
+        }
+
+        context.setVelocity(isVelocity);
+
+        return i;
+    }
+
+    private int getParameter(char[] array, int currentIndex, StringBuffer parameterBlock, VelocityFilterContext context)
+    {
+        int i = currentIndex;
+
+        if (array[i] == '$') {
+            i = getVar(array, currentIndex, parameterBlock, context);
+        } else if (array[i] == '"') {
+            i = getEscape(array, currentIndex, parameterBlock, '"', context);
+        } else if (array[i] == '\'') {
+            i = getEscape(array, currentIndex, parameterBlock, '\'', context);
+        }
+
+        return i;
+    }
+
+    private int getSimpleComment(char[] array, int currentIndex, StringBuffer velocityBlock)
+    {
+        velocityBlock.append("##");
+
+        int i = currentIndex + 1;
+
+        for (; i < array.length; ++i) {
+            if (array[i] == '\n') {
+                velocityBlock.append(array[i]);
+                ++i;
+                break;
+            }
+
+            velocityBlock.append(array[i]);
+        }
+
+        return i;
+    }
+
+    private int getMultilinesComment(char[] array, int currentIndex, StringBuffer velocityBlock)
+    {
+        velocityBlock.append("#*");
+
+        int i = currentIndex + 1;
+
+        for (; i < array.length; ++i) {
+            if (array[i] == '#' && array[i - 1] == '*') {
+                velocityBlock.append('#');
+                ++i;
+                break;
+            }
+
+            velocityBlock.append(array[i]);
+        }
+
+        return i;
+    }
+
+    private int getVar(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
+    {
+        velocityBlock.append('$');
+
+        int i = currentIndex + 1;
+
+        if (array[i] == '{') {
+            velocityBlock.append('{');
+            ++i;
+        }
+
+        // A Velocity variable starts with [a-zA-Z]
+        if (Character.isLetter(array[i])) {
+            context.setVelocity(true);
+
+            // Skip variable
+            for (; i < array.length && Character.isLetterOrDigit(array[i]); ++i) {
+                velocityBlock.append(array[i]);
+            }
+
+            // Skip method(s)
+            for (; i < array.length;) {
+                if (array[currentIndex + 1] == '{' && array[i] == '}') {
+                    velocityBlock.append('}');
+                    ++i;
+                    break;
+                } else if (array[i] == '.') {
+                    StringBuffer method = new StringBuffer();
+                    int index = getMethod(array, i, method, context);
+                    if (context.isVelocity()) {
+                        velocityBlock.append(method);
+                        i = index;
+                    } else {
+                        context.setVelocity(true);
+                    }
+                } else {
+                    break;
+                }
+            }
+        } else {
+            context.setVelocity(false);
+        }
+
+        return context.isVelocity() ? i : currentIndex;
+    }
+
+    private int getMethod(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
+    {
+        context.setVelocity(true);
+
+        velocityBlock.append('.');
+
+        int i = currentIndex + 1;
+
+        // A JAVA method starts with [a-zA-Z]
+        if (Character.isLetter(array[i])) {
+            for (; i < array.length; ++i) {
+                if (array[i] == '(') {
+                    i = getMethodParameters(array, i, velocityBlock, context);
+                    break;
+                } else if (!Character.isLetterOrDigit(array[i])) {
+                    break;
+                }
+
+                velocityBlock.append(array[i]);
+            }
+        } else {
+            context.setVelocity(false);
+        }
+
+        return i;
+    }
+
+    private int getMethodParameters(char[] array, int currentIndex, StringBuffer velocityBlock,
+        VelocityFilterContext context)
+    {
+        velocityBlock.append('(');
+
+        int i = currentIndex + 1;
+
+        int depth = 1;
+
+        for (; i < array.length;) {
+            if (array[i] == ')') {
+                --depth;
+                if (depth == 0) {
+                    velocityBlock.append(array[i]);
+                    ++i;
+                    break;
+                }
+            } else if (array[i] == '(') {
+                ++depth;
+            } else if (array[i] == '"') {
+                i = getEscape(array, i, velocityBlock, '"', context);
+                continue;
+            } else if (array[i] == '\'') {
+                i = getEscape(array, i, velocityBlock, '\'', context);
+                continue;
+            }
+
+            velocityBlock.append(array[i]);
+            ++i;
+        }
+
+        context.setVelocity(true);
+
+        return i;
+    }
+
+    private int getEscape(char[] array, int currentIndex, StringBuffer velocityBlock, char escapeChar,
+        VelocityFilterContext context)
+    {
+        velocityBlock.append(escapeChar);
+
+        int i = currentIndex + 1;
+
+        boolean isVelocity = false;
+        boolean escaped = false;
+
+        for (; i < array.length; ++i) {
+            if (!escaped) {
+                if (array[i] == '\\') {
+                    escaped = true;
+                } else if (array[i] == '$') {
+                    i = getVar(array, currentIndex, velocityBlock, context);
+                    isVelocity |= context.isVelocity();
+                    continue;
+                } else if (array[i] == escapeChar) {
+                    velocityBlock.append(array[i]);
+                    ++i;
+                    break;
+                }
+            } else {
+                escaped = false;
+            }
+
+            velocityBlock.append(array[i]);
+        }
+
+        context.setVelocity(isVelocity);
+
+        return i;
     }
 
     public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext)

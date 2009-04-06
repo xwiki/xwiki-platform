@@ -31,7 +31,6 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
- * 
  * @version $Id$
  * @since 1.8M1
  */
@@ -43,6 +42,7 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -50,6 +50,12 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
         setPriority(1000);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
@@ -61,7 +67,7 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
 
             if (currentIndex > 0) {
                 // Section consume all following new lines
-                before = CleanUtil.removeFirstNewLines(before);
+                before = CleanUtil.removeLeadingNewLines(before);
                 before = "\n\n" + before;
             }
 
@@ -75,7 +81,7 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
             return content;
         }
 
-        result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
+        result.append(CleanUtil.setLeadingNewLines(content.substring(currentIndex), 2));
 
         return result.toString();
     }

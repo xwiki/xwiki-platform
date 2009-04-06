@@ -41,6 +41,7 @@ public class PreFilter extends AbstractFilter implements Initializable
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -48,6 +49,12 @@ public class PreFilter extends AbstractFilter implements Initializable
         setPriority(100);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
@@ -58,7 +65,7 @@ public class PreFilter extends AbstractFilter implements Initializable
             String before = content.substring(currentIndex, matcher.start());
 
             // a standalone new line is not interpreted by XWiki 1.0 rendering
-            result.append(CleanUtil.removeLastNewLines(before, 1, true));
+            result.append(CleanUtil.removeTrailingNewLines(before, 1, true));
 
             result.append("{{{");
             result.append(filterContext.addProtectedContent(CleanUtil.cleanSpacesAndNewLines(matcher.group(1)).trim()));

@@ -30,7 +30,7 @@ import org.apache.commons.lang.StringUtils;
  * @version $Id$
  * @since 1.8M1
  */
-public class CleanUtil
+public final class CleanUtil
 {
     /**
      * Match all the first new lines.
@@ -53,6 +53,14 @@ public class CleanUtil
     private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\\\\\|([^\\\\])\\\\");
 
     /**
+     * Utility class.
+     */
+    private CleanUtil()
+    {
+
+    }
+
+    /**
      * Replace all spaces/new line groupes by one space.
      * 
      * @param content the content to convert.
@@ -64,12 +72,14 @@ public class CleanUtil
     }
 
     /**
-     * Remove first new line if there is only one new line.
+     * Remove first new lines if there is more than 0 and less or equals to the provided number.
      * 
      * @param content the content to convert.
+     * @param nb the number of new lines to match.
+     * @param replaceWithSpace indicate if the removed new lines are replaced with a white space.
      * @return the converted string.
      */
-    public static String removeFirstNewLines(String content, int nb, boolean replaceWithSpace)
+    public static String removeLeadingNewLines(String content, int nb, boolean replaceWithSpace)
     {
         String cleanedContent = content;
 
@@ -88,12 +98,14 @@ public class CleanUtil
     }
 
     /**
-     * Remove last new line if there is only one new line.
+     * Remove last new lines if there is more than 0 and less or equals to the provided number.
      * 
      * @param content the content to convert.
+     * @param nb the number of new lines to match.
+     * @param replaceWithSpace indicate if the removed new lines are replaced with a white space.
      * @return the converted string.
      */
-    public static String removeLastNewLines(String content, int nb, boolean replaceWithSpace)
+    public static String removeTrailingNewLines(String content, int nb, boolean replaceWithSpace)
     {
         String cleanedContent = content;
 
@@ -118,7 +130,7 @@ public class CleanUtil
      * @param nb the number of new lines the string need to contains at the beginning.
      * @return the converted string.
      */
-    public static String setFirstNewLines(String content, int nb)
+    public static String setLeadingNewLines(String content, int nb)
     {
         String cleanedContent = content;
 
@@ -140,7 +152,7 @@ public class CleanUtil
      * @param nb the number of new lines the string need to contains at the end.
      * @return the converted string.
      */
-    public static String setLastNewLines(String content, int nb)
+    public static String setTrailingNewLines(String content, int nb)
     {
         String cleanedContent = content;
 
@@ -156,12 +168,29 @@ public class CleanUtil
     }
 
     /**
+     * Check the provided string contains enough new lines at the end and add the need ones.
+     * 
+     * @param content the content to convert.
+     * @param nb the number of new lines the string need to contains at the end.
+     */
+    public static void setTrailingNewLines(StringBuffer content, int nb)
+    {
+        Matcher matcher = ENDING_NL_GROUP_PATTERN.matcher(content);
+
+        int foundNb = matcher.find() ? matcher.end() - matcher.start() : 0;
+
+        if (foundNb < nb) {
+            content.append(StringUtils.repeat("\n", nb - foundNb));
+        }
+    }
+
+    /**
      * Remove all the first new lines.
      * 
      * @param content the content to convert.
      * @return the converted string.
      */
-    public static String removeFirstNewLines(String content)
+    public static String removeLeadingNewLines(String content)
     {
         return STARTING_NL_GROUP_PATTERN.matcher(content).replaceAll("");
     }
@@ -172,7 +201,7 @@ public class CleanUtil
      * @param content the content to convert.
      * @return the converted string.
      */
-    public static String removeLastNewLines(String content)
+    public static String removeTrailingNewLines(String content)
     {
         return ENDING_NL_GROUP_PATTERN.matcher(content).replaceAll("");
     }

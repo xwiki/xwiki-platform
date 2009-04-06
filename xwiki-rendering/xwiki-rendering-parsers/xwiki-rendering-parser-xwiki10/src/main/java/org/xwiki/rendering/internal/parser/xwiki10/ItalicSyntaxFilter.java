@@ -38,6 +38,7 @@ public class ItalicSyntaxFilter extends AbstractSyntaxFilter implements Initiali
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException

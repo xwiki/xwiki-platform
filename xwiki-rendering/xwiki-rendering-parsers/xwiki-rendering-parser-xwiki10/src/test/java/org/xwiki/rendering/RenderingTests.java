@@ -45,7 +45,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("velocity/velocity5", false);
         suite.addTestsFromResource("velocity/velocity6", false);
         suite.addTestsFromResource("velocity/velocity7", false);
-        
+        suite.addTestsFromResource("velocity/velocity8", false);
+
+        // Groovy
         suite.addTestsFromResource("groovy/groovy1", false);
 
         // Velocity Macros
@@ -82,7 +84,7 @@ public class RenderingTests extends TestCase
         
         //Misc
         suite.addTestsFromResource("misc/misc1", false);
-
+        
         return new RenderingPlexusTestSetup(suite);
     }
 }

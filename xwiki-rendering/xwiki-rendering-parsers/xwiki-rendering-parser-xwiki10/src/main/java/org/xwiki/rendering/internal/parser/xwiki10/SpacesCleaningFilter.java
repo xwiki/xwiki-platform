@@ -41,6 +41,7 @@ public class SpacesCleaningFilter extends AbstractFilter implements Initializabl
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -48,6 +49,12 @@ public class SpacesCleaningFilter extends AbstractFilter implements Initializabl
         setPriority(2000);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
         return SPACES_PATTERN.matcher(content).replaceAll("$1 $2");

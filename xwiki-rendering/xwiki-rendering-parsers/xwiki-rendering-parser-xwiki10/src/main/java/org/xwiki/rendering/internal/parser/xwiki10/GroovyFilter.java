@@ -39,6 +39,7 @@ public class GroovyFilter extends AbstractFilter implements Initializable
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -46,13 +47,19 @@ public class GroovyFilter extends AbstractFilter implements Initializable
         setPriority(30);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
 
         String currentContent = content;
         for (int index = currentContent.indexOf(GROOVY_BEGIN); index != -1; index =
-            currentContent.indexOf(GROOVY_BEGIN)) {
+                currentContent.indexOf(GROOVY_BEGIN)) {
             result.append(currentContent.substring(0, index));
 
             currentContent = currentContent.substring(index + 2);
@@ -75,7 +82,7 @@ public class GroovyFilter extends AbstractFilter implements Initializable
                     .append(filterContext.addProtectedContent("{{groovy}}" + groovyContent + "{{/groovy}}", !newline));
 
                 if (newline) {
-                    currentContent = CleanUtil.setFirstNewLines(currentContent, 2);
+                    currentContent = CleanUtil.setLeadingNewLines(currentContent, 2);
                 }
             }
         }

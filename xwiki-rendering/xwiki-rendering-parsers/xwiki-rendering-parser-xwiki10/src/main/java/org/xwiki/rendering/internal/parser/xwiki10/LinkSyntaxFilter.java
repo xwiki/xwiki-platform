@@ -40,6 +40,7 @@ public class LinkSyntaxFilter extends AbstractFilter implements Initializable
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -47,6 +48,12 @@ public class LinkSyntaxFilter extends AbstractFilter implements Initializable
         setPriority(1000);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
@@ -57,7 +64,7 @@ public class LinkSyntaxFilter extends AbstractFilter implements Initializable
             String before = content.substring(current, matcher.start());
 
             // a standalone new line is not interpreted by XWiki 1.0 rendering
-            result.append(CleanUtil.removeLastNewLines(before, 1, true));
+            result.append(CleanUtil.removeTrailingNewLines(before, 1, true));
 
             StringBuffer linkResult = new StringBuffer();
             linkResult.append("[[");

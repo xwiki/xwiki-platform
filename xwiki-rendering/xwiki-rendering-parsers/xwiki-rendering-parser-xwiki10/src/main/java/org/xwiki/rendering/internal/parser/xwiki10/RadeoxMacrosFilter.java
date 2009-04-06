@@ -60,6 +60,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -77,6 +78,12 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
         this.componentManager = componentManager;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
         content = filterMacros(content, SINGLE_LINE_MACRO_PATTERN, false, filterContext);
@@ -96,7 +103,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
             String before = content.substring(currentIndex, matcher.start());
 
             if (currentMacro != null && !currentMacro.isInline()) {
-                before = CleanUtil.setFirstNewLines(before, 2);
+                before = CleanUtil.setLeadingNewLines(before, 2);
             }
 
             String allcontent = matcher.group(0);
@@ -111,10 +118,10 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
 
                 if (currentMacro.supportContent() == supportContent) {
                     // a standalone new line is not interpreted by XWiki 1.0 rendering
-                    before = CleanUtil.removeLastNewLines(before, 1, true);
+                    before = CleanUtil.removeTrailingNewLines(before, 1, true);
 
                     if (!currentMacro.isInline()) {
-                        before = CleanUtil.setLastNewLines(before, 2);
+                        before = CleanUtil.setTrailingNewLines(before, 2);
                     }
 
                     allcontent =
@@ -143,7 +150,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
         }
 
         if (currentMacro != null && !currentMacro.isInline()) {
-            result.append(CleanUtil.setFirstNewLines(content.substring(currentIndex), 2));
+            result.append(CleanUtil.setLeadingNewLines(content.substring(currentIndex), 2));
         } else {
             result.append(content.substring(currentIndex));
         }

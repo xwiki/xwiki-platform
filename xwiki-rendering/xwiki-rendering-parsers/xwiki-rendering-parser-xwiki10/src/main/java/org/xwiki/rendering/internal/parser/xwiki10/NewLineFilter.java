@@ -28,7 +28,6 @@ import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 
 /**
- * 
  * @version $Id$
  * @since 1.8M1
  */
@@ -39,6 +38,7 @@ public class NewLineFilter extends AbstractFilter implements Initializable
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -46,6 +46,12 @@ public class NewLineFilter extends AbstractFilter implements Initializable
         setPriority(0);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
         return MSNEWLINE_PATTERN.matcher(content).replaceAll("\n");

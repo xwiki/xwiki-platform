@@ -54,11 +54,14 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         setPriority(3000);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String, org.xwiki.rendering.parser.xwiki10.FilterContext)
+     */
     public String filter(String content, FilterContext filterContext)
     {
-        content = filterMacros(content, filterContext);
-
-        return content;
+        return filterMacros(content, filterContext);
     }
 
     private String filterMacros(String content, FilterContext filterContext)

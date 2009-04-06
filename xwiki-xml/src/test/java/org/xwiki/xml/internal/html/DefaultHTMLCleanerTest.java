@@ -64,6 +64,9 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         assertHTML("<p>\"&amp;</p>", "<p>\"&</p>");
         assertHTML("<p><img src=\"http://host.com/a.gif?a=foo&amp;b=bar\" /></p>", "<img src=\"http://host.com/a.gif?a=foo&b=bar\" />");
         assertHTML("<p>&#xA;</p>", "<p>&#xA;</p>");
+        
+        // Verify that double quotes are escaped in attibute values
+        assertHTML("<p value=\"script:&quot;&quot;\" />", "<p value='script:\"\"'");
 }
 
     public void testCloseUnbalancedTags()

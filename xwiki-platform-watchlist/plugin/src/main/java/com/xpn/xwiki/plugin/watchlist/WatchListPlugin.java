@@ -555,7 +555,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             String request = "select doc.fullName from XWikiDocument as doc where doc.space in ('" +
                 watchedSpaces + "') or doc.fullName in ('" + watchedDocuments + "') " +
                 "order by doc.date desc";
-            results.addAll(context.getWiki().getStore().search(request, 20, 0, context));
+            results.addAll(context.getWiki().getStore().<String>search(request, 20, 0, context));
         }
         return results;
     }

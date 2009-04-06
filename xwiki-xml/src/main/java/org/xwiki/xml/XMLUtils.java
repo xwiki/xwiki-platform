@@ -113,7 +113,7 @@ public final class XMLUtils
             String result = escapeElementEntities(text);
             
             // Attribute values must have quotes escaped since attributes are defined with quotes...
-            result.replaceAll("\"", "&quot;");
+            result = result.replaceAll("\"", "&quot;");
             
             return result;
         }

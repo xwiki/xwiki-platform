@@ -215,7 +215,7 @@ public abstract class AbstractLinkConfigWizardStep implements WizardStep, Source
      */
     public String getStepTitle()
     {
-        return Strings.INSTANCE.linkConfig();
+        return Strings.INSTANCE.linkConfigTitle();
     }
 
     /**

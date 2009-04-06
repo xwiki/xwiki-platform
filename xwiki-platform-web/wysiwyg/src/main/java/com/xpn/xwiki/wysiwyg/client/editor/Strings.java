@@ -147,11 +147,7 @@ public interface Strings extends Constants
 
     String chooseSpace();
     
-    String selectSpace();    
-
     String choosePage();
-    
-    String selectPage();
 
     String chooseAnchor();
 
@@ -203,9 +199,19 @@ public interface Strings extends Constants
 
     String linkURLToWebPageTextBoxTooltip();
 
-    String noPageSelectedError();
-    
-    String linkConfig();
+    String selectWikipageTitle();
+
+    String linkNoPageSelectedError();
+
+    String linkConfigTitle();
+
+    String linkCreateNewPageTitle();
+
+    String linkNewPageLabel();
+
+    String linkNewPageTextBoxTooltip();
+
+    String linkNewPageError();
 
     String image();
 

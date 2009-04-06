@@ -291,7 +291,10 @@ isc.XWEResultTree.addMethods({
             resource: node.resource,
             isNewPage: true,
             isNewAttachment: false,
-            clickCallback: function(viewer, node, recordNum) { viewer.input.value = '' }
+            clickCallback: function(viewer, node, recordNum) {
+                node.resource = XWiki.getResource(node.resource.prefixedSpace);               
+                viewer.input.value = '';
+              }
         };
 
         // Determine node position in the children list.
@@ -791,8 +794,8 @@ isc.XWETreeGrid.addMethods({
                         }
                     } else {
                         if (this.displayAddPage == true) {                            
-                            var addPageNode = this.getData().findById(resource.prefixedSpace 
-                                                                      + isc.XWEResultTree.constants.addNodeSuffix);
+                            var addPageNode = this.getData().findById(resource.prefixedSpace
+                                    + isc.XWEResultTree.constants.addNodeSuffix);
                             addPageNode.resource = resource;
                             this.selectNodeAndScroll(addPageNode);
                         }

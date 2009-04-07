@@ -68,6 +68,9 @@ public class SxResourceSource implements SxSource
         try {
             InputStream in = this.getClass().getResourceAsStream("/" + this.resourceName);
             return IOUtils.toString(in);
+        } catch (NullPointerException e) {
+            // This happens when the file was not found. Forward an IAE so that the sx action returns 404
+            throw new IllegalArgumentException(e);
         } catch (IOException e) {
             return "";
         }

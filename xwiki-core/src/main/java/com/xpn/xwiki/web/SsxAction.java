@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-
 import com.xpn.xwiki.web.sx.AbstractSxAction;
 import com.xpn.xwiki.web.sx.CssExtension;
 import com.xpn.xwiki.web.sx.Extension;
@@ -56,7 +55,6 @@ public class SsxAction extends AbstractSxAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-
         SxSource sxSource;
 
         Extension sxType = new CssExtension();
@@ -73,7 +71,12 @@ public class SsxAction extends AbstractSxAction
             sxSource = new SxDocumentSource(context, sxType);
         }
 
-        super.renderExtension(sxSource, sxType, context);
+        try {
+            super.renderExtension(sxSource, sxType, context);
+        } catch (IllegalArgumentException e) {
+            // Simply set a 404 status code and return null, so that no unneeded bytes are transfered
+            context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
         return null;
     }
 

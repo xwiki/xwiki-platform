@@ -438,7 +438,7 @@ public abstract class DOMUtils
     /*-{
         var attrNames = [];
         for(var i = 0; i < element.attributes.length; i++) {
-            attrNames.push(element.attributes.item(i));
+            attrNames.push(element.attributes.item(i).nodeName);
         }
         return attrNames;
     }-*/;

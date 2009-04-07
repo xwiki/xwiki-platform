@@ -95,10 +95,14 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         
         // Ensure that whitespaces at the end works.
         assertHTML("\n ", "\n ");
-        
+
         // Ensure that comments are not wrapped
         assertHTML("<!-- comment1 -->\n<p>hello</p>\n<!-- comment2 -->", 
             "<!-- comment1 -->\n<p>hello</p>\n<!-- comment2 -->");
+
+        // Ensure that comments don't prevent other elements to be wrapped with paragraphs.
+        assertHTML("<!-- comment --><p><span>hello</span><!-- comment --></p><p>world</p>", 
+            "<!-- comment --><span>hello</span><!-- comment --><p>world</p>");
     }
 
     public void testCleanNonXHTMLLists()

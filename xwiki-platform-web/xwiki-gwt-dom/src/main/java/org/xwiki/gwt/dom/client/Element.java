@@ -79,9 +79,12 @@ public class Element extends com.google.gwt.dom.client.Element
     /**
      * Returns the value of the specified CSS property for this element as it is computed by the browser before the
      * element is displayed. The CSS property doesn't have to be applied explicitly or directly on this element. It can
-     * be inherited or assumed by default on this element.
+     * be inherited or assumed by default on this element.<br/>
+     * NOTE: You have to pass the JavaScript name of the property and not its CSS name. The JavaScript name has camel
+     * case style ({@code fontWeight}) and it is used like this {@code object.style.propertyJSName = value}. The CSS
+     * name has dash style ({@code font-weight}) and it is used like this {@code propertyCSSName: value;}.
      * 
-     * @param propertyName the name of the CSS property whose value is returned.
+     * @param propertyName the script name of the CSS property whose value is returned.
      * @return the computed value of the specified CSS property for this element.
      */
     public final String getComputedStyleProperty(String propertyName)
@@ -292,5 +295,13 @@ public class Element extends com.google.gwt.dom.client.Element
     public final boolean hasAttribute(String attrName)
     {
         return DOMUtils.getInstance().hasAttribute(this, attrName);
+    }
+
+    /**
+     * @return {@code true} if this element has any attribute, {@code false} otherwise
+     */
+    public final boolean hasAttributes()
+    {
+        return DOMUtils.getInstance().hasAttributes(this);
     }
 }

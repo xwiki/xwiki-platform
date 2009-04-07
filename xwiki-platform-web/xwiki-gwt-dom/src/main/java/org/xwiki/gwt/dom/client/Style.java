@@ -47,17 +47,24 @@ public class Style extends com.google.gwt.dom.client.Style
     /**
      * Sets how thick or thin characters in text should be displayed.
      */
-    public static final String FONT_WEIGHT = "font-weight";
+    public static final Property FONT_WEIGHT =
+        new Property("font-weight", "fontWeight", true, false, FontWeight.NORMAL);
 
     /**
      * Sets the style of a font.
      */
-    public static final String FONT_STYLE = "font-style";
+    public static final Property FONT_STYLE = new Property("font-style", "fontStyle", true, false, FontStyle.NORMAL);
 
     /**
      * Decorates the text.
      */
-    public static final String TEXT_DECORATION = "text-decoration";
+    public static final Property TEXT_DECORATION =
+        new Property("text-decoration", "textDecoration", false, true, TextDecoration.NONE);
+
+    /**
+     * The text-align property aligns the text in an element.
+     */
+    public static final Property TEXT_ALIGN = new Property("text-align", "textAlign", true, false, null);
 
     /**
      * The font-family property is a prioritized list of font family names and/or generic family names for an element.
@@ -71,7 +78,7 @@ public class Style extends com.google.gwt.dom.client.Style
      * Note: If a family-name contains white-space, it should be quoted. Single quotes must be used when using the
      * "style" attribute in HTML.
      */
-    public static final String FONT_FAMILY = "font-family";
+    public static final Property FONT_FAMILY = new Property("font-family", "fontFamily", true, true, null);
 
     /**
      * Sets the width of an element.
@@ -132,6 +139,11 @@ public class Style extends com.google.gwt.dom.client.Style
     public static final class FontWeight
     {
         /**
+         * Default. Defines normal characters.
+         */
+        public static final String NORMAL = FontStyle.NORMAL;
+
+        /**
          * Defines thick characters.
          */
         public static final String BOLD = "bold";
@@ -155,6 +167,11 @@ public class Style extends com.google.gwt.dom.client.Style
     public static final class FontStyle
     {
         /**
+         * Default. The browser displays a normal font.
+         */
+        public static final String NORMAL = "normal";
+
+        /**
          * The browser displays an italic font.
          */
         public static final String ITALIC = "italic";
@@ -172,6 +189,11 @@ public class Style extends com.google.gwt.dom.client.Style
      */
     public static final class TextDecoration
     {
+        /**
+         * Default. Defines a normal text.
+         */
+        public static final String NONE = Display.NONE;
+
         /**
          * Defines a line through the text.
          */
@@ -224,6 +246,39 @@ public class Style extends com.google.gwt.dom.client.Style
          * This is a utility class so it has a private constructor.
          */
         private Position()
+        {
+        }
+    }
+
+    /**
+     * The text-align property aligns the text in an element.
+     */
+    public static final class TextAlign
+    {
+        /**
+         * Aligns the text to the left.
+         */
+        public static final String LEFT = Style.LEFT;
+
+        /**
+         * Aligns the text to the right.
+         */
+        public static final String RIGHT = "right";
+
+        /**
+         * Centers the text.
+         */
+        public static final String CENTER = "center";
+
+        /**
+         * Increases the spaces between words in order for lines to have the same width.
+         */
+        public static final String JUSTIFY = "justify";
+
+        /**
+         * This is a utility class so it has a private constructor.
+         */
+        private TextAlign()
         {
         }
     }

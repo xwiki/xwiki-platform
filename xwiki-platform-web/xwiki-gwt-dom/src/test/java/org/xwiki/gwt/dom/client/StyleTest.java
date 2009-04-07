@@ -31,7 +31,7 @@ public class StyleTest extends AbstractDOMTest
      */
     public void testToCamelCase()
     {
-        assertEquals("fontWeight", Style.toCamelCase(Style.FONT_WEIGHT));
+        assertEquals("fontWeight", Style.toCamelCase(Style.FONT_WEIGHT.getCSSName()));
         assertEquals(Style.DISPLAY, Style.toCamelCase(Style.DISPLAY));
         assertEquals("clientX", Style.toCamelCase("client-x"));
     }

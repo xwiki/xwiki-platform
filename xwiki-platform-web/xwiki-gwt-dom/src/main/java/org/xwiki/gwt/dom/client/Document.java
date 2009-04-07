@@ -260,12 +260,19 @@ public class Document extends com.google.gwt.dom.client.Document
     /**
      * @param command The name of the command to query.
      * @return The current value of the current range for the given command. If a command value has not been explicitly
-     *         set then it returns null.
+     *         set then it returns {@code null}.
      */
     public final native String queryCommandValue(String command)
     /*-{
         try{
-            return this.queryCommandValue(command);
+            var value = this.queryCommandValue(command);
+            // Not all commands have a string value (integer and boolean are also possible) so we must make sure that
+            // the returned value is a string, preserving the null value.
+            if (value == null || value == undefined) {
+                return null;
+            } else {
+                return '' + value;
+            }
         } catch(e) {
             return null;
         }

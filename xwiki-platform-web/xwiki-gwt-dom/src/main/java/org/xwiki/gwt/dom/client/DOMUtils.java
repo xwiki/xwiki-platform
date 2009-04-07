@@ -117,10 +117,13 @@ public abstract class DOMUtils
     /**
      * Returns the value of the specified CSS property for the given element as it is computed by the browser before it
      * displays that element. The CSS property doesn't have to be applied explicitly or directly on the given element.
-     * It can be inherited or assumed by default on that element.
+     * It can be inherited or assumed by default on that element.<br/>
+     * NOTE: You have to pass the JavaScript name of the property and not its CSS name. The JavaScript name has camel
+     * case style ({@code fontWeight}) and it is used like this {@code object.style.propertyJSName = value}. The CSS
+     * name has dash style ({@code font-weight}) and it is used like this {@code propertyCSSName: value;}.
      * 
      * @param el the element for which we retrieve the property value.
-     * @param propertyName the name of the CSS property whose value is returned.
+     * @param propertyName the script name of the CSS property whose value is returned.
      * @return the computed value of the specified CSS property for the given element.
      */
     public abstract String getComputedStyleProperty(Element el, String propertyName);
@@ -422,13 +425,23 @@ public abstract class DOMUtils
      * @param deep Indicates whether the children of the given node need to be imported.
      * @return a copy of the given node that can be inserted into the specified document.
      */
-    public abstract Node importNode(Document doc, Node externalNode, boolean deep);
+    public native Node importNode(Document doc, Node externalNode, boolean deep)
+    /*-{
+        return doc.importNode(externalNode, deep);
+    }-*/;
 
     /**
      * @param element The DOM element whose attribute names are returned.
      * @return The names of DOM attributes present on the given element.
      */
-    public abstract JsArrayString getAttributeNames(Element element);
+    public native JsArrayString getAttributeNames(Element element)
+    /*-{
+        var attrNames = [];
+        for(var i = 0; i < element.attributes.length; i++) {
+            attrNames.push(element.attributes.item(i));
+        }
+        return attrNames;
+    }-*/;
 
     /**
      * Searches for the first ancestor with the name <code>tagName</code> of the passed node, including the node itself.
@@ -474,13 +487,16 @@ public abstract class DOMUtils
 
     /**
      * Helps setting the inner HTML for an element, in a cross-browser manner, because IE seems to trim leading comments
-     * in the inner HTML.
+     * in the inner HTML. This method is overwritten in IE's specific implementation.
      * 
      * @param element element to set the inner HTML for
      * @param html the HTML string to set
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3146
      */
-    public abstract void setInnerHTML(Element element, String html);
+    public void setInnerHTML(Element element, String html)
+    {
+        element.setInnerHTML(html);
+    }
 
     /**
      * @param alice A DOM node.
@@ -1063,6 +1079,15 @@ public abstract class DOMUtils
     public native boolean hasAttribute(Element element, String attrName)
     /*-{
         return element.hasAttribute(attrName);
+    }-*/;
+
+    /**
+     * @param element a DOM element
+     * @return {@code true} if the given element has any attributes
+     */
+    public native boolean hasAttributes(Element element)
+    /*-{
+        return element.hasAttributes();
     }-*/;
 
     /**

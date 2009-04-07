@@ -24,6 +24,8 @@ package com.xpn.xwiki.objects.classes;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.xhtml.input;
 
 import com.xpn.xwiki.XWikiContext;
@@ -37,8 +39,6 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.web.XWikiMessageTool;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class NumberClass extends PropertyClass
 {
@@ -115,13 +115,14 @@ public class NumberClass extends PropertyClass
                 if ((value != null) && (!value.equals(""))) {
                     nvalue = new Double(value);
                 }
-           } else {
+            } else {
                 if ((value != null) && (!value.equals(""))) {
                     nvalue = new Long(value);
                 }
-           }
+            }
         } catch (NumberFormatException e) {
-            LOG.warn("Invalid number entered for property " + getName() + " of class " + getObject().getName() + ": " + value);
+            LOG.warn("Invalid number entered for property " + getName() + " of class " + getObject().getName() + ": "
+                + value);
             // Returning null makes sure that the old value (if one exists) will not be discarded/replaced
             return null;
         }

@@ -37,9 +37,14 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class NumberClass extends PropertyClass
 {
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(NumberClass.class);
+
     public NumberClass(PropertyMetaClass wclass)
     {
         super("number", "Number", wclass);
@@ -96,23 +101,31 @@ public class NumberClass extends PropertyClass
         BaseProperty property = newProperty();
         String ntype = getNumberType();
         Number nvalue = null;
-        if (ntype.equals("integer")) {
-            if ((value != null) && (!value.equals(""))) {
-                nvalue = new Integer(value);
-            }
-        } else if (ntype.equals("float")) {
-            if ((value != null) && (!value.equals(""))) {
-                nvalue = new Float(value);
-            }
-        } else if (ntype.equals("double")) {
-            if ((value != null) && (!value.equals(""))) {
-                nvalue = new Double(value);
-            }
-        } else {
-            if ((value != null) && (!value.equals(""))) {
-                nvalue = new Long(value);
-            }
+
+        try {
+            if (ntype.equals("integer")) {
+                if ((value != null) && (!value.equals(""))) {
+                    nvalue = new Integer(value);
+                }
+            } else if (ntype.equals("float")) {
+                if ((value != null) && (!value.equals(""))) {
+                    nvalue = new Float(value);
+                }
+            } else if (ntype.equals("double")) {
+                if ((value != null) && (!value.equals(""))) {
+                    nvalue = new Double(value);
+                }
+           } else {
+                if ((value != null) && (!value.equals(""))) {
+                    nvalue = new Long(value);
+                }
+           }
+        } catch (NumberFormatException e) {
+            LOG.warn("Invalid number entered for property " + getName() + " of class " + getObject().getName() + ": " + value);
+            // Returning null makes sure that the old value (if one exists) will not be discarded/replaced
+            return null;
         }
+
         property.setValue(nvalue);
         return property;
     }

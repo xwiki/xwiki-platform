@@ -22,7 +22,6 @@ package org.xwiki.gwt.dom.client.internal.ie;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
@@ -39,17 +38,7 @@ public class IEDOMUtils extends DOMUtils
      * 
      * @see DOMUtils#getComputedStyleProperty(Element, String)
      */
-    public String getComputedStyleProperty(Element el, String propertyName)
-    {
-        return getComputedStylePropertyIE(el, Style.toCamelCase(propertyName));
-    }
-
-    /**
-     * @param el The element for which we retrieve the computed value of the given style property.
-     * @param propertyName The name of the property in camel case format.
-     * @return The computed value of the given style property on the specified element.
-     */
-    private native String getComputedStylePropertyIE(Element el, String propertyName)
+    public native String getComputedStyleProperty(Element el, String propertyName)
     /*-{
         // We force it to be a string because we treat it as a string in the java code.
         return '' + el.currentStyle[propertyName];
@@ -139,4 +128,14 @@ public class IEDOMUtils extends DOMUtils
     /*-{
         return element.getAttribute(attrName) != null;
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#hasAttributes(Element)
+     */
+    public boolean hasAttributes(Element element)
+    {
+        return getAttributeNames(element).length() > 0;
+    }
 }

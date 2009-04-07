@@ -23,7 +23,6 @@ import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
 
 /**
@@ -41,42 +40,8 @@ public class MozillaDOMUtils extends DOMUtils
     public native String getComputedStyleProperty(Element el, String propertyName)
     /*-{
         // We force it to be a string because we treat it as a string in the java code.
-        return '' + el.ownerDocument.defaultView.getComputedStyle(el, null).getPropertyValue(propertyName);
+        return '' + el.ownerDocument.defaultView.getComputedStyle(el, null)[propertyName];
     }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#importNode(Document, Node, boolean)
-     */
-    public native Node importNode(Document doc, Node externalNode, boolean deep)
-    /*-{
-        return doc.importNode(externalNode, deep);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#getAttributeNames(Element)
-     */
-    public native JsArrayString getAttributeNames(Element element)
-    /*-{
-        var attrNames = [];
-        for(var i = 0; i < element.attributes.length; i++) {
-            attrNames.push(element.attributes.item(i));
-        }
-        return attrNames;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#setInnerHTML(Element, String)
-     */
-    public void setInnerHTML(Element element, String html)
-    {
-        element.setInnerHTML(html);
-    }
 
     /**
      * {@inheritDoc}

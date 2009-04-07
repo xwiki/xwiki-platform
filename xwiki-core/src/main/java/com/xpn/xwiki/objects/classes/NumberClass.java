@@ -72,6 +72,7 @@ public class NumberClass extends PropertyClass
         setStringValue("numberType", ntype);
     }
 
+    @Override
     public BaseProperty newProperty()
     {
         String ntype = getNumberType();
@@ -89,6 +90,7 @@ public class NumberClass extends PropertyClass
         return property;
     }
 
+    @Override
     public BaseProperty fromString(String value)
     {
         BaseProperty property = newProperty();
@@ -115,8 +117,8 @@ public class NumberClass extends PropertyClass
         return property;
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
 
@@ -132,8 +134,9 @@ public class NumberClass extends PropertyClass
         buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix,
-        XWikiCriteria criteria, XWikiContext context)
+    @Override
+    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
+        XWikiContext context)
     {
         input input1 = new input();
         input1.setType("text");
@@ -164,6 +167,7 @@ public class NumberClass extends PropertyClass
         buffer.append(input2.toString());
     }
 
+    @Override
     public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         Number value = (Number) map.get(prefix);
@@ -190,18 +194,15 @@ public class NumberClass extends PropertyClass
     {
         String data[] = map.get("");
         if ((data != null) && (data.length == 1)) {
-            query.setParam(getObject().getName() + "_" + getName(), fromString(data[0])
-                .getValue());
+            query.setParam(getObject().getName() + "_" + getName(), fromString(data[0]).getValue());
         } else {
             data = map.get("lessthan");
             if ((data != null) && (data.length == 1)) {
-                query.setParam(getObject().getName() + "_" + getName() + "_lessthan", fromString(
-                    data[0]).getValue());
+                query.setParam(getObject().getName() + "_" + getName() + "_lessthan", fromString(data[0]).getValue());
             }
             data = map.get("morethan");
             if ((data != null) && (data.length == 1)) {
-                query.setParam(getObject().getName() + "_" + getName() + "_morethan", fromString(
-                    data[0]).getValue());
+                query.setParam(getObject().getName() + "_" + getName() + "_morethan", fromString(data[0]).getValue());
             }
         }
     }

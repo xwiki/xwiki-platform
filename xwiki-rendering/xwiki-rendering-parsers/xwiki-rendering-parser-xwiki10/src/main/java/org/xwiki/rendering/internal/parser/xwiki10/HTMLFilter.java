@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -39,7 +38,7 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 @Component("htmlmacro")
 public class HTMLFilter extends AbstractFilter implements Initializable
 {
-    public static final String HTML_PATTERN = "([\\<\\>])";
+    public static final String HTML_PATTERN = "(\\<!--)|(--\\>)|([\\<\\>])";
 
     public static final Pattern HTMLVELOCITY_PATTERN =
         Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN + "|" + VelocityFilter.VELOCITYCLOSE_SPATTERN + "|"
@@ -47,6 +46,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -57,14 +57,10 @@ public class HTMLFilter extends AbstractFilter implements Initializable
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String, org.xwiki.rendering.parser.xwiki10.FilterContext)
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
      */
     public String filter(String content, FilterContext filterContext)
-    {
-        return filterMacros(content, filterContext);
-    }
-
-    private String filterMacros(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
         Matcher matcher = HTMLVELOCITY_PATTERN.matcher(content);
@@ -72,6 +68,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         int currentIndex = 0;
         boolean inHTMLMacro = false;
         boolean htmlMacroInVelocityMacro = false;
+        boolean inHTMLComment = false;
 
         int nbVOpen = 0;
         int nbVClose = 0;
@@ -87,65 +84,44 @@ public class HTMLFilter extends AbstractFilter implements Initializable
             String matchedContent = matcher.group(0);
 
             if (matcher.group(1) != null) {
+                // Velocity open
                 if (inHTMLMacro) {
                     nonHtmlContent.append(before);
                     nonHtmlContentWithVelocity.append(before);
-                    nonHtmlContentWithVelocity.append(matchedContent);
+                    appendVelocityOpen(nonHtmlContentWithVelocity, filterContext);
 
                     ++nbVOpen;
                 } else {
                     result.append(StringEscapeUtils.unescapeHtml(before));
-                    result.append(matchedContent);
+                    appendVelocityOpen(result, filterContext);
 
                     htmlMacroInVelocityMacro = true;
                 }
             } else if (matcher.group(2) != null) {
+                // Velocity close
                 if (inHTMLMacro) {
                     nonHtmlContent.append(before);
                     nonHtmlContentWithVelocity.append(before);
-                    nonHtmlContentWithVelocity.append(matchedContent);
+                    appendVelocityClose(nonHtmlContentWithVelocity, filterContext);
 
                     ++nbVClose;
                 } else {
                     result.append(StringEscapeUtils.unescapeHtml(before));
-                    result.append(matchedContent);
+                    appendVelocityClose(result, filterContext);
 
                     htmlMacroInVelocityMacro = false;
                 }
             } else {
-                if (StringUtils.countMatches(nonHtmlContent.toString() + before, "\n") > 10) {
-                    if (!htmlMacroInVelocityMacro && nbVOpen > 0) {
-                        VelocityFilter.appendVelocityOpen(result, filterContext);
-                    }
-                    if (htmlContent.length() > 0) {
-                        appendHTMLOpen(result, filterContext);
-                        result.append(htmlContent);
-                        appendHTMLClose(result, filterContext);
-                    }
-                    result.append(StringEscapeUtils.unescapeHtml(nonHtmlContentWithVelocity.toString()));
-                    if (nbVCloseInHTML > nbVOpenInHTML) {
-                        VelocityFilter.appendVelocityClose(result, filterContext);
-                    }
+                // html
+                htmlContent.append(nonHtmlContent);
 
+                if (!inHTMLMacro) {
                     result.append(StringEscapeUtils.unescapeHtml(before));
-
-                    htmlContent = new StringBuffer();
-                    htmlMacroInVelocityMacro =
-                        (htmlMacroInVelocityMacro && nbVOpen + nbVOpenInHTML == nbVClose + nbVCloseInHTML)
-                            || (!htmlMacroInVelocityMacro && nbVOpen + nbVOpenInHTML > nbVClose + nbVCloseInHTML);
-                    nbVOpenInHTML = 0;
-                    nbVCloseInHTML = 0;
                 } else {
-                    htmlContent.append(nonHtmlContent);
+                    htmlContent.append(before);
 
-                    if (!inHTMLMacro) {
-                        result.append(StringEscapeUtils.unescapeHtml(before));
-                    } else {
-                        htmlContent.append(before);
-
-                        nbVOpenInHTML += nbVOpen;
-                        nbVCloseInHTML += nbVClose;
-                    }
+                    nbVOpenInHTML += nbVOpen;
+                    nbVCloseInHTML += nbVClose;
                 }
 
                 nbVOpen = 0;
@@ -153,10 +129,18 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
                 inHTMLMacro = true;
 
-                nonHtmlContent = new StringBuffer();
-                nonHtmlContentWithVelocity = new StringBuffer();
+                nonHtmlContent.setLength(0);
+                nonHtmlContentWithVelocity.setLength(0);
 
-                htmlContent.append(matchedContent);
+                if (matcher.group(3) != null) {
+                    inHTMLComment = true;
+                    htmlContent.append(filterContext.addProtectedContent(matchedContent));
+                } else if (inHTMLComment && matcher.group(4) != null) {
+                    htmlContent.append(filterContext.addProtectedContent(matchedContent));
+                    inHTMLComment = false;
+                } else {
+                    htmlContent.append(matchedContent);
+                }
             }
         }
 
@@ -166,18 +150,23 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
         // Close html macro
         if (inHTMLMacro) {
-            if (!htmlMacroInVelocityMacro && nbVOpen > 0) {
-                VelocityFilter.appendVelocityOpen(result, filterContext);
-            }
-            if (htmlContent.length() > 0) {
+            if (!htmlMacroInVelocityMacro && nbVOpenInHTML > 0) {
+                appendVelocityOpen(result, filterContext);
+            } else if (nbVCloseInHTML == 0 && nbVOpenInHTML == 0) {
                 appendHTMLOpen(result, filterContext);
+            }
+
+            if (htmlContent.length() > 0) {
                 result.append(htmlContent);
+            }
+
+            if (nbVCloseInHTML == 0 && nbVOpenInHTML == 0) {
                 appendHTMLClose(result, filterContext);
+            } else if (htmlMacroInVelocityMacro || nbVCloseInHTML > 0) {
+                appendVelocityClose(result, filterContext);
             }
+
             result.append(StringEscapeUtils.unescapeHtml(nonHtmlContentWithVelocity.toString()));
-            if (nbVCloseInHTML > nbVOpenInHTML) {
-                VelocityFilter.appendVelocityClose(result, filterContext);
-            }
         }
 
         result.append(StringEscapeUtils.unescapeHtml(content.substring(currentIndex)));
@@ -187,11 +176,23 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
     public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext)
     {
-        result.append(filterContext.addProtectedContent("{{html wiki=true}}", true));
+        result.append(filterContext.addProtectedContent("{{html wiki=true}}", false));
     }
 
     public static void appendHTMLClose(StringBuffer result, FilterContext filterContext)
     {
-        result.append(filterContext.addProtectedContent("{{/html}}", true));
+        result.append(filterContext.addProtectedContent("{{/html}}", false));
+    }
+
+    public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext)
+    {
+        VelocityFilter.appendVelocityOpen(result, filterContext);
+        appendHTMLOpen(result, filterContext);
+    }
+
+    public static void appendVelocityClose(StringBuffer result, FilterContext filterContext)
+    {
+        appendHTMLClose(result, filterContext);
+        VelocityFilter.appendVelocityClose(result, filterContext);
     }
 }

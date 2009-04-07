@@ -175,7 +175,6 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         StringBuffer velocityContent = new StringBuffer();
 
         boolean inVelocityMacro = false;
-        int nbNL = 0;
         int i = 0;
 
         for (; i < array.length;) {
@@ -184,7 +183,6 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
             context.setVelocity(false);
             context.setConversion(false);
             context.setInline(true);
-            velocityContent.setLength(0);
 
             if (c == '#') {
                 i = getKeyWord(array, i, velocityContent, context);
@@ -197,29 +195,22 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
                     CleanUtil.setTrailingNewLines(nonVelocityContent, 2);
                 }
 
-                nonVelocityContent.append(filterContext.addProtectedContent(velocityContent.toString(), context.isInline()));
+                nonVelocityContent.append(filterContext.addProtectedContent(velocityContent.toString(), context
+                    .isInline()));
+                velocityContent.setLength(0);
             } else if (context.isVelocity()) {
                 result.append(nonVelocityContent);
                 nonVelocityContent.setLength(0);
-                nbNL = 0;
                 if (!inVelocityMacro) {
                     appendVelocityOpen(result, filterContext);
                     inVelocityMacro = true;
                 }
-                result.append(filterContext.addProtectedContent(velocityContent.toString()));
+
+                result.append(filterContext.addProtectedContent(velocityContent.toString(), context.isInline()));
+                velocityContent.setLength(0);
             } else {
                 nonVelocityContent.append(c);
                 ++i;
-                if (c == '\n') {
-                    ++nbNL;
-                }
-                if (nbNL > 10 && inVelocityMacro && context.getVelocityDepth() <= 0) {
-                    appendVelocityClose(result, filterContext);
-                    result.append(nonVelocityContent);
-                    nonVelocityContent.setLength(0);
-                    nbNL = 0;
-                    inVelocityMacro = false;
-                }
             }
         }
 
@@ -227,7 +218,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
             result.append(nonVelocityContent);
 
             // fix unclosed velocity blocks
-            while (context.getVelocityDepth() > 0) {
+            for (; context.getVelocityDepth() > 0; context.popVelocityDepth()) {
                 result.append(filterContext.addProtectedContent("#end"));
             }
 
@@ -246,14 +237,15 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
     {
         int i = currentIndex + 1;
 
+        context.setInline(false);
         context.setVelocity(true);
 
         if (array[i] == '#') {
             // A simple line comment
-            i = getSimpleComment(array, i, velocityBlock);
+            i = getSimpleComment(array, i, velocityBlock, context);
         } else if (array[i] == '*') {
             // A multi lines comment
-            i = getMultilinesComment(array, i, velocityBlock);
+            i = getMultilinesComment(array, i, velocityBlock, context);
         } else if (Character.isLetter(array[i])) {
             // A macro
             i = getMacro(array, i, velocityBlock, context);
@@ -281,9 +273,10 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         if (VELOCITY_ENDBLOCK.contains(macroName.toString())) {
             // #end
             context.popVelocityDepth();
+            // macroBlock.append("£");
         } else if (!VELOCITY_NOPARAMBLOCK.contains(macroName.toString())) {
             if (VELOCITY_BEGINBLOCK.contains(macroName.toString())) {
-                // #if, #elseif, #foreach
+                // #if, #foreach
                 context.pushVelocityDepth();
             }
 
@@ -297,6 +290,8 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
                     // Skip condition
                     i = getMethodParameters(array, i, macroBlock, context);
                 } else {
+                    context.setInline(true);
+
                     List<String> parameters = new ArrayList<String>();
                     // Get condition
                     i = getMacroParameters(array, i, macroBlock, parameters, context);
@@ -341,7 +336,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         List<String> parameterList, VelocityFilterContext context)
     {
         velocityBlock.append('(');
-        
+
         int i = currentIndex + 1;
 
         boolean isVelocity = false;
@@ -361,7 +356,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
             // Skip parameter
             StringBuffer parameterBlock = new StringBuffer();
-            i = getParameter(array, i, parameterBlock, context);
+            i = getMacroParameter(array, i, parameterBlock, context);
             isVelocity |= context.isVelocity();
             parameterList.add(parameterBlock.toString());
 
@@ -373,31 +368,46 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         return i;
     }
 
-    private int getParameter(char[] array, int currentIndex, StringBuffer parameterBlock, VelocityFilterContext context)
+    private int getMacroParameter(char[] array, int currentIndex, StringBuffer parameterBlock,
+        VelocityFilterContext context)
     {
         int i = currentIndex;
 
-        if (array[i] == '$') {
-            i = getVar(array, currentIndex, parameterBlock, context);
-        } else if (array[i] == '"') {
-            i = getEscape(array, currentIndex, parameterBlock, '"', context);
-        } else if (array[i] == '\'') {
-            i = getEscape(array, currentIndex, parameterBlock, '\'', context);
+        for (; i < array.length; ++i) {
+            if (array[i] == '$') {
+                i = getVar(array, currentIndex, parameterBlock, context);
+                if (context.isVelocity()) {
+                    break;
+                }
+            } else if (array[i] == '"') {
+                i = getEscape(array, currentIndex, parameterBlock, '"', context);
+                break;
+            } else if (array[i] == '\'') {
+                i = getEscape(array, currentIndex, parameterBlock, '\'', context);
+                break;
+            } else if (Character.isWhitespace(array[i])) {
+                break;
+            } else if (array[i] == ')') {
+                break;
+            }
+
+            parameterBlock.append(array[i]);
         }
 
         return i;
     }
 
-    private int getSimpleComment(char[] array, int currentIndex, StringBuffer velocityBlock)
+    private int getSimpleComment(char[] array, int currentIndex, StringBuffer velocityBlock,
+        VelocityFilterContext context)
     {
+        context.setVelocity(true);
+
         velocityBlock.append("##");
 
         int i = currentIndex + 1;
 
         for (; i < array.length; ++i) {
             if (array[i] == '\n') {
-                velocityBlock.append(array[i]);
-                ++i;
                 break;
             }
 
@@ -407,8 +417,11 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         return i;
     }
 
-    private int getMultilinesComment(char[] array, int currentIndex, StringBuffer velocityBlock)
+    private int getMultilinesComment(char[] array, int currentIndex, StringBuffer velocityBlock,
+        VelocityFilterContext context)
     {
+        context.setVelocity(true);
+
         velocityBlock.append("#*");
 
         int i = currentIndex + 1;
@@ -428,12 +441,12 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
     private int getVar(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
     {
-        velocityBlock.append('$');
+        StringBuffer varBlock = new StringBuffer("$");
 
         int i = currentIndex + 1;
 
         if (array[i] == '{') {
-            velocityBlock.append('{');
+            varBlock.append('{');
             ++i;
         }
 
@@ -443,40 +456,42 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
             // Skip variable
             for (; i < array.length && Character.isLetterOrDigit(array[i]); ++i) {
-                velocityBlock.append(array[i]);
+                varBlock.append(array[i]);
             }
 
             // Skip method(s)
             for (; i < array.length;) {
                 if (array[currentIndex + 1] == '{' && array[i] == '}') {
-                    velocityBlock.append('}');
+                    varBlock.append('}');
                     ++i;
                     break;
                 } else if (array[i] == '.') {
-                    StringBuffer method = new StringBuffer();
-                    int index = getMethod(array, i, method, context);
-                    if (context.isVelocity()) {
-                        velocityBlock.append(method);
-                        i = index;
-                    } else {
-                        context.setVelocity(true);
+                    i = getMethod(array, i, varBlock, context);
+                    if (!context.isVelocity()) {
+                        break;
                     }
                 } else {
                     break;
                 }
             }
+
+            context.setVelocity(true);
         } else {
             context.setVelocity(false);
         }
 
-        return context.isVelocity() ? i : currentIndex;
+        if (context.isVelocity()) {
+            velocityBlock.append(varBlock);
+        } else {
+            i = currentIndex;
+        }
+
+        return i;
     }
 
     private int getMethod(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
     {
-        context.setVelocity(true);
-
-        velocityBlock.append('.');
+        StringBuffer methodBlock = new StringBuffer(".");
 
         int i = currentIndex + 1;
 
@@ -484,16 +499,24 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         if (Character.isLetter(array[i])) {
             for (; i < array.length; ++i) {
                 if (array[i] == '(') {
-                    i = getMethodParameters(array, i, velocityBlock, context);
+                    i = getMethodParameters(array, i, methodBlock, context);
                     break;
                 } else if (!Character.isLetterOrDigit(array[i])) {
                     break;
                 }
 
-                velocityBlock.append(array[i]);
+                methodBlock.append(array[i]);
             }
+
+            context.setVelocity(true);
         } else {
             context.setVelocity(false);
+        }
+
+        if (context.isVelocity()) {
+            velocityBlock.append(methodBlock);
+        } else {
+            i = currentIndex;
         }
 
         return i;
@@ -545,14 +568,16 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         boolean isVelocity = false;
         boolean escaped = false;
 
-        for (; i < array.length; ++i) {
+        for (; i < array.length;) {
             if (!escaped) {
                 if (array[i] == '\\') {
                     escaped = true;
                 } else if (array[i] == '$') {
-                    i = getVar(array, currentIndex, velocityBlock, context);
-                    isVelocity |= context.isVelocity();
-                    continue;
+                    i = getVar(array, i, velocityBlock, context);
+                    if (context.isVelocity()) {
+                        isVelocity = true;
+                        continue;
+                    }
                 } else if (array[i] == escapeChar) {
                     velocityBlock.append(array[i]);
                     ++i;
@@ -563,6 +588,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
             }
 
             velocityBlock.append(array[i]);
+            ++i;
         }
 
         context.setVelocity(isVelocity);

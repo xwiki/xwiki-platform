@@ -39,6 +39,10 @@ public class PreFilter extends AbstractFilter implements Initializable
     private static final Pattern PRE_PATTERN =
         Pattern.compile("\\{pre\\}(.*?)\\{/pre\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
+    public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN);
+
+    public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
+
     /**
      * {@inheritDoc}
      * 
@@ -67,9 +71,26 @@ public class PreFilter extends AbstractFilter implements Initializable
             // a standalone new line is not interpreted by XWiki 1.0 rendering
             result.append(CleanUtil.removeTrailingNewLines(before, 1, true));
 
+            String preContent = matcher.group(1);
+
+            Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(preContent);
+            boolean velocityOpen = velocityOpenMatcher.find();
+            preContent = velocityOpenMatcher.replaceAll("");
+            Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(preContent);
+            boolean velocityClose = velocityCloseMatcher.find();
+            preContent = velocityCloseMatcher.replaceAll("");
+
+            if (velocityOpen) {
+                VelocityFilter.appendVelocityOpen(result, filterContext);
+            }
+
             result.append("{{{");
-            result.append(filterContext.addProtectedContent(CleanUtil.cleanSpacesAndNewLines(matcher.group(1)).trim()));
+            result.append(filterContext.addProtectedContent(CleanUtil.cleanSpacesAndNewLines(preContent).trim()));
             result.append("}}}");
+
+            if (velocityClose) {
+                VelocityFilter.appendVelocityClose(result, filterContext);
+            }
         }
 
         if (currentIndex == 0) {

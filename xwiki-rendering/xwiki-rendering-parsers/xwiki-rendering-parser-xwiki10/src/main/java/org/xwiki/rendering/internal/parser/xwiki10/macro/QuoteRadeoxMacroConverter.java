@@ -51,4 +51,10 @@ public class QuoteRadeoxMacroConverter extends AbstractRadeoxMacroConverter
     {
         return true;
     }
+    
+    @Override
+    public boolean isInline()
+    {
+        return false;
+    }
 }

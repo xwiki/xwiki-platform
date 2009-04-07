@@ -38,7 +38,7 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 @Component("standalonenewlinecleanning")
 public class StandaloneNewLineCleaningFilter extends AbstractFilter implements Initializable
 {
-    private static final Pattern SANDALONENEWLINE_PATTERN = Pattern.compile("([^\\n])\\n([^\\n])");
+    private static final Pattern SANDALONENEWLINE_PATTERN = Pattern.compile("([^\\n])\\n([^\\n])", Pattern.MULTILINE);
 
     /**
      * {@inheritDoc}

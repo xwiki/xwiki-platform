@@ -45,7 +45,7 @@ some text
 
 
 
-
+<!-- html comment -->
 
 
 
@@ -54,10 +54,10 @@ some text
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-some text {{velocity}}## commented
+some text {{velocity}}{{html wiki=true}}## commented
 
 ### commented
-{{html wiki=true}}<table> <tr><td></td></tr> </table>{{/html}}
+<table> <tr><td></td></tr> </table>
 
 \\## commented ## commented
 
@@ -79,7 +79,7 @@ some text {{velocity}}## commented
 
 
 
-\\\*#{{/velocity}}
+\\\*#
 
 
 
@@ -91,13 +91,13 @@ some text {{velocity}}## commented
 
 
 
-{{velocity}}## standalone comment
+## standalone comment
+
+
+
+<!-- html comment -->
 
 
 
 
-
-
-
-
-{{html wiki=true}}<div class="${variable}">**bold** some text</div>{{/html}}{{/velocity}}
+<div class="${variable}">**bold** some text</div>{{/html}}{{/velocity}}

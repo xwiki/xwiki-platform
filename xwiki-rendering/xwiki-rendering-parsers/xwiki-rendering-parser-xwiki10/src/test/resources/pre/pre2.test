@@ -7,5 +7,4 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{{{{velocity}}## some velocity
-{{/velocity}}}}}
+{{velocity}}{{html wiki=true}}{{{## some velocity}}}{{/html}}{{/velocity}}

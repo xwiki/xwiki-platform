@@ -161,8 +161,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 sconfig.setPersistentLoginManager(persistent);
 
                 MyFilterConfig fconfig = new MyFilterConfig();
-                fconfig.setInitParameter(FormAuthenticator.LOGIN_SUBMIT_PATTERN_KEY,
-                    xwiki.Param("xwiki.authentication.loginsubmitpage", "/loginsubmit/XWiki/XWikiLogin"));
+                fconfig.setInitParameter(FormAuthenticator.LOGIN_SUBMIT_PATTERN_KEY, xwiki.Param(
+                    "xwiki.authentication.loginsubmitpage", "/loginsubmit/XWiki/XWikiLogin"));
 
                 this.authenticator.init(fconfig, sconfig);
             }

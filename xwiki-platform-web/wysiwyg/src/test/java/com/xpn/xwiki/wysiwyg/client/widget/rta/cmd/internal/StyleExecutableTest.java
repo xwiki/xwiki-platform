@@ -54,7 +54,7 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         super.gwtSetUp();
 
         if (executable == null) {
-            executable = new StyleExecutable("em", null, Style.FONT_STYLE, Style.FontStyle.ITALIC, true, false);
+            executable = new ToggleStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em");
             insertHTML = new InsertHTMLExecutable();
         }
     }

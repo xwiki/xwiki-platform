@@ -130,15 +130,11 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
     }
 
     /**
-     * @return the color code for the grid cell that was last clicked
+     * @return the color code for the grid cell that was last clicked, or {@code null} if no cell has been selected
      */
     public String getSelectedColor()
     {
-        if (selectedCell != null) {
-            return selectedCell.getColor();
-        } else {
-            return null;
-        }
+        return selectedCell != null ? selectedCell.getColor() : null;
     }
 
     /**

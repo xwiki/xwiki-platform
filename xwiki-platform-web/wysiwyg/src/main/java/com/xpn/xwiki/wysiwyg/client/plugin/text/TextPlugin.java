@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.text;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
@@ -50,39 +53,19 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
 {
     /**
-     * The tool bar button that toggles the bold style.
+     * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
      */
-    private ToggleButton bold;
-
-    /**
-     * The tool bar button that toggles the italic style.
-     */
-    private ToggleButton italic;
-
-    /**
-     * The tool bar button that toggles the underline style.
-     */
-    private ToggleButton underline;
-
-    /**
-     * The tool bar button that toggles the strike through style.
-     */
-    private ToggleButton strikeThrough;
-
-    /**
-     * The tool bar button that toggles the teletype style.
-     */
-    private ToggleButton teletype;
-
-    /**
-     * Associates commands to shortcut keys.
-     */
-    private ShortcutKeyManager shortcutKeyManager;
+    private final Map<ToggleButton, Command> buttons = new HashMap<ToggleButton, Command>();
 
     /**
      * User interface extension for the editor tool bar.
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+
+    /**
+     * Associates commands to shortcut keys.
+     */
+    private ShortcutKeyManager shortcutKeyManager;
 
     /**
      * {@inheritDoc}
@@ -95,19 +78,13 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
 
         shortcutKeyManager = new ShortcutKeyManager();
 
-        bold = createFeature("bold", Command.BOLD, Images.INSTANCE.bold().createImage(), Strings.INSTANCE.bold(), 'B');
-        italic =
-            createFeature("italic", Command.ITALIC, Images.INSTANCE.italic().createImage(), Strings.INSTANCE.italic(),
-                'I');
-        underline =
-            createFeature("underline", Command.UNDERLINE, Images.INSTANCE.underline().createImage(), Strings.INSTANCE
-                .underline(), 'U');
-        strikeThrough =
-            createFeature("strikethrough", Command.STRIKE_THROUGH, Images.INSTANCE.strikeThrough().createImage(),
-                Strings.INSTANCE.strikeThrough());
-        teletype =
-            createFeature("teletype", Command.TELETYPE, Images.INSTANCE.teletype().createImage(), Strings.INSTANCE
-                .teletype());
+        addFeature("bold", Command.BOLD, Images.INSTANCE.bold().createImage(), Strings.INSTANCE.bold(), 'B');
+        addFeature("italic", Command.ITALIC, Images.INSTANCE.italic().createImage(), Strings.INSTANCE.italic(), 'I');
+        addFeature("underline", Command.UNDERLINE, Images.INSTANCE.underline().createImage(), Strings.INSTANCE
+            .underline(), 'U');
+        addFeature("strikethrough", Command.STRIKE_THROUGH, Images.INSTANCE.strikeThrough().createImage(),
+            Strings.INSTANCE.strikeThrough());
+        addFeature("teletype", Command.TELETYPE, Images.INSTANCE.teletype().createImage(), Strings.INSTANCE.teletype());
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().addKeyboardListener(this);
@@ -119,7 +96,7 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     }
 
     /**
-     * Creates a tool bar feature.
+     * Creates a tool bar feature and adds it to the tool bar.
      * 
      * @param name the feature name
      * @param command the rich text area command that is executed by this feature
@@ -127,13 +104,14 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
      * @param title the tool tip used on the tool bar button
      * @return the tool bar button that exposes this feature
      */
-    private ToggleButton createFeature(String name, Command command, Image image, String title)
+    private ToggleButton addFeature(String name, Command command, Image image, String title)
     {
         ToggleButton button = null;
         if (getTextArea().getCommandManager().isSupported(command)) {
             button = new ToggleButton(image, this);
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
+            buttons.put(button, command);
         }
         return button;
     }
@@ -148,9 +126,9 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
      * @param keyCode the shortcut key to be used
      * @return the tool bar button that exposes this feature
      */
-    private ToggleButton createFeature(String name, Command command, Image image, String title, char keyCode)
+    private ToggleButton addFeature(String name, Command command, Image image, String title, char keyCode)
     {
-        ToggleButton button = createFeature(name, command, image, title);
+        ToggleButton button = addFeature(name, command, image, title);
         if (button != null) {
             ClickCommand clickCommand = new ClickCommand(this, button);
             shortcutKeyManager.put(new ShortcutKey(keyCode, KeyboardListener.MODIFIER_CTRL), clickCommand);
@@ -166,11 +144,11 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
      */
     public void destroy()
     {
-        destroy(bold);
-        destroy(italic);
-        destroy(underline);
-        destroy(strikeThrough);
-        destroy(teletype);
+        for (ToggleButton button : buttons.keySet()) {
+            button.removeFromParent();
+            button.removeClickListener(this);
+        }
+        buttons.clear();
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().removeMouseListener(this);
@@ -185,47 +163,14 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     }
 
     /**
-     * Releases the given focus widget.
-     * 
-     * @param widget the widget to be destroyed
-     */
-    private void destroy(FocusWidget widget)
-    {
-        if (widget != null) {
-            widget.removeFromParent();
-            widget.removeClickListener(this);
-        }
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see ClickListener#onClick(Widget)
      */
     public void onClick(Widget sender)
     {
-        if (sender == bold) {
-            onClick(bold, Command.BOLD);
-        } else if (sender == italic) {
-            onClick(italic, Command.ITALIC);
-        } else if (sender == underline) {
-            onClick(underline, Command.UNDERLINE);
-        } else if (sender == strikeThrough) {
-            onClick(strikeThrough, Command.STRIKE_THROUGH);
-        } else if (sender == teletype) {
-            onClick(teletype, Command.TELETYPE);
-        }
-    }
-
-    /**
-     * Toggles the specifies command if the given focus widget is enabled.
-     * 
-     * @param sender the widget who sent the click event
-     * @param command the command to be toggled
-     */
-    private void onClick(FocusWidget sender, Command command)
-    {
-        if (sender.isEnabled()) {
+        Command command = buttons.get(sender);
+        if (command != null && ((FocusWidget) sender).isEnabled()) {
             getTextArea().getCommandManager().execute(command);
         }
     }
@@ -237,23 +182,8 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
      */
     public void update()
     {
-        update(bold, Command.BOLD);
-        update(italic, Command.ITALIC);
-        update(underline, Command.UNDERLINE);
-        update(strikeThrough, Command.STRIKE_THROUGH);
-        update(teletype, Command.TELETYPE);
-    }
-
-    /**
-     * Updates the given toggle button based on the state of the specified command.
-     * 
-     * @param button the button whose up/down state will be updated
-     * @param command the command that determines the state of the button
-     */
-    private void update(ToggleButton button, Command command)
-    {
-        if (button != null) {
-            button.setDown(getTextArea().getCommandManager().isExecuted(command));
+        for (Map.Entry<ToggleButton, Command> entry : buttons.entrySet()) {
+            entry.getKey().setDown(getTextArea().getCommandManager().isExecuted(entry.getValue()));
         }
     }
 }

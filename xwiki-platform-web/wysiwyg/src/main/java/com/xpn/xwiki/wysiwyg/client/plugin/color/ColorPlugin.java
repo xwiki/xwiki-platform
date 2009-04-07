@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.color;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.MouseListener;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PopupListener;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
@@ -40,32 +43,28 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class ColorPlugin extends AbstractPlugin implements ClickListener, MouseListener, PopupListener
+public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupListener
 {
     /**
-     * The tool bar button that opens the background color picker.
+     * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
      */
-    private PushButton backColor;
-
-    /**
-     * The background color picker.
-     */
-    private ColorPicker backColorPicker;
-
-    /**
-     * The tool bar button that opens the foreground color picker.
-     */
-    private PushButton foreColor;
-
-    /**
-     * The foreground color picker.
-     */
-    private ColorPicker foreColorPicker;
+    private final Map<PushButton, Command> buttons = new HashMap<PushButton, Command>();
 
     /**
      * User interface extension for the editor tool bar.
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+
+    /**
+     * The color picker.
+     */
+    private ColorPicker colorPicker;
+
+    /**
+     * The command for which the color picker has been shown. It is needed in order to know which command to execute
+     * after the color picker is closed.
+     */
+    private Command currentCommand;
 
     /**
      * {@inheritDoc}
@@ -76,27 +75,31 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, MouseL
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().isSupported(Command.FORE_COLOR)) {
-            foreColor = new PushButton(Images.INSTANCE.foreColor().createImage(), this);
-            foreColor.setTitle(Strings.INSTANCE.foreColor());
-            toolBarExtension.addFeature("forecolor", foreColor);
-
-            foreColorPicker = new ColorPicker();
-            foreColorPicker.addPopupListener(this);
-        }
-
-        if (getTextArea().getCommandManager().isSupported(Command.BACK_COLOR)) {
-            backColor = new PushButton(Images.INSTANCE.backColor().createImage(), this);
-            backColor.setTitle(Strings.INSTANCE.backColor());
-            toolBarExtension.addFeature("backcolor", backColor);
-
-            backColorPicker = new ColorPicker();
-            backColorPicker.addPopupListener(this);
-        }
+        addFeature("forecolor", Command.FORE_COLOR, Images.INSTANCE.foreColor().createImage(), Strings.INSTANCE
+            .foreColor());
+        addFeature("backcolor", Command.BACK_COLOR, Images.INSTANCE.backColor().createImage(), Strings.INSTANCE
+            .backColor());
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addMouseListener(this);
             getUIExtensionList().add(toolBarExtension);
+        }
+    }
+
+    /**
+     * Creates a tool bar feature and adds it to the tool bar.
+     * 
+     * @param name the feature name
+     * @param command the rich text area command that is executed by this feature
+     * @param image the image displayed on the tool bar
+     * @param title the tool tip used on the tool bar button
+     */
+    private void addFeature(String name, Command command, Image image, String title)
+    {
+        if (getTextArea().getCommandManager().isSupported(command)) {
+            PushButton button = new PushButton(image, this);
+            button.setTitle(title);
+            toolBarExtension.addFeature(name, button);
+            buttons.put(button, command);
         }
     }
 
@@ -107,32 +110,22 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, MouseL
      */
     public void destroy()
     {
-        if (foreColor != null) {
-            foreColor.removeFromParent();
-            foreColor.removeClickListener(this);
-            foreColor = null;
-
-            foreColorPicker.hide();
-            foreColorPicker.removeFromParent();
-            foreColorPicker.removePopupListener(this);
-            foreColorPicker = null;
+        if (colorPicker != null) {
+            colorPicker.hide();
+            colorPicker.removeFromParent();
+            colorPicker.removePopupListener(this);
+            colorPicker = null;
         }
 
-        if (backColor != null) {
-            backColor.removeFromParent();
-            backColor.removeClickListener(this);
-            backColor = null;
-
-            backColorPicker.hide();
-            backColorPicker.removeFromParent();
-            backColorPicker.removePopupListener(this);
-            backColorPicker = null;
+        for (PushButton button : buttons.keySet()) {
+            button.removeFromParent();
+            button.removeClickListener(this);
         }
+        buttons.clear();
 
-        if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeMouseListener(this);
-            toolBarExtension.clearFeatures();
-        }
+        currentCommand = null;
+
+        toolBarExtension.clearFeatures();
 
         super.destroy();
     }
@@ -144,65 +137,18 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, MouseL
      */
     public void onClick(Widget sender)
     {
-        if (sender == foreColor) {
-            onForeColor(true);
-        } else if (sender == backColor) {
-            onBackColor(true);
-        }
-    }
+        Command command = buttons.get(sender);
+        if (command != null) {
+            currentCommand = command;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseDown(Widget, int, int)
-     */
-    public void onMouseDown(Widget sender, int x, int y)
-    {
-        // ignore
-    }
+            String color = getTextArea().getCommandManager().getStringValue(command);
+            getColorPicker().setColor(color);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseEnter(Widget)
-     */
-    public void onMouseEnter(Widget sender)
-    {
-        // ignore
-    }
+            int left = sender.getAbsoluteLeft();
+            int top = sender.getAbsoluteTop() + sender.getOffsetHeight();
+            getColorPicker().setPopupPosition(left, top);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseLeave(Widget)
-     */
-    public void onMouseLeave(Widget sender)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseMove(Widget, int, int)
-     */
-    public void onMouseMove(Widget sender, int x, int y)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseUp(Widget, int, int)
-     */
-    public void onMouseUp(Widget sender, int x, int y)
-    {
-        // We listen to mouse up events instead of clicks because if the user selects text and the end points of the
-        // selection are in different DOM nodes the click events are not triggered.
-        if (sender == getTextArea()) {
-            foreColorPicker.hide();
-            backColorPicker.hide();
+            getColorPicker().show();
         }
     }
 
@@ -213,54 +159,25 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, MouseL
      */
     public void onPopupClosed(PopupPanel sender, boolean autoHide)
     {
-        if (sender == foreColorPicker && !autoHide) {
-            onForeColor(false);
-        } else if (sender == backColorPicker && !autoHide) {
-            onBackColor(false);
-        }
-    }
-
-    /**
-     * @param show whether to show the foreground color picker or to change the foreground color
-     */
-    public void onForeColor(boolean show)
-    {
-        if (show) {
-            String color = getTextArea().getCommandManager().getStringValue(Command.FORE_COLOR);
-            foreColorPicker.setColor(color);
-
-            int left = foreColor.getAbsoluteLeft();
-            int top = foreColor.getAbsoluteTop() + foreColor.getOffsetHeight();
-            foreColorPicker.setPopupPosition(left, top);
-
-            foreColorPicker.show();
-        } else {
-            String color = foreColorPicker.getColor();
+        if (sender == getColorPicker() && !autoHide) {
+            String color = getColorPicker().getColor();
             if (color != null) {
-                getTextArea().getCommandManager().execute(Command.FORE_COLOR, color);
+                getTextArea().getCommandManager().execute(currentCommand, color);
             }
         }
     }
 
     /**
-     * @param show whether to show the background color picker or to change the background color
+     * Lazy loads the color picker.
+     * 
+     * @return the color picker
      */
-    public void onBackColor(boolean show)
+    protected ColorPicker getColorPicker()
     {
-        if (show) {
-            String color = getTextArea().getCommandManager().getStringValue(Command.BACK_COLOR);
-            backColorPicker.setColor(color);
-
-            int left = backColor.getAbsoluteLeft();
-            int top = backColor.getAbsoluteTop() + backColor.getOffsetHeight();
-            backColorPicker.setPopupPosition(left, top);
-
-            backColorPicker.show();
-        } else {
-            String color = backColorPicker.getColor();
-            if (color != null) {
-                getTextArea().getCommandManager().execute(Command.BACK_COLOR, color);
-            }
+        if (colorPicker == null) {
+            colorPicker = new ColorPicker();
+            colorPicker.addPopupListener(this);
         }
+        return colorPicker;
     }
 }

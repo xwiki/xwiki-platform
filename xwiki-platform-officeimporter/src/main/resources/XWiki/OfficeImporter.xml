@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <xwikidoc>
 <web>XWiki</web>
 <name>OfficeImporter</name>
@@ -11,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1217261143000</creationDate>
-<date>1219045140000</date>
-<contentUpdateDate>1219045140000</contentUpdateDate>
-<version>1.1</version>
+<date>1238582154000</date>
+<contentUpdateDate>1238582154000</contentUpdateDate>
+<version>1.0</version>
 <title>Office Importer</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -21,17 +21,34 @@
 <comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
-<content> 
+<hidden>false</hidden>
+<content>
 #if($isguest)
   #error($msg.get("xe.officeimporter.notallowed"))  
 #else
+  #if($request.page)
+    #set($targetdoc = $xwiki.getDocument($request.page))
+    #set($targetspace = $targetdoc.space)
+    #set($targetname = $targetdoc.name)
+    #set($split = "checked")
+    #set($filter = "checked")
+    #set($heading = "4")
+  #else
+    #set($targetspace = "")
+    #set($targetname = "")
+    #set($split = "")
+    #set($filter = "")
+    #set($heading = "1")
+  #end
   1 $msg.get("xe.officeimporter.import.title")
-  &lt;form action='$xwiki.getURL("XWiki.OfficeImporterResults","view")' enctype="multipart/form-data" method="post"&gt;
+  &lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
   {table}&lt;p&gt;$msg.get("xe.officeimporter.import.document")&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
-  &lt;p&gt;$msg.get("xe.officeimporter.import.targetspace")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetSpace" type="text"/&gt;&lt;/p&gt;
-  &lt;p&gt;$msg.get("xe.officeimporter.import.targetpage")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetPage" type="text"/&gt;&lt;/p&gt;
-  &lt;p&gt;$msg.get("xe.officeimporter.import.options")&lt;/p&gt;|&lt;p&gt;&lt;input name="filterStyles" type="checkbox" value="strict"/&gt;$msg.get("xe.officeimporter.import.filtering")&lt;/p&gt;
+  &lt;p&gt;$msg.get("xe.officeimporter.import.targetspace")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetSpace" type="text" value="$targetspace"/&gt;&lt;/p&gt;
+  &lt;p&gt;$msg.get("xe.officeimporter.import.targetpage")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetPage" type="text" value="$targetname"/&gt; &lt;input name="appendContent" type="checkbox" value="true"/&gt;$msg.get("xe.officeimporter.import.appendresult")&lt;/p&gt;
+  &lt;p&gt;$msg.get("xe.officeimporter.import.styles")&lt;/p&gt;|&lt;p&gt;&lt;input name="filterStyles" type="checkbox" value="strict" $filter/&gt;$msg.get("xe.officeimporter.import.filterstyles")&lt;/p&gt;
+  &lt;p&gt;$msg.get("xe.officeimporter.import.splitting")&lt;p&gt;|&lt;p&gt;&lt;input name="splitDocument" type="checkbox" value="true" $split/&gt; $msg.get("xe.officeimporter.import.splitting.splitdocument")&lt;br/&gt;&lt;br/&gt;&amp;nbsp;$msg.get("xe.officeimporter.import.splitting.headinglevels"): &lt;br/&gt;&lt;br/&gt;&amp;nbsp;&lt;select size="5" multiple="true" name="headingLevelsToSplit"&gt;#foreach($h in [1..6]) &lt;option value="${h}" #if("${h}"=="${heading}") selected #end&gt;$msg.get("xe.officeimporter.import.splitting.heading")-${h}&lt;/option&gt; #end &lt;/select&gt;&lt;br/&gt;&lt;br/&gt;&amp;nbsp;$msg.get("xe.officeimporter.import.splitting.naming"): &lt;select name="childPagesNamingMethod"&gt;&lt;option value="headingNames"&gt;$msg.get("xe.officeimporter.import.splitting.naming.headingnames")&lt;/option&gt;&lt;option value="mainPageNameAndNumbering"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandnumbering")&lt;/option&gt;&lt;/select&gt;&lt;/p&gt;
   {table}
+  &lt;input type="hidden" name="groovyFilter" value="" /&gt;
   &lt;p&gt;&lt;input type="submit" value="$msg.get("xe.officeimporter.import.import")"/&gt;&lt;/p&gt;
   &lt;/form&gt;
 #end

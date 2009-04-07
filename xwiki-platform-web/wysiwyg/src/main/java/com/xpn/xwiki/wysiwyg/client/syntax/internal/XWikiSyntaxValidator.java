@@ -38,7 +38,6 @@ public class XWikiSyntaxValidator extends DefaultSyntaxValidator
         super("xwiki/2.0");
 
         // add XWiki specific validation rules
-        addValidationRule(new DisablingRule(new String[] {"justifyfull"}));
         addValidationRule(new DisableListInHeader());
         addValidationRule(new DisableIndentOutsideList());
         // FIXME : find a generic way of disabling inline/block/both elements on some identified elements

@@ -70,8 +70,7 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES.put(Command.INSERT_ORDERED_LIST, new DefaultExecutable(Command.INSERT_ORDERED_LIST.toString()));
         EXECUTABLES.put(Command.INSERT_PARAGRAPH, new DefaultExecutable(Command.INSERT_PARAGRAPH.toString()));
         EXECUTABLES.put(Command.INSERT_UNORDERED_LIST, new DefaultExecutable(Command.INSERT_UNORDERED_LIST.toString()));
-        EXECUTABLES.put(Command.ITALIC, new StyleExecutable("em", null, Style.FONT_STYLE, Style.FontStyle.ITALIC, true,
-            false));
+        EXECUTABLES.put(Command.ITALIC, new ToggleStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em"));
         EXECUTABLES.put(Command.JUSTIFY_CENTER, new DefaultExecutable(Command.JUSTIFY_CENTER.toString()));
         EXECUTABLES.put(Command.JUSTIFY_FULL, new DefaultExecutable(Command.JUSTIFY_FULL.toString()));
         EXECUTABLES.put(Command.JUSTIFY_LEFT, new DefaultExecutable(Command.JUSTIFY_LEFT.toString()));
@@ -79,13 +78,13 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         EXECUTABLES.put(Command.OUTDENT, new DefaultExecutable(Command.OUTDENT.toString()));
         EXECUTABLES.put(Command.REDO, new RedoExecutable());
         EXECUTABLES.put(Command.REMOVE_FORMAT, new DefaultExecutable(Command.REMOVE_FORMAT.toString()));
-        EXECUTABLES.put(Command.STRIKE_THROUGH, new StyleExecutable("del", null, Style.TEXT_DECORATION,
-            Style.TextDecoration.LINE_THROUGH, false, true));
+        EXECUTABLES.put(Command.STRIKE_THROUGH, new ToggleStyleExecutable(Style.TEXT_DECORATION,
+            Style.TextDecoration.LINE_THROUGH, "del"));
         EXECUTABLES.put(Command.SUB_SCRIPT, new DefaultExecutable(Command.SUB_SCRIPT.toString()));
         EXECUTABLES.put(Command.SUPER_SCRIPT, new DefaultExecutable(Command.SUPER_SCRIPT.toString()));
-        EXECUTABLES.put(Command.TELETYPE, new StyleExecutable("tt", null, Style.FONT_FAMILY, "monospace", true, true));
-        EXECUTABLES.put(Command.UNDERLINE, new StyleExecutable("ins", null, Style.TEXT_DECORATION,
-            Style.TextDecoration.UNDERLINE, false, true));
+        EXECUTABLES.put(Command.TELETYPE, new ToggleStyleExecutable(Style.FONT_FAMILY, "monospace", "tt"));
+        EXECUTABLES.put(Command.UNDERLINE, new ToggleStyleExecutable(Style.TEXT_DECORATION,
+            Style.TextDecoration.UNDERLINE, "ins"));
         EXECUTABLES.put(Command.UNLINK, new DefaultExecutable(Command.UNLINK.toString()));
         EXECUTABLES.put(Command.UNDO, new UndoExecutable());
     }

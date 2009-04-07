@@ -29,14 +29,14 @@ import org.xwiki.gwt.dom.client.Style;
  * 
  * @version $Id$
  */
-public class BoldExecutable extends StyleExecutable
+public class BoldExecutable extends ToggleStyleExecutable
 {
     /**
      * Creates a new executable of this type.
      */
     public BoldExecutable()
     {
-        super("strong", null, Style.FONT_WEIGHT, Style.FontWeight.BOLD, true, false);
+        super(Style.FONT_WEIGHT, Style.FontWeight.BOLD, "strong");
     }
 
     /**
@@ -46,8 +46,8 @@ public class BoldExecutable extends StyleExecutable
      */
     protected boolean matchesStyle(Element inputElement)
     {
-        String fontWeight = inputElement.getComputedStyleProperty(Style.FONT_WEIGHT);
-        if (Style.FontWeight.BOLD.equalsIgnoreCase(fontWeight) 
+        String fontWeight = inputElement.getComputedStyleProperty(getProperty().getJSName());
+        if (Style.FontWeight.BOLD.equalsIgnoreCase(fontWeight)
             || Style.FontWeight.BOLDER.equalsIgnoreCase(fontWeight)) {
             return true;
         } else {

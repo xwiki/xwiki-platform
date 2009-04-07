@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Property;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.Text;
@@ -33,94 +34,33 @@ import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
- * Applies in-line formatting to the current selection.
+ * Applies in-line style to the current selection.
  * 
  * @version $Id$
  */
 public class StyleExecutable extends AbstractExecutable
 {
     /**
-     * The name of the tag used for formatting.
+     * The style property used when applying style.
      */
-    private final String tagName;
+    private final Property property;
 
     /**
-     * The style name added to the formatting element.
-     */
-    private final String className;
-
-    /**
-     * CSS property that describes the in-line style applied.
-     */
-    private final String propertyName;
-
-    /**
-     * The value to be applied to {@link #propertyName}.
-     */
-    private final String propertyValue;
-
-    /**
-     * Whether to check if {@link #propertyName} has {@link #propertyValue} only on the current element or all his
-     * ancestors.
-     */
-    private final boolean inheritable;
-
-    /**
-     * Flag that specifies if {@link #propertyName} can have multiple values.
-     */
-    private final boolean multipleValue;
-
-    /**
-     * Creates a new instance.
+     * Creates a new instance that used the given style property.
      * 
-     * @param tagName {@link #tagName}
-     * @param className {@link #className}
-     * @param propertyName {@link #propertyName}
-     * @param propertyValue {@link #propertyValue}
-     * @param inheritable {@link #inheritable}
-     * @param multipleValue {@link #multipleValue}
+     * @param property the style property used when applying style
      */
-    public StyleExecutable(String tagName, String className, String propertyName, String propertyValue,
-        boolean inheritable, boolean multipleValue)
+    public StyleExecutable(Property property)
     {
-        this.tagName = tagName;
-        this.className = className;
-        this.propertyName = propertyName;
-        this.propertyValue = propertyValue;
-        this.inheritable = inheritable;
-        this.multipleValue = multipleValue;
+        this.property = property;
     }
 
     /**
-     * @return {@link #tagName}
+     * @return the style property associated with the executable
      */
-    public String getTagName()
+    protected Property getProperty()
     {
-        return tagName;
-    }
-
-    /**
-     * @return {@link #className}
-     */
-    public String getClassName()
-    {
-        return className;
-    }
-
-    /**
-     * @return {@link #propertyName}
-     */
-    public String getPropertyName()
-    {
-        return propertyName;
-    }
-
-    /**
-     * @return {@link #propertyValue}
-     */
-    public String getPropertyValue()
-    {
-        return propertyValue;
+        return property;
     }
 
     /**
@@ -132,9 +72,8 @@ public class StyleExecutable extends AbstractExecutable
     {
         Selection selection = rta.getDocument().getSelection();
         List<Range> ranges = new ArrayList<Range>();
-        boolean executed = isExecuted(rta);
         for (int i = 0; i < selection.getRangeCount(); i++) {
-            ranges.add(execute(selection.getRangeAt(i), executed));
+            ranges.add(execute(selection.getRangeAt(i), parameter));
         }
         selection.removeAllRanges();
         for (Range range : ranges) {
@@ -144,26 +83,26 @@ public class StyleExecutable extends AbstractExecutable
     }
 
     /**
-     * Adds to or removes from the given range the in-line formatting.
+     * Applies the underlying style {@link #property} with the given value to the specified range.
      * 
      * @param range the target range
-     * @param executed whether to add or remove the style
+     * @param parameter the value to set for the style {@link #property}
      * @return the given range after being processed
      */
-    protected Range execute(Range range, boolean executed)
+    protected Range execute(Range range, String parameter)
     {
         Range styledRange = range;
         if (range.isCollapsed()) {
             switch (range.getStartContainer().getNodeType()) {
                 case Node.TEXT_NODE:
                     Text text = (Text) range.getStartContainer();
-                    text = execute(text, range.getStartOffset(), range.getEndOffset(), executed).getText();
+                    text = execute(text, range.getStartOffset(), range.getEndOffset(), parameter).getText();
                     range.selectNodeContents(text);
                     break;
                 case Node.ELEMENT_NODE:
                     Text empty = (Text) range.getStartContainer().getOwnerDocument().createTextNode("");
                     domUtils.insertAt(range.getStartContainer(), empty, range.getStartOffset());
-                    range.selectNodeContents(execute(empty, 0, 0, executed).getText());
+                    range.selectNodeContents(execute(empty, 0, 0, parameter).getText());
                     break;
                 default:
                     // Do nothing.
@@ -184,7 +123,7 @@ public class StyleExecutable extends AbstractExecutable
                 if (text == range.getEndContainer()) {
                     endIndex = range.getEndOffset();
                 }
-                endContainer = execute(text, startIndex, endIndex, executed);
+                endContainer = execute(text, startIndex, endIndex, parameter);
                 if (startContainer == null) {
                     startContainer = endContainer;
                 }
@@ -204,7 +143,7 @@ public class StyleExecutable extends AbstractExecutable
      * @return the list of non empty text nodes that are completely or partially (at least one character) included in
      *         the given range
      */
-    private List<Text> getNonEmptyTextNodes(Range range)
+    protected List<Text> getNonEmptyTextNodes(Range range)
     {
         Node leaf = domUtils.getFirstLeaf(range);
         Node lastLeaf = domUtils.getLastLeaf(range);
@@ -239,197 +178,94 @@ public class StyleExecutable extends AbstractExecutable
     }
 
     /**
-     * Adds to or removes from the given text node the underlying style.
+     * Applies the underlying style {@link #property} with the given value to the specified text fragment.
      * 
      * @param text the target text node
      * @param startIndex the first character to be processed
      * @param endIndex the last character to be processed
-     * @param executed whether to add or remove the style
+     * @param parameter the value to set for the style {@link #property}
      * @return a text fragment indicating what has been processed
      */
-    protected TextFragment execute(Text text, int startIndex, int endIndex, boolean executed)
+    protected TextFragment execute(Text text, int startIndex, int endIndex, String parameter)
     {
-        return executed ? removeStyle(text, startIndex, endIndex) : addStyle(text, startIndex, endIndex);
-    }
+        // Make sure the style is applied only to the selected text.
+        text.crop(startIndex, endIndex);
 
-    /**
-     * Formats the given text node, from the begin index to the end index.
-     * 
-     * @param text the text node to be formatted
-     * @param firstCharIndex the first character on which we apply the style
-     * @param lastCharIndex the last character on which we apply the style
-     * @return a text fragment indicating what has been formatted
-     */
-    protected TextFragment addStyle(Text text, int firstCharIndex, int lastCharIndex)
-    {
-        if (matchesStyle(text)) {
-            // Already styled. Skip.
-            return new TextFragment(text, firstCharIndex, lastCharIndex);
+        // Look for the farthest in-line element ancestor without sibling nodes.
+        Element ancestor = null;
+        Node node = text.getParentNode();
+        while (node.getChildNodes().getLength() == 1 && domUtils.isInline(node)) {
+            ancestor = (Element) node;
+            node = node.getParentNode();
         }
 
-        Element styleElement = ((Document) text.getOwnerDocument()).xCreateElement(tagName);
-        if (className != null) {
-            styleElement.setClassName(className);
+        // If we haven't found the proper ancestor, we wrap the text in a span element.
+        if (ancestor == null) {
+            ancestor = ((Document) text.getOwnerDocument()).xCreateSpanElement().cast();
+            text.getParentNode().replaceChild(ancestor, text);
+            ancestor.appendChild(text);
         }
 
-        text.crop(firstCharIndex, lastCharIndex);
-        text.getParentNode().replaceChild(styleElement, text);
-        styleElement.appendChild(text);
+        // Apply the style.
+        ancestor.getStyle().setProperty(property.getJSName(), parameter);
 
-        return new TextFragment(text, 0, text.getLength());
-    }
-
-    /**
-     * Removes the underlying style from the given text node.
-     * 
-     * @param text the target text node
-     * @param firstCharIndex the first character on which we remove the style
-     * @param lastCharIndex the last character on which we remove the style
-     * @return a text fragment indicating what has been unformatted
-     */
-    protected TextFragment removeStyle(Text text, int firstCharIndex, int lastCharIndex)
-    {
-        text.crop(firstCharIndex, lastCharIndex);
-        Node child = text;
-        Node parent = child.getParentNode();
-        while (parent != null && matchesStyle(parent) && domUtils.isInline(parent) && split(parent, child)) {
-            child = child.getParentNode();
-            parent = child.getParentNode();
-        }
         return new TextFragment(text, 0, text.getLength());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#isExecuted(RichTextArea)
+     * @see AbstractExecutable#getParameter(RichTextArea)
      */
-    public boolean isExecuted(RichTextArea rta)
+    public String getParameter(RichTextArea rta)
     {
         Selection selection = rta.getDocument().getSelection();
+        String selectionParameter = null;
         for (int i = 0; i < selection.getRangeCount(); i++) {
-            if (!isExecuted(selection.getRangeAt(i))) {
-                return false;
+            String rangeParameter = getParameter(selection.getRangeAt(i));
+            if (rangeParameter == null || (selectionParameter != null && !selectionParameter.equals(rangeParameter))) {
+                return null;
             }
+            selectionParameter = rangeParameter;
         }
-        return true;
+        return selectionParameter;
     }
 
     /**
      * @param range the range to be inspected
-     * @return {@code true} if this executable was executed on the given range
+     * @return the value of the style {@link #property} for the given range
      */
-    protected boolean isExecuted(Range range)
+    protected String getParameter(Range range)
     {
         if (range.isCollapsed()) {
-            return matchesStyle(range.getStartContainer());
+            return getParameter(range.getStartContainer());
         } else {
             List<Text> textNodes = getNonEmptyTextNodes(range);
+            String rangeParameter = null;
             for (int i = 0; i < textNodes.size(); i++) {
-                if (!matchesStyle(textNodes.get(i))) {
-                    return false;
+                String textParameter = getParameter(textNodes.get(i));
+                if (textParameter == null || (rangeParameter != null && !rangeParameter.equals(textParameter))) {
+                    return null;
                 }
+                rangeParameter = textParameter;
             }
-            return textNodes.size() > 0;
+            return rangeParameter;
         }
     }
 
     /**
      * @param inputNode a DOM node
-     * @return {@code true} if the given node matches the style associated with this executable, {@code false} otherwise
+     * @return the value of the style {@link #property} for the given node
      */
-    protected boolean matchesStyle(Node inputNode)
+    protected String getParameter(Node inputNode)
     {
         Node node = inputNode;
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             node = node.getParentNode();
         }
         if (node == null || node.getNodeType() != Node.ELEMENT_NODE) {
-            return false;
+            return null;
         }
-        return matchesStyle(Element.as(node));
-    }
-
-    /**
-     * @param inputElement a DOM element
-     * @return {@code true} if the given element matches the style associated with this executable, {@code false}
-     *         otherwise
-     */
-    protected boolean matchesStyle(Element inputElement)
-    {
-        if (inheritable) {
-            return matchesInheritedStyle(inputElement);
-        } else {
-            Node node = inputElement;
-            while (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
-                if (matchesInheritedStyle((Element) node)) {
-                    return true;
-                }
-                node = node.getParentNode();
-            }
-            return false;
-        }
-    }
-
-    /**
-     * @param element a DOM element
-     * @return {@code true} if the given element matches the style associated with this executable, without testing the
-     *         ancestors of the element
-     */
-    protected boolean matchesInheritedStyle(Element element)
-    {
-        String computedValue = element.getComputedStyleProperty(propertyName);
-        if (multipleValue) {
-            return computedValue.toLowerCase().contains(propertyValue);
-        } else {
-            return propertyValue.equalsIgnoreCase(computedValue);
-        }
-    }
-
-    /**
-     * Splits the given parent node in two subtrees: left siblings of the given child in one side and right siblings on
-     * the other side. The given child will then go up one level to the root, between the two sides.
-     * 
-     * @param parent the node that will be split
-     * @param child the node that marks the place where the split is done
-     * @return {@code true} if the split was done
-     */
-    private boolean split(Node parent, Node child)
-    {
-        assert (child.getParentNode() == parent);
-        Node grandParent = parent.getParentNode();
-        if (grandParent == null) {
-            return false;
-        }
-        if (child.getPreviousSibling() != null) {
-            Node leftClone = parent.cloneNode(false);
-            Node leftSibling = child.getPreviousSibling();
-            leftClone.appendChild(leftSibling);
-            leftSibling = child.getPreviousSibling();
-            while (leftSibling != null) {
-                leftClone.insertBefore(leftSibling, leftClone.getFirstChild());
-                leftSibling = child.getPreviousSibling();
-            }
-            grandParent.insertBefore(leftClone, parent);
-        }
-        if (child.getNextSibling() != null) {
-            Node rightClone = parent.cloneNode(false);
-            Node rightSibling = child.getNextSibling();
-            while (rightSibling != null) {
-                rightClone.appendChild(rightSibling);
-                rightSibling = child.getNextSibling();
-            }
-            if (parent.getNextSibling() != null) {
-                grandParent.insertBefore(rightClone, parent.getNextSibling());
-            } else {
-                grandParent.appendChild(rightClone);
-            }
-        }
-        if (!matchesStyle(grandParent)) {
-            grandParent.replaceChild(child, parent);
-            return false;
-        } else {
-            return true;
-        }
+        return Element.as(node).getComputedStyleProperty(property.getJSName());
     }
 }

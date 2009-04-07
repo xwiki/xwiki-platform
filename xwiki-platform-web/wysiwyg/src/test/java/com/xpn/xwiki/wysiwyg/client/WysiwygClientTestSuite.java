@@ -23,6 +23,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
+import com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPickerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.indent.IndentExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.indent.OutdentExecutableTest;
@@ -92,6 +93,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(MacroCallTest.class);
         suite.addTestSuite(IndentExecutableTest.class);
         suite.addTestSuite(OutdentExecutableTest.class);
+        suite.addTestSuite(ColorPickerTest.class);
     }
 
     /**

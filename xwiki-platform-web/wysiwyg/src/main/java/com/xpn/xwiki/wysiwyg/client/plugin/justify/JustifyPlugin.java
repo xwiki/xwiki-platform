@@ -19,7 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.justify;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -41,24 +46,9 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListener
 {
     /**
-     * The tool bar button that toggles justify left.
+     * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
      */
-    private ToggleButton left;
-
-    /**
-     * The tool bar button that toggles justify center.
-     */
-    private ToggleButton center;
-
-    /**
-     * The tool bar button that toggles justify right.
-     */
-    private ToggleButton right;
-
-    /**
-     * The tool bar button that toggles justify full.
-     */
-    private ToggleButton full;
+    private final Map<ToggleButton, Command> buttons = new HashMap<ToggleButton, Command>();
 
     /**
      * User interface extension for the editor tool bar.
@@ -74,29 +64,14 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().isSupported(Command.JUSTIFY_LEFT)) {
-            left = new ToggleButton(Images.INSTANCE.justifyLeft().createImage(), this);
-            left.setTitle(Strings.INSTANCE.justifyLeft());
-            toolBarExtension.addFeature("justifyleft", left);
-        }
-
-        if (getTextArea().getCommandManager().isSupported(Command.JUSTIFY_CENTER)) {
-            center = new ToggleButton(Images.INSTANCE.justifyCenter().createImage(), this);
-            center.setTitle(Strings.INSTANCE.justifyCenter());
-            toolBarExtension.addFeature("justifycenter", center);
-        }
-
-        if (getTextArea().getCommandManager().isSupported(Command.JUSTIFY_RIGHT)) {
-            right = new ToggleButton(Images.INSTANCE.justifyRight().createImage(), this);
-            right.setTitle(Strings.INSTANCE.justifyRight());
-            toolBarExtension.addFeature("justifyright", right);
-        }
-
-        if (getTextArea().getCommandManager().isSupported(Command.JUSTIFY_FULL)) {
-            full = new ToggleButton(Images.INSTANCE.justifyFull().createImage(), this);
-            full.setTitle(Strings.INSTANCE.justifyFull());
-            toolBarExtension.addFeature("justifyfull", full);
-        }
+        addFeature("justifyleft", Command.JUSTIFY_LEFT, Images.INSTANCE.justifyLeft().createImage(), Strings.INSTANCE
+            .justifyLeft());
+        addFeature("justifycenter", Command.JUSTIFY_CENTER, Images.INSTANCE.justifyCenter().createImage(),
+            Strings.INSTANCE.justifyCenter());
+        addFeature("justifyright", Command.JUSTIFY_RIGHT, Images.INSTANCE.justifyRight().createImage(),
+            Strings.INSTANCE.justifyRight());
+        addFeature("justifyfull", Command.JUSTIFY_FULL, Images.INSTANCE.justifyFull().createImage(), Strings.INSTANCE
+            .justifyFull());
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().addMouseListener(this);
@@ -107,35 +82,38 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
     }
 
     /**
+     * Creates a tool bar feature and adds it to the tool bar.
+     * 
+     * @param name the feature name
+     * @param command the rich text area command that is executed by this feature
+     * @param image the image displayed on the tool bar
+     * @param title the tool tip used on the tool bar button
+     * @return the tool bar button that exposes this feature
+     */
+    private ToggleButton addFeature(String name, Command command, Image image, String title)
+    {
+        ToggleButton button = null;
+        if (getTextArea().getCommandManager().isSupported(command)) {
+            button = new ToggleButton(image, this);
+            button.setTitle(title);
+            toolBarExtension.addFeature(name, button);
+            buttons.put(button, command);
+        }
+        return button;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractStatefulPlugin#destroy()
      */
     public void destroy()
     {
-        if (left != null) {
-            left.removeFromParent();
-            left.removeClickListener(this);
-            left = null;
+        for (ToggleButton button : buttons.keySet()) {
+            button.removeFromParent();
+            button.removeClickListener(this);
         }
-
-        if (center != null) {
-            center.removeFromParent();
-            center.removeClickListener(this);
-            center = null;
-        }
-
-        if (right != null) {
-            right.removeFromParent();
-            right.removeClickListener(this);
-            right = null;
-        }
-
-        if (full != null) {
-            full.removeFromParent();
-            full.removeClickListener(this);
-            full = null;
-        }
+        buttons.clear();
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().removeMouseListener(this);
@@ -154,54 +132,9 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
      */
     public void onClick(Widget sender)
     {
-        if (sender == left) {
-            onJustifyLeft();
-        } else if (sender == center) {
-            onJustifyCenter();
-        } else if (sender == right) {
-            onJustifyRight();
-        } else if (sender == full) {
-            onJustifyFull();
-        }
-    }
-
-    /**
-     * Toggles justify left.
-     */
-    public void onJustifyLeft()
-    {
-        if (left.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.JUSTIFY_LEFT);
-        }
-    }
-
-    /**
-     * Toggles justify center.
-     */
-    public void onJustifyCenter()
-    {
-        if (center.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.JUSTIFY_CENTER);
-        }
-    }
-
-    /**
-     * Toggles justify right.
-     */
-    public void onJustifyRight()
-    {
-        if (right.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.JUSTIFY_RIGHT);
-        }
-    }
-
-    /**
-     * Toggles justify full.
-     */
-    public void onJustifyFull()
-    {
-        if (full.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.JUSTIFY_FULL);
+        Command command = buttons.get(sender);
+        if (command != null && ((FocusWidget) sender).isEnabled()) {
+            getTextArea().getCommandManager().execute(command);
         }
     }
 
@@ -212,17 +145,8 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
      */
     public void update()
     {
-        if (left != null) {
-            left.setDown(getTextArea().getCommandManager().isExecuted(Command.JUSTIFY_LEFT));
-        }
-        if (center != null) {
-            center.setDown(getTextArea().getCommandManager().isExecuted(Command.JUSTIFY_CENTER));
-        }
-        if (right != null) {
-            right.setDown(getTextArea().getCommandManager().isExecuted(Command.JUSTIFY_RIGHT));
-        }
-        if (full != null) {
-            full.setDown(getTextArea().getCommandManager().isExecuted(Command.JUSTIFY_FULL));
+        for (Map.Entry<ToggleButton, Command> entry : buttons.entrySet()) {
+            entry.getKey().setDown(getTextArea().getCommandManager().isExecuted(entry.getValue()));
         }
     }
 }

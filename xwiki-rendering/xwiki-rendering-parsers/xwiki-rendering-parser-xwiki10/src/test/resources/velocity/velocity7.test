@@ -13,8 +13,8 @@ It is an online workspace that allow people to work better together. This Wiki c
 .#-----------------------------------------------------
 = Welcome to your wiki =
 
-It is an online workspace that allow people to work better together. This Wiki contains //pages// organized by //spaces//. You're currently in the **Main** space, looking at the home page (**WebHome**). {{velocity}}#if($hasEdit) You can use the [[Sandbox space>>Sandbox.WebHome]] to get familiar with page editing. #end
+It is an online workspace that allow people to work better together. This Wiki contains //pages// organized by //spaces//. You're currently in the **Main** space, looking at the home page (**WebHome**). {{velocity}}{{html wiki=true}}#if($hasEdit) You can use the [[Sandbox space>>Sandbox.WebHome]] to get familiar with page editing. #end
 
-== $msg.get("xe.dashboard.wiki"){{/velocity}}
+== $msg.get("xe.dashboard.wiki"){{/html}}{{/velocity}}
 
 {{include document="Main.Dashboard"/}}

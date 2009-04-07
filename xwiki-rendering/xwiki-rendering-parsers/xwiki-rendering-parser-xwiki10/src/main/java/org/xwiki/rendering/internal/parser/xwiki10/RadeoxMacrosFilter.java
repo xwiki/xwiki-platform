@@ -56,6 +56,10 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
     public static final Pattern MULTI_LINE_MACRO_PATTERN =
         Pattern.compile("\\{(\\w+)(:(.+?))?\\}(.+?)\\{\\1\\}", Pattern.DOTALL);
 
+    public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN);
+
+    public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
+
     private ComponentManager componentManager;
 
     /**
@@ -112,6 +116,29 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
             String params = matcher.group(3);
             String macroContent = matcher.groupCount() >= 4 ? matcher.group(4) : null;
 
+            boolean velocityOpen = false;
+            boolean velocityClose = false;
+
+            if (params != null) {
+                // Clean velocity open macro inside params
+                Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(params);
+                velocityOpen |= velocityOpenMatcher.find();
+                params = velocityOpenMatcher.replaceAll("");
+                Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(params);
+                velocityClose |= velocityCloseMatcher.find();
+                params = velocityCloseMatcher.replaceAll("");
+            }
+
+            if (macroContent != null) {
+                // Clean velocity close macro inside content
+                Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(macroContent);
+                velocityOpen |= velocityOpenMatcher.find();
+                macroContent = velocityOpenMatcher.replaceAll("");
+                Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(macroContent);
+                velocityClose |= velocityCloseMatcher.find();
+                macroContent = velocityCloseMatcher.replaceAll("");
+            }
+
             try {
                 currentMacro =
                     (RadeoxMacroConverter) this.componentManager.lookup(RadeoxMacroConverter.class, macroName);
@@ -142,7 +169,13 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
             }
 
             result.append(before);
+            if (velocityOpen) {
+                VelocityFilter.appendVelocityOpen(result, filterContext);
+            }
             result.append(allcontent);
+            if (velocityClose) {
+                VelocityFilter.appendVelocityClose(result, filterContext);
+            }
         }
 
         if (currentIndex == 0) {

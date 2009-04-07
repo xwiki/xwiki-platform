@@ -7,11 +7,23 @@ same line
 
 another paragraph
 {quote}
+{quote}
+first line
+same line
+
+$var
+
+another paragraph
+{quote}
 .#-----------------------------------------------------
-.expect|xwiki/2.0|skip
-.# TODO: Need to fix XWiki 2.0 quote parsing for consecutive quotations lines, see http://jira.xwiki.org/jira/browse/XWIKI-3140
-.# TODO: Need to fix XWiki 2.0 quote parsing for empty new lines, see http://jira.xwiki.org/jira/browse/XWIKI-3124
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 >first line same line
 >
 >another paragraph
+
+{{velocity}}{{html wiki=true}}>first line same line
+>
+>$var
+>
+>another paragraph{{/html}}{{/velocity}}

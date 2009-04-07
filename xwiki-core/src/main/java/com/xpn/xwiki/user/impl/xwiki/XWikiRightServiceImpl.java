@@ -228,8 +228,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // Denied Guest need to be authenticated
             logDeny("unauthentified", (doc == null) ? "" : doc.getFullName(), action, "Guest has been denied");
             if (context.getRequest() != null
-                && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true"))
-            {
+                && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
                 context.getWiki().getAuthService().showLogin(context);
             }
             return false;
@@ -494,8 +493,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         if (isReadOnly) {
             if ("edit".equals(accessLevel) || "delete".equals(accessLevel) || "undelete".equals(accessLevel)
-                || "comment".equals(accessLevel) || "register".equals(accessLevel))
-            {
+                || "comment".equals(accessLevel) || "register".equals(accessLevel)) {
                 logDeny(name, resourceKey, accessLevel, "server in read-only mode");
                 return false;
             }
@@ -821,7 +819,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
     {
         try {
             if (doc == null) {
-                return false;
+                // If no context document is set, then check the rights of the current user
+                return isSuperAdminOrProgramming(context.getUser(), null, "programming", true, context);
             }
 
             String username = doc.getContentAuthor();

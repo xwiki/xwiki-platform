@@ -60,24 +60,26 @@ public class BodyFilter extends AbstractHTMLFilter
         Node markerNode = null;
         boolean containsOnlySpaces = true;
         while (currentNode != null) {
-            if (!ALLOWED_BODY_TAGS.contains(currentNode.getNodeName())) {
-                
-                // Ensure that we don't wrap elements that contain only spaces or newlines.
-                containsOnlySpaces = containsOnlySpaces(currentNode);
-
-                // Don't count comment nodes
-                if (markerNode == null && (currentNode.getNodeType() != Node.COMMENT_NODE)) {
-                    markerNode = currentNode;
-                } else {
-                    // Do nothing, just go to the next node.
+            // Note: We ignore comment nodes since there's no need to wrap them.
+            if (currentNode.getNodeType() != Node.COMMENT_NODE) {
+                if (!ALLOWED_BODY_TAGS.contains(currentNode.getNodeName())) {
+                    
+                    // Ensure that we don't wrap elements that contain only spaces or newlines.
+                    containsOnlySpaces = containsOnlySpaces(currentNode);
+    
+                    if (markerNode == null) {
+                        markerNode = currentNode;
+                    } else {
+                        // Do nothing, just go to the next node.
+                    }
+                } else if (markerNode != null) {
+                    // surround all the nodes starting with the marker node with a paragraph unless there are only
+                    // whitespaces or newlines.
+                    if (!containsOnlySpaces) {
+                        surroundWithParagraph(document, body, markerNode, currentNode);
+                    }
+                    markerNode = null;
                 }
-            } else if (markerNode != null) {
-                // surround all the nodes starting with the marker node with a paragraph unless there are only
-                // whitespaces or newlines.
-                if (!containsOnlySpaces) {
-                    surroundWithParagraph(document, body, markerNode, currentNode);
-                }
-                markerNode = null;
             }
             currentNode = currentNode.getNextSibling();
         }

@@ -19,6 +19,11 @@
  */
 package org.xwiki.gwt.dom.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gwt.core.client.JsArrayString;
+
 /**
  * Unit tests for {@link Element}.
  * 
@@ -121,5 +126,28 @@ public class ElementTest extends AbstractDOMTest
         String text = "\na \n b\t\n\tc";
         element.appendChild(document.createComment(text));
         assertEquals("<div><!--" + text + "--></div>", element.xGetString().toLowerCase());
+    }
+
+    /**
+     * Unit test for {@link Element#getAttributeNames()}.
+     */
+    public void testGetAttributeNames()
+    {
+        Element element = Document.get().createSpanElement().cast();
+        String customAttribute = "x";
+        element.setAttribute(customAttribute, "y");
+        element.setTitle("z");
+        element.getStyle().setProperty(Style.BACKGROUND_COLOR, "rgb(255, 0, 0)");
+
+        List<String> attrList = new ArrayList<String>();
+        attrList.add(customAttribute);
+        attrList.add("title");
+        attrList.add("style");
+
+        JsArrayString attributeNames = element.getAttributeNames();
+        for (int i = 0; i < attributeNames.length(); i++) {
+            attrList.remove(attributeNames.get(i));
+        }
+        assertEquals(0, attrList.size());
     }
 }

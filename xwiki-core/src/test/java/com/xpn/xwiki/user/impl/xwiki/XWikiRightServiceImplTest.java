@@ -123,4 +123,38 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         assertTrue(GLOBALUSERNAME + "does not have global view right on wiki2", result);
     }
+
+    /** Test that programming rights are checked on the context user when no context document is set. */
+    public void testProgrammingRightsWhenNoContextDocumentIsSet()
+    {
+        // Setup an XWikiPreferences document granting programming rights to XWiki.Programmer
+        XWikiDocument prefs = new XWikiDocument("XWiki", "XWikiPreferences");
+        Mock mockGlobalRightObj = mock(BaseObject.class, new Class[] {}, new Object[] {});
+        mockGlobalRightObj.stubs().method("getStringValue").with(eq("levels")).will(returnValue("programming,admin"));
+        mockGlobalRightObj.stubs().method("getStringValue").with(eq("users")).will(returnValue("XWiki.Programmer"));
+        mockGlobalRightObj.stubs().method("getIntValue").with(eq("allow")).will(returnValue(1));
+        mockGlobalRightObj.stubs().method("setNumber");
+        mockGlobalRightObj.stubs().method("setName");
+        mockGlobalRightObj.stubs().method("setWiki");
+        prefs.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), eq(this.context)).will(
+            returnValue(prefs));
+
+        // Setup the context (no context document)
+        this.mockXWiki.stubs().method("getDatabase").will(returnValue("xwiki"));
+        this.context.remove("doc");
+        this.context.remove("sdoc");
+
+        // XWiki.Programmer should have PR, as per the global rights.
+        this.context.setUser("XWiki.Programmer");
+        assertTrue(this.rightService.hasProgrammingRights(this.context));
+
+        // XWiki.XWikiGuest should not have PR
+        this.context.setUser("XWiki.XWikiGuest");
+        assertFalse(this.rightService.hasProgrammingRights(this.context));
+
+        // superadmin should always have PR
+        this.context.setUser("XWiki.superadmin");
+        assertTrue(this.rightService.hasProgrammingRights(this.context));
+    }
 }

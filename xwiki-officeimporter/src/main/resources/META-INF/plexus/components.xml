@@ -227,13 +227,16 @@
           <role>org.xwiki.rendering.parser.Parser</role>
           <role-hint>xwiki/2.0</role-hint>
           <field-name>xwikiParser</field-name>
-        </requirement>
+        </requirement>        
         <requirement>
           <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.refactoring.splitter.DocumentSplitter</role>
         </requirement>        
       </requirements>      
     </component>
-    <!-- Configuration -->
+    <!-- OpenOffice Server Configuration -->
     <component>
       <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration</role>
       <role-hint>default</role-hint>

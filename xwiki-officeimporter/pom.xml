@@ -69,10 +69,20 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-refactoring</artifactId>
+      <version>${pom.version}</version>
+    </dependency> 
+    <dependency>
       <groupId>net.sf.jodconverter</groupId>
       <artifactId>jodconverter</artifactId>
       <version>3.0-beta-1</version>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>1.6.0</version>
+    </dependency>   
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
@@ -85,7 +95,7 @@
       <artifactId>xwiki-core-shared-tests</artifactId>
       <version>${pom.version}</version>
       <scope>test</scope>
-    </dependency>    
+    </dependency>
   </dependencies>
   <build>
     <plugins>

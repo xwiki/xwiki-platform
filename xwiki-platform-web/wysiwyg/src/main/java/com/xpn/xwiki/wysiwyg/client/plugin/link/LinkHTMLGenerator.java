@@ -67,6 +67,7 @@ public final class LinkHTMLGenerator
             case NEW_WIKIPAGE:
                 spanClass = "wikicreatelink";
                 break;
+            case ATTACHMENT:
             case EMAIL:
             case EXTERNAL:
             default:

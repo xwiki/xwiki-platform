@@ -89,7 +89,7 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
             }
         });
 
-        MenuItem emailPageLink = new MenuItem(Strings.INSTANCE.linkToEmail(), new com.google.gwt.user.client.Command()
+        MenuItem emailLink = new MenuItem(Strings.INSTANCE.linkToEmail(), new com.google.gwt.user.client.Command()
         {
             public void execute()
             {
@@ -105,11 +105,21 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
                     plugin.onLinkInsert(LinkType.WIKIPAGE);
                 }
             });
+        
+        MenuItem attachmentLink =
+            new MenuItem(Strings.INSTANCE.linkToAttachment(), new com.google.gwt.user.client.Command()
+            {
+                public void execute()
+                {
+                    plugin.onLinkInsert(LinkType.ATTACHMENT);
+                }
+            });
 
         createLinkMenus = new ArrayList<UIObject>();
         createLinkMenus.add(webPageLink);
-        createLinkMenus.add(emailPageLink);
+        createLinkMenus.add(emailLink);
         createLinkMenus.add(wikiPageLink);
+        createLinkMenus.add(attachmentLink);
 
         MenuItem editLink = new MenuItem(Strings.INSTANCE.linkEdit(), new com.google.gwt.user.client.Command()
         {

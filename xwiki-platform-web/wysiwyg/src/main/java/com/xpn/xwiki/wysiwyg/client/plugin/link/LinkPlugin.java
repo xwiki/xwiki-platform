@@ -158,6 +158,9 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
             case NEW_WIKIPAGE:
                 getLinkWizard().start("wikipage", linkParams);
                 break;
+            case ATTACHMENT:
+                getLinkWizard().start("attachment", linkParams);
+                break;
             case EMAIL:
                 getLinkWizard().start("email", linkParams);
                 break;

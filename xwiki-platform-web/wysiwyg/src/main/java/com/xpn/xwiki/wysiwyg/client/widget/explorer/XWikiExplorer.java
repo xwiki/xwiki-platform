@@ -20,12 +20,12 @@
 package com.xpn.xwiki.wysiwyg.client.widget.explorer;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.BaseWidget;
+import com.smartgwt.client.widgets.tree.TreeGrid;
 
 /**
  * Wrapper for XWikiExplorer SmartClient-based widget.
- *
+ * 
  * @version $Id$
  */
 public class XWikiExplorer extends TreeGrid
@@ -40,7 +40,7 @@ public class XWikiExplorer extends TreeGrid
 
     /**
      * Constructor. Wraps the JavaScriptObject argument.
-     *
+     * 
      * @param jsObj JavaScript object to wrap.
      */
     public XWikiExplorer(JavaScriptObject jsObj)
@@ -49,9 +49,9 @@ public class XWikiExplorer extends TreeGrid
     }
 
     /**
-     * Static method allowing to get the XWikiExplorer, creates the widget from the JavaScriptObject argument
-     * if it is not null.
-     *
+     * Static method allowing to get the XWikiExplorer, creates the widget from the JavaScriptObject argument if it is
+     * not null.
+     * 
      * @param jsObj JavaScript object to wrap if not null.
      * @return XWikiExplorer widget.
      */
@@ -70,21 +70,22 @@ public class XWikiExplorer extends TreeGrid
 
     /**
      * Native JS call that creates the widget.
-     *
+     * 
      * @return XWikiExplorer JavaScript widget.
      */
     protected native JavaScriptObject create()
-        /*-{
-            var config = this.@com.smartgwt.client.widgets.BaseWidget::getConfig()();
-            var widget = $wnd.isc.XWETreeGrid.create(config);
-            this.@com.smartgwt.client.widgets.BaseWidget::doInit()();
-            return widget;
-        }-*/;
+    /*-{
+        var config = this.@com.smartgwt.client.widgets.BaseWidget::getConfig()();
+        var widget = $wnd.isc.XWETreeGrid.create(config);
+        this.@com.smartgwt.client.widgets.BaseWidget::doInit()();
+        return widget;
+    }-*/;
 
     /**
      * @param wiki wiki, Default value is "xwiki".
      */
-    public void setWiki(String wiki) {
+    public void setWiki(String wiki)
+    {
         setAttribute("wiki", wiki, true);
     }
 
@@ -177,112 +178,111 @@ public class XWikiExplorer extends TreeGrid
     }
 
     /**
-     * Get the name of the resource selected in the Tree.
-     * Examples: "xwiki", "xwiki:Main", "xwiki:Main.WebHome".
-     *
+     * Get the name of the resource selected in the Tree. Examples: "xwiki", "xwiki:Main", "xwiki:Main.WebHome".
+     * 
      * @return Name of the resource selected in the Tree, empty string if none selected.
      */
     public native String getValue()
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.getValue();
-        }-*/;
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.getValue();
+    }-*/;
 
     /**
      * @param value Set XWikiExplorer suggest input value.
      */
     public native void setValue(String value)
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.setValue(value);
-        }-*/;
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.setValue(value);
+    }-*/;
 
     /**
      * Get the name of the wiki selected in the Tree.
-     *
+     * 
      * @return the name of the wiki selected in the Tree, empty string if none selected.
      */
     public native String getSelectedWiki()
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.getSelectedWiki();
-        }-*/;
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.getSelectedWiki();
+    }-*/;
 
     /**
      * Get the name of the space selected in the Tree.
-     *
+     * 
      * @return the name of the space selected in the Tree, empty string if none selected.
      */
     public native String getSelectedSpace()
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.getSelectedSpace();
-        }-*/;
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.getSelectedSpace();
+    }-*/;
 
     /**
      * Get the name of the page selected in the Tree.
-     *
+     * 
      * @return the name of the page selected in the Tree, empty string if none selected.
      */
     public native String getSelectedPage()
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.getSelectedPage();
-        }-*/;
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.getSelectedPage();
+    }-*/;
 
     /**
      * Get the name of the attachment selected in the Tree.
-     *
+     * 
      * @return the name of the attachment selected in the Tree, empty string if none selected.
      */
     public native String getSelectedAttachment()
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.getSelectedAttachment();
-        }-*/;
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.getSelectedAttachment();
+    }-*/;
 
     /**
      * Get the name of the anchor selected in the Tree.
-     *
+     * 
      * @return the name of the anchor selected in the Tree, empty string if none selected.
      */
     public native String getSelectedAnchor()
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.getSelectedAnchor();
-        }-*/;
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.getSelectedAnchor();
+    }-*/;
 
     /**
      * Is the selected resource a new page.
-     *
+     * 
      * @return true if the selected node is a new page.
      */
     public native boolean isNewPage()
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.isNewPage();
-        }-*/;
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.isNewPage();
+    }-*/;
 
     /**
      * Is the selected resource a new attachment.
-     *
+     * 
      * @return true if the selected node is a new Attachment.
      */
     public native boolean isNewAttachment()
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.isNewAttachment();
-        }-*/;
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.isNewAttachment();
+    }-*/;
 
     /**
      * Get the URL of the selected node in the Tree.
-     *
+     * 
      * @return the URL of the selected node in the Tree.
      */
-    public native String getSelectedUrl()
-        /*-{
-            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-            return self.getSelectedUrl();
-        }-*/;
+    public native String getSelectedResourceURL()
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return self.getSelectedUrl();
+    }-*/;
 
 };

@@ -382,8 +382,13 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         if (context != null) {
             String susername = cannonicalUsername;
             int i = cannonicalUsername.indexOf(".");
+            int j = cannonicalUsername.indexOf(":");
+
             if (i != -1) {
                 susername = cannonicalUsername.substring(i + 1);
+            } else if (j != -1) {
+                // The username could be in the format xwiki:Username, so strip the wiki prefix.
+                susername = cannonicalUsername.substring(j + 1);
             }
 
             // First we check in the local database

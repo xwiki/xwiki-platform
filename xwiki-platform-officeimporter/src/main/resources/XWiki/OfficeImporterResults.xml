@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <xwikidoc>
 <web>XWiki</web>
 <name>OfficeImporterResults</name>
@@ -11,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1217261425000</creationDate>
-<date>1219045325000</date>
-<contentUpdateDate>1219045325000</contentUpdateDate>
-<version>1.1</version>
+<date>1238580697000</date>
+<contentUpdateDate>1238580697000</contentUpdateDate>
+<version>1.0</version>
 <title>Office Importer Results</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -21,47 +21,52 @@
 <comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <content>
 #if($isguest)
   #error($msg.get("xe.officeimporter.notallowed"))  
 #else
   1 $msg.get("xe.officeimporter.results.title")
-  
+
+  #set($goBack = "[$msg.get('xe.officeimporter.results.goback')&gt;XWiki.OfficeImporter]")  
+
   ## Validate fileName
   #set($fileUpload=$xwiki.fileupload)
   #set($fileName=$fileUpload.getFileName("filePath"))
-  #if(!$fileName || $fileName=="")
-  #set($goBack = "[$msg.get('xe.officeimporter.results.goback')&gt;XWiki.OfficeImporter]")
+  #if("$!{fileName}" == "")
     #error($msg.get("xe.officeimporter.results.missingfile", [$goBack]))
   #end
   
   ## Validate targetSpace
-  #if(!$request.targetSpace || $request.targetSpace=="")
-  #set($goBack = "[$msg.get('xe.officeimporter.results.goback')&gt;XWiki.OfficeImporter]")
+  #if("$!{request.targetSpace}" == "")
     #error($msg.get("xe.officeimporter.results.missingspace", [$goBack]))
   #else
     #set($targetSpace=$request.targetSpace)
   #end
 
   ## Validate targetPage
-  #if(!$request.targetPage || $request.targetPage=="")
-  #set($goBack = "[$msg.get('xe.officeimporter.results.goback')&gt;XWiki.OfficeImporter]")
+  #if("$!{request.targetPage}" == "")
     #error($msg.get("xe.officeimporter.results.missingpage", [$goBack]))
   #else
     #set($targetPage=$request.targetPage)
   #end  
 
-  ## Check style filter settings 
-  #if($request.filterStyles)
-    #set($filterStyles=$request.filterStyles)
-  #else
-    #set($filterStyles="none")
+  ## Split Levels
+  #set($headingLevelsArray=$request.getParameterValues("headingLevelsToSplit"))
+  #if($headingLevelsArray)
+    #foreach($headingLevel in $headingLevelsArray)
+      #if("$!{headingLevelsString}" == "")
+        #set($headingLevelsString="${headingLevel}")
+      #else
+        #set($headingLevelsString="${headingLevelsString},${headingLevel}")
+      #end
+    #end
   #end
 
   ## Import
-  #if($fileName &amp;&amp; $targetSpace &amp;&amp; $targetPage)    
+  #if($fileName &amp;&amp; $targetSpace &amp;&amp; $targetPage)
     #set($fileContent=$fileUpload.getFileItemData("filePath"))
-    #set($options={"filterStyles":${filterStyles}})
+    #set($options={"appendContent":"$!{request.appendContent}","filterStyles":"$!{request.filterStyles}","splitDocument":"$!{request.splitDocument}", "headingLevelsToSplit":"$!{headingLevelsString}","childPagesNamingMethod":"$!{request.childPagesNamingMethod}","groovyFilter":"$!{request.groovyFilter}"})
     #set($targetDocument="${targetSpace}.${targetPage}")
     #set($result=$officeimporter.importDocument($fileContent, $fileName, $targetDocument, $options))
     #if($result)
@@ -72,8 +77,7 @@
     #else
       #error($officeimporter.lastErrorMessage)
     #end
-  #end
-  
+  #end  
 #end
 </content>
 </xwikidoc>

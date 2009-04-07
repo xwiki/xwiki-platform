@@ -20,8 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.widget.explorer;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.ui.TextBox;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.BaseWidget;
 
@@ -104,15 +102,6 @@ public class XWikiExplorer extends TreeGrid
     public void setDefaultValue(String defaultValue)
     {
         setAttribute("defaultValue", defaultValue, true);
-    }
-
-    /**
-     * @param value Set XWikiExplorer suggest input value.
-     */
-    public void setValue(String value)
-    {
-        TextBox input = TextBox.wrap(DOM.getElementById(this.getID() + "_Input"));                 
-        input.setText(value);
     }
 
     /**
@@ -200,6 +189,15 @@ public class XWikiExplorer extends TreeGrid
         }-*/;
 
     /**
+     * @param value Set XWikiExplorer suggest input value.
+     */
+    public native void setValue(String value)
+        /*-{
+            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+            return self.setValue(value);
+        }-*/;
+
+    /**
      * Get the name of the wiki selected in the Tree.
      *
      * @return the name of the wiki selected in the Tree, empty string if none selected.
@@ -274,6 +272,17 @@ public class XWikiExplorer extends TreeGrid
         /*-{
             var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
             return self.isNewAttachment();
+        }-*/;
+
+    /**
+     * Get the URL of the selected node in the Tree.
+     *
+     * @return the URL of the selected node in the Tree.
+     */
+    public native String getSelectedUrl()
+        /*-{
+            var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+            return self.getSelectedUrl();
         }-*/;
 
 };

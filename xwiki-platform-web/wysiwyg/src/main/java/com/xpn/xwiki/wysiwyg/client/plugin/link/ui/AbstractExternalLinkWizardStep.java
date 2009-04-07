@@ -33,7 +33,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @version $Id$
  */
-public abstract class AbstractExternalLinkWizardStep extends AbstractLinkConfigWizardStep implements FocusListener
+public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardStep implements FocusListener
 {
     /**
      * The text box to store the URI of the created link.
@@ -60,6 +60,7 @@ public abstract class AbstractExternalLinkWizardStep extends AbstractLinkConfigW
         getLabelTextBox().setTitle(getLabelTextBoxTooltip());
 
         mainPanel = new FlowPanel();
+        mainPanel.removeStyleName(DEFAULT_STYLE_NAME);
         mainPanel.addStyleName("xLinkToUrl");
 
         FlowPanel urlPanel = new FlowPanel();
@@ -80,7 +81,7 @@ public abstract class AbstractExternalLinkWizardStep extends AbstractLinkConfigW
         {
             public void onSuccess(Boolean result)
             {
-                urlTextBox.setText(linkData.getUrl() == null ? getInputDefaultText() : linkData.getUrl());
+                urlTextBox.setText(getLinkData().getUrl() == null ? getInputDefaultText() : getLinkData().getUrl());
                 cb.onSuccess(null);
             }
 
@@ -138,8 +139,8 @@ public abstract class AbstractExternalLinkWizardStep extends AbstractLinkConfigW
             async.onSuccess(false);
         } else {
             String linkUri = buildURL();
-            linkData.setUrl(linkUri);
-            linkData.setReference(linkUri);
+            getLinkData().setUrl(linkUri);
+            getLinkData().setReference(linkUri);
             async.onSuccess(true);
         }
     }

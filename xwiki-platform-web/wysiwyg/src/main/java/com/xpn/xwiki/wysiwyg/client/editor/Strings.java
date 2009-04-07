@@ -167,7 +167,9 @@ public interface Strings extends Constants
 
     String linkToWebPage();
 
-    String linkToWikiPage();    
+    String linkToWikiPage();
+    
+    String linkToAttachment();
 
     String linkLabelLabel();
     
@@ -189,7 +191,9 @@ public interface Strings extends Constants
 
     String linkNoLabelError();
 
-    String linkWikiPageLabelTextBoxTooltip();
+    String linkConfigLabelTextBoxTooltip();
+
+    String linkConfigTooltipTextBoxTooltip();
 
     String linkWebPageLabelTextBoxTooltip();
 
@@ -202,6 +206,10 @@ public interface Strings extends Constants
     String selectWikipageTitle();
 
     String linkNoPageSelectedError();
+
+    String selectAttachmentTitle();
+
+    String linkNoAttachmentSelectedError();    
 
     String linkConfigTitle();
 

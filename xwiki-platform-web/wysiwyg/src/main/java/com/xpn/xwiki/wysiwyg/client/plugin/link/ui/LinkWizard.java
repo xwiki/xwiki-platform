@@ -67,13 +67,16 @@ public class LinkWizard extends Wizard implements WizardStepProvider
                 step = new EmailAddressLinkWizardStep();
             }
             if ("wikipage".equals(name)) {
-                step = new SelectorWizardStep();
+                step = new WikipageSelectorWizardStep();
+            }
+            if ("attachment".equals(name)) {
+                step = new AttachmentSelectorWizardStep();
             }
             if ("wikipagecreator".equals(name)) {
                 step = new CreateNewPageWizardStep();
             }
             if ("wikipageconfig".equals(name)) {
-                step = new WikiLinkConfigWizardStep();
+                step = new LinkConfigWizardStep();
             }
             // if something has been created, add it in the map
             if (step != null) {

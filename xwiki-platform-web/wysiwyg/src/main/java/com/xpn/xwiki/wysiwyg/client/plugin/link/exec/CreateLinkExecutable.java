@@ -164,8 +164,12 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
         if (wrappingSpanClass.equals("wikicreatelink")) {
             return LinkType.NEW_WIKIPAGE;
         }
-        if (wrappingSpanClass.equals("wikiexternallink") && reference.startsWith("mailto")) {
+        String externalLinkClass = "wikiexternallink";
+        if (wrappingSpanClass.equals(externalLinkClass) && reference.startsWith("mailto")) {
             return LinkType.EMAIL;
+        }
+        if (wrappingSpanClass.equals(externalLinkClass) && reference.startsWith("attach")) {
+            return LinkType.ATTACHMENT;
         }
         return LinkType.EXTERNAL;
     }

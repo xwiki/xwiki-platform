@@ -39,9 +39,9 @@ public class LinkConfig implements IsSerializable
     {
         /**
          * Link types: external link (default for any unrecognized link), internal link targeting an existent page,
-         * internal link targeting a new page, external link to an email address.
+         * internal link targeting a new page, link targeting an attached file, external link to an email address.
          */
-        EXTERNAL, NEW_WIKIPAGE, WIKIPAGE, EMAIL
+        EXTERNAL, NEW_WIKIPAGE, WIKIPAGE, ATTACHMENT, EMAIL
     };
 
     /**

@@ -39,16 +39,22 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
- * Abstract link creation wizard step, to hold general fields for link creation, such as link labels.
+ * Default implementation for the link configuration parameters, such as link labels, link tooltip, or opening the link
+ * in a new window or not.
  * 
  * @version $Id$
  */
-public abstract class AbstractLinkConfigWizardStep implements WizardStep, SourcesNavigationEvents, KeyboardListener
+public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents, KeyboardListener
 {
+    /**
+     * The default style of the link configuration dialog.
+     */
+    public static final String DEFAULT_STYLE_NAME = "xLinkConfig";
+    
     /**
      * The link data to be edited by this wizard step.
      */
-    protected LinkConfig linkData;
+    private LinkConfig linkData;
 
     /**
      * Collection of {@link NavigationListener}s, to be notified by navigation events from this step. Used to handle
@@ -79,14 +85,16 @@ public abstract class AbstractLinkConfigWizardStep implements WizardStep, Source
     /**
      * Default constructor.
      */
-    public AbstractLinkConfigWizardStep()
+    public LinkConfigWizardStep()
     {
         Label labelLabel = new Label(Strings.INSTANCE.linkLabelLabel());
         // on enter in the textbox, submit the form
         labelTextBox.addKeyboardListener(this);
         labelTextBox.setTitle(getLabelTextBoxTooltip());
+        tooltipTextBox.setTitle(getTooltipTextBoxTooltip());
         mainPanel.add(labelLabel);
         mainPanel.add(getLabelTextBox());
+        mainPanel.addStyleName(DEFAULT_STYLE_NAME);
         Label tooltipLabel = new Label(Strings.INSTANCE.linkTooltipLabel());
         // on enter in the textbox, submit the form
         tooltipTextBox.addKeyboardListener(this);
@@ -110,6 +118,14 @@ public abstract class AbstractLinkConfigWizardStep implements WizardStep, Source
         newWindowCheckBox.setChecked(linkData.isOpenInNewWindow());
         cb.onSuccess(null);
     }
+    
+    /**
+     * {@inheritDoc} 
+     */
+    public Widget display()
+    {
+        return mainPanel;
+    }    
 
     /**
      * @return the mainPanel, to be used by subclasses to display the form defined by this wizard step.
@@ -126,13 +142,29 @@ public abstract class AbstractLinkConfigWizardStep implements WizardStep, Source
     {
         return labelTextBox;
     }
+    
+    /**
+     * @return the {@link LinkConfig} configured by this wizard step
+     */
+    public LinkConfig getLinkData()
+    {
+        return linkData;
+    }    
 
     /**
-     * @return the tooltip for label text box.
+     * @return the tooltip for label text box
      */
     protected String getLabelTextBoxTooltip()
     {
-        return "";
+        return Strings.INSTANCE.linkConfigLabelTextBoxTooltip();
+    }
+    
+    /** 
+     * @return the tooltip for the tooltip text box
+     */
+    protected String getTooltipTextBoxTooltip()
+    {
+        return Strings.INSTANCE.linkConfigTooltipTextBoxTooltip();
     }
 
     /**

@@ -121,6 +121,57 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         // Finally run the test: Using xwiki:Admin should correctly authenticate the Admin user
         Principal principal = this.authService.authenticate("xwiki:SomeUser", "pass", this.getContext());
         assertNotNull(principal);
-        assertEquals("XWiki.SomeUser", principal.getName());
+        assertEquals("xwiki:XWiki.SomeUser", principal.getName());
+    }
+
+    /**
+     * Test that user is authenticated with a global account when a local one with the same name exists and the username
+     * contains a wiki prefix.
+     */
+    public void testLogintoVirtualXwikiWithWikiPrefixUsername() throws Exception
+    {
+        // Setup simple user profile documents
+        XWikiDocument userDocLocal = new XWikiDocument("local", "XWiki", "Admin");
+        XWikiDocument userDocVirtual = new XWikiDocument("xwiki", "XWiki", "Admin");
+
+        // Make a simple XWiki.XWikiUsers class that will contain a default password field
+        BaseClass userClass = new BaseClass();
+        userClass.addPasswordField("password", "Password", 20);
+        userClass.setClassName("XWiki.XWikiUsers");
+
+        // Mock the XWikiUsers object, since a real objects requires more mocking on the XWiki object
+        Mock mockUserObj = mock(BaseObject.class, new Class[] {}, new Object[] {});
+        mockUserObj.stubs().method("setWiki");
+        mockUserObj.stubs().method("setName");
+        mockUserObj.stubs().method("setNumber");
+        mockUserObj.stubs().method("getStringValue").with(eq("password")).will(returnValue("admin"));
+        userDocLocal.addObject("XWiki.XWikiUsers", (BaseObject) mockUserObj.proxy());
+
+        // Prepare the XWiki mock for local
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.Admin"), eq(this.getContext())).will(
+            returnValue(userDocLocal));
+        this.mockXWiki.stubs().method("getClass").with(eq("XWiki.XWikiUsers"), eq(this.getContext())).will(
+            returnValue(userClass));
+        this.mockXWiki.stubs().method("exists").will(returnValue(true));
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
+
+        // Run the test: Using Xwiki.Admin should correctly authenticate the Admin user
+        Principal principalLocal = this.authService.authenticate("XWiki.Admin", "admin", this.getContext());
+        assertNotNull(principalLocal);
+        assertEquals("XWiki.Admin", principalLocal.getName());
+
+        // Set the database name to local.
+        this.getContext().setDatabase("local");
+
+        // Prepare the XWiki mock for virtual
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.Admin"), eq(this.getContext())).will(
+            returnValue(userDocVirtual));
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
+        userDocVirtual.addObject("XWiki.XWikiUsers", (BaseObject) mockUserObj.proxy());
+
+        // Finally run the test: Using xwiki:Xwiki.Admin should correctly authenticate the Admin user
+        Principal principalVirtual = this.authService.authenticate("xwiki:XWiki.Admin", "admin", this.getContext());
+        assertNotNull(principalVirtual);
+        assertEquals("xwiki:XWiki.Admin", principalVirtual.getName());
     }
 }

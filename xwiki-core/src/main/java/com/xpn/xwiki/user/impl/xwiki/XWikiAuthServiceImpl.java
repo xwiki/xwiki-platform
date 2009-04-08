@@ -376,41 +376,53 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             return authenticateSuperAdmin(password, context);
         }
 
-        // If we have the context then we are using direct mode
-        // then we should specify the database
+        // If we have the context then we are using direct mode, and we should be able to specify the database
         // This is needed for virtual mode to work
         if (context != null) {
             String susername = cannonicalUsername;
+            String virtualXwikiName = null;
             int i = cannonicalUsername.indexOf(".");
             int j = cannonicalUsername.indexOf(":");
 
+            // Extract the specified wiki name, if it exists
+            if (j > 0) {
+                virtualXwikiName = cannonicalUsername.substring(0, j);
+            }
+
+            // Use just the username, without a wiki or space prefix
             if (i != -1) {
                 susername = cannonicalUsername.substring(i + 1);
-            } else if (j != -1) {
+            } else if (j > 0) {
                 // The username could be in the format xwiki:Username, so strip the wiki prefix.
                 susername = cannonicalUsername.substring(j + 1);
             }
 
-            // First we check in the local database
-            try {
-                String user = findUser(susername, context);
-                if (user != null) {
-                    if (checkPassword(user, password, context)) {
-                        return new SimplePrincipal(user);
-                    } else {
-                        context.put("message", "wrongpassword");
-                    }
-                } else {
-                    context.put("message", "wronguser");
-                }
-            } catch (Exception e) {
-                // continue
-            }
+            String db = context.getDatabase();
 
-            if (!context.isMainWiki()) {
-                // Then we check in the main database
-                String db = context.getDatabase();
+            try {
+                // Set the context database to the specified wiki, if any
+                if (virtualXwikiName != null) {
+                    context.setDatabase(virtualXwikiName);
+                }
+                // Check in the current database first
                 try {
+                    String user = findUser(susername, context);
+                    if (user != null) {
+                        if (checkPassword(user, password, context)) {
+                            return new SimplePrincipal(virtualXwikiName != null ? context.getDatabase() + ":" + user
+                                : user);
+                        } else {
+                            context.put("message", "wrongpassword");
+                        }
+                    } else {
+                        context.put("message", "wronguser");
+                    }
+                } catch (Exception e) {
+                    // continue
+                }
+
+                if (!context.isMainWiki()) {
+                    // Then we check in the main database
                     context.setDatabase(context.getMainXWiki());
                     try {
                         String user = findUser(susername, context);
@@ -429,13 +441,15 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                         context.put("message", "loginfailed");
                         return null;
                     }
-                } finally {
-                    context.setDatabase(db);
+
+                } else {
+                    // error message was already set
+                    return null;
                 }
-            } else {
-                // error message was already set
-                return null;
+            } finally {
+                context.setDatabase(db);
             }
+
         } else {
             context.put("message", "loginfailed");
             return null;

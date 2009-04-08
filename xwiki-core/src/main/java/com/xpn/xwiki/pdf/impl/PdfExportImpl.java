@@ -35,7 +35,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -122,15 +121,28 @@ public class PdfExportImpl implements PdfExport
     public PdfExportImpl()
     {
         this.tidy = new Tidy();
-        Properties props = new Properties();
-        props.setProperty("quiet", "true");
-        /*
-         * props.setProperty("quoteAmpersand", "true"); props.setProperty("xHtml", "true");
-         * props.setProperty("showWarnings", "false"); props.setProperty("tidyMark", "false");
-         */
-        props.setProperty("clean", "true");
-        this.tidy.setConfigurationFromProps(props);
-        this.tidy.setTrimEmptyElements(false);
+
+        // Setup a default configuration for Tidy
+        Properties baseConfiguration = new Properties();
+        baseConfiguration.setProperty("quiet", "true");
+        baseConfiguration.setProperty("clean", "true");
+        baseConfiguration.setProperty("tidy-mark", "false");
+        baseConfiguration.setProperty("output-xhtml", "true");
+        baseConfiguration.setProperty("show-warnings", "false");
+        baseConfiguration.setProperty("trim-empty-elements", "false");
+        baseConfiguration.setProperty("numeric-entities", "true");
+
+        // Allow Tidy to be configured in the tidy.properties file
+        Properties configuration = new Properties(baseConfiguration);
+        try {
+            configuration.load(this.getClass().getClassLoader().getResourceAsStream("/tidy.properties"));
+        } catch (IOException ex) {
+            log.warn("Tidy configuration file could not be read. Using default configuration.");
+        } catch (NullPointerException ex) {
+            log.warn("Tidy configuration file doesn't exist. Using default configuration.");
+        }
+
+        this.tidy.setConfigurationFromProps(configuration);
     }
 
     public String getXhtmlxsl()

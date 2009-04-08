@@ -74,13 +74,15 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
         // no attachments here
         explorer.setDisplayAttachments(showAttachments);
         explorer.setDisplayAddAttachment(showAttachments && addAttachments);
-        explorerPanel.setWidth("459px");
-        explorerPanel.setHeight("325px");
+        // spaces can't be selected.
+        explorer.setDisplaySpaceNodesDisabled(true);
+        explorer.setWidth("455px");
+        explorer.setHeight("305px");
         WikiDataSource ds = new WikiDataSource();
         explorer.setDataSource(ds);
         explorerPanel.setStyleName("xExplorerPanel");
-        explorer.setHtmlElement(explorerPanel.getElement());
-        explorer.draw();
+        explorer.setHtmlElement(explorerPanel.getElement());        
+        explorerPanel.add(explorer);
     }
 
     /**

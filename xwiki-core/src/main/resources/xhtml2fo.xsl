@@ -70,7 +70,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="writing-mode"><xsl:value-of select="$writing-mode"/></xsl:attribute>
         <xsl:attribute name="hyphenate"><xsl:value-of select="$hyphenate"/></xsl:attribute>
         <xsl:attribute name="text-align"><xsl:value-of select="$text-align"/></xsl:attribute>
-        <xsl:attribute name="font-family">FreeSans,sans-serif</xsl:attribute>
+        <xsl:attribute name="font-family">FreeSerif,serif</xsl:attribute>
         <!-- specified on fo:root to change the properties' initial values -->
     </xsl:attribute-set>
 

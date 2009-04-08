@@ -3068,10 +3068,23 @@ public class XWikiDocument implements DocumentModelBridge
                 if (link.getType() == LinkType.DOCUMENT) {
                     // The reference may not have the space or even document specified (in case of an empty string)
                     // Thus we need to find the fully qualified document name. For the moment this is done by calling
-                    // setName() on XWikiDocument.
+                    // setFullName() on XWikiDocument.
                     // TODO: In the future use a document name resolver class instead.
                     XWikiDocument document = new XWikiDocument();
-                    document.setFullName(link.getReference(), context);
+
+                    XWikiDocument contextDoc = context.getDoc();
+                    String contextWiki = context.getDatabase();
+                    try {
+                        // Make sure the right document is used as context document
+                        context.setDoc(this);
+                        // Make sure the right wiki is used as context document
+                        context.setDatabase(getDatabase());
+
+                        document.setFullName(link.getReference(), context);
+                    } finally {
+                        context.setDoc(contextDoc);
+                        context.setDatabase(contextWiki);
+                    }
 
                     // Verify that the link is not an autolink (i.e. a link to the current document) and only add
                     // if the link is not already in the list.
@@ -3090,7 +3103,7 @@ public class XWikiDocument implements DocumentModelBridge
     public List<String> getChildren(XWikiContext context) throws XWikiException
     {
         String query = "select distinct doc.fullName from XWikiDocument as doc";
-        Object[][] whereParameters = new Object[][] { {"doc.parent", this.getFullName()} };
+        Object[][] whereParameters = new Object[][] {{"doc.parent", this.getFullName()}};
         return context.getWiki().search(query, whereParameters, context);
     }
 

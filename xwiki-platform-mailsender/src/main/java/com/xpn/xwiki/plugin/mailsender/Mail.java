@@ -30,9 +30,9 @@ import com.xpn.xwiki.api.Attachment;
  */
 public class Mail
 {
-    private String to;
-
     private String from;
+
+    private String to;
 
     private String cc;
 
@@ -50,7 +50,7 @@ public class Mail
 
     public Mail()
     {
-        headers = new TreeMap<String, String>();
+        this.headers = new TreeMap<String, String>();
     }
 
     public Mail(String from, String to, String cc, String bcc, String subject, String textPart, String htmlPart)
@@ -68,7 +68,7 @@ public class Mail
 
     public List<Attachment> getAttachments()
     {
-        return attachments;
+        return this.attachments;
     }
 
     public void setAttachments(List<Attachment> attachments)
@@ -78,7 +78,7 @@ public class Mail
 
     public String getFrom()
     {
-        return from;
+        return this.from;
     }
 
     public void setFrom(String from)
@@ -88,7 +88,7 @@ public class Mail
 
     public String getTo()
     {
-        return to;
+        return this.to;
     }
 
     public void setTo(String to)
@@ -98,7 +98,7 @@ public class Mail
 
     public String getCc()
     {
-        return cc;
+        return this.cc;
     }
 
     public void setCc(String cc)
@@ -108,7 +108,7 @@ public class Mail
 
     public String getBcc()
     {
-        return bcc;
+        return this.bcc;
     }
 
     public void setBcc(String bcc)
@@ -118,7 +118,7 @@ public class Mail
 
     public String getSubject()
     {
-        return subject;
+        return this.subject;
     }
 
     public void setSubject(String subject)
@@ -128,7 +128,7 @@ public class Mail
 
     public String getTextPart()
     {
-        return textPart;
+        return this.textPart;
     }
 
     public void setTextPart(String message)
@@ -187,7 +187,7 @@ public class Mail
 
     public String getHtmlPart()
     {
-        return htmlPart;
+        return this.htmlPart;
     }
 
     public void setHtmlPart(String htmlPart)
@@ -197,12 +197,12 @@ public class Mail
 
     public void setHeader(String header, String value)
     {
-        headers.put(header, value);
+        this.headers.put(header, value);
     }
 
     public String getHeader(String header)
     {
-        return headers.get(header);
+        return this.headers.get(header);
     }
 
     public void setHeaders(Map<String, String> headers)
@@ -212,6 +212,6 @@ public class Mail
 
     public Map<String, String> getHeaders()
     {
-        return headers;
+        return this.headers;
     }
 }

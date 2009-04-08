@@ -202,8 +202,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return renderText(text, false, contentdoc, includingdoc, context);
     }
 
-    private String renderText(String text, boolean onlyInterpret, XWikiDocument contentdoc,
-        XWikiDocument includingdoc, XWikiContext context)
+    private String renderText(String text, boolean onlyInterpret, XWikiDocument contentdoc, XWikiDocument includingdoc,
+        XWikiContext context)
     {
         String key = getKey(text, contentdoc, includingdoc, context);
         int currentCacheDuration = context.getCacheDuration();
@@ -237,8 +237,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             MonitorPlugin monitor = Util.getMonitorPlugin(context);
             try {
                 // We need to make sure we don't use the cache duretion currently in the system
-                context.setCacheDuration((int) context.getWiki()
-                    .ParamAsLong("xwiki.rendering.defaultCacheDuration", 0));
+                context
+                    .setCacheDuration((int) context.getWiki().ParamAsLong("xwiki.rendering.defaultCacheDuration", 0));
                 // Start monitoring timer
                 if (monitor != null) {
                     monitor.startTimer("rendering");

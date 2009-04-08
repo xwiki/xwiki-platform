@@ -1134,8 +1134,6 @@ $html
 
 #macro (startfloatingbox)
 <div class="floatinginfobox">
-  ## We use an empty legend since the XHTML 1.0 strict XSD forces a legend to exist.
-  <legend></legend>
 #end
 
 #macro (endfloatingbox)

@@ -261,7 +261,7 @@ span.messagetype{
   display: none;
 }
 
-fieldset.floatinginfobox{
+div.floatinginfobox, fieldset.floatinginfobox{
   width: 200px;
   float: right;
   border: 1px solid #333;

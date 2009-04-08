@@ -223,7 +223,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                     XWikiRequest request = context.getRequest();
                     boolean refresh =
                         (request != null) && ("1".equals(request.get("refresh")))
-                            || "inline".equals(context.getAction());
+                            || "inline".equals(context.getAction()) || "admin".equals(context.getAction());
                     if ((cacheObject.isValid() && (!refresh))) {
                         addToCached(key, context);
                         return cacheObject.getContent();

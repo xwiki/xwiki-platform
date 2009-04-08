@@ -104,72 +104,72 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <xsl:attribute-set name="h1">
         <xsl:attribute name="font-size">2em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
-        <xsl:attribute name="font-style">italic</xsl:attribute>
-        <xsl:attribute name="space-before">0.67em</xsl:attribute>
-        <xsl:attribute name="space-after">0.07em</xsl:attribute>
+        <xsl:attribute name="font-style">normal</xsl:attribute>
+        <xsl:attribute name="space-before">0.8em</xsl:attribute>
+        <xsl:attribute name="space-after">0.2em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
-        <xsl:attribute name="start-indent">1mm</xsl:attribute>
+        <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h2">
         <xsl:attribute name="font-size">1.5em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
-        <xsl:attribute name="font-style">italic</xsl:attribute>
-        <xsl:attribute name="space-before">0.83em</xsl:attribute>
-        <xsl:attribute name="space-after">0.13em</xsl:attribute>
+        <xsl:attribute name="font-style">normal</xsl:attribute>
+        <xsl:attribute name="space-before">0.8em</xsl:attribute>
+        <xsl:attribute name="space-after">0.2em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
-        <xsl:attribute name="start-indent">2mm</xsl:attribute>
+        <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h3">
         <xsl:attribute name="font-size">1.17em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
-        <xsl:attribute name="font-style">italic</xsl:attribute>
-        <xsl:attribute name="space-before">1.0em</xsl:attribute>
-        <xsl:attribute name="space-after">0.3em</xsl:attribute>
+        <xsl:attribute name="font-style">normal</xsl:attribute>
+        <xsl:attribute name="space-before">0.8em</xsl:attribute>
+        <xsl:attribute name="space-after">0.2em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
-        <xsl:attribute name="start-indent">3mm</xsl:attribute>
+        <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h4">
         <xsl:attribute name="font-size">1em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
-        <xsl:attribute name="font-style">italic</xsl:attribute>
-        <xsl:attribute name="space-before">1.17em</xsl:attribute>
-        <xsl:attribute name="space-after">0.47em</xsl:attribute>
+        <xsl:attribute name="font-style">normal</xsl:attribute>
+        <xsl:attribute name="space-before">0.8em</xsl:attribute>
+        <xsl:attribute name="space-after">0.2em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
-        <xsl:attribute name="start-indent">4mm</xsl:attribute>
+        <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h5">
         <xsl:attribute name="font-size">0.85em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
-        <xsl:attribute name="font-style">italic</xsl:attribute>
-        <xsl:attribute name="space-before">1.33em</xsl:attribute>
-        <xsl:attribute name="space-after">0.63em</xsl:attribute>
+        <xsl:attribute name="font-style">normal</xsl:attribute>
+        <xsl:attribute name="space-before">0.8em</xsl:attribute>
+        <xsl:attribute name="space-after">0.2em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
-        <xsl:attribute name="start-indent">5mm</xsl:attribute>
+        <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h6">
         <xsl:attribute name="font-size">0.75em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
-        <xsl:attribute name="font-style">italic</xsl:attribute>
-        <xsl:attribute name="space-before">1.67em</xsl:attribute>
-        <xsl:attribute name="space-after">0.97em</xsl:attribute>
+        <xsl:attribute name="font-style">normal</xsl:attribute>
+        <xsl:attribute name="space-before">0.8em</xsl:attribute>
+        <xsl:attribute name="space-after">0.2em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
-        <xsl:attribute name="start-indent">6mm</xsl:attribute>
+        <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="p">
-        <xsl:attribute name="space-before">1em</xsl:attribute>
-        <xsl:attribute name="space-after">1em</xsl:attribute>
+        <xsl:attribute name="space-before">0.8em</xsl:attribute>
+        <xsl:attribute name="space-after">0.8em</xsl:attribute>
         <xsl:attribute name="text-indent">1em</xsl:attribute>
     </xsl:attribute-set>
 
@@ -1832,7 +1832,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:if test="$has-height and $has-width"><xsl:attribute name="scaling">non-uniform</xsl:attribute></xsl:if>
         <!-- The img attribute set contains values that scale images to 75%, in order to transform from 72 to 96 DPI;
              since the user specifies his own width and/or height, let the image scale to fit the specified values -->
-       <xsl:if test="$has-height or $has-width">
+        <xsl:if test="$has-height or $has-width">
             <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
             <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
         </xsl:if>

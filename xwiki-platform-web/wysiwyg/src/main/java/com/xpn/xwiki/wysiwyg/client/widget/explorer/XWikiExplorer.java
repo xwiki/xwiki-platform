@@ -178,6 +178,22 @@ public class XWikiExplorer extends TreeGrid
     }
 
     /**
+     * @param displayWikiNodesDisabled displayWikiNodesDisabled, Default value is false.
+     */
+    public void setDisplayWikiNodesDisabled(boolean displayWikiNodesDisabled)
+    {
+        setAttribute("displayWikiNodesDisabled", displayWikiNodesDisabled, true);
+    }
+
+    /**
+     * @param displaySpaceNodesDisabled displayAddAttachmentOnTop, Default value is false.
+     */
+    public void setDisplaySpaceNodesDisabled(boolean displaySpaceNodesDisabled)
+    {
+        setAttribute("displaySpaceNodesDisabled", displaySpaceNodesDisabled, true);
+    }
+
+    /**
      * Get the name of the resource selected in the Tree. Examples: "xwiki", "xwiki:Main", "xwiki:Main.WebHome".
      * 
      * @return Name of the resource selected in the Tree, empty string if none selected.

@@ -96,6 +96,8 @@ isc.XWEResultTree.addProperties({
     displayAttachmentsWhenEmpty: false, // Display attachments meta-node even if there's no attachments.
     displayAddAttachment: false, // Display a "Add Attachment" node in each Attachments meta-node.
     displayAddAttachmentOnTop: true, // Display the "Add Attachment" node on top.
+    displayWikiNodesDisabled: false, // Disable wiki nodes, they won't be clickable.
+    displaySpaceNodesDisabled: false, // Disable space nodes, they won't be clickable.
     blacklistedSpaces: "" // List of spaces that must be excluded from the tree.
 });
 
@@ -163,9 +165,17 @@ isc.XWEResultTree.addMethods({
         for (var i = 0; i < children.length; i++) {
             var currentDS = this.getNodeDataSource(children[i]);
             var title = children[i].name;
+            var enabled = true;
+
             // Transform title to a link if showLinks is activated.
             if (this.displayLinks == true && children[i].xwikiRelativeUrl != null) {
                 title = "<a href='" + children[i].xwikiRelativeUrl + "'>" + title + "</a>";
+            }
+
+            // Disable nodes if needed.
+            if (currentDS.recordsType == "wiki" && this.displayWikiNodesDisabled == true ||
+                currentDS.recordsType == "space" && this.displaySpaceNodesDisabled == true) {
+                enabled = false;
             }
 
             // Overwrite node properties.
@@ -174,7 +184,8 @@ isc.XWEResultTree.addMethods({
                 icon: currentDS.icon,
                 title: title,
                 isNewPage: false,
-                isNewAttachment: false
+                isNewAttachment: false,
+                enabled: enabled
             });
         }
 
@@ -653,7 +664,6 @@ isc.XWETreeGrid.addProperties({
     },
     // Style:
     showHeader: false, // Hide the sort header.
-    matchElement : true, // Make the tree match the size of its HTML container.
     folderIcon : "$xwiki.getSkinFile('icons/silk/database.gif')", // Icon to use, will be overriden by datasources.
     position : "relative", // CSS position.
     dropIconSuffix : "", // Keep the same icon for all states (opened, closed, etc).
@@ -685,9 +695,7 @@ isc.XWETreeGrid.addMethods({
         this.Super("draw", arguments);
 
         // Create suggest input.
-        if (typeof this.input == "undefined" || this.input == null) {
-            this.drawInput();
-        }
+        this.drawInput();
 
         // Propagate XWE ResultTree display options (displayLinks, etc) to the ResultTree.
         for (member in this) {

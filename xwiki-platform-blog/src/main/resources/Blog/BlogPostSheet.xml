@@ -46,9 +46,9 @@
   &lt;dd&gt;
   #getCategoriesHierarchy('' $tree)
   &lt;div id="blog_category_container"&gt;
-  #displayCategoriesHierarchy($tree 'selectable')&lt;/dd&gt;
-  &lt;/div&gt;
+  #displayCategoriesHierarchy($tree 'selectable')&lt;/div&gt;
   #showCreateCategoryBox($tree)
+  &lt;/dd&gt;
   &lt;/dl&gt;
   #template('tagedit.vm')
   #isPublished($entryObj $isPublished)

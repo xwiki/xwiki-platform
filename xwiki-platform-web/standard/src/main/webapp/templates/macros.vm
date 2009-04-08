@@ -1125,11 +1125,9 @@ $html
 #end
 
 #macro (floatingbox $text)
-<fieldset class="floatinginfobox">
-  ## We use an empty legend since the XHTML 1.0 strict XSD forces a legend to exist.
-  <legend></legend>
+<div class="floatinginfobox">
   $text
-</fieldset>
+</div>
 #end
 
 #macro (startfloatingbox)

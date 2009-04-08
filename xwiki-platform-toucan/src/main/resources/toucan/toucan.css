@@ -178,6 +178,7 @@ strong, .strong {
 }
 
 h1 span, h2 span, h3 span, h4 span {
+    overflow:hidden;
     display: block;
     position: relative;
     color: #000;
@@ -242,6 +243,11 @@ h5 {
     font-style: normal;
     font-size: 1.3em;
     line-height: 1.1em;
+}
+
+h1, h2, h3, h4, h5{
+    display:block;
+    position:relative;
 }
 
 span.edit_section {
@@ -3049,8 +3055,12 @@ span.messagetype {
     display: none;
 }
 
+html>body div.floatinginfobox, html>body fieldset.floatinginfobox{
+    width: auto; 
+}
+
 div.floatinginfobox, fieldset.floatinginfobox {
-    width: auto;
+    width: 0;
     float: right;
     border-left: 20px solid #FFF;
     border-bottom: 40px solid #FFF;

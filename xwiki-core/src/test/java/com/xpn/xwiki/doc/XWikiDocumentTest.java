@@ -257,6 +257,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetLinkedPages10()
     {
+        XWikiDocument contextDocument = new XWikiDocument("contextdocspace", "contextdocpage");
+        getContext().setDoc(contextDocument);
+
         this.mockXWiki.stubs().method("exists").will(returnValue(true));
 
         this.document.setContent("[TargetPage][TargetLabel>TargetPage][TargetSpace.TargetPage]"
@@ -270,6 +273,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetLinkedPages()
     {
+        XWikiDocument contextDocument = new XWikiDocument("contextdocspace", "contextdocpage");
+        getContext().setDoc(contextDocument);
+
         this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
             + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]"
             + "[[]]");
@@ -277,7 +283,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());
 
-        assertEquals(Arrays.asList("XWiki.TargetPage", "TargetSpace.TargetPage", "XWiki.WebHome"), linkedPages);
+        assertEquals(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage", "Space.WebHome"), linkedPages);
     }
 
     public void testGetSections10() throws XWikiException

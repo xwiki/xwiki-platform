@@ -46,13 +46,19 @@ public class FontFilter extends AbstractHTMLFilter
     public FontFilter()
     {
         fontSizeMap = new HashMap<String, String>();
-        fontSizeMap.put("1", "8");
-        fontSizeMap.put("2", "10");
-        fontSizeMap.put("3", "12");
-        fontSizeMap.put("4", "14");
-        fontSizeMap.put("5", "18");
-        fontSizeMap.put("6", "24");
-        fontSizeMap.put("7", "36");
+        fontSizeMap.put("1", "0.6em");
+        fontSizeMap.put("2", "0.8em");
+        fontSizeMap.put("3", "1.0em");
+        fontSizeMap.put("4", "1.2em");
+        fontSizeMap.put("5", "1.4em");
+        fontSizeMap.put("6", "1.6em");
+        fontSizeMap.put("7", "1.8em");
+        fontSizeMap.put("-3", "0.4em");
+        fontSizeMap.put("-2", fontSizeMap.get("1"));
+        fontSizeMap.put("-1", fontSizeMap.get("2"));
+        fontSizeMap.put("+1", fontSizeMap.get("4"));
+        fontSizeMap.put("+2", fontSizeMap.get("5"));
+        fontSizeMap.put("+3", fontSizeMap.get("6"));
     }
     
     /**
@@ -77,7 +83,7 @@ public class FontFilter extends AbstractHTMLFilter
                 String fontSize = fontTag.getAttribute(ATTRIBUTE_FONTSIZE);
                 String fontSizeCss = fontSizeMap.get(fontSize);
                 fontSizeCss = (fontSizeCss != null) ? fontSizeCss : fontSize;
-                buffer.append(String.format("font-size:%spt;", fontSizeCss));
+                buffer.append(String.format("font-size:%s;", fontSizeCss));
             }
             if (fontTag.hasAttribute(ATTRIBUTE_STYLE)) {
                 buffer.append(fontTag.getAttribute(ATTRIBUTE_STYLE));

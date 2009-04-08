@@ -42,6 +42,7 @@
   #end
   1 $msg.get("xe.officeimporter.import.title")
   &lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
+  &lt;div&gt;
   {table}&lt;p&gt;$msg.get("xe.officeimporter.import.document")&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40"/&gt;&lt;/p&gt;
   &lt;p&gt;$msg.get("xe.officeimporter.import.targetspace")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetSpace" type="text" value="$targetspace"/&gt;&lt;/p&gt;
   &lt;p&gt;$msg.get("xe.officeimporter.import.targetpage")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetPage" type="text" value="$targetname"/&gt; &lt;input name="appendContent" type="checkbox" value="true"/&gt;$msg.get("xe.officeimporter.import.appendresult")&lt;/p&gt;
@@ -50,6 +51,7 @@
   {table}
   &lt;input type="hidden" name="groovyFilter" value="" /&gt;
   &lt;p&gt;&lt;input type="submit" value="$msg.get("xe.officeimporter.import.import")"/&gt;&lt;/p&gt;
+  &lt;/div&gt;
   &lt;/form&gt;
 #end
 </content>

@@ -1129,11 +1129,11 @@ $html
 #end
 
 #macro (startfloatingbox)
-<fieldset class="floatinginfobox">
+<div class="floatinginfobox">
 #end
 
 #macro (endfloatingbox)
-</fieldset>
+</div>
 #end
 
 ###

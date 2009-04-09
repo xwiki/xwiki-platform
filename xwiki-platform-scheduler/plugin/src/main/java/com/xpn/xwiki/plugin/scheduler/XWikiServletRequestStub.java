@@ -322,7 +322,8 @@ public class XWikiServletRequestStub implements XWikiRequest
         return null;
     }
 
-    public void setScheme(String scheme) {
+    public void setScheme(String scheme)
+    {
         this.scheme = scheme;
     }
 

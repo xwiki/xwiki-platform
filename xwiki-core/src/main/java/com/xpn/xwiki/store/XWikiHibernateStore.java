@@ -234,6 +234,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 stmt.execute("CREATE SCHEMA " + schema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
                 stmt.execute("CREATE SCHEMA " + schema + " AUTHORIZATION DBA");
+            } else if (DatabaseProduct.DB2 == databaseProduct) {
+                stmt.execute("CREATE SCHEMA " + schema );
             } else {
                 stmt.execute("create database " + schema);
             }
@@ -286,6 +288,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 stmt.execute("DROP SCHEMA " + schema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
                 stmt.execute("DROP SCHEMA " + schema);
+            } else if (DatabaseProduct.DB2 == databaseProduct) {
+                stmt.execute("DROP SCHEMA " + schema + " RESTRICT");
             } else {
                 stmt.execute("DROP DATABASE " + schema);
             }

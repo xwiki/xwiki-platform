@@ -48,6 +48,19 @@ public class DatabaseProduct
     public static final DatabaseProduct HSQLDB = new DatabaseProduct("HSQL Database Engine");
 
     /**
+     * The product name for DB2 databases.
+     * <p>
+     * Per DB2 documentation at
+     * http://publib.boulder.ibm.com/infocenter/db2luw/v9r5/topic/com.ibm.db2.luw.apdv.java.doc/doc/c0053013.html, the
+     * database product name returned by the {@link java.sql.DatabaseMetaData#getDatabaseProductName()} method of DB2
+     * JDBC drivers varies by the OS and environment the product is running on. Hence the DB string here uses only the
+     * first 3 unique characters of the database product name. The {@link #toProduct(String)} method also hence checks
+     * for {@link java.lang.String#startsWith(String)} rather than an exact match.
+     * </p>
+     */
+    public static final DatabaseProduct DB2 = new DatabaseProduct("DB2/");
+
+    /**
      * Represents an unknown database for which we were not able to find the product name.
      */
     public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown");
@@ -111,6 +124,9 @@ public class DatabaseProduct
             product = DERBY;
         } else if (productNameAsString.equalsIgnoreCase(HSQLDB.getProductName())) {
             product = HSQLDB;
+        } else if (productNameAsString.startsWith(DB2.getProductName())) {
+            // See documentation above on why we check starts with for DB2
+            product = DB2;
         } else {
             product = UNKNOWN;
         }

@@ -23,6 +23,10 @@ public class DatabaseProductTest extends TestCase
         assertEquals(DatabaseProduct.HSQLDB, product);
         assertSame(DatabaseProduct.HSQLDB, product);
 
+        product = DatabaseProduct.toProduct("DB2/LINUXX8664");
+        assertEquals(DatabaseProduct.DB2, product);
+        assertSame(DatabaseProduct.DB2, product);
+
         product = DatabaseProduct.toProduct("Unknown");
         assertEquals(DatabaseProduct.UNKNOWN, product);
         assertSame(DatabaseProduct.UNKNOWN, product);

@@ -4,3 +4,4 @@ org.xwiki.rendering.internal.parser.WikiModelCreoleParser
 org.xwiki.rendering.internal.parser.WikiModelJspWikiParser
 org.xwiki.rendering.internal.parser.WikiModelXHTMLParser
 org.xwiki.rendering.internal.parser.WikiModelHTMLParser
+org.xwiki.rendering.internal.parser.WikiModelConfluenceParser

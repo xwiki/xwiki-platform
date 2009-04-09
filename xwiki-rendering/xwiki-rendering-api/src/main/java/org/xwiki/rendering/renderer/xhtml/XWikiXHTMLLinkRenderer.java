@@ -172,8 +172,16 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
                 this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
             } else {
                 spanAttributes.put(CLASS, "wikicreatelink");
-                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", link
-                    .getQueryString(), link.getAnchor()));
+                
+                // Add the parent=<current document name> parameter to the query string of the generated URL so that
+                // the new document is created with the current page as its parent.
+                String queryString = link.getQueryString();
+                if (StringUtils.isBlank(queryString)) {
+//                    queryString = "parent=" + this.documentAccessBridge.
+                }
+                
+                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", 
+                    link.getQueryString(), link.getAnchor()));
 
                 this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
                 this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);

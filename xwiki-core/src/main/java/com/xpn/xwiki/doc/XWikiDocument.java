@@ -72,6 +72,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameFactory;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -287,6 +288,12 @@ public class XWikiDocument implements DocumentModelBridge
 
     private XDOM xdom;
 
+    /**
+     * Used to convert a string into a proper Document Name.
+     */
+    private DocumentNameFactory documentNameFactory = 
+        (DocumentNameFactory) Utils.getComponent(DocumentNameFactory.class);
+    
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return context.getWiki().getStore();
@@ -3492,38 +3499,10 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setFullName(String fullname, XWikiContext context)
     {
-        if (fullname == null) {
-            return;
-        }
-
-        int i0 = fullname.lastIndexOf(":");
-        int i1 = fullname.lastIndexOf(".");
-
-        if (i0 != -1) {
-            setDatabase(fullname.substring(0, i0));
-            setSpace(fullname.substring(i0 + 1, i1));
-            setName(fullname.substring(i1 + 1));
-        } else {
-            if (context != null) {
-                setDatabase(context.getDatabase());
-            }
-            if (i1 == -1) {
-                try {
-                    setSpace(context.getDoc().getSpace());
-                } catch (Exception e) {
-                    setSpace("XWiki");
-                }
-                setName(fullname);
-            } else {
-                setSpace(fullname.substring(0, i1));
-                setName(fullname.substring(i1 + 1));
-            }
-        }
-
-        if (getName().equals("")) {
-            setName("WebHome");
-        }
-
+        DocumentName documentName = this.documentNameFactory.createDocumentName(fullname);
+        setDatabase(documentName.getWiki());
+        setSpace(documentName.getSpace());
+        setName(documentName.getPage());
         setContentDirty(true);
     }
 

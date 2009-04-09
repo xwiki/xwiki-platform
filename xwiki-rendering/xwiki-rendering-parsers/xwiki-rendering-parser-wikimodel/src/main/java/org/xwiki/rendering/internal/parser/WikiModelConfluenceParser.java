@@ -19,21 +19,42 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import org.apache.maven.doxia.module.confluence.ConfluenceParser;
+import org.wikimodel.wem.IWikiParser;
+import org.wikimodel.wem.confluence.ConfluenceWikiParser;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
+import org.xwiki.rendering.parser.ImageParser;
+import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.internal.parser.doxia.AbstractDoxiaParser;
 
 /**
- * @version $Id$
- * @since 1.5M2
+ * Parser for Confluence syntax.
+ * 
+ * @version $Id: $
+ * @since 1.8.2
  */
 @Component("confluence/1.0")
-public class DoxiaConfluenceParser extends AbstractDoxiaParser
+public class WikiModelConfluenceParser extends AbstractWikiModelParser
 {
+    /**
+     * Confluence 1.0 Syntax.
+     */
     private static final Syntax SYNTAX = new Syntax(SyntaxType.CONFLUENCE, "1.0");
+
+    /**
+     * @see #getLinkParser()
+     */
+    @Requirement
+    private LinkParser linkParser;
+
+    /**
+     * @see #getImageParser()
+     */
+    @Requirement
+    private ImageParser imageParser;
 
     /**
      * {@inheritDoc}
@@ -48,11 +69,31 @@ public class DoxiaConfluenceParser extends AbstractDoxiaParser
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractDoxiaParser#createDoxiaParser()
+     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#createWikiModelParser()
      */
     @Override
-    public org.apache.maven.doxia.parser.Parser createDoxiaParser()
+    public IWikiParser createWikiModelParser()
     {
-        return new ConfluenceParser();
+        return new ConfluenceWikiParser();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see AbstractWikiModelParser#getImageParser()
+     */
+    @Override
+    public ImageParser getImageParser()
+    {
+        return this.imageParser;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractWikiModelParser#getLinkParser()
+     */
+    @Override
+    public LinkParser getLinkParser()
+    {
+        return this.linkParser;
     }
 }

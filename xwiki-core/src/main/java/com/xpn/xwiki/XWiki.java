@@ -1365,14 +1365,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public XWikiDocument getDocument(String fullname, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
-        try {
-            doc.setFullName(fullname, context);
-        } catch (Exception ex) {
-            // The name isn't good. The most frequent cause for this is a kind of spam attempt which
-            // gives some ugly URLs.
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
-                "Invalid document name: " + fullname);
-        }
+        doc.setFullName(fullname, context);
         return getDocument(doc, context);
     }
 

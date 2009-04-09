@@ -20,39 +20,9 @@
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<object>
-<class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<name>tags</name>
-<prettyName>Tags</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>1</relationalStorage>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<size>30</size>
-<separator> </separator>
-<cache>0</cache>
-<separators> ,|</separators>
-<values></values>
-<number>1</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>Panels.RecentlyVisited</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
-</property>
-</object>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -63,100 +33,103 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<type>
-<name>type</name>
-<prettyName>Panel type</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<cache>0</cache>
-<separators> ,|</separators>
-<values>view|edit</values>
-<number>2</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
 <category>
-<name>category</name>
-<prettyName>Category</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
+<cache>0</cache>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<cache>0</cache>
-<separators> ,|</separators>
-<values>Information|Navigation|Tools|Administration|Other</values>
+<name>category</name>
 <number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Information|Navigation|Tools|Administration|Other</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
-<description>
-<name>description</name>
-<prettyName>Description</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
-<rows>5</rows>
-<number>3</number>
-<editor>Text</editor>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
 <content>
-<name>content</name>
-<prettyName>Content</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<rows>25</rows>
-<number>4</number>
 <editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
+<description>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
 <name>
 <name>name</name>
-<prettyName>Name</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
 <number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
+<type>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
 </class>
 <name>Panels.RecentlyVisited</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>dfc71cf9-5525-4912-bda2-11788a7da1a2</guid>
 <property>
-<type>view</type>
+<category>Navigation</category>
+</property>
+<property>
+<content>#set($rv_maxItems = "$!xwiki.getUserPreference('recent_actions_items')")
+#if($rv_maxItems == '')
+  #set($rv_maxItems = 5)
+#end
+#set($recentlyViewed = $xwiki.statsService.getRecentActions('view', $rv_maxItems))
+#if($recentlyViewed.size() &gt; 0 || $showEmptyPanels)
+  #panelheader($msg.get('panels.recentlyVisited.title'))
+  #set($first = true)
+  #foreach($docname in $recentlyViewed)
+    #if($xwiki.hasAccessLevel('view', $context.getUser(), $docname))
+      #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+      #if($first == true)
+        #set($first = false)
+      #else
+        &lt;span class="pitemseparator"&gt; | &lt;/span&gt;
+      #end
+      &lt;span class="panelitem"&gt;&lt;a href="$rdoc.getURL('view')"&gt;$rdoc.displayTitle&lt;/a&gt;&lt;/span&gt;
+    #end
+  #end
+  #panelfooter()
+#end</content>
 </property>
 <property>
 <description>List the last 5 documents you have visited.</description>
 </property>
 <property>
-<category>Navigation</category>
-</property>
-<property>
-<content>#set($rv_maxItems = $!xwiki.getUserPreference("recent_actions_items"))
-#if($rv_maxItems == "")
-#set($rv_maxItems = 5)
-#end
-#set($recentlyViewed = $xwiki.statsService.getRecentActions("view", $rv_maxItems))
-#if($recentlyViewed.size() &gt; 0 || $showEmptyPanels)
-#panelheader($msg.get("panels.recentlyVisited.title"))
-#set($first = true)
-#foreach($docname in $recentlyViewed)
-#set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-#if($first == true)
-#set($first = false)
-#else
-&lt;span class="pitemseparator"&gt; | &lt;/span&gt;
-#end
-&lt;span class="panelitem"&gt;&lt;a href="$rdoc.getURL("view")"&gt;$rdoc.displayTitle&lt;/a&gt;&lt;/span&gt;
-#end
-#panelfooter()
-#end</content>
-</property>
-<property>
 <name>Recently Visited Documents</name>
+</property>
+<property>
+<type>view</type>
 </property>
 </object>
 <content>#includeForm("Panels.PanelSheet")</content>

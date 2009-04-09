@@ -133,6 +133,7 @@ getResource : function(fullName) {
 		}
 	} else {
         resource.space = resource.fullName;
+        resource.prefixedSpace = resource.prefixedFullName;
     }
 
 	return resource;

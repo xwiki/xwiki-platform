@@ -2001,10 +2001,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 doc.getObject("XWiki.XWikiPreferences", "default_language", context.getLanguage(), true);
             String result = "";
 
-            try {
-                result = object.getStringValue(prefname);
-            } catch (Exception e) {
-                LOG.warn("Exception while getting wiki preference [" + prefname + "]", e);
+            if (object != null) {
+                try {
+                    result = object.getStringValue(prefname);
+                } catch (Exception e) {
+                    LOG.warn("Exception while getting wiki preference [" + prefname + "]", e);
+                }
             }
             // If empty we take it from the default pref object
             if (result.equals("")) {
@@ -2014,7 +2016,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             if (!result.equals("")) {
                 return result;
             }
-
         } catch (Exception e) {
             LOG.warn("Exception while getting wiki preference [" + prefname + "]", e);
         }
@@ -2046,10 +2047,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             BaseObject object =
                 doc.getObject("XWiki.XWikiPreferences", "default_language", context.getLanguage(), true);
             String result = "";
-            try {
-                result = object.getStringValue(prefname);
-            } catch (Exception e) {
-                LOG.warn("Exception while getting space preference [" + prefname + "]", e);
+            if (object != null) {
+                try {
+                    result = object.getStringValue(prefname);
+                } catch (Exception e) {
+                    LOG.warn("Exception while getting space preference [" + prefname + "]", e);
+                }
             }
 
             if (!result.equals("")) {

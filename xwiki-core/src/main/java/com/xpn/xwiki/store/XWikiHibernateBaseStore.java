@@ -158,7 +158,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 getConfiguration().setProperty(Environment.DEFAULT_SCHEMA, schemaName);
             }
         }
-        if (this,sessionFactory == null) {
+        if (this.sessionFactory == null) {
             this.sessionFactory = (HibernateSessionFactory) Utils.getComponent(HibernateSessionFactory.ROLE);
         }
 

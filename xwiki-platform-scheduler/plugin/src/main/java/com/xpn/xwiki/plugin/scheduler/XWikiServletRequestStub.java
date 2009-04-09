@@ -30,6 +30,9 @@ import com.xpn.xwiki.web.XWikiRequest;
  */
 public class XWikiServletRequestStub implements XWikiRequest
 {
+    /** The scheme used by the runtime instance. This is required for creating URLs from scheduled jobs. */
+    private String scheme;
+
     public XWikiServletRequestStub()
     {
         this.host = "";
@@ -319,9 +322,13 @@ public class XWikiServletRequestStub implements XWikiRequest
         return null;
     }
 
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
+
     public String getScheme()
     {
-        return null;
+        return scheme;
     }
 
     public String getServerName()

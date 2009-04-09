@@ -68,7 +68,8 @@ public class ImageMacro extends BaseLocaleMacro
 
         // Read the parameters
         String img = params.get("text", 0);
-        if (null == img || img.indexOf("=") != -1) {
+        // Allow the image to contain '=' when it is an URL.
+        if (null == img || (img.indexOf("=") != -1 && img.indexOf("://") == -1)) {
             return;
         }
         String height = params.get("height", 1);

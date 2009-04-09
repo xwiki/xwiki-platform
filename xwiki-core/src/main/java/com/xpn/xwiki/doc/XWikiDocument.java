@@ -292,7 +292,7 @@ public class XWikiDocument implements DocumentModelBridge
      * Used to convert a string into a proper Document Name.
      */
     private DocumentNameFactory documentNameFactory = 
-        (DocumentNameFactory) Utils.getComponent(DocumentNameFactory.class);
+        (DocumentNameFactory) Utils.getComponent(DocumentNameFactory.class.getName());
     
     public XWikiStoreInterface getStore(XWikiContext context)
     {

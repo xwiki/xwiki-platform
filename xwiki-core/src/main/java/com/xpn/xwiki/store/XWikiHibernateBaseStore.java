@@ -104,7 +104,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public String getPath()
     {
-        return hibpath;
+        return this.hibpath;
     }
 
     /**
@@ -158,8 +158,8 @@ public class XWikiHibernateBaseStore implements Initializable
                 getConfiguration().setProperty(Environment.DEFAULT_SCHEMA, schemaName);
             }
         }
-        if (sessionFactory == null) {
-            sessionFactory = (HibernateSessionFactory) Utils.getComponent(HibernateSessionFactory.class);
+        if (this.sessionFactory == null) {
+            this.sessionFactory = (HibernateSessionFactory) Utils.getComponent(HibernateSessionFactory.class);
         }
 
         setSessionFactory(getConfiguration().buildSessionFactory());
@@ -266,8 +266,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
         // We don't update the schema if the XWiki hibernate config parameter says not to update
         if ((!force) && (context.getWiki() != null)
-            && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema"))))
-        {
+            && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
             if (log.isDebugEnabled()) {
                 log.debug("Schema update deactivated for wiki [" + context.getDatabase() + "]");
             }
@@ -423,8 +422,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
             DatabaseProduct databaseProduct = getDatabaseProductName(context);
             if (databaseProduct == DatabaseProduct.ORACLE || databaseProduct == DatabaseProduct.HSQLDB
-                || databaseProduct == DatabaseProduct.DERBY)
-            {
+                || databaseProduct == DatabaseProduct.DERBY || databaseProduct == DatabaseProduct.DB2) {
                 dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
                 config.setProperty(Environment.DEFAULT_SCHEMA, contextSchema);
                 Iterator iter = config.getTableMappings();
@@ -616,20 +614,8 @@ public class XWikiHibernateBaseStore implements Initializable
                             } catch (Exception e) {
                             }
                         }
-                    } else if (DatabaseProduct.DERBY == databaseProduct) {
-                        Statement stmt = null;
-                        try {
-                            stmt = session.connection().createStatement();
-                            stmt.execute("SET SCHEMA " + schemaName);
-                        } finally {
-                            try {
-                                if (stmt != null) {
-                                    stmt.close();
-                                }
-                            } catch (Exception e) {
-                            }
-                        }
-                    } else if (DatabaseProduct.HSQLDB == databaseProduct) {
+                    } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
+                        || DatabaseProduct.DB2 == databaseProduct) {
                         Statement stmt = null;
                         try {
                             stmt = session.connection().createStatement();
@@ -781,7 +767,7 @@ public class XWikiHibernateBaseStore implements Initializable
         if (connection != null) {
             try {
                 // Keep some statistics about session and connections
-                if (connections.containsKey(connection.toString())) {
+                if (this.connections.containsKey(connection.toString())) {
                     log.info("Connection [" + connection.toString() + "] already in connection map for store "
                         + this.toString());
                 } else {
@@ -792,8 +778,8 @@ public class XWikiHibernateBaseStore implements Initializable
                         stackException.fillInStackTrace();
                         value = stackException.getStackTraceAsString();
                     }
-                    connections.put(connection.toString(), value);
-                    nbConnections++;
+                    this.connections.put(connection.toString(), value);
+                    this.nbConnections++;
                 }
             } catch (Throwable e) {
                 // This should not happen
@@ -813,9 +799,9 @@ public class XWikiHibernateBaseStore implements Initializable
         if (connection != null) {
             try {
                 // Keep some statistics about session and connections
-                if (connections.containsKey(connection.toString())) {
-                    connections.remove(connection.toString());
-                    nbConnections--;
+                if (this.connections.containsKey(connection.toString())) {
+                    this.connections.remove(connection.toString());
+                    this.nbConnections--;
                 } else {
                     log.info("Connection [" + connection.toString() + "] not in connection map");
                 }
@@ -946,7 +932,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     public SessionFactory getSessionFactory()
     {
-        return sessionFactory.getSessionFactory();
+        return this.sessionFactory.getSessionFactory();
     }
 
     public void setSessionFactory(SessionFactory sessionFactory)
@@ -956,17 +942,17 @@ public class XWikiHibernateBaseStore implements Initializable
 
     public Configuration getConfiguration()
     {
-        return sessionFactory.getConfiguration();
+        return this.sessionFactory.getConfiguration();
     }
 
     public Map<String, String> getConnections()
     {
-        return connections;
+        return this.connections;
     }
 
     public int getNbConnections()
     {
-        return nbConnections;
+        return this.nbConnections;
     }
 
     public void setNbConnections(int nbConnections)
@@ -1102,7 +1088,8 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param context XWikiContext
      * @return current hibernate database name
      */
-    private String getCurrentDatabase(XWikiContext context) {
+    private String getCurrentDatabase(XWikiContext context)
+    {
         return (String) context.get(currentDatabaseKey);
     }
 
@@ -1110,7 +1097,8 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param context XWikiContext
      * @param database current hibernate database name to set
      */
-    private void setCurrentDatabase(XWikiContext context, String database) {
+    private void setCurrentDatabase(XWikiContext context, String database)
+    {
         context.put(currentDatabaseKey, database);
     }
 }

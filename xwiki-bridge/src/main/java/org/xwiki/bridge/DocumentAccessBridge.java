@@ -178,6 +178,19 @@ public interface DocumentAccessBridge
     boolean isPropertyCustomMapped(String className, String propertyName) throws Exception;
 
     /**
+     * Sets the given property of the first object (of the given class) attached to the document. If no such object
+     * exists, this method will create a new object of the given class, attach it to the document and set the property.
+     * 
+     * @param documentName name of the document to access.
+     * @param className name of the class.
+     * @param propertyName name of the property to set.
+     * @param propertyValue value of the property to set.
+     * @throws Exception if the document cannot be accessed.
+     */
+    void setProperty(String documentName, String className, String propertyName, Object propertyValue)
+        throws Exception;
+    
+    /**
      * Returns the content of a document attachment.
      * 
      * @param documentName The name of the document to access.

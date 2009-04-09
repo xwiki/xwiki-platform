@@ -39,12 +39,6 @@ import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 public class DefaultHTMLCleaner implements HTMLCleaner
 {
     /**
-     * Filter used to remove or convert the HTML elements that were added by the WYSIWYG editor only for internal
-     * reasons.
-     */
-    private final WysiwygCleaningFilter filter = new WysiwygCleaningFilter();
-
-    /**
      * {@inheritDoc}
      * 
      * @see HTMLCleaner#clean(String)
@@ -61,7 +55,9 @@ public class DefaultHTMLCleaner implements HTMLCleaner
         // thus it doesn't know when its current value is submitted.
         HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
         List<HTMLFilter> filters = new ArrayList<HTMLFilter>();
-        filters.add(filter);
+        filters.add(new LineBreakFilter());
+        filters.add(new EmptyLineFilter());
+        filters.add(new StandAloneMacroFilter());
         filters.addAll(config.getFilters());
         config.setFilters(filters);
 

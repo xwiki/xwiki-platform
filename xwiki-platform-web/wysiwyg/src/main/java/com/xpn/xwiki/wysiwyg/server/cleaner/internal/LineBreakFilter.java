@@ -29,57 +29,31 @@ import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.filter.HTMLFilter;
 
 /**
- * Removes or replaces the HTML elements that were added by the WYSIWYG editor only for internal reasons. The following
- * transformations are done:
- * <ul>
- * <li>Removes <code>&lt;br class="spacer"/&gt;</code></li>
- * <li>Converts <code>&lt;p&gt;&lt;/p&gt;</code> to &lt;div class="wikimodel-emptyline"&gt;&lt;/div&gt;</li>
- * </ul>
+ * Removes the line breaks that were added by the WYSIWYG editor as spacers. Precisely, it removes all {@code <br
+ * class="spacer"/>}.
  * 
  * @version $Id$
  */
-public class WysiwygCleaningFilter implements HTMLFilter
+public class LineBreakFilter implements HTMLFilter
 {
-    /**
-     * The HTML class attribute.
-     */
-    private static final String CLASS = "class";
-
     /**
      * {@inheritDoc}
      * 
      * @see HTMLFilter#filter(Document, Map)
      */
-    public void filter(Document document, Map<String, String> arg1)
+    public void filter(Document document, Map<String, String> parameters)
     {
-        // Remove the BRs needed by Firefox in edit mode.
         NodeList brs = document.getElementsByTagName("br");
         List<Element> emptyLineBRs = new ArrayList<Element>();
         for (int i = 0; i < brs.getLength(); i++) {
             Element br = (Element) brs.item(i);
-            if ("spacer".equals(br.getAttribute(CLASS))) {
+            if ("spacer".equals(br.getAttribute("class"))) {
                 emptyLineBRs.add(br);
             }
         }
         for (int i = 0; i < emptyLineBRs.size(); i++) {
             Element br = emptyLineBRs.get(i);
             br.getParentNode().removeChild(br);
-        }
-
-        // Convert empty paragraphs back into empty-line DIVs.
-        NodeList paragraphs = document.getElementsByTagName("p");
-        List<Element> emptyParagraphs = new ArrayList<Element>();
-        for (int i = 0; i < paragraphs.getLength(); i++) {
-            Element paragraph = (Element) paragraphs.item(i);
-            if (!paragraph.hasChildNodes()) {
-                emptyParagraphs.add(paragraph);
-            }
-        }
-        for (int i = 0; i < emptyParagraphs.size(); i++) {
-            Element div = document.createElement("div");
-            div.setAttribute(CLASS, "wikimodel-emptyline");
-            Element paragraph = emptyParagraphs.get(i);
-            paragraph.getParentNode().replaceChild(div, paragraph);
         }
     }
 }

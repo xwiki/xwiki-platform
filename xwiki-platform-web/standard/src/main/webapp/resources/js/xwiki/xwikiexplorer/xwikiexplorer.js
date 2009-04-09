@@ -184,8 +184,8 @@ isc.XWEResultTree.addMethods({
                 icon: currentDS.icon,
                 title: title,
                 isNewPage: false,
-                isNewAttachment: false,
-                enabled: enabled
+                isNewAttachment: false
+                // enabled: enabled
             });
         }
 
@@ -692,10 +692,14 @@ isc.XWETreeGrid.addMethods({
      */
     draw : function() {
         // Draw tree.
-        this.Super("draw", arguments);
+        if (this.Super("draw", arguments) != null) {
+            return this;
+        }
 
         // Create suggest input.
-        this.drawInput();
+        if (typeof this.input == "undefined" && this.input == null) {
+            this.drawInput();
+        }
 
         // Propagate XWE ResultTree display options (displayLinks, etc) to the ResultTree.
         for (member in this) {

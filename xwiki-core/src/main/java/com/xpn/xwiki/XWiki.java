@@ -1605,7 +1605,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     return result;
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception while parsing template [" + template + "] from skin", ex);
+            }
         }
 
         try {
@@ -1613,6 +1616,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             return XWikiVelocityRenderer.evaluate(content, "/templates/" + template, (VelocityContext) context
                 .get("vcontext"), context);
         } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception while parsing template [" + template + "] from /templates/", e);
+            }
             return "";
         }
     }
@@ -1741,6 +1747,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
             }
         } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception while getting skin file [" + filename + "]", e);
+            }
         }
 
         // If all else fails, use the default base skin, even if the URLs could be invalid.
@@ -1805,6 +1814,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
             
         } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception while getting skin file [" + filename + "] from skin [" + skin + "]", e);
+            }
         }
 
         return null;
@@ -1823,25 +1835,51 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // Try to get it from URL
             if (context.getRequest() != null) {
                 skin = context.getRequest().getParameter("skin");
+                if (LOG.isDebugEnabled()) {
+                    if (skin != null && !skin.equals("")) {
+                        LOG.debug("Requested skin in the URL: [" + skin + "]");
+                    }
+                }
             }
 
             if ((skin == null) || (skin.equals(""))) {
                 skin = getUserPreference("skin", context);
+                if (LOG.isDebugEnabled()) {
+                    if (skin != null && !skin.equals("")) {
+                        LOG.debug("Configured skin in user preferences: [" + skin + "]");
+                    }
+                }
             }
-            if (skin.equals("")) {
-                skin = Param("xwiki.defaultskin", getDefaultBaseSkin(context));
+            if (skin == null || skin.equals("")) {
+                skin = Param("xwiki.defaultskin");
+                if (LOG.isDebugEnabled()) {
+                    if (skin != null && !skin.equals("")) {
+                        LOG.debug("Configured default skin in preferences: [" + skin + "]");
+                    }
+                }
+            }
+            if (skin == null || skin.equals("")) {
+                skin = getDefaultBaseSkin(context);
+                if (LOG.isDebugEnabled()) {
+                    if (skin != null && !skin.equals("")) {
+                        LOG.debug("Configured default base skin in preferences: [" + skin + "]");
+                    }
+                }
             }
         } catch (Exception e) {
+            LOG.debug("Exception while determining current skin", e);
             skin = getDefaultBaseSkin(context);
         }
         try {
             if (skin.indexOf(".") != -1) {
                 if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context)) {
+                    LOG.debug("Cannot access configured skin due to access rights, using the default skin.");
                     skin = Param("xwiki.defaultskin", getDefaultBaseSkin(context));
                 }
             }
         } catch (XWikiException e) {
             // if it fails here, let's just ignore it
+            LOG.debug("Exception while determining current skin", e);
         }
 
         context.put("skin", skin);
@@ -1924,6 +1962,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         } catch (Exception e) {
             baseskin = getDefaultBaseSkin(context);
+            LOG.debug("Exception while determining base skin", e);
         }
         context.put("baseskin", baseskin);
         return baseskin;
@@ -1965,6 +2004,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             try {
                 result = object.getStringValue(prefname);
             } catch (Exception e) {
+                LOG.warn("Exception while getting wiki preference [" + prefname + "]", e);
             }
             // If empty we take it from the default pref object
             if (result.equals("")) {
@@ -1976,6 +2016,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
 
         } catch (Exception e) {
+            LOG.warn("Exception while getting wiki preference [" + prefname + "]", e);
         }
         return Param(fallback_param, default_value);
     }
@@ -2008,12 +2049,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             try {
                 result = object.getStringValue(prefname);
             } catch (Exception e) {
+                LOG.warn("Exception while getting space preference [" + prefname + "]", e);
             }
 
             if (!result.equals("")) {
                 return result;
             }
         } catch (Exception e) {
+            LOG.warn("Exception while getting space preference [" + prefname + "]", e);
         }
         return getXWikiPreference(prefname, default_value, context);
     }
@@ -2030,6 +2073,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
             }
         } catch (Exception e) {
+            LOG.warn("Exception while getting user preference [" + prefname + "]", e);
         }
 
         return getWebPreference(prefname, context);

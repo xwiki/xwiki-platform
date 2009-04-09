@@ -212,6 +212,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         // So we force the dummy request with the current host
         XWikiServletRequestStub dummy = new XWikiServletRequestStub();
         dummy.setHost(context.getRequest().getHeader("x-forwarded-host"));
+        dummy.setScheme(context.getRequest().getScheme());
         XWikiServletRequest request = new XWikiServletRequest(dummy);
         scontext.setRequest(request);
 

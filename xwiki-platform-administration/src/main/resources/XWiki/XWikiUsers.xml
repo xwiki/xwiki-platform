@@ -129,7 +129,7 @@
 <cache>0</cache>
 <prettyName>User type</prettyName>
 <multiSelect>0</multiSelect>
-<values>Basic|Advanced</values>
+<values>Simple|Advanced</values>
 <separator> </separator>
 <displayType>select</displayType>
 <unmodifiable>0</unmodifiable>

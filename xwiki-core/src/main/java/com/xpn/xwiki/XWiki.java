@@ -2761,7 +2761,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addStaticListField("imtype", "IM Type", "---|AIM|Yahoo|Jabber|MSN|Skype|ICQ");
         needsUpdate |= bclass.addTextField("imaccount", "imaccount", 30);
         needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
-        needsUpdate |= bclass.addStaticListField("usertype", "User type", "Basic|Advanced");
+        needsUpdate |= bclass.addStaticListField("usertype", "User type", "Simple|Advanced");
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("skin", "skin", 30);

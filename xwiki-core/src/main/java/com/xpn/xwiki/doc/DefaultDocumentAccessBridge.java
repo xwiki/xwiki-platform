@@ -30,6 +30,7 @@ import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
@@ -251,6 +252,21 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         }
         List<String> lst = xcontext.getWiki().getClass(className, xcontext).getCustomMappingPropertyList(xcontext);
         return lst != null && lst.contains(property);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setProperty(String documentName, String className, String propertyName, Object propertyValue)
+        throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
+        BaseObject obj = doc.getObject(className, true, xcontext);
+        if (obj != null) {
+            obj.set(propertyName, propertyValue, xcontext);
+            xcontext.getWiki().saveDocument(doc, xcontext);
+        }
     }
 
     /**

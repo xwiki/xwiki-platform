@@ -176,6 +176,15 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
+     * {@inheritDoc}    
+     */
+    public void setProperty(String documentName, String className, String propertyName, Object propertyValue)
+        throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getURL(String, String, String, String)

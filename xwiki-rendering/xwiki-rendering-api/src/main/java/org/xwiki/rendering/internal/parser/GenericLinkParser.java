@@ -19,29 +19,34 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.parser.LinkParser;
 
 /**
- * Since we need to have wiki syntax-specific link parsers, this generic parser allows at least to the reference
- * displayed when using syntaxes other than XWiki (which has its specific link parser, see {@link XWikiLinkParser}),
- * while waiting for specialized link parsers to be written.
- *
+ * Each syntax should have its own link parser. However while we wait for syntax specific parser to be implemented
+ * this generic parser should provide a good approximation.
+ * 
  * @version $Id$
  * @since 1.6RC1
+ * @see AbstractLinkParser
  */
 @Component
-public class GenericLinkParser implements LinkParser
+public class GenericLinkParser extends AbstractLinkParser
 {
     /**
-     * {@inheritDoc}
-     * @see LinkParser#parse(String)
+     * The list of recognized URL prefixes.
      */
-    public Link parse(String rawLink)
+    private static final List<String> URI_PREFIXES = Arrays.asList("mailto");
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractLinkParser#getAllowedURIPrefixes()
+     */
+    @Override
+    protected List<String> getAllowedURIPrefixes()
     {
-        Link link = new Link();
-        link.setReference(rawLink);
-        return link;
+        return URI_PREFIXES;
     }
 }

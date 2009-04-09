@@ -134,8 +134,8 @@ Item 6
 Item 7
 .#-----------------------------------------------------
 .input|confluence/1.0|skip
+.# TODO: This is currently failing in wikimodel.
 .#-----------------------------------------------------
-.# TODO: See http://jira.codehaus.org/browse/DOXIA-232
 # Item 1
 ## Item 2
 ##* Item 3

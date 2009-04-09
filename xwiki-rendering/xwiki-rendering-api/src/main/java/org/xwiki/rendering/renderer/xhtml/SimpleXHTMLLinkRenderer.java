@@ -73,6 +73,9 @@ public class SimpleXHTMLLinkRenderer implements XHTMLLinkRenderer
             aAttributes.putAll(parameters);
             aAttributes.put(HREF, link.getReference());
             this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
+        } else {
+            // Display the link reference as is
+            this.xhtmlPrinter.printXML(link.getReference());
         }
     }
 
@@ -83,6 +86,9 @@ public class SimpleXHTMLLinkRenderer implements XHTMLLinkRenderer
      */
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.xhtmlPrinter.printXMLEndElement(ANCHOR);
+        // Only handle external links since this is a simple generic XHTML link renderer.
+        if (link.isExternalLink()) {
+            this.xhtmlPrinter.printXMLEndElement(ANCHOR);
+        }
     }
 }

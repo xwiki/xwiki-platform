@@ -50,7 +50,6 @@ public class WikiModelCreoleParser extends AbstractWikiModelParser
     @Requirement
     private ImageParser imageParser;
 
-
     /**
      * {@inheritDoc}
      * 

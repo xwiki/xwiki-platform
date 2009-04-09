@@ -283,7 +283,7 @@
 <size>1</size>
 <separator> </separator>
 <separators> ,|</separators>
-<values>Basic|Advanced</values>
+<values>Simple|Advanced</values>
 <number>21</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </usertype>

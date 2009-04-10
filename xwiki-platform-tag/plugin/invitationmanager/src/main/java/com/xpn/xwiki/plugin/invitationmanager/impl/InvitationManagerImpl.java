@@ -395,6 +395,7 @@ public class InvitationManagerImpl implements InvitationManager
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent(classContent);
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate)

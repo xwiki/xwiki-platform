@@ -226,6 +226,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         if (StringUtils.isBlank(doc.getContent())) {
             needsUpdate = true;
             doc.setContent("#includeForm(\"XWiki.XWikiMailSheet\"");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate) {

@@ -78,6 +78,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 CalendarEvent");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate)

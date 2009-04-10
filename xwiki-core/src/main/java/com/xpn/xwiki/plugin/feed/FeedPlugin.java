@@ -501,6 +501,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             objs = doc.getObjects("XWiki.FeedEntryClass");
             if ((doc.getContent() == null) || doc.getContent().trim().equals("")) {
                 doc.setContent("#includeForm(\"XWiki.FeedEntryClassSheet\")");
+                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
             }
         }
 
@@ -522,6 +523,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     doc.setCreationDate(adate);
                     if ((doc.getContent() == null) || doc.getContent().trim().equals("")) {
                         doc.setContent("#includeForm(\"XWiki.FeedEntryClassSheet\")");
+                        doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
                     }
                     if (force) {
                         BaseObject obj = doc.getObject("XWiki.FeedEntryClass");
@@ -583,6 +585,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("#includeForm(\"XWiki.ClassSheet\")");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         String parent = doc.getParent();
@@ -633,6 +636,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("#includeForm(\"XWiki.ClassSheet\")");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         String parent = doc.getParent();

@@ -94,6 +94,7 @@ public class AdminAction extends XWikiAction
                     tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());
+                    tdoc.setSyntaxId(doc.getSyntaxId());
                     tdoc.setAuthor(context.getUser());
                     tdoc.setStore(doc.getStore());
                     context.put("tdoc", tdoc);

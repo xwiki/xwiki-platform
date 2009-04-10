@@ -751,7 +751,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         map.put("active", "1");
 
         context.getWiki().createUser(userProfile.getName(), map, userClass.getName(),
-            "#includeForm(\"XWiki.XWikiUserSheet\")", "edit", context);
+            "#includeForm(\"XWiki.XWikiUserSheet\")", XWikiDocument.XWIKI10_SYNTAXID, "edit", context);
 
         // Update ldap profile object
         XWikiDocument createdUserProfile = context.getWiki().getDocument(userProfile.getFullName(), context);

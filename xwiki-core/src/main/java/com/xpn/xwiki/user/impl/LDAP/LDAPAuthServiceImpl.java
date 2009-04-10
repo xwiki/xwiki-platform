@@ -173,6 +173,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
                 doc.setParent("");
                 doc.addObject(bclass.getName(), bobj);
                 doc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
+                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
 
                 context.getWiki().protectUserPage(fullwikiname, "edit", doc, context);
 

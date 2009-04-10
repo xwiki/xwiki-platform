@@ -35,7 +35,7 @@
   <description>XWiki Platform - Plugins - Wiki Manager</description>
   <properties>
     <platform.tool.verification.version>1.12-SNAPSHOT</platform.tool.verification.version>
-    <platform.core.version>1.7.2</platform.core.version>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
     <platform.plugin.applicationmanager.version>1.7-SNAPSHOT</platform.plugin.applicationmanager.version>
   </properties>
   <dependencies>
@@ -60,6 +60,19 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>${platform.core.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${platform.core.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

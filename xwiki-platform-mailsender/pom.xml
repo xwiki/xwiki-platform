@@ -33,11 +33,14 @@
   <name>XWiki Platform - Plugins - Mail Sender</name>
   <version>1.7-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Mail Sender</description>
+  <properties>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.8</version>
+      <version>${platform.core.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -56,6 +59,19 @@
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
       <version>2.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>${platform.core.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${platform.core.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

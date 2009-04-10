@@ -377,15 +377,15 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
         for (; i < array.length; ++i) {
             if (array[i] == '$') {
-                i = getVar(array, currentIndex, parameterBlock, context);
+                i = getVar(array, i, parameterBlock, context);
                 if (context.isVelocity()) {
                     break;
                 }
             } else if (array[i] == '"') {
-                i = getEscape(array, currentIndex, parameterBlock, '"', context);
+                i = getEscape(array, i, parameterBlock, '"', context);
                 break;
             } else if (array[i] == '\'') {
-                i = getEscape(array, currentIndex, parameterBlock, '\'', context);
+                i = getEscape(array, i, parameterBlock, '\'', context);
                 break;
             } else if (Character.isWhitespace(array[i])) {
                 break;
@@ -447,48 +447,53 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
         int i = currentIndex + 1;
 
-        if (array[i] == '{') {
-            varBlock.append('{');
-            ++i;
-        }
-
-        // A Velocity variable starts with [a-zA-Z]
-        if (Character.isLetter(array[i])) {
-            context.setVelocity(true);
-
-            // Skip variable
-            for (; i < array.length && Character.isLetterOrDigit(array[i]); ++i) {
-                varBlock.append(array[i]);
+        if (i < array.length) {
+            if (array[i] == '{') {
+                varBlock.append('{');
+                ++i;
             }
 
-            // Skip method(s)
-            for (; i < array.length;) {
-                if (array[currentIndex + 1] == '{' && array[i] == '}') {
-                    varBlock.append('}');
-                    ++i;
-                    break;
-                } else if (array[i] == '.') {
-                    i = getMethod(array, i, varBlock, context);
-                    if (!context.isVelocity()) {
-                        break;
+            if (i < array.length) {
+                // A Velocity variable starts with [a-zA-Z]
+                if (Character.isLetter(array[i])) {
+                    context.setVelocity(true);
+
+                    // Skip variable
+                    for (; i < array.length && Character.isLetterOrDigit(array[i]); ++i) {
+                        varBlock.append(array[i]);
                     }
-                } else {
-                    break;
+
+                    // Skip method(s)
+                    for (; i < array.length;) {
+                        if (array[currentIndex + 1] == '{' && array[i] == '}') {
+                            varBlock.append('}');
+                            ++i;
+                            break;
+                        } else if (array[i] == '.') {
+                            i = getMethod(array, i, varBlock, context);
+                            if (!context.isVelocity()) {
+                                break;
+                            }
+                        } else if (array[i] == '[') {
+                            i = getTableElement(array, i, varBlock, context);
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    context.setVelocity(true);
+
+                    velocityBlock.append(varBlock);
+
+                    return i;
                 }
             }
-
-            context.setVelocity(true);
-        } else {
-            context.setVelocity(false);
         }
 
-        if (context.isVelocity()) {
-            velocityBlock.append(varBlock);
-        } else {
-            i = currentIndex;
-        }
+        context.setVelocity(false);
 
-        return i;
+        return currentIndex;
     }
 
     private int getMethod(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
@@ -520,6 +525,42 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         } else {
             i = currentIndex;
         }
+
+        return i;
+    }
+
+    private int getTableElement(char[] array, int currentIndex, StringBuffer velocityBlock,
+        VelocityFilterContext context)
+    {
+        velocityBlock.append('[');
+
+        int i = currentIndex + 1;
+
+        int depth = 1;
+
+        for (; i < array.length;) {
+            if (array[i] == ']') {
+                --depth;
+                if (depth == 0) {
+                    velocityBlock.append(array[i]);
+                    ++i;
+                    break;
+                }
+            } else if (array[i] == '[') {
+                ++depth;
+            } else if (array[i] == '"') {
+                i = getEscape(array, i, velocityBlock, '"', context);
+                continue;
+            } else if (array[i] == '\'') {
+                i = getEscape(array, i, velocityBlock, '\'', context);
+                continue;
+            }
+
+            velocityBlock.append(array[i]);
+            ++i;
+        }
+
+        context.setVelocity(true);
 
         return i;
     }

@@ -544,11 +544,12 @@ public class Utils
             try {
                 component = componentManager.lookup(role, hint);
             } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to load component [" + role + "] for hint [" + hint + "]", e);
+                throw new RuntimeException("Failed to load component [" + role .getName() 
+                    + "] for hint [" + hint + "]", e);
             }
         } else {
-            throw new RuntimeException("Component manager has not been initialized before lookup for [" + role
-                + "] for hint [" + hint + "]");
+            throw new RuntimeException("Component manager has not been initialized before lookup for [" 
+                + role.getName() + "] for hint [" + hint + "]");
         }
 
         return component;

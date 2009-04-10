@@ -14,3 +14,8 @@
   display: block;
   margin: 0 5px;
 }
+
+/* The width does not seem to be set on IE for the xwiki explorer input. The following should fit correctly*/
+.xExplorerPanel input {
+  width: 98%;
+}

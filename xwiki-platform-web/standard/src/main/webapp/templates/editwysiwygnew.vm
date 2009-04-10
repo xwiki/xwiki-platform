@@ -1,6 +1,9 @@
 ## Smartclient
 $xwiki.jsfx.use("js/smartclient/initsc.js", true)
 $xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js")
+## TODO: remove this line   
+## when http://forums.smartclient.com/showthread.php?t=3097 will be fixed
+$xwiki.jsfx.use("js/smartclient/overwritesc.js")
 $xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js")
 $xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js")
 $xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js")

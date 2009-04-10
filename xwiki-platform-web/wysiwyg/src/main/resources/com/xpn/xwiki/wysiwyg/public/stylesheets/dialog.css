@@ -95,6 +95,8 @@
 
 .xWizardDialog .xDialogHeader .button-container {
   position: absolute;
+  left: 15px;
+  top: 40px;
 }
 
 .xWizardDialog .xDialogFooter button {

@@ -209,8 +209,6 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     {
         LinkConfig linkParam = new LinkConfig();
         linkParam.fromJSON(linkCommandParameter);
-        // set the focus on the text area otherwise IE will fail with an "invalid argument" when using the selection
-        getTextArea().setFocus(true);
         Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
         Element wrappingAnchor = LinkExecutableUtils.getSelectedAnchor(getTextArea());
         // check the content of the wrapping anchor, if it's an image, it should be handled specially
@@ -247,8 +245,6 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     protected LinkConfig getCreateLinkParams()
     {
         LinkConfig config = new LinkConfig();
-        // set the focus on the text area otherwise IE will fail with an "invalid argument" when using the selection
-        getTextArea().setFocus(true);
         config.setLabel(getTextArea().getDocument().getSelection().getRangeAt(0).toHTML());
         // Check the special case when the selection is an image and add a link on an image
         String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);

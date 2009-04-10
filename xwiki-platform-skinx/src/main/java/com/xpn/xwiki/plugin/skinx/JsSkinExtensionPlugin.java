@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Skin Extension plugin that allows pulling javascript code stored inside wiki documents as
@@ -47,15 +46,10 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
-        try {
-            return "<script type='text/javascript' src='"
-                + context.getWiki().getURL(documentName, PLUGIN_NAME,
-                    "language=" + context.getLanguage() + parametersAsQueryString(documentName, context), context)
-                + "'></script>";
-        } catch (XWikiException e) {
-            LOG.warn("Cannot link to JS extension: " + documentName);
-            return "";
-        }
+        return "<script type='text/javascript' src='"
+            + context.getWiki().getURL(documentName, PLUGIN_NAME,
+                "language=" + context.getLanguage() + parametersAsQueryString(documentName, context), context)
+            + "'></script>";
     }
 
     /**

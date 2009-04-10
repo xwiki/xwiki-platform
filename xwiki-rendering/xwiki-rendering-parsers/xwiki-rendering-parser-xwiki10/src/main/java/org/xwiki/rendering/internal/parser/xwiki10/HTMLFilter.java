@@ -40,9 +40,11 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 {
     public static final String HTML_PATTERN = "(\\<!--)|(--\\>)|([\\<\\>])";
 
-    public static final Pattern HTMLVELOCITY_PATTERN =
-        Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN + "|" + VelocityFilter.VELOCITYCLOSE_SPATTERN + "|"
-            + HTML_PATTERN);
+    public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN);
+
+    public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
+
+    public static final Pattern HTMLVELOCITY_PATTERN = Pattern.compile(HTML_PATTERN);
 
     /**
      * {@inheritDoc}
@@ -67,109 +69,85 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
         int currentIndex = 0;
         boolean inHTMLMacro = false;
-        boolean htmlMacroInVelocityMacro = false;
         boolean inHTMLComment = false;
 
-        int nbVOpen = 0;
-        int nbVClose = 0;
-        int nbVOpenInHTML = 0;
-        int nbVCloseInHTML = 0;
+        boolean velocityOpenBefore = false;
+        boolean velocityCloseBefore = false;
 
         StringBuffer htmlContent = new StringBuffer();
-        StringBuffer nonHtmlContent = new StringBuffer();
-        StringBuffer nonHtmlContentWithVelocity = new StringBuffer();
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = content.substring(currentIndex, matcher.start());
 
-            String matchedContent = matcher.group(0);
+            if (!inHTMLMacro) {
+                // make velocity support html
+                Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(before);
+                velocityOpenBefore = velocityOpenMatcher.find();
+                before = velocityOpenMatcher.replaceAll(getVelocityOpen(filterContext));
+                Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(before);
+                velocityCloseBefore = velocityCloseMatcher.find();
+                before = velocityCloseMatcher.replaceAll(getVelocityClose(filterContext));
+
+                result.append(StringEscapeUtils.unescapeHtml(before));
+            } else {
+                htmlContent.append(before);
+            }
+
+            inHTMLMacro = true;
 
             if (matcher.group(1) != null) {
-                // Velocity open
-                if (inHTMLMacro) {
-                    nonHtmlContent.append(before);
-                    nonHtmlContentWithVelocity.append(before);
-                    appendVelocityOpen(nonHtmlContentWithVelocity, filterContext);
-
-                    ++nbVOpen;
-                } else {
-                    result.append(StringEscapeUtils.unescapeHtml(before));
-                    appendVelocityOpen(result, filterContext);
-
-                    htmlMacroInVelocityMacro = true;
-                }
-            } else if (matcher.group(2) != null) {
-                // Velocity close
-                if (inHTMLMacro) {
-                    nonHtmlContent.append(before);
-                    nonHtmlContentWithVelocity.append(before);
-                    appendVelocityClose(nonHtmlContentWithVelocity, filterContext);
-
-                    ++nbVClose;
-                } else {
-                    result.append(StringEscapeUtils.unescapeHtml(before));
-                    appendVelocityClose(result, filterContext);
-
-                    htmlMacroInVelocityMacro = false;
-                }
+                inHTMLComment = true;
+                htmlContent.append(filterContext.addProtectedContent(matcher.group(0)));
+            } else if (inHTMLComment && matcher.group(2) != null) {
+                htmlContent.append(filterContext.addProtectedContent(matcher.group(0)));
+                inHTMLComment = false;
             } else {
-                // html
-                htmlContent.append(nonHtmlContent);
-
-                if (!inHTMLMacro) {
-                    result.append(StringEscapeUtils.unescapeHtml(before));
-                } else {
-                    htmlContent.append(before);
-
-                    nbVOpenInHTML += nbVOpen;
-                    nbVCloseInHTML += nbVClose;
-                }
-
-                nbVOpen = 0;
-                nbVClose = 0;
-
-                inHTMLMacro = true;
-
-                nonHtmlContent.setLength(0);
-                nonHtmlContentWithVelocity.setLength(0);
-
-                if (matcher.group(3) != null) {
-                    inHTMLComment = true;
-                    htmlContent.append(filterContext.addProtectedContent(matchedContent));
-                } else if (inHTMLComment && matcher.group(4) != null) {
-                    htmlContent.append(filterContext.addProtectedContent(matchedContent));
-                    inHTMLComment = false;
-                } else {
-                    htmlContent.append(matchedContent);
-                }
+                htmlContent.append(matcher.group(0));
             }
         }
 
         if (currentIndex == 0) {
-            return StringEscapeUtils.unescapeHtml(content);
+            String cleanedContent = StringEscapeUtils.unescapeHtml(content);
+
+            // make velocity support html
+            cleanedContent = VELOCITYOPEN_PATTERN.matcher(cleanedContent).replaceAll(getVelocityOpen(filterContext));
+            cleanedContent = VELOCITYCLOSE_PATTERN.matcher(cleanedContent).replaceAll(getVelocityClose(filterContext));
+
+            return cleanedContent;
         }
 
-        // Close html macro
-        if (inHTMLMacro) {
-            if (!htmlMacroInVelocityMacro && nbVOpenInHTML > 0) {
-                appendVelocityOpen(result, filterContext);
-            } else if (nbVCloseInHTML == 0 && nbVOpenInHTML == 0) {
-                appendHTMLOpen(result, filterContext);
-            }
+        // clean html content
+        Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(htmlContent);
+        boolean velocityOpen = velocityOpenMatcher.find();
+        String cleanedHtmlContent = velocityOpenMatcher.replaceAll("");
+        Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(cleanedHtmlContent);
+        boolean velocityClose = velocityCloseMatcher.find();
+        cleanedHtmlContent = velocityCloseMatcher.replaceAll("");
 
-            if (htmlContent.length() > 0) {
-                result.append(htmlContent);
-            }
+        // print the content
 
-            if (nbVCloseInHTML == 0 && nbVOpenInHTML == 0) {
-                appendHTMLClose(result, filterContext);
-            } else if (htmlMacroInVelocityMacro || nbVCloseInHTML > 0) {
-                appendVelocityClose(result, filterContext);
-            }
-
-            result.append(StringEscapeUtils.unescapeHtml(nonHtmlContentWithVelocity.toString()));
+        if (velocityOpen) {
+            appendVelocityOpen(result, filterContext);
+        } else if (!velocityOpenBefore || velocityCloseBefore) {
+            appendHTMLOpen(result, filterContext);
         }
 
-        result.append(StringEscapeUtils.unescapeHtml(content.substring(currentIndex)));
+        result.append(cleanedHtmlContent);
+
+        if (velocityClose) {
+            appendVelocityClose(result, filterContext);
+        } else if (velocityCloseBefore || !velocityOpenBefore) {
+            appendHTMLClose(result, filterContext);
+        }
+
+        if (currentIndex < content.length()) {
+            String after = StringEscapeUtils.unescapeHtml(content.substring(currentIndex));
+
+            // make velocity support html
+            after = VELOCITYOPEN_PATTERN.matcher(after).replaceAll(getVelocityOpen(filterContext));
+            after = VELOCITYCLOSE_PATTERN.matcher(after).replaceAll(getVelocityClose(filterContext));
+
+            result.append(StringEscapeUtils.unescapeHtml(after));
+        }
 
         return result.toString();
     }
@@ -194,5 +172,23 @@ public class HTMLFilter extends AbstractFilter implements Initializable
     {
         appendHTMLClose(result, filterContext);
         VelocityFilter.appendVelocityClose(result, filterContext);
+    }
+
+    public static String getVelocityOpen(FilterContext filterContext)
+    {
+        StringBuffer str = new StringBuffer();
+
+        appendVelocityOpen(str, filterContext);
+
+        return str.toString();
+    }
+
+    public static String getVelocityClose(FilterContext filterContext)
+    {
+        StringBuffer str = new StringBuffer();
+
+        appendVelocityClose(str, filterContext);
+
+        return str.toString();
     }
 }

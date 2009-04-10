@@ -88,6 +88,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("html/html1", false);
         suite.addTestsFromResource("html/html2", false);
         suite.addTestsFromResource("html/html3", false);
+        suite.addTestsFromResource("html/html4", false);
 
         // Cleaning
         suite.addTestsFromResource("cleaning/cleaning1", false);

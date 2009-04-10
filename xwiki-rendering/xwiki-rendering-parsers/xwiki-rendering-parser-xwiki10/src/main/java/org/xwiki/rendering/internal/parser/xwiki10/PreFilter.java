@@ -23,11 +23,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
+import org.xwiki.rendering.parser.xwiki10.Filter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
-import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
  * @version $Id$
@@ -42,6 +43,12 @@ public class PreFilter extends AbstractFilter implements Initializable
     public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN);
 
     public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
+
+    @Requirement("spacescleanning")
+    public Filter spacesCleaningFilter;
+
+    @Requirement("standalonenewlinecleanning")
+    public Filter standaloneNewLineCleaningFilter;
 
     /**
      * {@inheritDoc}
@@ -68,8 +75,7 @@ public class PreFilter extends AbstractFilter implements Initializable
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = content.substring(currentIndex, matcher.start());
 
-            // a standalone new line is not interpreted by XWiki 1.0 rendering
-            result.append(CleanUtil.removeTrailingNewLines(before, 1, true));
+            result.append(before);
 
             String preContent = matcher.group(1);
 
@@ -84,9 +90,15 @@ public class PreFilter extends AbstractFilter implements Initializable
                 VelocityFilter.appendVelocityOpen(result, filterContext);
             }
 
-            result.append("{{{");
-            result.append(filterContext.addProtectedContent(CleanUtil.cleanSpacesAndNewLines(preContent).trim()));
-            result.append("}}}");
+            StringBuffer preBuffer = new StringBuffer();
+
+            preBuffer.append("{{{");
+            preContent = this.standaloneNewLineCleaningFilter.filter(preContent, filterContext);
+            preContent = this.spacesCleaningFilter.filter(preContent, filterContext);
+            preBuffer.append(preContent.trim());
+            preBuffer.append("}}}");
+
+            result.append(filterContext.addProtectedContent(preBuffer.toString(), true));
 
             if (velocityClose) {
                 VelocityFilter.appendVelocityClose(result, filterContext);

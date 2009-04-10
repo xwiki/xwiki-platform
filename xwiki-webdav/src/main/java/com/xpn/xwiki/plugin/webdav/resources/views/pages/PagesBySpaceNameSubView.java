@@ -155,7 +155,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
             String pName = resource.getDisplayName();
             if (getContext().hasAccess("edit", pName)) {
                 XWikiDocument childDoc = getContext().getDocument(pName);
-                childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
+                childDoc.setContent("This page was created through the WebDAV interface.");
                 getContext().saveDocument(childDoc);
             }
         } else {

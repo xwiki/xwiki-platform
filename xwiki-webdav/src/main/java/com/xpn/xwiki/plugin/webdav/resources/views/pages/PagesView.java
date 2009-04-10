@@ -102,7 +102,7 @@ public class PagesView extends AbstractDavView
             String homePage = resource.getDisplayName() + ".WebHome";
             getContext().checkAccess("edit", homePage);
             XWikiDocument doc = getContext().getDocument(resource.getDisplayName() + ".WebHome");
-            doc.setContent("This page was created thorugh xwiki-webdav interface.");
+            doc.setContent("This page was created through the WebDAV interface.");
             getContext().saveDocument(doc);
         } else {
             throw new DavException(DavServletResponse.SC_FORBIDDEN);

@@ -84,7 +84,14 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
                     wiki = getDefaultWikiName();
                 }
                 
-                spaceSeparatorPosition = reference.indexOf(SPACE_SEPARATOR, wikiSeparatorPosition);
+                // We allow space sep in space names and thus we look for the last space sep in the reference.
+                // TODO: Note that this was done to have the same behavior of XWikiDocument.setFullName() but it would
+                //       seem better to me to allow space sep in pages names rather than in space names (since users
+                //       want more liberty in page names and usually create pages in existing spaces).
+                spaceSeparatorPosition = reference.lastIndexOf(SPACE_SEPARATOR);
+                if (spaceSeparatorPosition <= wikiSeparatorPosition) {
+                    spaceSeparatorPosition = -1;
+                }
             } else {
                 // No wiki separator, use default wiki.
                 wiki = getDefaultWikiName();

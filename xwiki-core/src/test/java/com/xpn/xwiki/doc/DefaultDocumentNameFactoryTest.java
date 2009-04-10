@@ -115,5 +115,14 @@ public class DefaultDocumentNameFactoryTest extends AbstractBridgedXWikiComponen
         assertEquals(expectedDefaultWiki, name.getWiki());
         assertEquals(expectedDefaultSpace, name.getSpace());
         assertEquals("WebHome", name.getPage());        
+
+        name = factory.createDocumentName("wiki1.wiki2:wiki3:some.space.page");
+        assertEquals("wiki1.wiki2:wiki3", name.getWiki());
+        assertEquals("some.space", name.getSpace());
+        assertEquals("page", name.getPage());
+
+        name = factory.createDocumentName("some.space.page");
+        assertEquals("some.space", name.getSpace());
+        assertEquals("page", name.getPage());
     }
 }

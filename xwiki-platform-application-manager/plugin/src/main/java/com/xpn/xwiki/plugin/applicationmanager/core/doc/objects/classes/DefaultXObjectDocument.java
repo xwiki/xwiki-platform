@@ -129,6 +129,7 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
             if (super.isNew()) {
                 setParent(docTemplate.getParent());
                 setContent(docTemplate.getContent());
+                setSyntaxId(docTemplate.getSyntaxId());
             }
 
             this.isNew = true;

@@ -45,7 +45,7 @@ public class InvitationManagerImplTest extends InvitationManagerTest
             space,
             true,
             (InvitationManagerImpl) invitationManager,
-            context);
+            getContext());
     }
 
     protected MembershipRequest createMembershipRequest(String requester, String space)
@@ -55,7 +55,7 @@ public class InvitationManagerImplTest extends InvitationManagerTest
             space,
             true,
             (InvitationManagerImpl) invitationManager,
-            context);
+            getContext());
     }
 
     protected Invitation getInvitation(String invitee, String space) throws XWikiException
@@ -64,7 +64,7 @@ public class InvitationManagerImplTest extends InvitationManagerTest
             space,
             false,
             (InvitationManagerImpl) invitationManager,
-            context);
+            getContext());
     }
 
     protected MembershipRequest getMembershipRequest(String requester, String space)
@@ -74,6 +74,6 @@ public class InvitationManagerImplTest extends InvitationManagerTest
             space,
             false,
             (InvitationManagerImpl) invitationManager,
-            context);
+            getContext());
     }
 }

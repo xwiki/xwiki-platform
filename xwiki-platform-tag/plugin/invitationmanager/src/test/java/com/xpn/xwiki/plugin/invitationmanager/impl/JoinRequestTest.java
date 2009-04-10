@@ -37,16 +37,15 @@ import com.xpn.xwiki.plugin.invitationmanager.api.JoinRequest;
 import com.xpn.xwiki.plugin.invitationmanager.api.JoinRequestStatus;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Unit tests for classes implementing {@link JoinRequest} interface
  */
-public abstract class JoinRequestTest extends org.jmock.cglib.MockObjectTestCase
+public abstract class JoinRequestTest extends AbstractBridgedXWikiComponentTestCase
 {
     protected JoinRequest joinRequest;
-
-    protected XWikiContext context;
 
     protected XWiki xwiki;
 
@@ -60,13 +59,12 @@ public abstract class JoinRequestTest extends org.jmock.cglib.MockObjectTestCase
     {
         super.setUp();
 
-        context = new XWikiContext();
-        xwiki = new XWiki(new XWikiConfig(), context);
-        context.setWiki(xwiki);
+        xwiki = new XWiki(new XWikiConfig(), getContext());
+        getContext().setWiki(xwiki);
 
         mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
-                new Object[] {xwiki, context});
+                new Object[] {xwiki, getContext()});
         mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {

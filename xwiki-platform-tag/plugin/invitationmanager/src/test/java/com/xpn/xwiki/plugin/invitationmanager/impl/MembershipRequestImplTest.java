@@ -44,7 +44,7 @@ public class MembershipRequestImplTest extends MembershipRequestTest
 
         manager = new InvitationManagerImpl();
         manager.setMailNotification(false);
-        joinRequest = new MembershipRequestImpl(null, null, true, manager, context);
+        joinRequest = new MembershipRequestImpl(null, null, true, manager, getContext());
     }
 
     public void testSave()
@@ -54,7 +54,7 @@ public class MembershipRequestImplTest extends MembershipRequestTest
             String space = "testSpace";
 
             MembershipRequest expected =
-                new MembershipRequestImpl(requester, space, true, manager, context);
+                new MembershipRequestImpl(requester, space, true, manager, getContext());
             expected.setResponder("testResponder");
 
             Map map = new HashMap();
@@ -77,7 +77,7 @@ public class MembershipRequestImplTest extends MembershipRequestTest
             expected.save();
 
             MembershipRequest actual =
-                new MembershipRequestImpl(requester, space, false, manager, context);
+                new MembershipRequestImpl(requester, space, false, manager, getContext());
 
             assertEquals(expected.getRequester(), actual.getRequester());
             assertEquals(expected.getResponder(), actual.getResponder());

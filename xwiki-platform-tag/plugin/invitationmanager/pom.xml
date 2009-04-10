@@ -35,18 +35,15 @@
   <name>XWiki Platform - Plugins - Invitation Manager</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Invitation Manager</description>
+  <properties>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.8</version>
+      <version>${platform.core.version}</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock-cglib</artifactId>
-      <version>1.1.0</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
@@ -61,12 +58,28 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock-cglib</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <!-- Note: The 2.4 version is not technically correct as 2.4 corresponds to a specification
-           # and is not an implementation version. The central repo would need to be fixed... -->
-      <version>2.4</version>
-      <scope>provided</scope>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>${platform.core.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${platform.core.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>      

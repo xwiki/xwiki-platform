@@ -46,7 +46,7 @@ public class InvitationImplTest extends InvitationTest
 
         manager = new InvitationManagerImpl();
         manager.setMailNotification(false);
-        joinRequest = new InvitationImpl(null, null, true, manager, context);
+        joinRequest = new InvitationImpl(null, null, true, manager, getContext());
     }
 
     public void testSave()
@@ -55,7 +55,7 @@ public class InvitationImplTest extends InvitationTest
             String invitee = "testInvitee";
             String space = "testSpace";
 
-            Invitation expected = new InvitationImpl(invitee, space, true, manager, context);
+            Invitation expected = new InvitationImpl(invitee, space, true, manager, getContext());
             expected.setCode(RandomStringUtils.random(8));
             expected.setInviter("testInviter");
 
@@ -80,7 +80,7 @@ public class InvitationImplTest extends InvitationTest
 
             expected.save();
 
-            Invitation actual = new InvitationImpl(invitee, space, false, manager, context);
+            Invitation actual = new InvitationImpl(invitee, space, false, manager, getContext());
 
             assertEquals(expected.isOpen(), actual.isOpen());
             assertEquals(expected.getCode(), actual.getCode());

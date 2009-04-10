@@ -2718,6 +2718,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWiki TagClass");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate) {
@@ -2774,6 +2775,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWiki Users");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate) {
@@ -2811,6 +2813,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWiki Global Redirect Class");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate) {
@@ -2947,6 +2950,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWiki Preferences");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         String menu = doc.getStringValue("XWiki.XWikiPreferences", "menu");
@@ -2988,6 +2992,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {
             doc.setContent("1 XWiki Groups");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate) {
@@ -3071,6 +3076,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {
             doc.setContent("1 XWiki " + pagename + " Class");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate) {
@@ -3112,6 +3118,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWiki Comment Class");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate) {
@@ -3147,6 +3154,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWiki Skin Class");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate) {
@@ -3250,7 +3258,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 map.put("active", "1");
             }
 
-            int result = createUser(xwikiname, map, parent, content, userRights, context);
+            int result = createUser(xwikiname, map, parent, content, XWikiDocument.XWIKI10_SYNTAXID, userRights, 
+                context);
 
             if ((result > 0) && (withValidation)) {
                 // Send the validation email
@@ -3284,7 +3293,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         map.put("active", "1");
         map.put("first_name", xwikiname);
         String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
-        if (createUser(xwikiname, map, "XWiki.XWikiUsers", content, userRights, context) == 1) {
+        if (createUser(xwikiname, map, "XWiki.XWikiUsers", content, XWikiDocument.XWIKI10_SYNTAXID, 
+            userRights, context) == 1)
+        {
             return true;
         } else {
             return false;
@@ -3434,7 +3445,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return generateRandomString(size);
     }
 
-    public int createUser(String xwikiname, Map map, String parent, String content, String userRights,
+    public int createUser(String xwikiname, Map map, String parent, String content, String syntaxId, String userRights,
         XWikiContext context) throws XWikiException
     {
         BaseClass baseclass = getUserClass(context);
@@ -3459,6 +3470,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             doc.addObject(baseclass.getName(), newobject);
             doc.setParent(parent);
             doc.setContent(content);
+            doc.setSyntaxId(syntaxId);
             doc.setCreator(doc.getFullName());
             doc.setAuthor(doc.getFullName());
 
@@ -3475,6 +3487,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_CREATE,
                 "Cannot create user {0}", e, args);
         }
+    }
+    
+    /**
+     * @deprecated starting with XE 1.8.1 use 
+     *             {@link #createUser(String, Map, String, String, String, String, XWikiContext)} instead
+     */
+    public int createUser(String xwikiname, Map map, String parent, String content, String userRights,
+        XWikiContext context) throws XWikiException
+    {
+        return createUser(xwikiname, map, parent, content, XWikiDocument.XWIKI10_SYNTAXID, userRights, context);
     }
 
     public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException
@@ -4226,6 +4248,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     serverdoc.setStringValue("XWiki.XWikiServerClass", "language", wikilanguage);
                 }
                 serverdoc.setContent("#includeForm(\"XWiki.XWikiServerForm\")\n");
+                serverdoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
                 serverdoc.setParent("XWiki.XWikiServerClass");
                 saveDocument(serverdoc, context);
             } else {

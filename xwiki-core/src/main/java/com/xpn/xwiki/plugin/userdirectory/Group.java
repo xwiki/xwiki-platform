@@ -292,6 +292,7 @@ public class Group {
         if ((content==null)||(content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWikiGroups");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate)
@@ -322,6 +323,7 @@ public class Group {
         if ((content==null)||(content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 DirectoryGroupClass");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate)
@@ -353,6 +355,7 @@ public class Group {
         if ((content==null)||(content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWikiGroup");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate)

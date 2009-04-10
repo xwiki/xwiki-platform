@@ -1125,9 +1125,7 @@ $html
 #end
 
 #macro (floatingbox $text)
-<div class="floatinginfobox">
-  $text
-</div>
+<div class="floatinginfobox">$text</div>
 #end
 
 #macro (startfloatingbox)

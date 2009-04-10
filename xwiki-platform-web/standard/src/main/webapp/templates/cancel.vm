@@ -1,7 +1,7 @@
 ###
 ### Cancel action
 ###
-### This should NOT be displayed
+### This should NOT get displayed, since the cancel action redirects to view.
 ###
 #set($message=$msg.get("changescanceled"))
 #template("view.vm")

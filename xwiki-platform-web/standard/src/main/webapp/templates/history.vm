@@ -1,2 +1,6 @@
-<h1><span>$xwiki.parseMessage("viewhistorytitle")</span></h1>
+###
+### History page in the "view" mode
+###
+###
+<h1><span>$msg.get('core.viewers.history.title', [$doc.displayTitle, $doc.getURL()])</span></h1>
 #template("historyinline.vm")

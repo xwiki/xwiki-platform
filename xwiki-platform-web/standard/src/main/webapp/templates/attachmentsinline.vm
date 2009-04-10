@@ -1,15 +1,17 @@
 #macro(dynamicsize $sz)
 #if($sz < 1024)
-$sz bytes
+$sz bytes##
 #else
-#set($ksz = $sz / 1024)
+#set($ksz = $mathtool.div($sz, 1024))
+#set($ksz = $mathtool.roundTo(1, $ksz))
 #if($ksz < 1024)
-${ksz}kb
+${ksz}kb##
 #else
-#set($Msz = $sz / 1048576)
-${Msz}Mb
-#end
-#end
+#set($Msz = $mathtool.div($sz, 1048576))
+#set($Msz = $mathtool.roundTo(1, $Msz))
+${Msz}Mb##
+#end##
+#end##
 #end
 ###
 ### List document attachments
@@ -25,20 +27,17 @@ ${Msz}Mb
 #set($attachments = $doc.attachmentList)
     <div id="attachmentscontent" class="xwikiintracontent">
     <div id="attw">
-#if($inline && ($inline == true))
-    ##<div class="xwikititlewrapper" onclick="toggleClass($('attachments'), 'hidden'); toggleClass($('attachmentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("attachments")<span class="hidden">:</span> <span class="attachmentsno">$attachments.size()</span></h3></div>
-#end
       <div id="_attachments">
 #if($attachments.size()>0)
 #foreach ($attach in $attachments)
         <div class="attachment #if($velocityCount % 2 == 0) even #else odd #end">
           <span class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</span>
           <div class="information">
-          <span class="name"><a href="$doc.getAttachmentURL("${attach.filename}", "download")" title="$msg.get("downloadthisattachment")">#packName($attach.filename)</a></span>
+          <span class="name"><a href="$doc.getAttachmentURL(${attach.filename}, 'download')" title="$msg.get('core.viewers.attachments.download')">#packName($attach.filename)</a></span>
 #if($hasEdit || $hasAdmin)
           <span class="xwikibuttonlinks">
             ## Delete attachment link
-            <a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a>
+            <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=${redirect}")" onclick="return confirm('$msg.get('core.viewers.attachments.confirmDelete')');" title="$msg.get('core.viewers.attachments.deleteTitle', [$xwiki.getXMLEncoded($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
             ## Dav Edit attachment link. We display the link hidden by default, and let the WebDAV JSX extension display it if
             ## the browser supports Dav Edit 
 	    #set($documentUrl=$doc.getExternalURL("download"))
@@ -53,16 +52,16 @@ ${Msz}Mb
               <a class="editlink hidden" href="$davUrl" onclick="if(XWiki && XWiki.WebDAV){XWiki.WebDAV.davEdit('$davUrl')}; return false;">$msg.get("webdaveditattachment")</a>
             #end                    
          </span>
-#end
-          <span class="version"><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></span>
+#end ## hasEdit
+          <span class="version"><a href="$doc.getAttachmentURL(${attach.filename}, 'viewattachrev')" title="$msg.get('core.viewers.attachments.showHistory')">$attach.version</a></span>
           <div class="meta">
-          <span class="publisher">$msg.get("PostedBy"): <span>$xwiki.getLocalUserName($attach.author)</span></span>
-          <span class="date">$msg.get("on") $!xwiki.formatDate($attach.date)</span>
+          <span class="publisher">$msg.get('core.viewers.attachments.author', [$xwiki.getUserName($attach.author)])</span>
+          <span class="date">$msg.get('core.viewers.attachments.date', [$!xwiki.formatDate($attach.date)])</span>
           <span class="size">(#dynamicsize($attach.filesize))</span>
           </div>
-        </div>
-  </div> ## row
-#end
+          </div>
+        </div> ## row
+#end ## foreach
 <script type="text/javascript">
 // <![CDATA[
 // Let XWiki.WebDAV JS display links only if the browser support WebDAV.
@@ -70,21 +69,21 @@ if (XWiki && XWiki.WebDAV) { XWiki.WebDAV.displayDavLinks($('_attachments')); }
 // ]]>
 </script>
 #else
-<div>$msg.get("noattachments")</div>
+<div>$msg.get('core.viewers.attachments.noAttachments')</div>
 #end
 #if($hasEdit || $hasAdmin)
       <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
 <div>
 <input type="hidden" name="xredirect" value="${xwiki.getFormEncoded($redirect)}" />
 <fieldset class="expanded" id="attachform">
-        <legend onclick="toggleForm(this.form)">$msg.get("addattachment")<span class="expands">...</span></legend>
-     <!--  <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get("choosetargetfilename"):</label></div> -->
+        <legend onclick="toggleForm(this.form)">$msg.get('core.viewers.attachments.upload.title')<span class="expands">...</span></legend>
+     <!--  <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get('core.viewers.attachments.upload.filename')</label></div> -->
         <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
-        <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("choosefiletoupload"):</label></div>
+        <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get('core.viewers.attachments.upload.file')</label></div>
         <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
         <div>
-        <span class="buttonwrapper"><input type="submit" value="$msg.get("attachthisfile")" onclick="return updateAttachName(this.form, '$msg.get("doyouwanttoreplace")')" class="button"/></span>
-        <span class="buttonwrapper"><input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/></span>
+        <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.attachments.upload.submit')" onclick="return updateAttachName(this.form, '$msg.get('core.viewers.attachments.upload.confirmReplace')')" class="button"/></span>
+        <span class="buttonwrapper"><input type="reset" value="$msg.get('core.viewers.attachments.upload.cancel')" onclick="hideForm(this.form);" class="button"/></span>
         </div>
         </fieldset>
 </div>

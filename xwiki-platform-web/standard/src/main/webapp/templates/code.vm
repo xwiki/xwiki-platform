@@ -2,23 +2,18 @@
 ### Code page in the "view" mode
 ###
 ###
-<h1><span>$xwiki.parseMessage("viewcodetitle")</span></h1>
+<h1><span>$msg.get('core.viewers.code.title', [$doc.displayTitle, $doc.getURL()])</span></h1>
 #set($escapedcontent = $xwiki.getXMLEncoded($tdoc.translatedContent))
-#set($ln = $request.getParameter("showlinenumbers"))
-#if((!$ln) || ($ln == "1"))
-<a href="$doc.getURL("view", "viewer=code&showlinenumbers=0&$docvariant")">$msg.get("hidelinenumbers")</a>
-#set($splittedcontent = $escapedcontent.split("\n"))
-<br />
-<br />
-<textarea readonly="readonly" style="width: 100%; height: 300px;">
-#foreach($line in $splittedcontent)
+#set($ln = "$!request.getParameter('showlinenumbers')")
+#if($ln != '0')
+  <a href="$doc.getURL('view', "viewer=code&showlinenumbers=0&$docvariant")">$msg.get('core.viewers.code.hideLineNumbers')</a>
+  #set($contentLines = $escapedcontent.split($util.newline))
+  <textarea readonly="readonly" style="width: 100%; height: 300px;">
+#foreach($line in $contentLines)
 $velocityCount: $line
 #end
-</textarea>
+  </textarea>
 #else
-<a href="$doc.getURL("view", "viewer=code&showlinenumbers=1&$docvariant")">$msg.get("showlinenumbers")</a>
-<br />
-<br />
-<textarea readonly="readonly" style="width: 100%; height: 300px;">
-$escapedcontent</textarea>
+  <a href="$doc.getURL('view', "viewer=code&showlinenumbers=1&$docvariant")">$msg.get('core.viewers.code.showLineNumbers')</a>
+  <textarea readonly="readonly" style="width: 100%; height: 300px;">$escapedcontent</textarea>
 #end

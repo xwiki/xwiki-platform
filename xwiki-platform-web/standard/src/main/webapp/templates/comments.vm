@@ -2,9 +2,9 @@
 ### Comments page in the "view" mode
 ###
 ###
-#if("$!request.xpage" == "comments")
-$response.sendRedirect($doc.getURL("view", "viewer=comments"))
+#if("$!request.xpage" == 'comments')
+  $response.sendRedirect($doc.getURL('view', 'viewer=comments'))
 #else
-<h1><span>$xwiki.parseMessage("viewcommentstitle")</span></h1>
-#template("commentsinline.vm")
+  <h1><span>$msg.get('core.viewers.comments.title', [$doc.displayTitle, $doc.getURL()])</span></h1>
+  #template("commentsinline.vm")
 #end

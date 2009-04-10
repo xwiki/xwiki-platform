@@ -1,2 +1,6 @@
-<h2>$xwiki.parseMessage("viewinformationtitle")</h2>
+###
+### Information page in the "view" mode
+###
+###
+<h1><span>$msg.get('core.viewers.information.title', [$doc.displayTitle, $doc.getURL()])</span></h1>
 #template("informationinline.vm")

@@ -191,8 +191,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <dependentWarExcludes />
           <archiveClasses>true</archiveClasses>
+          <!-- We exclude the temporary files used during GWT compiling and the SmartClient JavaScript files which are
+            provided by the web-standard war -->
+          <warSourceExcludes>**/.gwt-tmp/**,**/sc/**</warSourceExcludes>
         </configuration>
       </plugin>
       <plugin>

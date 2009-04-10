@@ -25,9 +25,11 @@ import java.util.logging.Level;
 import org.restlet.Context;
 import org.restlet.Guard;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.xwiki.rest.resources.BrowserAuthenticationResource;
 
+import com.noelios.restlet.http.HttpConstants;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,47 +45,36 @@ public class XWikiAuthentication extends Guard
     @Override
     public int authenticate(Request request)
     {
-        /* This is a special case that is used to send back a challenge to popup the authentication dialog in browsers */
         if (request.getResourceRef().getPath().endsWith(BrowserAuthenticationResource.URI_PATTERN)) {
             return super.authenticate(request);
         }
 
-        /*
-         * Try to authenticate using information in the request (authorization header or a URI in the form of
-         * http://user:password@host/..., etc.)
-         */
-        if (super.authenticate(request) == 1) {
-            /* If it's succesfull then the context has ben set with the authenticated user */
-            return 1;
-        }
-
-        /* If authentication failed then no information is present in headers or URI, try to check cookies */
         XWikiContext xwikiContext = (XWikiContext) getContext().getAttributes().get(Constants.XWIKI_CONTEXT);
         XWiki xwiki = (XWiki) getContext().getAttributes().get(Constants.XWIKI);
 
-        try {
-            XWikiUser xwikiUser = xwiki.getAuthService().checkAuth(xwikiContext);
-            if (xwikiUser != null) {
-                xwikiContext.setUser(xwikiUser.getUser());
-                getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", xwikiUser.getUser()));
+        Form headers = (Form) request.getAttributes().get(HttpConstants.ATTRIBUTE_HEADERS);
 
-                getContext().getAttributes().put(Constants.XWIKI_USER, xwikiUser.getUser());
-                
-                return 1;
+        if (headers.getValues(HttpConstants.HEADER_AUTHORIZATION) == null) {
+            /*
+             * If there isn't an authorization header, check if the context contains an already authenticated session.
+             * If it's the case use the previously authenticated user.
+             */
+            try {
+                XWikiUser xwikiUser = xwiki.getAuthService().checkAuth(xwikiContext);
+                if (xwikiUser != null) {
+                    xwikiContext.setUser(xwikiUser.getUser());
+                    getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", xwikiUser.getUser()));
+
+                    getContext().getAttributes().put(Constants.XWIKI_USER, xwikiUser.getUser());
+                }
+            } catch (XWikiException e) {
+                getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
             }
-        } catch (XWikiException e) {
-            getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
+
+            return 1;
         }
 
-        /*
-         * If we are here all the previous authentication methods failed, so guest will be the user set for the context
-         * of this request.
-         */
-        String xwikiUser = "XWiki.XWikiGuest";
-        xwikiContext.setUser(xwikiUser);
-        getContext().getAttributes().put(Constants.XWIKI_USER, xwikiUser);
-        
-        return 1;
+        return super.authenticate(request);
     }
 
     @Override

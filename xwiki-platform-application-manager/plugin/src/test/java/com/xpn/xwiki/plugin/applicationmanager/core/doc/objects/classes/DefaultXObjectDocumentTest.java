@@ -29,10 +29,10 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 
@@ -46,10 +46,8 @@ import java.util.Map;
  * 
  * @version $Id: $
  */
-public class DefaultXObjectDocumentTest extends MockObjectTestCase
+public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private XWikiContext context;
-
     private XWiki xwiki;
 
     private Mock mockXWikiStore;
@@ -64,19 +62,20 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
      * @see junit.framework.TestCase#setUp()
      */
     @Override
-    protected void setUp() throws XWikiException
+    protected void setUp() throws Exception
     {
-        this.context = new XWikiContext();
+        super.setUp();
+        
         this.xwiki = new XWiki();
         this.xwiki.setNotificationManager(new XWikiNotificationManager());
-        this.context.setWiki(this.xwiki);
+        getContext().setWiki(this.xwiki);
 
         // //////////////////////////////////////////////////
         // XWikiHibernateStore
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
-            this.context});
+            getContext()});
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
@@ -109,7 +108,7 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
         this.mockXWikiVersioningStore =
             mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
-            this.xwiki, this.context});
+            this.xwiki, getContext()});
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
         this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
 
@@ -169,8 +168,8 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
         // ///
 
-        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(context);
-        DefaultXObjectDocument sdoc = (DefaultXObjectDocument) sclass.newXObjectDocument(context);
+        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(getContext());
+        DefaultXObjectDocument sdoc = (DefaultXObjectDocument) sclass.newXObjectDocument(getContext());
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());
@@ -187,9 +186,9 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
         // ///
 
-        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(context);
+        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(getContext());
         DefaultXObjectDocument sdoc =
-            (DefaultXObjectDocument) sclass.newXObjectDocument(DEFAULT_DOCFULLNAME, 0, context);
+            (DefaultXObjectDocument) sclass.newXObjectDocument(DEFAULT_DOCFULLNAME, 0, getContext());
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());
@@ -206,12 +205,12 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
         // ///
 
-        XWikiDocument doc = xwiki.getDocument(DEFAULT_DOCFULLNAME, context);
-        xwiki.saveDocument(doc, context);
+        XWikiDocument doc = xwiki.getDocument(DEFAULT_DOCFULLNAME, getContext());
+        xwiki.saveDocument(doc, getContext());
 
-        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(context);
+        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(getContext());
         DefaultXObjectDocument sdoc =
-            (DefaultXObjectDocument) sclass.newXObjectDocument(DEFAULT_DOCFULLNAME, 0, context);
+            (DefaultXObjectDocument) sclass.newXObjectDocument(DEFAULT_DOCFULLNAME, 0, getContext());
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());
@@ -224,10 +223,10 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
     public void testMergeObject() throws XWikiException
     {
-        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(context);
-        DefaultXObjectDocument sdoc1 = (DefaultXObjectDocument) sclass.newXObjectDocument(context);
+        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(getContext());
+        DefaultXObjectDocument sdoc1 = (DefaultXObjectDocument) sclass.newXObjectDocument(getContext());
 
-        DefaultXObjectDocument sdoc2 = (DefaultXObjectDocument) sclass.newXObjectDocument(context);
+        DefaultXObjectDocument sdoc2 = (DefaultXObjectDocument) sclass.newXObjectDocument(getContext());
 
         sdoc1.setStringValue(TestAbstractXClassManagerTest.FIELD_string, "valuesdoc1");
         sdoc1.setStringValue(TestAbstractXClassManagerTest.FIELD_string2, "value2sdoc1");

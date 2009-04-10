@@ -196,6 +196,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         if (StringUtils.isBlank(doc.getContent())) {
             needsUpdate = true;
             doc.setContent("1 XWiki Watchlist Notification Rule Class");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate) {
@@ -265,6 +266,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             if (StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
                 doc.setContent("#includeInContext(\"XWiki.SchedulerJobSheet\")");
+                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
             }
 
             if (needsUpdate) {

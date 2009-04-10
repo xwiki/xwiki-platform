@@ -26,20 +26,17 @@ import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jvnet.mock_javamail.Mailbox;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Integration tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}. The tests start a SMTP server.
  */
-public class MailSenderApiTest extends MockObjectTestCase
+public class MailSenderApiTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private XWikiContext context;
-
     private Mock mockXWiki;
 
     private XWiki xwiki;
@@ -47,12 +44,13 @@ public class MailSenderApiTest extends MockObjectTestCase
     private MailSenderPluginApi api;
 
     @Override
-    protected void setUp()
+    protected void setUp() throws Exception
     {
-        this.context = new XWikiContext();
+        super.setUp();
+        
         this.mockXWiki = mock(XWiki.class);
         this.xwiki = (XWiki) this.mockXWiki.proxy();
-        this.context.setWiki(this.xwiki);
+        getContext().setWiki(this.xwiki);
 
         // The plugin init creates a XWiki.Mail document if it doesn't exist and ensure it has the correct
         // class properties.
@@ -71,8 +69,8 @@ public class MailSenderApiTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("getXWikiPreference").with(eq("javamail_extra_props"), ANYTHING).will(
             returnValue(""));
 
-        MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy", this.context);
-        this.api = new MailSenderPluginApi(plugin, this.context);
+        MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy", getContext());
+        this.api = new MailSenderPluginApi(plugin, getContext());
 
         // Ensure that there are no messages in inbox
         Mailbox.clearAll();
@@ -107,7 +105,7 @@ public class MailSenderApiTest extends MockObjectTestCase
         mail.setTextPart("Text content");
 
         MailConfiguration config =
-            this.api.createMailConfiguration(new com.xpn.xwiki.api.XWiki(this.xwiki, this.context));
+            this.api.createMailConfiguration(new com.xpn.xwiki.api.XWiki(this.xwiki, getContext()));
         assertEquals(25, config.getPort());
         assertEquals("myserver", config.getHost());
         assertNull(config.getFrom());

@@ -308,6 +308,8 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
     private void convertMacro(String name, List<String> parameters, StringBuffer macroBlock,
         VelocityFilterContext context)
     {
+        context.setVelocity(true);
+
         try {
             VelocityMacroConverter currentMacro =
                 (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.ROLE, name);

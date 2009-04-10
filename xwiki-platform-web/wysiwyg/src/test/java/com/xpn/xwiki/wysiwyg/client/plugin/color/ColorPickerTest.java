@@ -75,4 +75,12 @@ public class ColorPickerTest extends AbstractWysiwygClientTest
         String colorName = "red";
         assertEquals(colorName, ColorPicker.convertToHex(colorName));
     }
+
+    /**
+     * Tests if {@link ColorPicker#convertToHex(String)} is null-safe.
+     */
+    public void testConvertNullToHex()
+    {
+        assertNull(ColorPicker.convertToHex(null));
+    }
 }

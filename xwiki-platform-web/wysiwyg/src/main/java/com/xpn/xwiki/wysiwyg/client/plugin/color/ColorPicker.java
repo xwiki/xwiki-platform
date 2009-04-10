@@ -91,7 +91,7 @@ public class ColorPicker extends PopupPanel implements ClickListener
      */
     public void setColor(String color)
     {
-        palette.setSelectedColor(convertToHex(color).toUpperCase());
+        palette.setSelectedColor(convertToHex(color));
     }
 
     /**
@@ -107,6 +107,9 @@ public class ColorPicker extends PopupPanel implements ClickListener
      */
     public static String convertToHex(String color)
     {
+        if (color == null) {
+            return null;
+        }
         try {
             // The color is a decimal integer (IE specific).
             String hex = Integer.toHexString(Integer.parseInt(color));
@@ -115,7 +118,9 @@ public class ColorPicker extends PopupPanel implements ClickListener
                 padding[i] = '0';
             }
             hex = String.valueOf(padding) + hex;
-            return '#' + hex.substring(4) + hex.substring(2, 4) + hex.substring(0, 2);
+            // We have to reverse the order of the channels because IE gives as BGR instead of RGB.
+            hex = '#' + hex.substring(4) + hex.substring(2, 4) + hex.substring(0, 2);
+            return hex.toUpperCase();
         } catch (NumberFormatException e) {
             String rgbRegExp = "^rgb\\s*\\(\\s*([0-9]+).*,\\s*([0-9]+).*,\\s*([0-9]+).*\\)$";
             String[] rgb = color.toLowerCase().replaceAll(rgbRegExp, "$1,$2,$3").split(",");
@@ -129,7 +134,7 @@ public class ColorPicker extends PopupPanel implements ClickListener
                     }
                     hex.append(channel);
                 }
-                return hex.toString();
+                return hex.toString().toUpperCase();
             } else {
                 // Either already hex color or unknown format. Leave it as it is.
                 return color;

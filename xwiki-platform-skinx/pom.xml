@@ -33,11 +33,14 @@
   <name>XWiki Platform - Plugins - Skin Extensions</name>
   <version>1.7-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Skin Extensions</description>
+  <properties>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.7.1</version>
+      <version>${platform.core.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

@@ -229,6 +229,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             if (StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
                 doc.setContent("1 XWiki " + getExtensionName() + " Extension Class");
+                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
             }
 
             if (needsUpdate) {

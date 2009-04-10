@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Skin Extension plugin that allows pulling CSS code stored inside wiki documents as
@@ -48,15 +47,10 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
-        try {
-            return "<link rel='stylesheet' type='text/css' href='"
-                + context.getWiki().getURL(documentName, PLUGIN_NAME,
-                    "language=" + context.getLanguage() + parametersAsQueryString(documentName, context), context)
-                + "'/>";
-        } catch (XWikiException e) {
-            LOG.warn("Cannot link to CSS extension: " + documentName);
-            return "";
-        }
+        return "<link rel='stylesheet' type='text/css' href='"
+            + context.getWiki().getURL(documentName, PLUGIN_NAME,
+                "language=" + context.getLanguage() + parametersAsQueryString(documentName, context), context)
+            + "'/>";
     }
 
     /**

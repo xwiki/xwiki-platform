@@ -105,7 +105,7 @@ public class WatchListJob implements Job
         // response and session to components which require them.
         // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
         ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class);
+            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class.getName());
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
@@ -120,8 +120,8 @@ public class WatchListJob implements Job
 
     protected void cleanupComponents()
     {
-        Container container = (Container) Utils.getComponent(Container.class);
-        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        Container container = (Container) Utils.getComponent(Container.class.getName());
+        Execution execution = (Execution) Utils.getComponent(Execution.class.getName());
 
         // We must ensure we clean the ThreadLocal variables located in the Container and Execution
         // components as otherwise we will have a potential memory leak.

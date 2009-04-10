@@ -489,6 +489,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                     DOCUMENTCONTENT_SHEET_PREFIX + getClassSheetFullName() + DOCUMENTCONTENT_EXT;
                 String content = getResourceDocumentContent(documentContentPath);
                 doc.setContent(content != null ? content : getClassSheetDefaultContent());
+                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
             }
 
             if (doc.isNew() || needsUpdate) {
@@ -548,6 +549,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                     getResourceDocumentContent(DOCUMENTCONTENT_TEMPLATE_PREFIX + getClassTemplateFullName()
                         + DOCUMENTCONTENT_EXT);
                 doc.setContent(content != null ? content : getClassTemplateDefaultContent());
+                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
 
                 doc.setParent(getClassFullName());
             }

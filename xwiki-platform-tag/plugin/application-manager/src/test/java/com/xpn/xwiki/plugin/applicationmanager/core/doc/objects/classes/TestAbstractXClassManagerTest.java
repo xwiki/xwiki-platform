@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 
@@ -38,16 +37,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager}.
  * 
  * @version $Id: $
  */
-public class TestAbstractXClassManagerTest extends MockObjectTestCase
+public class TestAbstractXClassManagerTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private XWikiContext context;
-
     private XWiki xwiki;
 
     private Map<String, XWikiDocument> documents = new HashMap<String, XWikiDocument>();
@@ -58,9 +56,9 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
      * @see junit.framework.TestCase#setUp()
      */
     @Override
-    protected void setUp() throws XWikiException
+    protected void setUp() throws Exception
     {
-        this.context = new XWikiContext();
+        super.setUp();
 
         Mock mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         mockXWiki.stubs().method("getDocument").will(new CustomStub("Implements XWiki.getDocument")
@@ -111,7 +109,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
         });
 
         this.xwiki = (XWiki) mockXWiki.proxy();
-        this.context.setWiki(this.xwiki);
+        getContext().setWiki(this.xwiki);
     }
 
     // ///////////////////////////////////////////////////////////////////////////////////////:
@@ -375,7 +373,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        XClassManager<XObjectDocument> xClassManager = DispatchXClassManager.getInstance(context);
+        XClassManager<XObjectDocument> xClassManager = DispatchXClassManager.getInstance(getContext());
 
         assertEquals(CLASS_SPACE_PREFIX, xClassManager.getClassSpacePrefix());
         assertEquals(CLASS_PREFIX, xClassManager.getClassPrefix());
@@ -398,7 +396,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        XClassManager<XObjectDocument> xClassManager = NoDispatchXClassManager.getInstance(context);
+        XClassManager<XObjectDocument> xClassManager = NoDispatchXClassManager.getInstance(getContext());
 
         assertEquals(CLASS_SPACE_PREFIX, xClassManager.getClassSpacePrefix());
         assertEquals(CLASS_PREFIX, xClassManager.getClassPrefix());
@@ -417,7 +415,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
     private void ptestCkeck(XClassManager<XObjectDocument> xclass) throws XWikiException
     {
-        XWikiDocument doc = xwiki.getDocument(xclass.getClassFullName(), context);
+        XWikiDocument doc = xwiki.getDocument(xclass.getClassFullName(), getContext());
 
         assertFalse(doc.isNew());
 
@@ -435,13 +433,13 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        XWikiDocument docSheet = xwiki.getDocument(xclass.getClassSheetFullName(), context);
+        XWikiDocument docSheet = xwiki.getDocument(xclass.getClassSheetFullName(), getContext());
 
         assertFalse(docSheet.isNew());
 
         // ///
 
-        XWikiDocument docTemplate = xwiki.getDocument(xclass.getClassTemplateFullName(), context);
+        XWikiDocument docTemplate = xwiki.getDocument(xclass.getClassTemplateFullName(), getContext());
 
         assertFalse(docTemplate.isNew());
 
@@ -456,7 +454,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        ptestCkeck(NoDispatchXClassManager.getInstance(context));
+        ptestCkeck(NoDispatchXClassManager.getInstance(getContext()));
     }
 
     public void testCkeckNoDispatch() throws XWikiException
@@ -465,13 +463,13 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        ptestCkeck(NoDispatchXClassManager.getInstance(context));
+        ptestCkeck(NoDispatchXClassManager.getInstance(getContext()));
     }
 
     private void ptestGetClassDocument(XClassManager<XObjectDocument> xClassManager) throws XWikiException
     {
-        XWikiDocument doc = xwiki.getDocument(xClassManager.getClassFullName(), context);
-        Document docFromClass = xClassManager.getClassDocument(context);
+        XWikiDocument doc = xwiki.getDocument(xClassManager.getClassFullName(), getContext());
+        Document docFromClass = xClassManager.getClassDocument(getContext());
 
         assertFalse(docFromClass.isNew());
         assertEquals(doc.getFullName(), docFromClass.getFullName());
@@ -483,7 +481,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassDocument(DispatchXClassManager.getInstance(context));
+        ptestGetClassDocument(DispatchXClassManager.getInstance(getContext()));
     }
 
     public void testGetClassDocumentNoDispatch() throws XWikiException
@@ -492,13 +490,13 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassDocument(NoDispatchXClassManager.getInstance(context));
+        ptestGetClassDocument(NoDispatchXClassManager.getInstance(getContext()));
     }
 
     private void ptestGetClassSheetDocument(XClassManager<XObjectDocument> xClassManager) throws XWikiException
     {
-        XWikiDocument doc = xwiki.getDocument(xClassManager.getClassSheetFullName(), context);
-        Document docFromClass = xClassManager.getClassSheetDocument(context);
+        XWikiDocument doc = xwiki.getDocument(xClassManager.getClassSheetFullName(), getContext());
+        Document docFromClass = xClassManager.getClassSheetDocument(getContext());
 
         assertFalse(docFromClass.isNew());
         assertEquals(doc.getFullName(), docFromClass.getFullName());
@@ -510,7 +508,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassSheetDocument(DispatchXClassManager.getInstance(context));
+        ptestGetClassSheetDocument(DispatchXClassManager.getInstance(getContext()));
     }
 
     public void testGetClassSheetDocumentNoDispatch() throws XWikiException
@@ -519,13 +517,13 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassSheetDocument(NoDispatchXClassManager.getInstance(context));
+        ptestGetClassSheetDocument(NoDispatchXClassManager.getInstance(getContext()));
     }
 
     private void ptestGetClassTemplateDocument(XClassManager<XObjectDocument> xClassManager) throws XWikiException
     {
-        XWikiDocument doc = xwiki.getDocument(xClassManager.getClassTemplateFullName(), context);
-        Document docFromClass = xClassManager.getClassTemplateDocument(context);
+        XWikiDocument doc = xwiki.getDocument(xClassManager.getClassTemplateFullName(), getContext());
+        Document docFromClass = xClassManager.getClassTemplateDocument(getContext());
 
         assertFalse(docFromClass.isNew());
         assertEquals(doc.getFullName(), docFromClass.getFullName());
@@ -537,7 +535,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassTemplateDocument(DispatchXClassManager.getInstance(context));
+        ptestGetClassTemplateDocument(DispatchXClassManager.getInstance(getContext()));
     }
 
     public void testGetClassTemplateDocumentNoDispatch() throws XWikiException
@@ -546,64 +544,64 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassTemplateDocument(NoDispatchXClassManager.getInstance(context));
+        ptestGetClassTemplateDocument(NoDispatchXClassManager.getInstance(getContext()));
     }
 
     public void testGetItemDefaultNameDisptach() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEM_NAME, DispatchXClassManager.getInstance(context).getItemDefaultName(
+        assertEquals(DEFAULT_ITEM_NAME, DispatchXClassManager.getInstance(getContext()).getItemDefaultName(
             DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME));
     }
 
     public void testGetItemDefaultNameNoDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEM_NAME, NoDispatchXClassManager.getInstance(context).getItemDefaultName(
+        assertEquals(DEFAULT_ITEM_NAME, NoDispatchXClassManager.getInstance(getContext()).getItemDefaultName(
             NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME));
     }
 
     public void testGetItemDocumentDefaultNameDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(context).getItemDocumentDefaultName(
-            DEFAULT_ITEM_NAME, context));
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(getContext()).getItemDocumentDefaultName(
+            DEFAULT_ITEM_NAME, getContext()));
     }
 
     public void testGetItemDocumentDefaultNameNoDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, NoDispatchXClassManager.getInstance(context)
-            .getItemDocumentDefaultName(DEFAULT_ITEM_NAME, context));
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, NoDispatchXClassManager.getInstance(getContext())
+            .getItemDocumentDefaultName(DEFAULT_ITEM_NAME, getContext()));
     }
 
     public void testGetItemDocumentDefaultFullNameDispatch() throws XWikiException
     {
-        assertEquals(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, DispatchXClassManager.getInstance(context)
-            .getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
+        assertEquals(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, DispatchXClassManager.getInstance(getContext())
+            .getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, getContext()));
     }
 
     public void testGetItemDocumentDefaultFullNameNoDispatch() throws XWikiException
     {
-        assertEquals(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, NoDispatchXClassManager.getInstance(context)
-            .getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
+        assertEquals(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, NoDispatchXClassManager.getInstance(getContext())
+            .getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, getContext()));
     }
 
     public void testIsInstanceNoDispatch() throws XWikiException
     {
-        assertTrue(NoDispatchXClassManager.getInstance(context).isInstance(
-            NoDispatchXClassManager.getInstance(context).newXObjectDocument(context).getDocumentApi()));
-        assertFalse(NoDispatchXClassManager.getInstance(context).isInstance(new XWikiDocument()));
+        assertTrue(NoDispatchXClassManager.getInstance(getContext()).isInstance(
+            NoDispatchXClassManager.getInstance(getContext()).newXObjectDocument(getContext()).getDocumentApi()));
+        assertFalse(NoDispatchXClassManager.getInstance(getContext()).isInstance(new XWikiDocument()));
     }
 
     public void testIsInstanceDispatch() throws XWikiException
     {
-        assertTrue(DispatchXClassManager.getInstance(context).isInstance(
-            DispatchXClassManager.getInstance(context).newXObjectDocument(context).getDocumentApi()));
-        assertFalse(DispatchXClassManager.getInstance(context).isInstance(new XWikiDocument()));
+        assertTrue(DispatchXClassManager.getInstance(getContext()).isInstance(
+            DispatchXClassManager.getInstance(getContext()).newXObjectDocument(getContext()).getDocumentApi()));
+        assertFalse(DispatchXClassManager.getInstance(getContext()).isInstance(new XWikiDocument()));
     }
 
     public void testCreateWhereClause_null() throws XWikiException
     {
         List<Object> list = new ArrayList<Object>();
 
-        String where = DispatchXClassManager.getInstance(context).createWhereClause(null, list);
+        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(null, list);
 
         assertEquals(WHERECLAUSE_null, where);
     }
@@ -613,7 +611,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
         List<Object> list = new ArrayList<Object>();
         String[][] fieldDescriptors = new String[][] {};
 
-        String where = DispatchXClassManager.getInstance(context).createWhereClause(fieldDescriptors, list);
+        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(fieldDescriptors, list);
 
         assertEquals(WHERECLAUSE_null, where);
     }
@@ -622,7 +620,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
     {
         List<Object> list = new ArrayList<Object>();
 
-        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_doc, list);
+        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_doc, list);
 
         assertEquals(WHERECLAUSE_doc, where);
     }
@@ -631,7 +629,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
     {
         List<Object> list = new ArrayList<Object>();
 
-        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_doc_multi, list);
+        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_doc_multi, list);
 
         assertEquals(WHERECLAUSE_doc_multi, where);
     }
@@ -640,7 +638,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
     {
         List<Object> list = new ArrayList<Object>();
 
-        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_obj, list);
+        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_obj, list);
 
         assertEquals(WHERECLAUSE_obj, where);
     }
@@ -649,7 +647,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
     {
         List<Object> list = new ArrayList<Object>();
 
-        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_obj_multi, list);
+        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_obj_multi, list);
 
         assertEquals(WHERECLAUSE_obj_multi, where);
     }
@@ -658,7 +656,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
     {
         List<Object> list = new ArrayList<Object>();
 
-        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_objdoc, list);
+        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_objdoc, list);
 
         assertEquals(WHERECLAUSE_objdoc, where);
     }
@@ -668,7 +666,7 @@ public class TestAbstractXClassManagerTest extends MockObjectTestCase
         List<Object> list = new ArrayList<Object>();
 
         String where =
-            DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_objdoc_multi, list);
+            DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_objdoc_multi, list);
 
         assertEquals(WHERECLAUSE_objdoc_multi, where);
     }

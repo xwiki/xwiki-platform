@@ -277,11 +277,7 @@ public class SpaceImpl extends Document implements Space
      */
     public String getHomeURL() throws SpaceManagerException
     {
-        try {
-            return context.getWiki().getURL(getSpace() + ".WebHome", "view", context);
-        } catch (XWikiException e) {
-            throw new SpaceManagerException(e);
-        }
+        return context.getWiki().getURL(getSpace() + ".WebHome", "view", context);
     }
 
     /**

@@ -35,11 +35,25 @@
   <name>XWiki Platform - Plugins - Space Manager</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Space Manager</description>
+  <properties>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.6.2</version>
+      <version>${platform.core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-mailsender</artifactId>
+      <version>1.6</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -49,29 +63,17 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.xpn.xwiki.platform.plugins</groupId>
-      <artifactId>xwiki-plugin-mailsender</artifactId>
-      <version>1.6</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.6.2</version>
+      <version>${platform.core.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.xpn.xwiki.platform.tools</groupId>
-      <artifactId>xwiki-shared-tests</artifactId>
-      <version>1.12</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${platform.core.version}</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>      

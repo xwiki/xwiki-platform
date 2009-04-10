@@ -157,6 +157,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWikiSpaceClass");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate)

@@ -42,7 +42,7 @@ function getY(el) {
       return el.offsetTop + getY(el.offsetParent) + el.clientTop;
     }
     else {
-      return el.offsetTop + getY(el.offsetParent) + (el.scrollHeight - el.clientHeight); 
+      return el.offsetTop + getY(el.offsetParent) + (el.scrollHeight - el.clientHeight);
     }
   }
   else {
@@ -167,7 +167,7 @@ function onDrag(el,x,y) {
   }
   if (list.length==0){
       if (parentNode != allPanels){
-        parentNode.appendChild( dragel); 
+        parentNode.appendChild( dragel);
       }
   }
   else if (pos!=0 && y<=getY(list[pos-1])) {
@@ -178,7 +178,7 @@ function onDrag(el,x,y) {
       parentNode.insertBefore(dragel, list[pos+2]);
     } else {
       if (parentNode != allPanels){
-        parentNode.appendChild( dragel); 
+        parentNode.appendChild( dragel);
       }
       else {
         dragel.parentNode.removeChild(dragel);
@@ -343,7 +343,7 @@ function attachDragHandler(el){
   el.ondblclick = function(ev) {};
   Drag.init(el,el);
   el.onDragStart = function (x,y) { onDragStart(this,x,y);};
-  el.onDrag = function (x,y) { 
+  el.onDrag = function (x,y) {
     onDrag(this,x,y);
   };
   el.onDragEnd = function (x,y) { onDragEnd(this,x,y);};
@@ -453,7 +453,8 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "none";
         releasePanels(rightPanels);
       }
-      mainContainer.className = "contenthidelefthideright";
+      // mainContainer.className = "contenthidelefthideright";
+      mainContainer.className = "hidelefthideright";
       break;
     case 1:
       //show left; hide right;
@@ -467,7 +468,8 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "none";
         releasePanels(rightPanels);
       }
-      mainContainer.className = "contenthideright";
+      // mainContainer.className = "contenthideright";
+      mainContainer.className = "hideright";
       break;
     case 2:
       //hide left; show right;
@@ -481,7 +483,8 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "block";
         restorePanels(rightPanels);
       }
-      mainContainer.className = "contenthideleft";
+      // mainContainer.className = "contenthideleft";
+      mainContainer.className = "hideleft";
       break;
     case 3:
       //show left; show right;
@@ -544,9 +547,9 @@ function panelEditorInit(){
   window.leftPanels    = document.getElementById("leftPanels");
   window.rightPanels   = document.getElementById("rightPanels");
   allPanels     = document.getElementById("allviewpanels");
-  mainContent   = document.getElementById("contentcolumn");
-  mainContainer = document.getElementById("contentcontainer");
-
+mainContent   = document.getElementById("contentcolumn");
+ // mainContainer = document.getElementById("contentcontainer");
+mainContainer = document.getElementById("body");
   leftPanelsLeft   = getX(leftPanels);
   leftPanelsRight  = leftPanelsLeft  + leftPanels.offsetWidth;
   rightPanelsLeft  = getX(rightPanels);

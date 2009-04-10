@@ -57,12 +57,13 @@
 </object>
 <content>### Administrate the presentation preferences globally and at space level.
 #if("$!editor" == 'globaladmin')
-  #set($legend = ['header', 'footer', 'skin'])
+  #set($legend = ['header', 'panels', 'footer', 'skin'])
 #else
-  #set($legend = ['header', 'skin'])
+  #set($legend = ['header', 'panels', 'skin'])
 #end
 #set($params = $util.hashMap)
 #set($params.header = ['title', 'meta'])
+#set($params.panels = ['showLeftPanels', 'leftPanels', 'showRightPanels', 'rightPanels'])
 #if("$!editor" == 'globaladmin')
   #set($params.footer = ['webcopyright', 'version'])
 #end

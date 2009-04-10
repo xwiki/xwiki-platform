@@ -189,7 +189,7 @@ public class DavPage extends AbstractDavResource
             String pName = resource.getDisplayName();
             getContext().checkAccess("edit", pName);
             XWikiDocument childDoc = getContext().getDocument(pName);
-            childDoc.setContent("This page was created thorugh xwiki-webdav interface.");
+            childDoc.setContent("This page was created through the WebDAV interface.");
             childDoc.setParent(this.name);
             getContext().saveDocument(childDoc);
         } else if (isFile) {

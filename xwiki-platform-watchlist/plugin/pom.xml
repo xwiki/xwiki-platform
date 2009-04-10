@@ -34,7 +34,7 @@
   <version>1.14-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - WatchList Manager</description>
   <properties>
-    <platform.core.version>1.9-SNAPSHOT</platform.core.version>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

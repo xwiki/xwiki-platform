@@ -335,6 +335,7 @@ final class WikiManager
 
                 includeFormatParams[2] = docFullName;
                 targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")", includeFormatParams));
+                targetDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
             }
 
             // Replace documents contents to link
@@ -344,6 +345,7 @@ final class WikiManager
 
                 includeFormatParams[2] = docFullName;
                 targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")", includeFormatParams));
+                targetDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
             }
         } finally {
             context.setDatabase(database);

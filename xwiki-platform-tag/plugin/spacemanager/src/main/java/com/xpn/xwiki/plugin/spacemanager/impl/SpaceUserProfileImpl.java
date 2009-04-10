@@ -86,6 +86,7 @@ public class SpaceUserProfileImpl extends Document implements SpaceUserProfile
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWiki Space User Profile Class");
+            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
 
         if (needsUpdate)

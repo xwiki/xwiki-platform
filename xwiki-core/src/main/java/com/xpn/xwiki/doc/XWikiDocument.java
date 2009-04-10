@@ -2054,6 +2054,11 @@ public class XWikiDocument implements DocumentModelBridge
                 } else {
                     setTemplate(template);
                     setContent(templatedoc.getContent());
+                    
+                    // Set the new document syntax as the syntax of the template since the template content
+                    // is copied into the new document
+                    setSyntaxId(templatedoc.getSyntaxId());
+                    
                     if ((getParent() == null) || (getParent().equals(""))) {
                         String tparent = templatedoc.getParent();
                         if (tparent != null) {

@@ -28,12 +28,12 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>15-SNAPSHOT</version>
+    <version>16-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-spacemanager</artifactId>
   <version>1.2-SNAPSHOT</version>
   <name>XWiki Platform - Plugins - Space Manager</name>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <description>XWiki Platform - Plugins - Space Manager</description>
   <properties>
     <platform.core.version>1.8-SNAPSHOT</platform.core.version>

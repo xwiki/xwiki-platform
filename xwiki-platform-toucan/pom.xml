@@ -42,7 +42,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-albatross</artifactId>
-      <version>1.18-SNAPSHOT</version>
+      <version>1.19-SNAPSHOT</version>
       <scope>runtime</scope>
       <type>zip</type>
     </dependency>

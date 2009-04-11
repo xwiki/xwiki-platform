@@ -27,10 +27,10 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>15-SNAPSHOT</version>
+    <version>14</version>
   </parent>
   <artifactId>xwiki-plugin-scheduler</artifactId>
-  <version>1.7-SNAPSHOT</version>
+  <version>1.7</version>
   <name>XWiki Platform - Plugins - Scheduler</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Scheduler</description>
@@ -60,4 +60,10 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-scheduler-1.7</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-scheduler-1.7</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-scheduler-1.7</url>
+  </scm>
 </project>

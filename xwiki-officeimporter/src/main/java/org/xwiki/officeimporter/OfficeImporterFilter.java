@@ -20,7 +20,7 @@
 package org.xwiki.officeimporter;
 
 import org.w3c.dom.Document;
-import org.xwiki.refactoring.WikiDocument;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.XDOM;
 
 /**
@@ -32,23 +32,36 @@ import org.xwiki.rendering.block.XDOM;
 public interface OfficeImporterFilter
 {
     /**
-     * Allows extended filtering on the html {@link Document} generated during the import process.
+     * Injects the {@link DocumentAccessBridge} component to be used for accessing documents.
      * 
+     * @param docBridge the {@link DocumentAccessBridge} component.
+     */
+    void setDocBridge(DocumentAccessBridge docBridge);
+    
+    /**
+     * Allows extended filtering on the main XHTML {@link Document} generated during the import process.
+     * 
+     * @param documentName name of the target wiki page.
      * @param document the {@link Document} containing the html content of the office document.
      */
-    void filter(Document document);
+    void filter(String documentName, Document document);
     
     /**
-     * Allows extended filtering on the {@link XDOM} generated during the import process.
+     * Allows extended filtering on xwiki documents generated during the import process.
      * 
+     * @param documentName name of the target wiki page.
      * @param xdom the {@link XDOM} representing the master wiki document.
+     * @param isSplit if this document is a result of a split operation.
      */
-    void filter(XDOM xdom);
+    void filter(String documentName, XDOM xdom, boolean isSplit);
     
     /**
-     * Allows extended filtering on the documents resulting from the split operation.
+     * Allows extended filtering on imported documents just before the content is saved.
      * 
-     * @param document The {@link WikiDocument} holding the contents of the wiki page.
+     * @param documentName name of the target wiki page.
+     * @param content xwiki/2.0 content of the document.
+     * @param isSplit if this document is a result of a split operation.
+     * @return the filtered document content.
      */
-    void filter(WikiDocument document);
+    String filter(String documentName, String content, boolean isSplit);
 }

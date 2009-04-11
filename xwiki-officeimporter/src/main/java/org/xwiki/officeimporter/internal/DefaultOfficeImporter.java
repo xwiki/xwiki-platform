@@ -141,12 +141,13 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
                 configuration.setParameters(params);
                 Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
-                importerFilter.filter(xhtmlDoc);
+                importerFilter.filter(targetWikiDocument, xhtmlDoc);
                 XMLUtils.stripHTMLEnvelope(xhtmlDoc);
                 XDOM xdom = xHtmlParser.parse(new StringReader(XMLUtils.toString(xhtmlDoc)));
-                importerFilter.filter(xdom);
+                importerFilter.filter(targetWikiDocument, xdom, false);
                 if (!isSplitRequest(params)) {
-                    saveDocument(targetWikiDocument, renderXdom(xdom, XWIKI_20), isAppendRequest(params));
+                    saveDocument(targetWikiDocument, importerFilter.filter(targetWikiDocument, renderXdom(xdom,
+                        XWIKI_20), false), isAppendRequest(params));
                 } else {
                     splitImport(targetWikiDocument, xdom, params, importerFilter);
                 }
@@ -293,8 +294,8 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         try {
             WikiDocument rootDoc = new WikiDocument(documentName, xdom, null);
             List<WikiDocument> documents = documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
-            for (WikiDocument doc : documents) {                
-                importerFilter.filter(doc);
+            for (WikiDocument doc : documents) {
+                importerFilter.filter(doc.getFullName(), doc.getXdom(), true);
                 String title = extractTitle(doc.getXdom());
                 if (null != title) {
                     docBridge.getDocument(doc.getFullName()).setTitle(title);
@@ -305,7 +306,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 }
                 String content = renderXdom(doc.getXdom(), XWIKI_20);
                 boolean append = doc.equals(rootDoc) ? isAppendRequest(params) : false;
-                saveDocument(doc.getFullName(), content, append);
+                saveDocument(doc.getFullName(), importerFilter.filter(doc.getFullName(), content, true), append);
             }
         } catch (Exception ex) {
             throw new OfficeImporterException("Internal error while importing document.", ex);
@@ -381,7 +382,9 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 getLogger().warn("Could not build the groovy filter.", t);
             }
         }
-        return (importerFilter != null) ? importerFilter : new DefaultOfficeImporterFilter();
+        importerFilter = (importerFilter == null) ? new DefaultOfficeImporterFilter() : importerFilter;
+        importerFilter.setDocBridge(docBridge);
+        return importerFilter;
     }
 
     /**

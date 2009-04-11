@@ -20,8 +20,8 @@
 package org.xwiki.officeimporter.internal;
 
 import org.w3c.dom.Document;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.officeimporter.OfficeImporterFilter;
-import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.rendering.block.XDOM;
 
 /**
@@ -35,24 +35,33 @@ public class DefaultOfficeImporterFilter implements OfficeImporterFilter
     /**
      * {@inheritDoc}
      */
-    public void filter(Document document)
+    public void setDocBridge(DocumentAccessBridge docBridge)
     {
         // Do nothing.
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void filter(String documentName, Document document)
+    {
+        // Do nothing.        
     }
 
     /**
      * {@inheritDoc}
      */
-    public void filter(XDOM xdom)
+    public void filter(String documentName, XDOM xdom, boolean isSplit)
     {
-        // Do nothing.
+        // Do nothing
     }
-
+    
     /**
      * {@inheritDoc}
      */
-    public void filter(WikiDocument document)
+    public String filter(String documentName, String content, boolean isSplit)
     {
-        // DO nothing.        
-    }
+        // Do nothing.
+        return content;
+    }     
 }

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-application-tag</artifactId>
   <name>XWiki Platform - Applications - Tag</name>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <packaging>xar</packaging>
   <description>Tag application for XWiki</description>
   <dependencies>
@@ -43,4 +43,10 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-tag-1.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-tag-1.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-tag-1.1</url>
+  </scm>
 </project>

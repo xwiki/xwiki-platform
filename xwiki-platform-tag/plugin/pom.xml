@@ -25,90 +25,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform</groupId>
-    <artifactId>xwiki</artifactId>
-    <version>23-SNAPSHOT</version>
-    <relativePath>../pom</relativePath>
+    <artifactId>xwiki-plugins</artifactId>
+    <groupId>com.xpn.xwiki.platform.plugins</groupId>
+    <version>14</version>
   </parent>
-  <groupId>com.xpn.xwiki.platform.plugins</groupId>
-  <artifactId>xwiki-plugins</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Plugins - Parent POM</name>
-  <version>16-SNAPSHOT</version>
-  <description>XWiki Platform - Plugins - Parent POM</description>
+  <artifactId>xwiki-plugin-tag</artifactId>
+  <name>XWiki Platform - Plugins - Tag</name>
+  <version>1.1</version>
+  <description>XWiki Platform - Plugins - Tag</description>
+  <dependencies>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>1.7.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.1</url>
   </scm>
-  <profiles>
-    <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>skinx</module>
-        <module>adwords</module>
-        <module>alexa</module>
-        <module>exoplatform</module>
-        <module>jodatime</module>
-        <module>scheduler</module>
-        <module>application-manager</module>
-        <module>wiki-manager</module>
-        <module>mailsender</module>
-        <module>watchlist</module>
-        <module>swizzle</module>
-        <module>spacemanager</module>
-        <module>lucene</module>
-        <module>activitystream</module>
-        <module>invitationmanager</module>
-        <module>calendar</module>
-        <module>tag</module>
-      </modules>
-    </profile>
-    <profile>
-      <!-- XWiki Enterprise -->
-      <id>xe</id>
-      <modules>     
-        <module>scheduler</module>
-        <module>mailsender</module>        
-        <module>watchlist</module>
-        <module>jodatime</module>
-        <module>skinx</module>
-        <module>lucene</module>
-        <module>tag</module>
-      </modules>
-    </profile>
-    <profile>
-      <!-- XWiki Enterprise Manager -->
-      <id>xem</id>
-      <modules>
-        <module>application-manager</module>
-        <module>wiki-manager</module>
-      </modules>
-    </profile>
-    <profile>
-      <!-- XWiki Workspaces -->
-      <id>xws</id>
-      <modules>
-        <module>application-manager</module>
-        <module>mailsender</module>
-        <module>spacemanager</module>
-        <module>activitystream</module>
-        <module>invitationmanager</module>
-      </modules>
-    </profile>
-    <profile>
-      <!-- Curriki -->
-      <id>curriki</id>
-      <modules>
-        <module>scheduler</module>
-        <module>mailsender</module>
-        <module>spacemanager</module>
-        <module>activitystream</module>
-        <module>invitationmanager</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

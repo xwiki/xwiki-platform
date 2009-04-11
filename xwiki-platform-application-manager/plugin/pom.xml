@@ -27,15 +27,14 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>15-SNAPSHOT</version>
+    <version>14</version>
   </parent>
   <artifactId>xwiki-plugin-application-manager</artifactId>
   <name>XWiki Platform - Plugins - Application Manager</name>
   <version>1.7-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Application Manager</description>
   <properties>
-    <platform.tool.verification.version>1.12-SNAPSHOT</platform.tool.verification.version>
-    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
+    <platform.core.version>1.8.1</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

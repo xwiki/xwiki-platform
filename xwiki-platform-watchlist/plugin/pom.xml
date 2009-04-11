@@ -27,14 +27,17 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>15-SNAPSHOT</version>
+    <version>14</version>
   </parent>
   <artifactId>xwiki-plugin-watchlist</artifactId>
   <name>XWiki Platform - Plugins - WatchList Manager</name>
   <version>1.14-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - WatchList Manager</description>
   <properties>
-    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
+    <platform.core.version>1.8.1</platform.core.version>
+    <platform.plugin.scheduler.version>1.7</platform.plugin.scheduler.version>
+    <platform.plugin.lucene.version>1.6</platform.plugin.lucene.version>
+    <platform.plugin.mailsender.version>1.7</platform.plugin.mailsender.version>
   </properties>
   <dependencies>
     <dependency>
@@ -46,17 +49,17 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-scheduler</artifactId>
-      <version>1.7-SNAPSHOT</version>
+      <version>${platform.plugin.scheduler.version}</version>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-mailsender</artifactId>
-      <version>1.7-SNAPSHOT</version>
+      <version>${platform.plugin.mailsender.version}</version>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-lucene</artifactId>
-      <version>1.7-SNAPSHOT</version>
+      <version>${platform.plugin.lucene.version}</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>

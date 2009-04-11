@@ -31,12 +31,12 @@
   </parent>
   <artifactId>xwiki-plugin-tag</artifactId>
   <name>XWiki Platform - Plugins - Tag</name>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Tag</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.1</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.1</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.1</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</url>
   </scm>
   <dependencies>
     <dependency>

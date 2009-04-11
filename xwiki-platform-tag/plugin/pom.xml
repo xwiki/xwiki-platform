@@ -31,13 +31,8 @@
   </parent>
   <artifactId>xwiki-plugin-tag</artifactId>
   <name>XWiki Platform - Plugins - Tag</name>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Tag</description>
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</url>
-  </scm>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-application-scheduler</artifactId>
   <name>XWiki Platform - Applications - Scheduler</name>
-  <version>1.7-SNAPSHOT</version>
+  <version>1.7</version>
   <packaging>xar</packaging>
   <description>Manages Scheduler Jobs</description>
   <dependencies>
@@ -43,4 +43,10 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-scheduler-1.7</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-scheduler-1.7</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-scheduler-1.7</url>
+  </scm>
 </project>

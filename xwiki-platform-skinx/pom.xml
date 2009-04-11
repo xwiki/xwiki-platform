@@ -27,14 +27,14 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>14</version>
+    <version>15-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-skinx</artifactId>
   <name>XWiki Platform - Plugins - Skin Extensions</name>
   <version>1.8-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Skin Extensions</description>
   <properties>
-    <platform.core.version>1.8.1</platform.core.version>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

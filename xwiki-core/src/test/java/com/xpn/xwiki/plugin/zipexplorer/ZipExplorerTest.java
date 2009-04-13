@@ -34,8 +34,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipEntry;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin} class.
  *
@@ -51,11 +51,20 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
         this.plugin = new ZipExplorerPlugin("zipexplorer", ZipExplorerPlugin.class.getName(), null);
     }
 
-    public void testIsZipFile()
+    public void testIsZipFile() throws Exception
     {
-        assertTrue(this.plugin.isZipFile("test.zip"));
-        assertFalse(this.plugin.isZipFile("test.txt"));
-        assertFalse(this.plugin.isZipFile("testzip"));
+        byte txtbuf[] = {0x00, 0x01, 0x02, 0x03, 0x06, 0x07};
+        ByteArrayInputStream txtBais = new ByteArrayInputStream(txtbuf);
+        assertFalse(this.plugin.isZipFile(txtBais));
+
+        byte tinybuf[] = {0x00};
+        ByteArrayInputStream tinyBais = new ByteArrayInputStream(tinybuf);
+        assertFalse(this.plugin.isZipFile(tinyBais));
+
+        byte zipbuf[] = createZipFile("test");
+        ByteArrayInputStream zipBais = new ByteArrayInputStream(zipbuf);
+        assertTrue(this.plugin.isZipFile(zipBais));
+
     }
 
     public void testIsValidZipURL()

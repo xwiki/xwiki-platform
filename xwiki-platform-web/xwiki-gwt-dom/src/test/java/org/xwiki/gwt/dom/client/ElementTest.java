@@ -138,16 +138,72 @@ public class ElementTest extends AbstractDOMTest
         element.setAttribute(customAttribute, "y");
         element.setTitle("z");
         element.getStyle().setProperty(Style.BACKGROUND_COLOR, "rgb(255, 0, 0)");
+        element.setClassName("test");
 
         List<String> attrList = new ArrayList<String>();
         attrList.add(customAttribute);
         attrList.add("title");
         attrList.add("style");
+        attrList.add("class");
 
         JsArrayString attributeNames = element.getAttributeNames();
         for (int i = 0; i < attributeNames.length(); i++) {
             attrList.remove(attributeNames.get(i));
         }
         assertEquals(0, attrList.size());
+    }
+
+    /**
+     * Unit test for {@link Element#hasClassName(String)}.
+     */
+    public void testHasClassName()
+    {
+        String className = "listItem-selected";
+
+        Element element = Document.get().createSpanElement().cast();
+        assertFalse(element.hasClassName(className));
+
+        element.setClassName(className);
+        assertFalse(element.hasClassName("listItem"));
+        assertTrue(element.hasClassName(className));
+
+        element.setClassName(className + "   gwtListItem  ");
+        assertTrue(element.hasClassName(className));
+        assertFalse(element.hasClassName(className.toUpperCase()));
+        assertTrue(element.hasClassName("gwtListItem"));
+
+        assertFalse(element.hasClassName(null));
+    }
+
+    /**
+     * Unit test for {@link Element#addClassName(String)}.
+     */
+    public void testAddClassName()
+    {
+        Element element = Document.get().createSpanElement().cast();
+        element.addClassName("macro-selected");
+        element.addClassName("macro");
+        element.addClassName("macro ");
+        element.addClassName(null);
+        assertEquals("macro-selected macro", element.getClassName());
+    }
+
+    /**
+     * Unit test for {@link Element#removeClassName(String)}.
+     */
+    public void testRemoveClassName()
+    {
+        Element element = Document.get().createSpanElement().cast();
+        element.removeClassName("color");
+        assertEquals("", element.getClassName());
+
+        element.setClassName("colorCell  colorCell-selected   ");
+        element.removeClassName("Cell");
+        element.removeClassName("colorCell");
+        assertEquals("colorCell-selected", element.getClassName());
+
+        element.removeClassName(null);
+        element.removeClassName(" colorCell-selected");
+        assertEquals("", element.getClassName());
     }
 }

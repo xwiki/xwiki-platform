@@ -59,8 +59,13 @@ body.main {
 .main h1 span, .main h2 span, .main h3 span, .main h4 span {
   border-bottom: 0 none;
   margin: 0;
-  /* IE behaves very strange when the span is displayed as block. */
+  /* IE behaves strangely when the span is displayed as block. */
   display: inline;
+  /*
+    IE behaves strangely when the span doesn't have static position.
+    See XWIKI-3339: New TOC overlaps with titles in WYSIWYG edition in IE6
+  */
+  position: static;
 }
 
 .main h1, .main h2, .main h3, .main h4 {
@@ -96,13 +101,12 @@ body.main {
 .main .macro-block {
   display: block;
   margin-right: auto;
-  /* Prevent horizontal scroll bar in IE */
+  /*
+    In IE6 the horizontal scroll bar appears even if we remove the padding and the border from the macro. In IE7 the
+    horizontal scroll bar appears when the macro is selected and the resize handlers are shown. Using a width of 99%
+    seems to prevent the horizontal scroll bar in IE.
+  */
   width: 99% !important;
-}
-
-html>body.main .macro-block {
-  /* Prevent horizontal scroll bar in IE */
-  width: 99.9% !important;
 }
 
 .main .macro-selected {

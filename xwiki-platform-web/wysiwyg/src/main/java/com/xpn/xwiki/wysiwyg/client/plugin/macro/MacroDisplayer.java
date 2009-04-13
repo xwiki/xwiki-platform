@@ -53,6 +53,16 @@ public class MacroDisplayer implements InnerHTMLListener
     public static final String SELECTED_MACRO_STYLE_NAME = MACRO_STYLE_NAME + "-selected";
 
     /**
+     * The CSS class name used on the text box containing the output of a block macro.
+     */
+    public static final String BLOCK_MACRO_STYLE_NAME = MACRO_STYLE_NAME + "-block";
+
+    /**
+     * The CSS class name used on the text box containing the output of an in-line macro.
+     */
+    public static final String INLINE_MACRO_STYLE_NAME = MACRO_STYLE_NAME + "-inline";
+
+    /**
      * Collection of DOM utility methods.
      */
     protected final DOMUtils domUtils = DOMUtils.getInstance();
@@ -163,6 +173,7 @@ public class MacroDisplayer implements InnerHTMLListener
     {
         // Create the read only text box.
         Element container = createReadOnlyBox();
+        container.setClassName(MACRO_STYLE_NAME);
 
         MacroCall call = new MacroCall(start.getNodeValue());
         container.setTitle(call.getName() + " macro");
@@ -175,10 +186,11 @@ public class MacroDisplayer implements InnerHTMLListener
         int endIndex = startIndex + siblingCount + 1;
         // We need to put macro output inside a container to be able to hide it when the macro is collapsed.
         Element output = (Element) textArea.getDocument().xCreateDivElement().cast();
+        output.setClassName("macro-output");
         output.appendChild(domUtils.extractNodeContents(start.getParentNode(), startIndex + 1, endIndex));
 
         // Let's see if the macro should be displayed in-line or as a block.
-        container.getStyle().setProperty(Style.DISPLAY, getOutputDisplay(output));
+        container.addClassName(isInLine(output) ? INLINE_MACRO_STYLE_NAME : BLOCK_MACRO_STYLE_NAME);
 
         container.appendChild(output);
         domUtils.insertAt(start.getParentNode(), container, startIndex);
@@ -188,19 +200,19 @@ public class MacroDisplayer implements InnerHTMLListener
 
     /**
      * @param output the output of a macro
-     * @return {@code Display#BLOCK} if the output of the macro contains block-level elements and thus the macro needs
-     *         to be displayed as a block, {@code Display#INLINE} otherwise
+     * @return {@code false} if the output of the macro contains block-level elements and thus the macro needs to be
+     *         displayed as a block, {@code true} otherwise
      */
-    private String getOutputDisplay(Element output)
+    private boolean isInLine(Element output)
     {
         Node child = output.getFirstChild();
         while (child != null) {
             if (domUtils.isBlock(child)) {
-                return Display.BLOCK;
+                return false;
             }
             child = child.getNextSibling();
         }
-        return Display.INLINE;
+        return true;
     }
 
     /**
@@ -275,7 +287,11 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public void setSelected(Element container, boolean selected)
     {
-        container.setClassName(MACRO_STYLE_NAME + (selected ? " " + SELECTED_MACRO_STYLE_NAME : ""));
+        if (selected) {
+            container.addClassName(SELECTED_MACRO_STYLE_NAME);
+        } else {
+            container.removeClassName(SELECTED_MACRO_STYLE_NAME);
+        }
     }
 
     /**
@@ -284,7 +300,7 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public boolean isSelected(Element container)
     {
-        return String.valueOf(container.getClassName()).contains(SELECTED_MACRO_STYLE_NAME);
+        return container.hasClassName(SELECTED_MACRO_STYLE_NAME);
     }
 
     /**
@@ -294,7 +310,7 @@ public class MacroDisplayer implements InnerHTMLListener
     public boolean isMacroContainer(Node node)
     {
         return getMacroContainerTagName().equalsIgnoreCase(node.getNodeName())
-            && String.valueOf(((Element) node).getClassName()).contains(MACRO_STYLE_NAME);
+            && ((Element) node).hasClassName(MACRO_STYLE_NAME);
     }
 
     /**

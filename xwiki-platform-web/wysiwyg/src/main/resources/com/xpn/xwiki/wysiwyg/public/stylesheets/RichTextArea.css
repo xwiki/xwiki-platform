@@ -73,18 +73,36 @@ body.main {
 }
 
 .main .macro {
-  border: 1px dashed #CCCCCC;
   background-color: transparent;
+  border: 1px dashed #CCCCCC;
   font-size: 100%;
-  text-align: left;
-  padding: 1px;
-  /* Prevent resizing in IE */
-  width: auto !important;
+  /* Prevent vertical resizing in IE */
   height: auto !important;
   /* Remove button padding in IE */
   overflow: visible;
+  padding: 1px;
+  text-align: left;
   /* Prevent word wrapping inside a macro container in IE */
   white-space: nowrap;
+}
+
+.main .macro-inline {
+  display: inline;
+  margin: 0px;
+  /* Prevent horizontal resizing in IE */
+  width: auto !important;
+}
+
+.main .macro-block {
+  display: block;
+  margin-right: auto;
+  /* Prevent horizontal scroll bar in IE */
+  width: 99% !important;
+}
+
+html>body.main .macro-block {
+  /* Prevent horizontal scroll bar in IE */
+  width: 99.9% !important;
 }
 
 .main .macro-selected {

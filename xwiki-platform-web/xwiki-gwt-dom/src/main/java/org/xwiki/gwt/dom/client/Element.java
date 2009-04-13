@@ -49,6 +49,11 @@ public class Element extends com.google.gwt.dom.client.Element
     public static final String META_DATA_ATTR = "metadata";
 
     /**
+     * The {@code class} attribute is a space-separated list of CSS class names.
+     */
+    public static final String CLASS_NAME_SEPARATOR = "\\s+";
+
+    /**
      * Default constructor. Needs to be protected because all instances are created from JavaScript.
      */
     protected Element()
@@ -303,5 +308,66 @@ public class Element extends com.google.gwt.dom.client.Element
     public final boolean hasAttributes()
     {
         return DOMUtils.getInstance().hasAttributes(this);
+    }
+
+    /**
+     * @param className a {@link String} representing the CSS class to look for
+     * @return {@code true} if this element's {@code class} attribute contains the given class name, {@code false}
+     *         otherwise
+     */
+    public final boolean hasClassName(String className)
+    {
+        if (className == null) {
+            return false;
+        }
+        String trimmedClassName = className.trim();
+        String[] classNames = getClassName().split(CLASS_NAME_SEPARATOR);
+        for (int i = 0; i < classNames.length; i++) {
+            if (classNames[i].equals(trimmedClassName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Adds a new CSS class name to this element's {@code class} attribute. The {@code class} attribute is a
+     * space-separated list of CSS class names.
+     * 
+     * @param className a {@link String} representing the CSS class to be appended to this element's {@code class}
+     *            attribute
+     * @see #setClassName(String)
+     */
+    public final void addClassName(String className)
+    {
+        if (className != null && !hasClassName(className)) {
+            String classNames = getClassName().trim();
+            setClassName(classNames.length() == 0 ? className.trim() : classNames + " " + className.trim());
+        }
+    }
+
+    /**
+     * Removes a CSS class name form this element's {@code class} attribute. The {@code class} attribute is a
+     * space-separated list of CSS class names.
+     * 
+     * @param className a {@link String} representing the CSS class to be removed from this element's {@code class}
+     *            attribute
+     * @see #setClassName(String)
+     */
+    public final void removeClassName(String className)
+    {
+        if (className == null) {
+            return;
+        }
+        String trimmedClassName = className.trim();
+        String[] classNames = getClassName().split(CLASS_NAME_SEPARATOR);
+        StringBuffer newClassName = new StringBuffer();
+        for (int i = 0; i < classNames.length; i++) {
+            if (!classNames[i].equals(trimmedClassName)) {
+                newClassName.append(" ");
+                newClassName.append(classNames[i]);
+            }
+        }
+        setClassName(newClassName.toString().trim());
     }
 }

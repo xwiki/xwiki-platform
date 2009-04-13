@@ -20,8 +20,8 @@
 package com.xpn.xwiki.plugin.zipexplorer;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -113,9 +113,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
 
         // Verify if we should return the original attachment. This will happen if the requested
         // download URL doesn't point to a zip or if the URL doesn't point to a file inside the ZIP.
-        if (!isZipFile(attachment.getFilename())
-            || !isValidZipURL(url, context.getAction().trim()))
-        {
+        if (!isValidZipURL(url, context.getAction().trim())) {
             return attachment;
         }
 
@@ -130,6 +128,10 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         try {
             byte[] stream = attachment.getContent(context);
             ByteArrayInputStream bais = new ByteArrayInputStream(stream);
+            if (!isZipFile(bais)) {
+                return attachment;
+            }
+
             ZipInputStream zis = new ZipInputStream(bais);
             ZipEntry entry;
 
@@ -168,22 +170,23 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     public List getFileList(Document document, String attachmentName, XWikiContext context)
     {
         List zipList = null;
-        if (isZipFile(attachmentName)) {
-            Attachment attachment = document.getAttachment(attachmentName);
-            zipList = new ArrayList();
-            try {
-                byte[] stream = attachment.getContent();
-                ByteArrayInputStream bais = new ByteArrayInputStream(stream);
+
+        Attachment attachment = document.getAttachment(attachmentName);
+        zipList = new ArrayList();
+        try {
+            byte[] stream = attachment.getContent();
+            ByteArrayInputStream bais = new ByteArrayInputStream(stream);
+            if (isZipFile(bais)) {
                 ZipInputStream zis = new ZipInputStream(bais);
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
                     zipList.add(entry.getName());
                 }
-            } catch (XWikiException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            } 
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return zipList;
     }
@@ -284,7 +287,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         // encode spaces and other special characters.
         try {
             path = URLDecoder.decode(path, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        } catch (IOException e) {
             // In case of error we log the error and continue with the undecoded URL.
             // TODO: Ideally this should rather fail fast but we have no exception handling
             // framework for scripting code. Change this when we have one. 
@@ -295,12 +298,25 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * @param filename the ZIP filename
-     * @return true if the file has a zip extension or false otherwise
+     * @param filecontent the  content of the file
+     * @return true if the file is in zip format (.zip, .jar etc) or false otherwise
      */
-    protected boolean isZipFile(String filename)
+    protected boolean isZipFile(ByteArrayInputStream filecontent)
     {
-        return filename.endsWith(".zip");
+        int standardZipHeader = 0x504b0304;
+        try {
+            DataInputStream datastream = new DataInputStream(filecontent);
+            int fileHeader = datastream.readInt();
+            // This is safe, since ByteArrayInputStream ignores close() calls.
+            datastream.close();
+            return (standardZipHeader == fileHeader);
+        } catch (IOException e) {
+            // The file doesn't have 4 bytes, so it isn't a zip file
+        } finally {
+            // Reset the input stream to the beginning. This is needed for further reading the archive.
+            filecontent.reset();
+        }
+        return false;
     }
 
     /**

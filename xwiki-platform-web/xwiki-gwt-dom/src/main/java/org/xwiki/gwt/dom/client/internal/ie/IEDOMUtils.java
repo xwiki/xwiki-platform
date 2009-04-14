@@ -104,10 +104,22 @@ public class IEDOMUtils extends DOMUtils
      * 
      * @see DOMUtils#getAttribute(Element, String)
      */
-    public String getAttribute(Element element, String name)
-    {
-        return element.getAttribute(name) + "";
-    }
+    public native String getAttribute(Element element, String name)
+    /*-{
+        // it seems that IE cannot return the style attribute value with getAttributeNode("style").nodeValue
+        // http://www.quirksmode.org/dom/w3c_core.html
+        if (name == "style") {
+            return element.style.cssText;
+        }
+        // the class, for example, is not returned on getAttribute("class") but getAttribute("className") or 
+        // getAttributeNode("class").nodeValue so make this the same for all attributes 
+        var attrNode = element.getAttributeNode(name);
+        if (attrNode) {
+            // make sure we don't print "undefined" and always return a String
+            return (attrNode.nodeValue || '' ) + ''; 
+        }
+        return '';
+    }-*/;
 
     /**
      * {@inheritDoc}

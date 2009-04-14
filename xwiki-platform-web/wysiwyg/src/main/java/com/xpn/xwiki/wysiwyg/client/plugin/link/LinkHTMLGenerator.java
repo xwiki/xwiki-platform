@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
+import java.util.Map;
+
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
@@ -59,6 +61,7 @@ public final class LinkHTMLGenerator
      */
     public String getLinkHTML(LinkConfig config)
     {
+        StringBuffer html = new StringBuffer("");
         String spanClass = "";
         switch (config.getType()) {
             case WIKIPAGE:
@@ -73,10 +76,27 @@ public final class LinkHTMLGenerator
             default:
                 spanClass = "wikiexternallink";
         }
-        return "<!--startwikilink:" + config.getReference() + "--><span class=\"" + spanClass + "\"><a href=\""
-            + config.getUrl() + "\""
-            + (!StringUtils.isEmpty(config.getTooltip()) ? "title=\"" + config.getTooltip() + "\" " : "")
-            + (config.isOpenInNewWindow() ? "rel=\"__blank\" " : "") + ">" + config.getLabel()
-            + "</a></span><!--stopwikilink-->";
+        String quoteString = "\"";
+        html.append("<!--startwikilink:");
+        html.append(config.getReference());
+        html.append("--><span class=\"");
+        html.append(spanClass);
+        html.append("\"><a href=\"");
+        html.append(config.getUrl());
+        html.append(quoteString);
+        // serialize the config parameters
+        for (Map.Entry<String, String> param : config.listParameters()) {
+            if (!StringUtils.isEmpty(param.getValue())) {
+                html.append(" ");
+                html.append(param.getKey());
+                html.append("=\"");
+                html.append(param.getValue().replace(quoteString, "&quot;"));
+                html.append(quoteString);
+            }
+        }
+        html.append(">");
+        html.append(config.getLabel());
+        html.append("</a></span><!--stopwikilink-->");
+        return html.toString();
     }
 }

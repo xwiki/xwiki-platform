@@ -235,7 +235,8 @@
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
             com/xpn/xwiki/wysiwyg/server/sync/**/*,
             com/xpn/xwiki/wysiwyg/server/DefaultWysiwygService.java,
-            com/xpn/xwiki/wysiwyg/server/DefaultWysiwygServiceTest.java</excludes>
+            com/xpn/xwiki/wysiwyg/server/DefaultWysiwygServiceTest.java,
+            com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfigTest.java</excludes>
         </configuration>
       </plugin>
     </plugins>

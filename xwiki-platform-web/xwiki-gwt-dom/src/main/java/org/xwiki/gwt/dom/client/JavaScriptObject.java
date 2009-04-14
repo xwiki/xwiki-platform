@@ -19,6 +19,8 @@
  */
 package org.xwiki.gwt.dom.client;
 
+import com.google.gwt.core.client.JsArrayString;
+
 /**
  * Extends GWT JavaScriptObject to add a fromJson method. Usage : <code>
  * public class MyCar extends JavaScriptObject {   
@@ -78,5 +80,20 @@ public class JavaScriptObject extends com.google.gwt.core.client.JavaScriptObjec
         var oldRef = this[key];
         this[key] = ref;
         return oldRef;
+    }-*/;
+
+    /**
+     * Returns all the keys set in this JavaScript object, to use with {@link JavaScriptObject#get(String)} to iterate
+     * over all properties, without knowing their names. TODO: refactor this to return a map of (key, value) pairs.
+     * 
+     * @return the array of keys set in this JavaScript object
+     */
+    public final native JsArrayString getKeys()
+    /*-{
+           var keys = [];
+           for (var key in this){
+              keys.push(key);
+           }
+           return keys;
     }-*/;
 }

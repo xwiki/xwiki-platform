@@ -205,10 +205,8 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
                 linkData.setLabel(labelTextBox.getText().trim());
                 linkData.setLabelText(labelTextBox.getText().trim());
             }
-            // if a tooltip was set, set it in the link config
-            if (getTooltipTextBox().getText().trim().length() != 0) {
-                linkData.setTooltip(getTooltipTextBox().getText());
-            }
+            // commit the tooltip value
+            linkData.setTooltip(getTooltipTextBox().getText());
             // set the link to open in new window according to user input
             linkData.setOpenInNewWindow(getNewWindowCheckBox().isChecked());
             async.onSuccess(true);

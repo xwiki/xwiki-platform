@@ -17,30 +17,49 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
+package com.xpn.xwiki.wysiwyg.client.plugin.history;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
 /**
- * Changes the background color of the current selection in Mozilla. It executes the built-in command "hilitecolor". We
- * created this class solely because in Mozilla the "backcolor" command sets the background color of the entire rich
- * text area. The implementation for the other browsers is in {@link BackColorExecutable}. We use deferred binding to
- * load the proper class.
+ * Factory for {@link HistoryPlugin}.
  * 
  * @version $Id$
  */
-public class HiliteColorExecutable extends DefaultExecutable
+public final class HistoryPluginFactory extends AbstractPluginFactory
 {
     /**
-     * The underlying predefined command.
+     * The singleton factory instance.
      */
-    public static final Command HILITE_COLOR = new Command("hilitecolor");
+    private static HistoryPluginFactory instance;
 
     /**
-     * Creates a new executable of this type.
+     * Default constructor.
      */
-    public HiliteColorExecutable()
+    private HistoryPluginFactory()
     {
-        super(HILITE_COLOR.toString());
+        super("history");
+    }
+
+    /**
+     * @return the singleton factory instance.
+     */
+    public static synchronized HistoryPluginFactory getInstance()
+    {
+        if (instance == null) {
+            instance = new HistoryPluginFactory();
+        }
+        return instance;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractPluginFactory#newInstance()
+     */
+    public Plugin newInstance()
+    {
+        return new HistoryPlugin();
     }
 }

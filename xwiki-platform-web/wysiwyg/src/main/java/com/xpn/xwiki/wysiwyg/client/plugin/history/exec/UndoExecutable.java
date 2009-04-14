@@ -17,27 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
+package com.xpn.xwiki.wysiwyg.client.plugin.history.exec;
 
+import com.xpn.xwiki.wysiwyg.client.plugin.history.History;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Loads the previous entry in the history of a rich text area.
  * 
  * @version $Id$
  */
-public class UndoExecutable implements Executable
+public class UndoExecutable extends AbstractHistoryExecutable
 {
+    /**
+     * Creates a new undo executable that uses the given history.
+     * 
+     * @param history the history to be used
+     */
+    public UndoExecutable(History history)
+    {
+        super(history);
+    }
+
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractHistoryExecutable#execute(RichTextArea, String)
      */
     public boolean execute(RichTextArea rta, String param)
     {
-        if (rta.getHistory().canUndo()) {
-            rta.getHistory().undo();
+        if (getHistory().canUndo()) {
+            getHistory().undo();
             return true;
         } else {
             return false;
@@ -47,7 +57,7 @@ public class UndoExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(RichTextArea)
+     * @see AbstractHistoryExecutable#getParameter(RichTextArea)
      */
     public String getParameter(RichTextArea rta)
     {
@@ -57,27 +67,27 @@ public class UndoExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractHistoryExecutable#isEnabled(RichTextArea)
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return rta.getHistory().canUndo();
+        return getHistory().canUndo();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(RichTextArea)
+     * @see AbstractHistoryExecutable#isExecuted(RichTextArea)
      */
     public boolean isExecuted(RichTextArea rta)
     {
-        return rta.getHistory().canRedo();
+        return getHistory().canRedo();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isSupported(RichTextArea)
+     * @see AbstractHistoryExecutable#isSupported(RichTextArea)
      */
     public boolean isSupported(RichTextArea rta)
     {

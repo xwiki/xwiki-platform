@@ -25,6 +25,9 @@ import org.xwiki.gwt.dom.client.Selection;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Timer;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
+import com.xpn.xwiki.wysiwyg.client.plugin.text.exec.BoldExecutable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
@@ -48,9 +51,9 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
     {
         super.gwtSetUp();
 
-        if (preserver == null) {
-            preserver = new SelectionPreserver(rta);
-        }
+        preserver = new SelectionPreserver(rta);
+        rta.getCommandManager().registerCommand(Command.BOLD, new BoldExecutable());
+        rta.getCommandManager().registerCommand(Command.UNDO, new UndoExecutable(new DefaultHistory(rta, 10)));
     }
 
     /**
@@ -503,7 +506,7 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         assertEquals("blue", rta.getDocument().getSelection().toString());
         assertEquals("<strong>blue</strong>bird", rta.getHTML().toLowerCase());
 
-        rta.getHistory().undo();
+        rta.getCommandManager().execute(Command.UNDO);
         assertEquals(content, rta.getHTML());
     }
 }

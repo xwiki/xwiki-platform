@@ -30,8 +30,6 @@ import com.google.gwt.user.client.ui.HasName;
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultCommandManager;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.history.History;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.history.internal.DefaultHistory;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster;
 
 /**
@@ -50,11 +48,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      * The command manager that executes commands on this rich text area.
      */
     private final CommandManager cm;
-
-    /**
-     * The history of this rich text area.
-     */
-    private final History history;
 
     /**
      * Overwrites the default behavior of the rich text area when DOM events are triggered by user actions and that
@@ -89,7 +82,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public RichTextArea()
     {
         cm = new DefaultCommandManager(this);
-        history = new DefaultHistory(this, 10);
         adjuster.setTextArea(this);
     }
 
@@ -98,12 +90,10 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      * used in unit tests.
      * 
      * @param cm Custom command manager
-     * @param history Custom history mechanism.
      */
-    public RichTextArea(CommandManager cm, History history)
+    public RichTextArea(CommandManager cm)
     {
         this.cm = cm;
-        this.history = history;
         adjuster.setTextArea(this);
     }
 
@@ -176,14 +166,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public CommandManager getCommandManager()
     {
         return cm;
-    }
-
-    /**
-     * @return The history of this rich text area.
-     */
-    public History getHistory()
-    {
-        return history;
     }
 
     /**

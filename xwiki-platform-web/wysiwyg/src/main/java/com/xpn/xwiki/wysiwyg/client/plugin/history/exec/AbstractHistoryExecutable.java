@@ -17,24 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
+package com.xpn.xwiki.wysiwyg.client.plugin.history.exec;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.History;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
- * Changes the background color of the current selection. It executes the built-in command. We created this class solely
- * because in Mozilla the "backcolor" command sets the background color of the entire rich text area. The implementation
- * for Mozilla is in {@link HiliteColorExecutable}. We use deferred binding to load the proper class.
+ * Abstract history executable.
  * 
  * @version $Id$
  */
-public class BackColorExecutable extends DefaultExecutable
+public abstract class AbstractHistoryExecutable implements Executable
 {
     /**
-     * Creates a new executable of this type.
+     * The history to be used by all concrete implementations.
      */
-    public BackColorExecutable()
+    private final History history;
+
+    /**
+     * Creates a new history executable that will be using the given history.
+     * 
+     * @param history the history to use
+     */
+    public AbstractHistoryExecutable(History history)
     {
-        super(Command.BACK_COLOR.toString());
+        this.history = history;
+    }
+
+    /**
+     * @return the history used by this executable
+     */
+    protected History getHistory()
+    {
+        return history;
     }
 }

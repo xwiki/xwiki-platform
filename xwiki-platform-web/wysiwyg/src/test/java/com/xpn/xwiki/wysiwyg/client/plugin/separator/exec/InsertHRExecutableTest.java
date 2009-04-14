@@ -17,15 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
+package com.xpn.xwiki.wysiwyg.client.plugin.separator.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 
 import com.google.gwt.user.client.Timer;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Unit test for {@link InsertHRExecutable}.
@@ -35,11 +36,6 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 public class InsertHRExecutableTest extends AbstractRichTextAreaTest
 {
     /**
-     * The executable being tested.
-     */
-    private Executable executable;
-
-    /**
      * {@inheritDoc}
      * 
      * @see AbstractRichTextAreaTest#gwtSetUp()
@@ -48,9 +44,8 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
     {
         super.gwtSetUp();
 
-        if (executable == null) {
-            executable = new InsertHRExecutable();
-        }
+        rta.getCommandManager().registerCommand(Command.INSERT_HORIZONTAL_RULE, new InsertHRExecutable());
+        rta.getCommandManager().registerCommand(Command.UNDO, new UndoExecutable(new DefaultHistory(rta, 10)));
     }
 
     /**
@@ -83,7 +78,7 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         range.collapse(true);
         select(range);
 
-        assertTrue(executable.execute(rta, null));
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
         assertEquals("a<p>b<ins><!--x-->c</ins></p><hr><p><ins>d</ins></p>e", removeNonBreakingSpaces(clean(rta
             .getHTML())));
     }
@@ -119,7 +114,7 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         select(range);
 
         assertEquals("cde", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, null));
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
         assertEquals("<ul><li>a<em>b</em><hr><em></em><del>f</del>g</li></ul>", removeNonBreakingSpaces(clean(rta
             .getHTML())));
 
@@ -153,7 +148,7 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
     {
         rta.setHTML("");
 
-        assertTrue(executable.execute(rta, null));
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
         assertEquals("<hr>", clean(rta.getHTML()));
     }
 
@@ -188,7 +183,7 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         select(range);
 
         assertEquals("b", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, null));
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
         assertEquals("a<strong></strong><hr><strong></strong>c", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
@@ -225,7 +220,7 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         select(range);
 
         assertEquals("oob", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, null));
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
         assertEquals("<ul><li>f<hr>ar</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
@@ -262,7 +257,7 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         select(range);
 
         assertEquals("onetwo", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, null));
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
         assertEquals("x<hr>", clean(rta.getHTML()));
     }
 
@@ -296,7 +291,7 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
         select(range);
 
         assertEquals("bob", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, null));
+        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
         assertTrue(rta.getCommandManager().execute(Command.UNDO));
         assertEquals(html, clean(rta.getHTML()));
     }

@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.color;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PopupListener;
@@ -31,11 +32,13 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.color.exec.BackColorExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Plug-in for controlling the text color and the background color. It installs two push buttons on the tool bar, each
@@ -74,6 +77,10 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
+
+        // Register custom executables.
+        getTextArea().getCommandManager().registerCommand(Command.BACK_COLOR,
+            (Executable) GWT.create(BackColorExecutable.class));
 
         addFeature("forecolor", Command.FORE_COLOR, Images.INSTANCE.foreColor().createImage(), Strings.INSTANCE
             .foreColor());

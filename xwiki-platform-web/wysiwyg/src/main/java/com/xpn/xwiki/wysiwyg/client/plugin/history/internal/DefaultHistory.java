@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.history.internal;
+package com.xpn.xwiki.wysiwyg.client.plugin.history.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +31,11 @@ import org.xwiki.gwt.dom.client.Text;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.History;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.history.History;
 
 /**
  * Default implementation for {@link History}.

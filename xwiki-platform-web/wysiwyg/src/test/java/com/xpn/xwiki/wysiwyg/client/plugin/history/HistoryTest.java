@@ -17,11 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.history;
+package com.xpn.xwiki.wysiwyg.client.plugin.history;
 
 import org.xwiki.gwt.dom.client.Range;
 
 import com.google.gwt.user.client.Timer;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.RedoExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -32,6 +35,20 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  */
 public class HistoryTest extends AbstractRichTextAreaTest
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractRichTextAreaTest#gwtSetUp()
+     */
+    protected void gwtSetUp() throws Exception
+    {
+        super.gwtSetUp();
+
+        History history = new DefaultHistory(rta, 10);
+        rta.getCommandManager().registerCommand(Command.UNDO, new UndoExecutable(history));
+        rta.getCommandManager().registerCommand(Command.REDO, new RedoExecutable(history));
+    }
+
     /**
      * Tests if undo and redo operations restore the previous selection.
      */

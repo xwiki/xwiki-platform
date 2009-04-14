@@ -22,9 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.gwt.dom.client.Style;
-
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
@@ -55,38 +52,21 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
     private boolean focused;
 
     static {
+        Command[] defaultCommands =
+            new Command[] {Command.BACK_COLOR, Command.BOLD, Command.CREATE_LINK, Command.DELETE, Command.FONT_NAME,
+                Command.FONT_SIZE, Command.FORE_COLOR, Command.FORMAT_BLOCK, Command.INDENT,
+                Command.INSERT_HORIZONTAL_RULE, Command.INSERT_IMAGE, Command.INSERT_ORDERED_LIST,
+                Command.INSERT_PARAGRAPH, Command.INSERT_UNORDERED_LIST, Command.ITALIC, Command.JUSTIFY_CENTER,
+                Command.JUSTIFY_FULL, Command.JUSTIFY_LEFT, Command.JUSTIFY_RIGHT, Command.OUTDENT, Command.REDO,
+                Command.REMOVE_FORMAT, Command.STRIKE_THROUGH, Command.SUB_SCRIPT, Command.SUPER_SCRIPT,
+                Command.TELETYPE, Command.UNDERLINE, Command.UNDO, Command.UNLINK};
         EXECUTABLES = new HashMap<Command, Executable>();
-        EXECUTABLES.put(Command.BACK_COLOR, (Executable) GWT.create(BackColorExecutable.class));
-        EXECUTABLES.put(Command.BOLD, new BoldExecutable());
-        EXECUTABLES.put(Command.CREATE_LINK, new DefaultExecutable(Command.CREATE_LINK.toString()));
-        EXECUTABLES.put(Command.DELETE, new DefaultExecutable(Command.DELETE.toString()));
-        EXECUTABLES.put(Command.FONT_NAME, new DefaultExecutable(Command.FONT_NAME.toString()));
-        EXECUTABLES.put(Command.FONT_SIZE, new DefaultExecutable(Command.FONT_SIZE.toString()));
-        EXECUTABLES.put(Command.FORE_COLOR, new DefaultExecutable(Command.FORE_COLOR.toString()));
-        EXECUTABLES.put(Command.FORMAT_BLOCK, new FormatBlockExecutable());
-        EXECUTABLES.put(Command.INDENT, new DefaultExecutable(Command.INDENT.toString()));
-        EXECUTABLES.put(Command.INSERT_HORIZONTAL_RULE, new InsertHRExecutable());
+        for (int i = 0; i < defaultCommands.length; i++) {
+            EXECUTABLES.put(defaultCommands[i], new DefaultExecutable(defaultCommands[i].toString()));
+        }
+
+        // Register custom executables.
         EXECUTABLES.put(Command.INSERT_HTML, new InsertHTMLExecutable());
-        EXECUTABLES.put(Command.INSERT_ORDERED_LIST, new DefaultExecutable(Command.INSERT_ORDERED_LIST.toString()));
-        EXECUTABLES.put(Command.INSERT_PARAGRAPH, new DefaultExecutable(Command.INSERT_PARAGRAPH.toString()));
-        EXECUTABLES.put(Command.INSERT_UNORDERED_LIST, new DefaultExecutable(Command.INSERT_UNORDERED_LIST.toString()));
-        EXECUTABLES.put(Command.ITALIC, new ToggleStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em"));
-        EXECUTABLES.put(Command.JUSTIFY_CENTER, new DefaultExecutable(Command.JUSTIFY_CENTER.toString()));
-        EXECUTABLES.put(Command.JUSTIFY_FULL, new DefaultExecutable(Command.JUSTIFY_FULL.toString()));
-        EXECUTABLES.put(Command.JUSTIFY_LEFT, new DefaultExecutable(Command.JUSTIFY_LEFT.toString()));
-        EXECUTABLES.put(Command.JUSTIFY_RIGHT, new DefaultExecutable(Command.JUSTIFY_RIGHT.toString()));
-        EXECUTABLES.put(Command.OUTDENT, new DefaultExecutable(Command.OUTDENT.toString()));
-        EXECUTABLES.put(Command.REDO, new RedoExecutable());
-        EXECUTABLES.put(Command.REMOVE_FORMAT, new DefaultExecutable(Command.REMOVE_FORMAT.toString()));
-        EXECUTABLES.put(Command.STRIKE_THROUGH, new ToggleStyleExecutable(Style.TEXT_DECORATION,
-            Style.TextDecoration.LINE_THROUGH, "del"));
-        EXECUTABLES.put(Command.SUB_SCRIPT, new DefaultExecutable(Command.SUB_SCRIPT.toString()));
-        EXECUTABLES.put(Command.SUPER_SCRIPT, new DefaultExecutable(Command.SUPER_SCRIPT.toString()));
-        EXECUTABLES.put(Command.TELETYPE, new ToggleStyleExecutable(Style.FONT_FAMILY, "monospace", "tt"));
-        EXECUTABLES.put(Command.UNDERLINE, new ToggleStyleExecutable(Style.TEXT_DECORATION,
-            Style.TextDecoration.UNDERLINE, "ins"));
-        EXECUTABLES.put(Command.UNLINK, new DefaultExecutable(Command.UNLINK.toString()));
-        EXECUTABLES.put(Command.UNDO, new UndoExecutable());
     }
 
     /**

@@ -105,7 +105,7 @@ Title level 6
 .#-------------------------------------------------------------------------
 .input|confluence/1.0
 .# This test is the only one inside the XWiki Test Suite for Confluence.
-. It's here to ensure that our Confluence parser works in general.
+.# It's here to ensure that our Confluence parser works in general.
 .# We don't include exhaustive confluence parser tests. These are supposed
 .# to be located inside WikiModel.
 .#-------------------------------------------------------------------------

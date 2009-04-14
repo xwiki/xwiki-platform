@@ -19,14 +19,17 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.exec;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
 
@@ -135,15 +138,14 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
         linkConfig.setUrl(wrappingAnchor.getAttribute(HREF_ATTRIBUTE_NAME));
         linkConfig.setLabel(wrappingAnchor.getInnerHTML());
         linkConfig.setLabelText(wrappingAnchor.getInnerText());
-        // get the tooltip, if any, and the target
-        String linkTooltip = wrappingAnchor.getTitle();
-        if (!StringUtils.isEmpty(linkTooltip)) {
-            linkConfig.setTooltip(linkTooltip);
-        }
-        // check if the target is _blank
-        String relAttr = wrappingAnchor.getAttribute("rel");
-        if (!StringUtils.isEmpty(relAttr) && relAttr.equals("__blank")) {
-            linkConfig.setOpenInNewWindow(true);
+        // get all the custom attributes and set them to the linkConfig
+        JsArrayString attrs = wrappingAnchor.getAttributeNames();
+        // skip the href parameters and the metadata one
+        List<String> skipAttrs = Arrays.asList(HREF_ATTRIBUTE_NAME, Element.META_DATA_ATTR, Element.META_DATA_REF);
+        for (int i = 0; i < attrs.length(); i++) {
+            if (!skipAttrs.contains(attrs.get(i))) {
+                linkConfig.setParameter(attrs.get(i), wrappingAnchor.xGetAttribute(attrs.get(i)));
+            }
         }
         return linkConfig.toJSON();
     }

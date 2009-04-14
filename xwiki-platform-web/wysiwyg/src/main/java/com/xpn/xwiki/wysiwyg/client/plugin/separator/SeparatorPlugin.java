@@ -28,6 +28,7 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.CompositeUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.separator.exec.InsertHRExecutable;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -63,6 +64,9 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickListener
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
+
+        // Register custom executables.
+        getTextArea().getCommandManager().registerCommand(Command.INSERT_HORIZONTAL_RULE, new InsertHRExecutable());
 
         // User interface extension that provides ways of separating tool bar entries.
         toolBarExtension.addUIExtension(new ToolBarSeparator());

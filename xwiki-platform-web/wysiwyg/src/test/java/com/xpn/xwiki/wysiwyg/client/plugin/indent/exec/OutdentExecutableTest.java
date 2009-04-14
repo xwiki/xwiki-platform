@@ -17,12 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.indent;
+package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
 import org.xwiki.gwt.dom.client.Range;
 
 import com.google.gwt.user.client.Timer;
-import com.xpn.xwiki.wysiwyg.client.plugin.indent.exec.OutdentExecutable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 

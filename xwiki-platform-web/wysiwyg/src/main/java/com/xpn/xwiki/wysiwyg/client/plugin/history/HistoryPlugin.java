@@ -17,16 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.undo;
+package com.xpn.xwiki.wysiwyg.client.plugin.history;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.RedoExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.ClickCommand;
@@ -42,22 +49,17 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class UndoPlugin extends AbstractPlugin implements ClickListener
+public class HistoryPlugin extends AbstractPlugin implements ClickListener
 {
     /**
-     * The tool bar button used for undoing the last action taken on the rich text area.
+     * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
      */
-    private PushButton undo;
-
-    /**
-     * The tool bar button used for redoing the last action taken on the rich text area.
-     */
-    private PushButton redo;
+    private final Map<PushButton, Command> buttons = new HashMap<PushButton, Command>();
 
     /**
      * Associates commands to shortcut keys.
      */
-    private ShortcutKeyManager shortcutKeyManager;
+    private final ShortcutKeyManager shortcutKeyManager = new ShortcutKeyManager();
 
     /**
      * Tool bar extension that includes the undo and redo buttons.
@@ -73,28 +75,40 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener
     {
         super.init(wysiwyg, textArea, config);
 
-        shortcutKeyManager = new ShortcutKeyManager();
-        if (getTextArea().getCommandManager().isSupported(Command.UNDO)) {
-            undo = new PushButton(Images.INSTANCE.undo().createImage(), this);
-            undo.setTitle(Strings.INSTANCE.undo());
-            ClickCommand undoCommand = new ClickCommand(this, undo);
-            shortcutKeyManager.put(new ShortcutKey('Z', KeyboardListener.MODIFIER_CTRL), undoCommand);
-            shortcutKeyManager.put(new ShortcutKey('Z', KeyboardListener.MODIFIER_META), undoCommand);
-            toolBarExtension.addFeature("undo", undo);
-        }
+        // Register custom executables.
+        History history = new DefaultHistory(textArea, 10);
+        getTextArea().getCommandManager().registerCommand(Command.REDO, new RedoExecutable(history));
+        getTextArea().getCommandManager().registerCommand(Command.UNDO, new UndoExecutable(history));
 
-        if (getTextArea().getCommandManager().isSupported(Command.REDO)) {
-            redo = new PushButton(Images.INSTANCE.redo().createImage(), this);
-            redo.setTitle(Strings.INSTANCE.redo());
-            ClickCommand redoCommand = new ClickCommand(this, redo);
-            shortcutKeyManager.put(new ShortcutKey('Y', KeyboardListener.MODIFIER_CTRL), redoCommand);
-            shortcutKeyManager.put(new ShortcutKey('Y', KeyboardListener.MODIFIER_META), redoCommand);
-            toolBarExtension.addFeature("redo", redo);
-        }
+        addFeature("undo", Command.UNDO, Images.INSTANCE.undo().createImage(), Strings.INSTANCE.undo(), 'Z');
+        addFeature("redo", Command.REDO, Images.INSTANCE.redo().createImage(), Strings.INSTANCE.redo(), 'Y');
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().addKeyboardListener(shortcutKeyManager);
             getUIExtensionList().add(toolBarExtension);
+        }
+    }
+
+    /**
+     * Creates a tool bar feature and adds it to the tool bar.
+     * 
+     * @param name the feature name
+     * @param command the rich text area command that is executed by this feature
+     * @param image the image displayed on the tool bar
+     * @param title the tool tip used on the tool bar button
+     * @param keyCode the shortcut key to be used
+     */
+    private void addFeature(String name, Command command, Image image, String title, char keyCode)
+    {
+        if (getTextArea().getCommandManager().isSupported(command)) {
+            PushButton button = new PushButton(image, this);
+            button.setTitle(title);
+            toolBarExtension.addFeature(name, button);
+            buttons.put(button, command);
+
+            ClickCommand clickCommand = new ClickCommand(this, button);
+            shortcutKeyManager.put(new ShortcutKey(keyCode, KeyboardListener.MODIFIER_CTRL), clickCommand);
+            shortcutKeyManager.put(new ShortcutKey(keyCode, KeyboardListener.MODIFIER_META), clickCommand);
         }
     }
 
@@ -105,8 +119,11 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener
      */
     public void destroy()
     {
-        destroy(undo);
-        destroy(redo);
+        for (PushButton button : buttons.keySet()) {
+            button.removeFromParent();
+            button.removeClickListener(this);
+        }
+        buttons.clear();
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().removeKeyboardListener(shortcutKeyManager);
@@ -118,41 +135,14 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener
     }
 
     /**
-     * Releases the given focus widget.
-     * 
-     * @param widget the widget to be destroyed
-     */
-    private void destroy(FocusWidget widget)
-    {
-        if (widget != null) {
-            widget.removeFromParent();
-            widget.removeClickListener(this);
-        }
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see ClickListener#onClick(Widget)
      */
     public void onClick(Widget sender)
     {
-        if (sender == undo) {
-            onClick(undo, Command.UNDO);
-        } else if (sender == redo) {
-            onClick(redo, Command.REDO);
-        }
-    }
-
-    /**
-     * Toggles the specifies command if the given focus widget is enabled.
-     * 
-     * @param sender the widget who sent the click event
-     * @param command the command to be toggled
-     */
-    private void onClick(FocusWidget sender, Command command)
-    {
-        if (sender.isEnabled()) {
+        Command command = buttons.get(sender);
+        if (command != null && ((FocusWidget) sender).isEnabled()) {
             getTextArea().getCommandManager().execute(command);
         }
     }

@@ -128,7 +128,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
      */
     private boolean isRichTextEditingSupported()
     {
-        RichTextArea rta = new RichTextArea(null, null);
+        RichTextArea rta = new RichTextArea(null);
         return rta.getBasicFormatter() != null;
     }
 

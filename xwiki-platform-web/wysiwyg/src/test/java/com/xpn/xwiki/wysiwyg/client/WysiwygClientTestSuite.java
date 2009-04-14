@@ -24,14 +24,17 @@ import junit.framework.TestSuite;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
 import com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPickerTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.FormatBlockExecutableTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.history.HistoryTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
-import com.xpn.xwiki.wysiwyg.client.plugin.indent.IndentExecutableTest;
-import com.xpn.xwiki.wysiwyg.client.plugin.indent.OutdentExecutableTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.indent.exec.IndentExecutableTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.indent.exec.OutdentExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtensionTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroCallTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.separator.exec.InsertHRExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManagerTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRuleTest;
@@ -39,11 +42,8 @@ import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidatorTest;
 import com.xpn.xwiki.wysiwyg.client.util.TimerTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserverTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.FormatBlockExecutableTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHRExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.StyleExecutableTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.history.HistoryTest;
 
 /**
  * All the client tests to be run. We're using a test suite because it decreases the overall testing time. GWTTestCase
@@ -88,6 +88,9 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(DefaultPluginFactoryManagerTest.class);
         suite.addTestSuite(DefaultPluginManagerTest.class);
         suite.addTestSuite(FocusWidgetUIExtensionTest.class);
+        suite.addTestSuite(HistoryTest.class);
+        suite.addTestSuite(FormatBlockExecutableTest.class);
+        suite.addTestSuite(InsertHRExecutableTest.class);
         suite.addTestSuite(ImageMetaDataExtractorTest.class);
         suite.addTestSuite(LinkMetaDataExtractorTest.class);
         suite.addTestSuite(MacroCallTest.class);
@@ -104,10 +107,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
     private static void addWidgetTests(TestSuite suite)
     {
         suite.addTestSuite(RichTextAreaTest.class);
-        suite.addTestSuite(HistoryTest.class);
         suite.addTestSuite(InsertHTMLExecutableTest.class);
-        suite.addTestSuite(InsertHRExecutableTest.class);
-        suite.addTestSuite(FormatBlockExecutableTest.class);
         suite.addTestSuite(StyleExecutableTest.class);
         suite.addTestSuite(SelectionPreserverTest.class);
     }

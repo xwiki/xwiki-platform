@@ -38,7 +38,7 @@ public class DefaultValidationRuleTest extends AbstractWysiwygClientTest
     public void testOutdentRule()
     {
         DefaultValidationRule outdentRule = new DefaultValidationRule("outdent", Command.OUTDENT);
-        RichTextArea textArea = new RichTextArea(new MockCommandManager(), null);
+        RichTextArea textArea = new RichTextArea(new MockCommandManager());
         RootPanel.get().add(textArea);
 
         assertFalse(outdentRule.areValid(textArea));

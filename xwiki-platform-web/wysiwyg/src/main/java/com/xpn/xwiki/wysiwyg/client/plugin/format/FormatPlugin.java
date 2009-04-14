@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.FormatBlockExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -56,6 +57,9 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
+
+        // Register custom executables.
+        getTextArea().getCommandManager().registerCommand(Command.FORMAT_BLOCK, new FormatBlockExecutable());
 
         if (getTextArea().getCommandManager().isSupported(Command.FORMAT_BLOCK)) {
             levels = new ListBox(false);

@@ -22,6 +22,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin.text;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
@@ -33,12 +35,14 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.text.exec.BoldExecutable;
 import com.xpn.xwiki.wysiwyg.client.util.ClickCommand;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleStyleExecutable;
 
 /**
  * Plug-in for making text bold, italic, underline or strike through. It installs four toggle buttons on the tool bar
@@ -75,6 +79,17 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
+
+        // Register custom executables.
+        getTextArea().getCommandManager().registerCommand(Command.BOLD, new BoldExecutable());
+        getTextArea().getCommandManager().registerCommand(Command.ITALIC,
+            new ToggleStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em"));
+        getTextArea().getCommandManager().registerCommand(Command.UNDERLINE,
+            new ToggleStyleExecutable(Style.TEXT_DECORATION, Style.TextDecoration.UNDERLINE, "ins"));
+        getTextArea().getCommandManager().registerCommand(Command.STRIKE_THROUGH,
+            new ToggleStyleExecutable(Style.TEXT_DECORATION, Style.TextDecoration.LINE_THROUGH, "del"));
+        getTextArea().getCommandManager().registerCommand(Command.TELETYPE,
+            new ToggleStyleExecutable(Style.FONT_FAMILY, "monospace", "tt"));
 
         shortcutKeyManager = new ShortcutKeyManager();
 

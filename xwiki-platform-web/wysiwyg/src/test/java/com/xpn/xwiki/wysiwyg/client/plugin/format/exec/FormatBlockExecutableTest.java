@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
+package com.xpn.xwiki.wysiwyg.client.plugin.format.exec;
 
 import org.xwiki.gwt.dom.client.Range;
 
@@ -25,6 +25,7 @@ import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
 
 /**
  * Unit tests for {@link FormatBlockExecutable}.

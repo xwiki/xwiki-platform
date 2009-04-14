@@ -17,49 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.undo;
+package com.xpn.xwiki.wysiwyg.client.plugin.color.exec;
 
-import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultExecutable;
 
 /**
- * Factory for {@link UndoPlugin}.
+ * Changes the background color of the current selection in Mozilla. It executes the built-in command "hilitecolor". We
+ * created this class solely because in Mozilla the "backcolor" command sets the background color of the entire rich
+ * text area. The implementation for the other browsers is in {@link BackColorExecutable}. We use deferred binding to
+ * load the proper class.
  * 
  * @version $Id$
  */
-public final class UndoPluginFactory extends AbstractPluginFactory
+public class HiliteColorExecutable extends DefaultExecutable
 {
     /**
-     * The singleton factory instance.
+     * The underlying predefined command.
      */
-    private static UndoPluginFactory instance;
+    public static final Command HILITE_COLOR = new Command("hilitecolor");
 
     /**
-     * Default constructor.
+     * Creates a new executable of this type.
      */
-    private UndoPluginFactory()
+    public HiliteColorExecutable()
     {
-        super("undo");
-    }
-
-    /**
-     * @return the singleton factory instance.
-     */
-    public static synchronized UndoPluginFactory getInstance()
-    {
-        if (instance == null) {
-            instance = new UndoPluginFactory();
-        }
-        return instance;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPluginFactory#newInstance()
-     */
-    public Plugin newInstance()
-    {
-        return new UndoPlugin();
+        super(HILITE_COLOR.toString());
     }
 }

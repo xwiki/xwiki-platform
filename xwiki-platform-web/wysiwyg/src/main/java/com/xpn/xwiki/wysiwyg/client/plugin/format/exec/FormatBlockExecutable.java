@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
+package com.xpn.xwiki.wysiwyg.client.plugin.format.exec;
 
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
@@ -27,6 +27,7 @@ import org.xwiki.gwt.dom.client.Selection;
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
  * Wraps the HTML fragment including the current selection in a specified block level element.

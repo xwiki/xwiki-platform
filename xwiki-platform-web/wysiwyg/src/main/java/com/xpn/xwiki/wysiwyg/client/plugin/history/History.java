@@ -17,24 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
-
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+package com.xpn.xwiki.wysiwyg.client.plugin.history;
 
 /**
- * Changes the background color of the current selection. It executes the built-in command. We created this class solely
- * because in Mozilla the "backcolor" command sets the background color of the entire rich text area. The implementation
- * for Mozilla is in {@link HiliteColorExecutable}. We use deferred binding to load the proper class.
+ * Interface for undoing and redoing user's edit actions.
  * 
  * @version $Id$
  */
-public class BackColorExecutable extends DefaultExecutable
+public interface History
 {
     /**
-     * Creates a new executable of this type.
+     * @return false if the current version of the edited content is the latest one.
      */
-    public BackColorExecutable()
-    {
-        super(Command.BACK_COLOR.toString());
-    }
+    boolean canRedo();
+
+    /**
+     * @return false if the current version is the first one or if it is the oldest one stored in the history.
+     */
+    boolean canUndo();
+
+    /**
+     * Loads the next newer version of the edited content.
+     */
+    void redo();
+
+    /**
+     * Loads the next older version of the edited content.
+     */
+    void undo();
 }

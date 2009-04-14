@@ -1,4 +1,4 @@
-package com.xpn.xwiki.wysiwyg.client.widget.rta.history.internal;
+package com.xpn.xwiki.wysiwyg.client.plugin.history.internal;
 
 import com.google.gwt.user.client.ui.KeyboardListener;
 

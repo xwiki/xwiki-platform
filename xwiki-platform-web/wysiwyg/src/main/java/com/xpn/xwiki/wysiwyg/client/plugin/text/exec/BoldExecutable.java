@@ -17,10 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
+package com.xpn.xwiki.wysiwyg.client.plugin.text.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
+
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleStyleExecutable;
 
 /**
  * If there is no selection, the insertion point will set bold for subsequently typed characters. If there is a
@@ -42,7 +44,7 @@ public class BoldExecutable extends ToggleStyleExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see StyleExecutable#matchesStyle(Element)
+     * @see ToggleStyleExecutable#matchesStyle(Element)
      */
     protected boolean matchesStyle(Element inputElement)
     {

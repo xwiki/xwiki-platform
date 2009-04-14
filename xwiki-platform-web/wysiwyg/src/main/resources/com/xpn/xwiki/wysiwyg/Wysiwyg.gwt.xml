@@ -97,12 +97,12 @@
   </replace-with>
 
   <!-- BackColorExecutable -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BackColorExecutable">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BackColorExecutable"/>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.color.exec.BackColorExecutable">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.color.exec.BackColorExecutable"/>
   </replace-with>
 
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.HiliteColorExecutable">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BackColorExecutable"/>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.color.exec.HiliteColorExecutable">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.color.exec.BackColorExecutable"/>
     <any>
       <when-property-is name="user.agent" value="gecko1_8"/>
       <when-property-is name="user.agent" value="gecko"/>

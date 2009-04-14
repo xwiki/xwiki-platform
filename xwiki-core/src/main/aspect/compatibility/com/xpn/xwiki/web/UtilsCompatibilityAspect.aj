@@ -39,7 +39,7 @@ public privileged aspect UtilsCompatibilityAspect
 	public static Object Utils.getComponent(String role, String hint)
     {
         try {
-            return getComponent(Utils.class.getClassLoader().loadClass(role).getName(), hint);
+            return getComponent(Utils.class.getClassLoader().loadClass(role), hint);
         } catch (Exception e) {
             throw new RuntimeException("Failed to load component [" + role + "] for hint [" + hint + "]", e);
         }

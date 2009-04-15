@@ -134,6 +134,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
         throws MacroExecutionException
     {
         String documentName = parameters.getDocument();
+        if (documentName == null) {
+            throw new MacroExecutionException(
+                "You must specify a 'document' parameter pointing to the document to include.");
+        }
+        
         Context actualContext = parameters.getContext();
 
         // Retrieve the included document's content

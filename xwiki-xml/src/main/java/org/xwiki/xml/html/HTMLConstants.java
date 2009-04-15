@@ -21,7 +21,7 @@
 package org.xwiki.xml.html;
 
 /**
- * HTML Constants used by the HTML Cleaner.
+ * HTML Constants.
  *
  * @version $Id: $
  * @since 1.6M2

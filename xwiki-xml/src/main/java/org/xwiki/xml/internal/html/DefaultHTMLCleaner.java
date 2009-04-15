@@ -30,7 +30,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.CleanerTransformations;
 import org.htmlcleaner.ContentToken;
-import org.htmlcleaner.DomSerializer;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.TagTransformation;
@@ -149,7 +148,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             // this can cause problem for code not serializing the W3C DOM to a String since it won't have the 
             // characters escaped.
             // See https://sourceforge.net/tracker/index.php?func=detail&aid=2691888&group_id=183053&atid=903696
-            Document tempDoc = new DomSerializer(cleanerProperties, false).createDOM(cleanedNode);
+            Document tempDoc = new XWikiDOMSerializer(cleanerProperties, false).createDOM(cleanedNode);
             DOMImplementation domImpl =
                 DocumentBuilderFactory.newInstance().newDocumentBuilder().getDOMImplementation();
             DocumentType docType =
@@ -191,17 +190,9 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         CleanerProperties defaultProperties = new CleanerProperties();
         defaultProperties.setOmitUnknownTags(true);
         defaultProperties.setNamespacesAware(true);
-                
-        // By default HTMLCleaner treats style and script tags as CDATA. This is causing errors if we use the best
-        // practice of using CDATA inside a script since we would have 2 nested CDATA blocks. For example:
-        //  <script type="text/javascript">
-        //  <![CDATA[
-        //  ...
-        //  ]]>
-        //  </script>
-        // Thus we need to turn off this feature.
-        // The problem is that SF's HTML Cleaner doesn't recognize CDATA blocks.
-        defaultProperties.setUseCdataForScriptAndStyle(false);
+        
+        // Wrap script and style content in CDATA blocks
+        defaultProperties.setUseCdataForScriptAndStyle(true);
         
         // Handle the NAMESPACE_AWARE configuration property
         String param = configuration.getParameters().get(HTMLCleanerConfiguration.NAMESPACES_AWARE);

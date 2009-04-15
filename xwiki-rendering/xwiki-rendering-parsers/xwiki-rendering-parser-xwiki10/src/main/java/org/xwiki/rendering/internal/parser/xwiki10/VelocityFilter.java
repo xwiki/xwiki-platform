@@ -448,45 +448,54 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         int i = currentIndex + 1;
 
         if (i < array.length) {
-            if (array[i] == '{') {
-                varBlock.append('{');
+            if (array[i] == '!') {
+                varBlock.append('!');
                 ++i;
             }
 
             if (i < array.length) {
-                // A Velocity variable starts with [a-zA-Z]
-                if (Character.isLetter(array[i])) {
-                    context.setVelocity(true);
+                boolean fullSyntax = false;
+                if (array[i] == '{') {
+                    varBlock.append('{');
+                    ++i;
+                    fullSyntax = true;
+                }
 
-                    // Skip variable
-                    for (; i < array.length && Character.isLetterOrDigit(array[i]); ++i) {
-                        varBlock.append(array[i]);
-                    }
+                if (i < array.length) {
+                    // A Velocity variable starts with [a-zA-Z]
+                    if (Character.isLetter(array[i])) {
+                        context.setVelocity(true);
 
-                    // Skip method(s)
-                    for (; i < array.length;) {
-                        if (array[currentIndex + 1] == '{' && array[i] == '}') {
-                            varBlock.append('}');
-                            ++i;
-                            break;
-                        } else if (array[i] == '.') {
-                            i = getMethod(array, i, varBlock, context);
-                            if (!context.isVelocity()) {
+                        // Skip variable
+                        for (; i < array.length && Character.isLetterOrDigit(array[i]); ++i) {
+                            varBlock.append(array[i]);
+                        }
+
+                        // Skip method(s)
+                        for (; i < array.length;) {
+                            if (fullSyntax && array[i] == '}') {
+                                varBlock.append('}');
+                                ++i;
+                                break;
+                            } else if (array[i] == '.') {
+                                i = getMethod(array, i, varBlock, context);
+                                if (!context.isVelocity()) {
+                                    break;
+                                }
+                            } else if (array[i] == '[') {
+                                i = getTableElement(array, i, varBlock, context);
+                                break;
+                            } else {
                                 break;
                             }
-                        } else if (array[i] == '[') {
-                            i = getTableElement(array, i, varBlock, context);
-                            break;
-                        } else {
-                            break;
                         }
+
+                        context.setVelocity(true);
+
+                        velocityBlock.append(varBlock);
+
+                        return i;
                     }
-
-                    context.setVelocity(true);
-
-                    velocityBlock.append(varBlock);
-
-                    return i;
                 }
             }
         }

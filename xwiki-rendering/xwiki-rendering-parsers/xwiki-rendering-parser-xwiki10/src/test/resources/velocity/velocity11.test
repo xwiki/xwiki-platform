@@ -1,6 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
+.# TODO: Start with a white space because of http://jira.xwiki.org/jira/browse/XWIKI-3082
  $var .method("$4novar")
 .#-----------------------------------------------------
 .expect|xwiki/2.0

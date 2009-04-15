@@ -22,8 +22,6 @@ package org.xwiki.rendering.internal.parser.xwiki10.macro;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameter;

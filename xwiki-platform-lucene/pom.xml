@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>15-SNAPSHOT</version>
+    <version>14</version>
   </parent>
   <artifactId>xwiki-plugin-lucene</artifactId>
   <name>XWiki Platform - Plugins - Lucene search</name>
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.9-SNAPSHOT</version>
+      <version>1.9-milestone-1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

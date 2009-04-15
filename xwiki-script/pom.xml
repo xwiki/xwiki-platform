@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-core-parent</artifactId>
-    <version>1.9-milestone-1</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-script</artifactId>

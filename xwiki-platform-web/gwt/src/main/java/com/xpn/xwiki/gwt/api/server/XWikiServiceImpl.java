@@ -108,11 +108,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         context.setMode(XWikiContext.MODE_GWT);
         context.setDatabase("xwiki");
 
+        initializeContainerComponent(context);
+
         XWiki xwiki = XWiki.getXWiki(context);
         XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
         context.setURLFactory(urlf);
-        
-        initializeContainerComponent(context);
         
         xwiki.prepareResources(context);
 

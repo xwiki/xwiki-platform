@@ -28,6 +28,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.parser.Syntax;
@@ -111,5 +112,19 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         List<Block> blocks = macro.execute(parameters, null, new MacroTransformationContext());
 
         assertBlocks(expected, blocks);
+    }
+    
+    public void testIncludeMacroWithNoDocumentSpecified() throws Exception
+    {
+        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+
+        try {
+            macro.execute(parameters, null, new MacroTransformationContext());
+            fail("An exception should have been thrown");
+        } catch (MacroExecutionException expected) {
+            assertEquals("You must specify a 'document' parameter pointing to the document to include.",
+                expected.getMessage());
+        }
     }
 }

@@ -24,12 +24,13 @@ beginMacroMarkerStandalone [html] [] [
 </script>
 ]
 beginXMLNode [script] [type=text/javascript]
-onWord [//]
 beginXMLNode [CDATA]
 onWord [
+   //
          if (2 > 1)
              alert("Hello, World")
-   // ]
+   // 
+]
 endXMLNode [CDATA]
 endXMLNode [script] [type=text/javascript]
 endMacroMarkerStandalone [html] [] [
@@ -51,7 +52,9 @@ endDocument
              alert("Hello, World")
    // ]]>
 </script>
---><script type="text/javascript">//<![CDATA[
+--><script type="text/javascript"><![CDATA[
+   //
          if (2 > 1)
              alert("Hello, World")
-   // ]]></script><!--stopmacro-->
+   // 
+]]></script><!--stopmacro-->

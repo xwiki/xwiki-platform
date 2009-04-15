@@ -123,8 +123,15 @@ public class XWikiDOMSerializer
                 content = processCDATABlocks(content);
             }
             
-            element.appendChild(specialCase ? document.createCDATASection(content) : document
-                .createTextNode(content));
+            // Generate a javascript comment in front on the CDATA block so that it works in IE6 and when
+            // serving XHTML under a mimetype of HTML.
+            if (specialCase) {
+                element.appendChild(document.createTextNode("//"));
+                element.appendChild(document.createCDATASection("\n" + content + "\n//"));
+            } else {
+                element.appendChild(document.createTextNode(content));
+            }
+            
             bufferedContent.setLength(0);
         }
     }

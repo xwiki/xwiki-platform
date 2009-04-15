@@ -127,16 +127,16 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
      */
     public void testScriptAndCData()
     {
-        assertHTML("<script type=\"text/javascript\"><![CDATA[//\nalert(\"Hello World\")\n// ]]></script>", 
+        assertHTML("<script type=\"text/javascript\">//<![CDATA[\n//\nalert(\"Hello World\")\n// \n//]]></script>", 
             "<script type=\"text/javascript\">//<![CDATA[\nalert(\"Hello World\")\n// ]]></script>");
 
-        assertHTML("<script type=\"text/javascript\"><![CDATA[\n"
+        assertHTML("<script type=\"text/javascript\">//<![CDATA[\n\n"
             + "// \n"
             + "function escapeForXML(origtext) {\n"
             + "   return origtext.replace(/\\&/g,'&'+'amp;').replace(/</g,'&'+'lt;')\n"
             + "       .replace(/>/g,'&'+'gt;').replace(/\'/g,'&'+'apos;').replace(/\"/g,'&'+'quot;');"
             + "}\n"
-            + "// \n]]>"
+            + "// \n\n//]]>"
             + "</script>", "<script type=\"text/javascript\">\n"
             + "// <![CDATA[\n"
             + "function escapeForXML(origtext) {\n"
@@ -146,8 +146,8 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
             + "// ]]>\n"
             + "</script>");
 
-        assertHTML("<script><![CDATA[<>]]></script>", "<script>&lt;&gt;</script>");
-        assertHTML("<script><![CDATA[<>]]></script>", "<script><></script>");
+        assertHTML("<script>//<![CDATA[\n<>\n//]]></script>", "<script>&lt;&gt;</script>");
+        assertHTML("<script>//<![CDATA[\n<>\n//]]></script>", "<script><></script>");
 
         assertHTML("<p><![CDATA[&]]></p>", "<p><![CDATA[&]]></p>");
 

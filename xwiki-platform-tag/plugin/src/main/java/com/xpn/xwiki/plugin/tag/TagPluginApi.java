@@ -63,7 +63,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
     
     /**
-     * Get tags within the wiki with their occurences counts.
+     * Get cardinality map of tags within the wiki.
      * 
      * @return map of tags with their occurences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
@@ -75,7 +75,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
     
     /**
-     * Get tags within a specific space and their occurences counts.
+     * Get cardinality map of tags for a specific wiki space.
      * 
      * @param space the space to get tags in
      * @return map of tags with their occurences counts
@@ -85,6 +85,42 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     public Map<String, Integer> getTagCount(String space) throws XWikiException
     {
         return this.getProtectedPlugin().getTagCount(space, context);
+    }
+    
+    /**
+     * Get cardinality map of tags matching a hql query.
+     * Exemples of usage:
+     * <ul>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery("","doc.creator='XWiki.JohnDoe'")
+     * </code>
+     * will return the cardinality map of tags for documents created by user XWiki.JohnDoe
+     * </li>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery(", BaseObject as obj", 
+     *    "obj.name=doc.fullName and obj.className='Blog.BlogPostClass'")
+     * </code>
+     * will return the cardinality map of tags associated to blog post documents
+     * </li>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery("", "")
+     * </code>
+     * will return all tags within the wiki
+     * </li>
+     * </ul>
+     * 
+     * @param from the from fragment of the query
+     * @param where the where fragment from the query
+     * @return map of tags with their occurences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, incorrect query fragments).
+     * @since 1.2
+     */
+    public Map<String, Integer> getTagCountForQuery(String from, String where) throws XWikiException
+    {
+        return this.getProtectedPlugin().getTagCountForQuery(from, where, context);
     }
     
     /**

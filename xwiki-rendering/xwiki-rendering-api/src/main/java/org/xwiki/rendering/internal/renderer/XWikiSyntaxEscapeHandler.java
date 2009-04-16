@@ -124,6 +124,8 @@ public class XWikiSyntaxEscapeHandler
         if (!blockStateListener.isInLink()) {
             replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
         } else {
+            // This need to be done after anything else because link label add another level of escaping (escaped as
+            // link label and then escaped as wiki content).
             replaceAll(accumulatedBuffer, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
             replaceAll(accumulatedBuffer, "]]", ESCAPE_CHAR + "]" + ESCAPE_CHAR + "]");
             replaceAll(accumulatedBuffer, ">>", ESCAPE_CHAR + ">" + ESCAPE_CHAR + ">");

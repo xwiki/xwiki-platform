@@ -27,7 +27,6 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
 
-
 /**
  * Unit tests for {@link org.xwiki.xml.XMLUtils}.
  * 
@@ -38,6 +37,12 @@ public class XMLUtilsTest extends AbstractXWikiComponentTestCase
 {
     private HTMLCleaner cleaner;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     */
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -51,5 +56,21 @@ public class XMLUtilsTest extends AbstractXWikiComponentTestCase
         XMLUtils.stripHTMLEnvelope(document);
         assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", XMLUtils
             .toString(document));
+    }
+    
+    public void testEscapeXMLComment()
+    {
+        assertEquals("-\\- ", XMLUtils.escapeXMLComment("-- "));
+        assertEquals("-\\", XMLUtils.escapeXMLComment("-"));
+        assertEquals("-\\-\\-\\", XMLUtils.escapeXMLComment("---"));
+        assertEquals("- ", XMLUtils.escapeXMLComment("- "));
+    }
+    
+    public void testUnescapeXMLComment()
+    {
+        assertEquals("", XMLUtils.unescapeXMLComment("\\"));
+        assertEquals("\\", XMLUtils.unescapeXMLComment("\\\\"));
+        assertEquals("--", XMLUtils.unescapeXMLComment("\\-\\-"));
+        assertEquals("--", XMLUtils.unescapeXMLComment("\\-\\-\\"));
     }
 }

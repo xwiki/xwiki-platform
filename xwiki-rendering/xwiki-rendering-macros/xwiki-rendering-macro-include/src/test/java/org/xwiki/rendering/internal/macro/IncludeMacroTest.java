@@ -116,7 +116,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
     
     public void testIncludeMacroWithNoDocumentSpecified() throws Exception
     {
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
+        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.ROLE, "include");
         IncludeMacroParameters parameters = new IncludeMacroParameters();
 
         try {

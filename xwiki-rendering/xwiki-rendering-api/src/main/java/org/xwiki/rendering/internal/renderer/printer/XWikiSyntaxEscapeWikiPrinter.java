@@ -66,7 +66,8 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
 
     public void printBeginBold()
     {
-        boolean isOnNewLine = this.listenerChain.getTextOnNewLineStateChainingListener().isTextOnNewLine() && getBuffer().length() == 0;
+        boolean isOnNewLine =
+            this.listenerChain.getTextOnNewLineStateChainingListener().isTextOnNewLine() && getBuffer().length() == 0;
 
         print("**");
 

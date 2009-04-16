@@ -54,12 +54,24 @@ public class DocumentStateChainingListener extends AbstractChainingListener
 
     // Events
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument()
+     */
+    @Override
     public void beginDocument()
     {
         ++this.documentDepth;
         super.beginDocument();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument()
+     */
+    @Override
     public void endDocument()
     {
         super.endDocument();

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
@@ -165,8 +166,7 @@ public class MacroTransformation extends AbstractTransformation
             }
 
             newBlocks =
-                ((Macro<Object>) macroHolder.macro).execute(macroParameters, macroHolder.macroBlock.getContent(),
-                    context);
+                ((Macro<Object>) macroHolder.macro).execute(macroParameters, normalizeContent(macroHolder), context);
         } catch (Exception e) {
             // The Macro failed to execute.
             // The macro will not be executed and we generate an error message instead of the macro
@@ -190,6 +190,42 @@ public class MacroTransformation extends AbstractTransformation
         return true;
     }
 
+    /**
+     * Strip a single leading and trailing new line if any. We do this since we want that:
+     * <pre><code>{{macro}}
+     * content
+     * {{/macro}}</code></pre>
+     * be equivalent to:
+     * <pre><code>{{macro}}content{{/macro}}</code></pre>
+     * This is to make it easier for the user to not introduce significant new lines by error.
+     * 
+     * @param macroHolder the object containing the macro object
+     * @return the normalized string
+     * @todo move this method in a generic xwiki-text or xwiki-string module
+     */
+    private String normalizeContent(MacroHolder macroHolder)
+    {
+        String normalizedContent = macroHolder.macroBlock.getContent();
+        if (normalizedContent != null && normalizedContent.length() > 0) {
+
+            // Remove leading New Line
+            if (normalizedContent.charAt(0) == '\n') {
+                normalizedContent = normalizedContent.substring(1);
+            } else if (normalizedContent.length() > 1 && normalizedContent.charAt(0) == '\r' 
+                && normalizedContent.charAt(1) == '\n') 
+            {
+                normalizedContent = normalizedContent.substring(2);
+            } else if (normalizedContent.charAt(0) == '\r') {
+                normalizedContent = normalizedContent.substring(1);
+            }
+            
+            // Remove trailing New Line
+            normalizedContent = StringUtils.chomp(normalizedContent);
+        }
+        
+        return normalizedContent;
+    }
+    
     /**
      * @return the macro with the highest priority for the passed syntax or null if no macro is found
      */

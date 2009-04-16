@@ -27,6 +27,7 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.parser.Syntax;
@@ -34,6 +35,11 @@ import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
+/**
+ * Unit tests for {@link MacroTransformation}.
+ * 
+ * @version $Id$
+ */
 public class MacroTransformationTest extends AbstractRenderingTestCase
 {
     private MacroTransformation transformation;
@@ -149,4 +155,21 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         assertEquals(expected, printer.toString());
     }
     
+    /**
+     * Verify that
+     * <pre><code>{{macro}}
+     * content
+     * {{/macro}}</code></pre>
+     * is equivalent to:
+     * <pre><code>{{macro}}content{{/macro}}</code></pre>
+     */
+    public void testMacroTransformationWithLeadingAndTrailingNewLines() throws Exception
+    {
+        XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testcontentmacro",
+            Collections.<String, String>emptyMap(), "\nhello\n", false)));
+        
+        this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
+
+        assertEquals("hello", dom.getChildrenByType(WordBlock.class, true).get(0).getWord());
+    }
 }

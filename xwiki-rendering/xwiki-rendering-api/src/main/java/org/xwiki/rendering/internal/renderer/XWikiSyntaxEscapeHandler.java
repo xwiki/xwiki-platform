@@ -73,8 +73,8 @@ public class XWikiSyntaxEscapeHandler
 
         // Escape table characters
         if (blockStateListener.isInTable()) {
-            replaceAll(accumulatedBuffer, "|", "~|");
-            replaceAll(accumulatedBuffer, "!!", "~!!");
+            replaceAll(accumulatedBuffer, "|", ESCAPE_CHAR + "|");
+            replaceAll(accumulatedBuffer, "!!", ESCAPE_CHAR + "!!");
         }
 
         if (escapeFirstIfMatching != null) {
@@ -85,16 +85,6 @@ public class XWikiSyntaxEscapeHandler
         // characters.
         if (blockStateListener.isInHeader()) {
             replaceAll(accumulatedBuffer, "=", ESCAPE_CHAR + "=");
-        }
-
-        // Escape "[[" if not in a link.
-        //replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
-        if (!blockStateListener.isInLink()) {
-            replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
-        } else {
-            replaceAll(accumulatedBuffer, "]]", ESCAPE_CHAR + "]" + ESCAPE_CHAR + "]");
-            replaceAll(accumulatedBuffer, ">>", ESCAPE_CHAR + ">" + ESCAPE_CHAR + ">");
-            replaceAll(accumulatedBuffer, "||", ESCAPE_CHAR + "|" + ESCAPE_CHAR + "|");
         }
 
         // Escape verbatim "{{{"
@@ -128,6 +118,16 @@ public class XWikiSyntaxEscapeHandler
         if (escapeLastChar) {
             accumulatedBuffer.replace(accumulatedBuffer.length() - 1, accumulatedBuffer.length(), ESCAPE_CHAR
                 + accumulatedBuffer.charAt(accumulatedBuffer.length() - 1));
+        }
+
+        // Escape "[[" if not in a link.
+        if (!blockStateListener.isInLink()) {
+            replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
+        } else {
+            replaceAll(accumulatedBuffer, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
+            replaceAll(accumulatedBuffer, "]]", ESCAPE_CHAR + "]" + ESCAPE_CHAR + "]");
+            replaceAll(accumulatedBuffer, ">>", ESCAPE_CHAR + ">" + ESCAPE_CHAR + ">");
+            replaceAll(accumulatedBuffer, "||", ESCAPE_CHAR + "|" + ESCAPE_CHAR + "|");
         }
     }
 

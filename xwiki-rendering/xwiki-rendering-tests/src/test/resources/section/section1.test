@@ -102,9 +102,13 @@ Title level 6
 .input|xhtml/1.0
 .#-----------------------------------------------------
 <html><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h2 id="HTitlelevel2"><span>Title level 2</span></h2><h3 id="HTitlelevel3"><span>Title level 3</span></h3><h4 id="HTitlelevel4"><span>Title level 4</span></h4><h5 id="HTitlelevel5"><span>Title level 5</span></h5><h6 id="HTitlelevel6"><span>Title level 6</span></h6></html>
-.#-----------------------------------------------------
+.#-------------------------------------------------------------------------
 .input|confluence/1.0
-.#-----------------------------------------------------
+.# This test is the only one inside the XWiki Test Suite for Confluence.
+.# It's here to ensure that our Confluence parser works in general.
+.# We don't include exhaustive confluence parser tests. These are supposed
+.# to be located inside WikiModel.
+.#-------------------------------------------------------------------------
 h1. Title level 1
 h2. Title level 2
 h3. Title level 3

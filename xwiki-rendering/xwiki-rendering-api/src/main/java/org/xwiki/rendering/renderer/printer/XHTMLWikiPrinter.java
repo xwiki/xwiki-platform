@@ -172,8 +172,19 @@ public class XHTMLWikiPrinter extends XMLWikiPrinter
     @Override
     public void printXMLComment(String content)
     {
+        printXMLComment(content, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printXMLComment(java.lang.String, boolean)
+     */
+    @Override
+    public void printXMLComment(String content, boolean escape)
+    {
         handleSpaceWhenStartElement();
-        super.printXMLComment(content);
+        super.printXMLComment(content, escape);
         this.elementEnded = true;
     }
 

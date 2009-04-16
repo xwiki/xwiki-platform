@@ -15,7 +15,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-|param="val\"u\\e"|-|--><p>simplemacro0</p><!--stopmacro-->
+<!--startmacro:testsimplemacro|-|param="val\\"u\\\\e"|-|--><p>simplemacro0</p><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -23,4 +23,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-|param="val\"u\\e"|-|--><p>simplemacro0</p><!--stopmacro-->
+<html><!--startmacro:testsimplemacro|-|param="val\\"u\\\\e"|-|--><p>simplemacro0</p><!--stopmacro--></html>

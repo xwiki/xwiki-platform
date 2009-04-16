@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xwiki.rendering.internal.renderer.printer.WikiWriter;
 import org.xwiki.rendering.internal.renderer.printer.XHTMLWriter;
+import org.xwiki.xml.XMLUtils;
 
 /**
  * Base toolkit class for all XML-based printers.
@@ -185,9 +186,20 @@ public class XMLWikiPrinter
      */
     public void printXMLComment(String content)
     {
+        printXMLComment(content, false);
+    }
+
+    /**
+     * Print a XML comment.
+     * 
+     * @param content the comment content
+     * @param escape indicate if comment content has to be escaped. XML content does not support -- and - (when it's the
+     *            last character). Escaping is based on backslash. "- --\ -" give "- \-\-\\ \-\ ".
+     */
+    public void printXMLComment(String content, boolean escape)
+    {
         try {
-            DefaultComment commentElement = new DefaultComment(content);
-            this.xmlWriter.write(commentElement);
+            this.xmlWriter.write(new DefaultComment(escape ? XMLUtils.escapeXMLComment(content) : content));
         } catch (IOException e) {
             // TODO: add error log here
         }

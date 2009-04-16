@@ -57,7 +57,7 @@ public class XHTMLMacroRenderer
         }
         buffer.append(SEPARATOR);
         buffer.append(content);
-        printer.printXMLComment(buffer.toString());
+        printer.printXMLComment(buffer.toString(), true);
     }
 
     public void endRender(XHTMLWikiPrinter printer)

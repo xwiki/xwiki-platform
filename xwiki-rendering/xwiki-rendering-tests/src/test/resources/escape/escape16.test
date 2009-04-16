@@ -1,0 +1,36 @@
+.#-------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify that macro content support -- (basically that XHTML renderer correctly escape it)
+.#-------------------------------------------------------------------
+{{macro}}--{{/macro}}
+[[~~-~~->>reference]]
+image:--
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+onMacroStandalone [macro] [] [--]
+beginParagraph
+beginLink [Reference = [reference]] [false]
+onSpecialSymbol [-]
+onSpecialSymbol [-]
+endLink [Reference = [reference]] [false]
+onNewLine
+onImage: [--] [true]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:macro|-||-|-\-\--><!--stopmacro--><p><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference">--</a></span><!--stopwikilink--><br/><!--startimage:-\-\--><img src="/xwiki/bin/download/currentdoc/--" class="wikimodel-freestanding" alt="--"/><!--stopimage--></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+{{macro}}--{{/macro}}
+
+[[~~-~~->>reference]]
+image:--
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><!--startmacro:macro|-||-|-\-\--><!--stopmacro--><p><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference">--</a></span><!--stopwikilink--><br/><!--startimage:-\-\--><img src="/xwiki/bin/download/currentdoc/--" class="wikimodel-freestanding" alt="--"/><!--stopimage--></p></html>

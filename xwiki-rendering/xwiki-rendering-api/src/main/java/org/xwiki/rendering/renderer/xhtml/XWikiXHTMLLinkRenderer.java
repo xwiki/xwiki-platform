@@ -130,7 +130,8 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
         // Add an XML comment as a placeholder so that the XHTML parser can find the document name.
         // Otherwise it would be too difficult to transform a URL into a document name especially since
         // a link can refer to an external URL.
-        this.xhtmlPrinter.printXMLComment("startwikilink:" + this.xwikiSyntaxLinkRenderer.renderLinkReference(link));
+        this.xhtmlPrinter.printXMLComment("startwikilink:" + this.xwikiSyntaxLinkRenderer.renderLinkReference(link),
+            true);
 
         Map<String, String> spanAttributes = new LinkedHashMap<String, String>();
         Map<String, String> aAttributes = new LinkedHashMap<String, String>();
@@ -172,16 +173,16 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
                 this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
             } else {
                 spanAttributes.put(CLASS, "wikicreatelink");
-                
+
                 // Add the parent=<current document name> parameter to the query string of the generated URL so that
                 // the new document is created with the current page as its parent.
                 String queryString = link.getQueryString();
                 if (StringUtils.isBlank(queryString)) {
-//                    queryString = "parent=" + this.documentAccessBridge.
+                    // queryString = "parent=" + this.documentAccessBridge.
                 }
-                
-                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", 
-                    link.getQueryString(), link.getAnchor()));
+
+                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", link
+                    .getQueryString(), link.getAnchor()));
 
                 this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
                 this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);

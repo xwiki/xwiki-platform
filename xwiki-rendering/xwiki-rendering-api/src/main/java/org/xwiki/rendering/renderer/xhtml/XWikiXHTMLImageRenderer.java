@@ -110,7 +110,7 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
 
         // And generate the XHTML IMG element. We need to save the image location in XML comment so that
         // it can be reconstructed later on when moving from XHTML to wiki syntax.
-        this.xhtmlPrinter.printXMLComment("startimage:" + this.imageRenderer.renderImage(image));
+        this.xhtmlPrinter.printXMLComment("startimage:" + this.imageRenderer.renderImage(image), true);
         this.xhtmlPrinter.printXMLElement(IMG, attributes);
         this.xhtmlPrinter.printXMLComment("stopimage");
     }

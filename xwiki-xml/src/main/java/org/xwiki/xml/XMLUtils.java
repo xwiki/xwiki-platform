@@ -55,14 +55,15 @@ public final class XMLUtils
          * Regex to recognize a XML Entity.
          */
         private static final Pattern ENTITY = Pattern.compile("&[a-z]+;|&#[0-9a-zA-Z]+;");
-        
+
         /**
          * Ampersand character.
          */
         private static final String AMPERSAND = "&";
-        
+
         /**
          * {@inheritDoc}
+         * 
          * @see XMLOutputter#XMLOutputter(Format)
          */
         public XWikiXMLOutputter(Format format)
@@ -72,6 +73,7 @@ public final class XMLUtils
 
         /**
          * {@inheritDoc}
+         * 
          * @see XMLOutputter#escapeElementEntities(String)
          */
         @Override
@@ -80,7 +82,7 @@ public final class XMLUtils
             if (text.length() == 0) {
                 return text;
             }
-            
+
             String result;
             int pos1 = text.indexOf("<![CDATA[");
             if (pos1 > -1) {
@@ -92,32 +94,33 @@ public final class XMLUtils
                 if (pos2 + 3 == text.length()) {
                     result = result + text.substring(pos1);
                 } else {
-                    result = result + text.substring(pos1, pos2 + 3) + escapeElementEntities(text.substring(pos2 + 3)); 
+                    result = result + text.substring(pos1, pos2 + 3) + escapeElementEntities(text.substring(pos2 + 3));
                 }
             } else {
                 result = escapeAmpersand(text);
                 result = result.replaceAll("<", "&lt;");
                 result = result.replaceAll(">", "&gt;");
             }
-            
-            return result; 
+
+            return result;
         }
 
         /**
          * {@inheritDoc}
+         * 
          * @see XMLOutputter#escapeAttributeEntities(String)
          */
         @Override
         public String escapeAttributeEntities(String text)
         {
             String result = escapeElementEntities(text);
-            
+
             // Attribute values must have quotes escaped since attributes are defined with quotes...
             result = result.replaceAll("\"", "&quot;");
-            
+
             return result;
         }
-        
+
         /**
          * Escape ampersand when it's not defining an entity.
          * 
@@ -169,13 +172,13 @@ public final class XMLUtils
         // Force newlines to use \n since otherwise the default is \n\r.
         // See http://www.jdom.org/docs/apidocs/org/jdom/output/Format.html#setLineSeparator(java.lang.String)
         format.setLineSeparator("\n");
-        
+
         XMLOutputter outputter = new XWikiXMLOutputter(format);
         return outputter.outputString(jdomDoc);
     }
 
     /**
-     * Strip the HTML envelope if it exists. Precisely this means removing the head tag and move all tags in the body 
+     * Strip the HTML envelope if it exists. Precisely this means removing the head tag and move all tags in the body
      * tag directly under the html element. This is useful for example if you wish to insert an HTML fragment into an
      * existing HTML page.
      * 
@@ -238,5 +241,69 @@ public final class XMLUtils
                 throw new RuntimeException("Failed to extract XML", t);
             }
         }
+    }
+
+    /**
+     * XML content does not support some characters inside its content but there is no official escaping/unescaping for
+     * it so me made our own.
+     * <p>
+     * <ul>
+     * <li>1) Escape existing \</li>
+     * <li>2) Escape --</li>
+     * <li>3) Add "\" (unescaped as "") at the end if the last char is -</li>
+     * </ul>
+     * 
+     * @param content the XML comment content to escape
+     * @return the escaped content.
+     */
+    public static String escapeXMLComment(String content)
+    {
+        StringBuffer str = new StringBuffer(content.length());
+
+        char[] buff = content.toCharArray();
+        char lastChar = 0;
+        for (char c : buff) {
+            if (c == '\\') {
+                str.append('\\');
+            } else if (c == '-' && lastChar == '-') {
+                str.append('\\');
+            }
+
+            str.append(c);
+            lastChar = c;
+        }
+
+        if (lastChar == '-') {
+            str.append('\\');
+        }
+
+        return str.toString();
+    }
+
+    /**
+     * XML content does not support some characters inside its content but there is no official escaping/unescaping for
+     * it so me made our own.
+     * 
+     * @param content the XML comment content to unescape
+     * @return the unescaped content.
+     * @see #escapeXMLComment(String)
+     */
+    public static String unescapeXMLComment(String content)
+    {
+        StringBuffer str = new StringBuffer(content.length());
+
+        char[] buff = content.toCharArray();
+        boolean escaped = false;
+        for (char c : buff) {
+            if (!escaped && c == '\\') {
+                escaped = true;
+                continue;
+            }
+
+            str.append(c);
+            escaped = false;
+        }
+
+        return str.toString();
     }
 }

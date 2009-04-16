@@ -84,7 +84,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("verbatim/verbatim5", false);
         suite.addTestsFromResource("verbatim/verbatim6", false);
         suite.addTestsFromResource("verbatim/verbatim7", false);
-        
+
         // Paragraphs
         suite.addTestsFromResource("paragraph/paragraph1", false);
         suite.addTestsFromResource("paragraph/paragraph2", false);
@@ -173,7 +173,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("section/section8", false);
         suite.addTestsFromResource("section/section9", false);
 
-        // Other
+        // Escaping
         suite.addTestsFromResource("escape/escape1", false);
         suite.addTestsFromResource("escape/escape2", false);
         suite.addTestsFromResource("escape/escape3", false);
@@ -189,6 +189,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("escape/escape13", false);
         suite.addTestsFromResource("escape/escape14", false);
         suite.addTestsFromResource("escape/escape15", false);
+        suite.addTestsFromResource("escape/escape16", false);
+
+        // Other
         suite.addTestsFromResource("horizontalline/horizontalline1", false);
         suite.addTestsFromResource("horizontalline/horizontalline2", false);
         suite.addTestsFromResource("horizontalline/horizontalline3", false);
@@ -210,7 +213,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
         suite.addTestsFromResource("image/image4", false);
-
+        
         return new RenderingPlexusTestSetup(suite);
     }
 }

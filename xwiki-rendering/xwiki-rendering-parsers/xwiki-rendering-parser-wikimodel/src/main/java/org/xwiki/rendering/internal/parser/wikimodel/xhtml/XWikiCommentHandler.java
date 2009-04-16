@@ -40,6 +40,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.xml.XMLUtils;
 
 /**
  * Handle Link and Macro definitions in comments (we store links in a comment since otherwise there are situations where
@@ -87,13 +88,15 @@ public class XWikiCommentHandler extends CommentHandler
         // the A tag, till we get a "stopwikilink" comment.
         // Same for "startimage" and "stopimage".
         if (!ignoreElements && content.startsWith("startwikilink:")) {
-            handleLinkCommentStart(content, stack);
+            handleLinkCommentStart(XMLUtils.unescapeXMLComment(content), stack);
         } else if (!ignoreElements && content.startsWith("stopwikilink")) {
-            handleLinkCommentStop(content, stack);
+            handleLinkCommentStop(XMLUtils.unescapeXMLComment(content), stack);
         } else if (!ignoreElements && content.startsWith("startimage:")) {
-            handleImageCommentStart(content, stack);
+            handleImageCommentStart(XMLUtils.unescapeXMLComment(content), stack);
         } else if (!ignoreElements && content.startsWith("stopimage")) {
-            handleImageCommentStop(content, stack);
+            handleImageCommentStop(XMLUtils.unescapeXMLComment(content), stack);
+        } else if (!ignoreElements && content.startsWith("startmacro")) {
+            super.onComment(XMLUtils.unescapeXMLComment(content), stack);
         } else {
             super.onComment(content, stack);
         }

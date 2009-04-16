@@ -24,7 +24,6 @@ import java.util.Stack;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
-import org.wikimodel.wem.WikiReferenceParser;
 import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.wikimodel.wem.xwiki.XWikiReferenceParser;
@@ -60,7 +59,7 @@ public class XWikiCommentHandler extends CommentHandler
 
     private PrintRendererFactory printRendererFactory;
 
-    private WikiReferenceParser referenceParser;
+    private XWikiReferenceParser referenceParser;
 
     /**
      * We're using a stack so that we can have nested comment handling. For example when we have a link to an image we
@@ -150,8 +149,9 @@ public class XWikiCommentHandler extends CommentHandler
             WikiParameters params = (WikiParameters) stack.getStackParameter("linkParameters");
 
             WikiReference wikiReference =
-                this.referenceParser.parse((label.length() > 0 ? label + ">>" : "") + reference
-                    + (params.getSize() > 0 ? "||" + params.toString() : ""));
+                this.referenceParser.parse((label.length() > 0 ? label + ">>" : "") + reference);
+
+            wikiReference = new WikiReference(wikiReference.getLink(), wikiReference.getLabel(), params);
 
             stack.getScannerContext().onReference(wikiReference);
         }

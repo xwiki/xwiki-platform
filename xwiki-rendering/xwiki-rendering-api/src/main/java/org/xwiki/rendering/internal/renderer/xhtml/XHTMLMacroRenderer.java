@@ -33,7 +33,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 public class XHTMLMacroRenderer
 {
     private static final String SEPARATOR = "|-|";
-    
+
     private XWikiMacroPrinter macroPrinter;
 
     public XHTMLMacroRenderer()

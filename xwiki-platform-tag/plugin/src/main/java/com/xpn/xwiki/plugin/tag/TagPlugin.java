@@ -137,7 +137,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     }
     
     /**
-     * Get tags within the wiki with their occurences counts.
+     * Get cardinality map of tags within the wiki.
      * 
      * @param context XWiki context.
      * @return map of tags (alphabetical order) with their occurences counts.
@@ -145,37 +145,64 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public Map<String, Integer> getTagCount(XWikiContext context) throws XWikiException
     {
-        return this.getTagCount(null, context);
+        return this.getTagCountForQuery(null, null, context);
     }
 
     /**
-     * Get tags within the wiki with their occurences counts in a specific space.
+     * Get cardinality map of tags for a specific wiki space.
      * 
      * @param space the wiki space to get tags from. If blank, return tags for the whole wiki.
      * @param context XWiki context.
      * @return map of tags (alphabetical order) with their occurences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 1.2
+     */
+    public Map<String, Integer> getTagCount(String space, XWikiContext context) throws XWikiException
+    {
+        if (!StringUtils.isBlank(space)) {
+            return getTagCountForQuery("", "doc.space='" + space + "'", context);
+        }
+        return getTagCount(context);
+    }
+    
+    /**
+     * Get cardinality map of tags matching a hql query.
+     * 
+     * @param fromHql the <code>from</code> fragment of the hql query
+     * @param whereHql the <code>where</code> fragment of the hql query
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 1.2
+     * 
+     * @see TagPluginApi#getTagCountForQuery(String, String)
      */
     @SuppressWarnings("unchecked")
-    public Map<String, Integer> getTagCount(String space, XWikiContext context) throws XWikiException
+    public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, XWikiContext context)
+        throws XWikiException
     {
         List<String> results = null;
         Map<String, Integer> tagCount = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
 
-        String baseHql = "select elements(prop.list) from BaseObject as obj, DBStringListProperty " + "as prop";
-        String whereHql = " where obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags'";
-        if (!StringUtils.isBlank(space)) {
-            baseHql += ", XWikiDocument as doc";
-            whereHql += " and doc.fullName=obj.name and doc.space='" + space + "'";
+        String from = "select elements(prop.list) from BaseObject as tagobject, DBStringListProperty " + "as prop";
+        String where = " where tagobject.className='XWiki.TagClass'"
+            + " and tagobject.id=prop.id.id and prop.id.name='tags'";
+        
+        // If at least one of the fragments is passed, the query should be matching XWiki documents 
+        if (!StringUtils.isBlank(fromHql) || !StringUtils.isBlank(whereHql)) {
+            from += (", XWikiDocument as doc" + fromHql);
         }
-        results = (List<String>) context.getWiki().search(baseHql + whereHql, context);
+        if (!StringUtils.isBlank(whereHql)) {
+            where += (" and doc.fullName=tagobject.name and " + whereHql);
+        }
+        results = (List<String>) context.getWiki().search(from + where, context);
         Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
 
         tagCount.putAll(CollectionUtils.getCardinalityMap(results));
 
         return tagCount;
-
     }
+    
     /**
      * Get documents with the given tags.
      * 

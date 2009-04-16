@@ -43,10 +43,11 @@ import org.w3c.dom.NodeList;
 public final class XMLUtils
 {
     /**
-     * JDOM's XMLOutputter class converts reserved XML characters (<, >, ' , &, \r and \n) into their entity 
-     * format (&lt;, &gt; &apos; &amp; &#xD; and \r\n). However since we're using HTML Cleaner
-     * (http://htmlcleaner.sourceforge.net/) and since it's buggy for character escapes we have turned off
-     * character escaping for it and thus we need to perform selective escaping here. 
+     * JDOM's XMLOutputter class converts reserved XML characters (<, >, ' , &, \r and \n) into their entity format
+     * (&lt;, &gt; &apos; &amp; &#xD; and \r\n). However since we're using HTML Cleaner
+     * (http://htmlcleaner.sourceforge.net/) and since it's buggy for character escapes we have turned off character
+     * escaping for it and thus we need to perform selective escaping here.
+     * 
      * @todo Remove this complex escaping code when SF HTML Cleaner will do proper escaping
      */
     public static class XWikiXMLOutputter extends XMLOutputter
@@ -245,7 +246,7 @@ public final class XMLUtils
 
     /**
      * XML content does not support some characters inside its content but there is no official escaping/unescaping for
-     * it so me made our own.
+     * it so we made our own.
      * <p>
      * <ul>
      * <li>1) Escape existing \</li>
@@ -282,7 +283,7 @@ public final class XMLUtils
 
     /**
      * XML content does not support some characters inside its content but there is no official escaping/unescaping for
-     * it so me made our own.
+     * it so we made our own.
      * 
      * @param content the XML comment content to unescape
      * @return the unescaped content.

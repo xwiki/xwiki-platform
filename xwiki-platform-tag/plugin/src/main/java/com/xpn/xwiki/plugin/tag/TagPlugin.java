@@ -20,12 +20,13 @@
 
 package com.xpn.xwiki.plugin.tag;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -141,36 +142,40 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @param context XWiki context.
      * @return map of tags (alphabetical order) with their occurences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     */
+    public Map<String, Integer> getTagCount(XWikiContext context) throws XWikiException
+    {
+        return this.getTagCount(null, context);
+    }
+
+    /**
+     * Get tags within the wiki with their occurences counts in a specific space.
      * 
+     * @param space the wiki space to get tags from. If blank, return tags for the whole wiki.
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      */
     @SuppressWarnings("unchecked")
-    public Map<String, Integer> getTagCount(XWikiContext context) throws XWikiException
-    {       
-        String previousTag = "";
-        int count = 1;
+    public Map<String, Integer> getTagCount(String space, XWikiContext context) throws XWikiException
+    {
         List<String> results = null;
         Map<String, Integer> tagCount = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
 
-        String hql = "select elements(prop.list) from BaseObject as obj, DBStringListProperty "
-                + "as prop where obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags'";        
-        results = (List<String>) context.getWiki().search(hql, context);
-        Collections.sort(results);
-                
-        for (String tag : results) {
-            if (tag.equals(previousTag)) {
-                count++;
-            } else {
-                if (!StringUtils.isBlank(previousTag)) {
-                    tagCount.put(previousTag, count);                                    
-                    count = 1;
-                }
-                previousTag = tag;
-            }            
+        String baseHql = "select elements(prop.list) from BaseObject as obj, DBStringListProperty " + "as prop";
+        String whereHql = " where obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags'";
+        if (!StringUtils.isBlank(space)) {
+            baseHql += ", XWikiDocument as doc";
+            whereHql += " and doc.fullName=obj.name and doc.space='" + space + "'";
         }
+        results = (List<String>) context.getWiki().search(baseHql + whereHql, context);
+        Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
 
-        return tagCount; 
+        tagCount.putAll(CollectionUtils.getCardinalityMap(results));
+
+        return tagCount;
+
     }
-
     /**
      * Get documents with the given tags.
      * 

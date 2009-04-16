@@ -191,6 +191,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("escape/escape15", false);
         suite.addTestsFromResource("escape/escape16", false);
         suite.addTestsFromResource("escape/escape17", false);
+        suite.addTestsFromResource("escape/escape18", false);
 
         // Other
         suite.addTestsFromResource("horizontalline/horizontalline1", false);

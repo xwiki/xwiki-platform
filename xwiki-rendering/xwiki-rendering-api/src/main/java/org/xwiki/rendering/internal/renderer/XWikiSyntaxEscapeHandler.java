@@ -23,6 +23,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
+import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
+import org.xwiki.rendering.listener.chaining.EventType;
+import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
@@ -52,6 +55,8 @@ public class XWikiSyntaxEscapeHandler
     {
         BlockStateChainingListener blockStateListener = listenerChain.getBlockStateChainingListener();
         TextOnNewLineStateChainingListener textStateListener = listenerChain.getTextOnNewLineStateChainingListener();
+        LookaheadChainingListener lookaheadListener = listenerChain.getLookaheadChainingListener();
+        DocumentStateChainingListener documentStateListener = listenerChain.getDocumentStateChainingListener();
 
         // Escape tilde symbol (i.e. the escape character).
         // Note: This needs to be the first replacement since other replacements below also use the tilde symbol
@@ -111,6 +116,16 @@ public class XWikiSyntaxEscapeHandler
         escapeURI(accumulatedBuffer, "image:");
         escapeURI(accumulatedBuffer, "attach:");
         escapeURI(accumulatedBuffer, "mailto:");
+
+        // Escape ( when it's the last character of a embedded document
+        // Escape ) when it's just before an embedded document
+        if (documentStateListener.getDocumentDepth() > 1
+            && lookaheadListener.getNextEvent() != null
+            && ((lookaheadListener.getNextEvent().eventType == EventType.END_DOCUMENT && accumulatedBuffer
+                .charAt(accumulatedBuffer.length() - 1) == ')') || (lookaheadListener.getNextEvent().eventType == EventType.BEGIN_DOCUMENT && accumulatedBuffer
+                .charAt(accumulatedBuffer.length() - 1) == '('))) {
+            escapeLastChar = true;
+        }
 
         // Escape last character if we're told to do so. This is to handle cases such as:
         // - onWord("hello:") followed by onFormat(ITALIC) which would lead to "hello://" if the ":" wasn't escaped

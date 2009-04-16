@@ -19,35 +19,39 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
-import org.xwiki.rendering.listener.DocumentImage;
-import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.ImageType;
-import org.xwiki.rendering.listener.URLImage;
+import java.util.Map;
 
 /**
- * Generate a XWiki syntax string representation of an {@link Image}, using the format:
- * <code>(optional document name)@(attachment name)</code>.
+ * Generates XWiki Syntax for a parameters like macros and links.
  * 
  * @version $Id$
- * @since 1.7M3
+ * @since 1.9M2
  */
-public class XWikiSyntaxImageRenderer
+public class XWikiParametersPrinter
 {
-    public String renderImage(Image image)
+    /**
+     * Print parameters in a String.
+     * 
+     * @param parameters the parameters to print.
+     * @return the printed parameters.
+     */
+    public String print(Map<String, String> parameters)
     {
-        String result;
-        if (image.getType() == ImageType.DOCUMENT) {
-            DocumentImage documentImage = (DocumentImage) image;
-            if (documentImage.getDocumentName() != null) {
-                result = documentImage.getDocumentName() + "@" + documentImage.getAttachmentName();
-            } else {
-                result = documentImage.getAttachmentName();
+        StringBuffer buffer = new StringBuffer();
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            String value = entry.getValue();
+            String key = entry.getKey();
+
+            if (key != null && value != null) {
+                if (buffer.length() > 0) {
+                    buffer.append(' ');
+                }
+
+                buffer.append(entry.getKey()).append('=').append('\"').append(
+                    entry.getValue().replace("\\", "\\\\").replace("\"", "\\\"")).append('\"');
             }
-        } else {
-            URLImage urlImage = (URLImage) image;
-            result = urlImage.getURL();
         }
 
-        return result;
+        return buffer.toString();
     }
 }

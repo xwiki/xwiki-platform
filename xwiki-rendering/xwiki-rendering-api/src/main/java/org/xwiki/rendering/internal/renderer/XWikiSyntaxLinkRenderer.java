@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +33,8 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public class XWikiSyntaxLinkRenderer
 {
+    XWikiParametersPrinter parametersPrinter = new XWikiParametersPrinter();
+
     public String renderLinkReference(Link link)
     {
         StringBuilder buffer = new StringBuilder();
@@ -81,14 +82,7 @@ public class XWikiSyntaxLinkRenderer
         // If there were parameters specified, output them separated by the "||" characters
         if (!parameters.isEmpty()) {
             printer.print("||");
-            Iterator<String> it = parameters.keySet().iterator();
-            while (it.hasNext()) {
-                String key = it.next();
-                printer.print(key + "=\"" + parameters.get(key) + "\"");
-                if (it.hasNext()) {
-                    printer.print(" ");
-                }
-            }
+            printer.print(this.parametersPrinter.print(parameters));
         }
 
         if (!isFreeStandingURI || (isFreeStandingURI && !parameters.isEmpty())) {

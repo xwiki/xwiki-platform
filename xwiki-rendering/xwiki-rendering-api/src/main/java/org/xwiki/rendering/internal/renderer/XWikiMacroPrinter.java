@@ -29,6 +29,8 @@ import java.util.Map;
  */
 public class XWikiMacroPrinter
 {
+    private XWikiParametersPrinter parametersPrinter = new XWikiParametersPrinter();
+
     public String print(String name, Map<String, String> parameters, String content)
     {
         StringBuffer buffer = new StringBuffer();
@@ -50,21 +52,6 @@ public class XWikiMacroPrinter
 
     public String printParameters(Map<String, String> parameters)
     {
-        StringBuffer buffer = new StringBuffer();
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            String value = entry.getValue();
-            String key = entry.getKey();
-
-            if (key != null && value != null) {
-                if (buffer.length() > 0) {
-                    buffer.append(' ');
-                }
-
-                buffer.append(entry.getKey()).append('=').append('\"').append(
-                    entry.getValue().replace("\\", "\\\\").replace("\"", "\\\"")).append('\"');
-            }
-        }
-
-        return buffer.toString();
+        return this.parametersPrinter.print(parameters);
     }
 }

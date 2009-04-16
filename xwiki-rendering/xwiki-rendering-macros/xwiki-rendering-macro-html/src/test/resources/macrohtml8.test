@@ -33,7 +33,7 @@ endDocument
 .expect|xhtml/1.0
 .#-----------------------------------------------------
 <!--startmacro:html|-|wiki="true"|-|
-<!-- comment1 -->
+<!-\- comment1 -\->
 <p>hello</p>
-<!-- comment2 -->
+<!-\- comment2 -\->
 --><!-- comment1 --><p>hello</p><!-- comment2 --><!--stopmacro-->

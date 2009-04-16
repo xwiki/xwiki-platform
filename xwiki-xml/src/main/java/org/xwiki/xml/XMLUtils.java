@@ -256,6 +256,7 @@ public final class XMLUtils
      * 
      * @param content the XML comment content to escape
      * @return the escaped content.
+     * @since 1.9M2
      */
     public static String escapeXMLComment(String content)
     {
@@ -288,6 +289,7 @@ public final class XMLUtils
      * @param content the XML comment content to unescape
      * @return the unescaped content.
      * @see #escapeXMLComment(String)
+     * @since 1.9M2
      */
     public static String unescapeXMLComment(String content)
     {

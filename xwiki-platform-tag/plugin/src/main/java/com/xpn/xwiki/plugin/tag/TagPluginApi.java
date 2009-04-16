@@ -75,6 +75,19 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
     
     /**
+     * Get tags within a specific space and their occurences counts.
+     * 
+     * @param space the space to get tags in
+     * @return map of tags with their occurences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 1.2
+     */
+    public Map<String, Integer> getTagCount(String space) throws XWikiException
+    {
+        return this.getProtectedPlugin().getTagCount(space, context);
+    }
+    
+    /**
      * Get all the documents containing the given tag.
      * 
      * @param tag tag to match.

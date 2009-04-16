@@ -90,7 +90,14 @@
       #end
       * &lt;img alt="" src="$xwiki.getSkinFile("icons/contact.png")"/&gt; &lt;a href="$doc.getURL("inline")"&gt;$msg.get("platform.core.profile.modifyProfile$!{msgKeyEditSuffix}")&lt;/a&gt;
       * &lt;img alt="" src="$xwiki.getSkinFile("icons/changeavatar.png")"/&gt; &lt;a href="$doc.getURL("edit", "xpage=changemyavatar")"&gt;$msg.get("platform.core.profile.changePhoto$!{msgKeyEditSuffix}")&lt;/a&gt;
-      #if($isAdvancedUser)
+      ## Code to check whether the document's user with usertype advanced.
+      #set($contextUserType = "$!{doc.getObject('XWiki.XWikiUsers').getProperty('usertype').value}")
+      #if($contextUserType == 'Advanced')
+        #set($isContextUserAdvanced = true)
+      #else
+        #set($isContextUserAdvanced = false)
+      #end
+      #if($isContextUserAdvanced)
         * &lt;img alt="" src="$xwiki.getSkinFile("icons/simpleuser.png")"/&gt; &lt;a href="$doc.getURL("save", "XWiki.XWikiUsers_${obj.number}_usertype=Simple")"&gt;$msg.get("platform.core.profile.switchSimple")&lt;/a&gt;
       #else
         * &lt;img alt="" src="$xwiki.getSkinFile("icons/advanceduser.png")"/&gt; &lt;a href="$doc.getURL("save", "XWiki.XWikiUsers_${obj.number}_usertype=Advanced")"&gt;$msg.get("platform.core.profile.switchAdvanced")&lt;/a&gt;

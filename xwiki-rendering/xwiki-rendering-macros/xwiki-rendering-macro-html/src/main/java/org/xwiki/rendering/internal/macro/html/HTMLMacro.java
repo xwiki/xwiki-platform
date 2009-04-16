@@ -169,7 +169,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             // some spaces/newlines before a XML declaration (prolog). Otherwise the XML parser would fail to parse.
             Document document = this.htmlCleaner.clean(new StringReader(content.trim()));
 
-            // Remove the HMTL envelope since this macro is only a fragment of a page which will already have an
+            // Remove the HTML envelope since this macro is only a fragment of a page which will already have an
             // HTML envelope when rendered.
             XMLUtils.stripHTMLEnvelope(document);
             String cleanedText = XMLUtils.toString(document);

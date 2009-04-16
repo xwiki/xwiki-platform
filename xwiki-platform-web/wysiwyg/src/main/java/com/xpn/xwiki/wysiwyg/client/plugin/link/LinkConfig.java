@@ -133,8 +133,9 @@ public class LinkConfig implements IsSerializable
 
     /**
      * The map of custom parameters set for this link. This will store all html parameters passed in wiki syntax and the
-     * methods that access known parameters (title, rel) will use this underlying map. FIXME: this won't keep the order
-     * of the parameters, unfortunately. TODO: think about moving all config members to this map
+     * methods that access known parameters (title, rel) will use this underlying map. <br />
+     * FIXME: this won't keep the order of the parameters, unfortunately. <br />
+     * TODO: think about moving all config members to this map
      */
     private Map<String, String> parameters = new HashMap<String, String>();
 
@@ -283,7 +284,7 @@ public class LinkConfig implements IsSerializable
     }
 
     /**
-     * @return true if this link is configured to open in a new window, false otherwise
+     * @return {@code true} if this link is configured to open in a new window, {@code false} otherwise
      */
     public boolean isOpenInNewWindow()
     {
@@ -346,7 +347,7 @@ public class LinkConfig implements IsSerializable
 
     /**
      * @param name the name of the parameter to unset
-     * @return the old value of the parameter to unset, if any, or null otherwiseO
+     * @return the old value of the parameter to unset, if any, or {@code null} otherwise
      */
     public String removeParameter(String name)
     {

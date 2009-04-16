@@ -179,7 +179,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     private Wizard getLinkWizard()
     {
         if (linkWizard == null) {
-            linkWizard = new LinkWizard();
+            linkWizard = new LinkWizard(this.getConfig());
             linkWizard.addWizardListener(this);
         }
         return linkWizard;

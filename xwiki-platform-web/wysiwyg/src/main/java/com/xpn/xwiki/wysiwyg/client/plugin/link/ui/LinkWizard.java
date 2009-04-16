@@ -24,6 +24,7 @@ import java.util.Map;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStepProvider;
@@ -43,11 +44,20 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     private Map<String, WizardStep> stepsMap = new HashMap<String, WizardStep>();
 
     /**
-     * Default constructor.
+     * The resource currently edited by this WYSIWYG, used to determine the context in which link creation takes place.
      */
-    public LinkWizard()
+    private String editedResource;
+
+    /**
+     * Builds a {@link LinkWizard} from the passed {@link Config}. The configuration is used to get WYSIWYG editor
+     * specific information for this wizard, such as the current page, etc.
+     * 
+     * @param config the context configuration for this {@link LinkWizard}
+     */
+    public LinkWizard(Config config)
     {
         super(Strings.INSTANCE.link(), Images.INSTANCE.link().createImage());
+        editedResource = config.getParameter("documentName");
         this.setProvider(this);
     }
 
@@ -67,10 +77,10 @@ public class LinkWizard extends Wizard implements WizardStepProvider
                 step = new EmailAddressLinkWizardStep();
             }
             if ("wikipage".equals(name)) {
-                step = new WikipageSelectorWizardStep();
+                step = new WikipageSelectorWizardStep(editedResource);
             }
             if ("attachment".equals(name)) {
-                step = new AttachmentSelectorWizardStep();
+                step = new AttachmentSelectorWizardStep(editedResource);
             }
             if ("wikipagecreator".equals(name)) {
                 step = new CreateNewPageWizardStep();

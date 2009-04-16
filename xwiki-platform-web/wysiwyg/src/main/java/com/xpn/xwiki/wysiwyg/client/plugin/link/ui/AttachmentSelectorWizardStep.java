@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
@@ -33,26 +32,45 @@ import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 public class AttachmentSelectorWizardStep extends AbstractSelectorWizardStep
 {
     /**
-     * Default constructor.
+     * The default selection on the tree.
      */
-    public AttachmentSelectorWizardStep()
+    private String defaultSelection;
+
+    /**
+     * Creates an attachment selection wizard step with the specified default selection. The selection will be used to
+     * position the attachment selection tree on the resource named by it, unless specified otherwise by the
+     * initialization data.
+     * 
+     * @param defaultSelection the default selection of the wiki explorer
+     */
+    public AttachmentSelectorWizardStep(String defaultSelection)
     {
         // don't show "Add attachment" for the moment
-        super(false, true, false);
+        super(false, true, false, defaultSelection);
+        this.defaultSelection = defaultSelection;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void init(Object data, AsyncCallback< ? > cb)
+    protected void initializeExplorerSelection()
     {
-        // if the data reference has a "attach" prefix, strip it away, to make the reference valid in the tree
-        String reference = ((LinkConfig) data).getReference();
-        if (!StringUtils.isEmpty(reference) && reference.startsWith("attach")) {
-            reference = reference.substring(7);
-            ((LinkConfig) data).setReference(reference);
+        String reference = getLinkData().getReference();
+        if (!StringUtils.isEmpty(reference)) {
+            if (reference.startsWith("attach")) {
+                reference = reference.substring(7);
+            }
+            getExplorer().setValue(reference);
+        } else {
+            // set the default selection back, every time for attachments
+            if (!StringUtils.isEmpty(defaultSelection)) {
+                // alter the defaultSelection to have an #Attachments anchor at the end, so that the attachments section
+                // is selected from the defaultResource
+                String attachmentsAnchor = "#Attachments";
+                getExplorer().setValue(
+                    defaultSelection + (!defaultSelection.endsWith(attachmentsAnchor) ? attachmentsAnchor : ""));
+            }
         }
-        super.init(data, cb);
     }
 
     /**

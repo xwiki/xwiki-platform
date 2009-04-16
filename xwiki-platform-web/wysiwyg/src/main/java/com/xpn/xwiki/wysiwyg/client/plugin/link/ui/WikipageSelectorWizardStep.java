@@ -35,12 +35,15 @@ import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 public class WikipageSelectorWizardStep extends AbstractSelectorWizardStep
 {
     /**
-     * Default constructor.
+     * Creates a wiki page selection wizard step with the specified default selection. The selection will be used to
+     * position the wiki page selection tree on the resource named by it on the first load. 
+     * 
+     * @param defaultSelection the default selection of the wiki explorer
      */
-    public WikipageSelectorWizardStep()
+    public WikipageSelectorWizardStep(String defaultSelection)
     {
         // build a standard selector which shows "Add page" and no attachments.
-        super(true, false, false);
+        super(true, false, false, defaultSelection);
     }
 
     /**

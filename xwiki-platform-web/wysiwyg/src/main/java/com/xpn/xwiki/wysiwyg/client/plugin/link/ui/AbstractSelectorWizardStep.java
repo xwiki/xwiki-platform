@@ -63,8 +63,10 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
      * @param addPage specifies whether the wiki explorer should show the option to add a page
      * @param showAttachments specifies whether the wiki explorer should show the attached files for pages
      * @param addAttachments specifies whether the wiki explorer should show the option to add an attachment
+     * @param defaultSelection the default selection of the wiki explorer displayed by this step
      */
-    public AbstractSelectorWizardStep(boolean addPage, boolean showAttachments, boolean addAttachments)
+    public AbstractSelectorWizardStep(boolean addPage, boolean showAttachments, boolean addAttachments,
+        String defaultSelection)
     {
         explorer = new XWikiExplorer();
         explorer.setDisplayLinks(false);
@@ -78,6 +80,7 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
         explorer.setHeight("305px");
         WikiDataSource ds = new WikiDataSource();
         explorer.setDataSource(ds);
+        explorer.setDefaultValue(defaultSelection);
         // strangely enough, this sets the style on the tree wrapper, which contains the input too, even if explorer is
         // a reference only to the tree
         explorer.addStyleName("xExplorerPanel");
@@ -93,10 +96,21 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
     public void init(Object data, AsyncCallback< ? > cb)
     {
         linkData = (LinkConfig) data;
+        initializeExplorerSelection();
+        cb.onSuccess(null);
+    }
+
+    /**
+     * Sets the initial explorer selection on {@link #init(Object, AsyncCallback)} time, to be overwritten by subclasses
+     * to perform specific actions. By default, the reference of the passed {@link LinkConfig}, if any, is set in the
+     * explorer.
+     */
+    protected void initializeExplorerSelection()
+    {
         if (!StringUtils.isEmpty(linkData.getReference())) {
             explorer.setValue(linkData.getReference());
         }
-        cb.onSuccess(null);
+        // else leave the tree where the last selection was
     }
 
     /**

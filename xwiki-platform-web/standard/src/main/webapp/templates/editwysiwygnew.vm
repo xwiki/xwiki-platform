@@ -115,13 +115,15 @@ $xwiki.getTextArea($tdoc.content)
         plugins: 'separator text valign list indent history format symbol link image table macro importer',
         syntax: "$doc.syntaxId",
         toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer | image | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol',
-        space: '${doc.space.replaceAll("'", "\\'")}',
-        page: '${doc.name.replaceAll("'", "\\'")}',
+        ## TODO: remove these when the image plugin will use the documentName for its initialization        
+        space: '${doc.space.replace("'", "\'")}',
+        page: '${doc.name.replace("'", "\'")}',
+        documentName: '${doc.fullName.replace("'", "\'")}',
         debug: #if($request.debug)'true'#else'false'#end
     };
 #if($request.sync)
     // Additional configuration for the real-time editing feature.
-    Wysiwyg0.syncPage = '${doc.fullName.replaceAll("'", "\\'")}';
+    Wysiwyg0.syncPage = '${doc.fullName.replace("'", "\'")}';
     Wysiwyg0.plugins += ' sync';
 #if($request.reset=="1")
     Wysiwyg0.syncReset = 1;

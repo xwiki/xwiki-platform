@@ -304,27 +304,31 @@ span.edit_section {
     font-family: courier, courier new, monospace;
 }
 
-.java-keyword {
-    font-weight: bold;
+#xwikimaincontainerinner .code .java-keyword {
     color: #0000aa;
     background-color: inherit;
 }
 
-.java-object {
+#xwikimaincontainerinner .code .java-object {
     color: #000088;
     background-color: inherit;
 }
 
-.java-quote {
+#xwikimaincontainerinner .code .java-quote {
     color: #00aa00;
     background-color: inherit;
 }
 
-.xml-keyword {
+#xwikimaincontainerinner .code .xml-keyword {
     font-weight: bold;
 }
 
-.xml-tag {
+#xwikimaincontainerinner .code .xml-tag {
+    color: #0000aa;
+    background-color: inherit;
+}
+
+#xwikimaincontainerinner .code .sql-keyword {
     color: #0000aa;
     background-color: inherit;
 }

@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.query.QueryManager;
 
+import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -2664,5 +2665,13 @@ public class XWiki extends Api
     public String getWebAppPath()
     {
         return this.xwiki.getWebAppPath(this.context);
+    }
+    
+    /**
+     * @return the syntax id of the syntax to use when creating new documents.
+     */
+    public String getDefaultDocumentSyntax()
+    {
+        return this.xwiki.getDefaultDocumentSyntax();
     }
 }

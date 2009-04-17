@@ -145,6 +145,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     public static final String XWIKI10_SYNTAXID = "xwiki/1.0";
 
+    public static final String XWIKI20_SYNTAXID = "xwiki/2.0";
+
     private String title;
 
     private String parent;

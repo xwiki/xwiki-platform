@@ -58,6 +58,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("velocity/velocity18", false);
         suite.addTestsFromResource("velocity/velocity19", false);
 
+        // Escape
+        suite.addTestsFromResource("escape/escape1", false);
+        suite.addTestsFromResource("escape/escape2", false);
+        
         // Groovy
         suite.addTestsFromResource("groovy/groovy1", false);
 
@@ -90,7 +94,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("html/html2", false);
         suite.addTestsFromResource("html/html3", false);
         suite.addTestsFromResource("html/html4", false);
-
+        
         // Cleaning
         suite.addTestsFromResource("cleaning/cleaning1", false);
 

@@ -69,9 +69,7 @@ public class ImageFilter extends AbstractHTMLFilter
                 image.setAttribute(ATTRIBUTE_SRC, src);
                 image.setAttribute(ATTRIBUTE_ALT, src);
             }
-            Comment beforeComment =
-                (null != targetDocument) ? htmlDocument.createComment("startimage:" + targetDocument + "@" + src)
-                    : htmlDocument.createComment("startimage:" + src);
+            Comment beforeComment = htmlDocument.createComment("startimage:" + src);
             Comment afterComment = htmlDocument.createComment("stopimage");
             image.getParentNode().insertBefore(beforeComment, image);
             image.getParentNode().insertBefore(afterComment, image.getNextSibling());

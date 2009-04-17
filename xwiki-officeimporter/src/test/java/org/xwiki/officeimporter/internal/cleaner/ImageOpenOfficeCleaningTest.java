@@ -52,7 +52,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         Node startComment = image.getPreviousSibling();
         Node stopComment = image.getNextSibling();
         assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
-        assertTrue(startComment.getNodeValue().equals("startimage:Import.Test@foo.png"));
+        assertTrue(startComment.getNodeValue().equals("startimage:foo.png"));
         assertEquals("/bridge/foo.png", image.getAttribute("src"));
         assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
         assertTrue(stopComment.getNodeValue().equals("stopimage"));
@@ -74,7 +74,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         Node startImageComment = image.getPreviousSibling();
         Node stopImageComment = image.getNextSibling();
         assertEquals(Node.COMMENT_NODE, startImageComment.getNodeType());
-        assertTrue(startImageComment.getNodeValue().equals("startimage:Import.Test@foo.png"));
+        assertTrue(startImageComment.getNodeValue().equals("startimage:foo.png"));
         assertEquals("/bridge/foo.png", image.getAttribute("src"));
         assertEquals(Node.COMMENT_NODE, stopImageComment.getNodeType());
         assertTrue(stopImageComment.getNodeValue().equals("stopimage"));

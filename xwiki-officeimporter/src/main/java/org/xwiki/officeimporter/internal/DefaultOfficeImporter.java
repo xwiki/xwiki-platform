@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -52,6 +53,7 @@ import org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BlockFilter;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -148,10 +150,10 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 if (!isSplitRequest(params)) {
                     saveDocument(targetWikiDocument, importerFilter.filter(targetWikiDocument, renderXdom(xdom,
                         XWIKI_20), false), isAppendRequest(params));
+                    attachArtifacts(targetWikiDocument, artifacts);
                 } else {
-                    splitImport(targetWikiDocument, xdom, params, importerFilter);
+                    splitImport(targetWikiDocument, xdom, artifacts, params, importerFilter);
                 }
-                attachArtifacts(targetWikiDocument, artifacts);
             }
         } catch (Exception ex) {
             throw new OfficeImporterException(ex.getMessage(), ex);
@@ -286,8 +288,8 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * @param importerFilter the {@link OfficeImporterFilter} to be used for filtering split documents.
      * @throws OfficeImporterException if a parsing error occurs.
      */
-    private void splitImport(String documentName, XDOM xdom, Map<String, String> params,
-        OfficeImporterFilter importerFilter) throws OfficeImporterException
+    private void splitImport(String documentName, XDOM xdom, Map<String, InputStream> artifacts,
+        Map<String, String> params, OfficeImporterFilter importerFilter) throws OfficeImporterException
     {
         SplittingCriterion splittingCriterion = getSplittingCriterion(documentName, params);
         NamingCriterion namingCriterion = getNamingCriterion(documentName, params);
@@ -295,16 +297,29 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
             WikiDocument rootDoc = new WikiDocument(documentName, xdom, null);
             List<WikiDocument> documents = documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
             for (WikiDocument doc : documents) {
-                importerFilter.filter(doc.getFullName(), doc.getXdom(), true);
+                XDOM childXdom = doc.getXdom();
+                // Apply extended filtering.
+                importerFilter.filter(doc.getFullName(), childXdom, true);
+                // Extract document title (if possible).
                 String title = extractTitle(doc.getXdom());
                 if (null != title) {
                     docBridge.getDocument(doc.getFullName()).setTitle(title);
                 }
+                // Set parent document (if possible).
                 if (doc.getParent() != null) {
                     DocumentName parentName = docBridge.getDocumentName(doc.getParent().getFullName());
                     docBridge.getDocument(doc.getFullName()).setParent(parentName);
                 }
-                String content = renderXdom(doc.getXdom(), XWIKI_20);
+                // Extract all image artifacts & attach them to the current document.
+                Map<String, InputStream> tempArtifacts = new HashMap<String, InputStream>();
+                List<ImageBlock> imageBlocks = childXdom.getChildrenByType(ImageBlock.class, true);
+                for (ImageBlock imageBlock : imageBlocks) {                    
+                    String imageName = imageBlock.getImage().getName(); 
+                    tempArtifacts.put(imageName, artifacts.remove(imageName));
+                }
+                attachArtifacts(doc.getFullName(), tempArtifacts);
+                // Render and save the document content.
+                String content = renderXdom(childXdom, XWIKI_20);
                 boolean append = doc.equals(rootDoc) ? isAppendRequest(params) : false;
                 saveDocument(doc.getFullName(), importerFilter.filter(doc.getFullName(), content, true), append);
             }

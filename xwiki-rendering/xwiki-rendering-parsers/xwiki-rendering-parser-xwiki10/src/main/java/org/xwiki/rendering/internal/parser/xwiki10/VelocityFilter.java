@@ -184,10 +184,12 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
             context.setConversion(false);
             context.setInline(true);
 
+            StringBuffer velocityBlock = new StringBuffer();
+
             if (c == '#') {
-                i = getKeyWord(array, i, velocityContent, context);
+                i = getKeyWord(array, i, velocityBlock, context);
             } else if (c == '$') {
-                i = getVar(array, i, velocityContent, context);
+                i = getVar(array, i, velocityBlock, context);
             }
 
             if (context.isConversion()) {
@@ -195,40 +197,53 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
                     CleanUtil.setTrailingNewLines(nonVelocityContent, 2);
                 }
 
-                nonVelocityContent.append(filterContext.addProtectedContent(velocityContent.toString(), context
-                    .isInline()));
-                velocityContent.setLength(0);
-            } else if (context.isVelocity()) {
-                result.append(nonVelocityContent);
-                nonVelocityContent.setLength(0);
                 if (!inVelocityMacro) {
-                    appendVelocityOpen(result, filterContext);
+                    result.append(filterContext.addProtectedContent(velocityBlock.toString(), context.isInline()));
+                } else {
+                    nonVelocityContent.append(filterContext.addProtectedContent(velocityBlock.toString(), context
+                        .isInline()));
+                }
+            } else if (context.isVelocity()) {
+                if (!inVelocityMacro) {
                     inVelocityMacro = true;
+                } else {
+                    velocityContent.append(nonVelocityContent);
+                    nonVelocityContent.setLength(0);
                 }
 
-                result.append(filterContext.addProtectedContent(velocityContent.toString(), context.isInline()));
-                velocityContent.setLength(0);
+                velocityContent.append(filterContext.addProtectedContent(velocityBlock.toString(), context.isInline()));
             } else {
-                nonVelocityContent.append(c);
+                if (!inVelocityMacro) {
+                    result.append(c);
+                } else {
+                    nonVelocityContent.append(c);
+                }
                 ++i;
             }
         }
 
+        // fix not closed #if, #foreach
         if (context.getVelocityDepth() > 0) {
-            result.append(nonVelocityContent);
+            velocityContent.append(nonVelocityContent);
+            nonVelocityContent.setLength(0);
 
             // fix unclosed velocity blocks
             for (; context.getVelocityDepth() > 0; context.popVelocityDepth()) {
-                result.append(filterContext.addProtectedContent("#end"));
+                velocityContent.append(filterContext.addProtectedContent("#end"));
             }
-
-            appendVelocityClose(result, filterContext);
-        } else {
-            if (inVelocityMacro) {
-                appendVelocityClose(result, filterContext);
-            }
-            result.append(nonVelocityContent);
         }
+
+        // print velocity content
+        if (velocityContent.length() > 0) {
+            boolean multilines = velocityContent.indexOf("\n") != -1;
+
+            appendVelocityOpen(result, filterContext, multilines);
+            result.append(velocityContent);
+            appendVelocityClose(result, filterContext, multilines);
+        }
+
+        // print end
+        result.append(nonVelocityContent);
 
         return result.toString();
     }
@@ -648,13 +663,15 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         return i;
     }
 
-    public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext)
+    public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent("{{velocity}}", VELOCITYOPEN_SUFFIX, true));
+        result.append(filterContext.addProtectedContent("{{velocity}}" + (nl ? "\n" : "") + "{{html wiki=true}}"
+            + (nl ? "\n" : ""), VELOCITYOPEN_SUFFIX, true));
     }
 
-    public static void appendVelocityClose(StringBuffer result, FilterContext filterContext)
+    public static void appendVelocityClose(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent("{{/velocity}}", VELOCITYCLOSE_SUFFIX, true));
+        result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/html}}" + (nl ? "\n" : "")
+            + "{{/velocity}}", VELOCITYCLOSE_SUFFIX, true));
     }
 }

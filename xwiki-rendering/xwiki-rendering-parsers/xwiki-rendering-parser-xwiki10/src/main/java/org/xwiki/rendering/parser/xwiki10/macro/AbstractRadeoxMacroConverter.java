@@ -112,7 +112,14 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
 
         if (content != null) {
             result.append("}}");
-            result.append(convertContent(content));
+
+            String macroContent = convertContent(content);
+            if (macroContent.indexOf("\n") != -1) {
+                result.append("\n" + macroContent + "\n");
+            } else {
+                result.append(macroContent);
+            }
+
             result.append("{{/");
             result.append(convertName(name));
         } else {

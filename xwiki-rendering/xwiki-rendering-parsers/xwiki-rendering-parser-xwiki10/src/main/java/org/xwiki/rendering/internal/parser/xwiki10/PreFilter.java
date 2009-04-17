@@ -79,6 +79,7 @@ public class PreFilter extends AbstractFilter implements Initializable
 
             String preContent = matcher.group(1);
 
+            // remove velocity macro marker from pre content
             Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(preContent);
             boolean velocityOpen = velocityOpenMatcher.find();
             preContent = velocityOpenMatcher.replaceAll("");
@@ -86,8 +87,11 @@ public class PreFilter extends AbstractFilter implements Initializable
             boolean velocityClose = velocityCloseMatcher.find();
             preContent = velocityCloseMatcher.replaceAll("");
 
+            // print pre
+            boolean multilines = preContent.indexOf("\n") != -1;
+            
             if (velocityOpen) {
-                VelocityFilter.appendVelocityOpen(result, filterContext);
+                VelocityFilter.appendVelocityOpen(result, filterContext, multilines);
             }
 
             StringBuffer preBuffer = new StringBuffer();
@@ -101,7 +105,7 @@ public class PreFilter extends AbstractFilter implements Initializable
             result.append(filterContext.addProtectedContent(preBuffer.toString(), true));
 
             if (velocityClose) {
-                VelocityFilter.appendVelocityClose(result, filterContext);
+                VelocityFilter.appendVelocityClose(result, filterContext, multilines);
             }
         }
 

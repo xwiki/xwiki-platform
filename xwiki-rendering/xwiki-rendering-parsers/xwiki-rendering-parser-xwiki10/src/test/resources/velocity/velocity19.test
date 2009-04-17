@@ -8,4 +8,8 @@ $!{var}
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
- {{velocity}}{{html wiki=true}}$!var $!{var}{{/html}}{{/velocity}} #!macro()
+ {{velocity}}
+{{html wiki=true}}
+$!var $!{var}
+{{/html}}
+{{/velocity}} #!macro()

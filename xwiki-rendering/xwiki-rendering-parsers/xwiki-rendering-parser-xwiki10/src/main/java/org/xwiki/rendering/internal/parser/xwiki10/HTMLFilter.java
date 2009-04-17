@@ -79,15 +79,12 @@ public class HTMLFilter extends AbstractFilter implements Initializable
             String before = content.substring(currentIndex, matcher.start());
 
             if (!inHTMLMacro) {
-                // make velocity support html
                 Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(before);
                 velocityOpenBefore = velocityOpenMatcher.find();
-                before = velocityOpenMatcher.replaceAll(getVelocityOpen(filterContext));
                 Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(before);
                 velocityCloseBefore = velocityCloseMatcher.find();
-                before = velocityCloseMatcher.replaceAll(getVelocityClose(filterContext));
 
-                result.append(StringEscapeUtils.unescapeHtml(before));
+                result.append(unescapeNonHtmlContent(before));
             } else {
                 htmlContent.append(before);
             }
@@ -106,13 +103,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         }
 
         if (currentIndex == 0) {
-            String cleanedContent = StringEscapeUtils.unescapeHtml(content);
-
-            // make velocity support html
-            cleanedContent = VELOCITYOPEN_PATTERN.matcher(cleanedContent).replaceAll(getVelocityOpen(filterContext));
-            cleanedContent = VELOCITYCLOSE_PATTERN.matcher(cleanedContent).replaceAll(getVelocityClose(filterContext));
-
-            return cleanedContent;
+            return unescapeNonHtmlContent(content);
         }
 
         // clean html content
@@ -125,70 +116,41 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
         // print the content
 
+        boolean multilines = cleanedHtmlContent.indexOf("\n") != -1;
+
         if (velocityOpen) {
-            appendVelocityOpen(result, filterContext);
+            VelocityFilter.appendVelocityOpen(result, filterContext, multilines);
         } else if (!velocityOpenBefore || velocityCloseBefore) {
-            appendHTMLOpen(result, filterContext);
+            appendHTMLOpen(result, filterContext, multilines);
         }
 
         result.append(cleanedHtmlContent);
 
         if (velocityClose) {
-            appendVelocityClose(result, filterContext);
+            VelocityFilter.appendVelocityClose(result, filterContext, multilines);
         } else if (velocityCloseBefore || !velocityOpenBefore) {
-            appendHTMLClose(result, filterContext);
+            appendHTMLClose(result, filterContext, multilines);
         }
 
         if (currentIndex < content.length()) {
-            String after = StringEscapeUtils.unescapeHtml(content.substring(currentIndex));
-
-            // make velocity support html
-            after = VELOCITYOPEN_PATTERN.matcher(after).replaceAll(getVelocityOpen(filterContext));
-            after = VELOCITYCLOSE_PATTERN.matcher(after).replaceAll(getVelocityClose(filterContext));
-
-            result.append(StringEscapeUtils.unescapeHtml(after));
+            result.append(unescapeNonHtmlContent(content.substring(currentIndex)));
         }
 
         return result.toString();
     }
 
-    public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext)
+    private String unescapeNonHtmlContent(String content)
     {
-        result.append(filterContext.addProtectedContent("{{html wiki=true}}", false));
+        return StringEscapeUtils.unescapeHtml(content);
     }
 
-    public static void appendHTMLClose(StringBuffer result, FilterContext filterContext)
+    public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent("{{/html}}", false));
+        result.append(filterContext.addProtectedContent("{{html wiki=true}}" + (nl ? "\n" : ""), false));
     }
 
-    public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext)
+    public static void appendHTMLClose(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        VelocityFilter.appendVelocityOpen(result, filterContext);
-        appendHTMLOpen(result, filterContext);
-    }
-
-    public static void appendVelocityClose(StringBuffer result, FilterContext filterContext)
-    {
-        appendHTMLClose(result, filterContext);
-        VelocityFilter.appendVelocityClose(result, filterContext);
-    }
-
-    public static String getVelocityOpen(FilterContext filterContext)
-    {
-        StringBuffer str = new StringBuffer();
-
-        appendVelocityOpen(str, filterContext);
-
-        return str.toString();
-    }
-
-    public static String getVelocityClose(FilterContext filterContext)
-    {
-        StringBuffer str = new StringBuffer();
-
-        appendVelocityClose(str, filterContext);
-
-        return str.toString();
+        result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/html}}", false));
     }
 }

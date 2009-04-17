@@ -77,7 +77,7 @@ public class RenderingTestCase extends MockObjectTestCase
 
         assertEquals(this.expected, this.renderer.getPrinter().toString());
     }
-
+    
     public void setComponentManager(ComponentManager componentManager)
     {
         this.componentManager = componentManager;

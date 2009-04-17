@@ -27,6 +27,7 @@ import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
 import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
+import org.xwiki.rendering.listener.chaining.LookaheadChainingListener.Event;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
 /**
@@ -117,13 +118,10 @@ public class XWikiSyntaxEscapeHandler
         escapeURI(accumulatedBuffer, "attach:");
         escapeURI(accumulatedBuffer, "mailto:");
 
-        // Escape ( when it's the last character of a embedded document
-        // Escape ) when it's just before an embedded document
         if (documentStateListener.getDocumentDepth() > 1
+            && accumulatedBuffer.charAt(accumulatedBuffer.length() - 1) == ')'
             && lookaheadListener.getNextEvent() != null
-            && ((lookaheadListener.getNextEvent().eventType == EventType.END_DOCUMENT && accumulatedBuffer
-                .charAt(accumulatedBuffer.length() - 1) == ')') || (lookaheadListener.getNextEvent().eventType == EventType.BEGIN_DOCUMENT && accumulatedBuffer
-                .charAt(accumulatedBuffer.length() - 1) == '('))) {
+            && lookaheadListener.getNextEvent().eventType == EventType.END_DOCUMENT) {
             escapeLastChar = true;
         }
 

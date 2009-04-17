@@ -58,14 +58,15 @@ public class RenderingTestSuite extends TestSuite
     public RenderingTestSuite(String name) throws Exception
     {
         super(name);
+
         this.rendererFactory = new DefaultPrintRendererFactory();
         this.rendererFactory.setDocumentAccessBridge(new MockDocumentAccessBridge());
-        
+
         DefaultLinkLabelGenerator linkLabelGenerator = new DefaultLinkLabelGenerator();
         linkLabelGenerator.setDocumentAccessBridge(new MockDocumentAccessBridge());
         linkLabelGenerator.setRenderingConfiguration(new DefaultRenderingConfiguration());
         this.rendererFactory.setLinkLabelGenerator(linkLabelGenerator);
-        
+
         this.rendererFactory.setAttachmentParser(new DefaultAttachmentParser());
         this.syntaxFactory = new DefaultSyntaxFactory();
     }
@@ -77,12 +78,22 @@ public class RenderingTestSuite extends TestSuite
 
         // Create a test case for each input and for each expectation so that each test is executed separately
         // and reported separately by the JUnit test runner.
-        for (String parserId : data.inputs.keySet()) {
+        for (Map.Entry<String, String> entry : data.inputs.entrySet()) {
             for (Syntax targetSyntax : data.expectations.keySet()) {
+                String parserId = entry.getKey();
+                String input = entry.getValue();
+
                 PrintRenderer renderer = this.rendererFactory.createRenderer(targetSyntax, new DefaultWikiPrinter());
+
+                if (parserId.equals("xhtml/1.0") && !input.startsWith("<?xml") && !input.startsWith("<!DOCTYPE")) {
+                    input =
+                        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
+                            + "<html>" + input + "</html>";
+                }
+
                 RenderingTestCase testCase =
-                    new RenderingTestCase(computeTestName(testResourceName, parserId, renderer), data.inputs
-                        .get(parserId), data.expectations.get(targetSyntax), parserId, renderer, runTransformations);
+                    new RenderingTestCase(computeTestName(testResourceName, parserId, renderer), input,
+                        data.expectations.get(targetSyntax), parserId, renderer, runTransformations);
                 addTest(testCase);
             }
         }

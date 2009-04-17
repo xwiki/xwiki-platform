@@ -133,8 +133,7 @@ public interface WysiwygService extends RemoteService
      * @return the xhtml result from the office importer.
      * @throws XWikiGWTException if the import operation fails.
      */
-    String officeToXHTML(String pageName, Map<String, String> cleaningParams)
-        throws XWikiGWTException;
+    String officeToXHTML(String pageName, Map<String, String> cleaningParams) throws XWikiGWTException;
 
     /**
      * @param syncedRevision The changes to this editor's content, since the last update.
@@ -187,6 +186,20 @@ public interface WysiwygService extends RemoteService
      * @return the data of the link to the document, containing link url and link reference information.
      */
     LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor);
+
+    /**
+     * Creates an attachment link from the given parameters. Note that the {@code attachmentName} name will be cleaned
+     * to match the attachment names cleaning rules, and the link reference and URL will be generated with the cleaned
+     * name. Also, this function will test the existence of this attachment for the specified document.
+     * 
+     * @param wikiName the name of the wiki of the page the file is attached to
+     * @param spaceName the name of the space of the page the file is attached to
+     * @param pageName the name of the page the file is attached to
+     * @param attachmentName the uncleaned name of the attachment, which is to be cleaned on the server
+     * @return a {@link LinkConfig} containing the reference and the URL of the attachment, or {@code null} in case the
+     *         attachment was not found
+     */
+    LinkConfig getAttachmentLink(String wikiName, String spaceName, String pageName, String attachmentName);
 
     /**
      * Returns all the image attachments from the referred page. It can either get all the pictures in a page or in a

@@ -1,10 +1,12 @@
-.xLinkToUrl .gwt-Label, .xLinkConfig .gwt-Label, .xLinkToNewPage .gwt-Label {
+.xLinkToUrl .gwt-Label, .xLinkConfig .gwt-Label, 
+.xLinkToNewPage .gwt-Label, .xUploadPanel .gwt-Label {
   font-weight: bold;
   width: 300px;
   padding: 5px;
 }
 
-.xLinkToUrl .gwt-TextBox, .xLinkConfig .gwt-TextBox, xLinkToNewPage .gwt-Label { 
+.xLinkToUrl .gwt-TextBox, .xLinkConfig .gwt-TextBox, 
+.xLinkToNewPage .gwt-TextBox, .xUploadPanel .gwt-FileUpload { 
   font-size: x-small;
   margin: 0 5px;
   width: 300px;

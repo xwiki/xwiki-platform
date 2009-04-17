@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
@@ -45,8 +46,7 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorWizardStep
      */
     public AttachmentSelectorWizardStep(String defaultSelection)
     {
-        // don't show "Add attachment" for the moment
-        super(false, true, false, defaultSelection);
+        super(false, true, true, defaultSelection);
         this.defaultSelection = defaultSelection;
     }
 
@@ -78,7 +78,10 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorWizardStep
      */
     public String getNextStep()
     {
-        return "wikipageconfig";
+        if (getExplorer().isNewAttachment()) {
+            return LinkWizardSteps.ATTACHUPLOAD.toString();
+        }
+        return LinkWizardSteps.WIKIPAGECONFIG.toString();
     }
 
     /**
@@ -86,7 +89,7 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorWizardStep
      */
     public String getStepTitle()
     {
-        return Strings.INSTANCE.selectAttachmentTitle();
+        return Strings.INSTANCE.linkSelectAttachmentTitle();
     }
 
     /**
@@ -105,9 +108,15 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorWizardStep
     {
         // get selected file, get its URL and add it
         String attachment = getExplorer().getSelectedAttachment();
-        if (StringUtils.isEmpty(attachment)) {
+        if (StringUtils.isEmpty(attachment) && !getExplorer().isNewAttachment()) {
             Window.alert(Strings.INSTANCE.linkNoAttachmentSelectedError());
             async.onSuccess(false);
+        } else if (getExplorer().isNewAttachment()) {
+            // prepare the link config for the uplaod attachment step
+            getLinkData().setWiki(getExplorer().getSelectedWiki());
+            getLinkData().setSpace(getExplorer().getSelectedSpace());
+            getLinkData().setPage(getExplorer().getSelectedPage());
+            async.onSuccess(true);
         } else {
             String attachmentRef = "attach:" + getExplorer().getValue();
             String attachmentURL = getExplorer().getSelectedResourceURL();

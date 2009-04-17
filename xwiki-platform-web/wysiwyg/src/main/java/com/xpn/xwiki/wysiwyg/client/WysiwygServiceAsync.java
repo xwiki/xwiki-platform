@@ -82,7 +82,7 @@ public interface WysiwygServiceAsync
      */
     void cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams,
         AsyncCallback<String> async);
-    
+
     /**
      * Imports the most recent office document attached to a wiki page into XHTML/1.0.
      * 
@@ -90,8 +90,7 @@ public interface WysiwygServiceAsync
      * @param cleaningParams additional parameters for the import operation.
      * @param async the callback to be used for notifying the caller after receiving the response from the server.
      */
-    void officeToXHTML(String pageName, Map<String, String> cleaningParams, 
-        AsyncCallback<String> async);
+    void officeToXHTML(String pageName, Map<String, String> cleaningParams, AsyncCallback<String> async);
 
     /**
      * Synchronizes this editor with others that edit the same page.
@@ -151,6 +150,22 @@ public interface WysiwygServiceAsync
      * @param async object used for asynchronous communication between server and client.
      */
     void getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor,
+        AsyncCallback<LinkConfig> async);
+
+    /**
+     * Creates an attachment link from the given parameters. Note that the {@code attachmentName} name will be cleaned
+     * to match the attachment names cleaning rules, and the link reference and URL will be generated with the cleaned
+     * name. Also, this function will test the existence of this attachment for the specified document.
+     * 
+     * @param wikiName the name of the wiki of the page the file is attached to
+     * @param spaceName the name of the space of the page the file is attached to
+     * @param pageName the name of the page the file is attached to
+     * @param attachmentName the uncleaned name of the attachment, which is to be cleaned on the server
+     * @param async object used for asynchronous communication between server and client, to return, on success, a
+     *            {@link LinkConfig} containing the reference and the URL of the attachment, or {@code null} in case the
+     *            attachment was not found
+     */
+    void getAttachmentLink(String wikiName, String spaceName, String pageName, String attachmentName,
         AsyncCallback<LinkConfig> async);
 
     /**

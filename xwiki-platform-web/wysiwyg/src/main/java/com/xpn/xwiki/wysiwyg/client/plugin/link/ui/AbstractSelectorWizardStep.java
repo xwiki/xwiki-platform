@@ -76,6 +76,7 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
         // no attachments here
         explorer.setDisplayAttachments(showAttachments);
         explorer.setDisplayAddAttachment(showAttachments && addAttachments);
+        explorer.setDisplayAttachmentsWhenEmpty(showAttachments && addAttachments);
         explorer.setWidth("455px");
         explorer.setHeight("305px");
         WikiDataSource ds = new WikiDataSource();

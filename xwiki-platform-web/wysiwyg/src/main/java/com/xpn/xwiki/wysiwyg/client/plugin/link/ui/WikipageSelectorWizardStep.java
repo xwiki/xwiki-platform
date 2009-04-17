@@ -25,6 +25,7 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
@@ -52,9 +53,9 @@ public class WikipageSelectorWizardStep extends AbstractSelectorWizardStep
     public String getNextStep()
     {
         if (getLinkData().getType() == LinkType.NEW_WIKIPAGE && StringUtils.isEmpty(getLinkData().getPage())) {
-            return "wikipagecreator";
+            return LinkWizardSteps.WIKIPAGECREATOR.toString();
         } else {
-            return "wikipageconfig";
+            return LinkWizardSteps.WIKIPAGECONFIG.toString();
         }
     }
 
@@ -63,7 +64,7 @@ public class WikipageSelectorWizardStep extends AbstractSelectorWizardStep
      */
     public String getStepTitle()
     {
-        return Strings.INSTANCE.selectWikipageTitle();
+        return Strings.INSTANCE.linkSelectWikipageTitle();
     }
 
     /**

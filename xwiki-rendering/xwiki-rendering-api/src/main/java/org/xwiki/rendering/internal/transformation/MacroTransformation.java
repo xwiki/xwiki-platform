@@ -165,8 +165,8 @@ public class MacroTransformation extends AbstractTransformation
                 return false;
             }
 
-            newBlocks =
-                ((Macro<Object>) macroHolder.macro).execute(macroParameters, normalizeContent(macroHolder), context);
+            newBlocks = ((Macro<Object>) macroHolder.macro).execute(macroParameters, 
+                normalizeContent(macroHolder.macroBlock.getContent()), context);
         } catch (Exception e) {
             // The Macro failed to execute.
             // The macro will not be executed and we generate an error message instead of the macro
@@ -199,13 +199,13 @@ public class MacroTransformation extends AbstractTransformation
      * <pre><code>{{macro}}content{{/macro}}</code></pre>
      * This is to make it easier for the user to not introduce significant new lines by error.
      * 
-     * @param macroHolder the object containing the macro object
+     * @param originalContent the content to normalize
      * @return the normalized string
      * @todo move this method in a generic xwiki-text or xwiki-string module
      */
-    private String normalizeContent(MacroHolder macroHolder)
+    private String normalizeContent(String originalContent)
     {
-        String normalizedContent = macroHolder.macroBlock.getContent();
+        String normalizedContent = originalContent;
         if (normalizedContent != null && normalizedContent.length() > 0) {
 
             // Remove leading New Line

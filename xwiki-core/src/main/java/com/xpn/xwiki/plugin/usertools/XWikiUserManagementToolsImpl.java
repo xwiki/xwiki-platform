@@ -118,7 +118,13 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
         userApiDoc.set("active", "0");
         userApiDoc.set("password", password);
         userApiDoc.set("validkey", validkey);
-        userApiDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
+        if (!context.getWiki().getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+            userApiDoc.setContent("{{include document=\"XWiki.XWikiUserSheet\"/}}");
+            userApiDoc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+        } else {
+            userApiDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
+            userApiDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+        }
         com.xpn.xwiki.api.Object rightobj = userApiDoc.newObject("XWiki.XWikiRights");
         rightobj.set("users", pageName) ;
         rightobj.set("allow", "1");
@@ -149,9 +155,9 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
         return org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(8);
     }
 
-    private String prepareInvitationMessage(XWikiDocument doc, String name, String password, String email, String validationUrl, String validKey, XWikiContext context) throws XWikiException {
-
-
+    private String prepareInvitationMessage(XWikiDocument doc, String name, String password, String email, 
+        String validationUrl, String validKey, XWikiContext context) throws XWikiException
+    {
         String content = doc.getContent();
 
         try {
@@ -167,8 +173,6 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
         }
         return content;
     }
-
-
 
     public String getUserSpace(XWikiContext context)
     {
@@ -202,8 +206,4 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
         context.getWiki().sendMessage(sender, email, message, context);
         return true;
     }
-
-    
-
-
 }

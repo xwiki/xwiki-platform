@@ -3249,6 +3249,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 XWikiDocument tdoc = getDocument(template, context);
                 if ((!tdoc.isNew())) {
                     content = tdoc.getContent();
+                    syntaxId = tdoc.getSyntaxId();
                 }
             }
 

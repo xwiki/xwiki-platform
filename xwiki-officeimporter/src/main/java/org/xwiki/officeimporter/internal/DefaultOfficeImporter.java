@@ -422,7 +422,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 // Append the new content.
                 docBridge.setDocumentSyntaxId(documentName, XWIKI_20.toIdString());
                 // Insert a newline between the old content and the appended content.
-                docBridge.setDocumentContent(documentName, oldContent + "\\\\" + content, "Updated by office importer",
+                docBridge.setDocumentContent(documentName, oldContent + "\n" + content, "Updated by office importer",
                     false);
             } else {
                 docBridge.setDocumentSyntaxId(documentName, XWIKI_20.toIdString());

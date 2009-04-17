@@ -3207,7 +3207,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             XWikiRequest request = context.getRequest();
             Map map = Util.getObject(request, "register");
-            String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
+
+            String content;
+            String syntaxId;
+            if (!getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+                content = "{{include document=\"XWiki.XWikiUserSheet\"/}}";
+                syntaxId = XWikiDocument.XWIKI20_SYNTAXID;
+            } else {
+                content = "#includeForm(\"XWiki.XWikiUserSheet\")";
+                syntaxId = XWikiDocument.XWIKI10_SYNTAXID;
+            }
+            
             String xwikiname = request.getParameter("xwikiname");
             String password2 = request.getParameter("register2_password");
             String password = ((String[]) map.get("password"))[0];
@@ -3256,7 +3266,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 map.put("active", "1");
             }
 
-            int result = createUser(xwikiname, map, parent, content, XWikiDocument.XWIKI10_SYNTAXID, userRights, 
+            int result = createUser(xwikiname, map, parent, content, syntaxId, userRights, 
                 context);
 
             if ((result > 0) && (withValidation)) {

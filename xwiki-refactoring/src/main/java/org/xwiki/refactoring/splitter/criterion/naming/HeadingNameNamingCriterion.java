@@ -82,8 +82,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
     public HeadingNameNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge,
         PrintRendererFactory rendererFactory)
     {
-        this.mainPageNameAndNumberingNamingCriterion =
-            new PageIndexNamingCriterion(baseDocumentName, docBridge);
+        this.mainPageNameAndNumberingNamingCriterion = new PageIndexNamingCriterion(baseDocumentName, docBridge);
         this.docBridge = docBridge;
         this.rendererFactory = rendererFactory;
         this.documentNames = new HashMap<String, String>();
@@ -97,6 +96,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
     public String getDocumentName(XDOM newDoc)
     {
         String documentName = null;
+        String prefix = spaceName + ".";
         if (newDoc.getChildren().size() > 0) {
             Block firstChild = newDoc.getChildren().get(0);
             if (firstChild instanceof HeaderBlock) {
@@ -116,12 +116,12 @@ public class HeadingNameNamingCriterion implements NamingCriterion
                 WikiPrinter printer = new DefaultWikiPrinter();
                 Listener listener = this.rendererFactory.createRenderer(new Syntax(SyntaxType.XWIKI, "2.0"), printer);
                 xdom.traverse(listener);
-                documentName = spaceName + "." + cleanPageName(printer.toString());
+                documentName = prefix + cleanPageName(printer.toString());
             }
         }
 
         // Fall back if necessary.
-        if (null == documentName) {
+        if (null == documentName || documentName.equals(prefix)) {
             documentName = mainPageNameAndNumberingNamingCriterion.getDocumentName(newDoc);
         }
 
@@ -147,6 +147,6 @@ public class HeadingNameNamingCriterion implements NamingCriterion
      */
     private String cleanPageName(String originalName)
     {
-        return originalName.replaceAll("[\\.:]", "-");
+        return originalName.trim().replaceAll("[\\.:]", "-");
     }
 }

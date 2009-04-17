@@ -79,10 +79,14 @@ public class HeadingNameNamingCriterionTest extends AbstractXWikiComponentTestCa
         // Test name clash resolution
         assertEquals("Test.Heading-1", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
         // Test heading text cleaning
-        xdom = xwikiParser.parse(new StringReader("=Very.Weird:Heading!="));
+        xdom = xwikiParser.parse(new StringReader("= Very.Weird:Heading! ="));
         sectionBlock = xdom.getChildren().get(0);
         assertEquals("Test.VeryWeirdHeading", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
-        // Test the fallback operation
+        // Test fallback operation
         assertEquals("Test.Test-1", namingCriterion.getDocumentName(xdom));
+        // Test fallback operation under empty heading names
+        xdom = xwikiParser.parse(new StringReader("=   ="));
+        sectionBlock = xdom.getChildren().get(0);
+        assertEquals("Test.Test-2", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
     }
 }

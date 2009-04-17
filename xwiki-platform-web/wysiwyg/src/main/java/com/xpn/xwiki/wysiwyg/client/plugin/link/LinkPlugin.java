@@ -32,6 +32,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.CreateLinkExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.LinkExecutableUtils;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.UnlinkExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -156,17 +157,17 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         switch (linkParams.getType()) {
             case WIKIPAGE:
             case NEW_WIKIPAGE:
-                getLinkWizard().start("wikipage", linkParams);
+                getLinkWizard().start(LinkWizardSteps.WIKIPAGE.toString(), linkParams);
                 break;
             case ATTACHMENT:
-                getLinkWizard().start("attachment", linkParams);
+                getLinkWizard().start(LinkWizardSteps.ATTACHMENT.toString(), linkParams);
                 break;
             case EMAIL:
-                getLinkWizard().start("email", linkParams);
+                getLinkWizard().start(LinkWizardSteps.EMAIL.toString(), linkParams);
                 break;
             case EXTERNAL:
             default:
-                getLinkWizard().start("webpage", linkParams);
+                getLinkWizard().start(LinkWizardSteps.WEBPAGE.toString(), linkParams);
                 break;
         }
     }

@@ -423,6 +423,46 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#getAttachmentLink(String, String, String, String)
+     */
+    public LinkConfig getAttachmentLink(String wikiName, String spaceName, String pageName, String attachmentName)
+    {
+        LinkConfig linkConfig = new LinkConfig();
+
+        XWikiContext context = getXWikiContext();
+        // clean attachment filename to be synchronized with all attachment operations
+        String cleanedFileName = context.getWiki().clearName(attachmentName, false, true, context);
+        DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
+        DocumentNameSerializer serializer = (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class);
+        String docReference = serializer.serialize(docName);
+        XWikiDocument doc = null;
+        try {
+            doc = context.getWiki().getDocument(docReference, context);
+        } catch (XWikiException e) {
+            // there was a problem with getting the document on the server
+            return null;
+        }
+        if (doc.isNew()) {
+            // the document does not exist, therefore nor does the attachment. Return null
+            return null;
+        }
+        // check for the existence of the attachment
+        if (doc.getAttachment(cleanedFileName) == null) {
+            // attachment is not there, something bad must have happened
+            return null;
+        }
+        // all right, now set the reference and url and return
+        // FIXME: this should not be created like this but got from a serializer
+        String attachmentReference = docReference + "@" + cleanedFileName;
+        linkConfig.setReference(attachmentReference);
+        linkConfig.setUrl(doc.getAttachmentURL(cleanedFileName, context));
+
+        return linkConfig;
+    }
+
+    /**
      * Gets a document name from the passed parameters, handling the empty wiki, empty space or empty page name.
      * 
      * @param wiki the wiki of the document
@@ -436,21 +476,22 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         String newPageName = clearXWikiName(page);
         String newSpaceName = clearXWikiName(space);
         String newWikiName = clearXWikiName(wiki);
-        if (StringUtils.isEmpty(newWikiName)) {
-            newWikiName = "xwiki";
+        if (StringUtils.isEmpty(wiki)) {
+            newWikiName = getXWikiContext().getDoc().getWikiName();
         }
-        // if we have no page name, link to the WebHome of whatever space
-        if (StringUtils.isEmpty(newPageName)) {
+        if (StringUtils.isEmpty(page)) {
             newPageName = "WebHome";
         }
         // if we have no space, link to the current doc's space
-        if (StringUtils.isEmpty(newSpaceName)) {
-            if ((StringUtils.isEmpty(newPageName)) && !StringUtils.isEmpty(wiki)) {
+        if (StringUtils.isEmpty(space)) {
+            if ((StringUtils.isEmpty(page)) && !StringUtils.isEmpty(wiki)) {
                 // if we have no space set and no page but we have a wiki, then create a link to the mainpage of the
                 // wiki
                 newSpaceName = "Main";
-            } else {
+            } else if (StringUtils.isEmpty(wiki)) {
+                // if all are empty, create a link to the current document
                 newSpaceName = getXWikiContext().getDoc().getSpace();
+                newPageName = getXWikiContext().getDoc().getPageName();
             }
         }
         return new DocumentName(newWikiName, newSpaceName, newPageName);

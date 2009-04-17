@@ -39,9 +39,20 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStepProvider;
 public class LinkWizard extends Wizard implements WizardStepProvider
 {
     /**
+     * Enumeration steps handled by this link wizard.
+     */
+    public static enum LinkWizardSteps
+    {
+        /**
+         * Steps managed by this wizard.
+         */
+        WEBPAGE, EMAIL, WIKIPAGE, WIKIPAGECREATOR, ATTACHMENT, ATTACHUPLOAD, WIKIPAGECONFIG
+    };
+
+    /**
      * Map with the instantiated steps to return. Will be lazily initialized upon request.
      */
-    private Map<String, WizardStep> stepsMap = new HashMap<String, WizardStep>();
+    private Map<LinkWizardSteps, WizardStep> stepsMap = new HashMap<LinkWizardSteps, WizardStep>();
 
     /**
      * The resource currently edited by this WYSIWYG, used to determine the context in which link creation takes place.
@@ -68,32 +79,60 @@ public class LinkWizard extends Wizard implements WizardStepProvider
      */
     public WizardStep getStep(String name)
     {
-        WizardStep step = stepsMap.get(name);
+        LinkWizardSteps requestedStep = parseStepName(name);
+        WizardStep step = stepsMap.get(requestedStep);
         if (step == null) {
-            if ("webpage".equals(name)) {
-                step = new WebPageLinkWizardStep();
-            }
-            if ("email".equals(name)) {
-                step = new EmailAddressLinkWizardStep();
-            }
-            if ("wikipage".equals(name)) {
-                step = new WikipageSelectorWizardStep(editedResource);
-            }
-            if ("attachment".equals(name)) {
-                step = new AttachmentSelectorWizardStep(editedResource);
-            }
-            if ("wikipagecreator".equals(name)) {
-                step = new CreateNewPageWizardStep();
-            }
-            if ("wikipageconfig".equals(name)) {
-                step = new LinkConfigWizardStep();
+            switch (requestedStep) {
+                case EMAIL:
+                    step = new EmailAddressLinkWizardStep();
+                    break;
+                case WIKIPAGE:
+                    step = new WikipageSelectorWizardStep(editedResource);
+                    break;
+                case WIKIPAGECREATOR:
+                    step = new CreateNewPageWizardStep();
+                    break;
+                case ATTACHMENT:
+                    step = new AttachmentSelectorWizardStep(editedResource);
+                    break;
+                case ATTACHUPLOAD:
+                    step = new AttachmentUploadWizardStep();
+                    break;
+                case WIKIPAGECONFIG:
+                    step = new LinkConfigWizardStep();
+                    break;
+                case WEBPAGE:
+                    step = new WebPageLinkWizardStep();
+                    break;
+                default:
+                    // nothing here, leave it null
+                    break;
             }
             // if something has been created, add it in the map
             if (step != null) {
-                stepsMap.put(name, step);
+                stepsMap.put(requestedStep, step);
             }
         }
         // return the found or newly created step
         return step;
+    }
+
+    /**
+     * Parses the specified step name in a {@link LinkWizardSteps} value.
+     * 
+     * @param name the name of the step to parse
+     * @return the {@link LinkWizardSteps} {@code enum} value corresponding to the passed name, or {@code null} if no
+     *         such value exists.
+     */
+    private LinkWizardSteps parseStepName(String name)
+    {
+        // let's be careful about this
+        LinkWizardSteps requestedStep = null;
+        try {
+            requestedStep = LinkWizardSteps.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            // nothing, just leave it null if it cannot be found in the enum
+        }
+        return requestedStep;
     }
 }

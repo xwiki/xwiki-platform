@@ -31,6 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
@@ -94,7 +95,7 @@ public class CreateNewPageWizardStep implements WizardStep
      */
     public String getNextStep()
     {
-        return "wikipageconfig";
+        return LinkWizardSteps.WIKIPAGECONFIG.toString();
     }
 
     /**

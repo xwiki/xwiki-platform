@@ -203,11 +203,11 @@ public interface Strings extends Constants
 
     String linkURLToWebPageTextBoxTooltip();
 
-    String selectWikipageTitle();
+    String linkSelectWikipageTitle();
 
     String linkNoPageSelectedError();
 
-    String selectAttachmentTitle();
+    String linkSelectAttachmentTitle();
 
     String linkNoAttachmentSelectedError();    
 
@@ -225,11 +225,15 @@ public interface Strings extends Constants
 
     String fileUploadLabel();
 
+    String fileUploadTitle();    
+
     String fileChooseLabel();
 
     String fileListFetchError();
 
     String fileUploadSubmitLabel();
+    
+    String fileUploadSubmitError();
 
     String imageInsertButton();
 

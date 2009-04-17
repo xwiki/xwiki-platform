@@ -112,8 +112,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * 
      * @see WysiwygServiceAsync#officeToXHTML(String, Map, AsyncCallback)
      */
-    public void officeToXHTML(String pageName, Map<String, String> cleaningParams,
-        AsyncCallback<String> async)
+    public void officeToXHTML(String pageName, Map<String, String> cleaningParams, AsyncCallback<String> async)
     {
         service.officeToXHTML(pageName, cleaningParams, async);
     }
@@ -230,6 +229,17 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
         AsyncCallback<LinkConfig> async)
     {
         service.getPageLink(wikiName, spaceName, pageName, revision, anchor, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#getAttachmentLink(String, String, String, String, AsyncCallback)
+     */
+    public void getAttachmentLink(String wikiName, String spaceName, String pageName, String attachmentName,
+        AsyncCallback<LinkConfig> async)
+    {
+        service.getAttachmentLink(wikiName, spaceName, pageName, attachmentName, async);
     }
 
     /**

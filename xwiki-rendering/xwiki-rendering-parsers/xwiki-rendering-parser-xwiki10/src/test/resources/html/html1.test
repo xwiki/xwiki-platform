@@ -18,7 +18,8 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{html wiki="true"}}<table> <tr><td></td></tr> </table>
+{{html wiki="true"}}
+<table> <tr><td></td></tr> </table>
 
 
 
@@ -29,4 +30,5 @@
 
 
 
-<div class="class">**bold** &amp; some text</div>{{/html}}
+<div class="class">**bold** &amp; some text</div>
+{{/html}}

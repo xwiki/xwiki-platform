@@ -17,7 +17,9 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity}}{{html wiki=true}}#set($var = "value")
+{{velocity}}
+{{html wiki=true}}
+#set($var = "value")
 
 
 
@@ -29,4 +31,6 @@
 
 
 * $var 1
-* $var{{/html}}{{/velocity}}
+* $var
+{{/html}}
+{{/velocity}}

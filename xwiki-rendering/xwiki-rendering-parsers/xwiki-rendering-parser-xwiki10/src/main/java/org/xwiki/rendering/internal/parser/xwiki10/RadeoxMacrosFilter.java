@@ -169,12 +169,17 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
             }
 
             result.append(before);
+
+            boolean multilines = allcontent.indexOf("\n") != -1;
+
             if (velocityOpen) {
-                VelocityFilter.appendVelocityOpen(result, filterContext);
+                VelocityFilter.appendVelocityOpen(result, filterContext, multilines);
             }
+
             result.append(allcontent);
+
             if (velocityClose) {
-                VelocityFilter.appendVelocityClose(result, filterContext);
+                VelocityFilter.appendVelocityClose(result, filterContext, multilines);
             }
         }
 

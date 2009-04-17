@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-#includeInContext  ("Space.PageName")
+ #includeInContext  ("Space.PageName")
 #includeTopic ("Space.PageName")
 #includeMacros("Space.PageName")
 
@@ -9,8 +9,6 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{include document="Space.PageName"/}}
-
- {{include document="Space.PageName" context="new"/}} {{include document="Space.PageName"/}}
+ {{include document="Space.PageName"/}} {{include document="Space.PageName" context="new"/}} {{include document="Space.PageName"/}}
 
 {{include document="Space.PageName"/}}

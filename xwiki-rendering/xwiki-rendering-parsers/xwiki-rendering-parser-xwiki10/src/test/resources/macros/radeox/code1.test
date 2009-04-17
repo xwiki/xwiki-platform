@@ -15,13 +15,17 @@ public class MyClass {
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 {{code}}
+
 public class MyClass {
   public void helloWorld() {}
 }
+
 {{/code}}
 
 {{code language="xml"}}
+
 <hello>
   <world>Cool!</world>
 </hello>
+
 {{/code}}

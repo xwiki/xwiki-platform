@@ -4,8 +4,7 @@
 .# this was causing some problem. Also verify that <br>
 .# located in implicit paragraphs are correctly handled.
 .#-----------------------------------------------------
-<?xml version="1.0" encoding="UTF-8"?>
-<html><head /><body>one two three<br/><br/>hello</body></html>
+<head /><body>one two three<br/><br/>hello</body>
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------

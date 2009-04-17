@@ -3,9 +3,7 @@
 .# Verify that HTML entities can be parsed by the XHTML parser and are encoded properly
 .# Note that &nbsp; is transformed into a space.
 .#-------------------------------------------------------------------------------------
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html><p>&nbsp;&tilde;&euro;</p><p param1="val&#252;e">&#160;&#732;&#8364;</p></html>
+<p>&nbsp;&tilde;&euro;</p><p param1="val&#252;e">&#160;&#732;&#8364;</p>
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------

@@ -452,6 +452,10 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     public void endList(ListType listType, Map<String, String> parameters)
     {
         this.listStyle.setLength(this.listStyle.length() - 1);
+
+        // Ensure that any not printed characters are flushed.
+        // TODO: Fix this better by introducing a state listener to handle escapes
+        getXWikiPrinter().flush();
     }
 
     /**
@@ -727,6 +731,14 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     public void endTableHeadCell(Map<String, String> parameters)
     {
         this.previousFormatParameters = null;
+    }
+
+    @Override
+    public void endTable(Map<String, String> parameters)
+    {
+        // Ensure that any not printed characters are flushed.
+        // TODO: Fix this better by introducing a state listener to handle escapes
+        getXWikiPrinter().flush();
     }
 
     /**

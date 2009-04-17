@@ -37,4 +37,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><ul><li>item<br/><br/>still in the same item</li></ul></html>
+<ul><li>item<br/><br/>still in the same item</li></ul>

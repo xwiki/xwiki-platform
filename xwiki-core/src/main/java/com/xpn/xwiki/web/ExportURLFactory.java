@@ -216,17 +216,15 @@ public class ExportURLFactory extends XWikiServletURLFactory
     private URL createAttachmentURL(String filename, String space, String name, String xwikidb, XWikiContext context)
         throws XWikiException, IOException, URISyntaxException
     {
-        String path =
-            "attachment/" + (xwikidb == null ? context.getDatabase() : xwikidb) + "." + space + "." + name + "."
-                + filename;
+        String db = (xwikidb == null ? context.getDatabase() : xwikidb);
+        String path = "attachment/" + db + "." + space + "." + name + "." + filename;
 
         File tempdir = this.exportDir;
         File file = new File(tempdir, path);
         if (!file.exists()) {
             XWikiDocument doc =
                 context.getWiki().getDocument(
-                    (xwikidb == null ? context.getDatabase() : xwikidb) + XWikiDocument.DB_SPACE_SEP + space
-                        + XWikiDocument.SPACE_NAME_SEP + name, context);
+                    db + XWikiDocument.DB_SPACE_SEP + space + XWikiDocument.SPACE_NAME_SEP + name, context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             byte[] data = attachment.getContent(context);
             FileOutputStream fos = new FileOutputStream(file);
@@ -234,7 +232,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             fos.close();
         }
 
-        return new URI("file://" + path).toURL();
+        return new URI("file://" + path.replace(" ", "%20")).toURL();
     }
 
     /*

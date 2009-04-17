@@ -54,6 +54,12 @@ public class XWikiRestletJaxRsApplication extends JaxRsApplication
          * JAX-RS resources
          */
         Restlet jaxRsRoot = super.createRoot();
+        
+        /* Add support for media query parameter for selecting the media type */
+        getTunnelService().setEnabled(true);
+        getMetadataService().addCommonExtensions();
+        getTunnelService().setQueryTunnel(true);
+        
         router.attach(jaxRsRoot);
 
         /* Build the actual chain */

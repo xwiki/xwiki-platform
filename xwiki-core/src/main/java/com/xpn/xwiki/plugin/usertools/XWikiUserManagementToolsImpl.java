@@ -104,11 +104,21 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
         }
         Document userApiDoc = userDoc.newDocument(context);
 
+        if (!context.getWiki().getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+            userApiDoc.setContent("{{include document=\"XWiki.XWikiUserSheet\"/}}");
+            userApiDoc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+        } else {
+            userApiDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
+            userApiDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+        }
+
         String template = DEFAULT_USERTEMPLATE_CLASS;
         if ((template != null) && (!template.equals(""))) {
             XWikiDocument tdoc = context.getWiki().getDocument(template, context);
-            if ((!tdoc.isNew()))
+            if ((!tdoc.isNew())) {
                 userApiDoc.setContent(tdoc.getContent());
+                userApiDoc.setSyntaxId(tdoc.getSyntaxId());
+            }
         }
 
         String password = getRandomPassword();
@@ -118,13 +128,6 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
         userApiDoc.set("active", "0");
         userApiDoc.set("password", password);
         userApiDoc.set("validkey", validkey);
-        if (!context.getWiki().getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
-            userApiDoc.setContent("{{include document=\"XWiki.XWikiUserSheet\"/}}");
-            userApiDoc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
-        } else {
-            userApiDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
-            userApiDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
-        }
         com.xpn.xwiki.api.Object rightobj = userApiDoc.newObject("XWiki.XWikiRights");
         rightobj.set("users", pageName) ;
         rightobj.set("allow", "1");

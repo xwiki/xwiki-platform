@@ -2,6 +2,7 @@ org.xwiki.rendering.internal.parser.xwiki10.XWikiParser
 org.xwiki.rendering.internal.parser.xwiki10.NewLineFilter
 org.xwiki.rendering.internal.parser.xwiki10.CodeMacroFilter
 org.xwiki.rendering.internal.parser.xwiki10.VelocityFilter
+org.xwiki.rendering.internal.parser.xwiki10.EscapeFilter
 org.xwiki.rendering.internal.parser.xwiki10.macro.IncludeInContextVelocityMacroConverter
 org.xwiki.rendering.internal.parser.xwiki10.macro.IncludeMacrosVelocityMacroConverter
 org.xwiki.rendering.internal.parser.xwiki10.macro.IncludeTopicVelocityMacroConverter
@@ -24,6 +25,7 @@ org.xwiki.rendering.internal.parser.xwiki10.ItalicSyntaxFilter
 org.xwiki.rendering.internal.parser.xwiki10.BoldSyntaxFilter
 org.xwiki.rendering.internal.parser.xwiki10.StrikeoutSyntaxFilter
 org.xwiki.rendering.internal.parser.xwiki10.UnderlineSyntaxFilter
+org.xwiki.rendering.internal.parser.xwiki10.UnescapeFilter
 org.xwiki.rendering.internal.parser.xwiki10.StandaloneNewLineCleaningFilter
 org.xwiki.rendering.internal.parser.xwiki10.SpacesCleaningFilter
 org.xwiki.rendering.internal.parser.xwiki10.HTMLFilter

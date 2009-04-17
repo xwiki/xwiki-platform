@@ -32,7 +32,7 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("escape")
+@Component("escape20")
 public class Escape20SyntaxFilter extends AbstractFilter implements Initializable
 {
     private static final Pattern SYNTAX_PATTERN = Pattern.compile("\\~|\\/\\/|\\_\\_|\\*\\*|\\-\\-|\\#\\#|\\^\\^|\\,\\,");

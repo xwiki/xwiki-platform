@@ -23,35 +23,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
-import org.xwiki.rendering.parser.xwiki10.Filter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
-import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroConverter;
-import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
- * Converts Code Macro.
+ * Match 1.0 escape syntax.
  * 
  * @version $Id$
- * @since 1.8M1
+ * @since 1.9M2
  */
-@Component("code")
-public class CodeMacroFilter extends AbstractFilter implements Initializable
+@Component("escape")
+public class EscapeFilter extends AbstractFilter implements Initializable
 {
-    private static final Pattern CODEMACRO_PATTERN =
-        Pattern.compile("\\{(code)(?::([^\\}]*))?\\}(.*?)\\{code\\}", Pattern.DOTALL);
+    /**
+     * Regex pattern for matching 1.0 syntax escaping.
+     */
+    public static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\(\\\\\\\\)(?!\\\\)|\\\\(.)");
 
-    @Requirement("code")
-    private RadeoxMacroConverter codeMacroConverter;
-
-    @Requirement("escape")
-    private Filter escapeFilter;
-
-    @Requirement("unescape")
-    private Filter unescapeFilter;
+    public static final String ESCAPE_SUFFIX = "escape";
 
     /**
      * {@inheritDoc}
@@ -60,7 +51,7 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
      */
     public void initialize() throws InitializationException
     {
-        setPriority(10);
+        setPriority(25);
     }
 
     /**
@@ -73,29 +64,29 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
     {
         StringBuffer result = new StringBuffer();
 
-        Matcher matcher = CODEMACRO_PATTERN.matcher(this.escapeFilter.filter(content, filterContext));
+        Matcher matcher = ESCAPE_PATTERN.matcher(content);
         int currentIndex = 0;
         for (; matcher.find(); currentIndex = matcher.end()) {
-            String before = content.substring(currentIndex, matcher.start());
+            result.append(content.substring(currentIndex, matcher.start()));
 
-            if (currentIndex > 0) {
-                before = CleanUtil.setLeadingNewLines(before, 2);
+            if (matcher.group(2) != null) {
+                String escaped = matcher.group(2);
+                if (escaped.equals("\\")) {
+                    result.append("\\\\");
+                } else {
+                    result.append(filterContext.addProtectedContent(matcher.group(2), ESCAPE_SUFFIX, true));
+                }
+            } else {
+                result.append(filterContext.addProtectedContent("\\", ESCAPE_SUFFIX, true));
             }
-
-            String macroResult =
-                this.codeMacroConverter.convert("code", RadeoxMacrosFilter.getMacroParameters(this.codeMacroConverter,
-                    matcher.group(2)), matcher.group(3), filterContext);
-
-            result.append(before);
-            result.append(filterContext.addProtectedContent(macroResult));
         }
 
         if (currentIndex == 0) {
-            return this.unescapeFilter.filter(content, filterContext);
+            return content;
         }
 
-        result.append(CleanUtil.setLeadingNewLines(content.substring(currentIndex), 2));
+        result.append(content.substring(currentIndex));
 
-        return this.unescapeFilter.filter(result.toString(), filterContext);
+        return result.toString();
     }
 }

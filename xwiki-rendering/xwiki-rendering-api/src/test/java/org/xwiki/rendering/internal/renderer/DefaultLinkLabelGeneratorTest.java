@@ -27,7 +27,7 @@ public class DefaultLinkLabelGeneratorTest extends MockObjectTestCase
         this.generator = new DefaultLinkLabelGenerator();
 
         Mock mockConfiguration = mock(RenderingConfiguration.class);
-        mockConfiguration.stubs().method("getLinkLabelFormat").will(returnValue("[%w:%s.%p] %P (%t)"));
+        mockConfiguration.stubs().method("getLinkLabelFormat").will(returnValue("[%w:%s.%p] %P (%t) [%w:%s.%p] %P (%t)"));
         this.generator.setRenderingConfiguration((RenderingConfiguration) mockConfiguration.proxy());
 
         this.mockModelBridge = mock(DocumentModelBridge.class);
@@ -45,7 +45,7 @@ public class DefaultLinkLabelGeneratorTest extends MockObjectTestCase
 
         this.mockModelBridge.stubs().method("getTitle").will(returnValue("My title"));
         this.mockAccessBridge.stubs().method("getDocument").will(returnValue(this.mockModelBridge.proxy()));
-        assertEquals("[xwiki:Main.HelloWorld] Hello World (My title)", this.generator.generate(link));
+        assertEquals("[xwiki:Main.HelloWorld] Hello World (My title) [xwiki:Main.HelloWorld] Hello World (My title)", this.generator.generate(link));
     }
 
     public void testGenerateWhenDocumentFailsToLoad()
@@ -73,6 +73,6 @@ public class DefaultLinkLabelGeneratorTest extends MockObjectTestCase
 
         this.mockAccessBridge.stubs().method("getDocumentName").will(returnValue(new DocumentName("$0", "\\", "$0")));
 
-        assertEquals("[$0:\\.$0] $0 ($0)", this.generator.generate(new Link()));
+        assertEquals("[$0:\\.$0] $0 ($0) [$0:\\.$0] $0 ($0)", this.generator.generate(new Link()));
     }
 }

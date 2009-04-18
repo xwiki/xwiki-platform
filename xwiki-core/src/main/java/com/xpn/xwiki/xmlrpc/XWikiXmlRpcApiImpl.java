@@ -664,7 +664,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             content = doc.getContent();
         }
 
-        return this.xwiki.getRenderingEngine().renderText(content, baseDocument, this.xwikiContext);
+        return baseDocument.getRenderedContent(content, baseDocument.getSyntaxId(), xwikiContext);
     }
 
     /**

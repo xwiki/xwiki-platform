@@ -20,6 +20,7 @@
 package org.xwiki.rendering.listener.chaining;
 
 import java.util.Map;
+import java.util.Stack;
 
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
@@ -85,17 +86,9 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
 
     private boolean isInTableCell;
 
-    private int definitionListDepth;
+    private Stack<DefinitionListState> definitionListDepth = new Stack<DefinitionListState>();
 
-    private int definitionDescriptionDepth;
-
-    private int definitionListItemIndex = -1;
-
-    private int listDepth;
-
-    private int listItemDepth;
-
-    private int listItemIndex = -1;
+    private Stack<ListState> listDepth = new Stack<ListState>();
 
     private int quotationDepth;
 
@@ -171,7 +164,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
 
     public int getDefinitionListDepth()
     {
-        return this.definitionListDepth;
+        return this.definitionListDepth.size();
     }
 
     public boolean isInDefinitionList()
@@ -179,24 +172,14 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         return getDefinitionListDepth() > 0;
     }
 
-    public int getDefinitionDescriptionDepth()
-    {
-        return this.definitionDescriptionDepth;
-    }
-
-    public boolean isInDefinitionDescription()
-    {
-        return getDefinitionDescriptionDepth() > 0;
-    }
-
     public int getDefinitionListItemIndex()
     {
-        return definitionListItemIndex;
+        return isInDefinitionList() ? this.definitionListDepth.peek().definitionListItemIndex : -1;
     }
 
     public int getListDepth()
     {
-        return this.listDepth;
+        return this.listDepth.size();
     }
 
     public boolean isInList()
@@ -204,19 +187,9 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         return getListDepth() > 0;
     }
 
-    public int getListItemDepth()
-    {
-        return this.listItemDepth;
-    }
-
-    public boolean isInListItem()
-    {
-        return getListItemDepth() > 0;
-    }
-
     public int getListItemIndex()
     {
-        return this.listItemIndex;
+        return isInList() ? this.listDepth.peek().listItemIndex : -1;
     }
 
     public void pushLinkDepth()
@@ -279,15 +252,14 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     public void beginDefinitionDescription()
     {
         ++this.inlineDepth;
-        ++this.definitionDescriptionDepth;
-        ++this.definitionListItemIndex;
+        ++this.definitionListDepth.peek().definitionListItemIndex;
 
         super.beginDefinitionDescription();
     }
 
     public void beginDefinitionList()
     {
-        ++this.definitionListDepth;
+        this.definitionListDepth.push(new DefinitionListState());
 
         super.beginDefinitionList();
     }
@@ -295,7 +267,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     public void beginDefinitionTerm()
     {
         ++this.inlineDepth;
-        ++this.definitionListItemIndex;
+        ++this.definitionListDepth.peek().definitionListItemIndex;
 
         super.beginDefinitionTerm();
     }
@@ -309,16 +281,15 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
 
     public void beginList(ListType listType, Map<String, String> parameters)
     {
-        ++this.listDepth;
+        this.listDepth.push(new ListState());
 
         super.beginList(listType, parameters);
     }
 
     public void beginListItem()
     {
-        ++this.listItemDepth;
         ++this.inlineDepth;
-        ++this.listItemIndex;
+        ++this.listDepth.peek().listItemIndex;
 
         super.beginListItem();
     }
@@ -399,7 +370,6 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         super.endDefinitionDescription();
 
         --this.inlineDepth;
-        --this.definitionDescriptionDepth;
         this.previousEvent = Event.DEFINITION_DESCRIPTION;
     }
 
@@ -407,10 +377,8 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     {
         super.endDefinitionList();
 
-        --this.definitionListDepth;
-        if (this.definitionListDepth == 0) {
-            this.definitionListItemIndex = -1;
-        }
+        this.definitionListDepth.pop();
+
         this.previousEvent = Event.DEFINITION_LIST;
     }
 
@@ -448,10 +416,8 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     {
         super.endList(listType, parameters);
 
-        --this.listDepth;
-        if (this.listDepth == 0) {
-            this.listItemIndex = -1;
-        }
+        this.listDepth.pop();
+
         this.previousEvent = Event.LIST;
     }
 
@@ -459,7 +425,6 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     {
         super.endListItem();
 
-        --this.listItemDepth;
         --this.inlineDepth;
         this.previousEvent = Event.LIST_ITEM;
     }
@@ -627,5 +592,15 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         this.previousEvent = Event.MACRO;
 
         super.onMacro(name, parameters, content, isInline);
+    }
+
+    private static class ListState
+    {
+        public int listItemIndex = -1;
+    }
+
+    private static class DefinitionListState
+    {
+        public int definitionListItemIndex = -1;
     }
 }

@@ -26,6 +26,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.xml.XMLComment;
@@ -143,6 +144,16 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
         getPrinter().print(word);
     }
 
+    @Override
+    public void beginList(ListType listType, Map<String, String> parameters)
+    {
+        if (getBlockState().getListDepth() == 1) {
+            printEmptyLine();
+        } else {
+            getPrinter().print("\n");
+        }
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -153,11 +164,9 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     {
         if (getBlockState().getListItemIndex() > 0) {
             getPrinter().print("\n");
-        } else {
-            printEmptyLine();
         }
 
-        // TODO: add some syntax here like a - or not, that's the question
+        // TODO: maybe add some syntax here like a - or not
     }
 
     /**
@@ -262,15 +271,28 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     */
+    @Override
+    public void beginDefinitionList()
+    {
+        if (getBlockState().getDefinitionListDepth() == 1 && !getBlockState().isInList()) {
+            printEmptyLine();
+        } else {
+            getPrinter().print("\n");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginDefinitionTerm()
      */
     @Override
     public void beginDefinitionTerm()
     {
-        if (getBlockState().getDefinitionListItemIndex() > 0 || getBlockState().getListItemIndex() >= 0) {
+        if (getBlockState().getDefinitionListItemIndex() > 0) {
             getPrinter().print("\n");
-        } else {
-            printEmptyLine();
         }
     }
 
@@ -282,10 +304,8 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginDefinitionDescription()
     {
-        if (getBlockState().getDefinitionListItemIndex() > 0 || getBlockState().getListItemIndex() >= 0) {
+        if (getBlockState().getDefinitionListItemIndex() > 0) {
             getPrinter().print("\n");
-        } else {
-            printEmptyLine();
         }
     }
 

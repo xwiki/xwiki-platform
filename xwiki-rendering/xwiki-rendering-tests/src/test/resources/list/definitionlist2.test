@@ -56,3 +56,13 @@ endDocument
 .input|xhtml/1.0
 .#-----------------------------------------------------
 <html><ul><li>item1<dl><dt>title1</dt><dd>definition1</dd></dl></li></ul><ol><li>item2<dl><dt>title2</dt><dd>definition2</dd></dl></li></ol></html>
+.#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+item1
+title1
+definition1
+
+item2
+title2
+definition2

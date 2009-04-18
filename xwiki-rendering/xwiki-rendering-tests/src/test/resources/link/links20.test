@@ -1,0 +1,26 @@
+.#----------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify that link containing backslash works
+.#----------------------------------------------------------------------------------------------
+[[\]]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Reference = [\]] [false]
+endLink [Reference = [\]] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p><!--startwikilink:\\--><span class="wikicreatelink"><a href="/xwiki/bin/view/\"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+[[\]]
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<p><!--startwikilink:\\--><span class="wikicreatelink"><a href="/xwiki/bin/view/\"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></p>

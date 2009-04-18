@@ -6571,7 +6571,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public String getDefaultDocumentSyntax()
     {
-        return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.class)).getDefaultDocumentSyntax();
+        return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.class.getName())).getDefaultDocumentSyntax();
     }
     
     /**

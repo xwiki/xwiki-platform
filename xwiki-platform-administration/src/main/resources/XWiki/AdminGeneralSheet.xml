@@ -56,11 +56,11 @@
 </property>
 </object>
 <content>### Administrate general wiki preferences, at global level
-#set($legend = ['language', 'editor', 'admin', 'server'])
+#set($legend = ['language', 'editor', 'admin', 'smtp'])
 #set($params = $util.hashMap)
 #set($params.language = ['multilingual', 'languages' , 'default_language', 'dateformat'])
 #set($params.editor = ['editor'])
 #set($params.admin = ['admin_email'])
-#set($params.server = ['smtp_server'])
+#set($params.smtp = ['smtp_server', 'smtp_port'])
 #includeForm('XWiki.AdminFieldsDisplaySheet')</content>
 </xwikidoc>

@@ -27,7 +27,6 @@ import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
 import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
-import org.xwiki.rendering.listener.chaining.LookaheadChainingListener.Event;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
 /**

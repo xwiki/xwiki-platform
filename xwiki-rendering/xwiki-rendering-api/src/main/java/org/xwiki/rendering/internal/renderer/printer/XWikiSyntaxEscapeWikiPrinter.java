@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.renderer.printer;
 
+import java.util.Stack;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxEscapeHandler;
@@ -43,6 +45,8 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
     private boolean escapeLastChar;
 
     private Pattern escapeFirstIfMatching;
+
+    private static final Pattern VERBATIM_PATTERN = Pattern.compile("(\\{\\{\\{)|(\\}\\}\\})");
 
     public XWikiSyntaxEscapeWikiPrinter(WikiPrinter printer, XWikiSyntaxListenerChain listenerChain)
     {
@@ -101,5 +105,99 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         }
 
         print(xwikiSyntaxText);
+    }
+
+    public void printVerbatimContent(String verbatimContent)
+    {
+        StringBuffer result = new StringBuffer();
+
+        Stack<StringBuffer> subVerbatimStack = new Stack<StringBuffer>();
+        boolean printEndVerbatim = false;
+
+        Matcher matcher = VERBATIM_PATTERN.matcher(verbatimContent);
+        int currentIndex = 0;
+        for (; matcher.find(); currentIndex = matcher.end()) {
+            String before = verbatimContent.substring(currentIndex, matcher.start());
+
+            if (printEndVerbatim) {
+                if (before.startsWith("}")) {
+                    result.append("~}~}~}");
+                } else {
+                    result.append("~}}}");
+                }
+            }
+
+            if (subVerbatimStack.size() == 0) {
+                result.append(before);
+            } else {
+                subVerbatimStack.peek().append(before);
+            }
+
+            if (matcher.group(1) != null) {
+                subVerbatimStack.push(new StringBuffer());
+            } else {
+                if (subVerbatimStack.size() == 0) {
+                    printEndVerbatim = true;
+                } else {
+                    StringBuffer subVerbatim = subVerbatimStack.pop();
+
+                    if (subVerbatimStack.size() == 0) {
+                        result.append("{{{");
+                        result.append(subVerbatim);
+                        result.append("}}}");
+                    } else {
+                        subVerbatimStack.peek().append("{{{");
+                        subVerbatimStack.peek().append(subVerbatim);
+                        subVerbatimStack.peek().append("}}}");
+                    }
+                }
+            }
+        }
+
+        if (currentIndex == 0) {
+            print(verbatimContent);
+            return;
+        }
+
+        String end = verbatimContent.substring(currentIndex);
+
+        if (printEndVerbatim) {
+            if (end.length() == 0 || end.charAt(0) == '}') {
+                result.append("~}~}~}");
+            } else {
+                result.append("~}}}");
+            }
+        }
+
+        if (subVerbatimStack.size() > 0) {
+            // Append remaining string
+            subVerbatimStack.peek().append(end);
+
+            // Escape not closed verbatim blocks
+            while (subVerbatimStack.size() > 0) {
+                StringBuffer subVerbatim = subVerbatimStack.pop();
+
+                if (subVerbatimStack.size() == 0) {
+                    if (subVerbatim.length() > 0 && subVerbatim.charAt(0) == '{') {
+                        result.append("~{~{~{");
+                    } else {
+                        result.append("~{{{");
+                    }
+                    result.append(subVerbatim);
+                } else {
+                    if (subVerbatim.length() > 0 && subVerbatim.charAt(0) == '{') {
+                        subVerbatimStack.peek().append("~{~{~{");
+                    } else {
+                        subVerbatimStack.peek().append("~{{{");
+                    }
+                    subVerbatimStack.peek().append(subVerbatim);
+                }
+            }
+        } else {
+            // Append remaining string
+            result.append(end);
+        }
+
+        print(result.toString());
     }
 }

@@ -84,6 +84,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("verbatim/verbatim5", false);
         suite.addTestsFromResource("verbatim/verbatim6", false);
         suite.addTestsFromResource("verbatim/verbatim7", false);
+        suite.addTestsFromResource("verbatim/verbatim8", false);
 
         // Paragraphs
         suite.addTestsFromResource("paragraph/paragraph1", false);
@@ -156,6 +157,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("list/list10", false);
         suite.addTestsFromResource("list/list11", false);
         suite.addTestsFromResource("list/list12", false);
+        suite.addTestsFromResource("list/list13", false);
         suite.addTestsFromResource("list/definitionlist1", false);
         suite.addTestsFromResource("list/definitionlist2", false);
         suite.addTestsFromResource("list/definitionlist3", false);
@@ -216,7 +218,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
         suite.addTestsFromResource("image/image4", false);
-        
+
         return new RenderingPlexusTestSetup(suite);
     }
 }

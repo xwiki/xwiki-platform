@@ -412,8 +412,10 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void beginList(ListType listType, Map<String, String> parameters)
     {
-        if (!getBlockState().isInListItem()) {
+        if (getBlockState().getListDepth() == 1) {
             printEmptyLine();
+        } else {
+            getPrinter().print("\n");
         }
 
         if (listType == ListType.BULLETED) {
@@ -550,7 +552,10 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
             printEmptyLine();
         }
         printParameters(parameters);
-        print("{{{" + protectedString + "}}}");
+
+        print("{{{");
+        getXWikiPrinter().printVerbatimContent(protectedString);
+        print("}}}");
     }
 
     /**
@@ -568,13 +573,14 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
-     * @since 1.6M2
      */
     @Override
     public void beginDefinitionList()
     {
-        if (!getBlockState().isInDefinitionDescription() && !getBlockState().isInListItem()) {
+        if (getBlockState().getDefinitionListDepth() == 1 && !getBlockState().isInList()) {
             printEmptyLine();
+        } else {
+            getPrinter().print("\n");
         }
     }
 
@@ -587,7 +593,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void beginDefinitionTerm()
     {
-        if (getBlockState().getDefinitionListItemIndex() > 0 || getBlockState().getListItemIndex() >= 0) {
+        if (getBlockState().getDefinitionListItemIndex() > 0) {
             getPrinter().print("\n");
         }
 
@@ -610,7 +616,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void beginDefinitionDescription()
     {
-        if (getBlockState().getDefinitionListItemIndex() > 0 || getBlockState().getListItemIndex() >= 0) {
+        if (getBlockState().getDefinitionListItemIndex() > 0) {
             getPrinter().print("\n");
         }
 

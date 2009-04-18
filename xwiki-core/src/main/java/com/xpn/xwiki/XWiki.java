@@ -2833,6 +2833,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         needsUpdate |= bclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
         needsUpdate |= bclass.addTextField("smtp_server", "SMTP Server", 30);
+        needsUpdate |= bclass.addTextField("smtp_port", "SMTP Port", 5);
         needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
         needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);

@@ -53,18 +53,18 @@ public class DefaultLinkLabelGenerator implements LinkLabelGenerator
         DocumentName documentName = this.bridge.getDocumentName(link.getReference());
         
         // Replace %w with the wiki name
-        result = format.replaceAll("%w", documentName.getWiki()); 
+        result = format.replace("%w", documentName.getWiki()); 
         
         // Replace %p with the page name
-        result = result.replaceAll("%p", documentName.getPage()); 
+        result = result.replace("%p", documentName.getPage()); 
 
         // Replace %s with the space name
-        result = result.replaceAll("%s", documentName.getSpace());
+        result = result.replace("%s", documentName.getSpace());
 
         // Replace %P with the page name in camel case + space
         if (result.indexOf("%P") > -1) {
             String normalizedPage = documentName.getPage().replaceAll("([a-z])([A-Z])", "$1 $2");
-            result = result.replaceAll("%P", normalizedPage);
+            result = result.replace("%P", normalizedPage);
         }
         
         // Replace %t with the document title and fall back to %p if the title is null or empty
@@ -72,7 +72,7 @@ public class DefaultLinkLabelGenerator implements LinkLabelGenerator
             try {
                 DocumentModelBridge document = this.bridge.getDocument(link.getReference());
                 if (!StringUtils.isBlank(document.getTitle())) {
-                    result = result.replaceAll("%t", document.getTitle());
+                    result = result.replace("%t", document.getTitle());
                 } else {
                     result = documentName.getPage();
                 }

@@ -435,7 +435,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         // clean attachment filename to be synchronized with all attachment operations
         String cleanedFileName = context.getWiki().clearName(attachmentName, false, true, context);
         DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
-        DocumentNameSerializer serializer = (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class);
+        DocumentNameSerializer serializer = (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.ROLE);
         String docReference = serializer.serialize(docName);
         XWikiDocument doc = null;
         try {

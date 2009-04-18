@@ -4425,11 +4425,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         String servletPath = Param("xwiki.servletpath", "");
 
         if (context.getRequest() != null) {
-            String currentServletpath = context.getRequest().getServletPath();
             if (StringUtils.isEmpty(servletPath)) {
-                if (currentServletpath.startsWith("/bin")) {
+                String currentServletpath = context.getRequest().getServletPath();
+                if (currentServletpath != null && currentServletpath.startsWith("/bin")) {
                     servletPath = "bin/";
-                } else if (currentServletpath.startsWith("/testbin")) {
+                } else if (currentServletpath != null && currentServletpath.startsWith("/testbin")) {
                     servletPath = "testbin/";
                 } else {
                     servletPath = Param("xwiki.defaultservletpath", "bin/");

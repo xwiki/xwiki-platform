@@ -29,23 +29,33 @@ document.observe('dom:loaded', function() {
   // ------------------------------------
   // Expand/collapse class properties (class editor),
   // classes and objects (object editor)
-  $$('#xwikiobjects .xclass-title, .xproperty-title').each(function(item) {
+  $$('#xwikiobjects .xclass-title').each(function(item) {
     item.observe('click', function(event) {
       item.up().toggleClassName('collapsed');
     }.bindAsEventListener());
   });
-  if ($$('.xproperty').size() > 1)
+  $$('#xwikiobjects .xclass').each(function(item) {
+    // Classes are expanded by default
+    item.addClassName('collapsable');
+  });
+  var totalItems = $$('.xproperty').size();
   $$('.xproperty').each(function(item) {
     item.addClassName('collapsable');
-    item.toggleClassName('collapsed');
+    if (totalItems > 1) {
+      item.toggleClassName('collapsed');
+    }
   });
-  if ($$('#xwikiobjects .xobject').size() > 1)
+  $$('.xproperty-title').each(function(item) {
+    item.observe('click', function(event) {
+      item.up().toggleClassName('collapsed');
+    }.bindAsEventListener());
+  });
+  totalItems = $$('#xwikiobjects .xobject').size();
   $$('#xwikiobjects .xobject').each(function(item) {
     item.addClassName('collapsable');
-    item.toggleClassName('collapsed');
-  });
-  $$('#xwikiobjects .xclass').each(function(item) {
-    item.addClassName('collapsable');
+    if (totalItems > 1) {
+      item.toggleClassName('collapsed');
+    }
   });
   $$('#xwikiobjects .xobject-title').each(function(item) {
     item.observe('click', function(event) {
@@ -54,7 +64,7 @@ document.observe('dom:loaded', function() {
   });
   // ------------------------------------
   // Allow to collapse object properties (object editor)
-  // and property meta-properties (lass editor)
+  // and property meta-properties (class editor)
   $$('.xobject-content dt, .xproperty-content dt').each(function(item) {
     if(! item.down('input[type=checkbox]')) {
       item.addClassName('collapsable');
@@ -99,6 +109,10 @@ XWiki.XPropertyOrdering = Class.create({
         }
       });
     });
+    if ($$('.xproperty').size() <= 1) {
+      return;
+    }
+
     // Create and insert move button
     $$('.xproperty-title').each(function(item) {
       var movebutton = new Element('img', {

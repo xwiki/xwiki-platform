@@ -1,28 +1,45 @@
-#if($request.xpage && $request.xpage=="editclass")
-$response.sendRedirect($doc.getURL($context.action, "editor=class"))
+$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
+$xwiki.ssfx.use('js/xwiki/dataeditors/dataeditors.css', true)##
+$xwiki.jsfx.use('js/xwiki/dataeditors/dataeditors.js', true)##
+#if("$!request.xpage" == 'editclass')
+  $response.sendRedirect($doc.getURL('edit', 'editor=class'))
 #else
-#set($formname = "propupdate")
-#set($saveaction = "propupdate")
+#set($formname = 'propupdate')
+#set($saveaction = 'propupdate')
 #set($class = $doc.getxWikiClass())
 #set($redirect = $xwiki.getRequestURL())
 <form id="$formname" method="post" action="$doc.getURL("preview")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent" class="clear">
-<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("edit", "editor=class")"/></div>
-<div id="xwikiclassproperties" class="accordion">
+#set($hiddenProperties = ['tooltip', 'customDisplay', 'unmodifiable', 'contenttype'])
+##
+##
+<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL('edit', 'editor=class')"/></div>
+<div id="xwikiclassproperties">
+##
 #set($hasProps = false)
 #foreach ($field in $class.properties)
-#set($hasProps = true)
-<div id="field_$field.name">
-<div id="field_${field.name}_title" class="accordionTabTitleBar"><h6><tt>$field.prettyName</tt></h6></div>
-<div id="field_${field.name}_content" class="accordionTabContentBox"><div>
+#if($hasProps == false)
+  #set($hasProps = true)
+  <div id="xclass_${class.name}" class="xclass">
+    <div id="xclass_${class.name}_title" class="xclass-title"><h2>$class.name</h2></div>
+    <div id="xclass_${class.name}_content" class="xclass-content"><div id="xclassContent">
+#end
+<div id="xproperty_$field.name" class="xproperty">
+<div id="xproperty_${field.name}_title" class="xproperty-title ${field.type}">
+  <h2>$doc.displayView($field.xWikiClass.get('prettyName'), "${field.name}_" , $field)
+  ($doc.displayView($field.xWikiClass.get('name'), "${field.name}_" , $field): $xwiki.metaclass.get($field.classType).prettyName)</h2>
+</div>
+<div id="xproperty_${field.name}_content" class="xproperty-content"><div>
 <dl>
 #foreach ($classprop in $field.xWikiClass.propertyNames)
 #set($propDef = $field.xWikiClass.get("$classprop"))
+#if($hiddenProperties.indexOf($propDef.name) == -1)
 #if($propDef.type.indexOf("Boolean") != -1)
-<dt>$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</dt>
+<dt class="boolean-property">$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</dt>
 #else
-<dt><label for="${field.name}_$classprop">$propDef.getPrettyName():</label></dt>
+<dt><label for="${field.name}_$classprop">$propDef.getPrettyName()</label></dt>
 <dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>
+#end
 #end
 #end
 </dl>
@@ -30,16 +47,37 @@ $response.sendRedirect($doc.getURL($context.action, "editor=class"))
 </div> ## content
 </div> ## field
 #end
-</div> ## accordion
-</div> ## editcontent
-<div class="bottombuttons">#template("editactions.vm")</div>
-</form>
-$xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
-$xwiki.jsfx.use("js/xwiki/accordion/accordion.js")
 #if($hasProps)
-<script type="text/javascript">
-var obj={div:'xwikiclassproperties',no:0};
-Event.observe(window,'load',createAccordion.bind(this,obj));
-</script>
+</div></div></div>
+</div> ## properties
+<div class="bottombuttons">#template("editactions.vm")</div>
+#else
+#info("No class is defined in this wiki document. You can <strong>create one by ading properties</strong> from the panel on you right, or you can <strong>choose another class to edit</strong> from the list below.")
+<h3>Existing classes in this wiki</h3>
+##
+## Existing classes are enumerated, grouped by space name.
+## The list is already sorted alphabetically
+##
+#set($prevSpace = "")
+#foreach ($classname in $xwiki.classList)
+  #if($!xwiki.hasAccessLevel("edit", $classname))
+    #set($classdoc = $xwiki.getDocument($classname))
+    #if($classdoc.space != $prevSpace)
+      #if($prevSpace != "")
+        </ul>
+      #end
+      <h4><a href="$xwiki.getURL("${classdoc.space}.WebHome")">$classdoc.space</a> space:</h4>
+      #set($prevSpace = $classdoc.space)
+      <ul>
+    #end
+    <li><a href="$classdoc.getURL("edit", "editor=class")">$classdoc.name</a></li>
+  #end
 #end
+#if($prevSpace != "")
+  </ul>
+#end
+</div> ## properties
+#end
+</div> ## xwikieditcontent
+</form>
 #end

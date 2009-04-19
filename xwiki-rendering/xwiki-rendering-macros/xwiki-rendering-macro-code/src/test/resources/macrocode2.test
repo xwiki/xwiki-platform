@@ -48,6 +48,7 @@ onWord [i]
 beginFormat: [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [>]
 endFormat: [NONE] [[style]=[color: #666666; ]]
+onNewLine
 endXMLNode [div] [class=box code]
 endMacroMarkerStandalone [code] [language=java] [
 <b>bold</b>

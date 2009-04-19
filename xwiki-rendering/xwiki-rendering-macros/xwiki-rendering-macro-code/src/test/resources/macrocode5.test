@@ -40,6 +40,7 @@ onSpecialSymbol [/]
 onWord [i]
 onSpecialSymbol [>]
 endFormat: [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onNewLine
 endFormat: [NONE] [[class]=[box code]]
 endMacroMarkerInline [code] [language=html] [<b>bold</b><i>italic</i>]
 endParagraph

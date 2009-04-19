@@ -27,6 +27,11 @@ package org.xwiki.gwt.dom.client;
 public class Style extends com.google.gwt.dom.client.Style
 {
     /**
+     * The name of the style attribute.
+     */
+    public static final String STYLE_ATTRIBUTE = "style";
+
+    /**
      * Sets how/if an element is displayed.
      */
     public static final String DISPLAY = "display";
@@ -64,7 +69,7 @@ public class Style extends com.google.gwt.dom.client.Style
     /**
      * The text-align property aligns the text in an element.
      */
-    public static final Property TEXT_ALIGN = new Property("text-align", "textAlign", true, false, null);
+    public static final Property TEXT_ALIGN = new Property("text-align", "textAlign", true, false, "");
 
     /**
      * The font-family property is a prioritized list of font family names and/or generic family names for an element.
@@ -78,7 +83,7 @@ public class Style extends com.google.gwt.dom.client.Style
      * Note: If a family-name contains white-space, it should be quoted. Single quotes must be used when using the
      * "style" attribute in HTML.
      */
-    public static final Property FONT_FAMILY = new Property("font-family", "fontFamily", true, true, null);
+    public static final Property FONT_FAMILY = new Property("font-family", "fontFamily", true, true, "");
 
     /**
      * Sets the width of an element.
@@ -252,6 +257,8 @@ public class Style extends com.google.gwt.dom.client.Style
 
     /**
      * The text-align property aligns the text in an element.
+     * 
+     * @see http://www.w3.org/TR/css3-text/#justification
      */
     public static final class TextAlign
     {

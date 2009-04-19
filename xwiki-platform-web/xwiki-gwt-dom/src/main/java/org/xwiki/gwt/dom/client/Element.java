@@ -281,6 +281,17 @@ public class Element extends com.google.gwt.dom.client.Element
     }
 
     /**
+     * Sets the value for the specified attribute in a cross browser manner.
+     * 
+     * @param name the name of the attribute
+     * @param value the value of the attribute
+     */
+    public final void xSetAttribute(String name, String value)
+    {
+        DOMUtils.getInstance().setAttribute(this, name, value);
+    }
+
+    /**
      * We need this method because {@link #getInnerText()} includes commented text in the output.
      * 
      * @return the text between the start and end tags of this element

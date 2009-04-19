@@ -2898,9 +2898,11 @@ div#xwikiclassproperties.accordion
     margin-left: 2em;
 }
 
-.panel input, .panel select,
-    #editPanels dl dd input {
-    width: 100%;
+.panel input, .panel select, #editPanels dl dd input {
+  width: 100%;
+}
+.panel .buttonwrapper, #editPanels .buttonwrapper {
+  margin-left: 0;
 }
 
 .buttonwrapper {

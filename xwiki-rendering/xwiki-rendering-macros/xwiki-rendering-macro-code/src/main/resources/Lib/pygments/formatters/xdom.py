@@ -48,3 +48,6 @@ class XDOMFormatter(Formatter):
                     self.listener.format(lasttype.__str__(), lastval, self.style.style_for_token(lasttype))
                 lasttype = ttype
                 lastval = value
+
+        if lastval:
+           self.listener.format(lasttype.__str__(), lastval, self.style.style_for_token(lasttype))

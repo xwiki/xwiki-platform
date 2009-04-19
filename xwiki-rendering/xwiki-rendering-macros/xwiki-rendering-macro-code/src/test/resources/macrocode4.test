@@ -554,6 +554,7 @@ onSpecialSymbol [)]
 onSpecialSymbol [(]
 onSpecialSymbol [)]
 onSpecialSymbol [;]
+onNewLine
 endXMLNode [div] [class=box code]
 endMacroMarkerStandalone [code] [language=javascript] [
 // getJSON function by Juriy Zaytsev 

@@ -21,6 +21,8 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -93,6 +95,7 @@
 <name>Panels.AddClassProperty</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>c64c99a4-2b29-4a5d-b828-910b5853186b</guid>
 <property>
 <category>Tools</category>
 </property>
@@ -102,17 +105,19 @@
 &lt;div class="padded"&gt;
 &lt;input type="hidden" name="xredirect" value="$doc.getURL("edit", "editor=class")"/&gt;
 &lt;label for="propname"&gt;$msg.get("propname"):&lt;/label&gt;&lt;br /&gt;
-&lt;input type="text" id="propname" name="propname" value="" size="20" /&gt;
-&lt;br /&gt;
+&lt;input type="text" id="propname" name="propname" value="" size="20" /&gt;&lt;br /&gt;
 &lt;label for="proptype"&gt;$msg.get("proptype"):&lt;/label&gt;&lt;br /&gt;
 &lt;select id="proptype" name="proptype" size="1"&gt;
 &lt;option value="---"&gt;$msg.get("selectproptype")&lt;/option&gt;
 #foreach($prop in $xwiki.metaclass.properties)
 &lt;option value="$prop.name"&gt;$prop.prettyName&lt;/option&gt;
 #end
-&lt;/select&gt;&lt;br /&gt;&lt;br /&gt;
-&lt;input type="submit" class="button" value="$msg.get("addproperty")"/&gt;
+&lt;/select&gt;
+&lt;span class="buttonwrapper"&gt;
+&lt;input type="submit" class="button" value="$msg.get("addproperty")"/&gt;&lt;/span&gt;
 &lt;/div&gt;
+## Fix floating buttons in albatross skin:
+&lt;div class="clearfloats"&gt;&lt;/div&gt;
 &lt;/form&gt;
 #panelfooter()</content>
 </property>
@@ -124,39 +129,6 @@
 </property>
 <property>
 <type>edit</type>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>tags</name>
-<number>1</number>
-<prettyName>Tags</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>Panels.AddClassProperty</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
 </property>
 </object>
 <content>#includeForm("Panels.PanelSheet")</content>

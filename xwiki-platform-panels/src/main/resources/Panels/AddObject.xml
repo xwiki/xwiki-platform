@@ -19,6 +19,10 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -29,95 +33,119 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<type>
-<name>type</name>
-<prettyName>Panel type</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<separators> ,|</separators>
-<values>view|edit</values>
-<number>2</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
 <category>
-<name>category</name>
-<prettyName>Category</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
+<cache>0</cache>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
-<size>1</size>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
 <separator> </separator>
 <separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
 <values>Information|Navigation|Tools|Administration|Other</values>
-<number>5</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
-<description>
-<name>description</name>
-<prettyName>Description</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
-<rows>5</rows>
-<number>3</number>
-<editor>Text</editor>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
 <content>
-<name>content</name>
-<prettyName>Content</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<rows>25</rows>
-<number>4</number>
 <editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
+<description>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
 <name>
 <name>name</name>
-<prettyName>Name</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
 <number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
+<type>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
 </class>
 <name>Panels.AddObject</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
-<property>
-<type>edit</type>
-</property>
-<property>
-<description>Form which allows adding an object to a document.</description>
-</property>
+<guid>5573abfe-8fad-437a-ba73-b03531d77d98</guid>
 <property>
 <category>Tools</category>
 </property>
 <property>
 <content>#largepanelheader($msg.get("addobject"))
 &lt;form id="objectadd" method="post" action="$doc.getURL("objectadd")" onsubmit="cancelCancelEdit()"&gt;
-&lt;div class="centered padded"&gt;
+&lt;p&gt;
 &lt;input type="hidden" name="xredirect" value="$doc.getURL("edit", "editor=object")" /&gt;
 &lt;select name="classname" size="1"&gt;
 &lt;option value="---"&gt;$msg.get("selectclass")&lt;/option&gt;
+##
+## Existing classes are enumerated, grouped by space name.
+## The list is already sorted alphabetically
+##
+#set($prevSpace = "")
+#set($optGroupOpen = false)
 #foreach ($classname in $xwiki.classList)
-&lt;option value="$classname"&gt;$classname&lt;/option&gt;
+  #if($!xwiki.hasAccessLevel("edit", $classname))
+    #set($classdoc = $xwiki.getDocument($classname))
+    #if($classdoc.space != $prevSpace)
+      #if($optGroupOpen)
+        &lt;/optgroup&gt;
+      #else
+        #set($optGroupOpen = true)
+      #end
+          &lt;optgroup label="$classdoc.space"&gt;
+      #set($prevSpace = $classdoc.space)
+    #end
+    &lt;option value="$classdoc.fullName"&gt;$classdoc.name&lt;/option&gt;
+  #end
+#end
+#if($optGroupOpen)
+        &lt;/optgroup&gt;
 #end
 &lt;/select&gt;
-&lt;/div&gt;
-&lt;div class="centered padded"&gt;
-&lt;input type="submit" value="$msg.get("addobjectfromclass")" /&gt;
-&lt;/div&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get("addobjectfromclass")" class="button"/&gt;&lt;/span&gt;
+&lt;/p&gt;
 &lt;/form&gt;
 #panelfooter()</content>
 </property>
 <property>
+<description>Form which allows adding an object to a document.</description>
+</property>
+<property>
 <name>Add Object</name>
+</property>
+<property>
+<type>edit</type>
 </property>
 </object>
 <content>#includeForm("Panels.PanelSheet")</content>

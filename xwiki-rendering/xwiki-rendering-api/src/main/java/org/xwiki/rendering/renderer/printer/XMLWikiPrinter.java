@@ -180,7 +180,10 @@ public class XMLWikiPrinter
     }
 
     /**
-     * Print a XML comment.
+     * Print a XML comment. Note that the content that you pass must be valid XML comment, ie not have 
+     * <code>--</code> characters (or <code>-</code> if it's the last character). 
+     * If you're not sure what the comment content will be use
+     * {@link #printXMLComment(String, boolean)} instead, passing true for the second parameter.
      * 
      * @param content the comment content
      */

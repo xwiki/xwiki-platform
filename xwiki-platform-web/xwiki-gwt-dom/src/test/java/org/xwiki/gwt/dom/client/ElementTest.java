@@ -32,6 +32,26 @@ import com.google.gwt.core.client.JsArrayString;
 public class ElementTest extends AbstractDOMTest
 {
     /**
+     * The name of the class attribute.
+     */
+    public static final String CLASS_ATTRIBUTE = "class";
+
+    /**
+     * The name of the style attribute.
+     */
+    public static final String STYLE_ATTRIBUTE = "style";
+
+    /**
+     * The name of the title attribute.
+     */
+    public static final String TITLE_ATTRIBUTE = "title";
+
+    /**
+     * The name of the ID attribute.
+     */
+    public static final String ID_ATTRIBUTE = "id";
+
+    /**
      * Unit test for {@link Element#xGetString()} when elements don't have meta data.
      */
     public void testXGetStringWithoutMetaData()
@@ -142,9 +162,9 @@ public class ElementTest extends AbstractDOMTest
 
         List<String> attrList = new ArrayList<String>();
         attrList.add(customAttribute);
-        attrList.add("title");
-        attrList.add("style");
-        attrList.add("class");
+        attrList.add(TITLE_ATTRIBUTE);
+        attrList.add(STYLE_ATTRIBUTE);
+        attrList.add(CLASS_ATTRIBUTE);
 
         JsArrayString attributeNames = element.getAttributeNames();
         for (int i = 0; i < attributeNames.length(); i++) {
@@ -205,5 +225,62 @@ public class ElementTest extends AbstractDOMTest
         element.removeClassName(null);
         element.removeClassName(" colorCell-selected");
         assertEquals("", element.getClassName());
+    }
+
+    /**
+     * Unit test for {@link Element#hasAttribute(String)}.
+     */
+    public void testHasAttribute()
+    {
+        Element element = Document.get().createSpanElement().cast();
+
+        assertFalse(element.hasAttribute(CLASS_ATTRIBUTE));
+        assertFalse(element.hasAttribute(STYLE_ATTRIBUTE));
+        assertFalse(element.hasAttribute(TITLE_ATTRIBUTE));
+        assertFalse(element.hasAttribute(ID_ATTRIBUTE));
+
+        String customAttribute = "from";
+        assertFalse(element.hasAttribute(customAttribute));
+
+        element.setClassName("xyz");
+        assertTrue(element.hasAttribute(CLASS_ATTRIBUTE));
+
+        element.getStyle().setProperty(Style.FONT_WEIGHT.getJSName(), Style.FontWeight.BOLD);
+        assertTrue(element.hasAttribute(STYLE_ATTRIBUTE));
+
+        element.setTitle("abc");
+        assertTrue(element.hasAttribute(TITLE_ATTRIBUTE));
+
+        element.setId("x11");
+        assertTrue(element.hasAttribute(ID_ATTRIBUTE));
+
+        element.setAttribute(customAttribute, "me");
+        assertTrue(element.hasAttribute(customAttribute));
+    }
+
+    /**
+     * Unit test for {@link Element#xSetAttribute(String, String)}.
+     */
+    public void testXSetAttribute()
+    {
+        Element element = Document.get().createSpanElement().cast();
+
+        testXSetXGetAttribute(element, TITLE_ATTRIBUTE, "123");
+        testXSetXGetAttribute(element, ID_ATTRIBUTE, "qwe");
+        testXSetXGetAttribute(element, CLASS_ATTRIBUTE, "def");
+        testXSetXGetAttribute(element, STYLE_ATTRIBUTE, "font-weight: bold;");
+    }
+
+    /**
+     * Sets the value of the specified attribute and then checks its value.
+     * 
+     * @param element a DOM element
+     * @param attrName the name of the attribute
+     * @param attrValue the value of the attribute
+     */
+    private void testXSetXGetAttribute(Element element, String attrName, String attrValue)
+    {
+        element.xSetAttribute(attrName, attrValue);
+        assertEquals(attrValue, element.xGetAttribute(attrName).toLowerCase());
     }
 }

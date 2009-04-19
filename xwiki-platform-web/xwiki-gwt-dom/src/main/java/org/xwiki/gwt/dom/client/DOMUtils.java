@@ -988,8 +988,8 @@ public abstract class DOMUtils
     }
 
     /**
-     * Returns the value of the named attribute of the specified element. This method will be overwritten for internet
-     * explorer browsers to handle bug http://code.google.com/p/google-web-toolkit/issues/detail?id=3238 .
+     * Returns the value of the named attribute of the specified element. This method will be overwritten for Internet
+     * Explorer browsers to handle bug http://code.google.com/p/google-web-toolkit/issues/detail?id=3238 .
      * 
      * @param element the element to get the attribute for
      * @param name the name of the attribute to return
@@ -998,6 +998,19 @@ public abstract class DOMUtils
     public String getAttribute(Element element, String name)
     {
         return element.getAttribute(name);
+    }
+
+    /**
+     * Sets the value of the specified attribute for the given element. This method will be overwritten for Internet
+     * Explorer to overcome that fact that the style attribute cannot be set in the standard way.
+     * 
+     * @param element the element whose attribute is set
+     * @param name the name of the attribute
+     * @param value the value of the attribute
+     */
+    public void setAttribute(Element element, String name, String value)
+    {
+        element.setAttribute(name, value);
     }
 
     /**

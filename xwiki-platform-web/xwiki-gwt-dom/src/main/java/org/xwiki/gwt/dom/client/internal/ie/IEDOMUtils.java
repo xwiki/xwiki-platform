@@ -22,6 +22,7 @@ package org.xwiki.gwt.dom.client.internal.ie;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
@@ -124,6 +125,23 @@ public class IEDOMUtils extends DOMUtils
     /**
      * {@inheritDoc}
      * 
+     * @see DOMUtils#setAttribute(Element, String, String)
+     */
+    public void setAttribute(Element element, String name, String value)
+    {
+        // In IE we can't set the style attribute using the standard setAttribute method from the DOM API.
+        if (Style.STYLE_ATTRIBUTE.equalsIgnoreCase(name)) {
+            element.getStyle().setProperty("cssText", value);
+        } else if ("class".equalsIgnoreCase(name)) {
+            element.setClassName(value);
+        } else {
+            element.setAttribute(name, value);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see DOMUtils#getInnerText(Element)
      */
     public native String getInnerText(Element element)
@@ -138,7 +156,8 @@ public class IEDOMUtils extends DOMUtils
      */
     public native boolean hasAttribute(Element element, String attrName)
     /*-{
-        return element.getAttribute(attrName) != null;
+        var attrNode = element.getAttributeNode(attrName);
+        return attrNode && attrNode.specified;
     }-*/;
 
     /**

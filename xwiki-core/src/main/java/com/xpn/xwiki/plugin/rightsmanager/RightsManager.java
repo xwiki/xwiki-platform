@@ -1025,7 +1025,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
                     removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
 
                 if (needUpdate && bobj.getStringValue(RIGHTSFIELD_USERS).trim().length() == 0
-                    && bobj.getStringValue(RIGHTSFIELD_USERS).trim().length() == 0) {
+                    && bobj.getStringValue(RIGHTSFIELD_GROUPS).trim().length() == 0) {
                     rightsDocument.removeObject(bobj);
                 }
             }

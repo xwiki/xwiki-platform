@@ -70,7 +70,7 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 ##
 #set($inputURLQueryString = "xpage=wysiwyginput&key=${wysiwygKey}")
 #if(!($request.sync || $reuseKey))
-#set($inputURLQueryString = $inputURLQueryString + "&render")
+#set($inputURLQueryString = $inputURLQueryString + "&render=true")
 #end
 ##
 ## Determine the initial content of the editor.

@@ -2,6 +2,6 @@
 #set($editorPanelsWiki = "Panels.EditModes,Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
 #set($editorPanelsWysiwyg = "Panels.EditModes,Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
 #set($editorPanelsObjects = "Panels.EditModes,Panels.ObjectEditorWelcome,Panels.AddObject")
-#set($editorPanelsClass = "Panels.EditModes,Panels.ClassEditorWelcome,Panels.AddClassProperty")
+#set($editorPanelsClass = "Panels.EditModes,Panels.AddClassProperty,Panels.ClassSwitcher")
 #set($editorPanelsRights = "Panels.EditModes,Panels.RightsEditorWelcome,Panels.RightsHelp,Panels.RightsTips")
 #set($editorPanelsHistory = "Panels.EditModes")

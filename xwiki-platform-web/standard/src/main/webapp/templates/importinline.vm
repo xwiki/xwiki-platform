@@ -17,7 +17,7 @@
       <h4 class="legend">$msg.get("import_listof${text}files")</h4>
       <ul>
         #foreach($item in $list)
-          <li>$item</li>
+          <li><a href="$xwiki.getURL($item)">$item</a></li>
         #end
       </ul>
     #end

@@ -28,7 +28,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
- * Unit tests for {@link StyleExecutable}.
+ * Unit tests for {@link InlineStyleExecutable}.
  * 
  * @version $Id$
  */
@@ -54,7 +54,7 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
         super.gwtSetUp();
 
         if (executable == null) {
-            executable = new ToggleStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em");
+            executable = new ToggleInlineStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em");
             insertHTML = new InsertHTMLExecutable();
         }
     }

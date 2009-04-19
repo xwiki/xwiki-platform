@@ -42,7 +42,7 @@ import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleStyleExecutable;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleInlineStyleExecutable;
 
 /**
  * Plug-in for making text bold, italic, underline or strike through. It installs four toggle buttons on the tool bar
@@ -83,13 +83,13 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
         // Register custom executables.
         getTextArea().getCommandManager().registerCommand(Command.BOLD, new BoldExecutable());
         getTextArea().getCommandManager().registerCommand(Command.ITALIC,
-            new ToggleStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em"));
+            new ToggleInlineStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em"));
         getTextArea().getCommandManager().registerCommand(Command.UNDERLINE,
-            new ToggleStyleExecutable(Style.TEXT_DECORATION, Style.TextDecoration.UNDERLINE, "ins"));
+            new ToggleInlineStyleExecutable(Style.TEXT_DECORATION, Style.TextDecoration.UNDERLINE, "ins"));
         getTextArea().getCommandManager().registerCommand(Command.STRIKE_THROUGH,
-            new ToggleStyleExecutable(Style.TEXT_DECORATION, Style.TextDecoration.LINE_THROUGH, "del"));
+            new ToggleInlineStyleExecutable(Style.TEXT_DECORATION, Style.TextDecoration.LINE_THROUGH, "del"));
         getTextArea().getCommandManager().registerCommand(Command.TELETYPE,
-            new ToggleStyleExecutable(Style.FONT_FAMILY, "monospace", "tt"));
+            new ToggleInlineStyleExecutable(Style.FONT_FAMILY, "monospace", "tt"));
 
         shortcutKeyManager = new ShortcutKeyManager();
 

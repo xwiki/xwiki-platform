@@ -38,7 +38,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class StyleExecutable extends AbstractExecutable
+public class InlineStyleExecutable extends AbstractExecutable
 {
     /**
      * The style property used when applying style.
@@ -50,7 +50,7 @@ public class StyleExecutable extends AbstractExecutable
      * 
      * @param property the style property used when applying style
      */
-    public StyleExecutable(Property property)
+    public InlineStyleExecutable(Property property)
     {
         this.property = property;
     }

@@ -58,6 +58,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner
         filters.add(new LineBreakFilter());
         filters.add(new EmptyLineFilter());
         filters.add(new StandAloneMacroFilter());
+        filters.add(new EmptyAttributeFilter());
         filters.addAll(config.getFilters());
         config.setFilters(filters);
 

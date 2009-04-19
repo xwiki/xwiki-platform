@@ -22,6 +22,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin.justify;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
@@ -35,6 +37,8 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BlockStyleExecutable;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleExecutable;
 
 /**
  * Plug-in for justifying text. It can be used to align text to the left, to the right, in center or to make it expand
@@ -64,6 +68,11 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
     {
         super.init(wysiwyg, textArea, config);
 
+        registerCustomExecutable(Command.JUSTIFY_LEFT, Style.TextAlign.LEFT);
+        registerCustomExecutable(Command.JUSTIFY_CENTER, Style.TextAlign.CENTER);
+        registerCustomExecutable(Command.JUSTIFY_RIGHT, Style.TextAlign.RIGHT);
+        registerCustomExecutable(Command.JUSTIFY_FULL, Style.TextAlign.JUSTIFY);
+
         addFeature("justifyleft", Command.JUSTIFY_LEFT, Images.INSTANCE.justifyLeft().createImage(), Strings.INSTANCE
             .justifyLeft());
         addFeature("justifycenter", Command.JUSTIFY_CENTER, Images.INSTANCE.justifyCenter().createImage(),
@@ -79,6 +88,20 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
             getTextArea().getCommandManager().addCommandListener(this);
             getUIExtensionList().add(toolBarExtension);
         }
+    }
+
+    /**
+     * Registers a custom executable for the given command that toggles the specified alignment.
+     * 
+     * @param command the command whose executable is overwritten
+     * @param alignment the alignment toggled by the custom executable
+     */
+    private void registerCustomExecutable(Command command, String alignment)
+    {
+        getTextArea().getCommandManager().registerCommand(
+            command,
+            new ToggleExecutable(new BlockStyleExecutable(Style.TEXT_ALIGN), alignment, Style.TEXT_ALIGN
+                .getDefaultValue()));
     }
 
     /**

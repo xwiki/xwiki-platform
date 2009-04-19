@@ -38,7 +38,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class ToggleStyleExecutable extends StyleExecutable
+public class ToggleInlineStyleExecutable extends InlineStyleExecutable
 {
     /**
      * The value of the style property when the style is applied.
@@ -65,7 +65,7 @@ public class ToggleStyleExecutable extends StyleExecutable
      * @param value the value of the style property when the style is applied
      * @param tagName the tag used to toggle the style
      */
-    public ToggleStyleExecutable(Property property, String value, String tagName)
+    public ToggleInlineStyleExecutable(Property property, String value, String tagName)
     {
         super(property);
 
@@ -76,7 +76,7 @@ public class ToggleStyleExecutable extends StyleExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see StyleExecutable#execute(RichTextArea, String)
+     * @see InlineStyleExecutable#execute(RichTextArea, String)
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
@@ -87,7 +87,7 @@ public class ToggleStyleExecutable extends StyleExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see StyleExecutable#execute(Text, int, int, String)
+     * @see InlineStyleExecutable#execute(Text, int, int, String)
      */
     protected TextFragment execute(Text text, int startIndex, int endIndex, String parameter)
     {

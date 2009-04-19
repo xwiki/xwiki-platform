@@ -19,7 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.format.exec;
 
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Timer;
@@ -303,5 +306,24 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
         range = rta.getDocument().getSelection().getRangeAt(0);
         assertTrue(range.isCollapsed());
         assertEquals(3, range.getStartOffset());
+    }
+
+    /**
+     * Unit test for {@link FormatBlockExecutable#replace(Element, String)}.
+     */
+    public void testReplace()
+    {
+        Element element = Document.get().createSpanElement().cast();
+        element.setId("agent007");
+        element.setTitle("classified");
+        element.getStyle().setProperty(Style.DISPLAY, Style.Display.NONE);
+        element.setInnerHTML("?<!--$--><em>*</em>");
+
+        Element parent = Document.get().createSpanElement().cast();
+        parent.appendChild(element);
+
+        FormatBlockExecutable.replace(element, "ins");
+        assertFalse(element.hasChildNodes());
+        assertEquals("<span><ins style=\"display: none;\">?<!--$--><em>*</em></ins></span>", clean(parent.getString()));
     }
 }

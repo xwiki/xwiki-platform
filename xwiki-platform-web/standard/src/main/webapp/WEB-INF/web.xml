@@ -73,16 +73,26 @@
   <filter-mapping>
     <filter-name>Set Character Encoding</filter-name>
     <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+    <dispatcher>ERROR</dispatcher>
   </filter-mapping>
 
   <filter-mapping>
     <filter-name>RequestRestorer</filter-name>
     <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
 
   <filter-mapping>
     <filter-name>ConversionFilter</filter-name>
     <servlet-name>action</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
 
   <filter-mapping>

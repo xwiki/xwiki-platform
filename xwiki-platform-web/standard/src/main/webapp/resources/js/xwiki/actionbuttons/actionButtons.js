@@ -69,10 +69,10 @@ XWiki.actionButtons.EditActions = Class.create({
   onCancel : function(evt) {
     evt.stop();
     var location = evt.element().form.action;
-    if (location.indexOf('?' == -1)) {
+    if (location.indexOf('?') == -1) {
       location += '?';
     }
-    window.location = location + 'action_cancel=true'; 
+    window.location = location + '&action_cancel=true'; 
   },
   onPreview : function(evt) {
     if (!this.validateForm(evt.element().form)) {

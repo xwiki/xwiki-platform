@@ -116,8 +116,6 @@
 &lt;span class="buttonwrapper"&gt;
 &lt;input type="submit" class="button" value="$msg.get("addproperty")"/&gt;&lt;/span&gt;
 &lt;/div&gt;
-## Fix floating buttons in albatross skin:
-&lt;div class="clearfloats"&gt;&lt;/div&gt;
 &lt;/form&gt;
 #panelfooter()</content>
 </property>

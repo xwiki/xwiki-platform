@@ -76,6 +76,7 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("undo", Command.UNDO));
         addValidationRule(new DefaultValidationRule("redo", Command.REDO));
         addValidationRule(new DefaultValidationRule("format", Command.FORMAT_BLOCK));
+        addValidationRule(new DefaultValidationRule("removeformat", Command.REMOVE_FORMAT));
         addValidationRule(new DefaultValidationRule("fontname", Command.FONT_NAME));
         addValidationRule(new DefaultValidationRule("fontsize", Command.FONT_SIZE));
         addValidationRule(new DefaultValidationRule("forecolor", Command.FORE_COLOR));

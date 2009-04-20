@@ -68,6 +68,11 @@ body.main {
   position: static;
 }
 
+.main h1, .main h2, .main h3, .main h4, .main h5 {
+  /* XWIKI-3638: Range detection fails inside relative positioned elements in IE */
+  position: static;
+}
+
 .main h1, .main h2, .main h3, .main h4 {
   border-bottom: 1px solid #CCCCCC;
   margin: 20px 0;
@@ -75,6 +80,8 @@ body.main {
 
 .main h1 {
   margin: 25px 0 20px 0;
+  /* Letter spacing affects the behavior of the Delete and Backspace keys in IE */
+  letter-spacing: normal;
 }
 
 .main .macro {

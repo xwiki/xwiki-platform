@@ -50,13 +50,17 @@ public interface Listener extends LinkListener, ImageListener
 {
     /**
      * Start of the document.
+     * 
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
-    void beginDocument();
+    void beginDocument(Map<String, String> parameters);
 
     /**
      * End of the document.
+     * 
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
-    void endDocument();
+    void endDocument(Map<String, String> parameters);
 
     /**
      * End of a text formatting block.

@@ -101,13 +101,13 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChainingListener#beginDocument()
+     * @see org.xwiki.rendering.listener.Listener#beginDocument(java.util.Map)
      */
-    public void beginDocument()
+    public void beginDocument(Map<String, String> parameters)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.beginDocument();
+            next.beginDocument(parameters);
         }
     }
 
@@ -348,13 +348,13 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChainingListener#endDocument()
+     * @see org.xwiki.rendering.listener.Listener#endDocument(java.util.Map)
      */
-    public void endDocument()
+    public void endDocument(Map<String, String> parameters)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.endDocument();
+            next.endDocument(parameters);
         }
     }
 

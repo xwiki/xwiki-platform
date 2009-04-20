@@ -40,13 +40,13 @@ public enum EventType
     BEGIN_DOCUMENT {
         void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.beginDocument();
+            listener.beginDocument((Map<String, String>) eventParameters[0]);
         }
     },
     END_DOCUMENT {
         void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.endDocument();
+            listener.endDocument((Map<String, String>) eventParameters[0]);
         }
     },
     BEGIN_PARAGRAPH {

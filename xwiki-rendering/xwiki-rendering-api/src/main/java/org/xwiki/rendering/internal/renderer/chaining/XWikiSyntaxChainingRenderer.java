@@ -115,15 +115,19 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see PrintRenderer#beginDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
      */
     @Override
-    public void beginDocument()
+    public void beginDocument(Map<String, String> parameters)
     {
         // Check if we're starting an embedded document
         if (getXWikiSyntaxListenerChain().getDocumentStateChainingListener().getDocumentDepth() > 1) {
             if (!getBlockState().isInLine()) {
                 printEmptyLine();
+            }
+
+            if (parameters.size() > 0) {
+                printParameters(parameters, true);
             }
 
             print("(((");
@@ -136,10 +140,10 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.PrintRenderer#endDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map)
      */
     @Override
-    public void endDocument()
+    public void endDocument(Map<String, String> parameters)
     {
         // Ensure that all data in the escape printer have been flushed
         getXWikiPrinter().flush();

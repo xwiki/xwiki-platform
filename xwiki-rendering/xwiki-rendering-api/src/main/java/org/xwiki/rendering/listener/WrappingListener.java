@@ -35,21 +35,21 @@ public class WrappingListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDocument()
+     * @see org.xwiki.rendering.listener.Listener#beginDocument(java.util.Map)
      */
-    public void beginDocument()
+    public void beginDocument(Map<String, String> parameters)
     {
-        this.listener.beginDocument();
+        this.listener.beginDocument(parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDocument()
+     * @see org.xwiki.rendering.listener.Listener#endDocument(java.util.Map)
      */
-    public void endDocument()
+    public void endDocument(Map<String, String> parameters)
     {
-        this.listener.endDocument();
+        this.listener.endDocument(parameters);
     }
 
     /**

@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.listener.chaining;
 
+import java.util.Map;
+
 /**
  * Provides information on document state: whether we are inside a document, an embedded document and the depth of
  * embedding. Note that this listener is separated from the
@@ -57,24 +59,26 @@ public class DocumentStateChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
      */
     @Override
-    public void beginDocument()
+    public void beginDocument(Map<String, String> parameters)
     {
         ++this.documentDepth;
-        super.beginDocument();
+
+        super.beginDocument(parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map)
      */
     @Override
-    public void endDocument()
+    public void endDocument(Map<String, String> parameters)
     {
-        super.endDocument();
+        super.endDocument(parameters);
+
         --this.documentDepth;
     }
 }

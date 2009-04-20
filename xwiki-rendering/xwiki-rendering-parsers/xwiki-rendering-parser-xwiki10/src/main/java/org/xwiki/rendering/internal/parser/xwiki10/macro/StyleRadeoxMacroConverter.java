@@ -55,7 +55,7 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
     {
         StringBuffer result = new StringBuffer();
 
-        boolean inline = parameters.get("type").equals("span");
+        boolean inline = parameters.get("type") != null && parameters.get("type").getValue().equals("span");
 
         // Print parameters
         StringBuffer parametersOpen = new StringBuffer();

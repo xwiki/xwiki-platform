@@ -19,6 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.gwt.dom.client.Element;
+
+import com.google.gwt.dom.client.Document;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
 /**
@@ -34,11 +40,81 @@ public class MacroCallTest extends AbstractWysiwygClientTest
      */
     public void testParseStartMacroComment()
     {
-        MacroCall call = new MacroCall("startmacro:html|-| a =  \"1\\\"2|-|3=\\\\\\\"4\\\\\" b=\"\"|-|=\"|-|\\");
-        assertEquals("html", call.getName());
-        assertEquals("=\"|-|\\", call.getContent());
-        assertEquals("1\"2|-|3=\\\"4\\", call.getArgument("a"));
-        assertEquals("", call.getArgument("b"));
-        assertEquals("startmacro:html|-|a=\"1\\\"2|-|3=\\\\\\\"4\\\\\" b=\"\" |-|=\"|-|\\", call.toString());
+        Map<String, String> args = new HashMap<String, String>();
+        args.put("a", "1\"2|-|3=\\\"4\\");
+        args.put("b", "");
+        testSerializeAndDeserialize("html", "=\"|-|\\", args);
+    }
+
+    /**
+     * Tests if the start macro comment is parsed correctly when it contains the {@code --} sequence.
+     */
+    public void testParseStartMacroCommentWithDashes()
+    {
+        testSerializeAndDeserialize("a--b\\c\\\\d-");
+        testSerializeAndDeserialize("a--b-c\\\\d\\");
+    }
+
+    /**
+     * Tests if the case used in parameter names is kept.
+     */
+    public void testKeepParameterNameCase()
+    {
+        MacroCall call = new MacroCall();
+        call.setName("box");
+        call.setContent("");
+
+        String sTaRt = "sTaRt";
+        String stArt = "stArt";
+
+        call.setArgument(sTaRt, "1");
+        assertEquals("1", call.getArgument(stArt));
+
+        call.setArgument(stArt, "2");
+        assertEquals("2", call.getArgument(sTaRt));
+
+        assertEquals("startmacro:box|-|sTaRt=\"2\" |-|", call.toString());
+    }
+
+    /**
+     * Tests if a {@link MacroCall} instance keeps its fields after serialization and deserialization. The given text is
+     * used to fill all the macro call fields.
+     * 
+     * @param text the text used to fill all the macro call fields
+     */
+    private void testSerializeAndDeserialize(String text)
+    {
+        Map<String, String> args = new HashMap<String, String>();
+        args.put(text, text);
+        testSerializeAndDeserialize(text, text, args);
+    }
+
+    /**
+     * Tests if a {@link MacroCall} instance keeps its fields after serialization and deserialization. The
+     * {@link MacroCall} instance is created based on the specified fields.
+     * 
+     * @param name the macro name
+     * @param content the macro content
+     * @param args the map of macro cal arguments
+     */
+    private void testSerializeAndDeserialize(String name, String content, Map<String, String> args)
+    {
+        MacroCall call = new MacroCall();
+        call.setName(name);
+        call.setContent(content);
+        for (Map.Entry<String, String> entry : args.entrySet()) {
+            call.setArgument(entry.getKey(), entry.getValue());
+        }
+
+        Element container = Document.get().createSpanElement().cast();
+        container.setInnerHTML("before<!--" + call.toString() + "-->after");
+        assertEquals(3, container.getChildNodes().getLength());
+
+        call = new MacroCall(container.getChildNodes().getItem(1).getNodeValue());
+        assertEquals(name, call.getName());
+        assertEquals(content, call.getContent());
+        for (Map.Entry<String, String> entry : args.entrySet()) {
+            assertEquals(entry.getValue(), call.getArgument(entry.getKey()));
+        }
     }
 }

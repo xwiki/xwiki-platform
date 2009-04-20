@@ -45,9 +45,14 @@ public class MacroCall
     private String name;
 
     /**
-     * The arguments passed to the macro.
+     * The values of the arguments passed to the macro.
      */
-    private final Map<String, String> arguments = new HashMap<String, String>();
+    private final Map<String, String> argumentValues = new HashMap<String, String>();
+
+    /**
+     * The case sensitive names of the arguments passed to the macro.
+     */
+    private final Map<String, String> argumentNames = new HashMap<String, String>();
 
     /**
      * The content of the macro.
@@ -70,40 +75,42 @@ public class MacroCall
      */
     public MacroCall(String startMacroComment)
     {
+        // Unescape the text of the start macro comment.
+        String text = unescape(startMacroComment);
+
         // Extract macro name.
         int start = START_MACRO.length();
-        int end = startMacroComment.indexOf(SEPARATOR, start);
-        name = startMacroComment.substring(start, end);
+        int end = text.indexOf(SEPARATOR, start);
+        name = text.substring(start, end);
 
         // Extract macro arguments.
         // Look for the first argument.
         start = end + SEPARATOR.length();
-        int equalIndex = startMacroComment.indexOf('=', start);
-        int separatorIndex = startMacroComment.indexOf(SEPARATOR, start);
+        int equalIndex = text.indexOf('=', start);
+        int separatorIndex = text.indexOf(SEPARATOR, start);
         while (equalIndex < separatorIndex && equalIndex > 0) {
-            String argumentName = startMacroComment.substring(start, equalIndex).trim();
+            String argumentName = text.substring(start, equalIndex).trim();
 
             // Opening quote.
-            start = startMacroComment.indexOf('"', equalIndex + 1) + 1;
+            start = text.indexOf('"', equalIndex + 1) + 1;
             // Look for the closing quote.
             end = start;
             boolean escaped = false;
-            while (escaped || startMacroComment.charAt(end) != '"') {
-                escaped = !escaped && '\\' == startMacroComment.charAt(end);
+            while (escaped || text.charAt(end) != '"') {
+                escaped = !escaped && '\\' == text.charAt(end);
                 end++;
             }
 
-            String argumentValue = startMacroComment.substring(start, end);
-            arguments.put(argumentName, unescape(argumentValue));
+            setArgument(argumentName, unescape(text.substring(start, end)));
 
             // Look for the next argument.
             start = end + 1;
-            equalIndex = startMacroComment.indexOf('=', start);
-            separatorIndex = startMacroComment.indexOf(SEPARATOR, start);
+            equalIndex = text.indexOf('=', start);
+            separatorIndex = text.indexOf(SEPARATOR, start);
         }
 
         // Extract macro content.
-        content = startMacroComment.substring(separatorIndex + SEPARATOR.length());
+        content = text.substring(separatorIndex + SEPARATOR.length());
     }
 
     /**
@@ -130,7 +137,7 @@ public class MacroCall
      */
     public String getArgument(String name)
     {
-        return arguments.get(name);
+        return argumentValues.get(name.toLowerCase());
     }
 
     /**
@@ -142,7 +149,15 @@ public class MacroCall
      */
     public String setArgument(String name, String value)
     {
-        return arguments.put(name, value);
+        String id = name.toLowerCase();
+        // If the name is case sensitive and it hasn't been set before, store it.
+        // We don't overwrite argument names because we don't want to loose their Wiki syntax form over macro edit in
+        // WYSIWYG mode. For instance, if a user writes {{toc sTaRt="1"/}} we should keep the case of the parameter name
+        // over macro edit.
+        if (!id.equals(name) && !argumentNames.containsKey(id)) {
+            argumentNames.put(id, name);
+        }
+        return argumentValues.put(id, value);
     }
 
     /**
@@ -153,7 +168,9 @@ public class MacroCall
      */
     public String removeArgument(String name)
     {
-        return arguments.remove(name);
+        String id = name.toLowerCase();
+        argumentNames.remove(id);
+        return argumentValues.remove(id);
     }
 
     /**
@@ -184,38 +201,81 @@ public class MacroCall
         StringBuffer strBuff = new StringBuffer(START_MACRO);
         strBuff.append(getName());
         strBuff.append(SEPARATOR);
-        for (Map.Entry<String, String> entry : arguments.entrySet()) {
-            strBuff.append(entry.getKey());
+        for (Map.Entry<String, String> entry : argumentValues.entrySet()) {
+            String argumentName = argumentNames.get(entry.getKey());
+            if (argumentName == null) {
+                argumentName = entry.getKey();
+            }
+            strBuff.append(argumentName);
             strBuff.append("=\"");
-            strBuff.append(escape(entry.getValue()));
+            strBuff.append(escapeMacroParameterValue(entry.getValue()));
             strBuff.append("\" ");
         }
         strBuff.append(SEPARATOR);
         strBuff.append(getContent());
 
-        return strBuff.toString();
+        return escapeComment(strBuff.toString());
     }
 
     /**
-     * Escapes {@code \} and {@code "} symbols in the given string, which usually is the value entered by the user for
-     * some macro parameter.
+     * Escapes the quotes inside a macro parameter value.
      * 
      * @param value the string to be escaped
      * @return the escaped string
      */
-    private String escape(String value)
+    private String escapeMacroParameterValue(String value)
     {
         return value.replaceAll("([\\\\\\\"])", "\\\\$1");
     }
 
     /**
-     * Unescapes {@code \} and {@code "} symbols in the given string before letting the user edit it.
+     * Unescapes characters escaped with backslash.
      * 
-     * @param value the string to be unescaped
-     * @return the unescaped string
+     * @param text the text to be unescaped
+     * @return the unescaped text
      */
-    private String unescape(String value)
+    private String unescape(String text)
     {
-        return value.replaceAll("\\\\([\\\\\\\"])", "$1");
+        StringBuffer result = new StringBuffer();
+        boolean escaped = false;
+        for (char c : text.toCharArray()) {
+            if (!escaped && c == '\\') {
+                escaped = true;
+                continue;
+            }
+
+            result.append(c);
+            escaped = false;
+        }
+        return result.toString();
+    }
+
+    /**
+     * Escapes the {@code --} sequence before setting the text of a comment DOM node.
+     * 
+     * @param text the text that needs to be put in a comment node
+     * @return the escaped text, which will be put in a comment node
+     */
+    private String escapeComment(String text)
+    {
+        StringBuffer result = new StringBuffer();
+        char lastChar = 0;
+        for (char c : text.toCharArray()) {
+            if (c == '\\') {
+                // Escape the backslash (the escaping character).
+                result.append('\\');
+            } else if (c == '-' && lastChar == '-') {
+                // Escape the second short dash.
+                result.append('\\');
+            }
+
+            result.append(c);
+            lastChar = c;
+        }
+        if (lastChar == '-') {
+            // If the comment data ends with a short dash, add an escaping character.
+            result.append('\\');
+        }
+        return result.toString();
     }
 }

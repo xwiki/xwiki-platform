@@ -94,8 +94,11 @@ document.observe('dom:loaded', function() {
 if (typeof(XWiki) == 'undefined') {
   XWiki = new Object();
 }
+if (typeof(XWiki.dataEditors) == 'undefined') {
+  XWiki.dataEditors = new Object();
+}
 
-XWiki.XPropertyOrdering = Class.create({
+XWiki.dataEditors.XPropertyOrdering = Class.create({
   initialize : function() {
     // Hide the property number, as ordering can be done by drag and drop
     $$('.xproperty-content').each(function(item) {
@@ -163,6 +166,6 @@ XWiki.XPropertyOrdering = Class.create({
 
 document.observe('dom:loaded', function() {
   if($('xclassContent')) {
-    new XWiki.XPropertyOrdering();
+    new XWiki.dataEditors.XPropertyOrdering();
   }
 });

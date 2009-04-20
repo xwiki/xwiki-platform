@@ -1,102 +1,27 @@
+### Buttons displayed in the edit interface: cancel, preview (when enabled), save and continue, save and view.
 ###
-###
-###
-#set($param = "")
-#if ($sectionNumber && ($sectionNumber != 0))
-   #set($param = "section=$sectionNumber")
-#end
-#if((!$showactions)||($showactions==1))
-#set($keyboardShortcutsEnabled = ($editor!="wysiwyg"))
-<script type="text/javascript">
-// <![CDATA[
-function checkDocumentContent() {
-#if($xwiki.isEditCommentSuggested()||$xwiki.isEditCommentMandatory())
- #if($xwiki.isEditCommentMandatory())
-  var commentField = document.forms.${formname}.comment
-  while (commentField.value=="") {
-    commentField.value = prompt("${msg.get("core.comment.prompt")}");
-  }
- #else
-  var commentField = document.forms.${formname}.comment
-  if (commentField.value=="") {
-    commentField.value = prompt("${msg.get("core.comment.prompt")}");
-  }
- #end
-#end
- return true;
-}
-
-function cancelEdit() {
-  document.forms.${formname}.action='$doc.getURL("cancel")';
-  if (document.forms.${formname}.onsubmit) {
-    if (document.forms.${formname}.onsubmit() == false) {
-      return false;
-    }
-  }
-  document.forms.${formname}.submit();
-}
-
-function preview() {
-  document.forms.${formname}.action='$doc.getURL("preview", $param)';
-  if (document.forms.${formname}.onsubmit) {
-    document.forms.${formname}.onsubmit();
-  }
-  if (checkDocumentContent()) {
-    document.forms.${formname}.submit()
-  }
-}
-
-function saveAndContinue() {
-  document.forms.${formname}.action='$doc.getURL("saveandcontinue", $param)';
-  if (document.forms.${formname}.onsubmit) {
-    document.forms.${formname}.onsubmit();
-  }
-  if (checkDocumentContent()) {
-    document.forms.${formname}.submit();
-  }
-}
-
-function saveAndView() {
-  document.forms.${formname}.action='$doc.getURL("${saveaction}", $param)';
-  if (document.forms.${formname}.onsubmit) {
-    document.forms.${formname}.onsubmit();
-  }
-  if (checkDocumentContent()) {
-    document.forms.${formname}.submit();
-  }
-}
-// ]]>
-</script>
-
-#if((!$tdoc.isNew())&&(!$minorFieldAdded)&&($xwiki.hasMinorEdit()))
-#set($minorFieldAdded = 1)
-$msg.get("core.minoredit"): <input type="checkbox" name="minorEdit" />
-#end
-
-#if((!$commentFieldAdded)&&($xwiki.hasEditComment()))
-#set($commentFieldAdded = 1)
-#if($xwiki.isEditCommentFieldHidden())
-<input type="hidden" name="comment" value="" size="80" />
-#else
-$msg.get("core.comment"): <input type="text" name="comment" value="" size="80" />
-#end
-#end
-
-<div>
-  <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" #if ($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.cancel")"#end value="$msg.get("cancel")" onclick="cancelEdit();"/></span>
-#if($previewenabled)  <span class="buttonwrapper"><input class="button" type="submit" name="formactionpreview" #if ($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.preview")"#end value="$msg.get("preview")" onclick="preview(); return false;"/></span>
-#end
-  <span class="buttonwrapper"><input class="button" type="submit" name="formactionsac" #if ($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.saveandcontinue")"#end value="$msg.get("saveandcontinue")" onclick="saveAndContinue(); return false;"/></span>
-  <span class="buttonwrapper"><input class="button" type="submit" name="formactionsave" #if ($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.saveandview")"#end value="$msg.get("saveandview")" onclick="saveAndView(); return false;"/></span>
-  #if($keyboardShortcutsEnabled)
-    <script type="text/javascript">
-    //<![CDATA[
-      shortcut.add("$msg.get("core.shortcuts.edit.cancel")",function() { cancelEdit(); }, {'propagate':false} );
-      #if($previewenabled) shortcut.add("$msg.get("core.shortcuts.edit.preview")",function() { preview(); }, {'propagate':false} ); #end
-      shortcut.add("$msg.get("core.shortcuts.edit.saveandcontinue")",function() { saveAndContinue(); }, {'propagate':false} );
-      shortcut.add("$msg.get("core.shortcuts.edit.saveandview")",function() { saveAndView(); }, {'propagate':false} );
-    //]]>
-    </script>
+#if("$!showactions" != '0')
+  #set($keyboardShortcutsEnabled = ($editor!="wysiwyg"))
+  ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
+  <div class="metamodifs">
+  <input type="hidden" name="xeditaction" value="$!editaction"/>
+  #if((!$tdoc.isNew()) && (!$minorFieldAdded) && ($xwiki.hasMinorEdit()))
+    #set($minorFieldAdded = 1)
+    $msg.get("core.minoredit"): <input type="checkbox" name="minorEdit" #if($request.minorEdit)checked="checked" #end/>
   #end
-</div>
+  #if((!$commentFieldAdded)&&($xwiki.hasEditComment()))
+    #set($commentFieldAdded = 1)
+    #if($xwiki.isEditCommentFieldHidden())
+      <input type="hidden" name="comment" value="$!{request.comment}" />
+    #else
+      $msg.get("core.comment"): <input type="text" name="comment" value="$!{request.comment}" size="40" title="Enter a brief description of the modification" />
+    #end
+  #end
+  </div> ## metamodifs
+  <div class="buttons">
+    #editActionButton('cancel', 'cancel')
+    #if($previewenabled) #editActionButton('preview', 'preview') #end
+    #editActionButton('saveandcontinue', 'saveandcontinue')
+    #editActionButton('save', 'saveandview')
+  </div> ## buttons
 #end

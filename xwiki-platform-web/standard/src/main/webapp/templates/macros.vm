@@ -1347,3 +1347,26 @@ $html
     #set($variable = $defaultValue)
   #end
 #end
+#**
+ * Displays a submit button, i.e. an <tt>input</tt> element with <tt>type=submit</tt>.
+ * For styling purposes, the button is wrapped in a span element.
+ * @param name The value of the <tt>name</tt> attribute
+ * @param shortcut The keyboard shortcut for this button. The value will be displayed
+ *        as the title of the element. The actual shortcut is attached elsewhere, in
+ *        the javascript code.
+ * @param value The value of the <tt>value</tt> attribute, i.e. the text displayed on
+ *        the button.
+ *#
+#macro(submitButton $name $shortcut $value)
+<span class="buttonwrapper"><input class="button" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/></span>
+#end
+#**
+ * Dsiplays a submit button for the editor. This macro calls submitButton,
+ * composing all its parameters based on the action's identifier and the 
+ * the identifier of the corresponding localized resources.
+ * @param action The identifier of the button's action.
+ * @param resourceIdentifier The key used to identify the localized resources.
+ *#
+#macro(editActionButton $action $resourceIdentifier)
+#submitButton("action_${action}", $msg.get("core.shortcuts.edit.${resourceIdentifier}"), $msg.get($resourceIdentifier))
+#end

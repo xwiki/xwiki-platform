@@ -1,3 +1,5 @@
+$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
+$xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div class="topbuttons">#template("previewactions.vm")</div>

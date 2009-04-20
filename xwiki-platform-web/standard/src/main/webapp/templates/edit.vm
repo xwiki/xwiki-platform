@@ -6,6 +6,8 @@
 ##
 ## Determine what editor to show
 ##
+$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
+$xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #if((!$editor) || ($editor == ""))
 #set($editor = $request.getParameter("editor"))
 #if((!$editor) || ($editor == ""))

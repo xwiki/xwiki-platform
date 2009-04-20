@@ -33,6 +33,7 @@ XWiki.actionButtons.EditActions = Class.create({
       'action_edit' : "$msg.get('core.shortcuts.edit.backtoedit')",
       'action_inline' : "$msg.get('core.shortcuts.edit.backtoedit')",
       'action_save' : "$msg.get('core.shortcuts.edit.saveandview')",
+      'action_propupdate' : "$msg.get('core.shortcuts.edit.saveandview')",
       'action_saveandcontinue' : "$msg.get('core.shortcuts.edit.saveandcontinue')"
     }
     for (var key in shortcuts) {
@@ -146,7 +147,7 @@ XWiki.actionButtons.EditActions.AjaxSaveAndContinue = Class.create({
       this.failedBox.hide();
       this.savingBox.show();
       this.showMessage();
-      var formData = new Hash(event.element().serialize({hash: true, submit: 'action_save'}));
+      var formData = new Hash(event.element().serialize({hash: true, submit: 'action_saveandcontinue'}));
       if (!Prototype.Browser.Opera) {
         // Opera can't handle properly 204 responses.
         formData.set('ajax', 'true');

@@ -22,6 +22,6 @@
     #editActionButton('cancel', 'cancel')
     #if($previewenabled) #editActionButton('preview', 'preview') #end
     #editActionButton('saveandcontinue', 'saveandcontinue')
-    #editActionButton('save', 'saveandview')
+    #editActionButton($saveaction, 'saveandview')
   </div> ## buttons
 #end

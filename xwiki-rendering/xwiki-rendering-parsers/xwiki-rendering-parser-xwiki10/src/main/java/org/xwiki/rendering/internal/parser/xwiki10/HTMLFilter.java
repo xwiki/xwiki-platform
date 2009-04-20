@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -30,7 +29,7 @@ import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 
 /**
- * Register all Velocity comments in order to protect them from following filters.
+ * Add needed HTML open and close macro.
  * 
  * @version $Id$
  * @since 1.8M1
@@ -38,13 +37,21 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 @Component("htmlmacro")
 public class HTMLFilter extends AbstractFilter implements Initializable
 {
-    public static final String HTML_PATTERN = "(\\<!--)|(--\\>)|([\\<\\>])";
+    public static final String HTML_SPATTERN = "(\\<!--)|(--\\>)|([\\<\\>])";
 
-    public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN);
+    public static final Pattern HTML_PATTERN = Pattern.compile(HTML_SPATTERN);
 
-    public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
+    public static final String HTMLOPEN_SUFFIX = "htmlopen";
 
-    public static final Pattern HTMLVELOCITY_PATTERN = Pattern.compile(HTML_PATTERN);
+    public static final String HTMLCLOSE_SUFFIX = "htmlclose";
+
+    public static final String HTMLOPEN_SPATTERN =
+        "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + HTMLOPEN_SUFFIX + "[\\d]+"
+            + FilterContext.XWIKI1020TOKEN_CP + ")";
+
+    public static final String HTMLCLOSE_SPATTERN =
+        "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + HTMLCLOSE_SUFFIX + "[\\d]+"
+            + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     /**
      * {@inheritDoc}
@@ -65,9 +72,9 @@ public class HTMLFilter extends AbstractFilter implements Initializable
     public String filter(String content, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
-        Matcher matcher = HTMLVELOCITY_PATTERN.matcher(content);
 
-        int currentIndex = 0;
+        Matcher matcher = HTML_PATTERN.matcher(content);
+
         boolean inHTMLMacro = false;
         boolean inHTMLComment = false;
 
@@ -75,16 +82,18 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         boolean velocityCloseBefore = false;
 
         StringBuffer htmlContent = new StringBuffer();
+
+        int currentIndex = 0;
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = content.substring(currentIndex, matcher.start());
 
             if (!inHTMLMacro) {
-                Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(before);
+                Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(before);
                 velocityOpenBefore = velocityOpenMatcher.find();
-                Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(before);
+                Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(before);
                 velocityCloseBefore = velocityCloseMatcher.find();
 
-                result.append(unescapeNonHtmlContent(before));
+                result.append(before);
             } else {
                 htmlContent.append(before);
             }
@@ -103,14 +112,14 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         }
 
         if (currentIndex == 0) {
-            return unescapeNonHtmlContent(content);
+            return content;
         }
 
         // clean html content
-        Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(htmlContent);
+        Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(htmlContent);
         boolean velocityOpen = velocityOpenMatcher.find();
         String cleanedHtmlContent = velocityOpenMatcher.replaceAll("");
-        Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(cleanedHtmlContent);
+        Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(cleanedHtmlContent);
         boolean velocityClose = velocityCloseMatcher.find();
         cleanedHtmlContent = velocityCloseMatcher.replaceAll("");
 
@@ -133,24 +142,20 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         }
 
         if (currentIndex < content.length()) {
-            result.append(unescapeNonHtmlContent(content.substring(currentIndex)));
+            result.append(content.substring(currentIndex));
         }
 
         return result.toString();
     }
 
-    private String unescapeNonHtmlContent(String content)
-    {
-        return StringEscapeUtils.unescapeHtml(content);
-    }
-
     public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent("{{html wiki=true}}" + (nl ? "\n" : ""), false));
+        result.append(filterContext
+            .addProtectedContent("{{html wiki=true}}" + (nl ? "\n" : ""), HTMLOPEN_SUFFIX, false));
     }
 
     public static void appendHTMLClose(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/html}}", false));
+        result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/html}}", HTMLCLOSE_SUFFIX, false));
     }
 }

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -66,78 +67,14 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VelocityFilter.VELOCITYCLOSE_SUFFIX
             + "[\\d]+" + FilterContext.XWIKI1020TOKEN_CP + ")";
 
+    public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN);
+
+    public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
+
     /**
      * Used to lookup macros converters.
      */
     private ComponentManager componentManager;
-
-    private static class VelocityFilterContext
-    {
-        private boolean velocity = false;
-
-        private boolean inline = true;
-
-        private boolean conversion = false;
-
-        private int velocityDepth = 0;
-
-        private FilterContext filterContext;
-
-        public VelocityFilterContext(FilterContext filterContext)
-        {
-            this.filterContext = filterContext;
-        }
-
-        public boolean isVelocity()
-        {
-            return this.velocity;
-        }
-
-        public void setVelocity(boolean velocity)
-        {
-            this.velocity = velocity;
-        }
-
-        public boolean isConversion()
-        {
-            return this.conversion;
-        }
-
-        public void setConversion(boolean conversion)
-        {
-            this.conversion = conversion;
-        }
-
-        public boolean isInline()
-        {
-            return this.inline;
-        }
-
-        public void setInline(boolean inline)
-        {
-            this.inline = inline;
-        }
-
-        public int getVelocityDepth()
-        {
-            return this.velocityDepth;
-        }
-
-        public void pushVelocityDepth()
-        {
-            ++this.velocityDepth;
-        }
-
-        public void popVelocityDepth()
-        {
-            --this.velocityDepth;
-        }
-
-        public FilterContext getFilterContext()
-        {
-            return this.filterContext;
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -673,5 +610,73 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
     {
         result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/html}}" + (nl ? "\n" : "")
             + "{{/velocity}}", VELOCITYCLOSE_SUFFIX, true));
+    }
+
+    private static class VelocityFilterContext
+    {
+        private boolean velocity = false;
+
+        private boolean inline = true;
+
+        private boolean conversion = false;
+
+        private int velocityDepth = 0;
+
+        private FilterContext filterContext;
+
+        public VelocityFilterContext(FilterContext filterContext)
+        {
+            this.filterContext = filterContext;
+        }
+
+        public boolean isVelocity()
+        {
+            return this.velocity;
+        }
+
+        public void setVelocity(boolean velocity)
+        {
+            this.velocity = velocity;
+        }
+
+        public boolean isConversion()
+        {
+            return this.conversion;
+        }
+
+        public void setConversion(boolean conversion)
+        {
+            this.conversion = conversion;
+        }
+
+        public boolean isInline()
+        {
+            return this.inline;
+        }
+
+        public void setInline(boolean inline)
+        {
+            this.inline = inline;
+        }
+
+        public int getVelocityDepth()
+        {
+            return this.velocityDepth;
+        }
+
+        public void pushVelocityDepth()
+        {
+            ++this.velocityDepth;
+        }
+
+        public void popVelocityDepth()
+        {
+            --this.velocityDepth;
+        }
+
+        public FilterContext getFilterContext()
+        {
+            return this.filterContext;
+        }
     }
 }

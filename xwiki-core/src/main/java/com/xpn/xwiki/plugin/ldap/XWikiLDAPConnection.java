@@ -21,7 +21,6 @@
 
 package com.xpn.xwiki.plugin.ldap;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -86,14 +85,10 @@ public class XWikiLDAPConnection
         // open LDAP
         int ldapPort = config.getLDAPPort(context);
         String ldapHost = config.getLDAPParam("ldap_server", "localhost", context);
-        String bindDNFormat = config.getLDAPParam("ldap_bind_DN", "{0}", context);
-        String bindPasswordFormat = config.getLDAPParam("ldap_bind_pass", "{1}", context);
-
-        Object[] arguments = {ldapUserName, password};
 
         // allow to use the given user and password also as the LDAP bind user and password
-        String bindDN = MessageFormat.format(bindDNFormat, arguments);
-        String bindPassword = MessageFormat.format(bindPasswordFormat, arguments);
+        String bindDN = config.getLDAPBindDN(ldapUserName, password, context);
+        String bindPassword = config.getLDAPBindPassword(ldapUserName, password, context);
 
         boolean bind;
         if ("1".equals(config.getLDAPParam("ldap_ssl", "0", context))) {
@@ -202,7 +197,7 @@ public class XWikiLDAPConnection
      * @throws UnsupportedEncodingException error when converting provided password to UTF-8 table.
      * @throws LDAPException error when trying to bind.
      */
-    private void bind(String loginDN, String password) throws UnsupportedEncodingException, LDAPException
+    public void bind(String loginDN, String password) throws UnsupportedEncodingException, LDAPException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Binding to LDAP server with credentials login=[" + loginDN + "]");
@@ -353,11 +348,11 @@ public class XWikiLDAPConnection
                 LOG.debug("  - values for attribute \"" + attributeName + "\"");
             }
 
-            Enumeration allValues = attribute.getStringValues();
+            Enumeration<String> allValues = attribute.getStringValues();
 
             if (allValues != null) {
                 while (allValues.hasMoreElements()) {
-                    String value = (String) allValues.nextElement();
+                    String value = allValues.nextElement();
 
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("    |- [" + value + "]");

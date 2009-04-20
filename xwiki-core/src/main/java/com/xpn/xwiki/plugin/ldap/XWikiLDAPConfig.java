@@ -1,6 +1,7 @@
 package com.xpn.xwiki.plugin.ldap;
 
 import java.security.Provider;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -279,7 +280,7 @@ public final class XWikiLDAPConfig
 
         return port;
     }
-    
+
     /**
      * Get mapping between XWiki groups names and LDAP groups names.
      * 
@@ -374,5 +375,50 @@ public final class XWikiLDAPConfig
         } catch (Exception e) {
             return (int) context.getWiki().ParamAsLong("xwiki.authentication.ldap.groupcache_expiration", 21800);
         }
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return the pattern to resolve to find the password to use to connect to LDAP server. It is based on
+     *         {@link MessageFormat}.
+     * @see MessageFormat#format(String, Object...)
+     * @see #getLDAPBindDN(String, String, XWikiContext)
+     */
+    public String getLDAPBindDN(XWikiContext context)
+    {
+        return getLDAPParam("ldap_bind_DN", "{0}", context);
+    }
+
+    /**
+     * @param login the login provided by the user
+     * @param password the password provided by the user
+     * @param context the XWiki context.
+     * @return the login to use to connect to LDAP server.
+     */
+    public String getLDAPBindDN(String login, String password, XWikiContext context)
+    {
+        return MessageFormat.format(getLDAPBindDN(context), login, password);
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return the pattern to resolve to find the password to use to connect to LDAP server.
+     * @see MessageFormat#format(String, Object...)
+     * @see #getLDAPBindPassword(String, String, XWikiContext)
+     */
+    public String getLDAPBindPassword(XWikiContext context)
+    {
+        return getLDAPParam("ldap_bind_pass", "{1}", context);
+    }
+
+    /**
+     * @param login the login provided by the user
+     * @param password the password provided by the user
+     * @param context the XWiki context.
+     * @return the password to use to connect to LDAP server.
+     */
+    public String getLDAPBindPassword(String login, String password, XWikiContext context)
+    {
+        return MessageFormat.format(getLDAPBindPassword(context), login, password);
     }
 }

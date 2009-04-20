@@ -400,11 +400,16 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                     "LDAP authentication failed:" + " could not validate the password: wrong password for " + ldapDn);
             }
         } else {
-            String bindDNFormat = config.getLDAPParam("ldap_bind_DN", "{0}", context);
-            String bindDN = MessageFormat.format(bindDNFormat, new Object[] {ldapUid});
+            String bindDNFormat = config.getLDAPBindDN(context);
+            String bindDN = config.getLDAPBindDN(ldapUid, password, context);
 
-            if (!ldapDn.equals(bindDN)) {
-                connector.getConnection().bind(LDAPConnection.LDAP_V3, ldapDn, password.getBytes("UTF8"));
+            if (bindDNFormat.equals(bindDN)) {
+                // Validate user credentials
+                connector.bind(ldapDn, password);
+
+                // Rebind admin user
+                connector.bind(bindDN, config.getLDAPBindPassword(ldapUid, password, context));
+
             }
         }
 
@@ -759,8 +764,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             content = "#includeForm(\"XWiki.XWikiUserSheet\")";
             syntaxId = XWikiDocument.XWIKI10_SYNTAXID;
         }
-        
-        context.getWiki().createUser(userProfile.getName(), map, userClass.getName(), content, syntaxId, "edit", 
+
+        context.getWiki().createUser(userProfile.getName(), map, userClass.getName(), content, syntaxId, "edit",
             context);
 
         // Update ldap profile object

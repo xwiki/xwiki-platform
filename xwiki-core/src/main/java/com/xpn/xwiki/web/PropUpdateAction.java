@@ -20,10 +20,12 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,6 +41,7 @@ public class PropUpdateAction extends XWikiAction
         XWiki xwiki = context.getWiki();
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
+        XWikiMessageTool msg = context.getMessageTool();
 
         // Prepare new class
         BaseClass bclass = doc.getxWikiClass();
@@ -46,56 +49,58 @@ public class PropUpdateAction extends XWikiAction
         bclass2.setFields(new HashMap());
 
         // Prepare a Map for field renames
-        Map fieldsToRename = new HashMap();
+        Map<String, String> fieldsToRename = new HashMap<String, String>();
 
-        Iterator it = bclass.getFieldList().iterator();
-        while (it.hasNext()) {
-            PropertyClass origproperty = (PropertyClass) it.next();
-            PropertyClass property = (PropertyClass) origproperty.clone();
-            String name = property.getName();
-            Map map = ((EditForm) form).getObject(name);
-            property.getxWikiClass(context).fromMap(map, property);
-            String newname = property.getName();
+        for (PropertyClass originalProperty : (Collection<PropertyClass>) bclass.getFieldList()) {
+            PropertyClass newProperty = (PropertyClass) originalProperty.clone();
+            String name = newProperty.getName();
+            Map<String, ? > map = ((EditForm) form).getObject(name);
+            newProperty.getxWikiClass(context).fromMap(map, newProperty);
+            String newName = newProperty.getName();
 
-            if (newname == null || newname.equals("") || !newname.matches("[\\w\\.\\-\\_]+")) {
+            if (StringUtils.isBlank(newName) || !newName.matches("[\\w\\.\\-\\_]+")) {
                 context.put("message", "propertynamenotcorrect");
                 return true;
             }
 
-            if (newname.indexOf(" ") != -1) {
-                newname = newname.replaceAll(" ", "");
-                property.setName(newname);
+            if (newName.indexOf(" ") != -1) {
+                newName = newName.replaceAll(" ", "");
+                newProperty.setName(newName);
             }
-            bclass2.addField(newname, property);
-            if (!newname.equals(name)) {
-                fieldsToRename.put(name, newname);
-                bclass2.addPropertyForRemoval(origproperty);
+            bclass2.addField(newName, newProperty);
+            if (!newName.equals(name)) {
+                fieldsToRename.put(name, newName);
+                bclass2.addPropertyForRemoval(originalProperty);
             }
         }
 
         doc.setxWikiClass(bclass2);
         doc.renameProperties(bclass.getName(), fieldsToRename);
         doc.setMetaDataDirty(true);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.updateClassProperty"), true, context);
+        xwiki.saveDocument(doc, msg.get("core.comment.updateClassProperty"), true, context);
 
         // We need to load all documents that use this property and rename it
         if (fieldsToRename.size() > 0) {
-            List list =
+            List<String> list =
                 xwiki.getStore().searchDocumentsNames(
-                    ", BaseObject as obj where obj.name=" + xwiki.getFullNameSQL() + " and obj.className='"
-                        + Utils.SQLFilter(bclass.getName()) + "' and " + xwiki.getFullNameSQL() + "<> '"
+                    ", BaseObject as obj where obj.name=doc.fullName and obj.className='"
+                        + Utils.SQLFilter(bclass.getName()) + "' and doc.fullName <> '"
                         + Utils.SQLFilter(bclass.getName()) + "'", context);
-            for (int i = 0; i < list.size(); i++) {
-                XWikiDocument doc2 = xwiki.getDocument((String) list.get(i), context);
+            for (String docName : list) {
+                XWikiDocument doc2 = xwiki.getDocument(docName, context);
                 doc2.renameProperties(bclass.getName(), fieldsToRename);
-                xwiki.saveDocument(doc2, context.getMessageTool().get("core.comment.updateClassPropertyName"), true,
-                    context);
+                xwiki.saveDocument(doc2, msg.get("core.comment.updateClassPropertyName"), true, context);
             }
         }
         xwiki.flushCache();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#action(XWikiContext)
+     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -113,6 +118,11 @@ public class PropUpdateAction extends XWikiAction
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#render(XWikiContext)
+     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

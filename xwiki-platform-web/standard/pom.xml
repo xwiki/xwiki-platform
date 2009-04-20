@@ -139,6 +139,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
+            <id>unpack-dependencies</id>
             <!-- Right phase is prepare-package, but it is only in maven-2.1
             <phase>prepare-package</phase>-->
             <phase>test</phase>
@@ -264,8 +265,9 @@
               </includes>
               <!-- Exclude already minified files -->
               <excludes>
-                <exclude>**/*-min.js</exclude>               
+                <exclude>**/*-min.js</exclude>
                 <exclude>**/*-debug.js</exclude>
+                <exclude>**/actionButtons.js</exclude>
                 <exclude>**/langs/*.js</exclude>
                 <exclude>resources/js/smartclient/**</exclude>
               </excludes>

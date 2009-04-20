@@ -27,13 +27,13 @@ XWiki.actionButtons.EditActions = Class.create({
   },
   addShortcuts : function() {
     var shortcuts = {
-      'action_cancel' : '$msg.get('core.shortcuts.edit.cancel')',
-      'action_preview' : '$msg.get('core.shortcuts.edit.preview')',
+      'action_cancel' : "$msg.get('core.shortcuts.edit.cancel')",
+      'action_preview' : "$msg.get('core.shortcuts.edit.preview')",
       // The following 2 are both "Back to edit" in the preview mode, depending on the used editor
-      'action_edit' : '$msg.get('core.shortcuts.edit.backtoedit')',
-      'action_inline' : '$msg.get('core.shortcuts.edit.backtoedit')',
-      'action_save' : '$msg.get('core.shortcuts.edit.saveandview')',
-      'action_saveandcontinue' : '$msg.get('core.shortcuts.edit.saveandcontinue')'
+      'action_edit' : "$msg.get('core.shortcuts.edit.backtoedit')",
+      'action_inline' : "$msg.get('core.shortcuts.edit.backtoedit')",
+      'action_save' : "$msg.get('core.shortcuts.edit.saveandview')",
+      'action_saveandcontinue' : "$msg.get('core.shortcuts.edit.saveandcontinue')"
     }
     for (var key in shortcuts) {
       var targetButtons = $$("input[name=" + key + "]");
@@ -108,19 +108,19 @@ XWiki.actionButtons.EditActions.AjaxSaveAndContinue = Class.create({
     }).hide();
     var innerContainer = new Element('div');
     this.savingBox = new Element('span', { 'class' : 'plainmessage' }).setStyle({
-      background: '#000 url($xwiki.getSkinFile('icons/xwiki/ajax-loader-white.gif')) 8px center no-repeat',
+      background: "#000 url($xwiki.getSkinFile('icons/xwiki/ajax-loader-white.gif')) 8px center no-repeat",
       margin: 'auto',
       padding: '8px 32px',
       color: '#FFF'
     }).update('Saving...').hide();
     this.savedBox = new Element('span').setStyle({
-      background: '#000 url($xwiki.getSkinFile('icons/silk/tick.gif')) 8px center no-repeat',
+      background: "#000 url($xwiki.getSkinFile('icons/silk/tick.gif')) 8px center no-repeat",
       margin: 'auto',
       padding: '8px 32px',
       color: '#FFF'
     }).update('Saved').hide();
     this.failedBox = new Element('span').setStyle({
-      background: '#DDD url($xwiki.getSkinFile('icons/msgerror.png')) 8px center no-repeat',
+      background: "#DDD url($xwiki.getSkinFile('icons/msgerror.png')) 8px center no-repeat",
       margin: 'auto',
       padding: '6px 32px 4px',
       color: '#F00',

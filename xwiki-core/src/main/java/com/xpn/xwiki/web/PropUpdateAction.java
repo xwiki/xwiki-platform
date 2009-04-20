@@ -82,20 +82,21 @@ public class PropUpdateAction extends XWikiAction
         if (fieldsToRename.size() > 0) {
             List list =
                 xwiki.getStore().searchDocumentsNames(
-                    ", BaseObject as obj where obj.name=" + xwiki.getFullNameSQL()
-                        + " and obj.className='" + Utils.SQLFilter(bclass.getName()) + "' and "
-                        + xwiki.getFullNameSQL() + "<> '" + Utils.SQLFilter(bclass.getName())
-                        + "'", context);
+                    ", BaseObject as obj where obj.name=" + xwiki.getFullNameSQL() + " and obj.className='"
+                        + Utils.SQLFilter(bclass.getName()) + "' and " + xwiki.getFullNameSQL() + "<> '"
+                        + Utils.SQLFilter(bclass.getName()) + "'", context);
             for (int i = 0; i < list.size(); i++) {
                 XWikiDocument doc2 = xwiki.getDocument((String) list.get(i), context);
                 doc2.renameProperties(bclass.getName(), fieldsToRename);
-                xwiki.saveDocument(doc2, context.getMessageTool().get("core.comment.updateClassPropertyName"), true, context);
+                xwiki.saveDocument(doc2, context.getMessageTool().get("core.comment.updateClassPropertyName"), true,
+                    context);
             }
         }
         xwiki.flushCache();
         return false;
     }
 
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         try {
@@ -112,6 +113,7 @@ public class PropUpdateAction extends XWikiAction
         return false;
     }
 
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         return "exception";

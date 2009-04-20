@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
+import java.util.Collections;
 import java.util.Stack;
 
 import org.wikimodel.wem.WikiParameter;
@@ -130,14 +131,14 @@ public class XWikiCommentHandler extends CommentHandler
                 .createRenderer(new Syntax(SyntaxType.XWIKI, "2.0"), printer);
         XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.getStackParameter("xdomGeneratorListener");
 
-        renderer.beginDocument();
+        renderer.beginDocument(Collections.<String, String> emptyMap());
         // We make sure we have the right states to have the right escaping but we want only the label so we can't
         // simply traverse a LinkBlock
         ((XWikiSyntaxListenerChain) renderer.getListenerChain()).getBlockStateChainingListener().pushLinkDepth();
         for (Block block : listener.getXDOM().getChildren()) {
             block.traverse(renderer);
         }
-        renderer.endDocument();
+        renderer.endDocument(Collections.<String, String> emptyMap());
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
         String linkComment = this.commentContentStack.pop();

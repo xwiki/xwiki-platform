@@ -51,8 +51,6 @@ import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
  */
 public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
 {
-    private static final String[][] DOCUMENT_DIV_ATTRIBUTES = new String[][] {{"class", "xwiki-document"}};
-
     private XHTMLLinkRenderer linkRenderer;
 
     private XHTMLImageRenderer imageRenderer;
@@ -131,23 +129,27 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#beginDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
      */
     @Override
-    public void beginDocument()
+    public void beginDocument(Map<String, String> parameters)
     {
         if (getDocumentState().getDocumentDepth() > 1) {
-            getXHTMLWikiPrinter().printXMLStartElement("div", DOCUMENT_DIV_ATTRIBUTES);
+            Map<String, String> clonedParameters = new LinkedHashMap<String, String>();
+            clonedParameters.put("class", "xwiki-document");
+            clonedParameters.putAll(parameters);
+
+            getXHTMLWikiPrinter().printXMLStartElement("div", clonedParameters);
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#endDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map)
      */
     @Override
-    public void endDocument()
+    public void endDocument(Map<String, String> parameters)
     {
         if (getDocumentState().getDocumentDepth() > 1) {
             getXHTMLWikiPrinter().printXMLEndElement("div");

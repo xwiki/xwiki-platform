@@ -40,14 +40,14 @@ public class LookaheadChainingListenerTest extends TestCase
     public class TestChainingListener extends AbstractChainingListener
     {
         public int calls = 0;
-        
+
         public TestChainingListener(ListenerChain listenerChain)
         {
             super(listenerChain);
         }
 
         @Override
-        public void beginDocument()
+        public void beginDocument(Map<String, String> parameters)
         {
             this.calls++;
         }
@@ -59,7 +59,7 @@ public class LookaheadChainingListenerTest extends TestCase
         }
 
         @Override
-        public void endDocument()
+        public void endDocument(Map<String, String> parameters)
         {
             this.calls++;
         }
@@ -76,33 +76,33 @@ public class LookaheadChainingListenerTest extends TestCase
         ListenerChain chain = new ListenerChain();
         LookaheadChainingListener listener = new LookaheadChainingListener(chain, 2);
         TestChainingListener testListener = new TestChainingListener(chain);
-        
+
         // The begin document flushes
-        listener.beginDocument();
+        listener.beginDocument(Collections.<String, String> emptyMap());
         assertEquals(1, testListener.calls);
 
         // 1st lookahead, nothing is sent to the test listener
-        listener.beginParagraph(Collections.<String, String>emptyMap());
+        listener.beginParagraph(Collections.<String, String> emptyMap());
         assertEquals(1, testListener.calls);
         assertEquals(EventType.BEGIN_PARAGRAPH, listener.getNextEvent().eventType);
         assertNull(listener.getNextEvent(2));
-        
+
         // 2nd lookahead, nothing is sent to the test listener
-        listener.beginParagraph(Collections.<String, String>emptyMap());
+        listener.beginParagraph(Collections.<String, String> emptyMap());
         assertEquals(1, testListener.calls);
         assertEquals(EventType.BEGIN_PARAGRAPH, listener.getNextEvent().eventType);
         assertEquals(EventType.BEGIN_PARAGRAPH, listener.getNextEvent(2).eventType);
         assertNull(listener.getNextEvent(3));
 
         // 3rd events, the first begin paragraph is sent
-        listener.endParagraph(Collections.<String, String>emptyMap());
+        listener.endParagraph(Collections.<String, String> emptyMap());
         assertEquals(2, testListener.calls);
         assertEquals(EventType.BEGIN_PARAGRAPH, listener.getNextEvent().eventType);
         assertEquals(EventType.END_PARAGRAPH, listener.getNextEvent(2).eventType);
         assertNull(listener.getNextEvent(3));
 
-        // The end document flushes 
-        listener.endDocument();
+        // The end document flushes
+        listener.endDocument(Collections.<String, String> emptyMap());
         assertEquals(5, testListener.calls);
         assertNull(listener.getNextEvent());
     }

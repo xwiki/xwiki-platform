@@ -98,9 +98,9 @@ public class XDOMGeneratorListener implements IWemListener
     private Stack<Integer> currentSectionLevel = new Stack<Integer>();
 
     private int documentLevel = 0;
-    
+
     private IdGenerator idGenerator = new IdGenerator();
-    
+
     private RenderersUtils renderersUtils = new RenderersUtils();
 
     private class MarkerBlock extends AbstractBlock
@@ -151,12 +151,17 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginDocument()
     {
-        if (documentLevel > 0) {
+        beginDocument(WikiParameters.EMPTY);
+    }
+
+    public void beginDocument(WikiParameters params)
+    {
+        if (this.documentLevel > 0) {
             this.stack.push(this.marker);
         }
         this.currentSectionLevel.push(0);
 
-        ++documentLevel;
+        ++this.documentLevel;
     }
 
     /**
@@ -259,17 +264,22 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endDocument()
     {
+        endDocument(WikiParameters.EMPTY);
+    }
+
+    public void endDocument(WikiParameters params)
+    {
         // Close sections
         int sectionLevel = this.currentSectionLevel.peek();
         for (; sectionLevel > 0; --sectionLevel) {
             this.stack.push(new SectionBlock(generateListFromStack()));
         }
 
-        --documentLevel;
+        --this.documentLevel;
 
         this.currentSectionLevel.pop();
-        if (documentLevel > 0) {
-            this.stack.push(new XDOM(generateListFromStack()));
+        if (this.documentLevel > 0) {
+            this.stack.push(new XDOM(generateListFromStack(), convertParameters(params)));
         }
     }
 
@@ -329,9 +339,8 @@ public class XDOMGeneratorListener implements IWemListener
         HeaderLevel headerLevel = HeaderLevel.parseInt(level);
         Map<String, String> parameters = convertParameters(params);
         String id = "H" + this.idGenerator.generateUniqueId(this.renderersUtils.renderPlainText(children));
-        
-        this.stack
-            .push(new HeaderBlock(children, headerLevel, parameters, id));
+
+        this.stack.push(new HeaderBlock(children, headerLevel, parameters, id));
     }
 
     public void endInfoBlock(char infoType, WikiParameters params)

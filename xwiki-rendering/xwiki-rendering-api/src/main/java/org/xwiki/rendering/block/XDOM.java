@@ -24,6 +24,7 @@ import org.xwiki.rendering.util.IdGenerator;
 
 import java.util.List;
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * Contains the full tree of {@link Block} that represent a XWiki Document's content.
@@ -45,6 +46,18 @@ public class XDOM extends AbstractFatherBlock
      * transformation.
      */
     private IdGenerator idGenerator;
+
+    /**
+     * @param childBlocks the list of children blocks of the block to construct
+     * @param parameters the parameters to set
+     * @see AbstractFatherBlock#AbstractFatherBlock(List)
+     */
+    public XDOM(List<Block> childBlocks, Map<String, String> parameters)
+    {
+        super(childBlocks, parameters);
+
+        this.idGenerator = new IdGenerator();
+    }
 
     /**
      * @param childBlocks the list of children blocks of the block to construct
@@ -102,7 +115,7 @@ public class XDOM extends AbstractFatherBlock
      */
     public void before(Listener listener)
     {
-        listener.beginDocument();
+        listener.beginDocument(getParameters());
     }
 
     /**
@@ -112,7 +125,7 @@ public class XDOM extends AbstractFatherBlock
      */
     public void after(Listener listener)
     {
-        listener.endDocument();
+        listener.endDocument(getParameters());
     }
 
     /**

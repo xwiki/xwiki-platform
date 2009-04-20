@@ -94,7 +94,7 @@ public class DoxiaGeneratorListener implements Listener
         }
     }
 
-    public void beginDocument()
+    public void beginDocument(Map<String, String> parameters)
     {
         this.sink.body();
     }
@@ -158,7 +158,7 @@ public class DoxiaGeneratorListener implements Listener
         // TODO: Find out what to do...
     }
 
-    public void endDocument()
+    public void endDocument(Map<String, String> parameters)
     {
         this.sink.body_();
     }

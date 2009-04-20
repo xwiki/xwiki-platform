@@ -15,6 +15,7 @@ org.xwiki.rendering.internal.parser.xwiki10.macro.ImageRadeoxMacroConverter
 org.xwiki.rendering.internal.parser.xwiki10.macro.CodeRadeoxMacroConverter
 org.xwiki.rendering.internal.parser.xwiki10.macro.TableRadeoxMacroConverter
 org.xwiki.rendering.internal.parser.xwiki10.macro.QuoteRadeoxMacroConverter
+org.xwiki.rendering.internal.parser.xwiki10.macro.StyleRadeoxMacroConverter
 org.xwiki.rendering.internal.parser.xwiki10.PreFilter
 org.xwiki.rendering.internal.parser.xwiki10.HrFilter
 org.xwiki.rendering.internal.parser.xwiki10.ListSyntaxFilter
@@ -29,4 +30,5 @@ org.xwiki.rendering.internal.parser.xwiki10.UnescapeFilter
 org.xwiki.rendering.internal.parser.xwiki10.StandaloneNewLineCleaningFilter
 org.xwiki.rendering.internal.parser.xwiki10.SpacesCleaningFilter
 org.xwiki.rendering.internal.parser.xwiki10.HTMLFilter
+org.xwiki.rendering.internal.parser.xwiki10.UnescapeHTMLFilter
 org.xwiki.rendering.internal.parser.xwiki10.Escape20SyntaxFilter

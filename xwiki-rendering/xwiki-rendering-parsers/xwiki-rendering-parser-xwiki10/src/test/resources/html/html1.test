@@ -15,6 +15,7 @@
 
 
 <div class="class">*bold* &amp; some text</div>
+&amp;
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -32,3 +33,5 @@
 
 <div class="class">**bold** &amp; some text</div>
 {{/html}}
+
+ &

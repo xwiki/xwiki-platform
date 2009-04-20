@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameter;
@@ -32,12 +33,11 @@ import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
  * @version $Id$
  * @since 1.8M1
  */
+@Component("style")
 public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 {
-    protected StyleRadeoxMacroConverter()
+    public StyleRadeoxMacroConverter()
     {
-        super("box");
-
         registerParameter("type");
         registerParameter("id");
         registerParameter("class");
@@ -55,17 +55,64 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
     {
         StringBuffer result = new StringBuffer();
 
-        appendParameters(result, convertFormatParameters(parameters));
+        boolean inline = parameters.get("type").equals("span");
 
-        super.convert(name, parameters, content, filterContext);
+        // Print parameters
+        StringBuffer parametersOpen = new StringBuffer();
+        Map<String, String> styleParameters = convertParameters(parameters);
+        if (styleParameters.size() > 0) {
+            parametersOpen.append("(% ");
+            appendParameters(parametersOpen, styleParameters);
+            parametersOpen.append(" %)");
+            result.append(filterContext.addProtectedContent(parametersOpen.toString(), inline));
+        }
+
+        if (!inline) {
+            // Open standalone group
+            result.append(filterContext.addProtectedContent("(((", false));
+        }
+
+        // Print content
+        result.append(convertContent(content, parameters));
+
+        // Print group close
+        if (inline) {
+            // Close inline group
+            result.append(filterContext.addProtectedContent("(%%)", true));
+        } else {
+            // Close standalone group
+            result.append(filterContext.addProtectedContent(")))", false));
+        }
 
         return result.toString();
     }
 
-    protected Map<String, String> convertFormatParameters(RadeoxMacroParameters parameters)
+    @Override
+    protected String convertContent(String content, RadeoxMacroParameters parameters)
+    {
+        StringBuffer result = new StringBuffer();
+
+        // Print icon
+        appendIcon(result, parameters);
+
+        // Print content
+        result.append(content);
+
+        return result.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter#convertParameters(org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters)
+     */
+    @Override
+    protected Map<String, String> convertParameters(RadeoxMacroParameters parameters)
     {
         Map<String, String> boxParameters = new HashMap<String, String>();
 
+        RadeoxMacroParameter classes = parameters.get("class");
+        RadeoxMacroParameter icon = parameters.get("icon");
         RadeoxMacroParameter id = parameters.get("id");
         RadeoxMacroParameter align = parameters.get("align");
         RadeoxMacroParameter name = parameters.get("name");
@@ -77,6 +124,13 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         RadeoxMacroParameter width = parameters.get("width");
         RadeoxMacroParameter height = parameters.get("height");
         RadeoxMacroParameter border = parameters.get("border");
+
+        // add class support
+        if ((!"none".equals(classes)) && (classes != null) && !StringUtils.isEmpty(classes.getValue().trim())) {
+            boxParameters.put("class", classes.getValue().trim());
+        } else if ((!"none".equals(icon)) && (icon != null) && !StringUtils.isEmpty(icon.getValue().trim())) {
+            boxParameters.put("class", "stylemacro");
+        }
 
         // add id support
         if ((!"none".equals(id)) && (id != null) && !StringUtils.isEmpty(id.getValue())) {
@@ -120,18 +174,16 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         if ((!"none".equals(border)) && (border != null) && !StringUtils.isEmpty(border.getValue().trim())) {
             styleStr.append("border:" + border.getValue().trim() + "; ");
         }
-        styleStr.append("\"");
-        boxParameters.put("style", styleStr.toString());
+
+        if (styleStr.length() > 0) {
+            boxParameters.put("style", styleStr.toString());
+        }
 
         return boxParameters;
     }
 
-    @Override
-    protected Map<String, String> convertParameters(RadeoxMacroParameters parameters)
+    private void appendIcon(StringBuffer result, RadeoxMacroParameters parameters)
     {
-        Map<String, String> boxParameters = new HashMap<String, String>();
-
-        RadeoxMacroParameter classes = parameters.get("class");
         RadeoxMacroParameter document = parameters.get("document");
         RadeoxMacroParameter icon = parameters.get("icon");
         boolean hasIcon = false;
@@ -146,21 +198,13 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 
         // add icon support
         if (hasIcon) {
+            result.append("image:");
             if (document != null) {
-                boxParameters.put("image", document + "@" + icon);
+                result.append(document + "@" + icon);
             } else {
-                boxParameters.put("image", icon.getValue().trim());
+                result.append(icon.getValue().trim());
             }
         }
-
-        // add class support
-        if ((!"none".equals(classes)) && (classes != null) && !StringUtils.isEmpty(classes.getValue().trim())) {
-            boxParameters.put("class", classes.getValue().trim());
-        } else if (hasIcon) {
-            boxParameters.put("class", "stylemacro");
-        }
-
-        return boxParameters;
     }
 
     @Override

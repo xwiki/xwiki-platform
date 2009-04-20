@@ -25,15 +25,13 @@ KK. list2
 j. list1
 jj. list2
 # list1
-## list2
 * list1
 ** list2
 1. list1
 11. list2
 11*. list3
 .#-----------------------------------------------------
-.expect|xwiki/2.0|skip
-.# TODO: Need to fix XWiki 2.0 list rendering, see http://jira.xwiki.org/jira/browse/XWIKI-3067
+.expect|xwiki/2.0
 .#-----------------------------------------------------
 (% style="list-style-type: square" %)
 * list1
@@ -82,8 +80,6 @@ non list text
 ** list2
 
 1. list1
-
-## list2
 
 * list1
 ** list2

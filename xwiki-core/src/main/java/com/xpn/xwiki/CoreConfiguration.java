@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * configuration file using a prefix of "core" followed by the property name. For example:
  * <code>core.defaultDocumentSyntax = xwiki/2.0</code>
  * 
- * @version $Id: CoreConfiguration.java 18237 2009-04-04 22:30:29Z vmassol $
+ * @version $Id$
  * @since 1.8RC2
  */
 @ComponentRole

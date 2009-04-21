@@ -28,3 +28,8 @@
 .xListItem-selected {
   background-color: #FFA;
 }
+
+.xFontFamilyPicker option {
+  font-size: small !important;
+  text-transform: capitalize;
+}

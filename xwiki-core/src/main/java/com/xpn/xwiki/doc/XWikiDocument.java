@@ -2846,7 +2846,7 @@ public class XWikiDocument implements DocumentModelBridge
         saveAttachmentContent(attachment, true, true, context);
     }
 
-    protected void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, boolean bTransaction,
+    public void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();

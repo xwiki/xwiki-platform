@@ -29,9 +29,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Extension of {@link org.xwiki.test.AbstractXWikiComponentTestCase} that sets up a bridge between the new
- * Execution Context and the old XWikiContext. This allows code that uses XWikiContext to be tested using this Test Case
- * class.
+ * Extension of {@link org.xwiki.test.AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution
+ * Context and the old XWikiContext. This allows code that uses XWikiContext to be tested using this Test Case class.
  * 
  * @version $Id: AbstractBridgedXWikiComponentTestCase.java 11544 2008-07-29 14:43:19Z amelentev $
  * @since 1.6M1
@@ -46,7 +45,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         super.setUp();
 
         this.context = new XWikiContext();
-        
+
         this.context.setDatabase("xwiki");
         this.context.setMainXWiki("xwiki");
 
@@ -64,6 +63,8 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         // Set a simple application context, as some components fail to start without one.
         Container c = (Container) getComponentManager().lookup(Container.class);
         c.setApplicationContext(new TestApplicationContext());
+
+        getComponentManager().registerComponent(TestCoreConfiguration.getComponentDescriptor());
     }
 
     @Override

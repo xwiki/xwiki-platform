@@ -256,6 +256,7 @@
                 </goals>
               </execution>
             </executions>        
+            <!-- YUI compression configuration, it is duplicated in the CI profile, don't forget to modify it too.  -->
             <configuration>
               <!-- Overwrite existing files -->
               <nosuffix>true</nosuffix>
@@ -390,12 +391,14 @@
                 <include>resources/js/**.js</include>
                 <include>resources/js/**.css</include>
               </includes>
-              <!-- Exclude already minified files -->
               <excludes>
+                <!-- Exclude already minified files -->
                 <exclude>**/*-min.js</exclude>
                 <exclude>**/*-debug.js</exclude>
                 <exclude>**/langs/*.js</exclude>
                 <exclude>resources/js/smartclient/**</exclude>
+                <!-- Exclude files with Velocity inside -->
+                <exclude>**/actionButtons.js</exclude>
               </excludes>
             </configuration>
           </plugin>          

@@ -635,6 +635,34 @@ function checkAdvancedContent(message) {
 }
 
 /**
+ * Open links marked with rel="external" in an external window and sets the target attribute to any
+ * rel attribute starting with "_". Note that We need to do this in Javascript
+ * as opposed to using target="_blank" since the target attribute is not valid XHTML.
+ */
+function externalLinks() {
+    if (!document.getElementsByTagName) return;
+    var anchors = document.getElementsByTagName("a");
+    for (var i = 0; i < anchors.length; i++) {
+        var anchor = anchors[i];
+        if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {
+            // Since the rel attribute can have other values we need to only take into account the ones
+            // starting with "_"
+            var values = anchor.getAttribute("rel").split(" ");
+            for (var j = 0; j < values.length; j++) {
+                if (values[j].charAt(0) == "_") {
+                    anchor.target = values[j].substring(1);
+                    break;
+                } else if (values[j] == "external") {
+                    anchor.target = "_blank";
+                    break;
+                }
+            }
+        }
+    }
+}
+Event.observe(window, "dom:loaded", externalLinks);
+
+/**
  * Keyboard Shortcuts.
  * Version: 2.01.A
  * URL: http://www.openjs.com/scripts/events/keyboard_shortcuts/

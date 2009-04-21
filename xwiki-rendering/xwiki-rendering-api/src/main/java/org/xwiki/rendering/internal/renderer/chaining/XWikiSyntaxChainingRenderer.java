@@ -207,6 +207,16 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
     {
+        // If the previous format had parameters and the parameters are different from the current ones then close them
+        if (this.previousFormatParameters != null && !this.previousFormatParameters.equals(parameters)) {
+            this.previousFormatParameters = null;
+            printParameters(parameters, false);
+        } else if (this.previousFormatParameters == null) {
+            this.previousFormatParameters = null;
+            printParameters(parameters, false);
+        } else {
+            this.previousFormatParameters = null;
+        }
         switch (format) {
             case BOLD:
                 getXWikiPrinter().printBeginBold();
@@ -229,16 +239,6 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
             case MONOSPACE:
                 print("##");
                 break;
-        }
-        // If the previous format had parameters and the parameters are different from the current ones then close them
-        if (this.previousFormatParameters != null && !this.previousFormatParameters.equals(parameters)) {
-            this.previousFormatParameters = null;
-            printParameters(parameters, false);
-        } else if (this.previousFormatParameters == null) {
-            this.previousFormatParameters = null;
-            printParameters(parameters, false);
-        } else {
-            this.previousFormatParameters = null;
         }
     }
 

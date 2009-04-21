@@ -86,6 +86,11 @@ public class Style extends com.google.gwt.dom.client.Style
     public static final Property FONT_FAMILY = new Property("font-family", "fontFamily", true, true, "");
 
     /**
+     * The font-size property sets the size of a font.
+     */
+    public static final Property FONT_SIZE = new Property("font-size", "fontSize", true, false, FontSize.MEDIUM);
+
+    /**
      * Sets the width of an element.
      */
     public static final String WIDTH = "width";
@@ -286,6 +291,24 @@ public class Style extends com.google.gwt.dom.client.Style
          * This is a utility class so it has a private constructor.
          */
         private TextAlign()
+        {
+        }
+    }
+
+    /**
+     * The font-size property sets the size of a font.
+     */
+    public static final class FontSize
+    {
+        /**
+         * Default value.
+         */
+        public static final String MEDIUM = "medium";
+
+        /**
+         * This is a utility class so it has a private constructor.
+         */
+        private FontSize()
         {
         }
     }

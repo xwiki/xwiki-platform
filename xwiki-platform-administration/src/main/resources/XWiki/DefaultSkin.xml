@@ -251,6 +251,6 @@
 
 $msg.get("xe.admin.skin.makeyourown")
 
-* &lt;a href="$doc.getURL("edit","editor=object")"&gt;$msg.get("xe.admin.skin.editskin")&lt;/a&gt;
-* [$msg.get("xe.admin.skin.testskin")&gt;Main.WebHome?skin=${doc.fullName}]
+* &lt;a href="$doc.getURL('edit', 'editor=object&amp;amp;classname=XWiki.XWikiSkins')"&gt;$msg.get('xe.admin.skin.editskin')&lt;/a&gt;
+* [$msg.get('xe.admin.skin.testskin')&gt;Main.WebHome?skin=${doc.fullName}]
 </content></xwikidoc>

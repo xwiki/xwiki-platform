@@ -1,0 +1,32 @@
+.attachmentActionButton {
+  background-color: transparent;
+  border: none;
+  padding: 2px 4px;
+  font-size: 80%;
+  margin-bottom: 4px;
+  background: transparent 2px center no-repeat;
+  padding-left: 20px;
+}
+
+.add-file-input {
+  margin-left: 10px;
+  background-position: 2px top;
+  background-image: url($xwiki.getSkinFile('icons/silk/textfield_add.gif'));
+}
+.add-file-input:hover {
+  color: #070;
+}
+
+.remove-file-input {
+  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
+  width: 16px;
+  text-indent: 30px;
+}
+.remove-file-input:hover {
+  color: #D00;
+}
+
+.uploadFileInput {
+  margin: 5px 10px !important;
+  border: 1px solid #ddd !important;
+}

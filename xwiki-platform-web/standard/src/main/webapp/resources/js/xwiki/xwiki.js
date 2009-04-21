@@ -639,9 +639,8 @@ function checkAdvancedContent(message) {
  * rel attribute starting with "_". Note that We need to do this in Javascript
  * as opposed to using target="_blank" since the target attribute is not valid XHTML.
  */
-function externalLinks() {
-    if (!document.getElementsByTagName) return;
-    var anchors = document.getElementsByTagName("a");
+document.observe("dom:loaded", function(){
+    var anchors = $$("a");
     for (var i = 0; i < anchors.length; i++) {
         var anchor = anchors[i];
         if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {
@@ -659,8 +658,7 @@ function externalLinks() {
             }
         }
     }
-}
-Event.observe(window, "dom:loaded", externalLinks);
+});
 
 /**
  * Keyboard Shortcuts.

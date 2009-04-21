@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1211800256000</creationDate>
-<date>1212569617000</date>
-<contentUpdateDate>1213892723000</contentUpdateDate>
+<date>1240316643000</date>
+<contentUpdateDate>1240316643000</contentUpdateDate>
 <version>1.1</version>
 <title>AdminGeneralSheet</title>
 <template></template>
@@ -22,6 +22,7 @@
 <comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -51,6 +52,7 @@
 <name>XWiki.AdminGeneralSheet</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
+<guid>eb863d01-a864-432b-a58a-b0b1933b490a</guid>
 <property>
 <tags/>
 </property>
@@ -59,7 +61,7 @@
 #set($legend = ['language', 'editor', 'admin', 'smtp'])
 #set($params = $util.hashMap)
 #set($params.language = ['multilingual', 'languages' , 'default_language', 'dateformat'])
-#set($params.editor = ['editor'])
+#set($params.editor = ['editor', 'core.defaultDocumentSyntax'])
 #set($params.admin = ['admin_email'])
 #set($params.smtp = ['smtp_server', 'smtp_port'])
 #includeForm('XWiki.AdminFieldsDisplaySheet')</content>

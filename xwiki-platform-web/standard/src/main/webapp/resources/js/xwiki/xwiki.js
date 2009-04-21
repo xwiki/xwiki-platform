@@ -158,7 +158,6 @@ Object.extend(XWiki, {
    * @return
    */
    displayDocExtra: function (extraID, extraTemplate, scrollToAnchor) {
-
      // Nested function: hides the previously displayed extra pane (window.activeDocExtraPane)
      // and display the one that is passed as an argument (extraID).
      // Fires an event to notify that the pane has changed.
@@ -266,7 +265,7 @@ Object.extend(XWiki, {
         }
     });
   },
-  
+
   /**
    * Make links marked with rel="external" in an external window and sets the target attribute to any
    * rel attribute starting with "_". Note that We need to do this in Javascript
@@ -296,28 +295,24 @@ Object.extend(XWiki, {
         }
     }
   },
-  
-  
+
   /**
    * Initialize method for the XWiki object. This is to be called only once upon dom loading.
    * It makes rendering errors expandable and fixes external links on the body content.
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
    */
   initialize: function(){ 
-  
     // Extra security to make sure we do not get initalized twice.
-    // It would fire the custom dom:loaded event twice, which could make their observers misbehave. 	
+    // It would fire the custom dom:loaded event twice, which could make their observers misbehave.
     if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
+      this.isInitialized = true;
 
-      this.makeRenderingErrorsExpandable();	
-      this.fixLinksTargetAttribute();	
+      this.makeRenderingErrorsExpandable();
+      this.fixLinksTargetAttribute();
 
-      document.fire("xwiki:dom:loaded");	  
-
-      this.isInitialized = true;	
+      document.fire("xwiki:dom:loaded");
     }
   }
-
 });
 
 /**

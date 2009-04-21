@@ -276,7 +276,7 @@ Object.extend(XWiki, {
     if (typeof content == "undefined") {
       content = document.body; 
     }
-    var anchors = content.select("a");
+    var anchors = content.select("a[rel]");
     for (var i = 0; i < anchors.length; i++) {
         var anchor = anchors[i];
         if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {

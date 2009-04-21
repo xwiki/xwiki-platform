@@ -79,6 +79,7 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
   font-family:'MS Sans Serif',sans-serif,Verdana,Arial;
   font-size:7pt !important;
   font-weight:normal;
+  height: 20px;
   margin-top:3px;
   padding:0px !important;
   vertical-align:top;

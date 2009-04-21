@@ -263,13 +263,14 @@
                 <include>resources/js/**.js</include>
                 <include>resources/js/**.css</include>
               </includes>
-              <!-- Exclude already minified files -->
               <excludes>
+                <!-- Exclude already minified files -->
                 <exclude>**/*-min.js</exclude>
                 <exclude>**/*-debug.js</exclude>
-                <exclude>**/actionButtons.js</exclude>
                 <exclude>**/langs/*.js</exclude>
                 <exclude>resources/js/smartclient/**</exclude>
+                <!-- Exclude files with Velocity inside -->
+                <exclude>**/actionButtons.js</exclude>
               </excludes>
             </configuration>
           </plugin>

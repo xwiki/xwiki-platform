@@ -2903,6 +2903,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
+        // Syntax
+        needsUpdate |= bclass.addTextField("core.defaultDocumentSyntax", "Default document syntax", 60);
+
         // for tags
         needsUpdate |= bclass.addBooleanField("tags", "Activate the tagging", "yesno");
 
@@ -3218,7 +3221,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 content = "#includeForm(\"XWiki.XWikiUserSheet\")";
                 syntaxId = XWikiDocument.XWIKI10_SYNTAXID;
             }
-            
+
             String xwikiname = request.getParameter("xwikiname");
             String password2 = request.getParameter("register2_password");
             String password = ((String[]) map.get("password"))[0];
@@ -3268,8 +3271,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 map.put("active", "1");
             }
 
-            int result = createUser(xwikiname, map, parent, content, syntaxId, userRights, 
-                context);
+            int result = createUser(xwikiname, map, parent, content, syntaxId, userRights, context);
 
             if ((result > 0) && (withValidation)) {
                 // Send the validation email
@@ -3311,8 +3313,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             content = "#includeForm(\"XWiki.XWikiUserSheet\")";
             syntaxId = XWikiDocument.XWIKI10_SYNTAXID;
         }
-        if (createUser(xwikiname, map, "XWiki.XWikiUsers", content, syntaxId, userRights, context) == 1)
-        {
+        if (createUser(xwikiname, map, "XWiki.XWikiUsers", content, syntaxId, userRights, context) == 1) {
             return true;
         } else {
             return false;
@@ -3505,9 +3506,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 "Cannot create user {0}", e, args);
         }
     }
-    
+
     /**
-     * @deprecated starting with XE 1.8.1 use 
+     * @deprecated starting with XE 1.8.1 use
      *             {@link #createUser(String, Map, String, String, String, String, XWikiContext)} instead
      */
     public int createUser(String xwikiname, Map map, String parent, String content, String userRights,
@@ -6598,7 +6599,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         return this.configuredSyntaxes;
     }
-    
+
     /**
      * @return the syntax id of the syntax to use when creating new documents.
      */
@@ -6606,12 +6607,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.class)).getDefaultDocumentSyntax();
     }
-    
+
     /**
-     * Create a default content for the document passed as parameter. Can generate content for 
-     * both XWiki Syntax 1.0 and XWiki Syntax 2.0. If new documents are set to be created in 
-     * XWiki Syntax 1.0 then generate XWiki 1.0 Syntax otherwise generate XWiki Syntax 2.0.
-     *  
+     * Create a default content for the document passed as parameter. Can generate content for both XWiki Syntax 1.0 and
+     * XWiki Syntax 2.0. If new documents are set to be created in XWiki Syntax 1.0 then generate XWiki 1.0 Syntax
+     * otherwise generate XWiki Syntax 2.0.
+     * 
      * @param pageHeader the page header to set
      */
     private void generatePageContent(XWikiDocument document, String pageHeader)

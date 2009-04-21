@@ -110,7 +110,7 @@ XWiki.WebDAV = {};
 XWiki.WebDAV.displayDavLinks = function(domNode) {
     // un-hide Dav links only if the browser is going to support it
     if(window.ActiveXObject || window.InstallTrigger) {
-       domNode.select("[class*='attachment']").each(displayDavLink);
+       domNode.select(".attachment").each(displayDavLink);
     }
 }
 

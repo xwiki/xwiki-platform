@@ -467,6 +467,17 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endListItem()
+     */
+    @Override
+    public void endListItem()
+    {
+        this.previousFormatParameters = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#beginXMLNode(XMLNode)
      */
     @Override
@@ -735,20 +746,25 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endTableHeadCell(java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endTable(java.util.Map)
      */
-    @Override
-    public void endTableHeadCell(Map<String, String> parameters)
-    {
-        this.previousFormatParameters = null;
-    }
-
     @Override
     public void endTable(Map<String, String> parameters)
     {
         // Ensure that any not printed characters are flushed.
         // TODO: Fix this better by introducing a state listener to handle escapes
         getXWikiPrinter().flush();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endTableHeadCell(java.util.Map)
+     */
+    @Override
+    public void endTableHeadCell(Map<String, String> parameters)
+    {
+        this.previousFormatParameters = null;
     }
 
     /**

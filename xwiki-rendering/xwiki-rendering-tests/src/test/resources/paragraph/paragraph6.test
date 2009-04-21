@@ -65,7 +65,7 @@ endDocument
 
 (% param4="valueA" %)hello (% param4="valueB" %)world
 
-**(% param5="value4" %)hello** world
+(% param5="value4" %)**hello** world
 
 (% param6="valueA" %)hello (% param7="valueB" %)world
 .#-----------------------------------------------------

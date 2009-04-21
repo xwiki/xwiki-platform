@@ -249,8 +249,11 @@ XWiki.suggest = Class.create({
 		var onSuccessFunc = function (req) { pointer.setSuggestions(req) };
 		var onErrorFunc = function (status) { alert("AJAX error: "+status); };
 
-		var myAjaxReq = new _xwk.AjaxReq();
-		myAjaxReq.makeRequest( url, meth, onSuccessFunc, onErrorFunc );
+		var ajx = new Ajax.Request(url,{
+			method: meth,
+			onSuccess: onSuccessFunc,
+			onFailure: onErrorFunc
+		});
 	},
 
 	/**
@@ -548,81 +551,7 @@ XWiki.suggest = Class.create({
 });
 
 
-// AJAX PROTOTYPE _____________________________________________
-
-
-if (typeof(_xwk.AjaxReq) == "undefined")
-	_xwk.AjaxReq = {}
-
-
-
-_xwk.AjaxReq = function ()
-{
-	this.req = {};
-	this.isIE = false;
-}
-
-
-
-_xwk.AjaxReq.prototype.makeRequest = function (url, meth, onComp, onErr)
-{
-	
-	if (meth != "POST")
-		meth = "GET";
-	
-	this.onComplete = onComp;
-	this.onError = onErr;
-	
-	var pointer = this;
-	
-	// branch for native XMLHttpRequest object
-	if (window.XMLHttpRequest)
-	{
-		this.req = new XMLHttpRequest();
-		this.req.onreadystatechange = function () { pointer.processReqChange() };
-		this.req.open("GET", url, true); //
-		this.req.send(null);
-	// branch for IE/Windows ActiveX version
-	}
-	else if (window.ActiveXObject)
-	{
-		this.req = new ActiveXObject("Microsoft.XMLHTTP");
-		if (this.req)
-		{
-			this.req.onreadystatechange = function () { pointer.processReqChange() };
-			this.req.open(meth, url, true);
-			this.req.send();
-		}
-	}
-}
-
-
-_xwk.AjaxReq.prototype.processReqChange = function()
-{
-	
-	// only if req shows "loaded"
-	if (this.req.readyState == 4) {
-		// only if "OK"
-		if (this.req.status == 200)
-		{
-			this.onComplete( this.req );
-		} else {
-			this.onError( this.req.status );
-		}
-	}
-}
-
-
-
-
-
-
-
-
-
-
 // DOM PROTOTYPE _____________________________________________
-
 
 if (typeof(_xwk.DOM) == "undefined")
 	_xwk.DOM = {}

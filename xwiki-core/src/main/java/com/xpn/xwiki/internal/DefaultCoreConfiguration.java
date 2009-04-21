@@ -19,12 +19,17 @@
  */
 package com.xpn.xwiki.internal;
 
+import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationManager;
 import org.xwiki.configuration.ConfigurationSourceCollection;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.CoreConfiguration;
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Configuration for the Core module.
@@ -32,6 +37,7 @@ import com.xpn.xwiki.CoreConfiguration;
  * @version $Id: $
  * @since 1.8RC2
  */
+@Component
 public class DefaultCoreConfiguration implements Initializable, CoreConfiguration
 {
     /**
@@ -42,21 +48,48 @@ public class DefaultCoreConfiguration implements Initializable, CoreConfiguratio
     /**
      * Injected by the Component Manager.
      */
+    @Requirement
     private ConfigurationManager configurationManager;
 
     /**
      * Injected by the Component Manager.
      */
+    @Requirement
     private ConfigurationSourceCollection sourceCollection;
 
     /**
+     * Execution context handler, needed for accessing the XWikiContext.
+     * <p>
+     * FIXME: need to refactor the configuration loading to be able to get wiki preference for a ConfigurationSource
+     */
+    @Requirement
+    private Execution execution;
+
+    /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.component.phase.Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
-        this.configurationManager.initializeConfiguration(this, this.sourceCollection.getConfigurationSources(),
-            "core");
+        this.configurationManager
+            .initializeConfiguration(this, this.sourceCollection.getConfigurationSources(), "core");
+    }
+
+    /**
+     * FIXME: need to refactor the configuration loading to be able to get wiki preference for a ConfigurationSource
+     */
+    private XWikiContext getContext()
+    {
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+    }
+
+    /**
+     * FIXME: need to refactor the configuration loading to be able to get wiki preference for a ConfigurationSource
+     */
+    private String getWikiConfigurationAsString(String configName)
+    {
+        return getContext().getWiki().getXWikiPreference(configName, null, getContext());
     }
 
     /**
@@ -64,7 +97,14 @@ public class DefaultCoreConfiguration implements Initializable, CoreConfiguratio
      */
     public String getDefaultDocumentSyntax()
     {
-        return this.defaultDocumentSyntax;
+        // FIXME: need to refactor the configuration loading to be able to get wiki preference for a ConfigurationSource
+        String defaultDocumentSyntax = getWikiConfigurationAsString("core.defaultDocumentSyntax");
+
+        if (StringUtils.isEmpty(defaultDocumentSyntax)) {
+            defaultDocumentSyntax = this.defaultDocumentSyntax;
+        }
+
+        return defaultDocumentSyntax;
     }
 
     public void setDefaultDocumentSyntax(String defaultDocumentSyntax)

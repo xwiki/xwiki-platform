@@ -293,9 +293,9 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Used to convert a string into a proper Document Name.
      */
-    private DocumentNameFactory documentNameFactory = 
-        (DocumentNameFactory) Utils.getComponent(DocumentNameFactory.class.getName());
-    
+    private DocumentNameFactory documentNameFactory =
+        (DocumentNameFactory) Utils.getComponent(DocumentNameFactory.ROLE);
+
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return context.getWiki().getStore();
@@ -428,7 +428,6 @@ public class XWikiDocument implements DocumentModelBridge
         this.attachmentList = new ArrayList<XWikiAttachment>();
         this.customClass = "";
         this.comment = "";
-        this.syntaxId = getDefaultDocumentSyntax();
 
         // Note: As there's no notion of an Empty document we don't set the original document
         // field. Thus getOriginalDocument() may return null.
@@ -2056,11 +2055,11 @@ public class XWikiDocument implements DocumentModelBridge
                 } else {
                     setTemplate(template);
                     setContent(templatedoc.getContent());
-                    
+
                     // Set the new document syntax as the syntax of the template since the template content
                     // is copied into the new document
                     setSyntaxId(templatedoc.getSyntaxId());
-                    
+
                     if ((getParent() == null) || (getParent().equals(""))) {
                         String tparent = templatedoc.getParent();
                         if (tparent != null) {
@@ -4151,6 +4150,12 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getSyntaxId()
     {
+        // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntax() need to create a
+        // XWikiDocument object to get preferences and generate an infinite loop
+        if (this.syntaxId == null) {
+            this.syntaxId = getDefaultDocumentSyntax();
+        }
+
         return this.syntaxId;
     }
 

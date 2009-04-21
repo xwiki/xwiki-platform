@@ -713,8 +713,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
 
         if (hasAttachmentRecycleBin(context)) {
-            setAttachmentRecycleBinStore((AttachmentRecycleBinStore) Utils.getComponent(
-                AttachmentRecycleBinStore.ROLE, Param("xwiki.store.attachment.recyclebin.hint")));
+            setAttachmentRecycleBinStore((AttachmentRecycleBinStore) Utils.getComponent(AttachmentRecycleBinStore.ROLE,
+                Param("xwiki.store.attachment.recyclebin.hint")));
         }
 
         // Run migrations
@@ -1787,15 +1787,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
                 return urlf.getURL(url, context);
             }
-            
+
             // Look for a resource file
             path = "/resources/" + filename;
             if (resourceExists(path)) {
                 URL url;
-                url = urlf.createResourceURL(filename, forceSkinAction, context);                
+                url = urlf.createResourceURL(filename, forceSkinAction, context);
                 return urlf.getURL(url, context);
             }
-            
+
         } catch (Exception e) {
         }
 
@@ -2723,8 +2723,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
-        needsUpdate |=
-            bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
+        needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
 
         String content = doc.getContent();
@@ -2777,9 +2776,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the required
-     * configuration properties to make XWiki work properly. If some properties are missing they are created and saved
-     * in the database.
+     * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the required configuration
+     * properties to make XWiki work properly. If some properties are missing they are created and saved in the
+     * database.
      * 
      * @param context the XWiki Context
      * @return the XWiki Base Class object containing the properties
@@ -2860,6 +2859,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
+        // Syntax
+        needsUpdate |= bclass.addTextField("core.defaultDocumentSyntax", "Default document syntax", 60);
+
         // for tags
         needsUpdate |= bclass.addBooleanField("tags", "Activate the tagging", "yesno");
 
@@ -2871,8 +2873,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
         needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
-        needsUpdate |=
-            bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
+        needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
         needsUpdate |= bclass.addTextField("convertmail", "convert email type", 1);
         needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
@@ -3068,7 +3069,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         bclass.setName("XWiki.XWikiComments");
         /*
-         * if (!"internal".equals(bclass.getCustomMapping())) { needsUpdate = true; bclass.setCustomMapping("internal"); }
+         * if (!"internal".equals(bclass.getCustomMapping())) { needsUpdate = true; bclass.setCustomMapping("internal");
+         * }
          */
         needsUpdate |= bclass.addTextField("author", "Author", 30);
         needsUpdate |= bclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
@@ -3179,7 +3181,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 content = "#includeForm(\"XWiki.XWikiUserSheet\")";
                 syntaxId = XWikiDocument.XWIKI10_SYNTAXID;
             }
-            
+
             String xwikiname = request.getParameter("xwikiname");
             String password2 = request.getParameter("register2_password");
             String password = ((String[]) map.get("password"))[0];
@@ -3229,8 +3231,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 map.put("active", "1");
             }
 
-            int result = createUser(xwikiname, map, parent, content, syntaxId, userRights, 
-                context);
+            int result = createUser(xwikiname, map, parent, content, syntaxId, userRights, context);
 
             if ((result > 0) && (withValidation)) {
                 // Send the validation email
@@ -3272,8 +3273,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             content = "#includeForm(\"XWiki.XWikiUserSheet\")";
             syntaxId = XWikiDocument.XWIKI10_SYNTAXID;
         }
-        if (createUser(xwikiname, map, "XWiki.XWikiUsers", content, syntaxId, userRights, context) == 1)
-        {
+        if (createUser(xwikiname, map, "XWiki.XWikiUsers", content, syntaxId, userRights, context) == 1) {
             return true;
         } else {
             return false;
@@ -3466,9 +3466,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 "Cannot create user {0}", e, args);
         }
     }
-    
+
     /**
-     * @deprecated starting with XE 1.8.1 use 
+     * @deprecated starting with XE 1.8.1 use
      *             {@link #createUser(String, Map, String, String, String, String, XWikiContext)} instead
      */
     public int createUser(String xwikiname, Map map, String parent, String content, String userRights,
@@ -3719,8 +3719,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
                 // Allow including document in the XWiki Syntax 1.0 but also other syntaxes using the new rendering.
                 if (contentdoc.getSyntaxId().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
-                    result = getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
-                        (XWikiDocument) context.get("doc"), context);
+                    result =
+                        getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
+                            (XWikiDocument) context.get("doc"), context);
                 } else {
                     // Note: the Script macro in the new rendering checks for programming rights for the document in
                     // the xwiki context.
@@ -3733,7 +3734,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 if (contentdoc.getSyntaxId().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
                     result = getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, doc, context);
                 } else {
-                    // Since the Script macro checks for programming rights in the current doc we need to temporarily set
+                    // Since the Script macro checks for programming rights in the current doc we need to temporarily
+                    // set
                     // the contentdoc as the current doc before rendering it.
                     XWikiDocument originalDoc = null;
                     try {
@@ -4428,8 +4430,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         doc.setFullName(fullname, context);
 
         URL url =
-            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, queryString, anchor, doc.getDatabase(),
-                context);
+            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, queryString, anchor,
+                doc.getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -4572,11 +4574,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 // pass to it using the following algorithm:
                 // path info = requestURI - (contextPath + servletPath)
                 String path;
-                
+
                 String uri = request.getRequestURI();
                 String contextPath = request.getContextPath();
                 String servletPath = request.getServletPath();
-                
+
                 if (!uri.startsWith(contextPath + servletPath)) {
                     LOG.warn("Request URI [" + request.getRequestURI() + "] should have matched " + "context path ["
                         + contextPath + "] and servlet path [" + servletPath + "]");
@@ -4591,7 +4593,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     if ("1".equals(Param("xwiki.virtual.usepath", "0"))) {
                         String[] vhi = uri.split("/");
                         if (vhi.length > 2 && vhi[2].equals(Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
-                            path = uri.substring(vhi[0].length() + 1 + vhi[1].length() + 1 + vhi[2].length() + 1 + vhi[3].length());
+                            path =
+                                uri.substring(vhi[0].length() + 1 + vhi[1].length() + 1 + vhi[2].length() + 1
+                                    + vhi[3].length());
                         } else {
                             path = uri.substring(contextPath.length() + servletPath.length());
                         }
@@ -4802,9 +4806,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
 
                     if (LOG.isDebugEnabled()) {
-                        LOG
-                            .debug("Initialized AuthService " + this.authService.getClass().getName()
-                                + " using 'new'.");
+                        LOG.debug("Initialized AuthService " + this.authService.getClass().getName() + " using 'new'.");
                     }
                 }
             }
@@ -4848,8 +4850,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     this.rightService = new XWikiRightServiceImpl();
 
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Initialized RightService " + this.authService.getClass().getName()
-                            + " using 'new'.");
+                        LOG
+                            .debug("Initialized RightService " + this.authService.getClass().getName()
+                                + " using 'new'.");
                     }
 
                 }
@@ -4947,8 +4950,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             return manager.getComponentInstanceOfType(Class.forName(className));
         } catch (Exception e) {
             Object[] args = {className};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND, "Service {0} not found", e, args);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND,
+                "Service {0} not found", e, args);
         }
     }
 
@@ -4977,8 +4980,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             return manager.getComponentInstanceOfType(Class.forName(className));
         } catch (Exception e) {
             Object[] args = {className};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND, "Service {0} not found", e, args);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND,
+                "Service {0} not found", e, args);
         }
     }
 
@@ -5403,8 +5406,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return content;
     }
 
-    public String getURLContent(String surl, String username, String password, XWikiContext context)
-        throws IOException
+    public String getURLContent(String surl, String username, String password, XWikiContext context) throws IOException
     {
         return getURLContent(surl, username, password, getHttpTimeout(context), getHttpUserAgent(context));
     }
@@ -5889,7 +5891,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public Object parseGroovyFromPage(String fullName, String jarWikiPage, XWikiContext context) throws XWikiException
     {
-        return parseGroovyFromString(context.getWiki().getDocument(fullName, context).getContent(), jarWikiPage, context);
+        return parseGroovyFromString(context.getWiki().getDocument(fullName, context).getContent(), jarWikiPage,
+            context);
     }
 
     public String getMacroList(XWikiContext context)
@@ -5986,8 +5989,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         temp = temp.replaceAll("[\u00d0\u010e\u0110]", "D");
         temp = temp.replaceAll("[\u00f0\u010f\u0111]", "d");
         temp = temp.replaceAll("[\u00c8\u00c9\u00ca\u00cb\u0112\u0114\u0116\u0118\u011a\u0204\u0206\u0228]", "E");
-        temp =
-            temp.replaceAll("[\u00e8\u00e9\u00ea\u00eb\u0113\u0115\u0117\u0119\u011b\u01dd\u0205\u0207\u0229]", "e");
+        temp = temp.replaceAll("[\u00e8\u00e9\u00ea\u00eb\u0113\u0115\u0117\u0119\u011b\u01dd\u0205\u0207\u0229]", "e");
         temp = temp.replaceAll("[\u011c\u011e\u0120\u0122\u01e4\u01e6\u01f4]", "G");
         temp = temp.replaceAll("[\u011d\u011f\u0121\u0123\u01e5\u01e7\u01f5]", "g");
         temp = temp.replaceAll("[\u0124\u0126\u021e]", "H");
@@ -6533,8 +6535,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     context.getWiki().getAttachmentStore().saveAttachmentContent(newAttach, false, context, true);
                     attachmentTreated++;
                 } catch (XWikiException e) {
-                    LOG.error("Error rolling back attachment " + entry.getKey()
-                        + " in document rollback for document " + tdoc.getFullName());
+                    LOG.error("Error rolling back attachment " + entry.getKey() + " in document rollback for document "
+                        + tdoc.getFullName());
                     // If we have already treated an attachment it's better to continue and leave
                     // only one attachment in bad state
                     // this is better then leaving the whole document in bad state...
@@ -6565,7 +6567,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         return this.configuredSyntaxes;
     }
-    
+
     /**
      * @return the syntax id of the syntax to use when creating new documents.
      */
@@ -6573,12 +6575,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.class.getName())).getDefaultDocumentSyntax();
     }
-    
+
     /**
-     * Create a default content for the document passed as parameter. Can generate content for 
-     * both XWiki Syntax 1.0 and XWiki Syntax 2.0. If new documents are set to be created in 
-     * XWiki Syntax 1.0 then generate XWiki 1.0 Syntax otherwise generate XWiki Syntax 2.0.
-     *  
+     * Create a default content for the document passed as parameter. Can generate content for both XWiki Syntax 1.0 and
+     * XWiki Syntax 2.0. If new documents are set to be created in XWiki Syntax 1.0 then generate XWiki 1.0 Syntax
+     * otherwise generate XWiki Syntax 2.0.
+     * 
      * @param pageHeader the page header to set
      */
     private void generatePageContent(XWikiDocument document, String pageHeader)

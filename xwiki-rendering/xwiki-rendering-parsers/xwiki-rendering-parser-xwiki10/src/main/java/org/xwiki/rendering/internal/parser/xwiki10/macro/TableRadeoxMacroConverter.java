@@ -41,6 +41,7 @@ public class TableRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         StringTokenizer tokenizer = new StringTokenizer(content, "|\n", true);
         String lastToken = null;
         boolean firstCell = true;
+        int nbLines = 0;
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
             // If a token contains [, then all tokens up to one containing a ] are concatenated. Kind of a block marker.
@@ -59,12 +60,13 @@ public class TableRadeoxMacroConverter extends AbstractRadeoxMacroConverter
                     // A new row, not a literal newline.
                     // If the last cell didn't contain any data, then it was skipped. Add a blank cell to compensate.
                     if (("".equals(lastToken) || "|".equals(lastToken)) && !firstCell) {
-                        result.append('|');
+                        result.append(filterContext.addProtectedContent(nbLines == 1 ? "|=" : "|", false));
                         result.append(" ");
-                        // OLD: table.addCell(" ");
                     }
-                    result.append('\n');
-                    // OLD: table.newRow();
+                    if (nbLines > 0) {
+                        result.append('\n');
+                    }
+                    ++nbLines;
                 } else {
                     // A continued row, with a literal newline.
                     String cell = lastToken;
@@ -78,44 +80,39 @@ public class TableRadeoxMacroConverter extends AbstractRadeoxMacroConverter
                         }
                     }
                     firstCell = false;
-                    result.append('|');
+                    result.append(filterContext.addProtectedContent(nbLines == 1 ? "|=" : "|", false));
                     result.append(cell.trim());
-                    // OLD: table.addCell(cell.trim());
                     if (!tokenizer.hasMoreTokens()) {
                         result.append('\n');
-                        // OLD: table.newRow();
+                        ++nbLines;
                     }
                 }
             } else if (!"|".equals(token)) {
                 // Cell data
                 if (!token.endsWith("\\")) {
                     // If the cell data ends with \\, then it will be continued. Current data is stored in lastToken.
-                    result.append('|');
+                    result.append(filterContext.addProtectedContent(nbLines == 1 ? "|=" : "|", false));
                     result.append(token.trim());
-                    // OLD: table.addCell(token.trim());
                     firstCell = false;
                 } else if (!tokenizer.hasMoreTokens()) {
                     // Remove backslashes from the end
                     while (token.endsWith("\\")) {
                         token = token.substring(0, token.length() - 1);
                     }
-                    result.append('|');
+                    result.append(filterContext.addProtectedContent(nbLines == 1 ? "|=" : "|", false));
                     result.append(token.trim());
-                    // OLD: table.addCell(token.trim());
                 }
             } else if ("|".equals(token)) {
                 // Cell delimiter
                 if ((null == lastToken || "".equals(lastToken)) && !firstCell || "|".equals(lastToken)) {
                     // If the last cell didn't contain any data, then it was skipped. Add a blank cell to compensate.
-                    result.append('|');
+                    result.append(filterContext.addProtectedContent(nbLines == 1 ? "|=" : "|", false));
                     result.append(" ");
-                    // OLD: table.addCell(" ");
                     firstCell = false;
                 } else if (lastToken.endsWith("\\")) {
                     // The last cell wasn't added because it ended with a continuation mark (\\). Add it now.
-                    result.append('|');
+                    result.append(filterContext.addProtectedContent(nbLines == 1 ? "|=" : "|", false));
                     result.append(lastToken.trim());
-                    // OLD: table.addCell(lastToken.trim());
                     firstCell = false;
                 }
             }
@@ -132,6 +129,12 @@ public class TableRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 
     @Override
     public boolean isInline()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean protectResult()
     {
         return false;
     }

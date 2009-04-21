@@ -102,34 +102,34 @@
         ## Set the extra to load
         ##
         #if ($velocityCount == 1)
-          var extraInit = function(){ displayDocExtra("${extraAnchor}", "${extraTemplate}", false) };
+          var extraInit = function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false) };
         #end
         if (hashviewer == "${extraAnchor}") {
-          var extraInit = function(){ displayDocExtra("${extraAnchor}", "${extraTemplate}", true) };
+          var extraInit = function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true) };
         }
         ##
         ## Replace tab link
         ##
         if ($("${extraAnchor}link") != null) {
           $("${extraAnchor}link").href="#${extraAnchor}";
-          Event.observe($("${extraAnchor}link"), "click", function(){ displayDocExtra("${extraAnchor}", "${extraTemplate}", false); }, false);
+          Event.observe($("${extraAnchor}link"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false); }, false);
         }
         ##
         ## Replace top menu link (if any)
         ##
         if ($("tmShow${extraAnchor}") != null) {
           $("tmShow${extraAnchor}").href="#${extraAnchor}";
-          Event.observe($("tmShow${extraAnchor}"), "click", function(){ displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
+          Event.observe($("tmShow${extraAnchor}"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
         }
         ##
         ## Override keyboard shortcut (if any)
         ##
         #if ($keyboardShortcutsEnabled && "$!extraShortcut" != "")
           shortcut.remove("$extraShortcut");
-          shortcut.add("$extraShortcut", function() { displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+          shortcut.add("$extraShortcut", function() { XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         #end
       #end
-      Event.observe(window, "load", extraInit, false);
+      document.observe("dom:loaded", extraInit, false);
     </script>
   </div> ## xwikidatacontents
 #end

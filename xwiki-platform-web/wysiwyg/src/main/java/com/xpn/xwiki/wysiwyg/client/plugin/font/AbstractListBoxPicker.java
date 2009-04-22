@@ -29,6 +29,11 @@ import com.google.gwt.user.client.ui.ListBox;
 public abstract class AbstractListBoxPicker extends ListBox implements Picker
 {
     /**
+     * The object used to match list item.
+     */
+    private final Matcher<String> matcher = new DefaultStringMatcher();
+
+    /**
      * Creates a new empty list box picker.
      */
     public AbstractListBoxPicker()
@@ -56,5 +61,32 @@ public abstract class AbstractListBoxPicker extends ListBox implements Picker
     public String getSelectedValue()
     {
         return getSelectedIndex() < 0 ? null : getValue(getSelectedIndex());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Picker#setSelectedValue(String)
+     */
+    public void setSelectedValue(String value)
+    {
+        setSelectedValue(value, matcher);
+    }
+
+    /**
+     * Looks for a list item that matches the given value and selects the one that is found.
+     * 
+     * @param value the value to look for
+     * @param matcher the object used to match the given value with the list item values
+     */
+    protected void setSelectedValue(String value, Matcher<String> matcher)
+    {
+        for (int i = getItemCount() - 1; i >= 0; i--) {
+            if (matcher.match(getValue(i), value)) {
+                setSelectedIndex(i);
+                return;
+            }
+        }
+        setSelectedIndex(-1);
     }
 }

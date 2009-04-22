@@ -19,48 +19,40 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.font;
 
-import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
 
 /**
- * A widget used for choosing a font family.
+ * Matches values of the font-family CSS property.
  * 
  * @version $Id$
  */
-public class FontFamilyPicker extends AbstractListBoxPicker
+public class FontFamilyMatcher extends AbstractFontMatcher
 {
     /**
-     * The object used to match font families.
+     * A larger font size increases the accuracy but may lower the speed of the test.
      */
-    private final Matcher<String> matcher = new FontFamilyMatcher();
+    public static final String TEST_FONT_SIZE = "50px";
 
     /**
-     * Creates a new empty font family picker.
+     * Creates a new font family matcher.
      */
-    public FontFamilyPicker()
+    public FontFamilyMatcher()
     {
-        addStyleName("xFontFamilyPicker");
+        super("mmmmmmmmmwwwwwww");
+
+        left.getStyle().setProperty(Style.FONT_SIZE.getJSName(), TEST_FONT_SIZE);
+        right.getStyle().setProperty(Style.FONT_SIZE.getJSName(), TEST_FONT_SIZE);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setValue(int, String)
+     * @see Matcher#match(Object, Object)
      */
-    public void setValue(int index, String value)
+    public boolean match(String leftValue, String rightValue)
     {
-        super.setValue(index, value);
-        Element option = (Element) getElement().getChildNodes().getItem(index);
-        option.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), value);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractListBoxPicker#setSelectedValue(String)
-     */
-    public void setSelectedValue(String value)
-    {
-        setSelectedValue(value, matcher);
+        left.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), leftValue);
+        right.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), rightValue);
+        return left.getOffsetWidth() == right.getOffsetWidth() && left.getOffsetHeight() == right.getOffsetHeight();
     }
 }

@@ -19,48 +19,45 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.font;
 
-import org.xwiki.gwt.dom.client.Element;
+import java.util.Comparator;
+
 import org.xwiki.gwt.dom.client.Style;
 
 /**
- * A widget used for choosing a font family.
+ * Compares two font sizes. This is not trivial as it may seem because font-size CSS property can take different kind of
+ * values.
  * 
  * @version $Id$
  */
-public class FontFamilyPicker extends AbstractListBoxPicker
+public class FontSizeComparator extends AbstractFontMatcher implements Comparator<String>
 {
     /**
-     * The object used to match font families.
+     * Creates a new font size comparator.
      */
-    private final Matcher<String> matcher = new FontFamilyMatcher();
-
-    /**
-     * Creates a new empty font family picker.
-     */
-    public FontFamilyPicker()
+    public FontSizeComparator()
     {
-        addStyleName("xFontFamilyPicker");
+        super("m");
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setValue(int, String)
+     * @see Comparator#compare(Object, Object)
      */
-    public void setValue(int index, String value)
+    public int compare(String leftValue, String rightValue)
     {
-        super.setValue(index, value);
-        Element option = (Element) getElement().getChildNodes().getItem(index);
-        option.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), value);
+        left.getStyle().setProperty(Style.FONT_SIZE.getJSName(), leftValue);
+        right.getStyle().setProperty(Style.FONT_SIZE.getJSName(), rightValue);
+        return left.getOffsetWidth() - right.getOffsetWidth();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setSelectedValue(String)
+     * @see Matcher#match(Object, Object)
      */
-    public void setSelectedValue(String value)
+    public boolean match(String leftValue, String rightValue)
     {
-        setSelectedValue(value, matcher);
+        return compare(leftValue, rightValue) == 0;
     }
 }

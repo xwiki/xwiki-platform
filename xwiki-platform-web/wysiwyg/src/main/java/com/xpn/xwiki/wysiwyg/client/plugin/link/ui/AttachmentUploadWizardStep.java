@@ -26,6 +26,7 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
  * Specific file upload wizard step to handle upload of a new file attachment in order to create a link to it.
@@ -45,17 +46,25 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
     @Override
     protected String getUploadURL()
     {
-        // /xwiki/rest/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments
+        // use a regular post to the upload action ftm, since REST is throwing an exception and messes up the document
+        // in some cases
+        // FIXME: un-hardcode this and make it work with multiwiki
         StringBuffer uploadURL = new StringBuffer();
-        uploadURL.append("/xwiki/rest/wikis/");
-        uploadURL.append(linkData.getWiki());
-        uploadURL.append("/spaces/");
+        uploadURL.append("../../upload/");
         uploadURL.append(linkData.getSpace());
-        uploadURL.append("/pages/");
+        uploadURL.append('/');
         uploadURL.append(linkData.getPage());
-        uploadURL.append("/attachments");
 
         return uploadURL.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getFileUploadInputName()
+    {
+        return "filepath";
     }
 
     /**
@@ -91,7 +100,7 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
     {
         // create the link reference
         WysiwygService.Singleton.getInstance().getAttachmentLink(linkData.getWiki(), linkData.getSpace(),
-            linkData.getPage(), getFileInputName(), new AsyncCallback<LinkConfig>()
+            linkData.getPage(), extractFileName(), new AsyncCallback<LinkConfig>()
             {
                 public void onSuccess(LinkConfig result)
                 {
@@ -111,5 +120,18 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
                     async.onFailure(caught);
                 }
             });
+    }
+
+    /**
+     * @return the filename set in the file upload field.
+     */
+    protected String extractFileName()
+    {
+        // not correct, since it strips \ out of unix filenames, but consistent with UploadAction behaviour, which we
+        // need to match to get the correct information about uploaded file
+        String fname = getFileUploadInput().getFilename();
+        fname = StringUtils.substringAfterLast(fname, "/");
+        fname = StringUtils.substringAfterLast(fname, "\\");
+        return fname;
     }
 }

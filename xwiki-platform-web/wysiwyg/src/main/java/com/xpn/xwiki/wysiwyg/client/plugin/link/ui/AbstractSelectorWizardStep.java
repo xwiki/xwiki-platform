@@ -115,6 +115,20 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
     }
 
     /**
+     * Invalidates the cache on the explorer, so that it will be reloaded on next display. To be used to request an
+     * update of the tree when new data is added to it.
+     */
+    protected void invalidateExplorerData()
+    {
+        // let's be silently safe about it, no calling function should fail because of this, at least for the moment
+        try {
+            explorer.invalidateCache();
+        } catch (Exception e) {
+            // nothing
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public Widget display()

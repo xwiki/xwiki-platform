@@ -474,6 +474,22 @@ isc.XWEDataSource.addProperties({
     }
 });
 
+/**
+ * Overwrite init method of the general data source so that transformRequest adds a random parameter to each request to 
+ * overcome IE cache. 
+ */
+isc.XWEDataSource.addMethods({
+    init : function() {
+        this.transformRequest = function (dsRequest) {
+            if (dsRequest.originalData) {
+                dsRequest.originalData.r = "" + Math.floor(Math.random() * 1000000);
+            }
+            return dsRequest.data;
+        };	
+        this.Super("init", arguments);
+    }
+});
+
 /*
  * Wiki DataSource
  */
@@ -722,6 +738,14 @@ isc.XWETreeGrid.addMethods({
             el.appendChild(document.createTextNode(css));
         }
         pa.appendChild(el);
+    },
+
+    /**
+     * Invalidate Cache needs to be overwritten to also invalidate the input cached value. 
+     */
+    invalidateCache : function() {
+        this.Super("invalidateCache", arguments);
+        this.inputValueCache = "";
     },
 
     /**

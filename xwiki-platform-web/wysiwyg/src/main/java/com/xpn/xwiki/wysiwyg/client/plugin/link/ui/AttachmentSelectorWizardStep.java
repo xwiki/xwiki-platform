@@ -79,6 +79,10 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorWizardStep
     public String getNextStep()
     {
         if (getExplorer().isNewAttachment()) {
+            // if a new attachment will be uploaded, invalidate the explorer cache so that the new attachment shows up
+            // in the tree when it will be loaded next. Even if the upload dialog could be canceled and then this is
+            // useless, there is no further point where we could access the explorer to invalidate it.
+            invalidateExplorerData();
             return LinkWizardSteps.ATTACHUPLOAD.toString();
         }
         return LinkWizardSteps.WIKIPAGECONFIG.toString();

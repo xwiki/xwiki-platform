@@ -29,18 +29,18 @@
 1 Manage blog categories
 
 1.1 Existing categories
-#if ("$!request.action" == "delete")
+#if ("$!request.xaction" == "delete")
   #foreach($item in $request.getParameterValues("${blogPostClassname}__category"))
     #deleteCategory($item)
   #end
-#elseif("$!request.action" == "create")
+#elseif("$!request.xaction" == "create")
   #set($title = $request.newCategoryName)
   #set($name = "${doc.space}.${title}")
   $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${request.newCategoryParent}&amp;title=${title}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${doc.getURL()}"))
 #end
 &lt;form action="" method="post"&gt;
 &lt;div&gt;
-&lt;input type="hidden" name="action" value="delete"/&gt;
+&lt;input type="hidden" name="xaction" value="delete"/&gt;
 #getCategoriesHierarchy("" $tree)
 #displayCategoriesHierarchy($tree 'selectable')
   &lt;input type="hidden" name="manage" value="true"/&gt;

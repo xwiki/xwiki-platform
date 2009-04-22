@@ -74,6 +74,14 @@ XWiki.actionButtons.EditActions = Class.create({
     document.fire("xwiki:actions:cancel");
 
     var location = evt.element().form.action;
+    if (typeof location != "string") {
+       location = evt.element().form.attributes.getNamedItem("action");
+       if (location) {
+         location = location.nodeValue;
+       } else {
+         location = window.self.location.href;
+       }
+    }
     if (location.indexOf('?') == -1) {
       location += '?';
     }

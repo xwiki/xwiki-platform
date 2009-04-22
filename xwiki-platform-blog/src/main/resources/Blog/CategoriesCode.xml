@@ -275,7 +275,7 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
 #macro(showCreateCategoryBox $tree)
   &lt;form action="" method="post"&gt;
   &lt;div class='create-category'&gt;
-    &lt;input type="hidden" name="action" value="create"/&gt;
+    &lt;input type="hidden" name="xaction" value="create"/&gt;
     &lt;label&gt;New category: &lt;input type="text" name="newCategoryName"&gt;&lt;/input&gt;&lt;/label&gt;
     &lt;label&gt;Parent:
       &lt;select name="newCategoryParent" id="blog_category_selectBox"&gt;

@@ -30,6 +30,11 @@ import org.xwiki.gwt.dom.client.Style;
 public class FontSizePicker extends AbstractListBoxPicker
 {
     /**
+     * The object used to compare font sizes.
+     */
+    private final FontSizeComparator comparator = new FontSizeComparator();
+
+    /**
      * Creates a new empty font size picker.
      */
     public FontSizePicker()
@@ -56,6 +61,20 @@ public class FontSizePicker extends AbstractListBoxPicker
      */
     public void setSelectedValue(String value)
     {
-        // TODO
+        if (isRelative(value)) {
+            super.setSelectedValue(value);
+        } else {
+            setSelectedValue(value, comparator);
+        }
+    }
+
+    /**
+     * @param value the value of the font-size CSS property
+     * @return {@code true} if the given value expresses a relative font size, {@code false} otherwise
+     */
+    private boolean isRelative(String value)
+    {
+        return value == null || value.endsWith("%") || Style.FontSize.SMALLER.equalsIgnoreCase(value)
+            || Style.FontSize.LARGER.equalsIgnoreCase(value);
     }
 }

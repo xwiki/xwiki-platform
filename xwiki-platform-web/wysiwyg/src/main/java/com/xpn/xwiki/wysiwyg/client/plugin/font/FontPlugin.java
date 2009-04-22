@@ -26,6 +26,7 @@ import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -43,6 +44,19 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InlineStyleExecutabl
  */
 public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
 {
+    /**
+     * The list of default font names.
+     */
+    private static final String DEFAULT_FONT_NAMES =
+        "andale mono,arial,arial black,book antiqua,comic sans ms"
+            + ",courier new,georgia,helvetica,impact,symbol,tahoma,terminal"
+            + ",times new roman,trebuchet ms,verdana,webdings,wingdings";
+
+    /**
+     * The list of default font sizes.
+     */
+    private static final String DEFAULT_FONT_SIZES = "8pt,10pt,12pt,14pt,18pt,24pt,36pt";
+
     /**
      * The association between pickers and the commands that are executed on change events.
      */
@@ -68,8 +82,10 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
         getTextArea().getCommandManager()
             .registerCommand(Command.FONT_SIZE, new InlineStyleExecutable(Style.FONT_SIZE));
 
-        addFontNameFeature();
-        addFontSizeFeature();
+        addFeature("fontname", Command.FONT_NAME, new FontFamilyPicker(), Strings.INSTANCE.font(), "fontNames",
+            DEFAULT_FONT_NAMES);
+        addFeature("fontsize", Command.FONT_SIZE, new FontSizePicker(), Strings.INSTANCE.fontSize(), "fontSizes",
+            DEFAULT_FONT_SIZES);
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().addMouseListener(this);
@@ -80,58 +96,29 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
     }
 
     /**
-     * Makes the font name feature available to be used on the tool bar.
+     * Makes the specified feature available to be used on the tool bar.
+     * 
+     * @param name the feature name
+     * @param command the rich text area command that is executed by this feature
+     * @param picker the widget to be placed on the tool bar
+     * @param title the tool tip used on the tool bar widget
+     * @param parameter the configuration parameter that holds the list of possible values for this feature
+     * @param defaultValues the default list of possible values for this list
      */
-    private void addFontNameFeature()
+    private void addFeature(String name, Command command, ListBox picker, String title, String parameter,
+        String defaultValues)
     {
-        if (getTextArea().getCommandManager().isSupported(Command.FONT_NAME)) {
-            FontFamilyPicker picker = new FontFamilyPicker();
-            picker.setTitle(Strings.INSTANCE.font());
+        if (getTextArea().getCommandManager().isSupported(command)) {
+            picker.setTitle(title);
             picker.addChangeListener(this);
 
-            picker.addItem("andale mono");
-            picker.addItem("arial");
-            picker.addItem("arial black");
-            picker.addItem("book antiqua");
-            picker.addItem("comic sans ms");
-            picker.addItem("courier new");
-            picker.addItem("georgia");
-            picker.addItem("helvetica");
-            picker.addItem("impact");
-            picker.addItem("symbol");
-            picker.addItem("tahoma");
-            picker.addItem("terminal");
-            picker.addItem("times new roman");
-            picker.addItem("trebuchet ms");
-            picker.addItem("verdana");
-            picker.addItem("webdings");
-            picker.addItem("wingdings");
+            String[] values = getConfig().getParameter(parameter, defaultValues).split("\\s*,\\s*");
+            for (int i = 0; i < values.length; i++) {
+                picker.addItem(values[i]);
+            }
 
-            toolBarExtension.addFeature("fontname", picker);
-            pickers.put(picker, Command.FONT_NAME);
-        }
-    }
-
-    /**
-     * Makes the font size feature available to be used on the tool bar.
-     */
-    private void addFontSizeFeature()
-    {
-        if (getTextArea().getCommandManager().isSupported(Command.FONT_SIZE)) {
-            FontSizePicker picker = new FontSizePicker();
-            picker.setTitle(Strings.INSTANCE.fontSize());
-            picker.addChangeListener(this);
-
-            picker.addItem("8pt");
-            picker.addItem("10pt");
-            picker.addItem("12pt");
-            picker.addItem("14pt");
-            picker.addItem("18pt");
-            picker.addItem("24pt");
-            picker.addItem("36pt");
-
-            toolBarExtension.addFeature("fontsize", picker);
-            pickers.put(picker, Command.FONT_SIZE);
+            toolBarExtension.addFeature(name, picker);
+            pickers.put((Picker) picker, command);
         }
     }
 

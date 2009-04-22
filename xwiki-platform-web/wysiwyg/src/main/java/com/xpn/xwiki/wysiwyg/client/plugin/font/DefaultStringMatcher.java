@@ -19,48 +19,20 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.font;
 
-import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.dom.client.Style;
-
 /**
- * A widget used for choosing a font family.
+ * Matches two {@link String}s if they are both null or equal ignoring case.
  * 
  * @version $Id$
  */
-public class FontFamilyPicker extends AbstractListBoxPicker
+public class DefaultStringMatcher implements Matcher<String>
 {
     /**
-     * The object used to match font families.
-     */
-    private final Matcher<String> matcher = new FontFamilyMatcher();
-
-    /**
-     * Creates a new empty font family picker.
-     */
-    public FontFamilyPicker()
-    {
-        addStyleName("xFontFamilyPicker");
-    }
-
-    /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setValue(int, String)
+     * @see Matcher#match(Object, Object)
      */
-    public void setValue(int index, String value)
+    public boolean match(String leftValue, String rightValue)
     {
-        super.setValue(index, value);
-        Element option = (Element) getElement().getChildNodes().getItem(index);
-        option.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), value);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractListBoxPicker#setSelectedValue(String)
-     */
-    public void setSelectedValue(String value)
-    {
-        setSelectedValue(value, matcher);
+        return leftValue == null ? rightValue == null : leftValue.equalsIgnoreCase(rightValue);
     }
 }

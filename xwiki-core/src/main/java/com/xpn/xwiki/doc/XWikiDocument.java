@@ -3165,7 +3165,7 @@ public class XWikiDocument implements DocumentModelBridge
     public List<String> getIncludedPages(XWikiContext context)
     {
         if (is10Syntax()) {
-            return getIncludedPagesForXWiki10Syntax(context);
+            return getIncludedPagesForXWiki10Syntax(getContent(), context);
         } else {
             // Find all include macros listed on the page
             XDOM dom = getXDOM();
@@ -3180,16 +3180,24 @@ public class XWikiDocument implements DocumentModelBridge
                     result.add(documentName);
                 }
             }
+            
+            // Also add all the included pages found in the velocity macro when using the deprecated #include* macros
+            // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to play nice
+            // with people migrating from 1.0 to 2.0 syntax
+            for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class, true)) {
+                // try to find matching content inside each velocity macro
+                result.addAll(getIncludedPagesForXWiki10Syntax(macroBlock.getContent(), context));
+            }
 
             return result;
         }
     }
 
-    private List<String> getIncludedPagesForXWiki10Syntax(XWikiContext context)
+    private List<String> getIncludedPagesForXWiki10Syntax(String content, XWikiContext context)
     {
         try {
             String pattern = "#include(Topic|InContext|Form|Macros|parseGroovyFromPage)\\([\"'](.*?)[\"']\\)";
-            List<String> list = context.getUtil().getUniqueMatches(getContent(), pattern, 2);
+            List<String> list = context.getUtil().getUniqueMatches(content, pattern, 2);
             for (int i = 0; i < list.size(); i++) {
                 try {
                     String name = list.get(i);

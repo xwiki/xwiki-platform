@@ -500,42 +500,6 @@ function openHelp() {
 }
 
 /**
- * Ajax request wrapper.
- *
- * @deprecated
- */
-var XWikiAjax = {
-        requests: new Array(),
-        start: function(status) {
-    this.status = $(status);
-    ajaxEngine.registerRequest ('setValue', 'SetValueResponse?xpage=rdf');
-    ajaxEngine.registerAjaxElement (this.status.id);
-},
-addRequest: function(dName, cName, field, value) {
-    var request = Object.extend({
-        type: 'set'
-    });
-    request.className = cName;
-    request.document = dName;
-    request.field = field;
-    request.value = value;
-    this.requests.push(request);
-},
-end: function() {
-    this.requests.reverse();
-    var req = this.requests.pop();
-    while (req) {
-        if (req.type=='set') {
-            ajaxEngine.sendRequest ('setValue', 'status='+this.status.id, 'doc='+req.document,
-                    'typedoc='+req.className, 'field='+req.field, 'value='+req.value);
-        };
-        req = this.requests.pop();
-    }
-    this.status.innerHtml = 'updated';
-}
-};
-
-/**
  * Remove special characters from text inputs.
  *
  * @param field1 Text input

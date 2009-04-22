@@ -43,4 +43,15 @@ public class StringUtils
     {
         return str == null || str.length() == 0;
     }
+
+    /**
+     * @param str the string to search in
+     * @param pattern the pattern to search in {@code str}
+     * @return the substring in {@code str} after the last occurrence of {@code pattern}, or the full {@code str} if
+     *         {@code pattern} does not appear
+     */
+    public static String substringAfterLast(String str, String pattern)
+    {
+        return str.substring(str.lastIndexOf(pattern) + 1);
+    }
 }

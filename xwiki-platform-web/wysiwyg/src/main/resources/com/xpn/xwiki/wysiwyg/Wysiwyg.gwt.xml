@@ -121,16 +121,4 @@
       <when-property-is name="user.agent" value="gecko"/>
     </any>
   </replace-with>
-
-  <!-- FileNameExtractor, to extract the file name in a file input the same on all browsers -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.link.ui.FileNameExtractor">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.link.ui.FileNameExtractor"/>
-  </replace-with>
-  
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.link.ui.IEFileNameExtractor">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.link.ui.FileNameExtractor"/>
-    <any>
-      <when-property-is name="user.agent" value="ie6"/>
-    </any>
-  </replace-with>
 </module>

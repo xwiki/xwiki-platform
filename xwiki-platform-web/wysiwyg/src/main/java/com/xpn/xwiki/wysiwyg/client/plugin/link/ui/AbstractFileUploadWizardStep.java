@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.EnumSet;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FileUpload;
@@ -30,7 +29,6 @@ import com.google.gwt.user.client.ui.FormHandler;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormSubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormSubmitEvent;
-import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,16 +45,6 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
 public abstract class AbstractFileUploadWizardStep implements WizardStep
 {
     /**
-     * The name of the file input field in the file upload form.
-     */
-    private static final String FILE_INPUT_NAME = "file";
-    
-    /**
-     * The name of the input to set the name of the file in. 
-     */
-    private static final String NAME_INPUT_NAME = "filename";
-
-    /**
      * Main panel of this wizard step, to be used for the {@link #display()}.
      */
     private final Panel mainPanel = new FlowPanel();
@@ -70,11 +58,6 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
      * The file input in the file upload form.
      */
     private final FileUpload fileUploadInput = new FileUpload();
-    
-    /**
-     * The input to get the file name.
-     */
-    private final Hidden fileNameInput = new Hidden();
 
     /**
      * Default constructor.
@@ -87,14 +70,11 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
         // set the url on submit time, just before upload
 
         Label fileLabel = new Label(Strings.INSTANCE.fileUploadLabel());
-        fileUploadInput.setName(FILE_INPUT_NAME);
+        fileUploadInput.setName(getFileUploadInputName());
         FlowPanel formPanel = new FlowPanel();
-        
-        fileNameInput.setName(NAME_INPUT_NAME);
 
         formPanel.add(fileLabel);
         formPanel.add(fileUploadInput);
-        formPanel.add(fileNameInput);
 
         fileUploadForm.setWidget(formPanel);
 
@@ -172,9 +152,6 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
             async.onSuccess(false);
             return;
         }
-        // set the filename to the extracted file name: useful because some browsers return the whole path as the value
-        // of the fileinput and the REST api does not handle this case
-        fileNameInput.setValue(getFileInputName());
         // otherwise continue with submit
         fileUploadForm.submit();
     }
@@ -185,6 +162,12 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
      * @return the url to set as the action of the file upload form
      */
     protected abstract String getUploadURL();
+
+    /**
+     * @return the {@code name} attribute of the {@link #fileUploadInput}, to be returned by subclasses implementing
+     *         {@link #getUploadURL()} to set the file upload form data.
+     */
+    protected abstract String getFileUploadInputName();
 
     /**
      * Handles the submit completion in asynchronous mode, to pass the result of processing the result in the received
@@ -200,14 +183,6 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
         // from the rest response now: application/json is not recognized by browser and application/xml is changed by
         // IE in XHTML, so info cannot be obtained
         async.onSuccess(true);
-    }
-
-    /**
-     * @return the filename set in the file upload field.
-     */
-    protected String getFileInputName()
-    {
-        return ((FileNameExtractor) GWT.create(FileNameExtractor.class)).getFileName(getFileUploadInput());
     }
 
     /**

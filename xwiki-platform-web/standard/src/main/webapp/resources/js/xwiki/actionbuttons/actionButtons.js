@@ -69,6 +69,10 @@ XWiki.actionButtons.EditActions = Class.create({
   },
   onCancel : function(evt) {
     evt.stop();
+
+    // Notify others we are going to cancel
+    document.fire("xwiki:actions:cancel");
+
     var location = evt.element().form.action;
     if (location.indexOf('?') == -1) {
       location += '?';
@@ -79,10 +83,17 @@ XWiki.actionButtons.EditActions = Class.create({
     if (!this.validateForm(evt.element().form)) {
       evt.stop();
     }
+    else {
+      // Nofity others
+      document.fire("xwiki:actions:preview");
+    }
   },
   onSaveAndView : function(evt) {
     if (!this.validateForm(evt.element().form)) {
       evt.stop();
+    }
+    else {
+      document.fire("xwiki:actions:save", {"continue": false});
     }
   }
 });
@@ -142,6 +153,7 @@ XWiki.actionButtons.EditActions.AjaxSaveAndContinue = Class.create({
   onSubmitting : function(event) {
     if (this.saveAndContinue) {
       event.stop();
+      document.fire("xwiki:actions:save", {"continue":true});
       this.saveAndContinue = false;
       this.savedBox.hide();
       this.failedBox.hide();

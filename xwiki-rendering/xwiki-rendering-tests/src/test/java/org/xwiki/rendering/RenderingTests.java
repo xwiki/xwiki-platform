@@ -46,6 +46,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("embeddeddoc/embeddeddoc6", false);
         suite.addTestsFromResource("embeddeddoc/embeddeddoc7", false);
         suite.addTestsFromResource("embeddeddoc/embeddeddoc8", false);
+        suite.addTestsFromResource("embeddeddoc/embeddeddoc9", false);
 
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);

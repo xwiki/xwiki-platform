@@ -116,6 +116,12 @@ public class Style extends com.google.gwt.dom.client.Style
     public static final String POSITION = "position";
 
     /**
+     * The visibility property sets if an element should be visible or invisible. Even invisible elements takes up space
+     * on the page. Use the {@link #DISPLAY} property to create invisible elements that do not take up space.
+     */
+    public static final String VISIBILITY = "visibility";
+
+    /**
      * Standard values for {@link Style#DISPLAY}.
      */
     public static final class Display
@@ -306,9 +312,49 @@ public class Style extends com.google.gwt.dom.client.Style
         public static final String MEDIUM = "medium";
 
         /**
+         * Sets the font-size to a smaller size than the parent element.
+         */
+        public static final String SMALLER = "smaller";
+
+        /**
+         * Sets the font-size to a larger size than the parent element.
+         */
+        public static final String LARGER = "larger";
+
+        /**
          * This is a utility class so it has a private constructor.
          */
         private FontSize()
+        {
+        }
+    }
+
+    /**
+     * Standard values for {@link Style#VISIBILITY}.
+     */
+    public static final class Visibility
+    {
+        /**
+         * The element is visible.
+         */
+        public static final String VISIBLE = "visible";
+
+        /**
+         * The element is invisible.
+         */
+        public static final String HIDDEN = "hidden";
+
+        /**
+         * When used in table elements, this value removes a row or column, but it does not affect the table layout. The
+         * space taken up by the row or column will be available for other content. If this value is used on other
+         * elements, it renders as "hidden".
+         */
+        public static final String COLLAPSE = "collapse";
+
+        /**
+         * This is a utility class so it has a private constructor.
+         */
+        private Visibility()
         {
         }
     }

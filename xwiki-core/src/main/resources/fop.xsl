@@ -42,12 +42,14 @@
         <xsl:param name="n" select="number(1)"/>
         <!-- 1-based rather than 0-based is more XML-ian :-) -->
         <xsl:param name="max"/>
-
+<!-- Disabling this, as it seems that recent versions of FOP work very well without it, and it is causing problems when
+     colgroup attributes are involved.
         <xsl:element name="fo:table-column">
             <xsl:attribute name="column-width">
                 <xsl:text>proportional-column-width(1)</xsl:text>
             </xsl:attribute>
         </xsl:element>
+-->
         <!--
 Note that changing this template to iterate downwards is a little more
 efficient and correct, IMO. Then you have no $max, you specify $n as

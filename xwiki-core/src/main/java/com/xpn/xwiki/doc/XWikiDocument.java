@@ -4160,7 +4160,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntax() need to create a
         // XWikiDocument object to get preferences and generate an infinite loop
-        if (this.syntaxId == null) {
+        if (isNew() && this.syntaxId == null) {
             this.syntaxId = getDefaultDocumentSyntax();
         }
 

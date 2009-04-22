@@ -53,6 +53,7 @@ public class StyleFilter extends AbstractHTMLFilter
         attributeMappingsStrict.put(TAG_A, "|href|name|");
         attributeMappingsStrict.put(TAG_IMG, "|alt|src|height|width|");
         attributeMappingsStrict.put(TAG_TD, "|colspan|rowspan|");
+        attributeMappingsStrict.put(TAG_TH, "|colspan|");
     }
 
     /**

@@ -199,6 +199,8 @@
 /* The toolbox, floated on the right of the title */
 .blog-entry-toolbox {
   float: right;
+  position: relative;
+  z-index: 1000;
 }
 /* Add a space + line between consecutive blog entries */
 .hentry + .hentry {

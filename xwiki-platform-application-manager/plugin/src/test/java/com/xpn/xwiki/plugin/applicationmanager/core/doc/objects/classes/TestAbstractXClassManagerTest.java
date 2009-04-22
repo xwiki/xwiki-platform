@@ -108,6 +108,8 @@ public class TestAbstractXClassManagerTest extends AbstractBridgedXWikiComponent
             }
         });
 
+        mockXWiki.stubs().method("getXWikiPreference").with(eq("core.defaultDocumentSyntax"), ANYTHING, ANYTHING).will(returnValue("xwiki/1.0"));
+        
         this.xwiki = (XWiki) mockXWiki.proxy();
         getContext().setWiki(this.xwiki);
     }

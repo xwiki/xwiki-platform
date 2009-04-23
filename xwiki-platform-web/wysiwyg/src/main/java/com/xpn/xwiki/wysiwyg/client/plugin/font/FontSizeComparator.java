@@ -58,6 +58,6 @@ public class FontSizeComparator extends AbstractFontMatcher implements Comparato
      */
     public boolean match(String leftValue, String rightValue)
     {
-        return compare(leftValue, rightValue) == 0;
+        return super.match(leftValue, rightValue) || compare(leftValue, rightValue) == 0;
     }
 }

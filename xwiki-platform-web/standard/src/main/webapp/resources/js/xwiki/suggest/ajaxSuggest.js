@@ -1,5 +1,10 @@
-if (typeof XWiki == "undefined") {
+// Make sure the XWiki 'namespace' exists.
+if(typeof XWiki == "undefined") {
   XWiki = new Object();
+}
+// Make sure the widgets 'namespace' exists.
+if(typeof(XWiki.widgets) == 'undefined') {
+  XWiki.widgets = new Object();
 }
 
 var useXWKns;
@@ -14,7 +19,7 @@ if (useXWKns) {
   _xwk = this;
 }
 
-// same this is temporary until the clean is finished.
+// Same, this is temporary until the clean is finished.
 // see http://jira.xwiki.org/jira/browse/XWIKI-3655
 _xwk.ajaxSuggest =
 
@@ -22,7 +27,46 @@ _xwk.ajaxSuggest =
  * Suggest class.
  * Provide value suggestions to users when starting to type in a text input.
  */
-XWiki.suggest = Class.create({
+XWiki.widgets.Suggest = Class.create({
+  options : {
+    // The minimum number of characters after which to trigger the suggest
+    minchars : 1,
+    // The HTTP method for the AJAX request
+    method : "get",
+    // The name of the request parameter holding the input stub
+    varname : "input",
+    // The CSS classname of the suggest list
+    className : "ajaxsuggest",
+    timeout : 2500,
+    delay : 500,
+    offsety : -5,
+    // Display a "no results" message, or simply hide the suggest box when no suggestions are available
+    shownoresults : true,
+    // The message to display as the "no results" message
+    noresults : "No results!",
+    maxheight : 250,
+    cache : false,
+    seps : "",
+    // The name of the JSON variable or XML element holding the results.
+    // "results" for the old suggest, "searchResults" for the REST search.
+    resultsParameter : "results",
+    // The name of the JSON parameter or XML attribute holding the result identifier.
+    // "id" for both the old suggest and the REST search.
+    resultId : "id",
+    // The name of the JSON parameter or XML attribute holding the result value.
+    // "value" for the old suggest, "pageFullName" for the REST page search.
+    resultValue : "value",
+    // The name of the JSON parameter or XML attribute holding the result auxiliary information.
+    // "info" for the old suggest, "pageFullName" for the REST search.
+    resultInfo : "info",
+    // The id of the element that will hold the suggest element
+    parentContainer : "body"
+  },
+  sInput : "",
+  nInputChars : 0,
+  aSuggestions : [],
+  iHighlighted : 0,
+
   /**
    * Initialize the suggest
    *
@@ -30,152 +74,109 @@ XWiki.suggest = Class.create({
    * @param {Object} param the options
    */
   initialize: function (fld, param){
-        this.fld = fld;
+    this.fld = $(fld);
 
-        if (!this.fld)
-            return false;
+    if (!this.fld) {
+      return false;
+    }
 
-        // init variables
-        //
-        this.sInput = "";
-        this.nInputChars = 0;
-        this.aSuggestions = [];
-        this.iHighlighted = 0;
+    // parameters object
+    Object.extend(this.options, param || { });
 
-        // parameters object
-        //
-        this.oP = (param) ? param : {};
+    // Reset the container if the configured parameter is not valid
+    if (!$(this.options.parentContainer)) {
+      this.options.parentContainer = $(document.body);
+    }
 
-        // defaults
-        //
-        if (!this.oP.minchars)
-            this.oP.minchars = 1;
-        if (!this.oP.method)
-            this.oP.meth = "get";
-        if (!this.oP.varname)
-            this.oP.varname = "input";
-        if (!this.oP.className)
-            this.oP.className = "ajaxsuggest";
-        if (!this.oP.timeout)
-            this.oP.timeout = 2500;
-        if (!this.oP.delay)
-            this.oP.delay = 500;
-        if (!this.oP.offsety)
-            this.oP.offsety = -5;
-        if (!this.oP.shownoresults)
-            this.oP.shownoresults = true;
-        if (!this.oP.noresults)
-            this.oP.noresults = "No results!";
-        if (!this.oP.maxheight && this.oP.maxheight !== 0)
-            this.oP.maxheight = 250;
-        if (!this.oP.cache && this.oP.cache != false)
-            this.oP.cache = false;
-        if (this.oP.seps)
-            this.seps = this.oP.seps;
-        else
-            this.seps = "";
-        // set keyup handler for field
-        // and prevent autocomplete from client
-        //
-        var pointer = this;
+    if (this.options.seps) {
+      this.seps = this.options.seps;
+    } else {
+      this.seps = "";
+    }
+    // Bind the key listeners on the input field.
+    this.fld.observe("keyup", this.onKeyUp.bindAsEventListener(this));
+    if (Prototype.Browser.IE) {
+      this.fld.observe("keydown", this.onKeyPress.bindAsEventListener(this));
+    } else {
+      this.fld.observe("keypress", this.onKeyPress.bindAsEventListener(this));
+    }
 
-        // NOTE: not using addEventListener because UpArrow fired twice in Safari
-        //_xwk.DOM.addEvent( this.fld, 'keyup', function(ev){ return pointer.onKeyPress(ev); } );
-
-        this.fld.onkeypress = function(ev){
-            return pointer.onKeyPress(ev);
-        }
-        this.fld.onkeyup = function(ev){
-            return pointer.onKeyUp(ev);
-        }
-
-        this.fld.setAttribute("autocomplete", "off");
+    // Prevent normal browser autocomplete
+    this.fld.setAttribute("autocomplete", "off");
   },
 
   /**
-   * Key press handler
-   *
-   * @param {Object} ev
+   * Treats normal characters and triggers the autocompletion behavior. This is needed since the field value is not
+   * updated when keydown/keypress are called, so the suggest would work with the previous value. The disadvantage is
+   * that keyUp is not fired for each stroke in a long keypress, but only once at the end. This is not a real problem,
+   * though.
    */
-  onKeyPress: function(ev)
+  onKeyUp: function(event)
   {
-    var key = (window.event) ? window.event.keyCode : ev.keyCode;
-
-    // set responses to keydown events in the field
-    // this allows the user to use the arrow keys to scroll through the results
-    // ESCAPE clears the list
-    // TAB sets the current highlighted value
-    //
-    var RETURN = 13;
-    var TAB = 9;
-    var ESC = 27;
-
-    var bubble = true;
-
-    switch(key)
-    {
-      case RETURN: {
-            if(this.aSuggestions.length == 1) {
-              this.setHighlight(1);
-            }
-           this.setHighlightedValue();
-        bubble = false;
-      }
-      break;
-
-      case ESC:
-        this.clearSuggestions();
+    var key = event.keyCode;
+    switch(key) {
+      // Ignore special keys, which are treated in onKeyPress
+      case Event.KEY_RETURN:
+      case Event.KEY_ESC:
+      case Event.KEY_UP:
+      case Event.KEY_DOWN:
         break;
-    }
-    return bubble;
-  },
-
-  onKeyUp: function(ev)
-  {
-    var key = (window.event) ? window.event.keyCode : ev.keyCode;
-
-    // set responses to keydown events in the field
-    // this allows the user to use the arrow keys to scroll through the results
-    // ESCAPE clears the list
-    // TAB sets the current highlighted value
-    //
-
-    var ARRUP = 38;
-    var ARRDN = 40;
-
-    var bubble = true;
-
-    switch(key)
-    {
-      case ARRUP:
-        this.changeHighlight(key);
-        bubble = false;
-        break;
-
-      case ARRDN:
-        this.changeHighlight(key);
-        bubble = false;
-        break;
-
       default: {
-          //if there are separators in the input string,
-          // get suggestions only for the text after the last separator
-          if(this.seps)
-          {
-              var lastIndx = -1;
-          for(var i = 0; i < this.seps.length; i++)
-             if(this.fld.value.lastIndexOf(this.seps.charAt(i)) > lastIndx)
-               lastIndx = this.fld.value.lastIndexOf(this.seps.charAt(i));
-          if(lastIndx == -1)
-              this.getSuggestions(this.fld.value);
-          else
-              this.getSuggestions(this.fld.value.substring(lastIndx+1));
+        // If there are separators in the input string, get suggestions only for the text after the last separator
+        // TODO The user might be typing in the middle of the field, not in the last item. Do a better detection by
+        // comparing the new value with the old one.
+        if(this.seps) {
+          var lastIndx = -1;
+          for(var i = 0; i < this.seps.length; i++) {
+            if(this.fld.value.lastIndexOf(this.seps.charAt(i)) > lastIndx) {
+              lastIndx = this.fld.value.lastIndexOf(this.seps.charAt(i));
+            }
           }
-        else
+          if(lastIndx == -1) {
+            this.getSuggestions(this.fld.value);
+          } else {
+            this.getSuggestions(this.fld.value.substring(lastIndx+1));
+          }
+        } else {
           this.getSuggestions(this.fld.value);
+        }
       }
     }
-    return bubble;
+  },
+  /**
+   * Treats Up and Down arrows, Enter and Escape, affecting the UI meta-behavior. Enter puts the currently selected
+   * value inside the target field, Escape closes the suggest dropdown, Up and Down move the current selection.
+   */
+  onKeyPress: function(event) {
+    if(!$(this.idAs)) {
+      // Let the key events pass through if the UI is not displayed
+      return;
+    }
+    var key = event.keyCode;
+
+    switch(key) {
+      case Event.KEY_RETURN:
+        if(this.aSuggestions.length == 1) {
+          this.setHighlight(1);
+        }
+        this.setHighlightedValue();
+        Event.stop(event);
+        break;
+      case Event.KEY_ESC:
+        this.clearSuggestions();
+        Event.stop(event);
+        break;
+      case Event.KEY_UP:
+        this.changeHighlight(key);
+        Event.stop(event);
+        break;
+      case Event.KEY_DOWN:
+        this.changeHighlight(key);
+        Event.stop(event);
+        break;
+      default:
+        break;
+    }
   },
 
   /**
@@ -185,18 +186,17 @@ XWiki.suggest = Class.create({
    */
   getSuggestions: function (val)
   {
-
     // if input stays the same, do nothing
     //
-    if (val == this.sInput)
+    if (val == this.sInput) {
       return false;
+    }
 
     // input length is less than the min required to trigger a request
     // reset input string
     // do nothing
     //
-    if (val.length < this.oP.minchars)
-    {
+    if (val.length < this.options.minchars) {
       this.sInput = "";
       return false;
     }
@@ -204,13 +204,13 @@ XWiki.suggest = Class.create({
     // if caching enabled, and user is typing (ie. length of input is increasing)
     // filter results out of aSuggestions from last request
     //
-    if (val.length>this.nInputChars && this.aSuggestions.length && this.oP.cache)
+    if (val.length>this.nInputChars && this.aSuggestions.length && this.options.cache)
     {
       var arr = [];
-      for (var i=0;i<this.aSuggestions.length;i++)
-      {
-        if (this.aSuggestions[i].value.substr(0,val.length).toLowerCase() == val.toLowerCase())
+      for (var i=0;i<this.aSuggestions.length;i++) {
+        if (this.aSuggestions[i].value.substr(0,val.length).toLowerCase() == val.toLowerCase()) {
           arr.push( this.aSuggestions[i] );
+        }
       }
 
       this.sInput = val;
@@ -220,16 +220,14 @@ XWiki.suggest = Class.create({
       this.createList(this.aSuggestions);
 
       return false;
-    }
-    else
-    {
+    } else  {
       // do new request
-        this.sInput = val;
+      this.sInput = val;
       this.nInputChars = val.length;
 
       var pointer = this;
       clearTimeout(this.ajID);
-      this.ajID = setTimeout( function() { pointer.doAjaxRequest() }, this.oP.delay );
+      this.ajID = setTimeout( function() { pointer.doAjaxRequest() }, this.options.delay );
     }
     return false;
   },
@@ -242,14 +240,14 @@ XWiki.suggest = Class.create({
     var pointer = this;
 
     // create ajax request
-    var url = this.oP.script+this.oP.varname+"="+escape(this.fld.value);
-    var meth = this.oP.meth;
+    var url = this.options.script + this.options.varname + "=" + escape(this.fld.value);
+    var method = this.options.method;
 
     var onSuccessFunc = function (req) { pointer.setSuggestions(req) };
-    var onErrorFunc = function (status) { alert("AJAX error: "+status); };
+    var onErrorFunc = function (response) { alert("AJAX error: " + response.status); };
 
     var ajx = new Ajax.Request(url,{
-      method: meth,
+      method: method,
       onSuccess: onSuccessFunc,
       onFailure: onErrorFunc
     });
@@ -264,27 +262,32 @@ XWiki.suggest = Class.create({
   {
     this.aSuggestions = [];
 
-    if (this.oP.json)
-    {
+    if (this.options.json) {
       var jsondata = eval('(' + req.responseText + ')');
+      var results = jsondata[this.options.resultsParameter];
 
-      for (var i=0;i<jsondata.results.length;i++)
-      {
-        this.aSuggestions.push(  { 'id':jsondata.results[i].id, 'value':jsondata.results[i].value, 'info':jsondata.results[i].info }  );
+      for (var i = 0; i < results.length; i++) {
+        this.aSuggestions.push({
+          'id': results[i][this.options.resultId],
+          'value': results[i][this.options.resultValue],
+          'info': results[i][this.options.resultInfo]
+        });
       }
-    }
-    else
-    {
+    } else {
       var xml = req.responseXML;
 
       // traverse xml
       //
-      var results = xml.getElementsByTagName('results')[0].childNodes;
+      var results = xml.getElementsByTagName(this.options.resultsParameter)[0].childNodes;
 
-      for (var i=0;i<results.length;i++)
-      {
+      // TODO: This is incompatible with the REST search
+      for (var i = 0; i < results.length; i++) {
         if (results[i].hasChildNodes()) {
-          this.aSuggestions.push(  { 'id':results[i].getAttribute('id'), 'value':results[i].childNodes[0].nodeValue, 'info':results[i].getAttribute('info') }  );
+          this.aSuggestions.push({
+            'id': results[i].getAttribute('id'),
+            'value':results[i].childNodes[0].nodeValue,
+            'info':results[i].getAttribute('info')
+          });
         }
       }
 
@@ -306,26 +309,31 @@ XWiki.suggest = Class.create({
     // get rid of old list
     // and clear the list removal timeout
     //
-    _xwk.DOM.removeElement(this.idAs);
+    if ($(this.idAs)) {
+      $(this.idAs).remove();
+    }
     this.killTimeout();
 
     // if no results, and shownoresults is false, do nothing
-    if (arr.length == 0 && !this.oP.shownoresults)
+    if (arr.length == 0 && !this.options.shownoresults)
       return false;
 
     // create holding div
     //
-    var div = _xwk.DOM.createElement("div", {id:this.idAs, className:this.oP.className});
+    var div = new Element("div", {
+      id: this.idAs,
+      className: this.options.className
+    });
 
-    var hcorner = _xwk.DOM.createElement("div", {className:"as_corner"});
-    var hbar = _xwk.DOM.createElement("div", {className:"as_bar"});
-    var header = _xwk.DOM.createElement("div", {className:"as_header"});
+    var hcorner = new Element("div", {className: "as_corner"});
+    var hbar = new Element("div", {className: "as_bar"});
+    var header = new Element("div", {className: "as_header"});
     header.appendChild(hcorner);
     header.appendChild(hbar);
     div.appendChild(header);
 
     // create and populate ul
-    var ul = _xwk.DOM.createElement("ul", {id:"as_ul"});
+    var ul = new Element("ul", {id: "as_ul"});
 
     // loop throught arr of suggestions
     // creating an LI element for each suggestion
@@ -339,12 +347,12 @@ XWiki.suggest = Class.create({
       var st = val.toLowerCase().indexOf( this.sInput.toLowerCase() );
       var output = val.substring(0,st) + "<em>" + val.substring(st, st+this.sInput.length) + "</em>" + val.substring(st+this.sInput.length);
 
-      var span = _xwk.DOM.createElement("span", {}, output, true);
+      var span = new Element("span").update(output);
 
-      var a = _xwk.DOM.createElement("a", { href:"#" });
+      var a = new Element("a", {href: "#"});
 
-      var tl   = _xwk.DOM.createElement("span", {className:"tl"}, " ");
-      var tr   = _xwk.DOM.createElement("span", {className:"tr"}, " ");
+      var tl = new Element("span", {className:"tl"}).update(" ");
+      var tr = new Element("span", {className:"tr"}).update(" ");
       a.appendChild(tl);
       a.appendChild(tr);
 
@@ -354,7 +362,7 @@ XWiki.suggest = Class.create({
       a.onclick = function () { pointer.setHighlightedValue(); return false; }
       a.onmouseover = function () { pointer.setHighlight(this.name); }
 
-      var li   = _xwk.DOM.createElement(  "li", {}, a  );
+      var li   = new Element("li").update(a);
 
       ul.appendChild( li );
     }
@@ -362,15 +370,15 @@ XWiki.suggest = Class.create({
     // no results
     if (arr.length == 0)
     {
-      var li = _xwk.DOM.createElement(  "li", {className:"as_warning"}, this.oP.noresults  );
+      var li = new Element("li", {className:"as_warning"}).update(this.options.noresults);
 
       ul.appendChild( li );
     }
     div.appendChild( ul );
 
-    var fcorner = _xwk.DOM.createElement("div", {className:"as_corner"});
-    var fbar = _xwk.DOM.createElement("div", {className:"as_bar"});
-    var footer = _xwk.DOM.createElement("div", {className:"as_footer"});
+    var fcorner = new Element("div", {className: "as_corner"});
+    var fbar = new Element("div", {className: "as_bar"});
+    var footer = new Element("div", {className: "as_footer"});
     footer.appendChild(fcorner);
     footer.appendChild(fbar);
     div.appendChild(footer);
@@ -378,10 +386,10 @@ XWiki.suggest = Class.create({
     // get position of target textfield
     // position holding div below it
     // set width of holding div to width of field
-    var pos = _xwk.DOM.getPos(this.fld);
+    var pos = this.fld.cumulativeOffset();
 
-    div.style.left = pos.x + "px";
-    div.style.top = (pos.y + this.fld.offsetHeight + this.oP.offsety) + "px";
+    div.style.left = pos.left + "px";
+    div.style.top = (pos.top + this.fld.offsetHeight + this.options.offsety) + "px";
     div.style.width = this.fld.offsetWidth + "px";
 
     // set mouseover functions for div
@@ -391,14 +399,14 @@ XWiki.suggest = Class.create({
     div.onmouseout = function(){ pointer.resetTimeout() }
 
     // add DIV to document
-    document.getElementsByTagName("body")[0].appendChild(div);
+    $(this.options.parentContainer).appendChild(div);
 
     // currently no item is highlighted
     this.iHighlighted = 0;
 
     // remove list after an interval
     var pointer = this;
-    this.toID = setTimeout(function () { pointer.clearSuggestions() }, this.oP.timeout);
+    this.toID = setTimeout(function () { pointer.clearSuggestions() }, this.options.timeout);
   },
 
   /**
@@ -408,7 +416,7 @@ XWiki.suggest = Class.create({
    */
   changeHighlight: function(key)
   {
-    var list = _xwk.DOM.getElement("as_ul");
+    var list = $("as_ul");
     if (!list)
       return false;
 
@@ -434,7 +442,7 @@ XWiki.suggest = Class.create({
    */
   setHighlight: function(n)
   {
-    var list = _xwk.DOM.getElement("as_ul");
+    var list = $("as_ul");
     if (!list)
       return false;
 
@@ -453,7 +461,7 @@ XWiki.suggest = Class.create({
    */
   clearHighlight: function()
   {
-    var list = _xwk.DOM.getElement("as_ul");
+    var list = $("as_ul");
     if (!list)
       return false;
 
@@ -500,13 +508,14 @@ XWiki.suggest = Class.create({
 
       // pass selected object to callback function, if exists
 
-      if (typeof(this.oP.callback) == "function")
-        this.oP.callback( this.aSuggestions[this.iHighlighted-1] );
+      if (typeof(this.options.callback) == "function") {
+        this.options.callback( this.aSuggestions[this.iHighlighted-1] );
+      }
 
       //there is a hidden input
       if(this.fld.id.indexOf("_suggest") > 0) {
         var hidden_id = this.fld.id.substring(0, this.fld.id.indexOf("_suggest"));
-        var hidden_inp = document.getElementById(hidden_id);
+        var hidden_inp = $(hidden_id);
 
         if(hidden_inp)
            hidden_inp.value = this.aSuggestions[ this.iHighlighted-1 ].info;
@@ -536,174 +545,29 @@ XWiki.suggest = Class.create({
   /**
    * Clear suggestions
    */
-  clearSuggestions: function(){
-      this.killTimeout();
-      var ele = _xwk.DOM.getElement(this.idAs);
-      var pointer = this;
-      if (ele) {
-          var fade = new _xwk.Fader(ele, 1, 0, 250, function(){
-              _xwk.DOM.removeElement(pointer.idAs)
-          });
-      }
+  clearSuggestions: function() {
+    this.killTimeout();
+    var ele = $(this.idAs);
+    var pointer = this;
+    if (ele) {
+      var fade = new Effect.Fade(ele, {duration: "0.25", afterFinish : function() {
+        if($(pointer.idAs)) {
+          $(pointer.idAs).remove();
+        }
+      }});
+    }
   }
 
 });
-
 
 // DOM PROTOTYPE _____________________________________________
 
 if (typeof(_xwk.DOM) == "undefined")
   _xwk.DOM = {}
 
-
-
-
-_xwk.DOM.createElement = function ( type, attr, cont, html )
-{
-  var ne = document.createElement( type );
-  if (!ne)
-    return false;
-
-  for (var a in attr)
-    ne[a] = attr[a];
-
-  if (typeof(cont) == "string" && !html)
-    ne.appendChild( document.createTextNode(cont) );
-  else if (typeof(cont) == "string" && html)
-    ne.innerHTML = cont;
-  else if (typeof(cont) == "object")
-    ne.appendChild( cont );
-
-  return ne;
-}
-
-
-
-
-
-_xwk.DOM.clearElement = function ( id )
-{
-  var ele = this.getElement( id );
-
-  if (!ele)
-    return false;
-
-  while (ele.childNodes.length)
-    ele.removeChild( ele.childNodes[0] );
-
-  return true;
-}
-
-
-
-
-
-
-
-
-
-_xwk.DOM.removeElement = function ( ele )
-{
-  var e = this.getElement(ele);
-
-  if (!e)
-    return false;
-  else if (e.parentNode.removeChild(e))
-    return true;
-  else
-    return false;
-}
-
-
-
-
-
-_xwk.DOM.replaceContent = function ( id, cont, html )
-{
-  var ele = this.getElement( id );
-
-  if (!ele)
-    return false;
-
-  this.clearElement( ele );
-
-  if (typeof(cont) == "string" && !html)
-    ele.appendChild( document.createTextNode(cont) );
-  else if (typeof(cont) == "string" && html)
-    ele.innerHTML = cont;
-  else if (typeof(cont) == "object")
-    ele.appendChild( cont );
-}
-
-
-
-
-
-
-
-
-
-_xwk.DOM.getElement = function ( ele )
-{
-  if (typeof(ele) == "undefined")
-  {
-    return false;
-  }
-  else if (typeof(ele) == "string")
-  {
-    var re = document.getElementById( ele );
-    if (!re)
-      return false;
-    else if (typeof(re.appendChild) != "undefined" ) {
-      return re;
-    } else {
-      return false;
-    }
-  }
-  else if (typeof(ele.appendChild) != "undefined")
-    return ele;
-  else
-    return false;
-}
-
-
-
-
-
-
-
-_xwk.DOM.appendChildren = function ( id, arr )
-{
-  var ele = this.getElement( id );
-
-  if (!ele)
-    return false;
-
-
-  if (typeof(arr) != "object")
-    return false;
-
-  for (var i=0;i<arr.length;i++)
-  {
-    var cont = arr[i];
-    if (typeof(cont) == "string")
-      ele.appendChild( document.createTextNode(cont) );
-    else if (typeof(cont) == "object")
-      ele.appendChild( cont );
-  }
-}
-
-
-
-
-
-
-
-
-
 _xwk.DOM.getPos = function ( ele )
 {
-  var ele = this.getElement(ele);
+  var ele = $(ele);
 
   var obj = ele;
 
@@ -736,93 +600,3 @@ _xwk.DOM.getPos = function ( ele )
 
   return {x:curleft, y:curtop}
 }
-
-
-
-
-
-
-
-
-
-
-// FADER PROTOTYPE _____________________________________________
-
-
-
-if (typeof(_xwk.Fader) == "undefined")
-  _xwk.Fader = {}
-
-
-
-
-
-_xwk.Fader = function (ele, from, to, fadetime, callback)
-{
-  if (!ele)
-    return false;
-
-  this.ele = ele;
-
-  this.from = from;
-  this.to = to;
-
-  this.callback = callback;
-
-  this.nDur = fadetime;
-
-  this.nInt = 50;
-  this.nTime = 0;
-
-  var p = this;
-  this.nID = setInterval(function() { p._fade() }, this.nInt);
-}
-
-
-
-
-_xwk.Fader.prototype._fade = function()
-{
-  this.nTime += this.nInt;
-
-  var ieop = Math.round( this._tween(this.nTime, this.from, this.to, this.nDur) * 100 );
-  var op = ieop / 100;
-
-  if (this.ele.filters) // internet explorer
-  {
-    try
-    {
-      this.ele.filters.item("DXImageTransform.Microsoft.Alpha").opacity = ieop;
-    } catch (e) {
-      // If it is not set initially, the browser will throw an error.  This will set it if it is not set yet.
-      this.ele.style.filter = 'progid:DXImageTransform.Microsoft.Alpha(opacity='+ieop+')';
-    }
-  }
-  else // other browsers
-  {
-    this.ele.style.opacity = op;
-  }
-
-
-  if (this.nTime == this.nDur)
-  {
-    clearInterval( this.nID );
-    if (this.callback != undefined)
-      this.callback();
-  }
-}
-
-
-
-_xwk.Fader.prototype._tween = function(t,b,c,d)
-{
-  return b + ( (c-b) * (t/d) );
-}
-
-
-/**
- *  Inspired by:    Timothy Groves - http://www.brandspankingnew.net
- *  version:            2.0 - 2007-02-07
- *
- */
-

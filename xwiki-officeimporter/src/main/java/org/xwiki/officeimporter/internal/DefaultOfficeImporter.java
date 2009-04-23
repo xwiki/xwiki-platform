@@ -368,10 +368,12 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         String namingMethodParam = params.get("childPagesNamingMethod");
         if (namingMethodParam == null || namingMethodParam.equals("")) {
             throw new OfficeImporterException("Unable to determine child pages naming method.");
+        } else if (namingMethodParam.equals("headingNames")) {
+            return new HeadingNameNamingCriterion(targetWikiDocument, docBridge, rendererFactory, false);
+        } else if (namingMethodParam.equals("mainPageNameAndHeading")) {
+            return new HeadingNameNamingCriterion(targetWikiDocument, docBridge, rendererFactory, true);
         } else if (namingMethodParam.equals("mainPageNameAndNumbering")) {
             return new PageIndexNamingCriterion(targetWikiDocument, docBridge);
-        } else if (namingMethodParam.equals("headingNames")) {
-            return new HeadingNameNamingCriterion(targetWikiDocument, docBridge, rendererFactory);
         } else {
             throw new OfficeImporterException("The specified naming criterion is not implemented yet.");
         }

@@ -68,19 +68,30 @@ public class HeadingNameNamingCriterion implements NamingCriterion
     private Map<String, String> documentNames;
 
     /**
+     * Name of the base page name.
+     */
+    private String basePageName;
+    
+    /**
      * Space name to be used with generated page names.
      */
     private String spaceName;
 
+    /**
+     * Flag indicating if each generated page name should be prepended with base page name.
+     */
+    private boolean prependBasePageName;
+    
     /**
      * Constructs a new {@link HeadingNameNamingCriterion}.
      * 
      * @param baseDocumentName name of the document that is being split.
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
      * @param rendererFactory {@link PrintRendererFactory} used to get xwiki 2.0 syntax renderer.
+     * @param prependBasePageName a flag indicating if each generated page name should be prepended with base page name.
      */
     public HeadingNameNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge,
-        PrintRendererFactory rendererFactory)
+        PrintRendererFactory rendererFactory, boolean prependBasePageName)
     {
         this.mainPageNameAndNumberingNamingCriterion = new PageIndexNamingCriterion(baseDocumentName, docBridge);
         this.docBridge = docBridge;
@@ -88,6 +99,8 @@ public class HeadingNameNamingCriterion implements NamingCriterion
         this.documentNames = new HashMap<String, String>();
         int dot = baseDocumentName.lastIndexOf('.');
         this.spaceName = (dot != -1) ? baseDocumentName.substring(0, dot) : "Main";
+        this.basePageName = baseDocumentName.substring(dot + 1);
+        this.prependBasePageName = prependBasePageName;
     }
 
     /**
@@ -116,13 +129,17 @@ public class HeadingNameNamingCriterion implements NamingCriterion
                 WikiPrinter printer = new DefaultWikiPrinter();
                 Listener listener = this.rendererFactory.createRenderer(new Syntax(SyntaxType.XWIKI, "2.0"), printer);
                 xdom.traverse(listener);
-                documentName = prefix + cleanPageName(printer.toString());
+                documentName = cleanPageName(printer.toString());
             }
         }
 
         // Fall back if necessary.
-        if (null == documentName || documentName.equals(prefix)) {
+        if (null == documentName || documentName.equals("")) {
             documentName = mainPageNameAndNumberingNamingCriterion.getDocumentName(newDoc);
+        } else if (prependBasePageName) {
+            documentName = prefix + basePageName + INDEX_SEPERATOR + documentName;
+        } else {
+            documentName = prefix + documentName;
         }
 
         // Resolve any name clashes.

@@ -1,0 +1,24 @@
+.xdialog-box .buttons {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.xdialog-box .non-existent{
+  color: red
+}
+
+.xdialog-box #jmp_target {
+  width: 98%;
+  border: 1px solid #CCC;
+  padding: 1px 2px;
+}
+
+.jmp-activator {
+  cursor: pointer;
+  font-size: 80%;
+  font-weight: 900;
+}
+
+.jmp-activator:hover {
+  text-decoration: underline;
+}

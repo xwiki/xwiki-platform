@@ -242,14 +242,20 @@ XWiki.widgets.Suggest = Class.create({
     // create ajax request
     var url = this.options.script + this.options.varname + "=" + escape(this.fld.value);
     var method = this.options.method;
+    var headers = {};
+    if (this.options.json) {
+      headers.Accept = "application/json";
+    } else {
+      headers.Accept = "application/xml";
+    }
 
-    var onSuccessFunc = function (req) { pointer.setSuggestions(req) };
-    var onErrorFunc = function (response) { alert("AJAX error: " + response.status); };
-
-    var ajx = new Ajax.Request(url,{
+    var ajx = new Ajax.Request(url, {
       method: method,
-      onSuccess: onSuccessFunc,
-      onFailure: onErrorFunc
+      requestHeaders: headers,
+      onSuccess: this.setSuggestions.bindAsEventListener(this),
+      onFailure: function (response) {
+        alert("AJAX error: " + response.statusText);
+      }
     });
   },
 
@@ -263,7 +269,10 @@ XWiki.widgets.Suggest = Class.create({
     this.aSuggestions = [];
 
     if (this.options.json) {
-      var jsondata = eval('(' + req.responseText + ')');
+      var jsondata = req.responseJSON;
+      if (!jsondata) {
+        return false;
+      }
       var results = jsondata[this.options.resultsParameter];
 
       for (var i = 0; i < results.length; i++) {

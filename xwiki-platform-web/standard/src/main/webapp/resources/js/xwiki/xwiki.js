@@ -255,7 +255,7 @@ Object.extend(XWiki, {
     if (typeof content == "undefined") {
       content = document.body; 
     }
-    content.select(".xwikirenderingerror").each(function(error) {
+    $(content).select(".xwikirenderingerror").each(function(error) {
         if(error.nextSibling.innerHTML !== "" && error.nextSibling.hasClassName("xwikirenderingerrordescription")) {
             error.style.cursor="pointer";
             error.title = "$msg.get('platform.core.rendering.error.readTechnicalInformation')";

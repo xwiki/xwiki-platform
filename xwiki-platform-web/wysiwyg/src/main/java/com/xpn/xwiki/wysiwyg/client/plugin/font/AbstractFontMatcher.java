@@ -29,7 +29,7 @@ import com.google.gwt.dom.client.Document;
  * 
  * @version $Id$
  */
-public abstract class AbstractFontMatcher implements Matcher<String>
+public abstract class AbstractFontMatcher extends DefaultStringMatcher
 {
     /**
      * The container element where the matching takes place.

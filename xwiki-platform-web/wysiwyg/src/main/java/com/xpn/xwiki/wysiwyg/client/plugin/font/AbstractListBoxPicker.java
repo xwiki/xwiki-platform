@@ -81,12 +81,18 @@ public abstract class AbstractListBoxPicker extends ListBox implements Picker
      */
     protected void setSelectedValue(String value, Matcher<String> matcher)
     {
+        // First, see if the given value is already selected.
+        if (getSelectedIndex() >= 0 && matcher.match(getValue(getSelectedIndex()), value)) {
+            return;
+        }
+        // Look for a matching value.
         for (int i = getItemCount() - 1; i >= 0; i--) {
             if (matcher.match(getValue(i), value)) {
                 setSelectedIndex(i);
                 return;
             }
         }
+        // No matching value found.
         setSelectedIndex(-1);
     }
 }

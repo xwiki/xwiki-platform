@@ -34,6 +34,16 @@ public class FontFamilyMatcher extends AbstractFontMatcher
     public static final String TEST_FONT_SIZE = "50px";
 
     /**
+     * The suffix added to a font family name in order to default it to the generic serif family.
+     */
+    public static final String SERIF_SUFFIX = ",serif";
+
+    /**
+     * The suffix added to a font family name in order to default it to the generic sans-serif family.
+     */
+    public static final String SANS_SERIF_SUFFIX = ",sans-serif";
+
+    /**
      * Creates a new font family matcher.
      */
     public FontFamilyMatcher()
@@ -51,8 +61,26 @@ public class FontFamilyMatcher extends AbstractFontMatcher
      */
     public boolean match(String leftValue, String rightValue)
     {
-        left.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), leftValue);
-        right.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), rightValue);
-        return left.getOffsetWidth() == right.getOffsetWidth() && left.getOffsetHeight() == right.getOffsetHeight();
+        if (super.match(leftValue, rightValue)) {
+            return true;
+        } else {
+            // If both values are not supported by the browser then the font-family property is defaulted to the same
+            // value causing a false positive result. To prevent this we add different suffixes to make sure the font
+            // family defaults to different values.
+            left.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), leftValue + SANS_SERIF_SUFFIX);
+            right.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), rightValue + SERIF_SUFFIX);
+            if (left.getOffsetWidth() != right.getOffsetWidth() || left.getOffsetHeight() != right.getOffsetHeight()) {
+                return false;
+            } else {
+                // Event if the values passed the previous test we are still not 100% sure they match. We can have:
+                // left: unsupported1,serif + ,sans-serif
+                // right: unsupported2 + ,serif
+                // By switching the suffixes we can exclude this rare case.
+                left.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), leftValue + SERIF_SUFFIX);
+                right.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), rightValue + SANS_SERIF_SUFFIX);
+                return left.getOffsetWidth() == right.getOffsetWidth()
+                    && left.getOffsetHeight() == right.getOffsetHeight();
+            }
+        }
     }
 }

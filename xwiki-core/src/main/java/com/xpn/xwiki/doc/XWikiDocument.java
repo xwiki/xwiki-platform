@@ -2316,7 +2316,8 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if (!getSyntaxId().equals(doc.getSyntaxId())) {
+        if ((getSyntaxId() != null && !getSyntaxId().equals(doc.getSyntaxId()))
+            || (getSyntaxId() == null && doc.getSyntaxId() != null)) {
             return false;
         }
 

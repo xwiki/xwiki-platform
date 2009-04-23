@@ -725,6 +725,7 @@ shortcut = {
                 }
 
                 //Find Which key is pressed
+                var code = 0;
                 if (e.keyCode) code = e.keyCode;
                 else if (e.which) code = e.which;
                 var character = String.fromCharCode(code).toLowerCase();

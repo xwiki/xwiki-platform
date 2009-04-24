@@ -12,7 +12,6 @@ XWiki.actionButtons.EditActions = Class.create({
   initialize : function() {
     this.addListeners();
     this.addShortcuts();
-    this.saveAndContinueListener = new XWiki.actionButtons.EditActions.AjaxSaveAndContinue(this);
   },
   addListeners : function() {
     $$('input[name=action_cancel]').each(function(item) {
@@ -23,6 +22,9 @@ XWiki.actionButtons.EditActions = Class.create({
     }.bind(this));
     $$('input[name=action_save]').each(function(item) {
       item.observe('click', this.onSaveAndView.bindAsEventListener(this));
+    }.bind(this));
+    $$('input[name=action_saveandcontinue]').each(function(item) {
+      item.observe('click', this.onSaveAndContinue.bindAsEventListener(this));
     }.bind(this));
   },
   addShortcuts : function() {
@@ -71,7 +73,7 @@ XWiki.actionButtons.EditActions = Class.create({
     evt.stop();
 
     // Notify others we are going to cancel
-    document.fire("xwiki:actions:cancel");
+    document.fire("xwiki:actions:cancel", {originalEvent : evt, form: evt.element().form});
 
     var location = evt.element().form.action;
     if (typeof location != "string") {
@@ -90,29 +92,32 @@ XWiki.actionButtons.EditActions = Class.create({
   onPreview : function(evt) {
     if (!this.validateForm(evt.element().form)) {
       evt.stop();
-    }
-    else {
+    } else {
       // Nofity others
-      document.fire("xwiki:actions:preview");
+      document.fire("xwiki:actions:preview", {originalEvent : evt, form: evt.element().form});
     }
   },
   onSaveAndView : function(evt) {
     if (!this.validateForm(evt.element().form)) {
       evt.stop();
+    } else {
+      document.fire("xwiki:actions:save", {"continue": false, originalEvent : evt, form: evt.element().form});
     }
-    else {
-      document.fire("xwiki:actions:save", {"continue": false});
+  },
+  onSaveAndContinue : function(evt) {
+    if (!this.validateForm(evt.element().form)) {
+      evt.stop();
+    } else {
+      document.fire("xwiki:actions:save", {"continue": true, originalEvent : evt, form: evt.element().form});
     }
   }
 });
 
 // ======================================
 // Save and continue button: Ajax improvements
-XWiki.actionButtons.EditActions.AjaxSaveAndContinue = Class.create({
-  saveAndContinue : false,
+XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
   effectDuration : 1.0,
-  initialize : function(editActions) {
-    this.editActions = editActions;
+  initialize : function() {
     this.createMessages();
     this.addListeners();
   },
@@ -153,26 +158,21 @@ XWiki.actionButtons.EditActions.AjaxSaveAndContinue = Class.create({
     document.body.appendChild(this.container);
   },
   addListeners : function() {
-    $$('input[name=action_saveandcontinue]').each(function(item){
-      $(item.form).observe('submit', this.onSubmitting.bindAsEventListener(this));
-      item.observe('click', this.onSAC.bindAsEventListener(this));
-    }.bind(this));
+    document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));
   },
-  onSubmitting : function(event) {
-    if (this.saveAndContinue) {
-      event.stop();
-      document.fire("xwiki:actions:save", {"continue":true});
-      this.saveAndContinue = false;
+  onSave : function(event) {
+    if (event.memo.continue) {
+      event.memo.originalEvent.stop();
       this.savedBox.hide();
       this.failedBox.hide();
       this.savingBox.show();
       this.showMessage();
-      var formData = new Hash(event.element().serialize({hash: true, submit: 'action_saveandcontinue'}));
+      var formData = new Hash(event.memo.form.serialize({hash: true, submit: 'action_saveandcontinue'}));
       if (!Prototype.Browser.Opera) {
         // Opera can't handle properly 204 responses.
         formData.set('ajax', 'true');
       }
-      new Ajax.Request(event.element().action, {
+      new Ajax.Request(event.memo.form.action, {
         method : 'post',
         parameters : formData.toQueryString(),
         onSuccess : this.onSuccess.bindAsEventListener(this),
@@ -181,13 +181,6 @@ XWiki.actionButtons.EditActions.AjaxSaveAndContinue = Class.create({
         onFailure : this.onFailure.bind(this)
       });
     }
-  },
-  onSAC : function(event) {
-    if (!this.editActions.validateForm(event.element().form)) {
-      event.stop();
-      return false;
-    }
-    this.saveAndContinue = true;
   },
   // IE converts 204 status code into 1223...
   on1223 : function(response) {
@@ -236,4 +229,5 @@ XWiki.actionButtons.EditActions.AjaxSaveAndContinue = Class.create({
 });
 document.observe('dom:loaded', function() {
   new XWiki.actionButtons.EditActions();
+  new XWiki.actionButtons.AjaxSaveAndContinue();
 });

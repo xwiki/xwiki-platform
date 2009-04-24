@@ -4998,13 +4998,16 @@ public class XWikiDocument implements DocumentModelBridge
 
         for (Vector<BaseObject> objects : objectsByClass.values()) {
             for (BaseObject bobject : objects) {
-                BaseClass bclass = bobject.getxWikiClass(context);
-                for (Object fieldClass : bclass.getProperties()) {
-                    if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
-                        TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
-                        LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
+                if (bobject != null) {
+                    BaseClass bclass = bobject.getxWikiClass(context);
+                    for (Object fieldClass : bclass.getProperties()) {
+                        if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
+                            TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
+                            LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
 
-                        field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntaxId, false));
+                            field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntaxId,
+                                false));
+                        }
                     }
                 }
             }

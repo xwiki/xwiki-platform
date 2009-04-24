@@ -471,7 +471,6 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="color">blue</xsl:attribute>
     </xsl:attribute-set>
 
-
     <!--======================================================================
     Templates
     =======================================================================-->
@@ -631,7 +630,50 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:template name="make-layout-master-set">
         <fo:layout-master-set>
-            <fo:simple-page-master master-name="all-pages"
+            <fo:simple-page-master master-name="first"
+                                   xsl:use-attribute-sets="page">
+                <fo:region-body margin-top="{$page-margin-top}"
+                                margin-right="{$page-margin-right}"
+                                margin-bottom="{$page-margin-bottom}"
+                                margin-left="{$page-margin-left}"
+                                column-count="{$column-count}"
+                                column-gap="{$column-gap}"/>
+                <xsl:choose>
+                    <xsl:when test="$writing-mode = 'tb-rl'">
+                        <fo:region-before extent="{$page-margin-right}" precedence="true"/>
+                        <fo:region-after  extent="{$page-margin-left}" precedence="true"/>
+                        <fo:region-start  region-name="page-header-first"
+                                          extent="{$page-margin-top}"
+                                          writing-mode="lr-tb"
+                                          display-align="before"/>
+                        <fo:region-end    region-name="page-footer-first"
+                                          extent="{$page-margin-bottom}"
+                                          writing-mode="lr-tb"
+                                          display-align="after"/>
+                    </xsl:when>
+                    <xsl:when test="$writing-mode = 'rl-tb'">
+                        <fo:region-before region-name="page-header-first"
+                                          extent="{$page-margin-top}"
+                                          display-align="before"/>
+                        <fo:region-after  region-name="page-footer-first"
+                                          extent="{$page-margin-bottom}"
+                                          display-align="after"/>
+                        <fo:region-start  extent="{$page-margin-right}"/>
+                        <fo:region-end    extent="{$page-margin-left}"/>
+                    </xsl:when>
+                    <xsl:otherwise><!-- $writing-mode = 'lr-tb' -->
+                        <fo:region-before region-name="page-header-first"
+                                          extent="{$page-margin-top}"
+                                          display-align="before"/>
+                        <fo:region-after  region-name="page-footer-first"
+                                          extent="{$page-margin-bottom}"
+                                          display-align="after"/>
+                        <fo:region-start  extent="{$page-margin-left}"/>
+                        <fo:region-end    extent="{$page-margin-bottom}"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </fo:simple-page-master>
+            <fo:simple-page-master master-name="rest"
                                    xsl:use-attribute-sets="page">
                 <fo:region-body margin-top="{$page-margin-top}"
                                 margin-right="{$page-margin-right}"
@@ -674,6 +716,19 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                     </xsl:otherwise>
                 </xsl:choose>
             </fo:simple-page-master>
+            <fo:page-sequence-master master-name="all-pages">
+                <fo:repeatable-page-master-alternatives>
+                    <xsl:choose>
+                        <xsl:when test="/html:html/html:body[@pdfcover = '1']">
+                            <fo:conditional-page-master-reference page-position="first" master-reference="first"/>
+                            <fo:conditional-page-master-reference page-position="rest" master-reference="rest"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <fo:conditional-page-master-reference page-position="all" master-reference="rest"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </fo:repeatable-page-master-alternatives>
+            </fo:page-sequence-master>
         </fo:layout-master-set>
     </xsl:template>
 
@@ -681,6 +736,12 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <xsl:template match="html:head | html:script" mode="preprocess"/>
 
     <xsl:template match="html:body" mode="preprocess">
+        <xsl:variable name="need-cover">
+           <xsl:value-of select="@pdfcover"/>
+        </xsl:variable>
+        <xsl:variable name="need-toc">
+           <xsl:value-of select="@pdftoc"/>
+        </xsl:variable>
         <fo:page-sequence master-reference="all-pages">
             <fo:title>
                 <xsl:value-of select="/html:html/html:head/html:title[@class='pdftitle']"/>
@@ -704,7 +765,72 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 </fo:block>
             </fo:static-content>
             <fo:flow flow-name="xsl-region-body">
-                <fo:block xsl:use-attribute-sets="body">
+                <!-- cover page -->
+                <xsl:if test="$need-cover = '1'">
+                    <fo:block xsl:use-attribute-sets="body" width="100%">
+                        <fo:block text-align="center" padding-top="10pt" padding-bottom="10pt">
+                            <fo:table table-layout="fixed" width="100%">
+                                <fo:table-body>
+                                    <fo:table-row height="200mm">
+                                        <fo:table-cell display-align="center">
+                                            <xsl:apply-templates select="/html:html/html:body/html:div[@class='pdfcover']" mode="pdfcover" />
+                                        </fo:table-cell>
+                                    </fo:table-row>
+                                </fo:table-body>
+                            </fo:table>
+                        </fo:block>
+                     </fo:block>
+                </xsl:if>
+                <!-- Table of content -->
+                <xsl:if test="$need-toc = '1'">
+                    <fo:block xsl:use-attribute-sets="body" break-before="page">
+                        <fo:block text-align="left" font-weight="bold" font-size="12pt"  padding-top="10pt" padding-bottom="10pt">
+                            <xsl:apply-templates  select="/html:html/html:body/html:div[@class='pdftoc']" mode="pdftoc" />
+                        </fo:block>
+                        <xsl:for-each select="/html:html/html:body/html:div[@id='xwikimaincontainer']/html:h1 |
+                                /html:html/html:body/html:div[@id='xwikimaincontainer']/html:h2 |
+                                /html:html/html:body/html:div[@id='xwikimaincontainer']/html:h3">
+                            <fo:block font-size="9pt" start-indent="10pt" width="100%" text-align-last="justify" >
+                                <xsl:choose>
+                                    <xsl:when test="self::html:h1">
+                                        <xsl:attribute name="start-indent">0pt</xsl:attribute>
+                                    </xsl:when>
+                                    <xsl:when test="self::html:h2">
+                                        <xsl:attribute name="start-indent">6pt</xsl:attribute>
+                                    </xsl:when>
+                                    <xsl:when test="self::html:h3">
+                                        <xsl:attribute name="start-indent">12pt</xsl:attribute>
+                                    </xsl:when>
+                                </xsl:choose>
+                                <fo:basic-link internal-destination="{generate-id(.)}">
+                                    <!-- TODO: Make numbering work.
+                                    <xsl:choose>
+                                        <xsl:when test="self::html:h1">
+                                           <xsl:number level="multiple" count="html:h1" format="1. "/>
+                                        </xsl:when>
+                                        <xsl:when test="self::html:h2">
+                                           <xsl:number level="multiple" count="html:h1|html:h2" format="1.1. "/>
+                                        </xsl:when>
+                                        <xsl:when test="self::html:h3">
+                                           <xsl:number level="multiple" count="html:h1|html:h2|html:h3" format="1.1.1. "/>
+                                        </xsl:when>
+                                    </xsl:choose>
+                                    -->
+                                    <xsl:value-of select="."/> 
+                                </fo:basic-link>
+                                <xsl:text> </xsl:text>
+                                <fo:leader leader-length.minimum="12pt" leader-length.optimum="40pt"
+                                    leader-length.maximum="100%" leader-pattern="dots" />
+                                <xsl:text> </xsl:text>
+                                <fo:basic-link internal-destination="{generate-id(.)}">
+                                    <fo:page-number-citation ref-id="{generate-id(.)}" />
+                                </fo:basic-link>
+                            </fo:block>
+                       </xsl:for-each>
+                    </fo:block>
+                </xsl:if>
+                <!-- the actual document content -->
+                <fo:block xsl:use-attribute-sets="body"  break-before="page">
                     <xsl:call-template name="process-common-attributes"/>
                     <xsl:apply-templates mode="preprocess"/>
                 </fo:block>
@@ -726,9 +852,27 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         </fo:block>
     </xsl:template>
 
+    <xsl:template match="/html:html/html:body/html:div[@class='pdfcover']" mode="pdfcover" priority="0">
+        <fo:block>
+            <xsl:call-template name="process-common-attributes"/>
+            <xsl:apply-templates mode="preprocess"/>
+        </fo:block>
+    </xsl:template>
+
+    <xsl:template match="/html:html/html:body/html:div[@class='pdftoc']" mode="pdftoc" priority="0">
+        <fo:block>
+            <xsl:call-template name="process-common-attributes"/>
+            <xsl:apply-templates mode="preprocess"/>
+        </fo:block>
+    </xsl:template>
+
     <xsl:template match="/html:html/html:body/html:div[@class='pdfheader']" priority="1" mode="preprocess"/>
 
     <xsl:template match="/html:html/html:body/html:div[@class='pdffooter']" priority="1" mode="preprocess"/>
+
+    <xsl:template match="/html:html/html:body/html:div[@class='pdfcover']" priority="1" mode="preprocess"/>
+
+    <xsl:template match="/html:html/html:body/html:div[@class='pdftoc']" priority="1" mode="preprocess"/>
 
     <xsl:template match="html:span[@class='page-number']" mode="preprocess">
           <fo:page-number/>
@@ -888,20 +1032,26 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
     <xsl:template match="html:h1" mode="transform">
-        <fo:block xsl:use-attribute-sets="h1">
-            <xsl:call-template name="process-common-attributes-and-children"/>
+        <fo:block id="{generate-id(.)}">
+            <fo:block xsl:use-attribute-sets="h1">
+                <xsl:call-template name="process-common-attributes-and-children"/>
+            </fo:block>
         </fo:block>
     </xsl:template>
 
     <xsl:template match="html:h2" mode="transform">
-        <fo:block xsl:use-attribute-sets="h2">
-            <xsl:call-template name="process-common-attributes-and-children"/>
+        <fo:block id="{generate-id(.)}">
+            <fo:block xsl:use-attribute-sets="h2" id="{generate-id(.)}">
+                <xsl:call-template name="process-common-attributes-and-children"/>
+            </fo:block>
         </fo:block>
     </xsl:template>
 
     <xsl:template match="html:h3" mode="transform">
-        <fo:block xsl:use-attribute-sets="h3">
-            <xsl:call-template name="process-common-attributes-and-children"/>
+        <fo:block id="{generate-id(.)}">
+            <fo:block xsl:use-attribute-sets="h3" id="{generate-id(.)}">
+                <xsl:call-template name="process-common-attributes-and-children"/>
+            </fo:block>
         </fo:block>
     </xsl:template>
 

@@ -95,7 +95,7 @@ XWiki.widgets.Suggest = Class.create({
     }
     // Bind the key listeners on the input field.
     this.fld.observe("keyup", this.onKeyUp.bindAsEventListener(this));
-    if (Prototype.Browser.IE) {
+    if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
       this.fld.observe("keydown", this.onKeyPress.bindAsEventListener(this));
     } else {
       this.fld.observe("keypress", this.onKeyPress.bindAsEventListener(this));

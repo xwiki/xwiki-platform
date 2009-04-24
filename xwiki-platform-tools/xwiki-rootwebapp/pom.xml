@@ -30,7 +30,7 @@
     <version>15</version>
   </parent>
   <artifactId>xwiki-rootwebapp</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>XWiki Platform - Tools - Default (root) webapp for the standalone package</name>
   <description>Contains a simple webapp whose purpose is to redirect to the XWiki one, and provide support for certain WebDAV clients.</description>
@@ -40,10 +40,4 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-rootwebapp-1.1</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-rootwebapp-1.1</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-rootwebapp-1.1</url>
-  </scm>
 </project>

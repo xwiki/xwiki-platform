@@ -32,12 +32,6 @@
   <artifactId>xwiki-application-webdav</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Applications - WebDAV</name>
-  <version>1.2</version>
+  <version>1.3-SNAPSHOT</version>
   <description>Holds utility functions required for WebDAV ui integration.</description>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-webdav-1.2</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-webdav-1.2</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-webdav-1.2</url>
-  </scm>
 </project>

@@ -3181,9 +3181,10 @@ public class XWikiDocument implements DocumentModelBridge
                     result.add(documentName);
                 }
             }
-            
+
             // Also add all the included pages found in the velocity macro when using the deprecated #include* macros
-            // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to play nice
+            // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to play
+            // nice
             // with people migrating from 1.0 to 2.0 syntax
             for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class, true)) {
                 // try to find matching content inside each velocity macro
@@ -4997,13 +4998,16 @@ public class XWikiDocument implements DocumentModelBridge
 
         for (Vector<BaseObject> objects : objectsByClass.values()) {
             for (BaseObject bobject : objects) {
-                BaseClass bclass = bobject.getxWikiClass(context);
-                for (Object fieldClass : bclass.getProperties()) {
-                    if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
-                        TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
-                        LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
+                if (bobject != null) {
+                    BaseClass bclass = bobject.getxWikiClass(context);
+                    for (Object fieldClass : bclass.getProperties()) {
+                        if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
+                            TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
+                            LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
 
-                        field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntaxId, false));
+                            field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntaxId,
+                                false));
+                        }
                     }
                 }
             }

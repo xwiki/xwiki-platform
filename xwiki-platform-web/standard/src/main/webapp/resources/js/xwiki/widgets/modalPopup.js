@@ -157,8 +157,8 @@ XWiki.widgets.ModalPopup = Class.create({
     var shortcuts = this.shortcuts[action].keys;
     var method = this.shortcuts[action].method;
     for (var i = 0; i < shortcuts.size(); ++i) {
-      if (Prototype.Browser.IE) {
-        shortcut.add(shortcuts[i], method.bindAsEventListener(this, action), {type: 'keydown'});
+      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+        shortcut.add(shortcuts[i], method.bindAsEventListener(this, action), {type: 'keyup'});
       } else {
         shortcut.add(shortcuts[i], method.bindAsEventListener(this, action), {type: 'keypress'});
       }

@@ -1,0 +1,15 @@
+<div style="text-align: center; width: 100%;">
+<h1>
+#set($title = "$!pdfdoc.display('title', 'rendered')")
+#if($title == '')
+  $!doc.displayTitle
+#else
+  $title
+#end
+</h1>
+<br />
+<br />
+$!xwiki.getUserName($tdoc.author, false)
+<br />
+$!xwiki.formatDate($tdoc.date)
+</div>

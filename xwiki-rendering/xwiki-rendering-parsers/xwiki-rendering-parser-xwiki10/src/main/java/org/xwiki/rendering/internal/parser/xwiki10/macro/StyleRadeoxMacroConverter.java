@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10.macro;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -73,7 +73,7 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         }
 
         // Print content
-        result.append(convertContent(content, parameters));
+        result.append(convertContent(content.trim(), parameters, filterContext));
 
         // Print group close
         if (inline) {
@@ -88,12 +88,16 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
     }
 
     @Override
-    protected String convertContent(String content, RadeoxMacroParameters parameters)
+    protected String convertContent(String content, RadeoxMacroParameters parameters, FilterContext filterContext)
     {
         StringBuffer result = new StringBuffer();
 
         // Print icon
-        appendIcon(result, parameters);
+        appendIcon(result, parameters, filterContext);
+
+        if (content.length() > 0) {
+            result.append(' ');
+        }
 
         // Print content
         result.append(content);
@@ -109,7 +113,7 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
     @Override
     protected Map<String, String> convertParameters(RadeoxMacroParameters parameters)
     {
-        Map<String, String> boxParameters = new HashMap<String, String>();
+        Map<String, String> boxParameters = new LinkedHashMap<String, String>();
 
         RadeoxMacroParameter classes = parameters.get("class");
         RadeoxMacroParameter icon = parameters.get("icon");
@@ -182,7 +186,7 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         return boxParameters;
     }
 
-    private void appendIcon(StringBuffer result, RadeoxMacroParameters parameters)
+    private void appendIcon(StringBuffer result, RadeoxMacroParameters parameters, FilterContext filterContext)
     {
         RadeoxMacroParameter document = parameters.get("document");
         RadeoxMacroParameter icon = parameters.get("icon");
@@ -198,7 +202,7 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
 
         // add icon support
         if (hasIcon) {
-            result.append("image:");
+            result.append(filterContext.addProtectedContent("image:", true));
             if (document != null) {
                 result.append(document + "@" + icon);
             } else {

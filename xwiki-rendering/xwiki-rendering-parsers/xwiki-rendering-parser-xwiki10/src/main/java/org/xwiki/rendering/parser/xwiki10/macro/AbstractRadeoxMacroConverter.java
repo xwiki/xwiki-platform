@@ -94,7 +94,7 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
         parameters20.put(key, value);
     }
 
-    protected String convertContent(String content, RadeoxMacroParameters parameters)
+    protected String convertContent(String content, RadeoxMacroParameters parameters, FilterContext filterContext)
     {
         return content;
     }
@@ -113,7 +113,7 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
         if (content != null) {
             result.append("}}");
 
-            String macroContent = convertContent(content, parameters);
+            String macroContent = convertContent(content, parameters, filterContext);
             if (macroContent.indexOf("\n") != -1) {
                 result.append("\n" + macroContent + "\n");
             } else {

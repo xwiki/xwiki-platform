@@ -1,35 +1,15 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-<table>
-<tr><td></td></tr>
-</table>
-
-
-
-
-&amp;
-
-
-
-
-
-<div class="customclass">*bold* &amp; some text</div>
-&amp;
+<div param="value">some content</div>
+<div>some content</div>
+<div/>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{html wiki="true"}}<table> <tr><td></td></tr> </table>{{/html}}
+(% param="value" %)
+(((some content)))
 
+(((some content)))
 
-
-
-&
-
-
-
-
-(% class="customclass" %)
-(((**bold** & some text)))
-
-&
+((()))

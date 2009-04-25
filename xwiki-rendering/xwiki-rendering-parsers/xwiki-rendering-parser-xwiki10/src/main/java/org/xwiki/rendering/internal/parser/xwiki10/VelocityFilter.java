@@ -189,6 +189,11 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
     {
         int i = currentIndex + 1;
 
+        if (i >= array.length) {
+            context.setVelocity(false);
+            return i;
+        }
+
         context.setInline(false);
         context.setVelocity(true);
 
@@ -237,17 +242,25 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
                 macroBlock.append(array[i]);
             }
 
-            if (array[i] == '(') {
-                if (VELOCITY_PARAMBLOCK.contains(macroName.toString())) {
-                    // Skip condition
-                    i = getMethodParameters(array, i, macroBlock, context);
-                } else {
-                    context.setInline(true);
+            if (i < array.length) {
+                if (array[i] == '(') {
+                    if (VELOCITY_PARAMBLOCK.contains(macroName.toString())) {
+                        // Skip condition
+                        i = getMethodParameters(array, i, macroBlock, context);
+                    } else {
+                        context.setInline(true);
 
-                    List<String> parameters = new ArrayList<String>();
-                    // Get condition
-                    i = getMacroParameters(array, i, macroBlock, parameters, context);
-                    convertMacro(macroName.toString(), parameters, macroBlock, context);
+                        List<String> parameters = new ArrayList<String>();
+                        // Get condition
+                        i = getMacroParameters(array, i, macroBlock, parameters, context);
+                        String convertedMacro = convertMacro(macroName.toString(), parameters, context);
+
+                        if (convertedMacro != null) {
+                            // Apply conversion
+                            macroBlock.setLength(0);
+                            macroBlock.append(convertedMacro);
+                        }
+                    }
                 }
             }
         }
@@ -257,33 +270,32 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         return i;
     }
 
-    private void convertMacro(String name, List<String> parameters, StringBuffer macroBlock,
-        VelocityFilterContext context)
+    private String convertMacro(String name, List<String> parameters, VelocityFilterContext context)
     {
+        String convertedMacro = null;
+
         context.setVelocity(true);
 
         try {
             VelocityMacroConverter currentMacro =
                 (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.class, name);
 
-            String convertedMacro = currentMacro.convert(name, parameters);
-
-            // Apply conversion
-            macroBlock.setLength(0);
-            macroBlock.append(convertedMacro);
+            convertedMacro = currentMacro.convert(name, parameters);
 
             context.setInline(currentMacro.isInline());
 
             context.setConversion(true);
         } catch (ComponentLookupException e) {
             if (getLogger().isDebugEnabled()) {
-                getLogger().debug("Can't find macro converter [" + macroBlock + "]", e);
+                getLogger().debug("Can't find macro converter [" + name + "]", e);
             }
         } catch (Exception e) {
             if (getLogger().isDebugEnabled()) {
-                getLogger().debug("Failed to convert macro [" + macroBlock + "]", e);
+                getLogger().debug("Failed to convert macro [" + name + "]", e);
             }
         }
+
+        return convertedMacro;
     }
 
     private int getMacroParameters(char[] array, int currentIndex, StringBuffer velocityBlock,
@@ -301,20 +313,22 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
                 velocityBlock.append(array[i]);
             }
 
-            // If ')' it's the end of parameters
-            if (array[i] == ')') {
-                velocityBlock.append(')');
-                ++i;
-                break;
+            if (i < array.length) {
+                // If ')' it's the end of parameters
+                if (array[i] == ')') {
+                    velocityBlock.append(')');
+                    ++i;
+                    break;
+                }
+
+                // Skip parameter
+                StringBuffer parameterBlock = new StringBuffer();
+                i = getMacroParameter(array, i, parameterBlock, context);
+                isVelocity |= context.isVelocity();
+                parameterList.add(parameterBlock.toString());
+
+                velocityBlock.append(parameterBlock);
             }
-
-            // Skip parameter
-            StringBuffer parameterBlock = new StringBuffer();
-            i = getMacroParameter(array, i, parameterBlock, context);
-            isVelocity |= context.isVelocity();
-            parameterList.add(parameterBlock.toString());
-
-            velocityBlock.append(parameterBlock);
         }
 
         context.setVelocity(isVelocity);

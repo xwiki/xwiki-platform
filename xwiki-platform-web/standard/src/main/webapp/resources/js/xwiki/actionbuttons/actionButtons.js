@@ -75,7 +75,6 @@ XWiki.actionButtons.EditActions = Class.create({
     // Notify others we are going to cancel
     this.notify(event, "cancel");
 
-
     var location = event.element().form.action;
     if (typeof location != "string") {
        location = event.element().form.attributes.getNamedItem("action");
@@ -173,6 +172,7 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
       if (typeof (event.memo.originalEvent) != 'undefined') {
         event.memo.originalEvent.stop();
       }
+      this.form = event.memo.form;
       this.savedBox.hide();
       this.failedBox.hide();
       this.savingBox.show();
@@ -201,6 +201,11 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     response.request.options.onFailure(response);
   },
   onSuccess : function(response) {
+    // If there was a 'template' field in the form, disable it to avoid 'This document already exists' errors.
+    if (this.form && this.form.template) {
+      this.form.template.disabled = true;
+      this.form.template.value = "";
+    }
     this.savingBox.hide();
     this.savedBox.show();
     this.hideMessage();

@@ -299,7 +299,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
 
         try {
             HTMLElementConverter currentMacro =
-                (HTMLElementConverter) this.componentManager.lookup(HTMLElementConverter.class, name);
+                (HTMLElementConverter) this.componentManager.lookup(HTMLElementConverter.class.getName(), name);
 
             convertedElement = currentMacro.convert(name, parameters, content, context);
 

@@ -15,21 +15,52 @@ if (typeof(XWiki.dataEditors) == 'undefined') {
  * TODO Improve i18n support
  * TODO Don't save if there were no changes
  * TODO Support for the WYSIWYG editors
- * TODO Create hidden fields for minorEdit and comment when such fields don't exist
+ * TODO Don't show in the class editor, if there is no class defined
  */
 XWiki.dataEditors.AutoSave = Class.create({
+  /** Is the autosave enabled ? */
   enabled: false,
+  /** If enabled, how frequent are the savings */
   frequency: 5, // minutes
+  /** Initialization */
   initialize : function() {
-    this.editComment = $(document.body).down("input[name='comment']"); // The element containing the edit comment from the edit form
-    this.minorEditCheckbox = $(document.body).down("input[name='minorEdit']"); // The minor edit checkbox from the edit form
+    if(!(this.form = $("xwikieditcontent")) || !(this.form = this.form.up("form"))) {
+      return;
+    }
+    this.initVersionMetadataElements();
     this.createUIElements();
     this.addListeners();
     if (this.enabled) {
       this.startTimer();
     }
   },
+  /**
+   * The metadata elements are the version comment input and the minor edit checkbox in the editor form.
+   * They may be missing if the document is new or if the wiki was configured not to display them.
+   * If they are missing, hidden inputs are created and introduced in the form in their place.
+   * By means of these, every autosaved version is marked as minor and contains the text "(Autosaved)" in the comment.
+   */
+  initVersionMetadataElements : function() {
+    var container = new Element("div", {"class" : "hidden"});
+    this.editComment = this.form.comment; // The element containing the edit comment from the edit form
+    if (!this.editComment) {
+      this.editComment = new Element('input', {type : "hidden", name: "comment"});
+      this.customMetadataElementsContainer = container;
+      container.insert(this.editComment);
+    }
+    this.minorEditCheckbox = this.form.minorEdit; // The minor edit checkbox from the edit form
+    if (!this.minorEditCheckbox) {
+      // Value already set, does not need to be switched on/off
+      this.minorEditCheckbox = new Element('input', {type : "checkbox", name: "minorEdit", checked: true});
+      this.customMetadataElementsContainer = container;
+      container.insert(this.minorEditCheckbox);
+    }
+  },
 
+  /**
+   * The UI of the autosave feature is created and introduced at the beginning of the edit form. It comprises a checkbox
+   * for enabling / disabling the autosave and an input that allows to set the autosave frequency.
+   */
   createUIElements : function() {
     // Checkbox to enable/disable the autosave
     this.autosaveCheckbox = new Element('input', {type: "checkbox", checked: this.enabled});
@@ -58,6 +89,9 @@ XWiki.dataEditors.AutoSave = Class.create({
     $(document.body).down(".alleditcontent").insert({before : container});
   },
 
+  /**
+   * Adds listeners to the elements in the autosave UI, allowing to acknowledge when the user changes the settings.
+   */
   addListeners : function() {
     // Stop the Enter key from submitting the form
     var preventSubmit = function(event) {
@@ -106,7 +140,11 @@ XWiki.dataEditors.AutoSave = Class.create({
     }.bindAsEventListener(this));
   },
 
-  // TODO This is bad, very difficult to internationalize.
+  /**
+   * Changes the label text displaying the time measure unit for autosave freaquency,
+   * according to the value introduced by the user in the input (singular or plural).
+   * TODO This is bad, very difficult to internationalize.
+   */
   setTimeUnit : function() {
     if (this.frequency == 1) {
       this.timeUnit.update("minute");
@@ -115,46 +153,70 @@ XWiki.dataEditors.AutoSave = Class.create({
     }
   },
 
+  /**
+   * Start autosave timer when the autosave is enabled.
+   * Every (this.frequency * 60) seconds, the callback function doAutosave is called.
+   */
   startTimer : function() {
     this.timer = new PeriodicalExecuter(this.doAutosave.bind(this), this.frequency * 60 /* seconds in a minute */);
   },
+  /**
+   * Stop the autosave loop when the autosave is disabled or when the autosave frequency is changed
+   * and the loop needs to be restarted.
+   */
   stopTimer : function() {
     if (this.timer) {
       this.timer.stop();
       delete this.timer;
     }
   },
+  /**
+   * Restart the timer  when the autosave frequency is changed, to take into account the nez set frequency.
+   */
   restartTimer : function() {
     this.stopTimer();
     this.startTimer();
   },
 
+  /**
+   * The function that performs the actual automatic save, if the content has changed.
+   * It marks the version as minor and updates the version comment with "(Autosaved)".
+   * Then, it fires the custom event <tt>xwiki:actions:save</tt> to invoke the 
+   * AjaxSaveAndContinue. Afterwards, it resets the version metadata elements to their
+   * previous state.
+   */
   doAutosave : function() {
-    var editComment = "";
-    var isMinorEdit = "";
-    // Add "(Autosaved)" in the comment field
-    // TODO These fields might not be available; create hidden inputs
-    if (this.editComment) {
-      editComment = this.editComment.value;
-      this.editComment.value += " (Autosaved)";
-    }
-    // Check the minor edit checkbox
-    if (this.minorEditCheckbox) {
-      isMinorEdit = this.minorEditCheckbox.checked;
-      this.minorEditCheckbox.checked = true;
-    }
+    this.updateVersionMetadata();
     // Hacks to force the rich text editors dump the data into the textarea
     // TODO Write me!
     // Call save and continue
     document.fire("xwiki:actions:save", {"continue": true, form: this.editComment.form});
     // Restore comment and minor edit to previous values
-    if (this.editComment) {
-      this.editComment.value = editComment;
+    this.resetVersionMetadata();
+  },
+  /**
+   * Marks the version as minor and updates the version comment with "(Autosaved)".
+   */
+  updateVersionMetadata : function() {
+    if(this.customMetadataElementsContainer) {
+      this.form.insert(this.customMetadataElementsContainer);
     }
+    this.userEditComment = this.editComment.value;
+    this.userMinorEdit = this.minorEditCheckbox.checked;
+    // Add "(Autosaved)" in the comment field
+    this.editComment.value += " (Autosaved)";
     // Check the minor edit checkbox
-    if (this.minorEditCheckbox ) {
-      this.minorEditCheckbox.checked = isMinorEdit;
+    this.minorEditCheckbox.checked = true;
+  },
+  /**
+   * Resets the version metadata elements to their previous state and the contentChanged to false.
+   */
+  resetVersionMetadata : function() {
+    if(this.customMetadataElementsContainer) {
+      this.customMetadataElementsContainer.remove();
     }
+    this.editComment.value = this.userEditComment;
+    this.minorEditCheckbox.checked = this.userMinorEdit;
   }
 });
 

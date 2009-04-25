@@ -102,6 +102,4 @@ some text {{velocity}}
 
 
 
-<div class="${variable}">**bold** some text</div>
-{{/html}}
-{{/velocity}}
+(% class="${variable}" %)(((**bold** some text))){{/html}}{{/velocity}}

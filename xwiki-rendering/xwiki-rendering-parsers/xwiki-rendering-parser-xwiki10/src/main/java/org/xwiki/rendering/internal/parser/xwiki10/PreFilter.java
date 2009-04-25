@@ -40,10 +40,6 @@ public class PreFilter extends AbstractFilter implements Initializable
     private static final Pattern PRE_PATTERN =
         Pattern.compile("\\{pre\\}(.*?)\\{/pre\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
-    public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN);
-
-    public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
-
     @Requirement("spacescleanning")
     public Filter spacesCleaningFilter;
 
@@ -80,10 +76,10 @@ public class PreFilter extends AbstractFilter implements Initializable
             String preContent = matcher.group(1);
 
             // remove velocity macro marker from pre content
-            Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(preContent);
+            Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(preContent);
             boolean velocityOpen = velocityOpenMatcher.find();
             preContent = velocityOpenMatcher.replaceAll("");
-            Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(preContent);
+            Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(preContent);
             boolean velocityClose = velocityCloseMatcher.find();
             preContent = velocityCloseMatcher.replaceAll("");
 

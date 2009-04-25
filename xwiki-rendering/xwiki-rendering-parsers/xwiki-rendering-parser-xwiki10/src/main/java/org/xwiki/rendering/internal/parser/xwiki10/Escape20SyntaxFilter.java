@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
@@ -35,10 +34,12 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 @Component("escape20")
 public class Escape20SyntaxFilter extends AbstractFilter implements Initializable
 {
-    private static final Pattern SYNTAX_PATTERN = Pattern.compile("\\~|\\/\\/|\\_\\_|\\*\\*|\\-\\-|\\#\\#|\\^\\^|\\,\\,");
+    private static final Pattern SYNTAX_PATTERN =
+        Pattern.compile("\\~|\\/\\/|\\_|\\*|\\--|\\#|\\^^|\\,,|1\\.|\\{|\\}|\\(|\\)|\\:|\\;|\\||\\=|\\!");
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -49,30 +50,11 @@ public class Escape20SyntaxFilter extends AbstractFilter implements Initializabl
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String, org.xwiki.rendering.parser.xwiki10.FilterContext)
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
      */
     public String filter(String content, FilterContext filterContext)
     {
-        StringBuffer result = new StringBuffer();
-
-        Matcher matcher = SYNTAX_PATTERN.matcher(content);
-        int current = 0;
-        for (; matcher.find(); current = matcher.end()) {
-            result.append(content.substring(current, matcher.start()));
-
-            String matchedContent = matcher.group(0);
-            for (char c : matchedContent.toCharArray()) {
-                result.append('~');
-                result.append(c);
-            }
-        }
-
-        if (current == 0) {
-            return content;
-        }
-
-        result.append(content.substring(current));
-
-        return result.toString();
+        return SYNTAX_PATTERN.matcher(content).replaceAll("~$0");
     }
 }

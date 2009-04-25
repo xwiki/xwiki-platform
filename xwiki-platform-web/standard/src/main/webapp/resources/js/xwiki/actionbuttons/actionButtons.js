@@ -124,6 +124,7 @@ XWiki.actionButtons.EditActions = Class.create({
 // Save and continue button: Ajax improvements
 XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
   effectDuration : 1.0,
+  hideDuration : 2.0,
   initialize : function() {
     this.createMessages();
     this.addListeners();
@@ -208,6 +209,7 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     }
     this.savingBox.hide();
     this.savedBox.show();
+    this.hideDuration = 2.0;
     this.hideMessage();
   },
   onFailure : function(response) {
@@ -218,6 +220,7 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     }
     this.savingBox.hide();
     this.failedBox.show();
+    this.hideDuration = 10.0;
     this.hideMessage();
   },
   showMessage : function() {
@@ -235,7 +238,7 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     }
   },
   hideMessage : function() {
-    this.hideEffect = new Effect.Fade(this.container, {duration: this.effectDuration, delay: 2, afterFinish: function() {
+    this.hideEffect = new Effect.Fade(this.container, {duration: this.effectDuration, delay: this.hideDuration, afterFinish: function() {
       this.savedBox.hide();
       this.failedBox.hide();
       delete this.hideEffect;

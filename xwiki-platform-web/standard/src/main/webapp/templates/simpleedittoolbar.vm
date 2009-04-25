@@ -1,20 +1,53 @@
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wikieditor/wikibits.js")"></script>
 <script type="text/javascript">
+## Syntax elements is a list of: [identifier, start markup, end markup, image name].
+## The identifier is used to display the button title, and the sample text.
+## The image is retrieved from /resources/icons/silk/imageName.gif
+#set($syntax10Elements = [])
+$syntax10Elements.add(['bold', '*', '*', 'text_bold'])
+$syntax10Elements.add(['italics', '~~', '~~', 'text_italic'])
+$syntax10Elements.add(['underline', '__', '__', 'text_underline'])
+$syntax10Elements.add(['strikethrough', '--', '--', 'text_strikethrough'])
+$syntax10Elements.add(['ulist', '\n* ', '\n', 'text_list_bullets'])
+$syntax10Elements.add(['olist', '\n# ', '\n', 'text_list_numbers'])
+$syntax10Elements.add(['ilink', '[', ']', 'link'])
+$syntax10Elements.add(['elink', '[', ']', 'link_go'])
+$syntax10Elements.add(['h1', '\n1 ', '\n', 'text_heading_1'])
+$syntax10Elements.add(['h2', '\n1.1 ', '\n', 'text_heading_2'])
+$syntax10Elements.add(['h3', '\n1.1.1 ', '\n', 'text_heading_3'])
+$syntax10Elements.add(['h4', '\n1.1.1.1 ', '\n', 'text_heading_4'])
+$syntax10Elements.add(['hr', '\n----\n', '', 'text_horizontalrule'])
+$syntax10Elements.add(['img', '{image:', '}', 'image'])
+$syntax10Elements.add(['sign', '\#sign("$context.user")', '', 'text_signature'])
+#set($syntax20Elements = [])
+$syntax20Elements.add(['bold', '**', '**', 'text_bold'])
+$syntax20Elements.add(['italics', '//', '//', 'text_italic'])
+$syntax20Elements.add(['underline', '__', '__', 'text_underline'])
+$syntax20Elements.add(['strikethrough', '--', '--', 'text_strikethrough'])
+$syntax20Elements.add(['subscript', ',,', ',,', 'text_subscript'])
+$syntax20Elements.add(['superscript', '^^', '^^', 'text_superscript'])
+$syntax20Elements.add(['ulist', '\n* ', '\n', 'text_list_bullets'])
+$syntax20Elements.add(['olist', '\n1. ', '\n', 'text_list_numbers'])
+$syntax20Elements.add(['ilink', '[[', ']]', 'link'])
+$syntax20Elements.add(['elink20', '[[', ']]', 'link_go'])
+$syntax20Elements.add(['h1', '\n= ', '=\n', 'text_heading_1'])
+$syntax20Elements.add(['h2', '\n== ', '==\n', 'text_heading_2'])
+$syntax20Elements.add(['h3', '\n=== ', '===\n', 'text_heading_3'])
+$syntax20Elements.add(['h4', '\n==== ', '====\n', 'text_heading_4'])
+$syntax20Elements.add(['hr', '\n----\n', '', 'text_horizontalrule'])
+$syntax20Elements.add(['img', '[[image:', ']]', 'image'])
+$syntax20Elements.add(['html', '\n{{html}}\n', '\n{{/html}}\n', 'html'])
+$syntax20Elements.add(['velocity', '\n{{velocity}}\n', '\n{{/velocity}}\n', 'cog'])
+#if($doc.syntaxId == 'xwiki/1.0')
+  #set($syntaxElements = $syntax10Elements)
+#elseif($doc.syntaxId == "xwiki/2.0")
+  #set($syntaxElements = $syntax20Elements)
+#end
 // <![CDATA[
-// document.writeln("<div id='simpleedittoolbar' class='layoutsubsection'>")
-// document.writeln("<div class='rightmenu'><a href='$xwiki.getURL("Doc.SimpleEditorToolbar")' onclick=\"openURL('$xwiki.getURL("Doc.SimpleEditorToolbar", "view", "xpage=plain")'); return false;\">aaaaaaaaa?<" + "/a><" + "/div>");
 document.writeln("<div class='leftmenu2'>");
-addButton('$xwiki.getSkinFile("js/xwiki/wikieditor/ed_format_bold.gif")','$msg.get("bold")','*','*','$msg.get("boldtext")');
-addButton('$xwiki.getSkinFile("js/xwiki/wikieditor/ed_format_italic.gif")','$msg.get("italics")','~~','~~','$msg.get("italicstext")');
-addButton('$xwiki.getSkinFile("js/xwiki/wikieditor/ed_format_underline.gif")','$msg.get("underline")','__','__','$msg.get("underlinetext")');
-// addButton('$xwiki.getSkinFile("js/xwiki/wikieditor/ed_title.gif")','$msg.get("secondleveltitle")','\n1.1 ','\n','$msg.get("titletext")');
-addButton('$xwiki.getSkinFile("js/xwiki/wikieditor/ed_link.gif")','$msg.get("ilink")','[',']','$msg.get("ilinktext")');
-// addButton('$xwiki.getSkinFile("js/xwiki/wikieditor/ed_extlink.gif")','$msg.get("elink")','[',']','$msg.get("elinktext")');
-addButton('$xwiki.getSkinFile("js/xwiki/wikieditor/ed_hr.gif")','$msg.get("hr")','\n----\n','','$msg.get("hrtext")');
-addButton('$xwiki.getSkinFile("js/xwiki/wikieditor/ed_image.gif")','$msg.get("img")','{image:','}','$msg.get("imgtext")');
-addButton('$xwiki.getSkinFile("js/xwiki/wikieditor/ed_about.gif")','$msg.get("sign")','\#sign("$context.user")','','$msg.get("signtext")');
-//addInfobox('$msg.get("simpleedittoolbardesc")','$msg.get("simpleedittoolbardesc2")');
-// document.writeln("<" + "/div>");
+#foreach($item in $syntaxElements)
+  addButton('$xwiki.getSkinFile("icons/silk/${item.get(3)}.gif")','$msg.get("core.edit.wikiToolbar.${item.get(0)}")','${item.get(1)}','${item.get(2)}','$msg.get("core.edit.wikiToolbar.${item.get(0)}text")');
+#end
 document.writeln("<" + "/div>");
 // ]]>
 </script>

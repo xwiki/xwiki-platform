@@ -69,15 +69,16 @@ XWiki.actionButtons.EditActions = Class.create({
     #end
     return true;
   },
-  onCancel : function(evt) {
-    evt.stop();
+  onCancel : function(event) {
+    event.stop();
 
     // Notify others we are going to cancel
-    document.fire("xwiki:actions:cancel", {originalEvent : evt, form: evt.element().form});
+    this.notify(event, "cancel");
 
-    var location = evt.element().form.action;
+
+    var location = event.element().form.action;
     if (typeof location != "string") {
-       location = evt.element().form.attributes.getNamedItem("action");
+       location = event.element().form.attributes.getNamedItem("action");
        if (location) {
          location = location.nodeValue;
        } else {
@@ -89,26 +90,33 @@ XWiki.actionButtons.EditActions = Class.create({
     }
     window.location = location + '&action_cancel=true'; 
   },
-  onPreview : function(evt) {
-    if (!this.validateForm(evt.element().form)) {
-      evt.stop();
+  onPreview : function(event) {
+    if (!this.validateForm(event.element().form)) {
+      event.stop();
     } else {
-      // Nofity others
-      document.fire("xwiki:actions:preview", {originalEvent : evt, form: evt.element().form});
+      // Notify others
+      this.notify(event, "preview");
     }
   },
-  onSaveAndView : function(evt) {
-    if (!this.validateForm(evt.element().form)) {
-      evt.stop();
+  onSaveAndView : function(event) {
+    if (!this.validateForm(event.element().form)) {
+      event.stop();
     } else {
-      document.fire("xwiki:actions:save", {"continue": false, originalEvent : evt, form: evt.element().form});
+      this.notify(event, "save", {"continue" : false});
     }
   },
-  onSaveAndContinue : function(evt) {
-    if (!this.validateForm(evt.element().form)) {
-      evt.stop();
+  onSaveAndContinue : function(event) {
+    if (!this.validateForm(event.element().form)) {
+      event.stop();
     } else {
-      document.fire("xwiki:actions:save", {"continue": true, originalEvent : evt, form: evt.element().form});
+      this.notify(event, "save", {"continue" : true});
+    }
+  },
+  notify : function(event, action, params) {
+    document.fire("xwiki:actions:" + action, Object.extend({originalEvent : event, form: event.element().form}, params || { }));
+    // In IE, events can't be stopped from another event's handler, so we must call stop() again here
+    if (event.stopped) {
+      event.stop();
     }
   }
 });
@@ -161,8 +169,10 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));
   },
   onSave : function(event) {
-    if (event.memo.continue) {
-      event.memo.originalEvent.stop();
+    if (event.memo["continue"]) {
+      if (typeof (event.memo.originalEvent) != 'undefined') {
+        event.memo.originalEvent.stop();
+      }
       this.savedBox.hide();
       this.failedBox.hide();
       this.savingBox.show();

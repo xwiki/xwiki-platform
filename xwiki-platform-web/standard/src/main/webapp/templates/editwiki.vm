@@ -29,3 +29,6 @@ $xwiki.getTextArea($tdoc.content)
 ## Insert JS and CSS needed for the fullscreen edit feature
 $xwiki.jsfx.use("js/xwiki/fullscreenedit/fullscreenEdit.js", true)
 $xwiki.ssfx.use("js/xwiki/fullscreenedit/fullscreenEdit.css", true)
+## Autosave feature
+$xwiki.jsfx.use('js/xwiki/dataeditors/autosave.js', true)
+$xwiki.ssfx.use('js/xwiki/dataeditors/autosave.css', true)

@@ -2822,9 +2822,7 @@ div#xwikiclassproperties.accordion
 }
 
 #xwikieditcontent div div.leftmenu2 a img {
-    background-color: #fff;
-    margin-left: 3px;
-    border: 1px solid #333;
+    margin-left: 4px;
 }
 
 .bottombuttons input.button {

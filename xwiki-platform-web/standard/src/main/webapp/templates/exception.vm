@@ -2,12 +2,11 @@
 <div class="main layoutsubsection">
     #set($message = $xwiki.parseMessage())
     #if($message)
-    <center>
-        <h2>$message</h2>
-        <br/><br/>
-    </center>
+    #xwikimessageboxstart($msg.get('notice') $message)
+    #xwikimessageboxend()
     #else
-    $msg.get("problemoccured")
+    #xwikimessageboxstart($msg.get('notice') $msg.get('problemoccured'))
+    #xwikimessageboxend()
     #end
     <br/><br/>
     #if($exp)

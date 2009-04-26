@@ -1,0 +1,55 @@
+.fullScreenEditButton {
+  cursor: ne-resize;
+  position: absolute;
+  right: 1%;
+  top: -14px;
+}
+.fullScreenCloseButton {
+  cursor: sw-resize;
+}
+.leftmenu2 .fullScreenEditButton, .leftmenu2 .fullScreenCloseButton {
+  position: static;
+  margin-left: 4px;
+}
+.mceToolbar .fullScreenEditButton, .mceToolbar .fullScreenCloseButton {
+  position: static;
+  margin-left: 3px;
+  margin-bottom: 2px;
+}
+.gwt-MenuBar .fullScreenEditButton, .gwt-MenuBar .fullScreenCloseButton {
+  position: static;
+  float: right;
+  margin: 5px;
+}
+
+.fullScreenWrapper {
+  z-index: 5;
+  position: fixed !important;
+  left: 0;
+  top: 0px;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background-color : #FFF;
+}
+
+/* Comment this to make the version comment and minor edit checkbox visible in full screen */
+.fullScreenWrapper .metamodifs{
+  display: none !important;
+}
+
+.fullScreenWrapper .mceEditorContainer {
+  height: auto !important;
+}
+.fullScreenWrapper table.mceEditor {
+  height: auto !important;
+}
+* html .fullScreenWrapper {
+  position: absolute !important;
+}
+/* Make sure gwt popup menus are visible in full screen: */
+.gwt-MenuBarPopup {
+  z-index: 12;
+}

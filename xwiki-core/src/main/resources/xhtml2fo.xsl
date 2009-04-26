@@ -1041,7 +1041,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:template match="html:h2" mode="transform">
         <fo:block id="{generate-id(.)}">
-            <fo:block xsl:use-attribute-sets="h2" id="{generate-id(.)}">
+            <fo:block xsl:use-attribute-sets="h2">
                 <xsl:call-template name="process-common-attributes-and-children"/>
             </fo:block>
         </fo:block>
@@ -1049,7 +1049,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:template match="html:h3" mode="transform">
         <fo:block id="{generate-id(.)}">
-            <fo:block xsl:use-attribute-sets="h3" id="{generate-id(.)}">
+            <fo:block xsl:use-attribute-sets="h3">
                 <xsl:call-template name="process-common-attributes-and-children"/>
             </fo:block>
         </fo:block>

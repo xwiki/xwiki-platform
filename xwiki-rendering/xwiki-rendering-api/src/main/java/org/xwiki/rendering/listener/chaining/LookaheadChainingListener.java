@@ -126,6 +126,18 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginGroup(Map)
+     */
+    @Override
+    public void beginGroup(Map<String, String> parameters)
+    {
+        saveEvent(EventType.BEGIN_GROUP, parameters);
+        firePreviousEvent();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginFormat(org.xwiki.rendering.listener.Format,
      *      java.util.Map)
      */
@@ -354,6 +366,17 @@ public class LookaheadChainingListener extends AbstractChainingListener
     {
         saveEvent(EventType.END_DOCUMENT, parameters);
         flush();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(Map)
+     */
+    public void endGroup(Map<String, String> parameters)
+    {
+        saveEvent(EventType.END_GROUP, parameters);
+        firePreviousEvent();
     }
 
     /**
@@ -642,13 +665,12 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onVerbatim(java.lang.String, java.util.Map,
-     *      boolean)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onVerbatim(String, boolean, Map)
      */
     @Override
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
-        saveEvent(EventType.ON_VERBATIM, protectedString, parameters, isInline);
+        saveEvent(EventType.ON_VERBATIM, protectedString, isInline, parameters);
         firePreviousEvent();
     }
 

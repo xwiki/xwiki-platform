@@ -22,7 +22,7 @@ package org.xwiki.rendering.renderer;
 import org.xwiki.rendering.internal.renderer.chaining.XWikiSyntaxChainingRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ConsecutiveNewLineStateChainingListener;
-import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
+import org.xwiki.rendering.listener.chaining.GroupStateChainingListener;
 import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
@@ -50,7 +50,7 @@ public class XWikiSyntaxRenderer extends AbstractChainingPrintRenderer
         // to write the XWiki Syntax chaining listener, for example for saving states (are we in a list, in a 
         // paragraph, are we starting a new line, etc).
         new LookaheadChainingListener(getListenerChain(), 2);
-        new DocumentStateChainingListener(getListenerChain());
+        new GroupStateChainingListener(getListenerChain());
         new BlockStateChainingListener(getListenerChain());
         new ConsecutiveNewLineStateChainingListener(getListenerChain());
         new TextOnNewLineStateChainingListener(getListenerChain());

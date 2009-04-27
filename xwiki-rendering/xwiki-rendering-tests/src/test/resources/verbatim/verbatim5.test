@@ -8,8 +8,8 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onVerbatimInline [abc]
-onVerbatimInline [def]
+onVerbatim [abc] [true]
+onVerbatim [def] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------

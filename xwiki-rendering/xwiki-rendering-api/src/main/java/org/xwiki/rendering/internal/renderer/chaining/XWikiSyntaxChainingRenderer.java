@@ -115,26 +115,23 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginGroup(Map)
      */
     @Override
-    public void beginDocument(Map<String, String> parameters)
+    public void beginGroup(Map<String, String> parameters)
     {
-        // Check if we're starting an embedded document
-        if (getXWikiSyntaxListenerChain().getDocumentStateChainingListener().getDocumentDepth() > 1) {
-            if (!getBlockState().isInLine()) {
-                printEmptyLine();
-            }
-
-            if (parameters.size() > 0) {
-                printParameters(parameters, true);
-            }
-
-            print("(((");
-
-            // Create a new listener stack in order to preserve current states, to handle the embedded document.
-            getListenerChain().pushAllStackableListeners();
+        if (!getBlockState().isInLine()) {
+            printEmptyLine();
         }
+
+        if (parameters.size() > 0) {
+            printParameters(parameters, true);
+        }
+
+        print("(((");
+
+        // Create a new listener stack in order to preserve current states, to handle the group.
+        getListenerChain().pushAllStackableListeners();
     }
 
     /**
@@ -147,14 +144,20 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     {
         // Ensure that all data in the escape printer have been flushed
         getXWikiPrinter().flush();
+    }
 
-        // Check if we're closing an embedded document or not
-        if (getXWikiSyntaxListenerChain().getDocumentStateChainingListener().getDocumentDepth() > 1) {
-            print(")))");
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(Map)
+     */
+    @Override
+    public void endGroup(Map<String, String> parameters)
+    {
+        print(")))");
 
-            // Restore previous listeners that were stacked
-            getListenerChain().popAllStackableListeners();
-        }
+        // Restore previous listeners that were stacked
+        getListenerChain().popAllStackableListeners();
     }
 
     /**
@@ -558,10 +561,10 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onVerbatim(String, Map, boolean)
+     * @see org.xwiki.rendering.renderer.Renderer#onVerbatim(String, boolean, Map)
      */
     @Override
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         if (!isInline) {
             printEmptyLine();

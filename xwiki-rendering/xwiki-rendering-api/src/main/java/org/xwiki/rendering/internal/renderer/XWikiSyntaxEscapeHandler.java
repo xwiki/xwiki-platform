@@ -23,8 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
-import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
 import org.xwiki.rendering.listener.chaining.EventType;
+import org.xwiki.rendering.listener.chaining.GroupStateChainingListener;
 import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
@@ -56,7 +56,7 @@ public class XWikiSyntaxEscapeHandler
         BlockStateChainingListener blockStateListener = listenerChain.getBlockStateChainingListener();
         TextOnNewLineStateChainingListener textStateListener = listenerChain.getTextOnNewLineStateChainingListener();
         LookaheadChainingListener lookaheadListener = listenerChain.getLookaheadChainingListener();
-        DocumentStateChainingListener documentStateListener = listenerChain.getDocumentStateChainingListener();
+        GroupStateChainingListener groupStateListener = listenerChain.getGroupStateChainingListener();
 
         // Escape tilde symbol (i.e. the escape character).
         // Note: This needs to be the first replacement since other replacements below also use the tilde symbol
@@ -98,7 +98,7 @@ public class XWikiSyntaxEscapeHandler
         // Escape "{{"
         replaceAll(accumulatedBuffer, "{{", ESCAPE_CHAR + "{" + ESCAPE_CHAR + "{");
 
-        // Escape embedded document
+        // Escape groups
         replaceAll(accumulatedBuffer, "(((", ESCAPE_CHAR + "(" + ESCAPE_CHAR + "(" + ESCAPE_CHAR + "(");
         replaceAll(accumulatedBuffer, ")))", ESCAPE_CHAR + ")" + ESCAPE_CHAR + ")" + ESCAPE_CHAR + ")");
 
@@ -117,10 +117,10 @@ public class XWikiSyntaxEscapeHandler
         escapeURI(accumulatedBuffer, "attach:");
         escapeURI(accumulatedBuffer, "mailto:");
 
-        if (documentStateListener.getDocumentDepth() > 1
+        if (groupStateListener.isInGroup()
             && accumulatedBuffer.charAt(accumulatedBuffer.length() - 1) == ')'
             && lookaheadListener.getNextEvent() != null
-            && lookaheadListener.getNextEvent().eventType == EventType.END_DOCUMENT) {
+            && lookaheadListener.getNextEvent().eventType == EventType.END_GROUP) {
             escapeLastChar = true;
         }
 

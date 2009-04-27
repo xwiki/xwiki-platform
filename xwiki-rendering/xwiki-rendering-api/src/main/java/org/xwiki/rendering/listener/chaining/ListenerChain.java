@@ -29,8 +29,8 @@ import java.util.Stack;
  * Stores information about the listeners in the chain and the order in which they need to be called. Also sports a
  * feature that allows pushing and popping listeners that are stackable. This feature is useful since listeners can hold
  * stateful information and sometimes you may need to push new versions of them to start with new state information. For
- * example this is used in the XWiki Syntax Renderer when an embedded document event is found to start the rendering for
- * that embedded document using reset state information.
+ * example this is used in the XWiki Syntax Renderer when group event is found to start the rendering for that group
+ * using reset state information.
  * 
  * @version $Id$
  * @since 1.8RC1

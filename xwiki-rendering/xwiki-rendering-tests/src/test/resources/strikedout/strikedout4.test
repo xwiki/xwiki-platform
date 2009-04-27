@@ -8,9 +8,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginFormat: [STRIKEDOUT] [[a]=[b]]
+beginFormat [STRIKEDOUT] [[a]=[b]]
 onWord [something]
-endFormat: [STRIKEDOUT] [[a]=[b]]
+endFormat [STRIKEDOUT] [[a]=[b]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

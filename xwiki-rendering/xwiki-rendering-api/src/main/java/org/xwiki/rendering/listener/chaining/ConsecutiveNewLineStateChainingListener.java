@@ -110,6 +110,18 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(Map)
+     */
+    @Override
+    public void endGroup(Map<String, String> parameters)
+    {
+        this.newLineCount = 0;
+        super.endGroup(parameters);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endFormat(org.xwiki.rendering.listener.Format,
      *      java.util.Map)
      */
@@ -368,8 +380,7 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onMacro(java.lang.String, java.util.Map,
-     *      java.lang.String, boolean)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onMacro(String, Map, String, boolean)
      */
     @Override
     public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
@@ -381,14 +392,13 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onVerbatim(java.lang.String, java.util.Map,
-     *      boolean)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onVerbatim(String, boolean, Map)
      */
     @Override
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         this.newLineCount = 0;
-        super.onVerbatim(protectedString, parameters, isInline);
+        super.onVerbatim(protectedString, isInline, parameters);
     }
 
     /**

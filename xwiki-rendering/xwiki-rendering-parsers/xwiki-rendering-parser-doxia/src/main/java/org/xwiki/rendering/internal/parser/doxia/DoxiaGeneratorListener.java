@@ -45,6 +45,52 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
+     * @see Listener#beginDocument(Map)
+     */
+    public void beginDocument(Map<String, String> parameters)
+    {
+        this.sink.body();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Listener#endDocument(Map)
+     */
+    public void endDocument(Map<String, String> parameters)
+    {
+        this.sink.body_();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Listener#beginGroup(Map)
+     */
+    public void beginGroup(Map<String, String> parameters)
+    {
+        // Do nothing since Doxia doesn't support groups
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Listener#endGroup(Map)
+     */
+    public void endGroup(Map<String, String> parameters)
+    {
+        // Do nothing since Doxia doesn't support groups
+    }
+
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see Listener#beginFormat(Format, Map)
      */
     public void beginFormat(Format format, Map<String, String> parameters)
@@ -92,11 +138,6 @@ public class DoxiaGeneratorListener implements Listener
                 // See http://jira.codehaus.org/browse/DOXIA-204
                 break;
         }
-    }
-
-    public void beginDocument(Map<String, String> parameters)
-    {
-        this.sink.body();
     }
 
     public void beginList(ListType listType, Map<String, String> parameters)
@@ -156,11 +197,6 @@ public class DoxiaGeneratorListener implements Listener
     public void beginXMLNode(XMLNode node)
     {
         // TODO: Find out what to do...
-    }
-
-    public void endDocument(Map<String, String> parameters)
-    {
-        this.sink.body_();
     }
 
     public void endList(ListType listType, Map<String, String> parameters)

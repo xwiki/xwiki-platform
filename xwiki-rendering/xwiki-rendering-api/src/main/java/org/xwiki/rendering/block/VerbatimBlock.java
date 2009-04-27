@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.Listener;
 /**
  * A Verbatim block.
  * 
- * @version $Id: VerbatimBlock.java 16469 2009-02-09 10:37:20Z tmortagne $
+ * @version $Id$
  * @since 1.8M2
  */
 public class VerbatimBlock extends AbstractBlock
@@ -77,7 +77,7 @@ public class VerbatimBlock extends AbstractBlock
      */
     public boolean isInline()
     {
-        return isInline;
+        return this.isInline;
     }
 
     /**
@@ -87,7 +87,7 @@ public class VerbatimBlock extends AbstractBlock
      */
     public void traverse(Listener listener)
     {
-        listener.onVerbatim(getProtectedString(), getParameters(), isInline());
+        listener.onVerbatim(getProtectedString(), isInline(), getParameters());
     }
 
     /**

@@ -10,9 +10,9 @@
 beginDocument
 beginParagraph
 beginLink [Reference = [Page]] [false]
-beginFormat: [BOLD]
+beginFormat [BOLD]
 onWord [hello]
-endFormat: [BOLD]
+endFormat [BOLD]
 endLink [Reference = [Page]] [false]
 onNewLine
 beginLink [Reference = [Page]] [false]

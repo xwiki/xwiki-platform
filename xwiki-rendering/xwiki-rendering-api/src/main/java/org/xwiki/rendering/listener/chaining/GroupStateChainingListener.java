@@ -22,36 +22,31 @@ package org.xwiki.rendering.listener.chaining;
 import java.util.Map;
 
 /**
- * Provides information on document state: whether we are inside a document, an embedded document and the depth of
- * embedding. Note that this listener is separated from the
+ * Provides information on whether we're inside a group. Note that this listener is separated from the
  * {@link org.xwiki.rendering.listener.chaining.BlockStateChainingListener} class because we don't want this listener to
- * be stackable (since we need to know the embedding depth even if we're inside an embedded document.
+ * be stackable (since we need to create new instance of stackable listeners to reset states when we encounter
+ * a begin group event but we also need to know we're inside a group).
  * 
  * @version $Id$
- * @since 1.8RC1
+ * @since 1.8.3
  */
-public class DocumentStateChainingListener extends AbstractChainingListener
+public class GroupStateChainingListener extends AbstractChainingListener
 {
-    private int documentDepth = 0;
+    private int groupDepth = 0;
 
-    public DocumentStateChainingListener(ListenerChain listenerChain)
+    public GroupStateChainingListener(ListenerChain listenerChain)
     {
         super(listenerChain);
     }
 
-    public void setDocumentDepth(int documentDepth)
-    {
-        this.documentDepth = documentDepth;
-    }
-
     public int getDocumentDepth()
     {
-        return this.documentDepth;
+        return this.groupDepth;
     }
 
-    public boolean isInDocument()
+    public boolean isInGroup()
     {
-        return this.documentDepth > 0;
+        return this.groupDepth > 0;
     }
 
     // Events
@@ -59,26 +54,26 @@ public class DocumentStateChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginGroup(Map)
      */
     @Override
-    public void beginDocument(Map<String, String> parameters)
+    public void beginGroup(Map<String, String> parameters)
     {
-        ++this.documentDepth;
+        ++this.groupDepth;
 
-        super.beginDocument(parameters);
+        super.beginGroup(parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(Map)
      */
     @Override
-    public void endDocument(Map<String, String> parameters)
+    public void endGroup(Map<String, String> parameters)
     {
-        super.endDocument(parameters);
+        super.endGroup(parameters);
 
-        --this.documentDepth;
+        --this.groupDepth;
     }
 }

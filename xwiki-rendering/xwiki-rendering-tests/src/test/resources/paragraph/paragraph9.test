@@ -16,10 +16,10 @@ hello  world
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-onVerbatimStandalone [
+onVerbatim [
   newline
   newline
-]
+] [false]
 beginParagraph
 onWord [Some]
 onSpace

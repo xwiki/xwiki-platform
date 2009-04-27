@@ -8,9 +8,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginFormat: [BOLD] [[a]=[b]]
+beginFormat [BOLD] [[a]=[b]]
 onWord [something]
-endFormat: [BOLD] [[a]=[b]]
+endFormat [BOLD] [[a]=[b]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

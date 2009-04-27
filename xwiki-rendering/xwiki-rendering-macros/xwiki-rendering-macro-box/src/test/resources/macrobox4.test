@@ -9,7 +9,7 @@
 beginDocument
 beginMacroMarkerStandalone [testbox] [] []
 beginXMLNode [div] [class=box]
-onVerbatimStandalone []
+onVerbatim [] [false]
 endXMLNode [div] [class=box]
 endMacroMarkerStandalone [testbox] [] []
 endDocument

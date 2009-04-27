@@ -7,7 +7,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-onVerbatimStandalone [abc] [[param]=[value]]
+onVerbatim [abc] [false] [[param]=[value]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

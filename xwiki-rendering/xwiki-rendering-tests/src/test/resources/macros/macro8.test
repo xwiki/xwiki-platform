@@ -17,7 +17,7 @@ beginXMLNode [span] [class=xwikirenderingerror]
 onWord [Not an inline macro]
 endXMLNode [span] [class=xwikirenderingerror]
 beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
-onVerbatimInline [This macro can only be used by itself on a new line]
+onVerbatim [This macro can only be used by itself on a new line] [true]
 endXMLNode [span] [class=xwikirenderingerrordescription hidden]
 endMacroMarkerInline [testsimplemacro] [] []
 onSpace

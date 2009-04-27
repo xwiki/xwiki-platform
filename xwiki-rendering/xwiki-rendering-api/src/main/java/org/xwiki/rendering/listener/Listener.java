@@ -63,6 +63,24 @@ public interface Listener extends LinkListener, ImageListener
     void endDocument(Map<String, String> parameters);
 
     /**
+     * Start a group of elements. Groups are used to allow using standalone elements in 
+     * list items, table cells, etc. They can also be used to set parameters on a group of 
+     * standalone elements.
+     * 
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
+     * @since 1.8.3
+     */
+    void beginGroup(Map<String, String> parameters);
+
+    /**
+     * End of the group.
+     * 
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
+     * @since 1.8.3
+     */
+    void endGroup(Map<String, String> parameters);
+
+    /**
      * End of a text formatting block.
      * 
      * @param format the formatting type (bold, italic, etc)
@@ -294,24 +312,24 @@ public interface Listener extends LinkListener, ImageListener
      * macro definition.
      * 
      * @param name the macro name
-     * @param parameters the macro parameters
+     * @param macroParameters the macro parameters
      * @param content the macro content
      * @param isInline if true the macro is located in a inline content (like paragraph, etc.)
      * @see #onMacro(String, java.util.Map, String, boolean)
      * @see #onInlineMacro(String, java.util.Map, String)
      */
-    void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline);
+    void beginMacroMarker(String name, Map<String, String> macroParameters, String content, boolean isInline);
 
     /**
      * End of marker containing a macro definition.
      * 
      * @param name the macro name
-     * @param parameters the macro parameters
+     * @param macroParameters the macro parameters
      * @param content the macro content
      * @param isInline if true the macro is located in a inline content (like paragraph, etc.)
      * @see #beginMacroMarker(String, java.util.Map, String, boolean)
      */
-    void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline);
+    void endMacroMarker(String name, Map<String, String> macroParameters, String content, boolean isInline);
 
     /**
      * Start of a quotation. There are one or several quotation lines inside a quotation block.
@@ -347,12 +365,12 @@ public interface Listener extends LinkListener, ImageListener
      * A {@link org.xwiki.rendering.macro.Macro} by itself on a line (ie not inside another Block).
      * 
      * @param name the macro name
-     * @param parameters the macro parameters
+     * @param macroParameters the macro parameters
      * @param content the macro content
      * @param isInline if true the macro is located in a inline content (like paragraph, etc.)
      * @since 1.6M2
      */
-    void onMacro(String name, Map<String, String> parameters, String content, boolean isInline);
+    void onMacro(String name, Map<String, String> macroParameters, String content, boolean isInline);
 
     /**
      * A word. Note that sentences ar broken into different events: word events, special symbols events, space events,
@@ -404,8 +422,8 @@ public interface Listener extends LinkListener, ImageListener
      * A portion of text.
      * 
      * @param protectedString the string to protected from rendering
+     * @param isInline if true the text content is located in a inline content (like paragraph, etc.)
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
-     * @param isInline if true it shouldn't be rendered and that is located inside another Block
      */
-    void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline);
+    void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters);
 }

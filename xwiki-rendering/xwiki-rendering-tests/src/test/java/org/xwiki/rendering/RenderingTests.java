@@ -38,16 +38,16 @@ public class RenderingTests extends TestCase
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
 
         // Embedded documents
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc1", false);
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc2", false);
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc3", false);
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc4", false);
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc5", false);
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc6", false);
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc7", false);
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc8", false);
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc9", false);
-        suite.addTestsFromResource("embeddeddoc/embeddeddoc10", false);
+        suite.addTestsFromResource("group/group1", false);
+        suite.addTestsFromResource("group/group2", false);
+        suite.addTestsFromResource("group/group3", false);
+        suite.addTestsFromResource("group/group4", false);
+        suite.addTestsFromResource("group/group5", false);
+        suite.addTestsFromResource("group/group6", false);
+        suite.addTestsFromResource("group/group7", false);
+        suite.addTestsFromResource("group/group8", false);
+        suite.addTestsFromResource("group/group9", false);
+        suite.addTestsFromResource("group/group10", false);
 
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);

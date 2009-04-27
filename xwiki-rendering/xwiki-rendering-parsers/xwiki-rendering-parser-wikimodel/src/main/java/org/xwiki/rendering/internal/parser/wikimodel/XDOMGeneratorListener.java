@@ -43,6 +43,7 @@ import org.xwiki.rendering.block.DefinitionListBlock;
 import org.xwiki.rendering.block.DefinitionTermBlock;
 import org.xwiki.rendering.block.EmptyLinesBlock;
 import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.HorizontalLineBlock;
 import org.xwiki.rendering.block.ImageBlock;
@@ -192,7 +193,7 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(this.marker);
     }
 
-    public void beginInfoBlock(char infoType, WikiParameters params)
+    public void beginInfoBlock(String infoType, WikiParameters params)
     {
         throw new RuntimeException("beginInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
     }
@@ -279,7 +280,7 @@ public class XDOMGeneratorListener implements IWemListener
 
         this.currentSectionLevel.pop();
         if (this.documentLevel > 0) {
-            this.stack.push(new XDOM(generateListFromStack(), convertParameters(params)));
+            this.stack.push(new GroupBlock(generateListFromStack(), convertParameters(params)));
         }
     }
 
@@ -290,27 +291,67 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void endFormat(WikiFormat format)
     {
+        // Get the styles: the styles are wiki syntax styles (i.e. styles which have a wiki syntax such as bold, italic ,etc).
+        // As opposed to format parameters which don't have any specific wiki syntax (they have a generic wiki syntax such as
+        // (% a='b' %) for example in XWiki Syntax 2.0.
         List<WikiStyle> styles = format.getStyles();
+        
+        // If there's any style or parameter defined, do something. The reason we need to check for this is because wikimodel
+        // sends an empty begin/endFormat event before starting an inline block (such as a paragraph).
         if ((styles.size() > 0) || (format.getParams().size() > 0)) {
 
             // Generate nested FormatBlock blocks since XWiki uses nested Format blocks whereas Wikimodel doesn't.
+            //
+            // Simple Use Case: (% a='b' %)**//hello//**(%%)
+            // WikiModel Events: 
+            //   beginFormat(params: a='b', styles = BOLD, ITALIC)
+            //   onWord(hello)
+            //   endFormat(params: a='b', styles = BOLD, ITALIC)
+            // XWiki Blocks:
+            //   FormatBLock(params: a='b', format = BOLD)
+            //     FormatBlock(format = ITALIC)
+            //
+            // More complex Use Case: **(% a='b' %)hello**world
+            // WikiModel Events: 
+            //   beginFormat(params: a='b', styles = BOLD)
+            //   onWord(hello)
+            //   endFormat(params: a='b', styles = BOLD)
+            //   beginFormat(params: a='b')
+            //   onWord(world)
+            //   endFormat(params: a='b')
+            // XWiki Blocks:
+            //   FormatBlock(params: a='b', format = BOLD)
+            //     WordBlock(hello)
+            //   FormatBlock(params: a='b')
+            //     WordBlock(world)
+            
+            // TODO: We should instead have the following which would allow to simplify XWikiSyntaxChaining Renderer
+            // which currently has to check if the next format has the same params as the previous format to decide
+            // whether to print it or not.
+            //   FormatBlock(params: a='b')
+            //     FormatBlock(format = BOLD)
+            //       WordBlock(hello)
+            //     WordBlock(world)
+            
             FormatBlock block;
             if (styles.size() > 0) {
                 block = new FormatBlock(generateListFromStack(), convertFormat(styles.get(styles.size() - 1)));
             } else {
                 block = new FormatBlock(generateListFromStack(), Format.NONE);
             }
-
-            // If there are any parameters set in the format then set it on the last block.
-            if (format.getParams().size() > 0) {
-                block.setParameters(convertParameters(new WikiParameters(format.getParams())));
-            }
+            
 
             if (styles.size() > 1) {
                 ListIterator<WikiStyle> it = styles.listIterator(styles.size() - 1);
                 while (it.hasPrevious()) {
                     block = new FormatBlock(Arrays.asList((Block) block), convertFormat(it.previous()));
                 }
+            }
+
+            // If there are any parameters set in the format then set it on the first block so that it's printed before
+            // the wiki syntax styles.
+            if (format.getParams().size() > 0) {
+                block.setParameters(convertParameters(new WikiParameters(format.getParams())));
             }
 
             // If the previous block is also a format block and it's the same style as the current
@@ -325,8 +366,8 @@ public class XDOMGeneratorListener implements IWemListener
             }
 
         } else {
-            // WikiModel generate begin/endFormat events even for simple text with no style so we need to remove our
-            // marker.
+            // Empty format. We need to remove our marker so pop all blocks after our marker and push them back on 
+            // the stack.
             for (Block block : generateListFromStack()) {
                 this.stack.push(block);
             }
@@ -343,7 +384,7 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(new HeaderBlock(children, headerLevel, parameters, id));
     }
 
-    public void endInfoBlock(char infoType, WikiParameters params)
+    public void endInfoBlock(String infoType, WikiParameters params)
     {
         throw new RuntimeException("endInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
     }
@@ -611,10 +652,12 @@ public class XDOMGeneratorListener implements IWemListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.wikimodel.wem.IWemListener#onVerbatimInline(String)
+     * @see org.wikimodel.wem.IWemListener#onVerbatimInline(String, WikiParameters)
      */
-    public void onVerbatimInline(String protectedString)
+    public void onVerbatimInline(String protectedString, WikiParameters params)
     {
+        // TODO: we're currently not handling any inline verbatim parameters (we don't have support for this in
+        // XWiki Blocks for now).
         this.stack.push(new VerbatimBlock(protectedString, true));
     }
 

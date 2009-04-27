@@ -8,9 +8,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginFormat: [SUBSCRIPT] [[a]=[b]]
+beginFormat [SUBSCRIPT] [[a]=[b]]
 onWord [something]
-endFormat: [SUBSCRIPT] [[a]=[b]]
+endFormat [SUBSCRIPT] [[a]=[b]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

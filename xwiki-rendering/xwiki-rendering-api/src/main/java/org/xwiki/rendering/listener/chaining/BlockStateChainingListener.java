@@ -727,7 +727,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(Map)
      */
     @Override
     public void endXMLNode(XMLNode node)
@@ -832,15 +832,14 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onVerbatim(java.lang.String, java.util.Map,
-     *      boolean)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onVerbatim(String, boolean, Map)
      */
     @Override
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         this.previousEvent = Event.VERBATIM_STANDALONE;
 
-        super.onVerbatim(protectedString, parameters, isInline);
+        super.onVerbatim(protectedString, isInline, parameters);
     }
 
     /**

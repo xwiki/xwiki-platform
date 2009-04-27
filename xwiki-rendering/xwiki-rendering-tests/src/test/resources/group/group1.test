@@ -1,8 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-before (((
-inside ))) after
+before ((( inside ))) after
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -10,11 +9,11 @@ beginDocument
 beginParagraph
 onWord [before]
 endParagraph
-beginDocument
+beginGroup
 beginParagraph
 onWord [inside]
 endParagraph
-endDocument
+endGroup
 beginParagraph
 onWord [after]
 endParagraph
@@ -22,12 +21,24 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>before</p><div class="xwiki-document"><p>inside</p></div><p>after</p>
+<p>before</p><div><p>inside</p></div><p>after</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 before
 
 (((inside)))
+
+after
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>before</p><div><p>inside</p></div><p>after</p></html>
+.#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+before
+
+inside
 
 after

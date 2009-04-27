@@ -8,9 +8,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginFormat: [MONOSPACE] [[a]=[b]]
+beginFormat [MONOSPACE] [[a]=[b]]
 onWord [something]
-endFormat: [MONOSPACE] [[a]=[b]]
+endFormat [MONOSPACE] [[a]=[b]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

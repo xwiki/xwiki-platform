@@ -11,9 +11,9 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginFormat: [UNDERLINED]
+beginFormat [UNDERLINED]
 onWord [underline]
-endFormat: [UNDERLINED]
+endFormat [UNDERLINED]
 endParagraph
 endDocument
 .#-----------------------------------------------------

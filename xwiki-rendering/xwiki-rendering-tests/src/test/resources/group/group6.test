@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-before ((( one ((( two ((( three
+before ((( opened and not closed
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -9,37 +9,29 @@ beginDocument
 beginParagraph
 onWord [before]
 endParagraph
-beginDocument
+beginGroup
 beginParagraph
-onWord [one]
+onWord [opened]
+onSpace
+onWord [and]
+onSpace
+onWord [not]
+onSpace
+onWord [closed]
 endParagraph
-beginDocument
-beginParagraph
-onWord [two]
-endParagraph
-beginDocument
-beginParagraph
-onWord [three]
-endParagraph
-endDocument
-endDocument
-endDocument
+endGroup
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>before</p><div class="xwiki-document"><p>one</p><div class="xwiki-document"><p>two</p><div class="xwiki-document"><p>three</p></div></div></div>
+<p>before</p><div><p>opened and not closed</p></div>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 before
 
-(((one
-
-(((two
-
-(((three)))))))))
+(((opened and not closed)))
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>before</p><div class="xwiki-document"><p>one</p><div class="xwiki-document"><p>two</p><div class="xwiki-document"><p>three</p></div></div></div></html>
+<html><p>before</p><div><p>opened and not closed</p></div></html>

@@ -9,9 +9,9 @@
 beginDocument
 beginParagraph
 beginLink [Reference = [Space.ExistingPage]] [false]
-beginFormat: [ITALIC]
+beginFormat [ITALIC]
 onWord [a]
-endFormat: [ITALIC]
+endFormat [ITALIC]
 onWord [b]
 endLink [Reference = [Space.ExistingPage]] [false]
 endParagraph

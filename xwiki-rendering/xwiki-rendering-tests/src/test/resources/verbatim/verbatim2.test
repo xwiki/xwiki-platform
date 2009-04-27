@@ -8,9 +8,9 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-onVerbatimStandalone [
+onVerbatim [
 **verbatim**
-]
+] [false]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

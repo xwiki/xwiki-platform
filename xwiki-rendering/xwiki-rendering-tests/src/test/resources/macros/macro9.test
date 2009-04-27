@@ -15,7 +15,7 @@ beginXMLNode [span] [class=xwikirenderingerror]
 onWord [Failed to execute macro: testfailingmacro]
 endXMLNode [span] [class=xwikirenderingerror]
 beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
-onVerbatimInline [stack trace here]
+onVerbatim [stack trace here] [true]
 endXMLNode [span] [class=xwikirenderingerrordescription hidden]
 endMacroMarkerInline [testfailingmacro] [] []
 onSpace

@@ -11,9 +11,9 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginFormat: [STRIKEDOUT]
+beginFormat [STRIKEDOUT]
 onWord [strikedout]
-endFormat: [STRIKEDOUT]
+endFormat [STRIKEDOUT]
 endParagraph
 endDocument
 .#-----------------------------------------------------

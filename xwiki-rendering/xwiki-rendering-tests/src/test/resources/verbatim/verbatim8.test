@@ -10,11 +10,11 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-onVerbatimStandalone [ ~ ]
-onVerbatimStandalone [ }}} ]
-onVerbatimStandalone [ }}} }}}]
-onVerbatimStandalone [ {{{ ]
-onVerbatimStandalone [ {{{ {{{{ ]
+onVerbatim [ ~ ] [false]
+onVerbatim [ }}} ] [false]
+onVerbatim [ }}} }}}] [false]
+onVerbatim [ {{{ ] [false]
+onVerbatim [ {{{ {{{{ ] [false]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

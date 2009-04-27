@@ -1,7 +1,7 @@
-.#---------------------------------------------------------------------------------------------------------
+.#---------------------------------------------------------------------------------------------
 .input|xhtml/1.0
-.# Verify that standalone block elements inside inline elements are rendered using embedded document syntax
-.#---------------------------------------------------------------------------------------------------------
+.# Verify that standalone block elements inside inline elements are rendered using group syntax
+.#---------------------------------------------------------------------------------------------
 <html><table><tr><th><p>head1</p><p>head2</p></th></tr><tr><td><ul><li>item</li></ul></td></tr></table><ul><li><table><tr><td>cell</td></tr></table></li></ul></html>
 .#-----------------------------------------------------
 .expect|event/1.0
@@ -10,31 +10,31 @@ beginDocument
 beginTable
 beginTableRow
 beginTableHeadCell
-beginDocument
+beginGroup
 beginParagraph
 onWord [head1]
 endParagraph
 beginParagraph
 onWord [head2]
 endParagraph
-endDocument
+endGroup
 endTableHeadCell
 endTableRow
 beginTableRow
 beginTableCell
-beginDocument
+beginGroup
 beginList [BULLETED]
 beginListItem
 onWord [item]
 endListItem
 endList [BULLETED]
-endDocument
+endGroup
 endTableCell
 endTableRow
 endTable
 beginList [BULLETED]
 beginListItem
-beginDocument
+beginGroup
 beginTable
 beginTableRow
 beginTableCell
@@ -42,7 +42,7 @@ onWord [cell]
 endTableCell
 endTableRow
 endTable
-endDocument
+endGroup
 endListItem
 endList [BULLETED]
 endDocument
@@ -58,4 +58,4 @@ head2)))
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><th><div class="xwiki-document"><p>head1</p><p>head2</p></div></th></tr><tr><td><div class="xwiki-document"><ul><li>item</li></ul></div></td></tr></table><ul><li><div class="xwiki-document"><table><tr><td>cell</td></tr></table></div></li></ul>
+<table><tr><th><div><p>head1</p><p>head2</p></div></th></tr><tr><td><div><ul><li>item</li></ul></div></td></tr></table><ul><li><div><table><tr><td>cell</td></tr></table></div></li></ul>

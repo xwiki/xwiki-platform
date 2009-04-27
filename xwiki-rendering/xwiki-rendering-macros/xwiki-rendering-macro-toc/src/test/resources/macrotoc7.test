@@ -54,10 +54,10 @@ endHeader [2, HTitle11]
 beginSection
 beginSection
 beginHeader [4, HTitle1111]
-beginFormat: [BOLD]
+beginFormat [BOLD]
 onWord [Title]
 onSpace
-beginFormat: [ITALIC]
+beginFormat [ITALIC]
 onWord [1]
 onSpecialSymbol [.]
 onWord [1]
@@ -65,8 +65,8 @@ onSpecialSymbol [.]
 onWord [1]
 onSpecialSymbol [.]
 onWord [1]
-endFormat: [ITALIC]
-endFormat: [BOLD]
+endFormat [ITALIC]
+endFormat [BOLD]
 endHeader [4, HTitle1111]
 endSection
 endSection

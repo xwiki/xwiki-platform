@@ -111,6 +111,18 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginGroup(Map)
+     */
+    @Override
+    public void beginGroup(Map<String, String> parameters)
+    {
+        this.isTextOnNewLine = false;
+        super.beginGroup(parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginFormat(org.xwiki.rendering.listener.Format,
      *      java.util.Map)
      */
@@ -401,13 +413,12 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onVerbatim(java.lang.String, java.util.Map,
-     *      boolean)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onVerbatim(String, boolean, Map)
      */
     @Override
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         this.isTextOnNewLine = false;
-        super.onVerbatim(protectedString, parameters, isInline);
+        super.onVerbatim(protectedString, isInline, parameters);
     }
 }

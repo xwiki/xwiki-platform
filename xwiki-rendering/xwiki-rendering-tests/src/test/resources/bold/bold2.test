@@ -11,9 +11,9 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginFormat: [BOLD]
+beginFormat [BOLD]
 onWord [bold]
-endFormat: [BOLD]
+endFormat [BOLD]
 endParagraph
 endDocument
 .#-----------------------------------------------------

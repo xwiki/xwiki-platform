@@ -114,6 +114,19 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
+     * @see ChainingListener#beginGroup(Map)
+     */
+    public void beginGroup(Map<String, String> parameters)
+    {
+        ChainingListener next = getListenerChain().getNextListener(getClass());
+        if (next != null) {
+            next.beginGroup(parameters);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see ChainingListener#beginFormat(Format, Map)
      */
     public void beginFormat(Format format, Map<String, String> parameters)
@@ -355,6 +368,19 @@ public abstract class AbstractChainingListener implements ChainingListener
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
             next.endDocument(parameters);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ChainingListener#endGroup(Map)
+     */
+    public void endGroup(Map<String, String> parameters)
+    {
+        ChainingListener next = getListenerChain().getNextListener(getClass());
+        if (next != null) {
+            next.endGroup(parameters);
         }
     }
 
@@ -660,13 +686,13 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChainingListener#onVerbatim(String, Map, boolean)
+     * @see ChainingListener#onVerbatim(String, boolean, Map)
      */
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.onVerbatim(protectedString, parameters, isInline);
+            next.onVerbatim(protectedString, isInline, parameters);
         }
     }
 

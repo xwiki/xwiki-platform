@@ -77,7 +77,7 @@ public class VerbatimBlock extends AbstractBlock
      */
     public boolean isInline()
     {
-        return isInline;
+        return this.isInline;
     }
 
     /**
@@ -87,7 +87,7 @@ public class VerbatimBlock extends AbstractBlock
      */
     public void traverse(Listener listener)
     {
-        listener.onVerbatim(getProtectedString(), getParameters(), isInline());
+        listener.onVerbatim(getProtectedString(), isInline(), getParameters());
     }
 
     /**

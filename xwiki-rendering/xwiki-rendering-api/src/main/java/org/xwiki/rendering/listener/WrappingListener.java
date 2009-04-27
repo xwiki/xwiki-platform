@@ -55,6 +55,26 @@ public class WrappingListener implements Listener
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.Listener#beginGroup(Map)
+     */
+    public void beginGroup(Map<String, String> parameters)
+    {
+        this.listener.beginGroup(parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endGroup(Map)
+     */
+    public void endGroup(Map<String, String> parameters)
+    {
+        this.listener.endGroup(parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginFormat(Format, Map)
      */
     public void beginFormat(Format format, Map<String, String> parameters)
@@ -320,11 +340,11 @@ public class WrappingListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, Map, boolean)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, boolean, Map)
      */
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
-        this.listener.onVerbatim(protectedString, parameters, isInline);
+        this.listener.onVerbatim(protectedString, isInline, parameters);
     }
 
     /**

@@ -259,11 +259,10 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onVerbatim(java.lang.String,
-     *      java.util.Map, boolean)
+     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onVerbatim(String, boolean, Map)
      */
     @Override
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         getPrinter().print(protectedString);
     }

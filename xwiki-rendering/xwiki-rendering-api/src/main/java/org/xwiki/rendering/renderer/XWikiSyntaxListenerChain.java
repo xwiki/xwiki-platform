@@ -21,7 +21,7 @@ package org.xwiki.rendering.renderer;
 
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ConsecutiveNewLineStateChainingListener;
-import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
+import org.xwiki.rendering.listener.chaining.GroupStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
@@ -67,10 +67,10 @@ public class XWikiSyntaxListenerChain extends ListenerChain
     }
 
     /**
-     * @return the stateful {@link DocumentStateChainingListener} for this rendering session.
+     * @return the stateful {@link GroupStateChainingListener} for this rendering session.
      */
-    public DocumentStateChainingListener getDocumentStateChainingListener()
+    public GroupStateChainingListener getGroupStateChainingListener()
     {
-        return (DocumentStateChainingListener) getListener(DocumentStateChainingListener.class);
+        return (GroupStateChainingListener) getListener(GroupStateChainingListener.class);
     }
 }

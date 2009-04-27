@@ -11,9 +11,9 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginFormat: [ITALIC]
+beginFormat [ITALIC]
 onWord [italic]
-endFormat: [ITALIC]
+endFormat [ITALIC]
 endParagraph
 endDocument
 .#-----------------------------------------------------

@@ -31,7 +31,6 @@ import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.URLImage;
-import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
@@ -48,13 +47,6 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     public EventsChainingRenderer(WikiPrinter printer, ListenerChain listenerChain)
     {
         super(printer, listenerChain);
-    }
-
-    // State
-
-    private DocumentStateChainingListener getDocumentState()
-    {
-        return (DocumentStateChainingListener) getListenerChain().getListener(DocumentStateChainingListener.class);
     }
 
     // Events
@@ -78,11 +70,29 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endDocument(Map<String, String> parameters)
     {
-        if (getDocumentState().getDocumentDepth() > 1) {
-            getPrinter().println("endDocument");
-        } else {
-            getPrinter().print("endDocument" + serializeParameters(parameters));
-        }
+        getPrinter().print("endDocument" + serializeParameters(parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginGroup(Map)
+     */
+    @Override
+    public void beginGroup(Map<String, String> parameters)
+    {
+        getPrinter().println("beginGroup" + serializeParameters(parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(Map)
+     */
+    @Override
+    public void endGroup(Map<String, String> parameters)
+    {
+        getPrinter().println("endGroup" + serializeParameters(parameters));
     }
 
     /**
@@ -94,7 +104,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
     {
-        getPrinter().println("beginFormat: [" + format + "]" + serializeParameters(parameters));
+        getPrinter().println("beginFormat [" + format + "]" + serializeParameters(parameters));
     }
 
     /**
@@ -106,7 +116,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endFormat(Format format, Map<String, String> parameters)
     {
-        getPrinter().println("endFormat: [" + format + "]" + serializeParameters(parameters));
+        getPrinter().println("endFormat [" + format + "]" + serializeParameters(parameters));
     }
 
     /**
@@ -385,15 +395,13 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onVerbatim(java.lang.String,
-     *      java.util.Map, boolean)
+     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onVerbatim(String, boolean, Map)
      */
     @Override
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
-        getPrinter().println(
-            "onVerbatim" + (isInline ? "Inline" : "Standalone") + " [" + protectedString + "]"
-                + serializeParameters(parameters));
+        getPrinter().println("onVerbatim [" + protectedString + "] [" + isInline + "]" 
+            + serializeParameters(parameters)); 
     }
 
     /**

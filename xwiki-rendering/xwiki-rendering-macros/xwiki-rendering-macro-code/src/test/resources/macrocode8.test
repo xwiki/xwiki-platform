@@ -14,16 +14,16 @@ export X=foo
 bar
 ]
 beginXMLNode [div] [class=box code]
-beginFormat: [NONE] [[style]=[color: #008000; ]]
+beginFormat [NONE] [[style]=[color: #008000; ]]
 onWord [export]
 onSpace
-endFormat: [NONE] [[style]=[color: #008000; ]]
-beginFormat: [NONE] [[style]=[color: #19177C; ]]
+endFormat [NONE] [[style]=[color: #008000; ]]
+beginFormat [NONE] [[style]=[color: #19177C; ]]
 onWord [X]
-endFormat: [NONE] [[style]=[color: #19177C; ]]
-beginFormat: [NONE] [[style]=[color: #666666; ]]
+endFormat [NONE] [[style]=[color: #19177C; ]]
+beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [=]
-endFormat: [NONE] [[style]=[color: #666666; ]]
+endFormat [NONE] [[style]=[color: #666666; ]]
 onWord [foo]
 onNewLine
 onWord [bar]

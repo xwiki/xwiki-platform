@@ -16,7 +16,7 @@ beginXMLNode [span] [class=xwikirenderingerror]
 onWord [Unknown macro: unknown]
 endXMLNode [span] [class=xwikirenderingerror]
 beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
-onVerbatimInline [The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.]
+onVerbatim [The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.] [true]
 endXMLNode [span] [class=xwikirenderingerrordescription hidden]
 endMacroMarkerInline [unknown] [] []
 onSpace

@@ -6,18 +6,18 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginDocument [[param]=[value]]
+beginGroup [[param]=[value]]
 beginParagraph
 onWord [some]
 onSpace
 onWord [text]
 endParagraph
-endDocument
+endGroup [[param]=[value]]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<div class="xwiki-document" param="value"><p>some text</p></div>
+<div param="value"><p>some text</p></div>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -26,4 +26,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<div class="xwiki-document" param="value"><p>some text</p></div>
+<div param="value"><p>some text</p></div>

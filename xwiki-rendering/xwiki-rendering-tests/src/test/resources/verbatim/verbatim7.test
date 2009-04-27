@@ -8,9 +8,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph [[param]=[value]]
-beginFormat: [NONE] [[param2]=[value2]]
-onVerbatimInline [abc]
-endFormat: [NONE] [[param2]=[value2]]
+beginFormat [NONE] [[param2]=[value2]]
+onVerbatim [abc] [true]
+endFormat [NONE] [[param2]=[value2]]
 endParagraph [[param]=[value]]
 endDocument
 .#-----------------------------------------------------

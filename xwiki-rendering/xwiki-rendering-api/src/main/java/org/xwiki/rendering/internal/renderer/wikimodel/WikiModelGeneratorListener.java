@@ -75,6 +75,26 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.listener.Listener#beginGroup(Map)
+     */
+    public void beginGroup(Map<String, String> parameters)
+    {
+        this.wikimodelListener.beginDocument(createWikiParameters(parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endGroup(Map)
+     */
+    public void endGroup(Map<String, String> parameters)
+    {
+        this.wikimodelListener.endDocument(createWikiParameters(parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see Listener#beginFormat(Format, Map)
      */
     public void beginFormat(Format format, Map<String, String> parameters)
@@ -281,12 +301,14 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, Map, boolean)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, boolean, Map)
      */
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         if (isInline) {
-            this.wikimodelListener.onVerbatimInline(protectedString);
+            // TODO: we're currently not handling any inline verbatim parameters (we don't have support for this in
+            // XWiki Blocks for now).
+            this.wikimodelListener.onVerbatimInline(protectedString, WikiParameters.EMPTY);
         } else {
             this.wikimodelListener.onVerbatimBlock(protectedString, createWikiParameters(parameters));
         }

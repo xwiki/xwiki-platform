@@ -1,44 +1,36 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-before ((( inside ))) after
+text
+
+
+(((doc)))
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onWord [before]
+onWord [text]
 endParagraph
-beginDocument
+onEmptyLines [1]
+beginGroup
 beginParagraph
-onWord [inside]
+onWord [doc]
 endParagraph
-endDocument
-beginParagraph
-onWord [after]
-endParagraph
+endGroup
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>before</p><div class="xwiki-document"><p>inside</p></div><p>after</p>
+<p>text</p><div class="wikimodel-emptyline"></div><div><p>doc</p></div>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-before
+text
 
-(((inside)))
 
-after
+(((doc)))
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>before</p><div class="xwiki-document"><p>inside</p></div><p>after</p></html>
-.#-----------------------------------------------------
-.expect|plain/1.0
-.#-----------------------------------------------------
-before
-
-inside
-
-after
+<p>text</p><div class="wikimodel-emptyline"></div><div><p>doc</p></div>

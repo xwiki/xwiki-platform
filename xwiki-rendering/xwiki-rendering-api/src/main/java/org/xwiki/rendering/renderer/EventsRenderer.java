@@ -20,7 +20,6 @@
 package org.xwiki.rendering.renderer;
 
 import org.xwiki.rendering.internal.renderer.chaining.EventsChainingRenderer;
-import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -41,7 +40,6 @@ public class EventsRenderer extends AbstractChainingPrintRenderer
     {
         super(printer, new ListenerChain());
         
-        new DocumentStateChainingListener(getListenerChain());
         new EventsChainingRenderer(printer, getListenerChain());
     }
 }

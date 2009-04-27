@@ -29,7 +29,6 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
-import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener.Event;
 import org.xwiki.rendering.listener.xml.XMLComment;
@@ -76,11 +75,6 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     }
 
     // State
-
-    private DocumentStateChainingListener getDocumentState()
-    {
-        return (DocumentStateChainingListener) getListenerChain().getListener(DocumentStateChainingListener.class);
-    }
 
     private BlockStateChainingListener getBlockState()
     {
@@ -129,33 +123,27 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginGroup(Map)
      */
     @Override
-    public void beginDocument(Map<String, String> parameters)
+    public void beginGroup(Map<String, String> parameters)
     {
-        if (getDocumentState().getDocumentDepth() > 1) {
-            Map<String, String> clonedParameters = new LinkedHashMap<String, String>();
-            clonedParameters.put("class", "xwiki-document");
-            clonedParameters.putAll(parameters);
-
-            getXHTMLWikiPrinter().printXMLStartElement("div", clonedParameters);
-        }
+        Map<String, String> clonedParameters = new LinkedHashMap<String, String>();
+        clonedParameters.putAll(parameters);
+        getXHTMLWikiPrinter().printXMLStartElement("div", clonedParameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(Map)
      */
     @Override
-    public void endDocument(Map<String, String> parameters)
+    public void endGroup(Map<String, String> parameters)
     {
-        if (getDocumentState().getDocumentDepth() > 1) {
-            getXHTMLWikiPrinter().printXMLEndElement("div");
-        }
+        getXHTMLWikiPrinter().printXMLEndElement("div");
     }
-
+    
     /**
      * {@inheritDoc}
      * 
@@ -523,10 +511,10 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onVerbatim(String, Map, boolean)
+     * @see org.xwiki.rendering.renderer.Renderer#onVerbatim(String, boolean, Map)
      */
     @Override
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         if (isInline) {
             // Note: We generate a tt element rather than a pre element since pre elements cannot be located inside

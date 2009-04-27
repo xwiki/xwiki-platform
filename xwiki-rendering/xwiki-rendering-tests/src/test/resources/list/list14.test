@@ -16,12 +16,12 @@ onSpace
 onWord [1]
 endListItem
 beginListItem
-beginFormat: [NONE] [[style]=[background-color:rgb(255, 0, 0);]]
+beginFormat [NONE] [[style]=[background-color:rgb(255, 0, 0);]]
 onSpace
 onWord [Item]
 onSpace
 onWord [2]
-endFormat: [NONE] [[style]=[background-color:rgb(255, 0, 0);]]
+endFormat [NONE] [[style]=[background-color:rgb(255, 0, 0);]]
 endListItem
 beginListItem
 onWord [Item]

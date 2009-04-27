@@ -11,7 +11,7 @@ beginDocument
 beginParagraph
 onWord [Paragraph1]
 onNewLine
-onVerbatimInline [verbatim]
+onVerbatim [verbatim] [true]
 onNewLine
 onWord [Paragraph2]
 endParagraph

@@ -11,18 +11,18 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginFormat: [BOLD]
+beginFormat [BOLD]
 onWord [bold]
 onSpace
-endFormat: [BOLD]
+endFormat [BOLD]
 onSpace
 onWord [not]
 onSpace
 onWord [bold]
-beginFormat: [BOLD]
+beginFormat [BOLD]
 onSpace
 onWord [bold]
-endFormat: [BOLD]
+endFormat [BOLD]
 endParagraph
 endDocument
 .#-----------------------------------------------------

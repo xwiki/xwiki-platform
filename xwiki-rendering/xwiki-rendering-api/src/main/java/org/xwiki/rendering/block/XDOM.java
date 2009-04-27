@@ -92,25 +92,6 @@ public class XDOM extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.AbstractBlock#setParent(org.xwiki.rendering.block.Block)
-     */
-    @Override
-    public void setParent(Block parentBlock)
-    {
-        if (parentBlock != null) {
-            // The document become a embedded document
-            this.idGenerator = null;
-        } else if (this.idGenerator == null) {
-            // The embedded document become a root document
-            this.idGenerator = new IdGenerator();
-        }
-
-        super.setParent(parentBlock);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)

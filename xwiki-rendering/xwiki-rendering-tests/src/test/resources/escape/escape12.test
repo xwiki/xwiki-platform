@@ -10,18 +10,18 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginFormat: [BOLD]
+beginFormat [BOLD]
 onSpace
 onWord [word]
-endFormat: [BOLD]
+endFormat [BOLD]
 endParagraph
 beginParagraph
-beginFormat: [BOLD]
+beginFormat [BOLD]
 onWord [1]
 onSpecialSymbol [.]
 onSpace
 onWord [word]
-endFormat: [BOLD]
+endFormat [BOLD]
 endParagraph
 endDocument
 .#-----------------------------------------------------

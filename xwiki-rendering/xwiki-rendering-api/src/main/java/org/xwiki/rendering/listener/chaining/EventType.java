@@ -49,6 +49,24 @@ public enum EventType
             listener.endDocument((Map<String, String>) eventParameters[0]);
         }
     },
+    BEGIN_GROUP {
+        void fireEvent(Listener listener, Object[] eventParameters)
+        {
+            listener.beginGroup((Map<String, String>) eventParameters[0]);
+        }
+    },
+    END_GROUP {
+        void fireEvent(Listener listener, Object[] eventParameters)
+        {
+            listener.endGroup((Map<String, String>) eventParameters[0]);
+        }
+
+        @Override
+        public boolean isInlineEnd()
+        {
+            return true;
+        }
+    },
     BEGIN_PARAGRAPH {
         void fireEvent(Listener listener, Object[] eventParameters)
         {
@@ -388,8 +406,8 @@ public enum EventType
     ON_VERBATIM {
         void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.onVerbatim((String) eventParameters[0], (Map<String, String>) eventParameters[1],
-                (Boolean) eventParameters[2]);
+            listener.onVerbatim((String) eventParameters[0], (Boolean) eventParameters[1], 
+                (Map<String, String>) eventParameters[2]);
         }
     },
     ON_WORD {

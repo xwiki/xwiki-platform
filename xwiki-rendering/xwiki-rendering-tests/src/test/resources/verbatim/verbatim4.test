@@ -9,7 +9,7 @@ before{{{abc{{{123}}}cde}}}after
 beginDocument
 beginParagraph
 onWord [before]
-onVerbatimInline [abc{{{123}}}cde]
+onVerbatim [abc{{{123}}}cde] [true]
 onWord [after]
 endParagraph
 endDocument

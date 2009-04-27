@@ -13,7 +13,7 @@ beginMacroMarkerStandalone [testbox] [] [
 content
 ]
 beginXMLNode [div] [class=box]
-onVerbatimStandalone [content]
+onVerbatim [content] [false]
 endXMLNode [div] [class=box]
 endMacroMarkerStandalone [testbox] [] [
 content

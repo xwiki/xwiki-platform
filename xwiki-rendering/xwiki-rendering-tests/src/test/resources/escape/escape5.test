@@ -23,9 +23,9 @@ onSpecialSymbol [.]
 onSpace
 onWord [notlist]
 onNewLine
-beginFormat: [ITALIC]
+beginFormat [ITALIC]
 onWord [something]
-endFormat: [ITALIC]
+endFormat [ITALIC]
 onSpace
 onSpecialSymbol [*]
 onSpace

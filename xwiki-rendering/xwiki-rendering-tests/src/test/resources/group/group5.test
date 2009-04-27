@@ -5,9 +5,9 @@
 
 |=Table Header 1|=Table Header 2|=Table Header 3
 |Cell One|Cell Two (((
-= This is an embedded document
+= This is a group
 
-The first paragraph of the embedded document
+The first paragraph of the group
 
 * list item one
 * list item two
@@ -64,19 +64,17 @@ beginTableCell
 onWord [Cell]
 onSpace
 onWord [Two]
-beginDocument
+beginGroup
 beginSection
-beginHeader [1, HThisisanembeddeddocument]
+beginHeader [1, HThisisagroup]
 onWord [This]
 onSpace
 onWord [is]
 onSpace
-onWord [an]
+onWord [a]
 onSpace
-onWord [embedded]
-onSpace
-onWord [document]
-endHeader [1, HThisisanembeddeddocument]
+onWord [group]
+endHeader [1, HThisisagroup]
 beginParagraph
 onWord [The]
 onSpace
@@ -88,9 +86,7 @@ onWord [of]
 onSpace
 onWord [the]
 onSpace
-onWord [embedded]
-onSpace
-onWord [document]
+onWord [group]
 endParagraph
 beginList [BULLETED]
 beginListItem
@@ -125,7 +121,7 @@ endList [BULLETED]
 endListItem
 endList [BULLETED]
 endSection
-endDocument
+endGroup
 endTableCell
 beginTableCell
 onSpace
@@ -157,16 +153,16 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="HThetopleveldocument"><span>The top-level document</span></h1><table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div class="xwiki-document"><h1 id="HThisisanembeddeddocument"><span>This is an embedded document</span></h1><p>The first paragraph of the embedded document</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>
+<h1 id="HThetopleveldocument"><span>The top-level document</span></h1><table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div><h1 id="HThisisagroup"><span>This is a group</span></h1><p>The first paragraph of the group</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 = The top-level document =
 
 |=Table Header 1|=Table Header 2|=Table Header 3
-|Cell One|Cell Two(((= This is an embedded document =
+|Cell One|Cell Two(((= This is a group =
 
-The first paragraph of the embedded document
+The first paragraph of the group
 
 * list item one
 * list item two
@@ -177,4 +173,4 @@ The next paragraph in the top-level document
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="HThetopleveldocument"><span>The top-level document</span></h1><table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div class="xwiki-document"><h1 id="HThisisanembeddeddocument"><span>This is an embedded document</span></h1><p>The first paragraph of the embedded document</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>
+<h1 id="HThetopleveldocument"><span>The top-level document</span></h1><table><tr><th>Table Header 1</th><th>Table Header 2</th><th>Table Header 3</th></tr><tr><td>Cell One</td><td>Cell Two<div><h1 id="HThisisagroup"><span>This is a group</span></h1><p>The first paragraph of the group</p><ul><li>list item one</li><li>list item two<ul><li>sub-item 1</li><li>sub-item 2</li></ul></li></ul></div></td><td>&nbsp;Cell Three</td></tr></table><p>The next paragraph in the top-level document</p>

@@ -11,9 +11,9 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginFormat: [MONOSPACE]
+beginFormat [MONOSPACE]
 onWord [monospace]
-endFormat: [MONOSPACE]
+endFormat [MONOSPACE]
 endParagraph
 endDocument
 .#-----------------------------------------------------

@@ -1,34 +1,30 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that ) is escaped if last character of a embbeded document
+.# Verify that ) is escaped if last character of a group
 .#---------------------------------------------------------------------------------------------------------
-(((embedded doc~))))
-(((* embedded doc ~))))
+(((group~))))
+(((* group ~))))
 (((| cell 1 | cell2 ~))))
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginDocument
+beginGroup
 beginParagraph
-onWord [embedded]
-onSpace
-onWord [doc]
+onWord [group]
 onSpecialSymbol [)]
 endParagraph
-endDocument
-beginDocument
+endGroup
+beginGroup
 beginList [BULLETED]
 beginListItem
-onWord [embedded]
-onSpace
-onWord [doc]
+onWord [group]
 onSpace
 onSpecialSymbol [)]
 endListItem
 endList [BULLETED]
-endDocument
-beginDocument
+endGroup
+beginGroup
 beginTable
 beginTableRow
 beginTableCell
@@ -46,21 +42,21 @@ onSpecialSymbol [)]
 endTableCell
 endTableRow
 endTable
-endDocument
+endGroup
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<div class="xwiki-document"><p>embedded doc)</p></div><div class="xwiki-document"><ul><li>embedded doc )</li></ul></div><div class="xwiki-document"><table><tr><td>&nbsp;cell 1&nbsp;</td><td>&nbsp;cell2 )</td></tr></table></div>
+<div><p>group)</p></div><div><ul><li>group )</li></ul></div><div><table><tr><td>&nbsp;cell 1&nbsp;</td><td>&nbsp;cell2 )</td></tr></table></div>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-(((embedded doc~))))
+(((group~))))
 
-(((* embedded doc ~))))
+(((* group ~))))
 
 (((| cell 1 | cell2 ~))))
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<div class="xwiki-document"><p>embedded doc)</p></div><div class="xwiki-document"><ul><li>embedded doc )</li></ul></div><div class="xwiki-document"><table><tr><td>&nbsp;cell 1&nbsp;</td><td>&nbsp;cell2 )</td></tr></table></div>
+<div><p>group)</p></div><div><ul><li>group )</li></ul></div><div><table><tr><td>&nbsp;cell 1&nbsp;</td><td>&nbsp;cell2 )</td></tr></table></div>

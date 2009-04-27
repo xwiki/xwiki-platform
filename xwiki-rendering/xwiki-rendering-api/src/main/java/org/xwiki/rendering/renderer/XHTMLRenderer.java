@@ -21,7 +21,6 @@ package org.xwiki.rendering.renderer;
 
 import org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
-import org.xwiki.rendering.listener.chaining.DocumentStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -51,7 +50,6 @@ public class XHTMLRenderer extends AbstractChainingPrintRenderer
     {
         super(printer, new ListenerChain());
 
-        new DocumentStateChainingListener(getListenerChain());
         new BlockStateChainingListener(getListenerChain());
         new XHTMLChainingRenderer(printer, linkRenderer, imageRenderer, getListenerChain());
     }

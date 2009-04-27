@@ -11,7 +11,7 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-onVerbatimInline [**verbatim**]
+onVerbatim [**verbatim**] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------

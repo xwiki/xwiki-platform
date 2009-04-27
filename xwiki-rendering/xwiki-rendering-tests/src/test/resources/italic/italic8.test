@@ -8,9 +8,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginFormat: [ITALIC] [[a]=[b]]
+beginFormat [ITALIC] [[a]=[b]]
 onWord [something]
-endFormat: [ITALIC] [[a]=[b]]
+endFormat [ITALIC] [[a]=[b]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

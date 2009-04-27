@@ -11,20 +11,20 @@
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [testformatmacro] [] []
-beginFormat: [NONE] [[param]=[value]]
+beginFormat [NONE] [[param]=[value]]
 onWord [formatmacro1]
-endFormat: [NONE] [[param]=[value]]
+endFormat [NONE] [[param]=[value]]
 endMacroMarkerStandalone [testformatmacro] [] []
 beginParagraph
-beginFormat: [NONE] [[a]=[b]]
+beginFormat [NONE] [[a]=[b]]
 beginMacroMarkerInline [testformatmacro] [] []
-beginFormat: [NONE] [[param]=[value]]
+beginFormat [NONE] [[param]=[value]]
 onWord [formatmacro2]
-endFormat: [NONE] [[param]=[value]]
+endFormat [NONE] [[param]=[value]]
 endMacroMarkerInline [testformatmacro] [] []
 onSpace
 onWord [text]
-endFormat: [NONE] [[a]=[b]]
+endFormat [NONE] [[a]=[b]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

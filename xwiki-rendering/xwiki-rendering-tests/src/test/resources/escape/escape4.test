@@ -16,9 +16,9 @@ beginDocument
 beginParagraph
 onWord [something]
 onSpecialSymbol [:]
-beginFormat: [ITALIC]
+beginFormat [ITALIC]
 onWord [whatever]
-endFormat: [ITALIC]
+endFormat [ITALIC]
 onNewLine
 onWord [hello]
 onSpecialSymbol [:]

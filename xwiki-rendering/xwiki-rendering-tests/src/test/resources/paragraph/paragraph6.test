@@ -19,38 +19,38 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph [[param1]=[value1][param2]=[value2]]
-beginFormat: [NONE] [[param3]=[value3]]
+beginFormat [NONE] [[param3]=[value3]]
 onWord [hello]
-endFormat: [NONE] [[param3]=[value3]]
+endFormat [NONE] [[param3]=[value3]]
 onSpace
 onWord [world]
 endParagraph [[param1]=[value1][param2]=[value2]]
 beginParagraph
-beginFormat: [NONE] [[param4]=[valueA]]
+beginFormat [NONE] [[param4]=[valueA]]
 onWord [hello]
 onSpace
-endFormat: [NONE] [[param4]=[valueA]]
-beginFormat: [NONE] [[param4]=[valueB]]
+endFormat [NONE] [[param4]=[valueA]]
+beginFormat [NONE] [[param4]=[valueB]]
 onWord [world]
-endFormat: [NONE] [[param4]=[valueB]]
+endFormat [NONE] [[param4]=[valueB]]
 endParagraph
 beginParagraph
-beginFormat: [BOLD] [[param5]=[value4]]
+beginFormat [BOLD] [[param5]=[value4]]
 onWord [hello]
-endFormat: [BOLD] [[param5]=[value4]]
-beginFormat: [NONE] [[param5]=[value4]]
+endFormat [BOLD] [[param5]=[value4]]
+beginFormat [NONE] [[param5]=[value4]]
 onSpace
 onWord [world]
-endFormat: [NONE] [[param5]=[value4]]
+endFormat [NONE] [[param5]=[value4]]
 endParagraph
 beginParagraph
-beginFormat: [NONE] [[param6]=[valueA]]
+beginFormat [NONE] [[param6]=[valueA]]
 onWord [hello]
 onSpace
-endFormat: [NONE] [[param6]=[valueA]]
-beginFormat: [NONE] [[param7]=[valueB]]
+endFormat [NONE] [[param6]=[valueA]]
+beginFormat [NONE] [[param7]=[valueB]]
 onWord [world]
-endFormat: [NONE] [[param7]=[valueB]]
+endFormat [NONE] [[param7]=[valueB]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

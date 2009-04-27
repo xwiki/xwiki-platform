@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.renderer;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.parser.AttachmentParser;
@@ -55,6 +56,9 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
     @Requirement
     private AttachmentParser attachmentParser;
 
+    @Requirement
+    private DocumentNameSerializer documentNameSerializer;
+
     /**
      * {@inheritDoc}
      * 
@@ -68,8 +72,8 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
         if (targetSyntax.toIdString().equals("xhtml/1.0")) {
             result =
                 new XHTMLRenderer(printer, new XWikiXHTMLLinkRenderer(this.documentAccessBridge,
-                    this.linkLabelGenerator, this.attachmentParser), new XWikiXHTMLImageRenderer(
-                    this.documentAccessBridge));
+                    this.linkLabelGenerator, this.attachmentParser, this.documentNameSerializer),
+                    new XWikiXHTMLImageRenderer(this.documentAccessBridge));
         } else if (targetSyntax.toIdString().equals("xwiki/2.0")) {
             result = new XWikiSyntaxRenderer(printer);
         } else if (targetSyntax.toIdString().equals("event/1.0")) {
@@ -101,5 +105,10 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
     public void setAttachmentParser(AttachmentParser attachmentParser)
     {
         this.attachmentParser = attachmentParser;
+    }
+    
+    public void setDocumentNameSerializer(DocumentNameSerializer documentNameSerializer)
+    {
+        this.documentNameSerializer = documentNameSerializer;
     }
 }

@@ -60,9 +60,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public DocumentModelBridge getDocument(String documentName) throws Exception
     {
         XWikiContext xcontext = getContext();
-        return (DocumentModelBridge) xcontext.getWiki().getDocument(documentName, xcontext);
+        return xcontext.getWiki().getDocument(documentName, xcontext);
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -72,8 +72,21 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiDocument document = new XWikiDocument();
         document.setFullName(documentName, getContext());
-        
+
         return new DocumentName(document.getWikiName(), document.getSpaceName(), document.getPageName());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getCurrentDocumentName()
+     */
+    public DocumentName getCurrentDocumentName()
+    {
+        XWikiDocument currentDocument = getContext().getDoc();
+
+        return currentDocument == null ? null : new DocumentName(currentDocument.getWikiName(), currentDocument
+            .getSpaceName(), currentDocument.getPageName());
     }
 
     /**
@@ -122,7 +135,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
             exists = (!doc.isNew());
         } catch (XWikiException e) {
-            // If we failed to get the document we consider it doesn't exist. 
+            // If we failed to get the document we consider it doesn't exist.
             // Note that this can happen when the storage subsystem is down for example.
         }
         return exists;
@@ -334,13 +347,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         String attachmentURL;
         try {
-            attachmentURL = xcontext.getWiki().getAttachmentURL(
-                documentName == null ? xcontext.getDoc().getFullName() : documentName, attachmentName, xcontext);
+            attachmentURL =
+                xcontext.getWiki().getAttachmentURL(
+                    documentName == null ? xcontext.getDoc().getFullName() : documentName, attachmentName, xcontext);
         } catch (XWikiException e) {
             // This cannot happen. There's a bug in the definition of XWiki.getAttachmentURL: it says it can generate
             // an exception but in fact no exception is raised in the current implementation.
             throw new RuntimeException("Failed to get attachment URL", e);
-        } 
+        }
         return attachmentURL;
     }
 
@@ -418,6 +432,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     /**
      * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#popDocumentFromContext(Map)
      */
     public void popDocumentFromContext(Map<String, Object> backupObjects)
@@ -427,6 +442,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     /**
      * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#pushDocumentInContext(Map, String)
      */
     public void pushDocumentInContext(Map<String, Object> backupObjects, String documentName) throws Exception

@@ -15,7 +15,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage">label</a></span><!--stopwikilink--></p>
+<p><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage?parent=xwiki:Space.Page">label</a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -23,4 +23,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage">label</a></span><!--stopwikilink--></p></html>
+<p><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/view/Space/UnknownPage?parent=xwiki:Space.Page">label</a></span><!--stopwikilink--></p>

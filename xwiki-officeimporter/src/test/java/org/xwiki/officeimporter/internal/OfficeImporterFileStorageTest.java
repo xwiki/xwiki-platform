@@ -19,7 +19,7 @@
  */
 package org.xwiki.officeimporter.internal;
 
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
  * Test class for {@link OfficeImporterFileStorage}.
@@ -27,15 +27,19 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.9M1
  */
-public class OfficeImporterFileStorageTest extends AbstractXWikiComponentTestCase
+public class OfficeImporterFileStorageTest extends AbstractRenderingTestCase
 {
     /**
      * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.scaffolding.AbstractRenderingTestCase#registerComponents()
      */
-    protected void setUp() throws Exception
+    @Override
+    protected void registerComponents() throws Exception
     {
+        super.registerComponents();
+
         getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-        super.setUp();
     }
 
     /**

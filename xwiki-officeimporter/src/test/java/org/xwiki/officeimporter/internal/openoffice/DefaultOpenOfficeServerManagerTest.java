@@ -21,8 +21,7 @@ package org.xwiki.officeimporter.internal.openoffice;
 
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
-
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
  * Test case for {@link DefaultOpenOfficeServerManager}.
@@ -30,7 +29,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOpenOfficeServerManagerTest extends AbstractXWikiComponentTestCase
+public class DefaultOpenOfficeServerManagerTest extends AbstractRenderingTestCase
 {
     /**
      * The {@link OpenOfficeServerManager} component.
@@ -40,13 +39,27 @@ public class DefaultOpenOfficeServerManagerTest extends AbstractXWikiComponentTe
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setUp() throws Exception
     {
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();
-        manager = (OpenOfficeServerManager) getComponentManager().lookup(OpenOfficeServerManager.ROLE, "default");
+
+        this.manager = (OpenOfficeServerManager) getComponentManager().lookup(OpenOfficeServerManager.ROLE, "default");
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
+     */
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+    }
+
     /**
      * Tests the initial status of the oo server manager.
      */

@@ -20,10 +20,8 @@
 package org.xwiki.officeimporter.internal.openoffice;
 
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
-import org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeServerConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration;
-
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
  * Test case for {@link DefaultOpenOfficeServerConfiguration}.
@@ -31,7 +29,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOpenOfficeConfigurationTest extends AbstractXWikiComponentTestCase
+public class DefaultOpenOfficeConfigurationTest extends AbstractRenderingTestCase
 {
     /**
      * Office importer configuration.
@@ -41,13 +39,29 @@ public class DefaultOpenOfficeConfigurationTest extends AbstractXWikiComponentTe
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setUp() throws Exception
-    {        
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-        super.setUp();        
-        configuration = (OpenOfficeServerConfiguration) getComponentManager().lookup(OpenOfficeServerConfiguration.ROLE, "default");
+    {
+        super.setUp();
+
+        this.configuration =
+            (OpenOfficeServerConfiguration) getComponentManager()
+                .lookup(OpenOfficeServerConfiguration.ROLE, "default");
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
+     */
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+    }
+
     /**
      * Test if default configuration values are present.
      */
@@ -57,5 +71,5 @@ public class DefaultOpenOfficeConfigurationTest extends AbstractXWikiComponentTe
         assertNotNull(configuration.getProfilePath());
         assertTrue(configuration.getMaxTasksPerProcess() > 0);
         assertTrue(configuration.getTaskExecutionTimeout() > 0);
-    }   
+    }
 }

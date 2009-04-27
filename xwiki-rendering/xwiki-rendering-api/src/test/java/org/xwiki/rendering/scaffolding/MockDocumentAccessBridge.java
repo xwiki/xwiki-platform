@@ -101,7 +101,8 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      */
     public String getURL(String documentName, String action, String queryString, String anchor)
     {
-        String result = "/xwiki/bin/view/" + (StringUtils.isBlank(documentName) ? "currentdoc" : documentName.replace(".", "/"));
+        String result =
+            "/xwiki/bin/view/" + (StringUtils.isBlank(documentName) ? "currentdoc" : documentName.replace(".", "/"));
         if (anchor != null) {
             result = result + "#" + anchor;
         }
@@ -174,12 +175,12 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public void setProperty(String documentName, String className, String propertyName, Object propertyValue)
         throws Exception
     {
-        throw new RuntimeException("Not implemented");        
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -300,6 +301,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#getDocumentName(String)
      */
     public DocumentName getDocumentName(String documentName)
+    {
+        return new DocumentName("xwiki", "Space", "Page");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getCurrentDocumentName()
+     */
+    public DocumentName getCurrentDocumentName()
     {
         return new DocumentName("xwiki", "Space", "Page");
     }

@@ -29,7 +29,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page?parent=xwiki:Space.Page"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page?parent=xwiki:Space.Page">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page?parent=xwiki:Space.Page"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -39,4 +39,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p></html>
+<p><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page?parent=xwiki:Space.Page"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page?parent=xwiki:Space.Page">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="/xwiki/bin/view/Page?parent=xwiki:Space.Page"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p>

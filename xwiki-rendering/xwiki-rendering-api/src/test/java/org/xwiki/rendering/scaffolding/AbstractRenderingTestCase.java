@@ -28,7 +28,6 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 
-
 public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTestCase
 {
     public AbstractRenderingTestCase()
@@ -54,14 +53,13 @@ public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTe
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
      */
     @Override
-    protected void setUp() throws Exception
+    protected void registerComponents() throws Exception
     {
-        super.setUp();
-
         getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         getComponentManager().registerComponent(MockConfigurationSourceCollection.getComponentDescriptor());
+        getComponentManager().registerComponent(MockDocumentNameSerializer.getComponentDescriptor());
     }
 }

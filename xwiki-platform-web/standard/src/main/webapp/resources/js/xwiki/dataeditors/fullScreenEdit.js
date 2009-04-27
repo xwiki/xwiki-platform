@@ -163,6 +163,7 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
     });
     // Add functionality
     fullScreenButton.observe('click', this.makeFullScreen.bindAsEventListener(this, targetElement));
+    fullScreenButton.observe('mousedown', this.preventDrag.bindAsEventListener(this));
     // Set position
     fullScreenButton.setStyle({
       'left' : targetElement.positionedOffset().left + targetElement.getWidth() - this.buttonSize + 'px',
@@ -187,6 +188,7 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
     });
     // Add functionality
     this.closeButton.observe('click', this.closeFullScreen.bind(this));
+    this.closeButton.observe('mousedown', this.preventDrag.bindAsEventListener(this));
     // Hide by default
     this.closeButton.hide();
 
@@ -367,6 +369,12 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
         targetElement.down(".mceEditorIframe").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - this.toolbar.getHeight() + 'px'});
       }
     }
+  }.
+  /**
+   * onMouseDown handler that prevents dragging the button.
+   */
+  preventDrag : function(event) {
+    event.stop();
   }
 });
 

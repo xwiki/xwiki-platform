@@ -50,7 +50,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
 
         return componentDescriptor;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -66,8 +66,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getAttachmentContent(String, String)
      */
-    public byte[] getAttachmentContent(String documentName, String attachmentName)
-        throws Exception
+    public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
@@ -138,19 +137,18 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String, int, String)
      */
-    public String getProperty(String documentName, String className, int objectNumber,
-        String propertyName) throws Exception
+    public String getProperty(String documentName, String className, int objectNumber, String propertyName)
+        throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
-    
+
     /**
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getProperty(String, String, String)
      */
-    public String getProperty(String documentName, String className, String propertyName)
-        throws Exception
+    public String getProperty(String documentName, String className, String propertyName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
@@ -176,7 +174,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public void setProperty(String documentName, String className, String propertyName, Object propertyValue)
         throws Exception
@@ -239,8 +237,8 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#setAttachmentContent(String, String, byte[])
      */
-    public void setAttachmentContent(String documentName, String attachmentName,
-        byte[] attachmentData) throws Exception
+    public void setAttachmentContent(String documentName, String attachmentName, byte[] attachmentData)
+        throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
@@ -250,8 +248,8 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#setDocumentContent(String, String, String, boolean)
      */
-    public void setDocumentContent(String documentName, String content, String editComment,
-        boolean isMinorEdit) throws Exception
+    public void setDocumentContent(String documentName, String content, String editComment, boolean isMinorEdit)
+        throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
@@ -265,7 +263,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         throw new RuntimeException("Not implemented");
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -292,6 +290,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#getDocumentName(String)
      */
     public DocumentName getDocumentName(String documentName)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getCurrentDocumentName()
+     */
+    public DocumentName getCurrentDocumentName()
     {
         throw new RuntimeException("Not implemented");
     }

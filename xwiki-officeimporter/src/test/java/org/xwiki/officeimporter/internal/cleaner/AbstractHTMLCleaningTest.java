@@ -20,9 +20,8 @@
 package org.xwiki.officeimporter.internal.cleaner;
 
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.xml.html.HTMLCleaner;
-
-import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Abstract class for all HTML cleaner tests.
@@ -30,7 +29,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.8M2
  */
-public class AbstractHTMLCleaningTest extends AbstractXWikiComponentTestCase
+public class AbstractHTMLCleaningTest extends AbstractRenderingTestCase
 {
     /**
      * Beginning of the test html document.
@@ -46,20 +45,34 @@ public class AbstractHTMLCleaningTest extends AbstractXWikiComponentTestCase
      * {@link OpenOfficeHTMLCleaner} used for tests.
      */
     protected HTMLCleaner openOfficeHTMLCleaner;
-    
+
     /**
      * {@link WysiwygHTMLCleaner} used for tests.
      */
     protected HTMLCleaner wysiwygHTMLCleaner;
-    
+
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setUp() throws Exception
     {
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-        openOfficeHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "openoffice");
-        wysiwygHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "wysiwyg");
         super.setUp();
+
+        this.openOfficeHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "openoffice");
+        this.wysiwygHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "wysiwyg");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.scaffolding.AbstractRenderingTestCase#registerComponents()
+     */
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
     }
 }

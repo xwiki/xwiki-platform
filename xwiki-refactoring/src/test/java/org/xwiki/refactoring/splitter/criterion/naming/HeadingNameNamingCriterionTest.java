@@ -27,7 +27,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
  * Test case for {@link HeadingNameNamingCriterion}.
@@ -35,7 +35,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.9M1
  */
-public class HeadingNameNamingCriterionTest extends AbstractXWikiComponentTestCase
+public class HeadingNameNamingCriterionTest extends AbstractRenderingTestCase
 {
     /**
      * The {@link Parser} component.
@@ -46,24 +46,35 @@ public class HeadingNameNamingCriterionTest extends AbstractXWikiComponentTestCa
      * The {@link DocumentAccessBridge} component.
      */
     private DocumentAccessBridge docBridge;
-    
+
     /**
      * Factory to get various syntax renderers.
      */
     private PrintRendererFactory rendererFactory;
-    
+
     /**
      * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.scaffolding.AbstractRenderingTestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception
     {
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();
+
         xwikiParser = (Parser) getComponentManager().lookup(Parser.class, "xwiki/2.0");
         docBridge = (DocumentAccessBridge) getComponentManager().lookup(DocumentAccessBridge.class, "default");
         rendererFactory = (PrintRendererFactory) getComponentManager().lookup(PrintRendererFactory.class, "default");
     }
-    
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+    }
+
     /**
      * Tests document names generated.
      * 
@@ -72,7 +83,8 @@ public class HeadingNameNamingCriterionTest extends AbstractXWikiComponentTestCa
     public void testDocumentNamesGeneration() throws Exception
     {
         XDOM xdom = xwikiParser.parse(new StringReader("=Heading="));
-        NamingCriterion namingCriterion = new HeadingNameNamingCriterion("Test.Test", docBridge, rendererFactory, false);
+        NamingCriterion namingCriterion =
+            new HeadingNameNamingCriterion("Test.Test", docBridge, rendererFactory, false);
         Block sectionBlock = xdom.getChildren().get(0);
         // Test normal heading-name naming
         assertEquals("Test.Heading", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));

@@ -79,6 +79,19 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getCurrentDocumentName()
+     */
+    public DocumentName getCurrentDocumentName()
+    {
+        XWikiDocument currentDocument = getContext().getDoc();
+
+        return currentDocument == null ? null : new DocumentName(currentDocument.getWikiName(), currentDocument
+            .getSpaceName(), currentDocument.getPageName());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#getDocumentContent(String)
      */
     public String getDocumentContent(String documentName) throws Exception

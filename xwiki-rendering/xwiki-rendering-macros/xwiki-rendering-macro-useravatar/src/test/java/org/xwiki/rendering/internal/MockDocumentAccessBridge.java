@@ -52,7 +52,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getDocumentContent(String documentName) throws Exception
     {
@@ -60,7 +60,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getDocumentContent(String documentName, String language) throws Exception
     {
@@ -68,7 +68,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public boolean exists(String documentName)
     {
@@ -76,7 +76,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getURL(String documentName, String action, String queryString, String anchor)
     {
@@ -91,7 +91,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getAttachmentURL(String documentName, String attachmentName)
     {
@@ -100,7 +100,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getProperty(String documentName, String className, int objectNumber, String propertyName)
         throws Exception
@@ -109,18 +109,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getProperty(String documentName, String className, String propertyName) throws Exception
     {
-        return documentName.equals("XWiki.Admin") && 
-            className.equals("XWiki.XWikiUsers") && propertyName.equals("avatar") 
-            ? "mockAvatar.png"
-            : null;
+        return documentName.equals("XWiki.Admin") && className.equals("XWiki.XWikiUsers")
+            && propertyName.equals("avatar") ? "mockAvatar.png" : null;
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getProperty(String documentName, String propertyName) throws Exception
     {
@@ -128,7 +126,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getPropertyType(String className, String propertyName) throws Exception
     {
@@ -136,7 +134,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public boolean isPropertyCustomMapped(String className, String propertyName) throws Exception
     {
@@ -144,7 +142,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public void setProperty(String documentName, String className, String propertyName, Object propertyValue)
         throws Exception
@@ -153,7 +151,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
@@ -161,7 +159,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public boolean hasProgrammingRights()
     {
@@ -169,7 +167,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getDocumentContentForDefaultLanguage(String arg0) throws Exception
     {
@@ -177,7 +175,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public boolean isDocumentViewable(String arg0)
     {
@@ -185,7 +183,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getCurrentUser()
     {
@@ -193,7 +191,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getDefaultEncoding()
     {
@@ -201,7 +199,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public String getDocumentSyntaxId(String arg0) throws Exception
     {
@@ -209,7 +207,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public boolean isDocumentEditable(String arg0)
     {
@@ -217,7 +215,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public void setAttachmentContent(String arg0, String arg1, byte[] arg2) throws Exception
     {
@@ -225,7 +223,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public void setDocumentContent(String arg0, String arg1, String arg2, boolean arg3) throws Exception
     {
@@ -233,7 +231,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public void setDocumentSyntaxId(String arg0, String arg1) throws Exception
     {
@@ -241,7 +239,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public DocumentModelBridge getDocument(String documentName) throws Exception
     {
@@ -249,7 +247,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public DocumentName getDocumentName(String documentName)
     {
@@ -257,7 +255,15 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
+     */
+    public DocumentName getCurrentDocumentName()
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public void popDocumentFromContext(Map<String, Object> backupObjects)
     {
@@ -265,7 +271,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public void pushDocumentInContext(Map<String, Object> backupObjects, String documentName) throws Exception
     {

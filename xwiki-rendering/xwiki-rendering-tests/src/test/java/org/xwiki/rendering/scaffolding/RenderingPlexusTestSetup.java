@@ -18,5 +18,6 @@ public class RenderingPlexusTestSetup extends PlexusTestSetup
 
         getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         getComponentManager().registerComponent(MockConfigurationSourceCollection.getComponentDescriptor());
+        getComponentManager().registerComponent(MockDocumentNameSerializer.getComponentDescriptor());
     }
 }

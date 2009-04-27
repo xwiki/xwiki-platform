@@ -69,6 +69,8 @@ public class RenderingTestSuite extends TestSuite
 
         this.rendererFactory.setAttachmentParser(new DefaultAttachmentParser());
         this.syntaxFactory = new DefaultSyntaxFactory();
+
+        this.rendererFactory.setDocumentNameSerializer(new MockDocumentNameSerializer());
     }
 
     public void addTestsFromResource(String testResourceName, boolean runTransformations) throws Exception

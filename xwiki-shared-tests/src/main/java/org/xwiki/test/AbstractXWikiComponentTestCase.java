@@ -41,22 +41,22 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
      * @see #getApplicationContextMock()
      */
     private Mock mockApplicationContext;
-    
+
     /**
      * @see #getRequestMock()
      */
     private Mock mockRequest;
-    
+
     /**
      * @see #getResponseMock()
      */
     private Mock mockResponse;
-    
+
     /**
      * @see #getSessionMock()
      */
     private Mock mockSession;
-    
+
     public AbstractXWikiComponentTestCase()
     {
         super();
@@ -67,12 +67,18 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
         super(testName);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
     protected void setUp() throws Exception
     {
         // Create a mock Container implementation since we're not running in a real container. We need to do this
-        // since some components are using the Container component (for example to access resource such as the XWiki 
+        // since some components are using the Container component (for example to access resource such as the XWiki
         // configuration file).
-    	// Tests can use the getter methods to access the mocks and configure them as needed.
+        // Tests can use the getter methods to access the mocks and configure them as needed.
         Container container = (Container) getComponentManager().lookup(Container.class);
 
         this.mockApplicationContext = mock(ApplicationContext.class);
@@ -82,24 +88,42 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
 
         this.mockRequest = mock(Request.class);
         container.setRequest((Request) this.mockRequest.proxy());
-        
+
         this.mockResponse = mock(Response.class);
         container.setResponse((Response) this.mockResponse.proxy());
-        
+
         this.mockSession = mock(Session.class);
         container.setSession((Session) this.mockSession.proxy());
-        
+
+        // Put before execution context initialization because it could be needed for some executing context
+        // initializer
+        registerComponents();
+
         this.initializer.initialize();
     }
 
+    /**
+     * Register custom/mock components
+     */
+    protected void registerComponents() throws Exception
+    {
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.framework.TestCase#tearDown()
+     */
+    @Override
     protected void tearDown() throws Exception
     {
         this.initializer.shutdown();
     }
-    
+
     /**
-     * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) 
-     *         which can then be put in the XWiki Context for testing.
+     * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) which can
+     *         then be put in the XWiki Context for testing.
      */
     public ComponentManager getComponentManager() throws Exception
     {
@@ -113,7 +137,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     {
         return this.mockApplicationContext;
     }
-    
+
     /**
      * @return the Container {@link Request} mock
      */
@@ -121,7 +145,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     {
         return this.mockRequest;
     }
-    
+
     /**
      * @return the Container {@link Response} mock
      */
@@ -129,7 +153,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     {
         return this.mockResponse;
     }
-    
+
     /**
      * @return the Container {@link Session} mock
      */

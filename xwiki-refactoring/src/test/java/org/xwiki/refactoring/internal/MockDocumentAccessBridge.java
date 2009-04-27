@@ -293,6 +293,11 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
         throw new RuntimeException("Not implemented");
     }
 
+    public DocumentName getCurrentDocumentName()
+    {
+        throw new RuntimeException("Not implemented");
+    }
+    
     /**
      * {@inheritDoc}
      * 

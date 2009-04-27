@@ -22,8 +22,8 @@ package org.xwiki.bridge;
 import java.util.Map;
 
 /**
- * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes
- * and the Document services.
+ * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
+ * services.
  * 
  * @version $Id$
  * @since 1.6M1
@@ -46,7 +46,17 @@ public interface DocumentAccessBridge
      * @return the document name object containing the information
      */
     DocumentName getDocumentName(String documentName);
-    
+
+    /**
+     * Get the different parts of a the current document name (wiki, space, page).
+     * <p>
+     * The current document is found in the context.
+     * 
+     * @return the document name object containing the information
+     * @since 1.9M2
+     */
+    DocumentName getCurrentDocumentName();
+
     /**
      * Check if a document exists or not in the wiki.
      * 
@@ -56,8 +66,8 @@ public interface DocumentAccessBridge
     boolean exists(String documentName);
 
     /**
-     * Updates the target document with the new content provided. If the target document does not
-     * exists, a new one will be created.
+     * Updates the target document with the new content provided. If the target document does not exists, a new one will
+     * be created.
      * 
      * @param documentName Name of the target document.
      * @param content Content to be set.
@@ -65,8 +75,8 @@ public interface DocumentAccessBridge
      * @param isMinorEdit Flag indicating if this change is a minor one.
      * @throws Exception if the storage cannot be accessed.
      */
-    void setDocumentContent(String documentName, String content, String editComment,
-        boolean isMinorEdit) throws Exception;
+    void setDocumentContent(String documentName, String content, String editComment, boolean isMinorEdit)
+        throws Exception;
 
     /**
      * Retrieves the textual content of the document, in the current language.
@@ -78,18 +88,18 @@ public interface DocumentAccessBridge
     String getDocumentContent(String documentName) throws Exception;
 
     /**
-     * Get the syntax Id of the target document. If the target document
-     * does not exists, the default syntax of a new document is returned.
+     * Get the syntax Id of the target document. If the target document does not exists, the default syntax of a new
+     * document is returned.
      * 
      * @param documentName Name of the target document.
      * @return the syntax id.
      * @throws Exception If the storage cannot be accessed.
      */
     String getDocumentSyntaxId(String documentName) throws Exception;
-    
+
     /**
-     * Changes the syntax Id of the target document to the given syntaxId. If the target document
-     * does not exists, a new one will be created.
+     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exists, a new
+     * one will be created.
      * 
      * @param documentName Name of the target document.
      * @param syntaxId New syntax Id.
@@ -100,8 +110,8 @@ public interface DocumentAccessBridge
     /**
      * Retrieves the textual content of the document, in the document's default language.
      * <p>
-     * Note: you should always use {@link #getDocumentContent(String)} unless you really need
-     * specifically the document's content for default language of the document.
+     * Note: you should always use {@link #getDocumentContent(String)} unless you really need specifically the
+     * document's content for default language of the document.
      * 
      * @param documentName The name of the document to access.
      * @return The document's content.
@@ -129,8 +139,7 @@ public interface DocumentAccessBridge
      * @return A <code>string</code> representation of the property value.
      * @throws Exception If the document cannot be accessed.
      */
-    String getProperty(String documentName, String className, int objectNumber,
-        String propertyName) throws Exception;
+    String getProperty(String documentName, String className, int objectNumber, String propertyName) throws Exception;
 
     /**
      * Retrieves the value for an object property, from the first object of the given class.
@@ -141,12 +150,11 @@ public interface DocumentAccessBridge
      * @return A <code>string</code> representation of the property value.
      * @throws Exception If the document cannot be accessed.
      */
-    String getProperty(String documentName, String className, String propertyName)
-        throws Exception;
+    String getProperty(String documentName, String className, String propertyName) throws Exception;
 
     /**
-     * Retrieves the value for an object property, from the first object of any class that has a
-     * property with that name.
+     * Retrieves the value for an object property, from the first object of any class that has a property with that
+     * name.
      * 
      * @param documentName The name of the document to access.
      * @param propertyName The name of the property to retrieve.
@@ -158,8 +166,8 @@ public interface DocumentAccessBridge
     /**
      * @param className The name of the class.
      * @param propertyName The name of the property.
-     * @return class name of the property object or null if property is not found. For example
-     *         StringProperty, IntegerProperty.
+     * @return class name of the property object or null if property is not found. For example StringProperty,
+     *         IntegerProperty.
      * @throws Exception if class cannot be accessed
      */
     String getPropertyType(String className, String propertyName) throws Exception;
@@ -182,54 +190,48 @@ public interface DocumentAccessBridge
      * @param propertyValue value of the property to set.
      * @throws Exception if the document cannot be accessed.
      */
-    void setProperty(String documentName, String className, String propertyName, Object propertyValue)
-        throws Exception;
-    
+    void setProperty(String documentName, String className, String propertyName, Object propertyValue) throws Exception;
+
     /**
      * Returns the content of a document attachment.
      * 
      * @param documentName The name of the document to access.
      * @param attachmentName The filename of the attachment to access.
-     * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if
-     *         the attachment does not exist.
+     * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
+     *         not exist.
      * @throws Exception If the document cannot be accessed.
      */
     byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception;
 
     /**
-     * Sets the content of a document attachment. If the document or the attachment does not exist,
-     * both will be created newly.
+     * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created
+     * newly.
      * 
      * @param documentName Target document name.
      * @param attachmentName Name of the attachment.
      * @param attachmentData Attachment content.
      * @throws Exception If the storage cannot be accessed.
      */
-    void setAttachmentContent(String documentName, String attachmentName, byte[] attachmentData)
-        throws Exception;
+    void setAttachmentContent(String documentName, String attachmentName, byte[] attachmentData) throws Exception;
 
     /**
-     * Retrieves the internal (without the hostname) URL that can be used to access a document,
-     * using a specific action.
+     * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.
      * 
      * @param documentName The name of the document to access.
-     * @param action The "mode" in which the document is accessed, for example <code>view</code> to
-     *            view the document, <code>edit</code> to open the document for modifications, etc.
-     * @param queryString An optional query string to append to the URL, use <code>null</code> or an
-     *            empty string to skip.
-     * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an
-     *            empty string to skip.
-     * @return A <code>String</code> representation of the URL, starting with the path segment of
-     *         the URL (without protocol, host and port), for example
-     *         <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
+     * @param action The "mode" in which the document is accessed, for example <code>view</code> to view the document,
+     *            <code>edit</code> to open the document for modifications, etc.
+     * @param queryString An optional query string to append to the URL, use <code>null</code> or an empty string to
+     *            skip.
+     * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an empty string to skip.
+     * @return A <code>String</code> representation of the URL, starting with the path segment of the URL (without
+     *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
      */
     String getURL(String documentName, String action, String queryString, String anchor);
 
     /**
      * Retrieves the internal (without the hostname) URL that can be used to access an attachment.
      * 
-     * @param documentName the full name of the document containing the attachment (eg
-     *            "wiki:Space.Page")
+     * @param documentName the full name of the document containing the attachment (eg "wiki:Space.Page")
      * @param attachmentName the attachment name (eg "my.png")
      * @return the attachment URL
      */
@@ -253,7 +255,7 @@ public interface DocumentAccessBridge
     boolean hasProgrammingRights();
 
     /**
-     * Utility method to retrieve the current user. 
+     * Utility method to retrieve the current user.
      * 
      * @return The current user.
      */
@@ -263,10 +265,10 @@ public interface DocumentAccessBridge
      * @return The default encoding for the current wiki.
      */
     String getDefaultEncoding();
-    
+
     /**
-     * Sets the passed document as the current document in the XWiki Context and saves current values
-     * related to the current document into a backup object.
+     * Sets the passed document as the current document in the XWiki Context and saves current values related to the
+     * current document into a backup object.
      * 
      * @param backupObjects the object in which to some context properties will be saved
      * @param documentName the document to set as the current document
@@ -275,10 +277,10 @@ public interface DocumentAccessBridge
     void pushDocumentInContext(Map<String, Object> backupObjects, String documentName) throws Exception;
 
     /**
-     * Restore values saved in a backup object in the XWiki Context and restore the current document
-     * with the same value before {@link #pushDocumentInContext(Map, String)} was called.
+     * Restore values saved in a backup object in the XWiki Context and restore the current document with the same value
+     * before {@link #pushDocumentInContext(Map, String)} was called.
      * 
-     * @param backupObjects the object containing the backed-up context properties to restore 
+     * @param backupObjects the object containing the backed-up context properties to restore
      */
     void popDocumentFromContext(Map<String, Object> backupObjects);
 }

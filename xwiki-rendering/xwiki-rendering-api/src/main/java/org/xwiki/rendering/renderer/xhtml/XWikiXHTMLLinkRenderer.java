@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.Link;
@@ -86,17 +88,24 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
     private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
 
     /**
+     * Used to generate document String identifier.
+     */
+    private DocumentNameSerializer documentNameSerializer;
+
+    /**
      * @param documentAccessBridge used to generate the link targeting a local document.
      * @param linkLabelGenerator used to generate a link label.
      * @param attachmentParser used to extract the attachment information form the reference if the link is targeting an
      *            attachment.
+     * @param documentNameSerializer used to generate document String identifier.
      */
     public XWikiXHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, LinkLabelGenerator linkLabelGenerator,
-        AttachmentParser attachmentParser)
+        AttachmentParser attachmentParser, DocumentNameSerializer documentNameSerializer)
     {
         this.documentAccessBridge = documentAccessBridge;
         this.linkLabelGenerator = linkLabelGenerator;
         this.attachmentParser = attachmentParser;
+        this.documentNameSerializer = documentNameSerializer;
         this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
     }
 
@@ -178,11 +187,14 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
                 // the new document is created with the current page as its parent.
                 String queryString = link.getQueryString();
                 if (StringUtils.isBlank(queryString)) {
-                    // queryString = "parent=" + this.documentAccessBridge.
+                    DocumentName documentName = this.documentAccessBridge.getCurrentDocumentName();
+                    if (documentName != null) {
+                        queryString = "parent=" + this.documentNameSerializer.serialize(documentName);
+                    }
                 }
 
-                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", link
-                    .getQueryString(), link.getAnchor()));
+                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", queryString, link
+                    .getAnchor()));
 
                 this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
                 this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);

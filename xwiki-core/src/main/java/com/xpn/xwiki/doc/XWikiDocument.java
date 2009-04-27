@@ -291,6 +291,10 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private XWikiDocument originalDocument;
 
+    /**
+     * The document structure expressed as a tree of Block objects. We store it for performance reasons since parsing
+     * is a costly operation that we don't want to repeat whenever some code ask for the XDOM information. 
+     */
     private XDOM xdom;
 
     /**

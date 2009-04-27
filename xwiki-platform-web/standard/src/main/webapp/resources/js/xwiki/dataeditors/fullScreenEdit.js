@@ -369,7 +369,7 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
         targetElement.down(".mceEditorIframe").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - this.toolbar.getHeight() + 'px'});
       }
     }
-  }.
+  },
   /**
    * onMouseDown handler that prevents dragging the button.
    */

@@ -45,8 +45,10 @@ import com.xpn.xwiki.XWikiContext;
  * <dd>An image to print before the URL. Actually not used, this parameter is always ignored.</dd>
  * </dl>
  * 
+ * @deprecated It provides limited functionality compared to the wiki link syntax.
  * @version $Id$
  */
+@Deprecated
 public class LinkMacro extends BaseLocaleMacro
 {
     /**

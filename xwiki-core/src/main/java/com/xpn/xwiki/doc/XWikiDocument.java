@@ -267,7 +267,10 @@ public class XWikiDocument implements DocumentModelBridge
 
     private ArrayList<BaseObject> objectsToRemove = new ArrayList<BaseObject>();
 
-    // Template by default assign to a view
+    /**
+     * The view template (vm file) to use. When not set the default view template is used.
+     * @see com.xpn.xwiki.web.ViewAction#render(XWikiContext)
+     */
     private String defaultTemplate;
 
     private String validationScript;

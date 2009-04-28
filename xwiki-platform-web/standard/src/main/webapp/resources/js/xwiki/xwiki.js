@@ -260,8 +260,8 @@ Object.extend(XWiki, {
             error.style.cursor="pointer";
             error.title = "$msg.get('platform.core.rendering.error.readTechnicalInformation')";
             Event.observe(error, "click", function(event){
-                   toggleClass(event.element().nextSibling,'hidden');
-           });
+                   event.element().next().toggleClassName("hidden");
+            });
         }
     });
   },

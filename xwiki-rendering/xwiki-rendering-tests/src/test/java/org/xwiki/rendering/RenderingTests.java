@@ -48,6 +48,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("group/group8", false);
         suite.addTestsFromResource("group/group9", false);
         suite.addTestsFromResource("group/group10", false);
+        suite.addTestsFromResource("group/group11", false);
 
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);

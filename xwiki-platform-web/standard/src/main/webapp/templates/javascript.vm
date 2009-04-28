@@ -17,7 +17,6 @@ $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
 $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', true)
 <script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/xwiki.js", true)"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/suggest/ajaxSuggest.js")"></script>
 <script type="text/javascript">
 // <![CDATA[
@@ -83,6 +82,15 @@ XWiki.viewer = "$!{viewer}";
 // ]]>
 </script>
 #end
-## Hook for inserting JavaScript skin extensions
-<!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
+##
+## Hooks for inserting JavaScript skin extensions
+##
+## - Skin file extension hook. Placed first since skin extensions might need to have xwiki or external libraries included first to be able to work properly
 <!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
+## - Skin extension hook
+<!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
+##
+## Compatibility "aspect" file for deprecated code.
+## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
+##
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", true)"></script>

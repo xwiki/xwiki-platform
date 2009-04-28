@@ -1,84 +1,405 @@
-div.scrollbar {
-  overflow: auto !important;
-  height: 250px;
-  margin: 0px;
-  padding: 0px;
-  width: 25px;
-  left: -10px;
-  position: relative;
+/* <Grid Pagination Specific Style> Top, Bottom*/
+.xwiki-grid td.xwiki-grid-pagination {
+	color: #888;
+	font-size: 90%;
+	line-height: 22px;
+	border: 0px;
+}
+.xwiki-grid-loader , .xwiki-grid-loader img{
+	float: left;
+} 
+.xwiki-grid-pagination .xwiki-grid-limits{
+	float: left;
+}
+.xwiki-grid-pagination .xwiki-grid-limits strong{
+	font-weight: normal;
+}
+.xwiki-grid-pagination .xwiki-grid-pagination-content, .xwiki-grid-pagination .xwiki-grid-pagination-text {
+	display: in-line;
+}
+.xwiki-grid-pagination span.pagenumber {
+	color: #888;
+	cursor: pointer;
+}
+.xwiki-grid-pagination span.pagenumber:hover {
+	color: #4D4D4D;
+	text-decoration: underlined;
+}
+.xwiki-grid-pagination span.selected {
+	color: #4D4D4D;
+	font-weight: bold;
+}
+.xwiki-grid-pagination span.pagenumber:focus {
+    outline: dotted 1px #000;
+}
+/* <Pagination>*/
+.pagination{
+	float: right;
+	margin-right: 10px;
+}
+.controlPagination{
+	position:relative;
+	width:42px;
+	height:22px;
+	overflow:hidden;
+	margin:0!important;
+	padding:0!important;
+	float: right;
+}
+.controlPagination a{
+	position:absolute;
+	top:0;
+	left:0;
+	line-height:25px;
+	outline:none;
+	overflow:hidden;
+	border:none;
+}
+.controlPagination a.prevPagination , .controlPagination a.noPrevPagination, .controlPagination a.nextPagination, .controlPagination a.noNextPagination {
+	background-image:url("$xwiki.getSkinFile('js/xwiki/table/img/navigation.png')");
+	width: 21px;
+	height: 22px;
+}
+.controlPagination a.prevPagination {
+	background-position:left top;
+}
+.controlPagination a.noPrevPagination{
+	background-position:left bottom;
+}
+.controlPagination a.nextPagination {
+	background-position:right top;
+	left: 21px;
+}
+.controlPagination a.noNextPagination {
+	background-position:right bottom;
+	left: 21px;
+}
+/* </ Pagination>*/
+/* </ Grid Pagination> */
+/* <Grid Containers> */
+table.xwiki-grid {
+	width: 100%;
+	margin:0;
+}
+.xwiki-grid td.xwiki-grid-display-container{
+	margin: 0;
+	border-color: #ffffff;
+	padding: 0 0 0 4px;
+	width:auto;
+}
+.xwiki-grid td.xwiki-grid-display-container table.xwiki-grid-display{
+	margin:0px;
+	border-collapse:collapse;
+	width: 100%;
+}
+.xwiki-grid-display td { /* IE6 tr border-bottom fix*/
+	border-color: #ffffff;
+	border-bottom-color: #cccccc;
+}
+html>body .xwiki-grid-display td {
+	border: 0px;
+}
+/* </Grid Containers> */
+/* <Grid Header> */
+table.xwiki-grid table.xwiki-grid-display thead.xwiki-grid-display-header{
+	border-bottom: 5px solid #dddddd;
+}
+thead.xwiki-grid-display-header tr#xwiki-grid-display-filters:hover , thead.xwiki-grid-display-header tr.rowHover#xwiki-grid-display-filters{ /* for IE6 tr:hover fix*/
+	background-color: #fff;
+}
+thead.xwiki-grid-display-header th.xwiki-grid-display-header-text{
+	background-color: #dddddd;
+	border: 0;
+	border-collapse:separate;
+	border-right:1px solid #FFFFFF;
+	color: #4D4D4D;
+	padding: 3px 16px 3px 5px;
+	font-weight: normal;
+	text-align:left;
+	/*cursor:pointer;*/
+	white-space:nowrap;
+}
+thead.xwiki-grid-display-header th.sortable {
+	cursor: pointer;
+}
+thead.xwiki-grid-display-header th.desc {
+	background:#dddddd url("$xwiki.getSkinFile('icons/silk/bullet_arrow_down.gif')") no-repeat scroll right center;
+}
+thead.xwiki-grid-display-header th.asc {
+	background:#dddddd url("$xwiki.getSkinFile('icons/silk/bullet_arrow_up.png')") no-repeat scroll right center;
+}
+thead.xwiki-grid-display-header th.selected {
+	color:#4D4D4D;
+	background-color: lemonChiffon;
+}
+thead.xwiki-grid-display-header  td.xwiki-grid-display-header-filter{ /* IE6 padding fix */
+	padding: 1px;
+}
+html>body thead.xwiki-grid-display-header  td.xwiki-grid-display-header-filter{
+	padding: 2px 5px 2px 0px;
+	border-color: transparent;
+}
+thead.xwiki-grid-display-header td.xwiki-grid-display-header-filter input,
+thead.xwiki-grid-display-header td.xwiki-grid-display-header-filter select{
+	width: 100%;
+	border:1px solid #DDDDDD;
+	color: #888;
+	margin: 0;
+	padding:0 0 0 2px;
+}
+/* </ Grid Header> */
+/* <Grid Body> */
+tbody.xwiki-grid-display-body tr {
+	border-bottom: 1px solid #cccccc;
+}
+tbody.xwiki-grid-display-body tr:hover , tbody.xwiki-grid-display-body tr.rowHover{ /* for IE6 tr:hover fix*/
+	background-color: lemonChiffon;
+}
+tbody.xwiki-grid-display-body tr.rowHover td { /* IE6 tr border-bottom fix*/
+	border-left-color: lemonChiffon;
+	border-right-color: lemonChiffon;
+}
+tbody.xwiki-grid-display-body td{
+	color:#4D4D4D;
+	padding: 3px 2px 3px 4px;
+	background-image: none;	
+}
+tbody.xwiki-grid-display-body a, tbody.xwiki-grid-display-body a:hover{
+	color: #00007e; 
+}
+tbody.xwiki-grid-display-body td.linkeditor, tbody.xwiki-grid-display-body td.editableCellHover.linkeditor a {
+	padding-right: 16px;
+	cursor:pointer;
+}
+tbody.xwiki-grid-display-body td:hover.linkeditor{  
+	background:lemonChiffon url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
+	cursor:pointer;
+}
+tbody.xwiki-grid-display-body td.linkeditor a.editableCellHover{ /* for IE6 td:hover fix and because IE6 doesn't support multiple class td.linkeditor.editableCellHover*/
+	display: block;
+	background:lemonChiffon url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
+	cursor:pointer;
+	color:#4D4D4D;
+	padding-right: 16px;
+}
+tbody.xwiki-grid-display-body td.linkeditor a{
+	color:#4D4D4D;
+	text-decoration: none;
+}
+tbody.xwiki-grid-display-body td:hover.linkview, tbody.xwiki-grid-display-body td.editableCellHover.linkview,
+tbody.xwiki-grid-display-body td:hover.typenone, tbody.xwiki-grid-display-body td.editableCellHover.typenone,
+tbody.xwiki-grid-display-body td.typenone, tbody.xwiki-grid-display-body td.linkview{
+	
+}
+tbody.xwiki-grid-display-body td:hover.typenumeric, tbody.xwiki-grid-display-body td.editableCellHover.typenumeric, tbody.xwiki-grid-display-body td.typenumeric {
+	text-align: right;
+}
+tbody.xwiki-grid-display-body td:hover.typenone, tbody.xwiki-grid-display-body td.editableCellHover.typenone, tbody.xwiki-grid-display-body td.typenone {
+	text-align: center;
+	padding-left: 0;
+}
+/* </ Grid Body> */
+/* <Dialog Box> */
+div.dialog-loading{
+	border: 1px solid #aaa;
+}
+div.dialog-loading tr.dialogTop td.dialogTopCenter div.Caption{
+	background-color:#DDDDDD;
+}
+div.dialog-loading tr.dialogMiddle td.dialogMiddleCenter div.gwt-ModalDialog-Content{
+	padding:20px;
+}
+div.xwikigwt-editfield{
+	background-color:#FFFFFF;
+	border: 1px solid #aaa;
+}
+div.xwikigwt-editfield-main {
+	padding:20px;
+}
+div.xwikigwt-editfield  tr.dialogTop td.dialogTopCenter div.Caption {
+	background-color:#DDDDDD;
+	color:#4D4D4D;
+	padding:9px 4px 4px;
+}
+div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfield-actions {
+	margin-top:10px;
+	width: 75%;
+}
+div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfield-actions .xwikigwt-cancel{
+	background-color:#ffffff;
+	color:#00007E;
+	padding: 0;
+	border: 0;
+	float: right;
+}
+div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfield-actions .xwikigwt-next{
+	background-color:#dddddd;
+	color:#000;
+}
+/* </Dialog Box> */
+/* <Tag Cloud> */
+div.xwiki-grid-tagcloud ol.tagCloud {
+	margin:0;
+}
+div.xwiki-grid-tagcloud ol.tagCloud li span{
+	color: #ccc;
+	padding: 0px 3px 0px 3px;
+	border: 1px solid #fff;
+}
+div.xwiki-grid-tagcloud ol.tagCloud li.selectable span {
+	cursor: pointer;
+	color: #00007E;
+}
+div.xwiki-grid-tagcloud ol.tagCloud li.selected span {
+	background-color: lemonChiffon;
+	border: 1px solid #DDDDDD;
+}
+div.xwiki-grid-tagcloud {
+	float:left;
+	width:65%;
+}
+div.xwiki-grid-tagcloudcontrols {
+	float:right;
+	color:#888888;
+	font-size:90%;
+}
+div.xwiki-grid-tagcloudcontrols img {
+	margin-right:5px;
+}
+.xwiki-grid-tagcloud-container div.clearfloats {
+	background-color: transparent;
+	margin: 0;
+	overflow: hidden;
+}
+.xwiki-grid-tagcloud-container{
+	border: 1px solid #ddd;
+	border-bottom: 5px solid #ddd;
+	background-color: transparent;
+	padding: 10px;
+	position: relative;
+}
+.tippointer{
+	position: relative;
+	width: 0;
+	height: 0;
+	top: -3px !important;
+	left: 45px;
+	border-top: 20px solid #ddd;
+    border-right: 20px dotted transparent;
+    border-left: 20px dotted transparent;
+    border-bottom: 0px none;
 }
 
-div.inscrollbar {
-  width: 1px;
-  margin: 0px;
-  padding: 0px;
-  height: 3000px;
+.tippointer div {
+	position: absolute;
+	width: 0;
+	height: 0;
+	top: -20px;
+	left: -15px;
+	border-color: #DDDDDD transparent transparent;
+	border-style:solid;
+	border-width:15px 15px 0;
+}
+.xwiki-grid-tagcloud-container h2 {
+	font-size: 1em;	
+	color: #888;
+}
+.xwiki-grid-tagcloud-container h2 span{
+	color: #888;
+	font-size: 0.8em;
+	font-weight: normal;
+	line-height: 2em;
+	margin: 0 0 10px;
+	border: none;
+}
+/* </Tag Cloud> */
+
+/* <Compatibility> */
+/* This section contains rules for backward compatibility with the deprecated (since 1.9M2) ASSTable */
+/* TODO move the users and groups related styles in toucan/albatross skin files */
+div.xwiki-grid-pagination-content {
+	background: url($xwiki.getSkinFile("icons/silk/page_white_copy.gif")) no-repeat;
+	padding-left:20px;
+	padding-bottom:2px;
+	display:inline;
+}
+div.xwiki-grid-pagination-content span.pagenumber {
+	display:inline;
+	color: #888;
+	cursor: pointer;
+}
+div.xwiki-grid-pagination-content span.pagenumber:hover {
+	color: #4D4D4D;
+	text-decoration: underlined;
+}
+div.xwiki-grid-pagination-content span.selected {
+	color: #4D4D4D;
+	font-weight: bold;
+}
+div.xwiki-grid-pagination-content span.pagenumber:focus {
+    outline: dotted 1px #000;
 }
 
 .display {
-  border-collapse: collapse;
-  border: 1px solid #d4dee8;
-  width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #e8e8e8;
+    width: 100%;
 }
 
 .display td {
-  border: 1px solid #d4dee8;
-}
-
-#showLimits {
-  font-size: 12px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+    border: 1px solid #e8e8e8;
+    padding: 3px;
 }
 
 .icon-manage {
-  cursor: pointer;
-  padding-right: 10px;
+   cursor: pointer;
+   padding-right: 10px;
 }
 
 .icon-manageg {
-  padding-right: 10px;
+   padding-right: 10px;
 }
 
 #ajax-loader {
-  margin: 0px;
-  padding: 0px;
-  position: absolute;
-  top: 50%;
-  left: 35%;
-  z-index: 10000;
-  display: none;
-  width: 220px;
-  background-color: #fff;
-  border: 1px solid #999;
-  font-size: 11px;
-  padding: 8px;
-  text-indent: 5px;
+   margin: 0px;
+   padding: 0px;
+   position: absolute;
+   top: 50%;
+   left: 35%;
+   z-index: 1000000000;
+   display: none;
+   width: 220px;
+   background-color: #fff;
+   border: 1px solid #999;
+   font-size: 11px;
+   padding: 8px;
+   text-indent: 5px;
 }
 
 .theader {
-  background-color: #1f66ab;
-  color: #fff;
-  font-weight: bold;
-  font-size: 12px;
+   background-color: #ccc;
+   color: #FFF;
+   font-weight: bold;
+   font-size: 1em;
 }
 
 #table-filters {
-  background-color: #d4dee8;
+    background-color: #efefef;
 }
 
 .filter {
-  width: 70%;
+	width: 70%;
 }
 
 .theader td {
-  padding-left: 10px;
+	padding: 3px 0 3px 10px;
 }
 
 table.livetable {
-  width: 100%;
-  position: relative;
-/*  left: 4px; */
-  padding: 0px;
-  margin: 0px;
+    width: 100%;
+    position: relative;
+    border: 5px solid #fff;
+    margin: 0px;
+    left: 0px;
 }
+/* </Compatibility> */

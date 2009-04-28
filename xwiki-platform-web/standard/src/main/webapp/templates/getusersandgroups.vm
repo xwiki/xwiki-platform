@@ -14,7 +14,7 @@ $response.setContentType("application/x-json")
 #set($params = $request.getParameterMap())
 #set($keys = $params.keySet())
 ## Params which are not supposed to be used for filtering
-#set($defaultKeys = ["xpage", "offset", "limit", "wiki", "uorg", "clsname", "space", "reqNo"])
+#set($defaultKeys = ["xpage", "offset", "limit", "wiki", "uorg", "clsname", "space", "reqNo", "sort", "dir"])
 ## Params that should filter the document, not object properties
 #set($docProps = ["fullName", "name"])
 ## The filter being constructed. It will be passed to the rightsmanager API.

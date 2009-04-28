@@ -9,7 +9,7 @@ $response.setContentType("application/x-json")
 #### get all the request parameters which are filters
 #set( $params = $request.getParameterMap() )
 #set( $keys = $params.keySet() )
-#set( $defaultKeys = ["xpage", "offset", "limit", "wiki", "reqNo"] )
+#set( $defaultKeys = ["xpage", "offset", "limit", "wiki", "reqNo", "sort", "dir"] )
 #set( $docProps = ["fullName", "name"] )
 #set( $filterMap = $util.hashMap )
 #set( $orderList = $util.arrayList )

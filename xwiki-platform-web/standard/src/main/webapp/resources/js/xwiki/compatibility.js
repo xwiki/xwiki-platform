@@ -39,23 +39,27 @@ if (typeof XWiki.widgets == "object" && typeof XWiki.widgets.LiveTable != "klass
 
       if($("showLimits")) {
         // inject an element for pagination since the scroller has been removed.
-		$("showLimits").up("tr").insert({'after':
-         new Element("tr").update( 
-	       new Element("td").update(
-		     new Element("div", {
-	  	       'id': domNode + "-pagination",
-		       'class': "xwiki-grid-pagination-content"
-	         })
-	       )
-	     )
-	    });
+        if($("showLimits").up("tr")) {
+			$("showLimits").up("tr").insert({'after':
+	         new Element("tr").update( 
+		       new Element("td").update(
+			     new Element("div", {
+		  	       'id': domNode + "-pagination",
+			       'class': "xwiki-grid-pagination-content"
+		         })
+		       )
+		     )
+		    });	
+        }
 	    // replace the id of the limits element by the one expected by convention by the new LiveTable widget
 	    $("showLimits").id = domNode + "-limits";
       }
 
-      if ($('scrollbar1')) {
-	     // remove that annoying pseudo-scroll, the new widget support normal pagination.
-	     $('scrollbar1').up("td").next().remove(); // remove the buff td
+      if ($('scrollbar1') && $('scrollbar1').up("td")) {
+	     // if it present, remove that annoying pseudo-scroll, the new widget support normal pagination.
+         if($('scrollbar1').up("td").next()) {
+	       $('scrollbar1').up("td").next().remove(); // remove the buff td
+         }
 	     $('scrollbar1').up("td").remove();  // remove the td that holds the scrollbar
       }
  
@@ -66,7 +70,7 @@ if (typeof XWiki.widgets == "object" && typeof XWiki.widgets.LiveTable != "klass
 
       // Ouf, that should be all for compatibility code, now we call father initialize method of new widget.
       // Some arguments are dropped since the new signature is different.
-      $super(url, domNode, getHandler);
+      $super(url, domNode, getHandler, {"action" : action});
     } 
   });
 }

@@ -65,9 +65,6 @@
       #end
     #end
     <div id="xwikieditcontent">
-        <div id="ajax-loader">$msg.get("ui.ajaxTable.loading")<br />
-          <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$msg.get('ui.ajaxTable.loading')" title="" />
-        </div>
         #if("$!editor" == "spacerights")
             <div class="spaceName">$msg.get("platform.core.rightsManagement.editRightsForSpace", [$space])&nbsp;&nbsp;
                 <select name="space" style="width: 130px;" class="filter" onchange="location='?editor=spacerights&amp;global=1&amp;space='+this.value;">
@@ -81,80 +78,81 @@
                 </select>
             </div>
         #end ## editor = spacerights
-        <table id="usersandgroupstable" class="livetable#if("$!editor"!="") $editor#end">
-            <tr>
-                <td colspan="3" style="padding-top:10px;">
-                  <span id="showLimits"></span>
-                </td>
-            </tr>
-            <tr>
-				<td style="width:100%">
-                  <table class="display">
-                   <thead class="theader">
-                      <tr>
-						  <td class="usersorgroupsnames">
-                          <input type="radio" id="uorgg" name="uorg" value="groups" onclick="if(!$('unregistered').hasClassName('hidden')) $('unregistered').addClassName('hidden');" checked="checked" />$msg.get("Groups")&nbsp;&nbsp;
-                          <input type="radio" id="uorgu" name="uorg" value="users" onclick="if($('unregistered').hasClassName('hidden')) $('unregistered').removeClassName('hidden');" />$msg.get("Users")
-                          </td>
-                          #foreach($i in [0..$maxlevel])
-                          <td class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</td>
-                          #end
-                      </tr>
-                      <tr id="unregistered">
-                        <td id="unreguser">$msg.get("rightsmanager.unregisteredusers")</td>
-                        #foreach($i in [0..$maxlevel])
-                        <td class="rights" id="td${levelsRights.get($i)}"></td>
-                        #end
-                      </tr>
-                      <tr id="table-filters">
-                          <td>
-                            $msg.get("rightsmanager.searchfilter") <input name="name" type="text" style="width:65%"/>
-                            #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
-                            #if(!$mainwk) ## display the combobox only in a local wiki
-                            <select name="wiki" style="margin-left:10px;">
-                              <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
-                              <option value="global">$msg.get("rightsmanager.global")</option>
-                              <option value="both">$msg.get("rightsmanager.both")</option>
-                            </select>
-                            #else<input type="hidden" name="wiki" value="local"/>#end
-                            #set($colsp = $maxlevel + 1)
-                            </td><td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
-                      </tr>
-                  </thead>
-                  <tbody id="display1"><tr><td>&nbsp;</td></tr></tbody>
-                 </table>
-			   </td>
-               <td valign="top">
-                  <div id="scrollbar1" class="scrollbar"><div class="inscrollbar">&nbsp;</div></div>
-               </td>
-               <td id="buff"></td>
-            </tr>
-            #if("$!request.editor" == "globaladmin" || "$!editor" == "globaladmin")
-			    <tr>
-			  	    <td>
-				        <table>
-                            #set($auth_view = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_view"))
-                            #set($auth_edit = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_edit"))
-                            #if("$!auth_view" == "Yes")
-                                #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-                                #set($view_alt = "yes")
-                            #elseif("$!auth_view" == "No" || "$!auth_view" == "---")
-                                #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-                                #set($view_alt = "no")
-                            #end
-                            #if("$!auth_edit" == "Yes")
-                                #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-                                #set($edit_alt = "yes")
-                            #elseif("$!auth_edit" == "No" || "$!auth_edit" == "---")
-                                #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-                                #set($edit_alt = "no")
-                            #end
-						    <tr><td>$msg.get("authenticate_view")</td><td><img id="allowguestview" alt="$view_alt" src="${view_icon}" /></td></tr>
-						    <tr><td>$msg.get("authenticate_edit")</td><td><img id="allowguestedit" alt="$edit_alt" src="${edit_icon}" /></td></tr>
-					    </table>
-				    </td>
-		        </tr>
-		    #end
+        <table id="usersandgroupstable" class="xwiki-grid#if("$!editor"!="") $editor#end">
+	      <tr>
+	        <td class="xwiki-grid-pagination" colspan="2">
+	          <span id="usersandgroupstable-limits" class="xwiki-grid-limits"></span>
+    	      <span id="usersandgroupstable-ajax-loader" class="xwiki-grid-loader"><img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$msg.get('xe.grid.loading')" title="" />$msg.get("xe.grid.loading")</span>
+	        <span class="pagination">
+	          <span id="usersandgroupstable-pagination-text" class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
+	          <span id="usersandgroupstable-pagination" class="xwiki-grid-pagination-content" ></span>
+	        </span>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td class="xwiki-grid-display-container">
+	        <table class="xwiki-grid-display">
+	          <thead class="xwiki-grid-display-header">
+	             <tr class="userorgroups-header">
+				   <td class="usersorgroupsnames">
+                     <input type="radio" id="uorgg" name="uorg" value="groups" onclick="if(!$('unregistered').hasClassName('hidden')) $('unregistered').addClassName('hidden');" checked="checked" />$msg.get("Groups")&nbsp;&nbsp;
+                     <input type="radio" id="uorgu" name="uorg" value="users" onclick="if($('unregistered').hasClassName('hidden')) $('unregistered').removeClassName('hidden');" />$msg.get("Users")
+                   </td>
+                   #foreach($i in [0..$maxlevel])
+                     <td class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</td>
+                   #end
+                 </tr>
+                 <tr id="unregistered">
+                   <td id="unreguser">$msg.get("rightsmanager.unregisteredusers")</td>
+                   #foreach($i in [0..$maxlevel])
+                     <td class="rights" id="td${levelsRights.get($i)}"></td>
+                   #end
+                 </tr>
+                 <tr id="usersandgroupstable-filters">
+                   <td>$msg.get("rightsmanager.searchfilter") <input name="name" type="text" style="width:65%"/>
+                     #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
+                       #if(!$mainwk) ## display the combobox only in a local wiki
+                       <select name="wiki" style="margin-left:10px;">
+                         <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
+                         <option value="global">$msg.get("rightsmanager.global")</option>
+                         <option value="both">$msg.get("rightsmanager.both")</option>
+                       </select>
+                       #else<input type="hidden" name="wiki" value="local"/>#end
+                       #set($colsp = $maxlevel + 1)
+                   </td>
+                   <td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
+                 </tr>
+               </thead>
+               <tbody id="usersandgroupstable-display" class="xwiki-grid-display-body"><tr><td>&nbsp;</td></tr></tbody>
+             </table>
+           </td>
+          </tr>
+          #if("$!request.editor" == "globaladmin" || "$!editor" == "globaladmin")
+          <tr>
+            <td>
+              <table>
+              #set($auth_view = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_view"))
+              #set($auth_edit = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_edit"))
+              #if("$!auth_view" == "Yes")
+                #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+                #set($view_alt = "yes")
+              #elseif("$!auth_view" == "No" || "$!auth_view" == "---")
+                #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+                #set($view_alt = "no")
+              #end
+              #if("$!auth_edit" == "Yes")
+                #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+                #set($edit_alt = "yes")
+              #elseif("$!auth_edit" == "No" || "$!auth_edit" == "---")
+                #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+                #set($edit_alt = "no")
+              #end
+                <tr><td>$msg.get("authenticate_view")</td><td><img id="allowguestview" alt="$view_alt" src="${view_icon}" /></td></tr>
+                <tr><td>$msg.get("authenticate_edit")</td><td><img id="allowguestedit" alt="$edit_alt" src="${edit_icon}" /></td></tr>
+              </table>
+            </td>
+          </tr>
+		#end
         </table>
         <script type="text/javascript">
         //<![CDATA[
@@ -163,7 +161,7 @@
         saveUrl.replace(/&amp;/g, "&");
         window.currentUser = "$context.user";
         window.unregUser = "XWiki.XWikiGuest";
-        var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstable", displayUsersAndGroups, true);
+        var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", displayUsersAndGroups);
         #foreach($i in [0..$maxlevel])
         var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", saveUrl, "${r.get($i)}");
         #end

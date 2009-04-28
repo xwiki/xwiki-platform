@@ -204,11 +204,6 @@ function displayUsers(row, i, table)
   var docurl = row.docurl;
 
   var tr = document.createElement('tr');
-  if (i % 2 == 0) {
-    tr.className = "even";
-  } else {
-    tr.className = "odd";
-  }
 
   var username = document.createElement('td');
   if (wikiname == "local") {
@@ -272,12 +267,6 @@ function displayGroups(row, i, table)
 
   var tr = document.createElement('tr');
 
-  if (i % 2 == 0) {
-    tr.className = "even";
-  } else {
-    tr.className = "odd";
-  }
-
   var username = document.createElement('td');
   if (wikiname == "local") {
     var a = document.createElement('a');
@@ -329,8 +318,6 @@ function displayGroups(row, i, table)
 function displayMembers(row, i, table)
 {
   var tr = document.createElement('tr');
-  if(i % 2 == 0) tr.className = "even";
-  else tr.className = "odd";
 
   var membername = document.createElement("td");
 
@@ -384,12 +371,6 @@ function displayUsersAndGroups(row, i, table, idx)
   var saveUrl = "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + row.fullname + "&uorg=" + uorg;
 
   var tr = document.createElement('tr');
-
-  if (i % 2 == 0) {
-    tr.className = "even";
-  } else {
-    tr.className = "odd";
-  }
 
   var username = document.createElement('td');
   if(row.wikiname == "local") {

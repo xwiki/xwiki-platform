@@ -104,7 +104,7 @@ html>body .xwiki-grid-display td {
 table.xwiki-grid table.xwiki-grid-display thead.xwiki-grid-display-header{
 	border-bottom: 5px solid #dddddd;
 }
-thead.xwiki-grid-display-header tr#xwiki-grid-display-filters:hover , thead.xwiki-grid-display-header tr.rowHover#xwiki-grid-display-filters{ /* for IE6 tr:hover fix*/
+thead.xwiki-grid-display-header tr.xwiki-grid-display-filters:hover , thead.xwiki-grid-display-header tr.rowHover.{ /* for IE6 tr:hover fix*/
 	background-color: #fff;
 }
 thead.xwiki-grid-display-header th.xwiki-grid-display-header-text{

@@ -93,3 +93,7 @@
 .addlabel {
   font-weight: bold;
 }
+
+tr.userorgroups-header {
+  background-color:#DDDDDD;
+}

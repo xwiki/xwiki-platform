@@ -108,6 +108,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             context.setConversion(false);
             context.setElementName(null);
             context.setType(null);
+            context.setHTML(false);
             context.setVelocityOpen(false);
             context.setVelocityClose(false);
 
@@ -117,19 +118,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                 i = getHTMLBlock(array, i, htmlBlock, context);
             }
 
-            if (context.isConversion()) {
-                StringBuffer nonHtmlbuffer = inHTMLMacro ? nonHTMLContent : result;
-
-                if (context.isVelocityOpen()) {
-                    VelocityFilter.appendVelocityOpen(nonHtmlbuffer, filterContext, false);
-                }
-
-                nonHtmlbuffer.append(htmlBlock);
-
-                if (context.isVelocityClose()) {
-                    VelocityFilter.appendVelocityClose(nonHtmlbuffer, filterContext, false);
-                }
-            } else if (context.getType() != null) {
+            if (context.isHTML()) {
                 if (!inHTMLMacro) {
                     inHTMLMacro = true;
                 } else {
@@ -137,14 +126,36 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                     nonHTMLContent.setLength(0);
                 }
 
-                htmlContent.append(htmlBlock);
-            } else {
-                if (!inHTMLMacro) {
-                    result.append(c);
+                if (context.isConversion()) {
+                    if (context.isVelocityOpen()) {
+                        VelocityFilter.appendVelocityOpen(htmlContent, filterContext, false);
+                    }
+
+                    htmlContent.append(htmlBlock);
+
+                    if (context.isVelocityClose()) {
+                        VelocityFilter.appendVelocityClose(htmlContent, filterContext, false);
+                    }
                 } else {
-                    nonHTMLContent.append(c);
+                    htmlContent.append(htmlBlock);
                 }
-                ++i;
+            } else {
+                StringBuffer nonHtmlbuffer = inHTMLMacro ? nonHTMLContent : result;
+
+                if (context.isConversion()) {
+                    if (context.isVelocityOpen()) {
+                        VelocityFilter.appendVelocityOpen(nonHtmlbuffer, filterContext, false);
+                    }
+
+                    nonHtmlbuffer.append(htmlBlock);
+
+                    if (context.isVelocityClose()) {
+                        VelocityFilter.appendVelocityClose(nonHtmlbuffer, filterContext, false);
+                    }
+                } else {
+                    nonHtmlbuffer.append(c);
+                    ++i;
+                }
             }
         }
 
@@ -220,6 +231,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
     public int getComment(char[] array, int currentIndex, StringBuffer htmlBlock, HTMLFilterContext context)
     {
         context.setType(HTMLType.COMMENT);
+        context.setHTML(true);
 
         StringBuffer commentBlock = new StringBuffer();
 
@@ -285,8 +297,10 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                 }
             }
 
-            context.setType(HTMLType.ELEMENT);
+            context.setHTML(true);
         }
+
+        context.setType(HTMLType.ELEMENT);
 
         return i;
     }
@@ -340,9 +354,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                 break;
             }
 
-            if (context.isConversion()) {
-                elementContent.append(htmlBlock);
-            } else if (context.getType() != null) {
+            if (context.getType() != null) {
                 elementContent.append(htmlBlock);
             } else {
                 elementContent.append(c);
@@ -513,91 +525,6 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         return i;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
-     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
-     */
-    public String filter2(String content, FilterContext filterContext)
-    {
-        StringBuffer result = new StringBuffer();
-
-        Matcher matcher = HTML_PATTERN.matcher(content);
-
-        boolean inHTMLMacro = false;
-        boolean inHTMLComment = false;
-
-        boolean velocityOpenBefore = false;
-        boolean velocityCloseBefore = false;
-
-        StringBuffer htmlContent = new StringBuffer();
-
-        int currentIndex = 0;
-        for (; matcher.find(); currentIndex = matcher.end()) {
-            String before = content.substring(currentIndex, matcher.start());
-
-            if (!inHTMLMacro) {
-                Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(before);
-                velocityOpenBefore = velocityOpenMatcher.find();
-                Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(before);
-                velocityCloseBefore = velocityCloseMatcher.find();
-
-                result.append(before);
-            } else {
-                htmlContent.append(before);
-            }
-
-            inHTMLMacro = true;
-
-            if (matcher.group(1) != null) {
-                inHTMLComment = true;
-                htmlContent.append(filterContext.addProtectedContent(matcher.group(0)));
-            } else if (inHTMLComment && matcher.group(2) != null) {
-                htmlContent.append(filterContext.addProtectedContent(matcher.group(0)));
-                inHTMLComment = false;
-            } else {
-                htmlContent.append(matcher.group(0));
-            }
-        }
-
-        if (currentIndex == 0) {
-            return content;
-        }
-
-        // clean html content
-        Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(htmlContent);
-        boolean velocityOpen = velocityOpenMatcher.find();
-        String cleanedHtmlContent = velocityOpenMatcher.replaceAll("");
-        Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(cleanedHtmlContent);
-        boolean velocityClose = velocityCloseMatcher.find();
-        cleanedHtmlContent = velocityCloseMatcher.replaceAll("");
-
-        // print the content
-
-        boolean multilines = cleanedHtmlContent.indexOf("\n") != -1;
-
-        if (velocityOpen) {
-            VelocityFilter.appendVelocityOpen(result, filterContext, multilines);
-        } else if (!velocityOpenBefore || velocityCloseBefore) {
-            appendHTMLOpen(result, filterContext, multilines);
-        }
-
-        result.append(cleanedHtmlContent);
-
-        if (velocityClose) {
-            VelocityFilter.appendVelocityClose(result, filterContext, multilines);
-        } else if (velocityCloseBefore || !velocityOpenBefore) {
-            appendHTMLClose(result, filterContext, multilines);
-        }
-
-        if (currentIndex < content.length()) {
-            result.append(content.substring(currentIndex));
-        }
-
-        return result.toString();
-    }
-
     public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
         result.append(filterContext
@@ -614,6 +541,8 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         private boolean conversion = false;
 
         private HTMLType type = null;
+
+        private boolean html = false;
 
         private FilterContext filterContext;
 
@@ -651,6 +580,16 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         public void setType(HTMLType type)
         {
             this.type = type;
+        }
+
+        public boolean isHTML()
+        {
+            return html;
+        }
+
+        public void setHTML(boolean isHTML)
+        {
+            this.html = isHTML;
         }
 
         public String getElementName()

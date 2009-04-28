@@ -57,6 +57,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("velocity/velocity17", false);
         suite.addTestsFromResource("velocity/velocity18", false);
         suite.addTestsFromResource("velocity/velocity19", false);
+        suite.addTestsFromResource("velocity/velocity20", false);
 
         // Groovy
         suite.addTestsFromResource("groovy/groovy1", false);
@@ -94,6 +95,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("html/html5", false);
         suite.addTestsFromResource("html/html6", false);
         suite.addTestsFromResource("html/html7", false);
+        suite.addTestsFromResource("html/html8", false);
 
         // HTML elements
         suite.addTestsFromResource("macros/html/br1", false);

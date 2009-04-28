@@ -33,6 +33,11 @@ import org.xwiki.rendering.internal.parser.xwiki10.HTMLFilter.HTMLFilterContext;
 @ComponentRole
 public interface HTMLElementConverter
 {
+    /**
+     * This component's role, used when code needs to look it up.
+     */
+    String ROLE = HTMLElementConverter.class.getName();
+
     String getElementName();
 
     boolean protectResult();

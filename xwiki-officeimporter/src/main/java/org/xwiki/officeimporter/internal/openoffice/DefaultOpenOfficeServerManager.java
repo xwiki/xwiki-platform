@@ -160,7 +160,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
      */
     public void startServer() throws OpenOfficeServerManagerException
     {
-        if (ServerState.UNKNOWN != currentState) {
+        if (ServerState.RUNNING != currentState) {
             if (!isOfficeManagerInitialized()) {
                 initializeOfficeManager();
             }

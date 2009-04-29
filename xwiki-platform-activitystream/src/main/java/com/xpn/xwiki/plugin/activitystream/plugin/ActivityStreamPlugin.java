@@ -109,7 +109,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
     {
         super.virtualInit(context);
         try {
-            activityStream.initClasses(context);
+            // activityStream.initClasses(context);
         } catch (Exception e) {
         }
     }

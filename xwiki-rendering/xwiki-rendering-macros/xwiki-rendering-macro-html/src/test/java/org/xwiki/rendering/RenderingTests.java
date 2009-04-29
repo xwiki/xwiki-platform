@@ -47,6 +47,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrohtml8", true);
         suite.addTestsFromResource("macrohtml9", true);
         suite.addTestsFromResource("macrohtml10", true);
+        suite.addTestsFromResource("macrohtml11", true);
+        suite.addTestsFromResource("macrohtml12", true);
 
         return new RenderingPlexusTestSetup(suite);
     }

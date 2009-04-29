@@ -54,35 +54,7 @@ beginMacroMarkerStandalone [html] [wiki=true] [
       </table>
 </div>
 ]
-beginXMLNode [div]
-beginXMLNode [h1]
-onWord [Hello]
-onSpace
-onWord [John]
-endXMLNode [h1]
-beginXMLNode [table]
-beginXMLNode [tbody]
-beginXMLNode [tr]
-beginXMLNode [td]
-beginList [BULLETED]
-beginListItem
-onWord [item]
-endListItem
-endList [BULLETED]
-endXMLNode [td]
-endXMLNode [tr]
-beginXMLNode [tr]
-beginXMLNode [td]
-beginList [BULLETED]
-beginListItem
-onWord [item]
-endListItem
-endList [BULLETED]
-endXMLNode [td]
-endXMLNode [tr]
-endXMLNode [tbody]
-endXMLNode [table]
-endXMLNode [div]
+onRawText [<div><h1>Hello John</h1><table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table></div>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 <div>
     <h1>Hello John</h1>

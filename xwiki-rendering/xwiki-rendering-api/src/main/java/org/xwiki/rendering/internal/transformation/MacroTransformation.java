@@ -32,13 +32,14 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.XMLBlock;
-import org.xwiki.rendering.listener.xml.XMLElement;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
@@ -271,15 +272,13 @@ public class MacroTransformation extends AbstractTransformation
         Block descriptionBlock = new VerbatimBlock(description, macroToReplace.isInline());
 
         if (macroToReplace.isInline()) {
-            errorBlocks.add(new XMLBlock(Arrays.<Block> asList(new WordBlock(message)), new XMLElement("span",
-                errorBlockParams)));
-            errorBlocks.add(new XMLBlock(Arrays.asList(descriptionBlock), new XMLElement("span",
-                errorDescriptionBlockParams)));
+            errorBlocks.add(new FormatBlock(Arrays.<Block> asList(new WordBlock(message)), Format.NONE, 
+                errorBlockParams));
+            errorBlocks.add(new FormatBlock(Arrays.asList(descriptionBlock), Format.NONE, 
+                errorDescriptionBlockParams));
         } else {
-            errorBlocks.add(new XMLBlock(Arrays.<Block> asList(new WordBlock(message)), new XMLElement("div",
-                errorBlockParams)));
-            errorBlocks.add(new XMLBlock(Arrays.asList(descriptionBlock), new XMLElement("div",
-                errorDescriptionBlockParams)));
+            errorBlocks.add(new GroupBlock(Arrays.<Block> asList(new WordBlock(message)), errorBlockParams));
+            errorBlocks.add(new GroupBlock(Arrays.asList(descriptionBlock), errorDescriptionBlockParams));
         }
 
         macroToReplace.replace(wrapInMacroMarker(macroToReplace, errorBlocks));

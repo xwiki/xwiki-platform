@@ -8,8 +8,8 @@
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [testbox] [] []
-beginXMLNode [div] [class=box]
+beginGroup [[class]=[box]]
 onVerbatim [] [false]
-endXMLNode [div] [class=box]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [testbox] [] []
 endDocument

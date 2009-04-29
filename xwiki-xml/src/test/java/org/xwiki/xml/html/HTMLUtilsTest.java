@@ -18,22 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.xml;
+package org.xwiki.xml.html;
 
 import java.io.StringReader;
 
 import org.w3c.dom.Document;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
-import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
 
 /**
- * Unit tests for {@link org.xwiki.xml.XMLUtils}.
+ * Unit tests for {@link org.xwiki.xml.html.HTMLUtils}.
  * 
  * @version $Id: $
- * @since 1.6M1
+ * @since 1.8.3
  */
-public class XMLUtilsTest extends AbstractXWikiComponentTestCase
+public class HTMLUtilsTest extends AbstractXWikiComponentTestCase
 {
     private HTMLCleaner cleaner;
 
@@ -49,19 +49,20 @@ public class XMLUtilsTest extends AbstractXWikiComponentTestCase
         cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "default");
     }
 
-    public void testEscapeXMLComment()
+    public void testStripHTMLEnvelope() throws Exception
     {
-        assertEquals("-\\- ", XMLUtils.escapeXMLComment("-- "));
-        assertEquals("-\\", XMLUtils.escapeXMLComment("-"));
-        assertEquals("-\\-\\-\\", XMLUtils.escapeXMLComment("---"));
-        assertEquals("- ", XMLUtils.escapeXMLComment("- "));
+        Document document =
+            cleaner.clean(new StringReader("<html><head/><body><p>test1</p><p>test2</p></body></html>"));
+        HTMLUtils.stripHTMLEnvelope(document);
+        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", XMLUtils
+            .toString(document));
     }
     
-    public void testUnescapeXMLComment()
+    public void testStripTopLevelParagraph() throws Exception
     {
-        assertEquals("", XMLUtils.unescapeXMLComment("\\"));
-        assertEquals("\\", XMLUtils.unescapeXMLComment("\\\\"));
-        assertEquals("--", XMLUtils.unescapeXMLComment("\\-\\-"));
-        assertEquals("--", XMLUtils.unescapeXMLComment("\\-\\-\\"));
+        Document document = cleaner.clean(new StringReader("<html><head /><body><p>test</p></body></html>"));
+        HTMLUtils.stripFirstElementInside(document, "body", "p");
+        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><head /><body>test</body></html>\n", 
+            XMLUtils.toString(document));
     }
 }

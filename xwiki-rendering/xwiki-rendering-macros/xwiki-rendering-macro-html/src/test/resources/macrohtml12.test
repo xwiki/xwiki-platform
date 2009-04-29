@@ -1,0 +1,28 @@
+.#---------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify that we can not clean and still have wiki syntax
+.# (provided the passed HTML is valid XML).
+.#---------------------------------------------------------------
+{{html clean="false" wiki="true"}}
+<unknown>
+* item
+</unknown>
+{{/html}}
+.#-----------------------------------------------------
+.expect|event/1.0|skip
+.# TODO needs to be fixed in WikiModel's XHTMLWhitespaceXMLFilter
+.# which doesn't handle correctly unknown elements.
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [html] [clean=false|wiki=true] [
+<unknown>
+* item
+</unknown>
+]
+onRawText [<unknown><ul><li>item</li></ul></unknown>] [xhtml/1.0]
+endMacroMarkerStandalone [html] [clean=false|wiki=true] [
+<unknown>
+* item
+</unknown>
+]
+endDocument

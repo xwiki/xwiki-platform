@@ -35,7 +35,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
  * Map XWiki Listener events on to WikiModel events.
@@ -183,16 +183,6 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.beginHeader(level.getAsInt(), createWikiParameters(parameters));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Listener#beginXMLNode(XMLNode)
-     */
-    public void beginXMLNode(XMLNode node)
-    {
-        // TODO: Find what to do... For now don't render XML elements
-    }
-
     public void endList(ListType listType, Map<String, String> parameters)
     {
         this.wikimodelListener.endList(createWikiParameters(parameters), false);
@@ -222,16 +212,6 @@ public class WikiModelGeneratorListener implements Listener
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         this.wikimodelListener.endHeader(level.getAsInt(), createWikiParameters(parameters));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Listener#endXMLNode(XMLNode)
-     */
-    public void endXMLNode(XMLNode node)
-    {
-        // TODO: Find what to do... For now don't render XML elements
     }
 
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -276,6 +256,16 @@ public class WikiModelGeneratorListener implements Listener
     public void onId(String name)
     {
         // TODO: Find what to do...
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onRawText(String, Syntax)
+     */
+    public void onRawText(String text, Syntax syntax)
+    {
+        // Nothing to do since wikimodel doesn't support raw content.
     }
 
     /**

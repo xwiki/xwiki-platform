@@ -42,6 +42,16 @@ public interface HTMLConstants
     String WHITE_SPACE_CHARS = "\u0020\u0009\u000C\u200B" + "\n\r";
     
     /**
+     * HTML &lt;html@gt; tag name.
+     */
+    String TAG_HTML = "html";
+
+    /**
+     * HTML &lt;head@gt; tag name.
+     */
+    String TAG_HEAD = "head";
+
+    /**
      * HTML &lt;body@gt; tag name.
      */
     String TAG_BODY = "body";

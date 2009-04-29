@@ -2,7 +2,7 @@ package org.xwiki.rendering.listener;
 
 import java.util.Map;
 
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
  * A Listener wrapping another Listener.
@@ -147,16 +147,6 @@ public class WrappingListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#beginXMLNode(XMLNode)
-     */
-    public void beginXMLNode(XMLNode node)
-    {
-        this.listener.beginXMLNode(node);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.listener.Listener#endFormat(Format, Map)
      */
     public void endFormat(Format format, Map<String, String> parameters)
@@ -224,16 +214,6 @@ public class WrappingListener implements Listener
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         this.listener.endHeader(level, id, parameters);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Listener#endXMLNode(XMLNode)
-     */
-    public void endXMLNode(XMLNode node)
-    {
-        this.listener.endXMLNode(node);
     }
 
     /**
@@ -345,6 +325,16 @@ public class WrappingListener implements Listener
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         this.listener.onVerbatim(protectedString, isInline, parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onRawText(String, Syntax)
+     */
+    public void onRawText(String text, Syntax syntax)
+    {
+        this.listener.onRawText(text, syntax);
     }
 
     /**

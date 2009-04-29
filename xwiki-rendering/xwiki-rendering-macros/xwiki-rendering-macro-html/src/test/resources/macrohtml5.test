@@ -1,6 +1,6 @@
 .#------------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify trimming of whitespaces/new lines when in non-wiki mode (wiki syntax NOT allowed in element content)
+.# Verify trimming of whitespaces/new lines when in non-wiki mode (wiki syntax not parsed in element content)
 .#------------------------------------------------------------------------------------------------------------
 {{html}}
 <pre>
@@ -30,26 +30,12 @@ hello  world
    ]]>
 </p>
 ]
-beginXMLNode [pre]
-onWord [
+onRawText [<pre>
   newline
   newline
-]
-endXMLNode [pre]
-beginXMLNode [p]
-onWord [Some ]
-beginXMLNode [span]
-onWord [text ]
-endXMLNode [span]
-beginXMLNode [comment]
-endXMLNode [comment]
-onWord [another ]
-beginXMLNode [CDATA]
-onWord [
+</pre><p>Some <span>text </span><!--comment-->another <![CDATA[
 hello  world
-   ]
-endXMLNode [CDATA]
-endXMLNode [p]
+   ]]></p>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [] [
 <pre>
   newline

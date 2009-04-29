@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 
 import org.wikimodel.wem.xhtml.filter.XHTMLWhitespaceXMLFilter;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 
 /**
@@ -37,7 +39,14 @@ import org.xml.sax.XMLReader;
 public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
 {
     /**
-     * The leading and trainling white spaces matching pattern.
+     * The SAX property controlling whether XHTML elements can contain wiki syntax or not. This controls the whitespace
+     * stripping behavior. 
+     */
+    public static final String SAX_CONTAINS_WIKI_SYNTAX_PROPERTY = 
+        "http://xwiki.org/sax/properties/contains-wiki-syntax";
+
+    /**
+     * The leading and trailing white spaces matching pattern.
      */
     private static final Pattern HTML_WHITESPACE_BOUNDARIES_PATTERN = Pattern.compile("^\\s+|\\s+$");
 
@@ -49,22 +58,26 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLWhitespaceXMLFilter#XHTMLWhitespaceXMLFilter()
+     * @see XHTMLWhitespaceXMLFilter#XHTMLWhitespaceXMLFilter(XMLReader)
      */
-    public XWikiXHTMLWhitespaceXMLFilter(boolean containsWikiSyntax)
+    public XWikiXHTMLWhitespaceXMLFilter(XMLReader reader)
     {
-        this.containsWikiSyntax = containsWikiSyntax;
+        super(reader);
     }
-
+    
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLWhitespaceXMLFilter#XHTMLWhitespaceXMLFilter(XMLReader)
+     * @see XHTMLWhitespaceXMLFilter#setProperty(String, Object)
      */
-    public XWikiXHTMLWhitespaceXMLFilter(XMLReader reader, boolean containsWikiSyntax)
+    @Override
+    public void setProperty(String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException
     {
-        super(reader);
-        this.containsWikiSyntax = containsWikiSyntax;
+        if (SAX_CONTAINS_WIKI_SYNTAX_PROPERTY.equalsIgnoreCase(name)) {
+            this.containsWikiSyntax = ((Boolean) value).booleanValue();
+        } else {
+            super.setProperty(name, value);
+        }
     }
 
     /**

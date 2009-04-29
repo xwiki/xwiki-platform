@@ -25,11 +25,7 @@ import java.util.Map;
 
 import org.wikimodel.wem.IWikiParser;
 import org.wikimodel.wem.xhtml.XhtmlParser;
-import org.wikimodel.wem.xhtml.filter.AccumulationXMLFilter;
-import org.wikimodel.wem.xhtml.filter.DTDXMLFilter;
-import org.wikimodel.wem.xhtml.filter.XHTMLWhitespaceXMLFilter;
 import org.wikimodel.wem.xhtml.handler.TagHandler;
-import org.xml.sax.XMLReader;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.parser.ImageParser;
@@ -88,11 +84,16 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     private PrintRendererFactory printRendererFactory;
 
     /**
-     * Used to create an optimized SAX XML Reader. In general SAX parsers don't cache DTD grammars and
-     * as a consequence parsing a document with a grammar such as the XHTML DTD takes a lot more time
-     * than required. 
+     * A special factory that create foolproof XML reader that have the following characteristics:
+     * <ul>
+     * <li>Use DTD caching when the underlying XML parser is Xerces</li>
+     * <li>Ignore SAX callbacks when the parser parses the DTD</li>
+     * <li>Accumulate onCharacters() calls since SAX parser may normally call this event several times.</li>
+     * <li>Remove non-semantic white spaces where needed</li>
+     * <li>Resolve DTDs locally to speed DTD loading/validation</li> 
+     * </ul>
      */
-    @Requirement
+    @Requirement("xwiki")
     private XMLReaderFactory xmlReaderFactory;
     
     /**
@@ -127,7 +128,6 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
         return this.xwikiParser;
     }
     
-    
     /**
      * {@inheritDoc}
      * 
@@ -155,45 +155,13 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     	parser.setCommentHandler(new XWikiCommentHandler(this, this.linkParser, this.imageParser, this.printRendererFactory));
     	
     	// Construct our own XML filter chain since we want to use our own Comment filter.
-    	parser.setXmlReader(createXMLReader());
+    	try {
+    	    parser.setXmlReader(this.xmlReaderFactory.createXMLReader());
+    	} catch (Exception e) {
+    	    throw new ParseException("Failed to create XML reader", e);
+    	}
     	
     	return parser;
-    }
-    
-    /**
-     * Create a special XML filter chain so that we can use our extended implementation of
-     * {@link XHTMLWhitespaceXMLFilter} that knows how to handle XWiki's special comment placeholders.
-     * 
-     * @return the top level XML Filter chain
-     * @throws ParseException in case of an error while initializing the XML filters
-     */
-    private XMLReader createXMLReader() throws ParseException
-    {
-        XMLReader xmlReader;
-
-        try {
-
-            // Use a performant XML Reader (which does DTD caching for Xerces)
-            xmlReader = this.xmlReaderFactory.createXMLReader();
-            
-            // Ignore SAX callbacks when the parser parses the DTD
-            DTDXMLFilter dtdFilter = new DTDXMLFilter(xmlReader);
-            
-            // Add a XML Filter to accumulate onCharacters() calls since SAX
-            // parser may call it several times.
-            AccumulationXMLFilter accumulationFilter = new AccumulationXMLFilter(dtdFilter);
-    
-            // Add a XML Filter to remove non-semantic white spaces.
-            XWikiXHTMLWhitespaceXMLFilter whitespaceFilter = 
-                new XWikiXHTMLWhitespaceXMLFilter(accumulationFilter, false);
-            
-            xmlReader = whitespaceFilter;
-            
-        } catch (Exception e) {
-            throw new ParseException("Failed to create XML reader", e);
-        }
-        
-        return xmlReader;
     }
     
     /**

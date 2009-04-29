@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.block;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,28 @@ import org.xwiki.rendering.listener.Listener;
  */
 public class GroupBlock extends AbstractFatherBlock
 {
+    /**
+     * Create an empty group block with no children. This is useful when the user wants to call
+     * {@link #addChild(Block)} manually for adding children one by one after the block is
+     * constructed.
+     */
+    public GroupBlock()
+    {
+        this(Collections.<Block> emptyList());
+    }
+
+    /**
+     * Create an empty group block with no children. This is useful when the user wants to call
+     * {@link #addChild(Block)} manually for adding children one by one after the block is
+     * constructed.
+     * 
+     * @param parameters the parameters of the group
+     */
+    public GroupBlock(Map<String, String> parameters)
+    {
+        this(Collections.<Block> emptyList(), parameters);
+    }
+
     /**
      * @param blocks the children blocks of the group
      */

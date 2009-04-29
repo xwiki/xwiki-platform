@@ -31,9 +31,8 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener.Event;
-import org.xwiki.rendering.listener.xml.XMLComment;
-import org.xwiki.rendering.listener.xml.XMLElement;
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.MonitoringWikiPrinter;
@@ -71,7 +70,13 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
         this.linkRenderer = linkRenderer;
         this.imageRenderer = imageRenderer;
         this.macroRenderer = new XHTMLMacroRenderer();
-        this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
+
+        // If the passed printer is already a XHTML printer then use it directly.
+        if (XHTMLWikiPrinter.class.isAssignableFrom(printer.getClass())) {
+            this.xhtmlWikiPrinter = (XHTMLWikiPrinter) printer;
+        } else {
+            this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
+        }
     }
 
     // State
@@ -412,50 +417,6 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginXMLNode(XMLNode)
-     */
-    @Override
-    public void beginXMLNode(XMLNode node)
-    {
-        switch (node.getNodeType()) {
-            case CDATA:
-                getXHTMLWikiPrinter().printXMLStartCData();
-                break;
-            case COMMENT:
-                XMLComment commentNode = (XMLComment) node;
-                getXHTMLWikiPrinter().printXMLComment(commentNode.getComment());
-                break;
-            case ELEMENT:
-                XMLElement elementNode = (XMLElement) node;
-                getXHTMLWikiPrinter().printXMLStartElement(elementNode.getName(), elementNode.getAttributes());
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.Renderer#endXMLNode(XMLNode)
-     */
-    @Override
-    public void endXMLNode(XMLNode node)
-    {
-        switch (node.getNodeType()) {
-            case CDATA:
-                getXHTMLWikiPrinter().printXMLEndCData();
-                break;
-            case ELEMENT:
-                XMLElement elementNode = (XMLElement) node;
-                getXHTMLWikiPrinter().printXMLEndElement(elementNode.getName());
-                break;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.renderer.Renderer#beginMacroMarker(String, java.util.Map, String, boolean)
      */
     @Override
@@ -753,5 +714,19 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
         // superseded by another one in the printer stack.
         this.imageRenderer.setXHTMLWikiPrinter(getXHTMLWikiPrinter());
         this.imageRenderer.onImage(image, isFreeStandingURI, parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onRawText(String, Syntax)
+     */
+    @Override
+    public void onRawText(String text, Syntax syntax)
+    {
+        // Directly inject the HTML content in the wiki printer (bypassing the XHTML printer)
+        if ((syntax.getType() == SyntaxType.XHTML) || (syntax.getType() == SyntaxType.HTML)) {
+            getPrinter().print(text);
+        }
     }
 }

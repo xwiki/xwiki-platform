@@ -31,7 +31,7 @@ import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.URLImage;
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
 
 public class DoxiaGeneratorListener implements Listener
 {
@@ -189,16 +189,6 @@ public class DoxiaGeneratorListener implements Listener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Listener#beginXMLNode(XMLNode)
-     */
-    public void beginXMLNode(XMLNode node)
-    {
-        // TODO: Find out what to do...
-    }
-
     public void endList(ListType listType, Map<String, String> parameters)
     {
         if (listType == ListType.BULLETED) {
@@ -247,16 +237,6 @@ public class DoxiaGeneratorListener implements Listener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Listener#endXMLNode(XMLNode)
-     */
-    public void endXMLNode(XMLNode node)
-    {
-        // TODO: Find out what to do...
-    }
-
     public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
     {
         // Don't do anything since macros have already been transformed so this method
@@ -268,29 +248,42 @@ public class DoxiaGeneratorListener implements Listener
         // TODO: Decide when to generate a line break and when to generate a new line
 
         // Since there's no On NewLine event in Doxia we simply generate text
-        this.sink.rawText("\n");
+        this.sink.text("\n");
     }
 
     public void onSpace()
     {
         // Since there's no On Space event in Doxia we simply generate text
-        this.sink.rawText(" ");
+        this.sink.text(" ");
     }
 
     public void onSpecialSymbol(char symbol)
     {
         // Since there's no On Special Symbol event in Doxia we simply generate text
-        this.sink.rawText("" + symbol);
+        this.sink.text("" + symbol);
     }
 
     public void onWord(String word)
     {
-        this.sink.rawText(word);
+        this.sink.text(word);
     }
 
     public void onId(String name)
     {
         // TODO: Find out what to do...
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onRawText(String, Syntax)
+     */
+    public void onRawText(String text, Syntax syntax)
+    {
+        // TODO: Ensure this is correct. The problem is that Doxia doesn't seem to have a syntax
+        // associated with the raw text so I'm not sure how the renderers (sink in Doxia language)
+        // can decide whether to print it or not.
+        this.sink.rawText(text);
     }
 
     /**

@@ -30,7 +30,6 @@ import org.xwiki.rendering.listener.DefaultAttachement;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.xml.XMLElement;
 
 /**
  * Unit tests for Block manipulation, testing {@link AbstractBlock}.
@@ -118,8 +117,7 @@ public class BlockTest extends TestCase
         Link link = new Link();
         link.setReference("reference");
         LinkBlock lb = new LinkBlock(Arrays.asList((Block) new WordBlock("label")), link, false);
-        XMLBlock xb = new XMLBlock(new XMLElement("xml", Collections.singletonMap("key", "value")));
-        Block rootBlock = new ParagraphBlock(Arrays.asList((Block) wb, ib, lb, xb));
+        Block rootBlock = new ParagraphBlock(Arrays.asList((Block) wb, ib, lb));
 
         Block newRootBlock = rootBlock.clone();
 
@@ -127,11 +125,9 @@ public class BlockTest extends TestCase
         assertNotSame(wb, newRootBlock.getChildren().get(0));
         assertNotSame(ib, newRootBlock.getChildren().get(1));
         assertNotSame(lb, newRootBlock.getChildren().get(2));
-        assertNotSame(lb, newRootBlock.getChildren().get(3));
 
         assertEquals(wb.getWord(), ((WordBlock) newRootBlock.getChildren().get(0)).getWord());
         assertNotSame(ib.getImage(), ((ImageBlock) newRootBlock.getChildren().get(1)).getImage());
         assertNotSame(lb.getLink(), ((LinkBlock) newRootBlock.getChildren().get(2)).getLink());
-        assertNotSame(xb.getXMLNode(), ((XMLBlock) newRootBlock.getChildren().get(3)).getXMLNode());
     }
 }

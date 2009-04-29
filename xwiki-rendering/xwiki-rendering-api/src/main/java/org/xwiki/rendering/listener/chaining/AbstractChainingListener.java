@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
  * Default and basic implementation of a chaining listener that knows how to delegate event calls to the next listener
@@ -309,19 +309,6 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChainingListener#beginXMLNode(XMLNode)
-     */
-    public void beginXMLNode(XMLNode node)
-    {
-        ChainingListener next = getListenerChain().getNextListener(getClass());
-        if (next != null) {
-            next.beginXMLNode(node);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see ChainingListener#endDefinitionDescription()
      */
     public void endDefinitionDescription()
@@ -569,19 +556,6 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChainingListener#endXMLNode(XMLNode)
-     */
-    public void endXMLNode(XMLNode node)
-    {
-        ChainingListener next = getListenerChain().getNextListener(getClass());
-        if (next != null) {
-            next.endXMLNode(node);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see ChainingListener#onEmptyLines(int)
      */
     public void onEmptyLines(int count)
@@ -706,6 +680,19 @@ public abstract class AbstractChainingListener implements ChainingListener
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
             next.onWord(word);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ChainingListener#onRawText(String, Syntax)
+     */
+    public void onRawText(String text, Syntax syntax)
+    {
+        ChainingListener next = getListenerChain().getNextListener(getClass());
+        if (next != null) {
+            next.onRawText(text, syntax);
         }
     }
 }

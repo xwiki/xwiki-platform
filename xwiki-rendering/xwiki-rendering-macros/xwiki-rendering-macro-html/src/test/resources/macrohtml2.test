@@ -1,5 +1,9 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Test with conditions:
+.# - standalone macro
+.# - wiki = true
+.# - clean = true
 .#-----------------------------------------------------
 {{html wiki="true"}}
 <table>
@@ -23,19 +27,7 @@ beginMacroMarkerStandalone [html] [wiki=true] [
 </tr>
 </table>
 ]
-beginXMLNode [table]
-beginXMLNode [tbody]
-beginXMLNode [tr]
-beginXMLNode [td]
-beginList [BULLETED]
-beginListItem
-onWord [listitem]
-endListItem
-endList [BULLETED]
-endXMLNode [td]
-endXMLNode [tr]
-endXMLNode [tbody]
-endXMLNode [table]
+onRawText [<table><tbody><tr><td><ul><li>listitem</li></ul></td></tr></tbody></table>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 <table>
 <tr>

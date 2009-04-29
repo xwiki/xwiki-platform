@@ -13,7 +13,7 @@ beginMacroMarkerStandalone [box] [] [
 * one
 * two
 ]
-beginXMLNode [div] [class=box]
+beginGroup [[class]=[box]]
 beginList [BULLETED]
 beginListItem
 onWord [one]
@@ -22,7 +22,7 @@ beginListItem
 onWord [two]
 endListItem
 endList [BULLETED]
-endXMLNode [div] [class=box]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [box] [] [
 * one
 * two

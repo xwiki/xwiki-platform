@@ -35,19 +35,41 @@ public class HTMLMacroParameters
     private boolean wiki;
 
     /**
+     * Indicate if the HTML should be transformed into valid XHTML or not.
+     */
+    private boolean clean = true;
+    
+    /**
      * @param wiki indicate if the user has asked to interpret wiki syntax or not
      */
-    @ParameterDescription("indicate if the wiki syntax in the macro will be interpreted or not")
+    @ParameterDescription("Indicate if the wiki syntax in the macro will be interpreted or not.")
     public void setWiki(boolean wiki)
     {
         this.wiki = wiki;
     }
 
     /**
+     * @param clean indicate if the HTML should be transformed into valid XHTML or not
+     */
+    @ParameterDescription("Indicate if the HTML should be transformed into valid XHTML or not.")
+    public void setClean(boolean clean)
+    {
+        this.clean = clean;
+    }
+    
+    /**
      * @return if the user has asked to interpret wiki syntax or not
      */
     public boolean getWiki()
     {
         return this.wiki;
+    }
+
+    /**
+     * @return if the HTML should be transformed into valid XHTML or not
+     */
+    public boolean getClean()
+    {
+        return this.clean;
     }
 }

@@ -27,7 +27,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
  * Indicates block element for which we are inside and previous blocks.
@@ -58,7 +58,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
         TABLE_CELL,
         TABLE_HEAD_CELL,
         TABLE_ROW,
-        XML_NODE,
+        RAW_TEXT,
         EMPTY_LINES,
         HORIZONTAL_LINE,
         ID,
@@ -727,14 +727,14 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onRawText(String, Syntax)
      */
     @Override
-    public void endXMLNode(XMLNode node)
+    public void onRawText(String text, Syntax syntax)
     {
-        super.endXMLNode(node);
+        super.onRawText(text, syntax);
 
-        this.previousEvent = Event.XML_NODE;
+        this.previousEvent = Event.RAW_TEXT;
     }
 
     /**

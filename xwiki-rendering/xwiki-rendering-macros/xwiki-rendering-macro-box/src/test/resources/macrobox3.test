@@ -12,9 +12,9 @@ beginDocument
 beginMacroMarkerStandalone [testbox] [] [
 content
 ]
-beginXMLNode [div] [class=box]
+beginGroup [[class]=[box]]
 onVerbatim [content] [false]
-endXMLNode [div] [class=box]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [testbox] [] [
 content
 ]

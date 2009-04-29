@@ -12,12 +12,12 @@ beginParagraph
 onWord [Unknown]
 onSpace
 beginMacroMarkerInline [unknown] [] []
-beginXMLNode [span] [class=xwikirenderingerror]
+beginFormat [NONE] [[class]=[xwikirenderingerror]]
 onWord [Unknown macro: unknown]
-endXMLNode [span] [class=xwikirenderingerror]
-beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
+endFormat [NONE] [[class]=[xwikirenderingerror]]
+beginFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
 onVerbatim [The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.] [true]
-endXMLNode [span] [class=xwikirenderingerrordescription hidden]
+endFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
 endMacroMarkerInline [unknown] [] []
 onSpace
 onWord [macro]

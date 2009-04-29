@@ -1,6 +1,7 @@
 .#---------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify HTML macro work in inline mode
+.# Verify HTML macro works in inline mode and that it doesn't
+.# insert an extra paragraph.
 .#---------------------------------------------------------------
 some {{html}}html content{{/html}} and non html content
 .#-----------------------------------------------------

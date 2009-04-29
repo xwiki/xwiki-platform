@@ -17,36 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser;
+package org.xwiki.rendering.internal.macro.html;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.Attributes2;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.XMLBlock;
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.xml.XMLCData;
-import org.xwiki.rendering.listener.xml.XMLComment;
-import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.xml.html.HTMLConstants;
 
 /**
- * XML SAX handler that converts XML events into Blocks.
+ * XML SAX handler that parses wiki syntax in XML element text and generate XHTML in output (as a String).
  * 
  * @version $Id$
  * @since 1.5M2
@@ -56,45 +54,63 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     /**
      * The parser to use to interpret the wiki syntax.
      */
-    private Parser parser;
+    private Parser wikiParser;
 
     /**
-     * Indicate if the wiki syntax need to be interpreted.
+     * The factory that will allow us to create a XHTML renderer to convert the wiki syntax into XHTML.
      */
-    private boolean interpretWikiSyntax;
+    private PrintRendererFactory rendererFactory; 
 
-    private Stack<Block> stack = new Stack<Block>();
+    /**
+     * Printer we use to serialize XML.
+     */
+    private XHTMLWikiPrinter xhtmlPrinter;
+    
+    /**
+     * The printer containing the XHTML as a String.
+     */
+    private WikiPrinter printer;
 
+    /**
+     * If true then the user has asked to clean up the HTML he entered.
+     */
+    private boolean clean;
+    
+    /**
+     * If true then XML element content contain wiki syntax.
+     */
+    private boolean wiki;
+    
     /**
      * Used to parse inline content.
      */
     private ParserUtils inlineConverter = new ParserUtils();
 
-    private final MarkerBlock marker = new MarkerBlock();
-
-    private class MarkerBlock extends AbstractBlock
+    /**
+     * @param wikiParser the parser to use to interpret the wiki syntax.
+     * @param rendererFactory the factory that will allow us to create a XHTML renderer to use to convert the wiki 
+     *        syntax into XHTML.
+     * @param clean if true then the user has asked to clean up the HTML he entered
+     * @param wiki if true then XML element contents contain wiki syntax
+     */
+    public XMLBlockConverterHandler(Parser wikiParser, PrintRendererFactory rendererFactory, boolean clean, 
+        boolean wiki)
     {
-        public void traverse(Listener listener)
-        {
-        }
+        this.wikiParser = wikiParser;
+        this.rendererFactory = rendererFactory;
+        this.clean = clean;
+        this.wiki = wiki;
+        
+        this.printer = new DefaultWikiPrinter();
+        this.xhtmlPrinter = new XHTMLWikiPrinter(this.printer);
     }
 
     /**
-     * @param parser the parser to use to interpret the wiki syntax.
-     * @param interpretWikiSyntax indicate if the wiki syntax need to be interpreted.
+     * @return the XHTML as a string
      */
-    public XMLBlockConverterHandler(Parser parser, boolean interpretWikiSyntax)
+    public String getOutput()
     {
-        this.parser = parser;
-        this.interpretWikiSyntax = interpretWikiSyntax;
-    }
-
-    /**
-     * @return the root block.
-     */
-    public Block getRootBlock()
-    {
-        return this.stack.peek();
+        return this.printer.toString();
     }
 
     /**
@@ -107,27 +123,27 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     {
         String content = new String(ch, start, length);
 
-        // If we've been told by the user to not render wiki syntax we simply pass the text as a Word block as is
-        if (!this.interpretWikiSyntax) {
-            this.stack.push(new WordBlock(content));
+        // If we've been told by the user to not render wiki syntax we simply pass the text as is
+        if (!this.wiki) {
+            this.printer.print(content);
         } else {
-
             // Parse the content containing wiki syntax.
             XDOM dom;
             try {
-                dom = this.parser.parse(new StringReader(content));
+                dom = this.wikiParser.parse(new StringReader(content));
             } catch (ParseException e) {
                 throw new SAXException("Failed to parse [" + content + "]", e);
             }
-
+    
             // Remove any paragraph that might have been added since we don't want paragraphs.
             // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
             List<Block> children = dom.getChildren();
             this.inlineConverter.removeTopLevelParagraph(children);
-
-            for (Block block : children) {
-                this.stack.push(block);
-            }
+    
+            // Generate XHTML
+            PrintRenderer xhtmlRenderer = 
+                this.rendererFactory.createRenderer(new Syntax(SyntaxType.XHTML, "1.0"), this.xhtmlPrinter);
+            dom.traverse(xhtmlRenderer);
         }
     }
 
@@ -140,26 +156,30 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException
     {
-        Map<String, String> map = new LinkedHashMap<String, String>();
-        for (int i = 0; i < attributes.getLength(); i++) {
-            // The XHTML DTD specifies some default value for some attributes. For example for a TD element
-            // it defines colspan=1 and rowspan=1. Thus we'll get a colspan and rowspan attribute passed to
-            // the current method even though they are not defined in the source XHTML content.
-            // However with SAX2 it's possible to check if an attribute is defined in the source or not using
-            // the Attributes2 class.
-            // See http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html#package_description
-            if (attributes instanceof Attributes2) {
-                Attributes2 attributes2 = (Attributes2) attributes;
-                // If the attribute is present in the XHTML source file then add it, otherwise skip it.
-                if (attributes2.isSpecified(i)) {
+        // If we're in clean mode and we encounter a <html> tag don't print it (since the macro is inserting a 
+        // XHTML fragment into an existing XHTML document. In non clean mode we honor whatever the user enters.
+        if (!clean || !HTMLConstants.TAG_HTML.equalsIgnoreCase(name)) {
+            
+            Map<String, String> map = new LinkedHashMap<String, String>();
+            for (int i = 0; i < attributes.getLength(); i++) {
+                // The XHTML DTD specifies some default value for some attributes. For example for a TD element
+                // it defines colspan=1 and rowspan=1. Thus we'll get a colspan and rowspan attribute passed to
+                // the current method even though they are not defined in the source XHTML content.
+                // However with SAX2 it's possible to check if an attribute is defined in the source or not using
+                // the Attributes2 class.
+                // See http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html#package_description
+                if (attributes instanceof Attributes2) {
+                    Attributes2 attributes2 = (Attributes2) attributes;
+                    // If the attribute is present in the XHTML source file then add it, otherwise skip it.
+                    if (attributes2.isSpecified(i)) {
+                        map.put(attributes.getQName(i), attributes.getValue(i));
+                    }
+                } else {
                     map.put(attributes.getQName(i), attributes.getValue(i));
                 }
-            } else {
-                map.put(attributes.getQName(i), attributes.getValue(i));
             }
+            this.xhtmlPrinter.printXMLStartElement(name, map);
         }
-        this.stack.push(new XMLBlock(new XMLElement(name, map)));
-        this.stack.push(this.marker);
     }
 
     /**
@@ -170,9 +190,12 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException
     {
-        // Pop the stack until we reach a marker block
-        List<Block> nestedBlocks = generateListFromStack();
-        this.stack.peek().addChildren(nestedBlocks);
+        // If we're in clean mode and we encounter a <html> tag don't print it (since the macro is inserting a 
+        // XHTML fragment into an existing XHTML document. In non clean mode we honor whatever the user enters.
+        if (!clean || !HTMLConstants.TAG_HTML.equalsIgnoreCase(name)) {
+
+            this.xhtmlPrinter.printXMLEndElement(name);
+        }
     }
 
     /**
@@ -182,7 +205,7 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
      */
     public void comment(char[] value, int offset, int count) throws SAXException
     {
-        this.stack.push(new XMLBlock(new XMLComment(new String(value, offset, count))));
+        this.xhtmlPrinter.printXMLComment(new String(value, offset, count));
     }
 
     /**
@@ -192,8 +215,7 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
      */
     public void startCDATA() throws SAXException
     {
-        this.stack.push(new XMLBlock(new XMLCData()));
-        this.stack.push(this.marker);
+        this.xhtmlPrinter.printXMLStartCData();
     }
 
     /**
@@ -203,9 +225,7 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
      */
     public void endCDATA() throws SAXException
     {
-        // Pop the stack until we reach a marker block
-        List<Block> nestedBlocks = generateListFromStack();
-        this.stack.peek().addChildren(nestedBlocks);
+        this.xhtmlPrinter.printXMLEndCData();
     }
 
     /**
@@ -246,20 +266,5 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     public void endEntity(String arg0) throws SAXException
     {
         // Nothing to do since an entity definition shouldn't be present in a XHTML macro content
-    }
-
-    private List<Block> generateListFromStack()
-    {
-        List<Block> blocks = new ArrayList<Block>();
-        while (!this.stack.empty()) {
-            if (this.stack.peek() != this.marker) {
-                blocks.add(this.stack.pop());
-            } else {
-                this.stack.pop();
-                break;
-            }
-        }
-        Collections.reverse(blocks);
-        return blocks;
     }
 }

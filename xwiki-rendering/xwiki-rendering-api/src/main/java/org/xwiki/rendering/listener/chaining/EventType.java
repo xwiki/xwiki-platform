@@ -27,7 +27,7 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
  * Stores event types and offers a way to call a stored event.
@@ -341,16 +341,10 @@ public enum EventType
             listener.endTableRow((Map<String, String>) eventParameters[0]);
         }
     },
-    BEGIN_XML_NODE {
+    ON_RAW_TEXT {
         void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.beginXMLNode((XMLNode) eventParameters[0]);
-        }
-    },
-    END_XML_NODE {
-        void fireEvent(Listener listener, Object[] eventParameters)
-        {
-            listener.endXMLNode((XMLNode) eventParameters[0]);
+            listener.onRawText((String) eventParameters[0], (Syntax) eventParameters[1]);
         }
     },
     ON_EMPTY_LINES {

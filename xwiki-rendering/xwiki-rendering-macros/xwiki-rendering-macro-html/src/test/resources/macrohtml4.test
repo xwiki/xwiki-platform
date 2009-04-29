@@ -35,40 +35,7 @@ hello  world
    ]]>
 </p>
 ]
-beginXMLNode [p]
-onWord [a]
-onSpace
-beginXMLNode [strong]
-onWord [b]
-endXMLNode [strong]
-onSpace
-onWord [c]
-endXMLNode [p]
-beginXMLNode [pre]
-onWord [newline]
-onNewLine
-onSpace
-onSpace
-onWord [newline]
-endXMLNode [pre]
-beginXMLNode [p]
-onWord [Some]
-onSpace
-beginXMLNode [span]
-onWord [text]
-onSpace
-endXMLNode [span]
-beginXMLNode [comment]
-endXMLNode [comment]
-onWord [another]
-onSpace
-beginXMLNode [CDATA]
-onWord [hello]
-onSpace
-onSpace
-onWord [world]
-endXMLNode [CDATA]
-endXMLNode [p]
+onRawText [<p>a <strong>b</strong> c</p><pre>newline<br/>&nbsp;&nbsp;newline</pre><p>Some <span>text&nbsp;</span><!--comment-->another <![CDATA[hello &nbsp;world]]></p>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 a <strong>b</strong> c 
 <pre>

@@ -1,6 +1,7 @@
 .#-------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that the "wiki" parameter works and escapes wiki syntax when false.
+.# Verify that the "wiki" parameter is false by default and that wiki syntax is
+.# thus escaped.
 .#-------------------------------------------------------------------------------
 {{html}}
 **some escaped text**
@@ -12,9 +13,7 @@ beginDocument
 beginMacroMarkerStandalone [html] [] [
 **some escaped text**
 ]
-beginXMLNode [p]
-onWord [**some escaped text**]
-endXMLNode [p]
+onRawText [<p>**some escaped text**</p>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [] [
 **some escaped text**
 ]

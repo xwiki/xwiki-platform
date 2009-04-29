@@ -27,7 +27,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
  * Stores events without emitting them back in order to accumulate them and to provide a lookahead feature. The
@@ -311,18 +311,6 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
-     */
-    @Override
-    public void beginXMLNode(XMLNode node)
-    {
-        saveEvent(EventType.BEGIN_XML_NODE, node);
-        firePreviousEvent();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionDescription()
      */
     @Override
@@ -555,12 +543,12 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onRawText(String, Syntax)
      */
     @Override
-    public void endXMLNode(XMLNode node)
+    public void onRawText(String text, Syntax syntax)
     {
-        saveEvent(EventType.END_XML_NODE, node);
+        saveEvent(EventType.ON_RAW_TEXT, text, syntax);
         firePreviousEvent();
     }
 

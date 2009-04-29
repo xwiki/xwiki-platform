@@ -33,13 +33,12 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
-import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -126,9 +125,8 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
                 Block html = new MacroBlock("html", Collections.singletonMap("wiki", "false"),
                     entry.getDescription().getValue(), context.isInline());
 
-                XMLElement xmlElement = new XMLElement("div");
-                xmlElement.setAttribute(CLASS_ATTRIBUTE, "rssitemdescription");
-                parentBlock.addChild(new XMLBlock(Arrays.asList(html), xmlElement));
+                parentBlock.addChild(new GroupBlock(Arrays.asList(html), 
+                    Collections.singletonMap(CLASS_ATTRIBUTE, "rssitemdescription")));
             }
         }
     }

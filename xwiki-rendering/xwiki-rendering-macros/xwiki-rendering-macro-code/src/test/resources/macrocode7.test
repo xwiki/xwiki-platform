@@ -13,7 +13,7 @@ beginMacroMarkerStandalone [code] [] [
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
 ]
-beginXMLNode [div] [class=box code]
+beginGroup [[class]=[box code]]
 onWord [Google]
 onSpace
 onSpecialSymbol [:]
@@ -169,7 +169,7 @@ onSpecialSymbol [}]
 onSpecialSymbol [}]
 endFormat [NONE] [[style]=[color: #BC7A00; ]]
 onNewLine
-endXMLNode [div] [class=box code]
+endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [] [
 Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
 Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}

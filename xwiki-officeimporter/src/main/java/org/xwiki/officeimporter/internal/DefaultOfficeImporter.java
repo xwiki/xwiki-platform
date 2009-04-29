@@ -49,6 +49,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.xwiki.xml.html.HTMLUtils;
 
 /**
  * Default implementation of the office importer component.
@@ -121,7 +122,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
                 configuration.setParameters(params);
                 Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
-                XMLUtils.stripHTMLEnvelope(xhtmlDoc);
+                HTMLUtils.stripHTMLEnvelope(xhtmlDoc);
                 String xwikiCode = convert(new StringReader(XMLUtils.toString(xhtmlDoc)), xHtmlParser, XWIKI_20);
                 docBridge
                     .setDocumentContent(targetWikiDocument, xwikiCode, "Content updated by office importer", false);
@@ -158,7 +159,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
                 configuration.setParameters(params);
                 Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
-                XMLUtils.stripHTMLEnvelope(xhtmlDoc);
+                HTMLUtils.stripHTMLEnvelope(xhtmlDoc);
                 return XMLUtils.toString(xhtmlDoc);
             }
         } catch (Exception ex) {

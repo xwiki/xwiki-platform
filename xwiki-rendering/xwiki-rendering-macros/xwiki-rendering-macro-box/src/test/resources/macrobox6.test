@@ -23,7 +23,7 @@ onSpace
 onWord [first]
 endParagraph
 beginMacroMarkerStandalone [box] [] [A box that should not be inline]
-beginXMLNode [div] [class=box]
+beginGroup [[class]=[box]]
 beginParagraph
 onWord [A]
 onSpace
@@ -39,7 +39,7 @@ onWord [be]
 onSpace
 onWord [inline]
 endParagraph
-endXMLNode [div] [class=box]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [box] [] [A box that should not be inline]
 endDocument
 .#-----------------------------------------------------

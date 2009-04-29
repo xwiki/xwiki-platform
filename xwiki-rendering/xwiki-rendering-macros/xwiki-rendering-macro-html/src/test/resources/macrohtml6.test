@@ -1,7 +1,6 @@
 .#-------------------------------------------------------------------------------
 .input|xwiki/2.0
 .# Verify that HTML entities are supported and can be parsed.
-.# Note that (((xxx))) is a special notation to display non ascii printable chars 
 .#-------------------------------------------------------------------------------
 {{html wiki="true"}}
 &nbsp;
@@ -13,9 +12,7 @@ beginDocument
 beginMacroMarkerStandalone [html] [wiki=true] [
 &nbsp;
 ]
-beginXMLNode [p]
-onWord [(((160)))]
-endXMLNode [p]
+onRawText [<p>&#160;</p>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 &nbsp;
 ]

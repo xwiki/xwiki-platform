@@ -11,12 +11,12 @@ beginParagraph
 onWord [Execution]
 onSpace
 beginMacroMarkerInline [testfailingmacro] [] []
-beginXMLNode [span] [class=xwikirenderingerror]
+beginFormat [NONE] [[class]=[xwikirenderingerror]]
 onWord [Failed to execute macro: testfailingmacro]
-endXMLNode [span] [class=xwikirenderingerror]
-beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
+endFormat [NONE] [[class]=[xwikirenderingerror]]
+beginFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
 onVerbatim [stack trace here] [true]
-endXMLNode [span] [class=xwikirenderingerrordescription hidden]
+endFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
 endMacroMarkerInline [testfailingmacro] [] []
 onSpace
 onWord [error]

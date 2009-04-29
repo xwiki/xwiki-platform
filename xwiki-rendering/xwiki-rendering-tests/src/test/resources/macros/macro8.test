@@ -13,12 +13,12 @@ onSpace
 onWord [inline]
 onSpace
 beginMacroMarkerInline [testsimplemacro] [] []
-beginXMLNode [span] [class=xwikirenderingerror]
+beginFormat [NONE] [[class]=[xwikirenderingerror]]
 onWord [Not an inline macro]
-endXMLNode [span] [class=xwikirenderingerror]
-beginXMLNode [span] [class=xwikirenderingerrordescription hidden]
+endFormat [NONE] [[class]=[xwikirenderingerror]]
+beginFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
 onVerbatim [This macro can only be used by itself on a new line] [true]
-endXMLNode [span] [class=xwikirenderingerrordescription hidden]
+endFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
 endMacroMarkerInline [testsimplemacro] [] []
 onSpace
 onWord [macro]

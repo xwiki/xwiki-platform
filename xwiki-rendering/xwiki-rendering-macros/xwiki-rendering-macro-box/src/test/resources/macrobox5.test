@@ -7,7 +7,7 @@
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [box] [title=[[XWiki>>http://www.xwiki.org]]|cssClass=myCLASS|image=http://l.yimg.com/i/i/fr/tr/usa4.jpg] [alabala]
-beginXMLNode [div] [class=box myCLASS]
+beginGroup [[class]=[box myCLASS]]
 onImage: [http://l.yimg.com/i/i/fr/tr/usa4.jpg] [true]
 onNewLine
 beginLink [Reference = [http://www.xwiki.org]] [false]
@@ -16,7 +16,7 @@ endLink [Reference = [http://www.xwiki.org]] [false]
 beginParagraph
 onWord [alabala]
 endParagraph
-endXMLNode [div] [class=box myCLASS]
+endGroup [[class]=[box myCLASS]]
 endMacroMarkerStandalone [box] [title=[[XWiki>>http://www.xwiki.org]]|cssClass=myCLASS|image=http://l.yimg.com/i/i/fr/tr/usa4.jpg] [alabala]
 endDocument
 .#-----------------------------------------------------

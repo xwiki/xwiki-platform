@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
  * Counts consecutive new lines.
@@ -283,13 +283,13 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onRawText(String, Syntax)
      */
     @Override
-    public void endXMLNode(XMLNode node)
+    public void onRawText(String text, Syntax syntax)
     {
         this.newLineCount = 0;
-        super.endXMLNode(node);
+        super.onRawText(text, syntax);
     }
 
     /**

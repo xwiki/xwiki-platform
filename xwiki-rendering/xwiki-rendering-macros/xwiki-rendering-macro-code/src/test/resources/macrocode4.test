@@ -60,7 +60,7 @@ beginMacroMarkerStandalone [code] [language=javascript] [
   }
 })();
 ]
-beginXMLNode [div] [class=box code]
+beginGroup [[class]=[box code]]
 beginFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
@@ -555,7 +555,7 @@ onSpecialSymbol [(]
 onSpecialSymbol [)]
 onSpecialSymbol [;]
 onNewLine
-endXMLNode [div] [class=box code]
+endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [language=javascript] [
 // getJSON function by Juriy Zaytsev 
 // http://github.com/kangax/protolicious/tree/master/get_json.js

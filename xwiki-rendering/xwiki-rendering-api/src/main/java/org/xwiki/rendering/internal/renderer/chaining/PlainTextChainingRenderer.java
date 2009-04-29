@@ -29,9 +29,6 @@ import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.listener.xml.XMLComment;
-import org.xwiki.rendering.listener.xml.XMLElement;
-import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -189,48 +186,6 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     public void onSpecialSymbol(char symbol)
     {
         getPrinter().print(String.valueOf(symbol));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
-     */
-    @Override
-    public void beginXMLNode(XMLNode node)
-    {
-        switch (node.getNodeType()) {
-            case CDATA:
-                getXMLWikiPrinter().printXMLStartCData();
-                break;
-            case COMMENT:
-                XMLComment commentNode = (XMLComment) node;
-                getXMLWikiPrinter().printXMLComment(commentNode.getComment());
-                break;
-            case ELEMENT:
-                XMLElement elementNode = (XMLElement) node;
-                getXMLWikiPrinter().printXMLStartElement(elementNode.getName(), elementNode.getAttributes());
-                break;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
-     */
-    @Override
-    public void endXMLNode(XMLNode node)
-    {
-        switch (node.getNodeType()) {
-            case CDATA:
-                getXMLWikiPrinter().printXMLEndCData();
-                break;
-            case ELEMENT:
-                XMLElement elementNode = (XMLElement) node;
-                getXMLWikiPrinter().printXMLEndElement(elementNode.getName());
-                break;
-        }
     }
 
     /**

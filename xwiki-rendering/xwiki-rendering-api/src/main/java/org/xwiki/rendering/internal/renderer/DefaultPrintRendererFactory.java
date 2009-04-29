@@ -70,10 +70,9 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
         PrintRenderer result;
 
         if (targetSyntax.toIdString().equals("xhtml/1.0")) {
-            result =
-                new XHTMLRenderer(printer, new XWikiXHTMLLinkRenderer(this.documentAccessBridge,
-                    this.linkLabelGenerator, this.attachmentParser, this.documentNameSerializer),
-                    new XWikiXHTMLImageRenderer(this.documentAccessBridge));
+            result = new XHTMLRenderer(printer, new XWikiXHTMLLinkRenderer(this.documentAccessBridge,
+                this.linkLabelGenerator, this.attachmentParser, this.documentNameSerializer),
+                new XWikiXHTMLImageRenderer(this.documentAccessBridge));
         } else if (targetSyntax.toIdString().equals("xwiki/2.0")) {
             result = new XWikiSyntaxRenderer(printer);
         } else if (targetSyntax.toIdString().equals("event/1.0")) {

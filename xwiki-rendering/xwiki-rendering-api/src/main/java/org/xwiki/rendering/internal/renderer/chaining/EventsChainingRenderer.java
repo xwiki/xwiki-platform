@@ -32,7 +32,7 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.listener.xml.XMLNode;
+import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
@@ -316,23 +316,12 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
+     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onRawText(String, Syntax)
      */
     @Override
-    public void beginXMLNode(XMLNode node)
+    public void onRawText(String text, Syntax syntax)
     {
-        getPrinter().println("beginXMLNode " + node);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#endXMLNode(org.xwiki.rendering.listener.xml.XMLNode)
-     */
-    @Override
-    public void endXMLNode(XMLNode node)
-    {
-        getPrinter().println("endXMLNode " + node);
+        getPrinter().println("onRawText [" + text + "] [" + syntax.toIdString() + "]");
     }
 
     /**

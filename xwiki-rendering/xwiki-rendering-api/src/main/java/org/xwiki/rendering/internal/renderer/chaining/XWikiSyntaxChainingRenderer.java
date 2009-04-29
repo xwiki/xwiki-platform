@@ -35,7 +35,6 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.StackableChainingListener;
-import org.xwiki.rendering.listener.xml.XMLNode;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
@@ -481,30 +480,6 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginXMLNode(XMLNode)
-     */
-    @Override
-    public void beginXMLNode(XMLNode node)
-    {
-        // There's no xwiki wiki syntax for writing HTML (we have to use Macros for that). Hence discard
-        // any XML node events.
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PrintRenderer#endXMLNode(XMLNode)
-     */
-    @Override
-    public void endXMLNode(XMLNode node)
-    {
-        // There's no xwiki wiki syntax for writing HTML (we have to use Macros for that). Hence discard
-        // any XML node events.
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see PrintRenderer#beginMacroMarker(String, java.util.Map, String, boolean)
      */
     @Override
@@ -785,7 +760,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         getLinkRenderer().beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
         getLinkRenderer().endRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
     }
-
+    
     protected void printParameters(Map<String, String> parameters)
     {
         printParameters(parameters, true);

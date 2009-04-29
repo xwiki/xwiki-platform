@@ -31,13 +31,12 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.NewLineBlock;
-import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
-import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -54,21 +53,6 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  */
 public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends AbstractMacro<P> implements Composable
 {
-    /**
-     * A new line based on <code>\n</code>.
-     */
-    private static final char NEWLINE_N = '\n';
-
-    /**
-     * A new line based on <code>\r</code>.
-     */
-    private static final char NEWLINE_R = '\r';
-
-    /**
-     * A new line based on <code>\r\n</code>.
-     */
-    private static final String NEWLINE_RN = "\r\n";
-
     /**
      * Used to get the current syntax parser.
      */
@@ -141,7 +125,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
             spanBlock.setParameters(boxParameters);
             boxBlock = spanBlock;
         } else {
-            boxBlock = new XMLBlock(new XMLElement("div", boxParameters));
+            boxBlock = new GroupBlock(boxParameters);
 
             // we add the image, if there is one
             if (!StringUtils.isEmpty(imageParameter)) {
@@ -159,13 +143,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
             if (titleBlockList != null) {
                 boxBlock.addChildren(titleBlockList);
             }
-            // We remove the first leading and trailing new line in non inline mode to have a better readability
-            // {{box}}
-            // some content
-            // {{box}}
-            // is the same than
-            // {{box}}some content{{box}}
-            List<Block> contentBlocks = parseContent(parameters, stripSingleNewLine(content), context);
+            List<Block> contentBlocks = parseContent(parameters, content, context);
             boxBlock.addChildren(contentBlocks);
         }
 
@@ -197,39 +175,6 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         } catch (ParseException e) {
             throw new MacroExecutionException(e.getMessage(), e);
         }
-    }
-
-    /**
-     * Remove the first and last new line of provided content.
-     * 
-     * @param content the content to trim.
-     * @return the trimed content.
-     */
-    private String stripSingleNewLine(String content)
-    {
-        int beginIndex = 0;
-        int endIndex = content.length();
-        if (endIndex > 0) {
-            if (content.charAt(0) == NEWLINE_N) {
-                beginIndex = 1;
-            } else if (content.startsWith(NEWLINE_RN)) {
-                beginIndex = 2;
-            } else if (content.charAt(0) == NEWLINE_R) {
-                beginIndex = 1;
-            }
-
-            if (endIndex - beginIndex > 0) {
-                if (content.charAt(endIndex - 1) == NEWLINE_R) {
-                    endIndex -= 1;
-                } else if (content.endsWith(NEWLINE_RN)) {
-                    endIndex -= 2;
-                } else if (content.charAt(endIndex - 1) == NEWLINE_N) {
-                    endIndex -= 1;
-                }
-            }
-        }
-
-        return content.substring(beginIndex, endIndex);
     }
 
     /**

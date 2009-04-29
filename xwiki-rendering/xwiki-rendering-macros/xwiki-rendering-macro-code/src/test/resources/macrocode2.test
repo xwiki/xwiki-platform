@@ -14,7 +14,7 @@ beginMacroMarkerStandalone [code] [language=java] [
 <b>bold</b>
 <i>italic</i>
 ]
-beginXMLNode [div] [class=box code]
+beginGroup [[class]=[box code]]
 beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [<]
 endFormat [NONE] [[style]=[color: #666666; ]]
@@ -49,7 +49,7 @@ beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [>]
 endFormat [NONE] [[style]=[color: #666666; ]]
 onNewLine
-endXMLNode [div] [class=box code]
+endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [language=java] [
 <b>bold</b>
 <i>italic</i>

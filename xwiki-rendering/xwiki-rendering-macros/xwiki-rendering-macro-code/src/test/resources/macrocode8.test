@@ -13,7 +13,7 @@ beginMacroMarkerStandalone [code] [language=sh] [
 export X=foo
 bar
 ]
-beginXMLNode [div] [class=box code]
+beginGroup [[class]=[box code]]
 beginFormat [NONE] [[style]=[color: #008000; ]]
 onWord [export]
 onSpace
@@ -28,7 +28,7 @@ onWord [foo]
 onNewLine
 onWord [bar]
 onNewLine
-endXMLNode [div] [class=box code]
+endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [language=sh] [
 export X=foo
 bar

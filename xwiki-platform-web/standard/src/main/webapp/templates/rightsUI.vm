@@ -131,19 +131,19 @@
           <tr>
             <td>
               <table>
-              #set($auth_view = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_view"))
-              #set($auth_edit = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_edit"))
-              #if("$!auth_view" == "Yes")
+              #set($auth_view = $doc.getObject("XWiki.XWikiPreferences").getProperty("authenticate_view").getValue())
+              #set($auth_edit = $doc.getObject("XWiki.XWikiPreferences").getProperty("authenticate_edit").getValue())              
+              #if("$!auth_view" == "1")
                 #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
                 #set($view_alt = "yes")
-              #elseif("$!auth_view" == "No" || "$!auth_view" == "---")
+              #else
                 #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
                 #set($view_alt = "no")
               #end
-              #if("$!auth_edit" == "Yes")
+              #if("$!auth_edit" == "1")
                 #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
                 #set($edit_alt = "yes")
-              #elseif("$!auth_edit" == "No" || "$!auth_edit" == "---")
+              #else
                 #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
                 #set($edit_alt = "no")
               #end

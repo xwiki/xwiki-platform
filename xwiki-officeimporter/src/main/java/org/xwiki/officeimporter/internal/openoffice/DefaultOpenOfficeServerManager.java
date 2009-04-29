@@ -23,6 +23,8 @@ import java.io.File;
 
 import net.sf.jodconverter.OfficeDocumentConverter;
 import net.sf.jodconverter.office.ManagedProcessOfficeManager;
+import net.sf.jodconverter.office.ManagedProcessOfficeManagerConfiguration;
+import net.sf.jodconverter.office.OfficeConnectionMode;
 import net.sf.jodconverter.office.OfficeException;
 import net.sf.jodconverter.office.OfficeManager;
 
@@ -45,7 +47,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
     /**
      * The {@link OpenOfficeServerConfiguration} component.
      */
-    private OpenOfficeServerConfiguration configuration;
+    private OpenOfficeServerConfiguration serverConfiguration;
 
     /**
      * Current oo server process state.
@@ -95,10 +97,15 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
         File officeHome = new File(getOfficeHome());
         File officeProfile = new File(getOfficeProfile());
         try {
+            OfficeConnectionMode connectionMode = OfficeConnectionMode.socket(8100);
+            ManagedProcessOfficeManagerConfiguration configuration =
+                new ManagedProcessOfficeManagerConfiguration(connectionMode);
+            configuration.setOfficeHome(officeHome);
+            configuration.setTemplateProfileDir(officeProfile);
+            configuration.setMaxTasksPerProcess(serverConfiguration.getMaxTasksPerProcess());
+            configuration.setTaskExecutionTimeout(serverConfiguration.getTaskExecutionTimeout());
             ManagedProcessOfficeManager managedProcessOfficeManager =
-                new ManagedProcessOfficeManager(officeHome, officeProfile);
-            managedProcessOfficeManager.setMaxTasksPerProcess(configuration.getMaxTasksPerProcess());
-            managedProcessOfficeManager.setTaskExecutionTimeout(configuration.getTaskExecutionTimeout());
+                new ManagedProcessOfficeManager(configuration);
             this.officeManager = managedProcessOfficeManager;
             this.documentConverter = new OfficeDocumentConverter(officeManager);
             setOfficeManagerInitialized(true);
@@ -129,7 +136,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
      */
     public String getOfficeHome()
     {
-        return configuration.getHomePath();
+        return serverConfiguration.getHomePath();
     }
 
     /**
@@ -137,7 +144,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
      */
     public String getOfficeProfile()
     {
-        return configuration.getProfilePath();
+        return serverConfiguration.getProfilePath();
     }
 
     /**

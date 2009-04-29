@@ -3511,6 +3511,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * @deprecated starting with XE 1.8.1 use
      *             {@link #createUser(String, Map, String, String, String, String, XWikiContext)} instead
      */
+    @Deprecated
     public int createUser(String xwikiname, Map map, String parent, String content, String userRights,
         XWikiContext context) throws XWikiException
     {
@@ -3741,7 +3742,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
                 if (checkAccess("view", doc, context) == false) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                        XWikiException.ERROR_XWIKI_ACCESS_DENIED, "Access to this document is denied");
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED, "Access to this document is denied: " + doc);
                 }
             } catch (XWikiException e) {
                 LOG.warn("Exception Including Topic " + topic, e);

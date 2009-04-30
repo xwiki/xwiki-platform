@@ -168,6 +168,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
     {
         if (sender == getColorPicker() && !autoHide) {
             String color = getColorPicker().getColor();
+            getTextArea().setFocus(true);
             if (color != null) {
                 getTextArea().getCommandManager().execute(currentCommand, color);
             }

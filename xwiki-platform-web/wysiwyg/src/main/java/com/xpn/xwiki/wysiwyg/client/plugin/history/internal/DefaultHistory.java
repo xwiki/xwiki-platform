@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.history.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
@@ -44,6 +45,12 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  */
 public class DefaultHistory implements History, KeyboardListener, CommandListener
 {
+    /**
+     * The list of commands that should be ignored, meaning that they shouldn't generate history entries.
+     */
+    private static final List<Command> IGNORED_COMMANDS =
+        Arrays.asList(Command.UNDO, Command.REDO, new Command("submit"));
+
     /**
      * The rich text area for which we record the history. Actions taken on this rich text area trigger the update of
      * the history. Using the {@link History} interface the content of this rich text area can be reverted to a previous
@@ -327,11 +334,7 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         if (sender == textArea.getCommandManager()) {
-            if (command != Command.UNDO && command != Command.REDO) {
-                // Make sure the rich text area is focused before saving its state:
-                // * some browsers associate the selection with the focused state
-                // * allow focus listeners to be called since they might change the content
-                textArea.setFocus(true);
+            if (!IGNORED_COMMANDS.contains(command)) {
                 save();
                 previousKeyboardAction = null;
             }

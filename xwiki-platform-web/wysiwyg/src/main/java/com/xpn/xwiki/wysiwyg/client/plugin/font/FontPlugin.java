@@ -154,6 +154,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
     {
         Command command = pickers.get(sender);
         if (command != null && ((FocusWidget) sender).isEnabled()) {
+            getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(command, ((Picker) sender).getSelectedValue());
         }
     }

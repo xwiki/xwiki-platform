@@ -114,9 +114,13 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
      * @see ClickListener#onClick(Widget)
      */
     public void onClick(Widget sender)
-    {        
+    {
         for (TableFeature feature : features) {
             if (sender == feature.getButton()) {
+                // Insert table feature opens a dialog so we shouldn't focus the rich text are in this case.
+                if (!(feature instanceof InsertTable)) {
+                    getTextArea().setFocus(true);
+                }
                 getTextArea().getCommandManager().execute(feature.getCommand());
             }
         }

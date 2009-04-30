@@ -83,9 +83,11 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("backcolor", Command.BACK_COLOR));
         addValidationRule(new DefaultValidationRule("hr", Command.INSERT_HORIZONTAL_RULE));
         addValidationRule(new DefaultValidationRule("symbol", Command.INSERT_HTML));
-        // FIXME : implement this in the table plugin when possible
+        addValidationRule(new DefaultValidationRule("image", Command.INSERT_IMAGE));
+        // FIXME : Register the following validation rules in the related plug-ins.
+        addValidationRule(new DefaultValidationRule("importer", Command.INSERT_HTML));
         addTableValidationRules();
-        // Add the validation rule for the image selection behaviour
+        // Add the validation rule for the image selection behavior.
         addValidationRule(new ImageSelectionBehaviourRule());
     }
 

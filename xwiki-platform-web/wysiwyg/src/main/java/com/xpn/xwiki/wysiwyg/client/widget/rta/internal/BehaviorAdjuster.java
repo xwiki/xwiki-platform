@@ -39,6 +39,8 @@ import com.google.gwt.user.client.ui.SourcesLoadEvents;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
 /**
  * Adjusts the behavior of the rich text area to meet the cross browser specification.<br/>
@@ -47,7 +49,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class BehaviorAdjuster implements LoadListener
+public class BehaviorAdjuster implements LoadListener, CommandListener
 {
     /**
      * The name of the <code>&lt;br/&gt;</code> tag.
@@ -87,6 +89,11 @@ public class BehaviorAdjuster implements LoadListener
     public static final String CLASS_NAME = "class";
 
     /**
+     * The command that stores the value of the rich text area in an HTML form field.
+     */
+    public static final Command SUBMIT = new Command("submit");
+
+    /**
      * Collection of DOM utility methods.
      */
     protected DOMUtils domUtils = DOMUtils.getInstance();
@@ -117,6 +124,9 @@ public class BehaviorAdjuster implements LoadListener
             throw new IllegalStateException("Text area has already been set!");
         }
         this.textArea = textArea;
+        if (textArea.getCommandManager() != null) {
+            textArea.getCommandManager().addCommandListener(this);
+        }
         // Workaround till GWT provides a way to detect when the rich text area has finished loading.
         if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof SourcesLoadEvents) {
             ((SourcesLoadEvents) textArea.getBasicFormatter()).addLoadListener(this);
@@ -134,9 +144,6 @@ public class BehaviorAdjuster implements LoadListener
     {
         Event event = getTextArea().getCurrentEvent();
         switch (event.getTypeInt()) {
-            case Event.ONBLUR:
-                onBeforeBlur();
-                break;
             case Event.ONMOUSEDOWN:
                 onBeforeMouseDown();
                 break;
@@ -166,11 +173,38 @@ public class BehaviorAdjuster implements LoadListener
             case Event.ONKEYPRESS:
                 onKeyPress();
                 break;
-            case Event.ONFOCUS:
-                onFocus();
-                break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
+     */
+    public boolean onBeforeCommand(CommandManager sender, Command command, String param)
+    {
+        if (SUBMIT.equals(command)) {
+            // The edited content might be submitted so we have to mark the BRs that have been added to allow the user
+            // to edit the empty block elements. These BRs will be removed from rich text area's HTML output on the
+            // server side.
+            markSpacers();
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see CommandListener#onCommand(CommandManager, Command, String)
+     */
+    public void onCommand(CommandManager sender, Command command, String param)
+    {
+        if (SUBMIT.equals(command)) {
+            // Revert the changes made on before submit command in order avoid conflicts with the rich text area's
+            // history mechanism.
+            unMarkSpacers();
         }
     }
 
@@ -675,27 +709,6 @@ public class BehaviorAdjuster implements LoadListener
     protected void onBeforeMouseDown()
     {
         // Nothing here by default. May be overridden by browser specific implementations.
-    }
-
-    /**
-     * Called before the underlying rich text area looses focus.
-     */
-    protected void onBeforeBlur()
-    {
-        // The edited content might be submitted so we have to mark the BRs that have been added to allow the user to
-        // edit the empty block elements. These BRs will be removed from rich text area's HTML output on the server
-        // side.
-        markSpacers();
-    }
-
-    /**
-     * Called each time the underlying rich text area gains the focus.
-     */
-    protected void onFocus()
-    {
-        // It seems the edited content wasn't submitted so we have to unmark the unwanted BRs in order to avoid
-        // conflicts with the rich text area's history mechanism.
-        unMarkSpacers();
     }
 
     /**

@@ -235,7 +235,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
                 return false;
             }
         }
-        return true;
+        return selection.getRangeCount() > 0;
     }
 
     /**

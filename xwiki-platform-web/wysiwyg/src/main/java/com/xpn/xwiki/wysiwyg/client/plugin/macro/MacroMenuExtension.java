@@ -117,6 +117,7 @@ public class MacroMenuExtension implements Updatable, MenuListener
         {
             public void execute()
             {
+                plugin.getTextArea().setFocus(true);
                 plugin.getTextArea().getCommandManager().execute(MacroPlugin.COLLAPSE);
             }
         });
@@ -124,6 +125,7 @@ public class MacroMenuExtension implements Updatable, MenuListener
         {
             public void execute()
             {
+                plugin.getTextArea().setFocus(true);
                 plugin.getTextArea().getCommandManager().execute(MacroPlugin.EXPAND);
             }
         });

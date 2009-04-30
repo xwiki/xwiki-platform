@@ -19,7 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.valign;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -44,14 +49,9 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class VerticalAlignPlugin extends AbstractStatefulPlugin implements ClickListener
 {
     /**
-     * The tool bar button that toggles the superscript style.
+     * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
      */
-    private ToggleButton superScript;
-
-    /**
-     * The tool bar button that toggles the subscript style.
-     */
-    private ToggleButton subScript;
+    private final Map<ToggleButton, Command> buttons = new HashMap<ToggleButton, Command>();
 
     /**
      * User interface extension for the editor tool bar.
@@ -67,17 +67,10 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().isSupported(Command.SUPER_SCRIPT)) {
-            superScript = new ToggleButton(Images.INSTANCE.superscript().createImage(), this);
-            superScript.setTitle(Strings.INSTANCE.superscript());
-            toolBarExtension.addFeature("superscript", superScript);
-        }
-
-        if (getTextArea().getCommandManager().isSupported(Command.SUB_SCRIPT)) {
-            subScript = new ToggleButton(Images.INSTANCE.subscript().createImage(), this);
-            subScript.setTitle(Strings.INSTANCE.subscript());
-            toolBarExtension.addFeature("subscript", subScript);
-        }
+        addFeature("superscript", Command.SUPER_SCRIPT, Images.INSTANCE.superscript().createImage(), Strings.INSTANCE
+            .superscript());
+        addFeature("subscript", Command.SUB_SCRIPT, Images.INSTANCE.subscript().createImage(), Strings.INSTANCE
+            .subscript());
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().addMouseListener(this);
@@ -88,23 +81,35 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
     }
 
     /**
+     * Creates a tool bar feature and adds it to the tool bar.
+     * 
+     * @param name the feature name
+     * @param command the rich text area command that is executed by this feature
+     * @param image the image displayed on the tool bar
+     * @param title the tool tip used on the tool bar button
+     */
+    private void addFeature(String name, Command command, Image image, String title)
+    {
+        if (getTextArea().getCommandManager().isSupported(command)) {
+            ToggleButton button = new ToggleButton(image, this);
+            button.setTitle(title);
+            toolBarExtension.addFeature(name, button);
+            buttons.put(button, command);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractStatefulPlugin#destroy()
      */
     public void destroy()
     {
-        if (superScript != null) {
-            superScript.removeFromParent();
-            superScript.removeClickListener(this);
-            superScript = null;
+        for (ToggleButton button : buttons.keySet()) {
+            button.removeFromParent();
+            button.removeClickListener(this);
         }
-
-        if (subScript != null) {
-            subScript.removeFromParent();
-            subScript.removeClickListener(this);
-            subScript = null;
-        }
+        buttons.clear();
 
         if (toolBarExtension.getFeatures().length > 0) {
             getTextArea().removeMouseListener(this);
@@ -123,30 +128,10 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
      */
     public void onClick(Widget sender)
     {
-        if (sender == superScript) {
-            onSuperScript();
-        } else if (sender == subScript) {
-            onSubScript();
-        }
-    }
-
-    /**
-     * Toggles superscript style.
-     */
-    public void onSuperScript()
-    {
-        if (superScript.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.SUPER_SCRIPT);
-        }
-    }
-
-    /**
-     * Toggles subscript style.
-     */
-    public void onSubScript()
-    {
-        if (subScript.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.SUB_SCRIPT);
+        Command command = buttons.get(sender);
+        if (command != null && ((FocusWidget) sender).isEnabled()) {
+            getTextArea().setFocus(true);
+            getTextArea().getCommandManager().execute(command);
         }
     }
 
@@ -157,11 +142,8 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
      */
     public void update()
     {
-        if (superScript != null) {
-            superScript.setDown(getTextArea().getCommandManager().isExecuted(Command.SUPER_SCRIPT));
-        }
-        if (subScript != null) {
-            subScript.setDown(getTextArea().getCommandManager().isExecuted(Command.SUB_SCRIPT));
+        for (Map.Entry<ToggleButton, Command> entry : buttons.entrySet()) {
+            entry.getKey().setDown(getTextArea().getCommandManager().isExecuted(entry.getValue()));
         }
     }
 }

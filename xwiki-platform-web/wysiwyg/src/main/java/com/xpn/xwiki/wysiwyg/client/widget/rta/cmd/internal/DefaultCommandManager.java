@@ -22,8 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gwt.user.client.ui.FocusListener;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
@@ -33,7 +31,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
  * 
  * @version $Id$
  */
-public class DefaultCommandManager extends AbstractCommandManager implements FocusListener
+public class DefaultCommandManager extends AbstractCommandManager
 {
     /**
      * The map of predefined executable provided by the rich text area.
@@ -45,11 +43,6 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
      * text area.
      */
     private final RichTextArea rta;
-
-    /**
-     * Specifies if the underlying rich text area has focus.
-     */
-    private boolean focused;
 
     static {
         Command[] defaultCommands =
@@ -89,8 +82,6 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
     public DefaultCommandManager(RichTextArea rta, Map<Command, Executable> executables)
     {
         this.rta = rta;
-        rta.addFocusListener(this);
-
         for (Map.Entry<Command, Executable> entry : executables.entrySet()) {
             registerCommand(entry.getKey(), entry.getValue());
         }
@@ -110,7 +101,6 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (commandListeners.fireBeforeCommand(this, cmd, param)) {
             return false;
         }
-        focus();
         boolean success = executable.execute(rta, param);
         if (success) {
             commandListeners.fireCommand(this, cmd, param);
@@ -129,7 +119,6 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return false;
         }
-        focus();
         return executable.isEnabled(rta);
     }
 
@@ -144,7 +133,6 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return false;
         }
-        focus();
         return executable.isExecuted(rta);
     }
 
@@ -159,7 +147,6 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return false;
         }
-        focus();
         return executable.isSupported(rta);
     }
 
@@ -174,41 +161,6 @@ public class DefaultCommandManager extends AbstractCommandManager implements Foc
         if (executable == null) {
             return null;
         }
-        focus();
         return executable.getParameter(rta);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FocusListener#onFocus(Widget)
-     */
-    public void onFocus(Widget sender)
-    {
-        if (sender == rta) {
-            focused = true;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FocusListener#onLostFocus(Widget)
-     */
-    public void onLostFocus(Widget sender)
-    {
-        if (sender == rta) {
-            focused = false;
-        }
-    }
-
-    /**
-     * Focuses the underlying rich text area.
-     */
-    private void focus()
-    {
-        if (!focused) {
-            rta.setFocus(true);
-        }
     }
 }

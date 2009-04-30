@@ -19,7 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.indent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -42,14 +47,9 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class IndentPlugin extends AbstractPlugin implements ClickListener
 {
     /**
-     * The tool bar button used for indenting the current selection.
+     * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
      */
-    private PushButton indent;
-
-    /**
-     * The tool bar button used for outdenting the current selection.
-     */
-    private PushButton outdent;
+    private final Map<PushButton, Command> buttons = new HashMap<PushButton, Command>();
 
     /**
      * User interface extension for the editor tool bar.
@@ -65,22 +65,33 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().isSupported(Command.INDENT)) {
-            indent = new PushButton(Images.INSTANCE.indent().createImage(), this);
-            indent.setTitle(Strings.INSTANCE.indent());
-            toolBarExtension.addFeature("indent", indent);
-            getTextArea().getCommandManager().registerCommand(Command.INDENT, new IndentExecutable());
-        }
+        // Register custom executables.
+        getTextArea().getCommandManager().registerCommand(Command.INDENT, new IndentExecutable());
+        getTextArea().getCommandManager().registerCommand(Command.OUTDENT, new OutdentExecutable());
 
-        if (getTextArea().getCommandManager().isSupported(Command.OUTDENT)) {
-            outdent = new PushButton(Images.INSTANCE.outdent().createImage(), this);
-            outdent.setTitle(Strings.INSTANCE.outdent());
-            toolBarExtension.addFeature("outdent", outdent);
-            getTextArea().getCommandManager().registerCommand(Command.OUTDENT, new OutdentExecutable());
-        }
+        addFeature("indent", Command.INDENT, Images.INSTANCE.indent().createImage(), Strings.INSTANCE.indent());
+        addFeature("outdent", Command.OUTDENT, Images.INSTANCE.outdent().createImage(), Strings.INSTANCE.outdent());
 
         if (toolBarExtension.getFeatures().length > 0) {
             getUIExtensionList().add(toolBarExtension);
+        }
+    }
+
+    /**
+     * Creates a tool bar feature and adds it to the tool bar.
+     * 
+     * @param name the feature name
+     * @param command the rich text area command that is executed by this feature
+     * @param image the image displayed on the tool bar
+     * @param title the tool tip used on the tool bar button
+     */
+    private void addFeature(String name, Command command, Image image, String title)
+    {
+        if (getTextArea().getCommandManager().isSupported(command)) {
+            PushButton button = new PushButton(image, this);
+            button.setTitle(title);
+            toolBarExtension.addFeature(name, button);
+            buttons.put(button, command);
         }
     }
 
@@ -91,17 +102,11 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
      */
     public void destroy()
     {
-        if (indent != null) {
-            indent.removeFromParent();
-            indent.removeClickListener(this);
-            indent = null;
+        for (PushButton button : buttons.keySet()) {
+            button.removeFromParent();
+            button.removeClickListener(this);
         }
-
-        if (outdent != null) {
-            outdent.removeFromParent();
-            outdent.removeClickListener(this);
-            outdent = null;
-        }
+        buttons.clear();
 
         toolBarExtension.clearFeatures();
 
@@ -115,30 +120,10 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
      */
     public void onClick(Widget sender)
     {
-        if (sender == indent) {
-            onIndent();
-        } else if (sender == outdent) {
-            onOutdent();
-        }
-    }
-
-    /**
-     * Indents the current selection.
-     */
-    public void onIndent()
-    {
-        if (indent.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.INDENT);
-        }
-    }
-
-    /**
-     * Outdents the current selection.
-     */
-    public void onOutdent()
-    {
-        if (outdent.isEnabled()) {
-            getTextArea().getCommandManager().execute(Command.OUTDENT);
+        Command command = buttons.get(sender);
+        if (command != null && ((FocusWidget) sender).isEnabled()) {
+            getTextArea().setFocus(true);
+            getTextArea().getCommandManager().execute(command);
         }
     }
 }

@@ -111,10 +111,9 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
      */
     public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
     {
+        getTextArea().setFocus(true);
         if (importerDialog.getResult() != null) {
             getTextArea().getCommandManager().execute(Command.INSERT_HTML, importerDialog.getResult());
-        } else {
-            getTextArea().setFocus(true);
         }
     }
 

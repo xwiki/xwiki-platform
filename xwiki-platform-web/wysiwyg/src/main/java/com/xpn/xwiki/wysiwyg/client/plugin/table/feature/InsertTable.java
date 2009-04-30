@@ -221,16 +221,13 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
     {
+        getPlugin().getTextArea().setFocus(true);
         if (!autoClosed && !getDialog().isCanceled()) {
             // Call the command again, passing the insertion configuration as a JSON object.
             getPlugin().getTextArea().getCommandManager().execute(
                 getCommand(),
                 "{ rows:" + getDialog().getRowNumber() + ", cols: " + getDialog().getColNumber() + ", header: "
                     + getDialog().hasHeader() + " }");
-        } else {
-            // We get here if the dialog has been closed by clicking the close button.
-            // In this case we return the focus to the text area.
-            getPlugin().getTextArea().setFocus(true);
         }
     }
 }

@@ -25,7 +25,6 @@ import java.util.Map;
 
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.IncrementalCommand;
-import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -54,8 +53,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.StyleWithCssExecutab
  * 
  * @version $Id$
  */
-public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener, CommandListener, ChangeListener,
-    LoadListener
+public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener, CommandListener, LoadListener
 {
     /**
      * Iterates through the features placed on the tool bar and enables or disables them by following the syntax
@@ -108,16 +106,6 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
      * The string used to identify the menu bar extension point.
      */
     private static final String MENU_ROLE = "menu";
-
-    /**
-     * The name of the syntax configuration parameter.
-     */
-    private static final String SYNTAX = "syntax";
-
-    /**
-     * Default syntax. Can be overwritten from the configuration.
-     */
-    private static final String DEFAULT_SYNTAX = "xwiki/2.0";
 
     /**
      * The list of plug-ins that can be loaded by default. Can be overwritten from the configuration.
@@ -190,14 +178,11 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
 
         ui = new RichTextEditor();
         ui.addLoadListener(this);
-        ui.getConfig().addFlag("wysiwyg");
-        ui.getConfig().setParameter(SYNTAX, config.getParameter(SYNTAX, DEFAULT_SYNTAX));
         ui.getTextArea().addMouseListener(this);
         ui.getTextArea().addKeyboardListener(this);
         ui.getTextArea().getCommandManager().addCommandListener(this);
-        ui.getTextArea().addChangeListener(this);
 
-        sv = svm.getSyntaxValidator(getSyntax());
+        sv = svm.getSyntaxValidator(getConfig().getParameter("syntax"));
 
         pm = new DefaultPluginManager(wysiwyg, ui.getTextArea(), config);
         pm.setPluginFactoryManager(pfm);
@@ -315,18 +300,6 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChangeListener#onChange(Widget)
-     */
-    public void onChange(Widget sender)
-    {
-        if (sender == ui.getTextArea()) {
-            ui.getConfig().setNameSpace(ui.getTextArea().getName());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see LoadListener#onError(Widget)
      */
     public void onError(Widget sender)
@@ -344,6 +317,7 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
         if (sender == ui) {
             initTextArea();
             loadPlugins();
+            initEditor();
             fillMenu();
             fillToolBar();
             update();
@@ -355,7 +329,7 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
      */
     private void initTextArea()
     {
-        // Focus the rich text area to be sure it has reached desing mode.
+        // Focus the rich text area to be sure it has reached design mode.
         getUI().getTextArea().setFocus(true);
 
         // Make sure the editor uses formatting tags instead of CSS.
@@ -383,6 +357,21 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
         String[] pluginNames = config.getParameter("plugins", DEFAULT_PLUGINS).split(WHITE_SPACE_SEPARATOR);
         for (int i = 0; i < pluginNames.length; i++) {
             pm.load(pluginNames[i]);
+        }
+    }
+
+    /**
+     * Loads the root user interface extensions.
+     */
+    private void initEditor()
+    {
+        // TODO: Transform the tool bar and the menu bar in root UI extensions.
+        String[] rootExtensionNames = config.getParameter("rootUI", "submit").split(WHITE_SPACE_SEPARATOR);
+        for (int i = 0; i < rootExtensionNames.length; i++) {
+            UIExtension rootExtension = pm.getUIExtension("root", rootExtensionNames[i]);
+            if (rootExtension != null) {
+                ui.getContainer().add((Widget) rootExtension.getUIObject(rootExtensionNames[i]));
+            }
         }
     }
 
@@ -488,10 +477,10 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     }
 
     /**
-     * @return The syntax in which the HTML output of this editor will be converted on the server side.
+     * @return this editor's configuration object
      */
-    public String getSyntax()
+    public Config getConfig()
     {
-        return ui.getConfig().getParameter(SYNTAX);
+        return config;
     }
 }

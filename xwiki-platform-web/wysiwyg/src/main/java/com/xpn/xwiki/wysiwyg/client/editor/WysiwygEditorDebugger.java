@@ -144,7 +144,8 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
             }
         });
 
-        WysiwygService.Singleton.getInstance().fromHTML(currentHTML, editor.getSyntax(), new AsyncCallback<String>()
+        String syntax = editor.getConfig().getParameter("syntax");
+        WysiwygService.Singleton.getInstance().fromHTML(currentHTML, syntax, new AsyncCallback<String>()
         {
             public void onFailure(Throwable caught)
             {

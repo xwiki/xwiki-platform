@@ -157,6 +157,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
     {
         Command command = buttons.get(sender);
         if (command != null && ((FocusWidget) sender).isEnabled()) {
+            getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(command);
         }
     }
@@ -168,18 +169,9 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
      */
     public void onChange(Widget sender)
     {
-        if (sender == levels) {
-            onFormat();
-        }
-    }
-
-    /**
-     * Change the formatting level of the text surrounding the current selection.
-     */
-    public void onFormat()
-    {
-        if (levels.isEnabled()) {
+        if (sender == levels && levels.isEnabled()) {
             String level = levels.getValue(levels.getSelectedIndex());
+            getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(Command.FORMAT_BLOCK, level);
         }
     }

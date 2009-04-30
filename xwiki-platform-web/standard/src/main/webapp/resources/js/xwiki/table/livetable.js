@@ -56,13 +56,9 @@ XWiki.widgets.LiveTable = Class.create({
     if (typeof paginationNodes != "undefined") {
        this.paginator = new GridPagination(this, paginationNodes, options.maxPages || 10);
     }
-    if ($(domNodeName + '-filters')) {
-      // Ideally we should pass domNodeName + "-filters" as the filter node instead of the whole display table,
-      // so that the filters elements (input/selects) are retrieved down this filter node
-      // But right now this would break the RMUI since the checkbox to switch from group view to user view
-      // in the rights UI is outside this element.
-      // FIXME
-      this.filter = new GridFilter(this, this.displayNode.up("table"));
+	// filters
+    if ($(domNodeName).down(".xwiki-grid-display-filters")) {
+      this.filter = new GridFilter(this, $(domNodeName).down(".xwiki-grid-display-filters"));
     }
     if ($(domNodeName + "-tagcloud"))
     {
@@ -122,7 +118,7 @@ XWiki.widgets.LiveTable = Class.create({
     {
       method: 'get',
       onComplete: function( transport ) {
-        this.loadingStatus.style.display = "none";
+        self.loadingStatus.style.display = "none";
       },
 
       onSuccess: function( transport ) {
@@ -193,7 +189,7 @@ XWiki.widgets.LiveTable = Class.create({
         document.fire("xwiki:livetable:newrow", {
           "row":elem,
           "table":this
-    });
+        });
       }
     }
     if (this.paginator) this.paginator.refreshPagination();
@@ -685,7 +681,7 @@ if(browser.isIE6x) {
     Event.observe(ev.memo.row, "mouseover", function(event){
       event.element().up("tr").addClassName("rowHover");
     });
-    Event.observe(ev.memo, "mouseout", function(event){
+    Event.observe(ev.memo.row, "mouseout", function(event){
       event.element().up("tr").removeClassName("rowHover");
      });
   });

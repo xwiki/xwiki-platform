@@ -1478,7 +1478,7 @@ $html
               #else
                 #set($isSortable = false)
               #end
-              <th class="xwiki-grid-display-header-text #if($isSortable)sortable#end #if($colname == $selectedColumn) selected $defaultOrder #elseif($isSortable) asc #end" #if($isSortable)rel="${colname}"#end #if("$!colprop.type"=="hidden") style="display: none" #end>$msg.get("${transprefix}${colname}")</th>
+              <th class="xwiki-grid-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end" #if($isSortable)rel="${colname}"#end #if("$!colprop.type"=="hidden") style="display: none" #end>$msg.get("${transprefix}${colname}")</th>
             #end
             </tr>
             <tr class="xwiki-grid-display-filters">

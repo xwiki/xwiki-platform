@@ -16,39 +16,6 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<object>
-<class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>tags</name>
-<number>1</number>
-<prettyName>Tags</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>XWiki.XWikiGroupSheet</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
-</property>
-</object>
 <content>#set($interface = $xwiki.rightsmanager.defaultUi)
 ## display the new interface
 #if($interface == "new")
@@ -156,11 +123,12 @@ window.addNewMember = function(uorg, name)
                          var nr = parseInt(transport.responseText);  
                          if(nr == 0) $('errMsg').innerHTML = "$du";
                          else {
-                                var end = window.tabl.totalRows + nr;       
-                                var start = end - window.tabl.limit + 1;
-                                if(start &lt; 1)  start = 1;
-                                window.tabl.showRows(start, end); 
-                                window.tabl.refreshScrollbar();
+                             // if the new total (saved + the one user or group just added) exceed the table limit       
+                             // we ask for the "last page" (the bottom of the table), otherwise, we ask for the whole first page.
+                             var start = (window.tabl.totalRows + 1) &gt; window.tabl.limit ? window.tabl.totalRows - window.tabl.limit + 2 : 0;
+                             // force fetching rows again in any case, to get the newly added user or group
+                             window.tabl.totalRows = -1 ;
+                             window.tabl.showRows(start, window.tabl.limit);
                          }                   
                        }
              });

@@ -52,7 +52,7 @@ $xwiki.jsfx.use('js/xwiki/dataeditors/dataeditors.js', true)##
 </div> ## properties
 <div class="bottombuttons">#template("editactions.vm")</div>
 #else
-#info("No class is defined in this wiki document. You can <strong>create one by ading properties</strong> from the panel on you right, or you can <strong>choose another class to edit</strong> from the list below.")
+#info("No class is defined in this wiki document. You can <strong>create one by adding properties</strong> from the panel on your right, or you can <strong>choose another class to edit</strong> from the list below.")
 <h3>Existing classes in this wiki</h3>
 ##
 ## Existing classes are enumerated, grouped by space name.

@@ -21,6 +21,8 @@ package org.xwiki.rendering.internal.renderer;
 
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Generates XWiki Syntax for a Macro Block.
  * 
@@ -34,12 +36,22 @@ public class XWikiMacroPrinter
     public String print(String name, Map<String, String> parameters, String content)
     {
         StringBuffer buffer = new StringBuffer();
-        buffer.append("{{").append(name);
+
+        // Print begin macro
+        buffer.append("{{");
+        buffer.append(name);
+
+        // Print parameters
         if (!parameters.isEmpty()) {
             buffer.append(' ');
             buffer.append(printParameters(parameters));
         }
-        if ((content == null) || (content.length() == 0)) {
+
+        // Print end macro
+        // FIXME: differenciate between no content and empty content when WYSIWYG will support it. See
+        // http://jira.xwiki.org/jira/browse/XWIKI-3735
+        // if (content == null) {
+        if (StringUtils.isEmpty(content)) {
             buffer.append("/}}");
         } else {
             buffer.append("}}");

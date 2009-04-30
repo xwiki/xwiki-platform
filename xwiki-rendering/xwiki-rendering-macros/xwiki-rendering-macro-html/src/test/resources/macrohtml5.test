@@ -33,7 +33,7 @@ hello  world
 onRawText [<pre>
   newline
   newline
-</pre><p>Some <span>text </span><!--comment-->another <![CDATA[
+</pre><p>Some <span>text </span><!--comment-->another<![CDATA[
 hello  world
    ]]></p>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [] [

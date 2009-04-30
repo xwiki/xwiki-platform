@@ -1,10 +1,9 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-.# TODO: Start with a white space because of http://jira.xwiki.org/jira/browse/XWIKI-3082
- $response.sendRedirect($diffDoc.getURL("view", "viewer=changes&rev1=${rev1}&rev2=${rev2}"))
+$response.sendRedirect($diffDoc.getURL("view", "viewer=changes&rev1=${rev1}&rev2=${rev2}"))
 non velocity
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
- {{velocity}}{{html wiki=true}}$response.sendRedirect($diffDoc.getURL("view", "viewer=changes&rev1=${rev1}&rev2=${rev2}")){{/html}}{{/velocity}} non velocity
+{{velocity}}{{html wiki=true}}$response.sendRedirect($diffDoc.getURL("view", "viewer=changes&rev1=${rev1}&rev2=${rev2}")){{/html}}{{/velocity}} non velocity

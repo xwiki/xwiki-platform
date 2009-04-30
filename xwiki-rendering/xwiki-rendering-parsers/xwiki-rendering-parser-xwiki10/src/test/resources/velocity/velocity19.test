@@ -1,14 +1,13 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-.# TODO: Start with a white space because of http://jira.xwiki.org/jira/browse/XWIKI-3082
- $!var
+$!var
 $!{var}
 #!macro()
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
- {{velocity}}
+{{velocity}}
 {{html wiki=true}}
 $!var $!{var}
 {{/html}}

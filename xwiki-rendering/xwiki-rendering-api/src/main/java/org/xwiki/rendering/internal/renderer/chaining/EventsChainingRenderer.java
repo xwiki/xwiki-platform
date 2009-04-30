@@ -389,8 +389,8 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
-        getPrinter().println("onVerbatim [" + protectedString + "] [" + isInline + "]" 
-            + serializeParameters(parameters)); 
+        getPrinter().println(
+            "onVerbatim [" + protectedString + "] [" + isInline + "]" + serializeParameters(parameters));
     }
 
     /**
@@ -641,17 +641,37 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     private void printMacroData(String eventName, String name, Map<String, String> parameters, String content,
         boolean isInline)
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuffer parametersBuffer = new StringBuffer();
         for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
             String paramName = paramsIt.next();
-            buffer.append(paramName).append("=").append(parameters.get(paramName));
+            parametersBuffer.append(paramName).append("=").append(parameters.get(paramName));
             if (paramsIt.hasNext()) {
-                buffer.append("|");
+                parametersBuffer.append("|");
             }
         }
-        getPrinter().println(
-            eventName + (isInline ? "Inline" : "Standalone") + " [" + name + "] [" + buffer.toString() + "] ["
-                + content + "]");
+
+        StringBuffer macroBuffer = new StringBuffer();
+
+        macroBuffer.append(eventName);
+        macroBuffer.append(isInline ? "Inline" : "Standalone");
+
+        macroBuffer.append(" [");
+        macroBuffer.append(name);
+        macroBuffer.append("]");
+
+        macroBuffer.append(" [");
+        macroBuffer.append(parametersBuffer);
+        macroBuffer.append("]");
+
+        // FIXME: differenciate between no content and empty content when WYSIWYG will support it. See
+        // http://jira.xwiki.org/jira/browse/XWIKI-3735
+        // if (content != null) {
+        macroBuffer.append(" [");
+        macroBuffer.append(content == null ? "" : content);
+        macroBuffer.append("]");
+        // }
+
+        getPrinter().println(macroBuffer.toString());
     }
 
     private String serializeParameters(Map<String, String> parameters)

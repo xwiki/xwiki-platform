@@ -50,13 +50,24 @@ public class XHTMLMacroRenderer
     public void beginRender(XHTMLWikiPrinter printer, String name, Map<String, String> parameters, String content)
     {
         StringBuilder buffer = new StringBuilder("startmacro:");
+
+        // Print name
         buffer.append(name);
+
+        // Print parameters
         buffer.append(SEPARATOR);
         if (!parameters.isEmpty()) {
             buffer.append(this.macroPrinter.printParameters(parameters));
         }
+
+        // Print content
+        // FIXME: differenciate between no content and empty content when WYSIWYG will support it. See
+        // http://jira.xwiki.org/jira/browse/XWIKI-3735
+        // if (content != null) {
         buffer.append(SEPARATOR);
-        buffer.append(content);
+        buffer.append(content == null ? "" : content);
+        // }
+
         printer.printXMLComment(buffer.toString(), true);
     }
 

@@ -6,12 +6,12 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-onMacroStandalone [macro] [] []
-onMacroStandalone [macro] [] []
+beginParagraph
+onMacroInline [macro] [] []
+onMacroInline [macro] [] []
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{macro/}}
-
-{{macro/}}
+{{macro/}}{{macro/}}

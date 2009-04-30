@@ -3,6 +3,7 @@
 .# Verify the TOC list is well formated (down and up, jump more that one level, etc.) for a local scope
 .#-----------------------------------------------------
 = Title1
+
 {{toc start="1" depth="6" numbered="true" scope="local" /}}
 == Title1.1
 ==== Title1.1.1.1

@@ -117,37 +117,42 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         if (!StringUtils.isEmpty(parameters.getWidth())) {
             boxParameters.put("style", "width:" + parameters.getWidth());
         }
-        
+
         Block boxBlock;
-        if (context.isInline()) {
-            List<Block> contentBlocks = parseContent(parameters, content, context);
-            FormatBlock spanBlock = new FormatBlock(contentBlocks, Format.NONE);
-            spanBlock.setParameters(boxParameters);
-            boxBlock = spanBlock;
+
+        if (content != null) {
+            if (context.isInline()) {
+                List<Block> contentBlocks = parseContent(parameters, content, context);
+                FormatBlock spanBlock = new FormatBlock(contentBlocks, Format.NONE);
+                spanBlock.setParameters(boxParameters);
+                boxBlock = spanBlock;
+            } else {
+                boxBlock = new GroupBlock(boxParameters);
+
+                // we add the image, if there is one
+                if (!StringUtils.isEmpty(imageParameter)) {
+                    Image image = new URLImage(imageParameter);
+                    Block imageBlock = new ImageBlock(image, true);
+                    boxBlock.addChild(imageBlock);
+                    boxBlock.addChild(NewLineBlock.NEW_LINE_BLOCK);
+                }
+                // we add the title, if there is one
+                if (!StringUtils.isEmpty(titleParameter)) {
+                    Parser parser = getSyntaxParser(context);
+                    List<Block> titleBlocks = parseTitle(parser, titleParameter);
+                    boxBlock.addChildren(titleBlocks);
+                }
+                if (titleBlockList != null) {
+                    boxBlock.addChildren(titleBlockList);
+                }
+                List<Block> contentBlocks = parseContent(parameters, content, context);
+                boxBlock.addChildren(contentBlocks);
+            }
+
+            return Collections.singletonList(boxBlock);
         } else {
-            boxBlock = new GroupBlock(boxParameters);
-
-            // we add the image, if there is one
-            if (!StringUtils.isEmpty(imageParameter)) {
-                Image image = new URLImage(imageParameter);
-                Block imageBlock = new ImageBlock(image, true);
-                boxBlock.addChild(imageBlock);
-                boxBlock.addChild(NewLineBlock.NEW_LINE_BLOCK);
-            }
-            // we add the title, if there is one
-            if (!StringUtils.isEmpty(titleParameter)) {
-                Parser parser = getSyntaxParser(context);
-                List<Block> titleBlocks = parseTitle(parser, titleParameter);
-                boxBlock.addChildren(titleBlocks);
-            }
-            if (titleBlockList != null) {
-                boxBlock.addChildren(titleBlockList);
-            }
-            List<Block> contentBlocks = parseContent(parameters, content, context);
-            boxBlock.addChildren(contentBlocks);
+            return Collections.emptyList();
         }
-
-        return Collections.singletonList(boxBlock);
     }
 
     /**

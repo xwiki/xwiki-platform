@@ -21,17 +21,13 @@ package com.xpn.xwiki.wysiwyg.client.editor;
 
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusListener;
-import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.LoadListenerCollection;
 import com.google.gwt.user.client.ui.SourcesLoadEvents;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.util.Console;
-import com.xpn.xwiki.wysiwyg.client.widget.HiddenConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
 import com.xpn.xwiki.wysiwyg.client.widget.ToolBar;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
@@ -41,7 +37,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class RichTextEditor extends Composite implements SourcesLoadEvents, FocusListener, ChangeListener, LoadListener
+public class RichTextEditor extends Composite implements SourcesLoadEvents, LoadListener
 {
     /**
      * The menu bar.
@@ -59,15 +55,9 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
     protected final RichTextArea textArea;
 
     /**
-     * Additional data to be sent to the server.
+     * The UI container.
      */
-    protected final HiddenConfig config;
-
-    /**
-     * Input hidden that stores the content of the rich text area. This content will be sent to the server when the form
-     * in which this editor is placed will be submitted.
-     */
-    protected final Hidden content;
+    protected final FlowPanel container;
 
     /**
      * The list of listeners that are notified when the UI is loaded.
@@ -80,22 +70,13 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
     public RichTextEditor()
     {
         textArea = new RichTextArea();
-        textArea.addFocusListener(this);
-        textArea.addChangeListener(this);
         // Workaround till GWT provides a way to detect when the rich text area has finished loading.
         if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof SourcesLoadEvents) {
             ((SourcesLoadEvents) textArea.getBasicFormatter()).addLoadListener(this);
         }
 
-        config = new HiddenConfig();
-
-        content = new Hidden();
-        content.setDefaultValue("");
-
-        FlowPanel container = new FlowPanel();
+        container = new FlowPanel();
         container.add(textArea);
-        container.add(content);
-        container.add(config);
         container.addStyleName("xRichTextEditor");
         initWidget(container);
     }
@@ -133,12 +114,11 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
     }
 
     /**
-     * @return the group of hidden inputs that can be used to sent additional data to the server when the HTML form in
-     *         which this editor is placed is submitted.
+     * @return the UI container
      */
-    public HiddenConfig getConfig()
+    public FlowPanel getContainer()
     {
-        return config;
+        return container;
     }
 
     /**
@@ -203,43 +183,5 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Focu
     public void removeLoadListener(LoadListener listener)
     {
         loadListeners.remove(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ChangeListener#onChange(Widget)
-     */
-    public void onChange(Widget sender)
-    {
-        if (sender == textArea) {
-            content.setValue(textArea.getHTML());
-            if (textArea.getName() != null) {
-                content.setName(textArea.getName());
-                content.setID(textArea.getName());
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FocusListener#onFocus(Widget)
-     */
-    public void onFocus(Widget sender)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FocusListener#onLostFocus(Widget)
-     */
-    public void onLostFocus(Widget sender)
-    {
-        if (sender == textArea) {
-            content.setValue(textArea.getHTML());
-        }
     }
 }

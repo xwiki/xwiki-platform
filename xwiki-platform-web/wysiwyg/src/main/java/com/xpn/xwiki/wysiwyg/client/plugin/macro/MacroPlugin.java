@@ -173,11 +173,9 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
             getEditDialog().setMacroCall(new MacroCall(getTextArea().getCommandManager().getStringValue(INSERT)));
             getEditDialog().center();
         } else {
-            if (getEditDialog().isCanceled()
-                || !getTextArea().getCommandManager().execute(INSERT, getEditDialog().getMacroCall().toString())) {
-                // We get here if the dialog has been closed by clicking the close button or if the command failed.
-                // In this case we return the focus to the text area.
-                getTextArea().setFocus(true);
+            getTextArea().setFocus(true);
+            if (!getEditDialog().isCanceled()) {
+                getTextArea().getCommandManager().execute(INSERT, getEditDialog().getMacroCall().toString());
             }
         }
     }

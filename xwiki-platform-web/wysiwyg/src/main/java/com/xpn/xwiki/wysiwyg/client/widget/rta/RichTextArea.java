@@ -24,10 +24,6 @@ import org.xwiki.gwt.dom.client.Event;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.IFrameElement;
-import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ChangeListenerCollection;
-import com.google.gwt.user.client.ui.HasName;
-import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultCommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster;
@@ -37,7 +33,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster;
  * 
  * @version $Id$
  */
-public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements SourcesChangeEvents, HasName
+public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea
 {
     /**
      * @see #setHTML(String)
@@ -55,18 +51,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      * prevented from a listener by calling {@link Event#preventDefault()} on the {@link #getCurrentEvent()}.
      */
     private final BehaviorAdjuster adjuster = (BehaviorAdjuster) GWT.create(BehaviorAdjuster.class);
-
-    /**
-     * The list of listeners that are notified when the content of the rich text area changes. Change events are
-     * triggered only when the content of the rich text area is changed using {@link #setHTML(String)} or
-     * {@link #setText(String)}.
-     */
-    private final ChangeListenerCollection changeListeners = new ChangeListenerCollection();
-
-    /**
-     * The name of this rich text area. It could be used to submit the edited contents to the server.
-     */
-    private String name;
 
     /**
      * The current event triggered on this rich text area. We need to store it because DOM.eventGetCurrentEvent() and
@@ -95,49 +79,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     {
         this.cm = cm;
         adjuster.setTextArea(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesChangeEvents#addChangeListener(ChangeListener)
-     */
-    public void addChangeListener(ChangeListener listener)
-    {
-        changeListeners.add(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesChangeEvents#removeChangeListener(ChangeListener)
-     */
-    public void removeChangeListener(ChangeListener listener)
-    {
-        changeListeners.remove(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasName#setName(String)
-     */
-    public void setName(String name)
-    {
-        if (!name.equals(this.name)) {
-            this.name = name;
-            changeListeners.fireChange(this);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasName#getName()
-     */
-    public String getName()
-    {
-        return name;
     }
 
     /**
@@ -181,18 +122,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         // we test this attribute in the setHTMLImpl to avoid overwriting the contents when setHTML haven't been called.
         getElement().setAttribute(DIRTY, String.valueOf(true));
         super.setHTML(html);
-        changeListeners.fireChange(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.RichTextArea#setText(String)
-     */
-    public void setText(String text)
-    {
-        super.setText(text);
-        changeListeners.fireChange(this);
     }
 
     /**

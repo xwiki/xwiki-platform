@@ -46,7 +46,11 @@ public class InsertImageExecutable extends InsertHTMLExecutable
      */
     private Element getSelectedImage(RichTextArea rta)
     {
-        // Check if current selection perfectly wraps an image
+        // First, let's check if we have a selection.
+        if (rta.getDocument().getSelection().getRangeCount() == 0) {
+            return null;
+        }
+        // Second, let's check if the current selection perfectly wraps an image.
         Range currentRange = rta.getDocument().getSelection().getRangeAt(0);
         Node startContainer = currentRange.getStartContainer();
         Node endContainer = currentRange.getEndContainer();

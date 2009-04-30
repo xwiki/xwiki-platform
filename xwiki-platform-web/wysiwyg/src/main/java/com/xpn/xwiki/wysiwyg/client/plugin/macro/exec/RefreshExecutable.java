@@ -22,11 +22,12 @@ package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
@@ -36,6 +37,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
  */
 public class RefreshExecutable extends AbstractExecutable
 {
+    /**
+     * The command used to notify all the plug-ins that the content of the rich text area is about to be submitted.
+     */
+    private static final Command SUBMIT = new Command("submit");
+
     /**
      * The syntax used for storing the edited document.
      */
@@ -80,23 +86,33 @@ public class RefreshExecutable extends AbstractExecutable
         waiting.getElement().getStyle().setPropertyPx(Style.LEFT, rta.getElement().getOffsetLeft());
         waiting.getElement().getStyle().setPropertyPx(Style.TOP, rta.getElement().getOffsetTop());
         rta.getElement().getParentNode().insertBefore(waiting.getElement(), rta.getElement());
+        waiting.setFocus(true);
 
-        // We have to blur the rich text area first in order to trigger some client-side DOM clean-up. In consequence,
-        // we wait to be notified of the blur event before refreshing the content of the rich text area.
-        rta.addFocusListener(new FocusListener()
+        // Allow other plug-ins to adjust the content before the refresh by executing a submit command.
+        CommandListener submitListener = new CommandListener()
         {
-            public void onFocus(Widget sender)
+            public boolean onBeforeCommand(CommandManager sender, Command command, String param)
+            {
+                // The refresh is executed just before the submit command is executed.
+                if (SUBMIT.equals(command)) {
+                    refresh(rta);
+                }
+                return false;
+            }
+
+            public void onCommand(CommandManager sender, Command command, String param)
             {
                 // ignore
             }
-
-            public void onLostFocus(Widget sender)
-            {
-                rta.removeFocusListener(this);
-                refresh(rta);
-            }
-        });
-        waiting.setFocus(true);
+        };
+        // We add the listener now to be sure it is the last one called, after all the other plug-ins did their job.
+        rta.getCommandManager().addCommandListener(submitListener);
+        if (!rta.getCommandManager().execute(SUBMIT)) {
+            // Send the refresh request even if the submit command failed.
+            refresh(rta);
+        }
+        // We no longer need to lister to the submit command.
+        rta.getCommandManager().removeCommandListener(submitListener);
 
         return true;
     }
@@ -112,12 +128,14 @@ public class RefreshExecutable extends AbstractExecutable
         {
             public void onFailure(Throwable caught)
             {
+                rta.setFocus(true);
                 waiting.getElement().getParentNode().removeChild(waiting.getElement());
             }
 
             public void onSuccess(String result)
             {
                 rta.setHTML(result);
+                rta.setFocus(true);
                 waiting.getElement().getParentNode().removeChild(waiting.getElement());
             }
         });

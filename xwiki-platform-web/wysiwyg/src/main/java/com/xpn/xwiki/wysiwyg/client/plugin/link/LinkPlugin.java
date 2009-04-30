@@ -267,6 +267,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      */
     public void onUnlink()
     {
+        getTextArea().setFocus(true);
         getTextArea().getCommandManager().execute(Command.UNLINK);
     }
 
@@ -278,6 +279,8 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     {
         // build the HTML block from the configuration data
         String linkHTML = LinkHTMLGenerator.getInstance().getLinkHTML((LinkConfig) result);
+        // Return the focus to the rich text area.
+        getTextArea().setFocus(true);
         // insert the built HTML
         getTextArea().getCommandManager().execute(Command.CREATE_LINK, linkHTML);
     }

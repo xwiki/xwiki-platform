@@ -143,6 +143,7 @@ public class HistoryPlugin extends AbstractPlugin implements ClickListener
     {
         Command command = buttons.get(sender);
         if (command != null && ((FocusWidget) sender).isEnabled()) {
+            getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(command);
         }
     }

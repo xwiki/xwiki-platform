@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
 
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.IFrameElement;
@@ -96,23 +98,22 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
             }
 
             // Extract info from DOM
-            String name = hook.getAttribute("name");
             String height = String.valueOf(Math.max(hook.getOffsetHeight(), 100)) + "px";
 
             // Prepare the DOM
+            // Hide the hook element
+            hook.getStyle().setProperty(Style.DISPLAY, Style.Display.NONE);
+            // Create a container for the editor UI
             Element container = DOM.createDiv();
             String containerId = hookId + "_container";
             container.setId(containerId);
-            hook.getParentElement().replaceChild(container, hook);
+            hook.getParentElement().insertBefore(container, hook);
 
             // Create the WYSIWYG Editor
             WysiwygEditor editor = WysiwygEditorFactory.getInstance().newEditor(config, this);
             RichTextArea textArea = editor.getUI().getTextArea();
             IFrameElement.as(textArea.getElement()).setSrc(config.getParameter("inputURL", "about:blank"));
             textArea.setHeight(height);
-            if (name != null) {
-                textArea.setName(name);
-            }
 
             // Insert the WYSIWYG Editor
             if ("true".equals(config.getParameter("debug", "false"))) {

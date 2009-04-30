@@ -24,6 +24,7 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.internal.ie.NativeSelection;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
@@ -45,59 +46,8 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
     public void onLoad(Widget sender)
     {
         super.onLoad(sender);
-        ensureSelectionIsPreserved(getTextArea().getDocument());
+        NativeSelection.ensureSelectionIsPreserved(getTextArea().getDocument());
     }
-
-    /**
-     * Ensures that the selection of the given document is preserved when the document looses focus. This method is
-     * required because IE has only one selection object per top level window. This means that when a child document
-     * looses the focus its selection object will return ranges from the parent document.
-     * 
-     * @param document the document whose selection has to be preserved
-     */
-    private native void ensureSelectionIsPreserved(Document document)
-    /*-{
-        // If there is a previously stored selection then restore it. We have to do this before the edited document
-        // gets focused to allow users to have a different selection than the stored one (by clicking inside the edited
-        // document when it doesn't have the focus).
-        document.body.attachEvent('onbeforeactivate', function(event) {
-            // Save the bookmark locally to prevent any interference.
-            var bookmark = document.body.__bookmark;
-            // Reset the bookmark to prevent redundant calls to this function.
-            // NOTE: We don't use "null" but "undefined" to reset the bookmark because typeof(bookmark) returns
-            // "object" when the bookmark is null but defined (previously had a non null value).
-            document.body.__bookmark = undefined;
-            switch (typeof(bookmark)) {
-                case 'string':
-                    // The bookmark is an opaque string that can be used with moveToBookmark to recreate the original
-                    // text range.
-                    var textRange = document.body.createTextRange();
-                    textRange.moveToBookmark(bookmark);
-                    textRange.select();
-                    break;
-                case 'object':
-                    // The bookmark is a reference to the element previously selected.
-                    var controlRange = document.body.createControlRange();
-                    controlRange.addElement(bookmark);
-                    controlRange.select();
-                    break;
-            }
-        });
-
-        // Save the selection when the edited document is about to loose focus.
-        document.body.attachEvent('onbeforedeactivate', function(event) {
-            document.body.__bookmark = undefined;
-            var range = document.selection.createRange();
-            // Check the type of the range and if the range is inside the edited document.
-            if (range.getBookmark && range.parentElement().ownerDocument == document) {
-                // Text range.
-                document.body.__bookmark = range.getBookmark();
-            } else if (range.item && range.length > 0 && range.item(0).ownerDocument == document) {
-                // Control range.
-                document.body.__bookmark = range.item(0);
-            }
-        });
-    }-*/;
 
     /**
      * {@inheritDoc}

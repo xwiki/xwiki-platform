@@ -109,17 +109,8 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickListener
      */
     public void onClick(Widget sender)
     {
-        if (sender == hr) {
-            onHorizontalRule();
-        }
-    }
-
-    /**
-     * Inserts a horizontal rule in place of the current selection.
-     */
-    public void onHorizontalRule()
-    {
-        if (hr.isEnabled()) {
+        if (sender == hr && hr.isEnabled()) {
+            getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE);
         }
     }

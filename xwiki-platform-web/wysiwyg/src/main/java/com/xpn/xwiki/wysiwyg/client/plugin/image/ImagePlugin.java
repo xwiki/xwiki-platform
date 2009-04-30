@@ -166,10 +166,9 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
             getImageDialog().center();
         } else {
             String imageHTML = getImageDialog().getImageHTMLBlock();
+            getTextArea().setFocus(true);
             if (imageHTML != null) {
                 getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageHTML);
-            } else {
-                getTextArea().setFocus(true);
             }
         }
     }

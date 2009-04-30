@@ -72,9 +72,9 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      */
     @Requirement("box")
     protected Macro<BoxMacroParameters> boxMacro;
-    
-    /** 
-     * Needed to parse the ordinary text. 
+
+    /**
+     * Needed to parse the ordinary text.
      */
     private ParserUtils parserUtils = new ParserUtils();
 
@@ -88,14 +88,15 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
 
     /**
      * Renders the given RSS's entries.
+     * 
      * @param parentBlock the parent Block to which the output is going to be added
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param parameters our parameter helper object
      * @param context the macro's transformation context
      * @throws MacroExecutionException if the content cannot be rendered
-     */ 
-    private void renderEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters, 
-        MacroTransformationContext context) throws MacroExecutionException 
+     */
+    private void renderEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         int maxElements = parameters.getCount();
         int count = 0;
@@ -106,7 +107,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
                 break;
             }
             SyndEntry entry = (SyndEntry) item;
-            
+
             Link titleLink = new Link();
             titleLink.setType(LinkType.URI);
             titleLink.setReference(entry.getLink());
@@ -114,7 +115,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
             paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
             parentBlock.addChild(paragraphTitleBlock);
-            
+
             if (parameters.isContent() && entry.getDescription() != null) {
                 // We are wrapping the feed entry content in a HTML macro, not considering what the declared content
                 // is, because some feed will declare text while they actually contain HTML.
@@ -122,17 +123,19 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
                 // A case where doing this might hurt is if a feed declares "text" and has any XML inside it does
                 // not want to be interpreted as such, but displayed as is instead. But this certainly is too rare
                 // compared to mis-formed feeds that say text while they want to say HTML.
-                Block html = new MacroBlock("html", Collections.singletonMap("wiki", "false"),
-                    entry.getDescription().getValue(), context.isInline());
+                Block html =
+                    new MacroBlock("html", Collections.singletonMap("wiki", "false"),
+                        entry.getDescription().getValue(), context.isInline());
 
-                parentBlock.addChild(new GroupBlock(Arrays.asList(html), 
-                    Collections.singletonMap(CLASS_ATTRIBUTE, "rssitemdescription")));
+                parentBlock.addChild(new GroupBlock(Arrays.asList(html), Collections.singletonMap(CLASS_ATTRIBUTE,
+                    "rssitemdescription")));
             }
         }
     }
 
-    /** 
+    /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()
@@ -155,45 +158,46 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         } catch (Exception ex) {
             throw new MacroExecutionException("Error processing " + parameters.getFeedURL() + ": " + ex.getMessage());
         }
-        if (feed == null) { 
+        if (feed == null) {
             throw new MacroExecutionException("No feed found at " + parameters.getFeedURL());
         }
-        
+
         BoxMacroParameters boxParameters = new BoxMacroParameters();
         boolean hasImage = parameters.isImage() && feed.getImage() != null;
 
         boxParameters.setCssClass("rssfeed");
-        
+
         if (!StringUtils.isEmpty(parameters.getWidth())) {
             boxParameters.setWidth(parameters.getWidth());
         }
-        
+
         renderFeedOrEntryTitle(boxParameters, "rsschanneltitle", feed.getTitle(), feed.getLink());
 
         List<Block> result = null;
         if (hasImage) {
             boxParameters.setImage(feed.getImage().getUrl());
-            result = boxMacro.execute(boxParameters, content, context);
+            result = boxMacro.execute(boxParameters, content == null ? "" : content, context);
         } else {
-            result = boxMacro.execute(boxParameters, content, context);
+            result = boxMacro.execute(boxParameters, content == null ? "" : content, context);
         }
-        
+
         renderEntries(result.get(0), feed, parameters, context);
 
         return result;
     }
-    
+
     /**
      * Renders the RSS's title.
+     * 
      * @param boxParameters the BoxParameters where the title will be fitted
      * @param cssClass the CSS sheet
      * @param title the title's text
      * @param link the title's link (if there is one)
      */
-    private void renderFeedOrEntryTitle(BoxMacroParameters boxParameters, 
-        String cssClass, String title, String link) {
+    private void renderFeedOrEntryTitle(BoxMacroParameters boxParameters, String cssClass, String title, String link)
+    {
         List<Block> titleBlocks = null;
-        
+
         if (link == null) {
             titleBlocks = this.parserUtils.parsePlainText(title);
         } else {
@@ -205,7 +209,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         }
         ParagraphBlock titleBlock = new ParagraphBlock(titleBlocks);
         titleBlock.setParameter(CLASS_ATTRIBUTE, cssClass);
-        
+
         boxParameters.setBlockTitle(Collections.singletonList(titleBlock));
     }
 }

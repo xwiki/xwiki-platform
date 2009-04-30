@@ -21,8 +21,10 @@ package org.xwiki.rendering.internal.macro.html;
 
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -72,7 +74,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      * The syntax representing the output of this macro (used for the RawBlock).
      */
     private static final Syntax XHTML_SYNTAX = new Syntax(SyntaxType.XHTML, "1.0");
-    
+
     /**
      * To clean the passed HTML so that it's valid XHTML (this is required since we use an XML parser to parse it).
      */
@@ -84,7 +86,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      */
     @Requirement
     private PrintRendererFactory rendererFactory;
-    
+
     /**
      * A special factory that create foolproof XML reader that have the following characteristics:
      * <ul>
@@ -92,7 +94,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      * <li>Ignore SAX callbacks when the parser parses the DTD</li>
      * <li>Accumulate onCharacters() calls since SAX parser may normally call this event several times.</li>
      * <li>Remove non-semantic white spaces where needed</li>
-     * <li>Resolve DTDs locally to speed DTD loading/validation</li> 
+     * <li>Resolve DTDs locally to speed DTD loading/validation</li>
      * </ul>
      */
     @Requirement("xwiki")
@@ -134,48 +136,53 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
         throws MacroExecutionException
     {
         List<Block> blocks;
-        String normalizedContent = content;
-        
-        // Clean the HTML into valid XHTML if the user has asked (it's the default).
-        if (parameters.getClean()) {
-            // Note that we trim the content since we want to be lenient with the user in case he has entered
-            // some spaces/newlines before a XML declaration (prolog). Otherwise the XML parser would fail to parse.
-            Document document = this.htmlCleaner.clean(new StringReader(content.trim()));
 
-            // Since XML can only have a single root node and since we want to allow users to put
-            // content such as the following, we need to wrap the content in a root node:
-            // <tag1>
-            // ..
-            // </tag1>
-            // <tag2>
-            // </tag2>
-            // In addition we also need to ensure the XHTML DTD is defined so that valid XHTML entities can be
-            // specified.
+        if (!StringUtils.isEmpty(content)) {
+            String normalizedContent = content;
 
-            // Remove the HTML envelope since this macro is only a fragment of a page which will already have an
-            // HTML envelope when rendered. We remove it so that the HTML <head> tag isn't output.
-            HTMLUtils.stripHTMLEnvelope(document);
-            
-            // If in inline mode remove the top level paragraph if there's one.
-            if (context.isInline()) {
-                HTMLUtils.stripFirstElementInside(document, HTMLConstants.TAG_HTML, HTMLConstants.TAG_P);
+            // Clean the HTML into valid XHTML if the user has asked (it's the default).
+            if (parameters.getClean()) {
+                // Note that we trim the content since we want to be lenient with the user in case he has entered
+                // some spaces/newlines before a XML declaration (prolog). Otherwise the XML parser would fail to parse.
+                Document document = this.htmlCleaner.clean(new StringReader(content.trim()));
+
+                // Since XML can only have a single root node and since we want to allow users to put
+                // content such as the following, we need to wrap the content in a root node:
+                // <tag1>
+                // ..
+                // </tag1>
+                // <tag2>
+                // </tag2>
+                // In addition we also need to ensure the XHTML DTD is defined so that valid XHTML entities can be
+                // specified.
+
+                // Remove the HTML envelope since this macro is only a fragment of a page which will already have an
+                // HTML envelope when rendered. We remove it so that the HTML <head> tag isn't output.
+                HTMLUtils.stripHTMLEnvelope(document);
+
+                // If in inline mode remove the top level paragraph if there's one.
+                if (context.isInline()) {
+                    HTMLUtils.stripFirstElementInside(document, HTMLConstants.TAG_HTML, HTMLConstants.TAG_P);
+                }
+
+                normalizedContent = XMLUtils.toString(document);
             }
-            
-            normalizedContent = XMLUtils.toString(document);
-        }
-        
-        // If the user has mentioned that there's wiki syntax in the macro then we need to parse the content using
-        // an XML parser. We also use a XML parser if the user has asked to clean since it's the easiest way to
-        // ignore XML declaration, doctype, html element and the first paragraph if in inline mode.
-        if (parameters.getClean() || parameters.getWiki()) {
-            normalizedContent = parseXHTML(normalizedContent, parameters.getClean(), parameters.getWiki());
+
+            // If the user has mentioned that there's wiki syntax in the macro then we need to parse the content using
+            // an XML parser. We also use a XML parser if the user has asked to clean since it's the easiest way to
+            // ignore XML declaration, doctype, html element and the first paragraph if in inline mode.
+            if (parameters.getClean() || parameters.getWiki()) {
+                normalizedContent = parseXHTML(normalizedContent, parameters.getClean(), parameters.getWiki());
+            }
+
+            blocks = Arrays.asList((Block) new RawBlock(normalizedContent, XHTML_SYNTAX));
+        } else {
+            blocks = Collections.emptyList();
         }
 
-        blocks = Arrays.asList((Block) new RawBlock(normalizedContent, XHTML_SYNTAX));
-        
         return blocks;
     }
-    
+
     /**
      * Parse the XHTML using a XML parser since XML elements can contain wiki syntax which we parse with a XWiki syntax
      * Parser and convert to XHTML.
@@ -188,14 +195,14 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      */
     private String parseXHTML(String xhtml, boolean clean, boolean wiki) throws MacroExecutionException
     {
-        XMLBlockConverterHandler handler = new XMLBlockConverterHandler(this.wikiParser, this.rendererFactory,
-            clean, wiki);
+        XMLBlockConverterHandler handler =
+            new XMLBlockConverterHandler(this.wikiParser, this.rendererFactory, clean, wiki);
 
         try {
             XMLReader xr = this.xmlReaderFactory.createXMLReader();
             xr.setContentHandler(handler);
             xr.setErrorHandler(handler);
-            
+
             // Control whitespace stripping depending on whether XHTML elements contain wiki syntax or not.
             xr.setProperty(XWikiXHTMLWhitespaceXMLFilter.SAX_CONTAINS_WIKI_SYNTAX_PROPERTY, wiki);
 

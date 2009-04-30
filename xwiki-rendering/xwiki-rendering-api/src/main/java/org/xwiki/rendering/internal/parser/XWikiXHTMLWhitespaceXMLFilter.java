@@ -93,7 +93,6 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
                 // Make sure we clean head/trail white spaces
                 trimLeadingWhiteSpaces();
                 trimTrailingWhiteSpaces();
-                sendContent();
             }
         }
         super.endCDATA();
@@ -115,10 +114,10 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLWhitespaceXMLFilter#cleanExtraWhiteSpaces()
+     * @see XHTMLWhitespaceXMLFilter#cleanContentExtraWhiteSpaces()
      */
     @Override
-    protected void cleanExtraWhiteSpaces()
+    protected void cleanContentExtraWhiteSpaces()
     {
         // If the element texts can contain wiki syntax only clean whitespaces at beginning and end of texts.
         if (this.containsWikiSyntax) {
@@ -129,7 +128,7 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
                 getContent().append(result);
             }
         } else {
-            super.cleanExtraWhiteSpaces();
+            super.cleanContentExtraWhiteSpaces();
         }
     }
 

@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
@@ -110,22 +111,22 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     public List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        List<Block> result;
+        List<Block> result = Collections.emptyList();
 
-        // 1) Run script engine on macro block content
-        String scriptResult = evaluate(parameters, content, context);
+        if (!StringUtils.isEmpty(content)) {
+            // 1) Run script engine on macro block content
+            String scriptResult = evaluate(parameters, content, context);
 
-        if (parameters.isOutput()) {
-            // 2) Run the wiki syntax parser on the script-rendered content
-            XDOM parsedDom = parseSourceSyntax(scriptResult, context);
+            if (parameters.isOutput()) {
+                // 2) Run the wiki syntax parser on the script-rendered content
+                XDOM parsedDom = parseSourceSyntax(scriptResult, context);
 
-            // 3) If in inline mode remove any top level paragraph
-            result = parsedDom.getChildren();
-            if (context.isInline()) {
-                this.parserUtils.removeTopLevelParagraph(result);
+                // 3) If in inline mode remove any top level paragraph
+                result = parsedDom.getChildren();
+                if (context.isInline()) {
+                    this.parserUtils.removeTopLevelParagraph(result);
+                }
             }
-        } else {
-            result = Collections.emptyList();
         }
 
         return result;

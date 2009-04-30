@@ -9,16 +9,16 @@ paragraph
 beginDocument
 beginParagraph
 onWord [paragraph]
+onNewLine
+onMacroInline [macro] [] []
 endParagraph
-onMacroStandalone [macro] [] []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>paragraph</p><!--startmacro:macro|-||-|--><!--stopmacro-->
+<p>paragraph<br/><!--startmacro:macro|-||-|--><!--stopmacro--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 paragraph
-
 {{macro/}}

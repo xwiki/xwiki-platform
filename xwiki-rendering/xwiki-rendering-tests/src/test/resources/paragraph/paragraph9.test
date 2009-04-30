@@ -28,7 +28,6 @@ onSpace
 onWord [before]
 onSpace
 onWord [another]
-onSpace
 onNewLine
 onWord [hello]
 onSpace
@@ -46,7 +45,7 @@ endDocument
 <pre>
   newline
   newline
-</pre><p>Some text before another <br/>hello &nbsp;world<br/>&nbsp;&nbsp;&nbsp;</p>
+</pre><p>Some text before another<br/>hello &nbsp;world<br/>&nbsp;&nbsp;&nbsp;</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -55,6 +54,6 @@ endDocument
   newline
 }}}
 
-Some text before another 
+Some text before another
 hello  world
    

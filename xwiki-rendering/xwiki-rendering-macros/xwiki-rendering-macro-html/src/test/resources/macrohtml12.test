@@ -9,9 +9,7 @@
 </unknown>
 {{/html}}
 .#-----------------------------------------------------
-.expect|event/1.0|skip
-.# TODO needs to be fixed in WikiModel's XHTMLWhitespaceXMLFilter
-.# which doesn't handle correctly unknown elements.
+.expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [html] [clean=false|wiki=true] [

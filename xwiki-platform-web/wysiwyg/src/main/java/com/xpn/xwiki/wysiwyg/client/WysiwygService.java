@@ -30,6 +30,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.Attachment;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
@@ -211,6 +212,17 @@ public interface WysiwygService extends RemoteService
      * @return list of the images
      */
     List<ImageConfig> getImageAttachments(String wikiName, String spaceName, String pageName);
+
+    /**
+     * Returns all the attachments from the referred page.
+     * 
+     * @param wikiName the name of the wiki to get attachments from
+     * @param spaceName the name of the space to get attachments from
+     * @param pageName the name of the page to get attachments from
+     * @return list of the attachments
+     * @throws XWikiGWTException if something goes wrong on the server
+     */
+    List<Attachment> getAttachments(String wikiName, String spaceName, String pageName) throws XWikiGWTException;
 
     /**
      * @param macroName a string representing the name of a macro

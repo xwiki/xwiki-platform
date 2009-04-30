@@ -67,6 +67,7 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.Attachment;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
@@ -454,8 +455,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             return null;
         }
         // all right, now set the reference and url and return
-        // FIXME: this should not be created like this but got from a serializer
-        String attachmentReference = docReference + "@" + cleanedFileName;
+        String attachmentReference = getAttachmentReference(docReference, cleanedFileName);
         linkConfig.setReference(attachmentReference);
         linkConfig.setUrl(doc.getAttachmentURL(cleanedFileName, context));
 
@@ -473,9 +473,9 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     protected DocumentName prepareDocumentName(String wiki, String space, String page)
     {
-        String newPageName = clearXWikiName(page);
-        String newSpaceName = clearXWikiName(space);
-        String newWikiName = clearXWikiName(wiki);
+        String newPageName = StringUtils.isEmpty(page) ? page : clearXWikiName(page);
+        String newSpaceName = StringUtils.isEmpty(space) ? space : clearXWikiName(space);
+        String newWikiName = StringUtils.isEmpty(wiki) ? wiki : clearXWikiName(wiki);
         if (StringUtils.isEmpty(wiki)) {
             newWikiName = getXWikiContext().getDoc().getWikiName();
         }
@@ -510,6 +510,19 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     {
         // remove all . since they're used as separators for space and page
         return name.replaceAll("\\.", "");
+    }
+
+    /**
+     * Helper method to get the reference to an attachment. <br />
+     * FIXME: which should be removed when such a serializer will exist in the bridge.
+     * 
+     * @param docReference the reference of the document to which the file is attached
+     * @param attachName the name of the attached file to get the reference for
+     * @return the reference of a file attached to a document, in the form wiki:Space.Page@filename.ext
+     */
+    private String getAttachmentReference(String docReference, String attachName)
+    {
+        return docReference + "@" + attachName;
     }
 
     /**
@@ -550,6 +563,34 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             }
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#getAttachments(String, String, String)
+     */
+    public List<Attachment> getAttachments(String wikiName, String spaceName, String pageName) throws XWikiGWTException
+    {
+        XWikiContext context = getXWikiContext();
+        List<Attachment> attachments = new ArrayList<Attachment>();
+        DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
+        DocumentNameSerializer serializer = (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class);
+        String docReference = serializer.serialize(docName);
+        XWikiDocument doc = null;
+        try {
+            doc = context.getWiki().getDocument(docReference, context);
+            for (XWikiAttachment attach : doc.getAttachmentList()) {
+                Attachment currentAttach = new Attachment();
+                currentAttach.setFilename(attach.getFilename());
+                currentAttach.setDownloadUrl(doc.getAttachmentURL(attach.getFilename(), context));
+                currentAttach.setReference(getAttachmentReference(docReference, attach.getFilename()));
+                attachments.add(currentAttach);
+            }
+        } catch (XWikiException e) {
+            throw getXWikiGWTException(e);
+        }
+        return attachments;
     }
 
     /**

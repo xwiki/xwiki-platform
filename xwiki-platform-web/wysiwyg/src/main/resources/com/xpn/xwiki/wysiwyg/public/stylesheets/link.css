@@ -21,3 +21,51 @@
 .xExplorerPanel input {
   width: 98%;
 }
+
+/* Styles for the attachment link step */
+.xToggleButtons {
+  background-color: #eeeeee;
+}
+
+.xToggleButtons button {
+  height: 25px;
+  line-height: 17px;
+  background-color: #eeeeee;
+  border: none;
+  cursor: pointer;
+}
+
+.xToggleButtons button.xSelected {
+  background-color: #ffffff;
+}
+
+.xLinkStep .listGrid, .xExplorerPanel .listGrid {
+  border: none;
+}
+
+.xLinkStep .xListBox {
+  height: 320px;
+  overflow: auto;
+}
+
+.xAttachmentsSelector {
+  margin-top: 5px;
+}
+
+.xAttachmentsSelector .xAttachPreview, .xAttachmentsSelector .xNewFilePreview {
+  padding: 5px 5px 5px 20px;
+  cursor: pointer;
+  background-position: left center;
+  background-repeat: no-repeat;
+}
+.xAttachmentsSelector .xAttachPreview {
+  background-image: url(../images/page_white_text.gif);
+}
+
+.xAttachmentsSelector .xNewFilePreview {
+  background-image: url(../images/bullet_add.gif);
+}
+
+.xAttachmentsSelector .xListItem-selected {
+  background-color: #D4E8FF;
+}

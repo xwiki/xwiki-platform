@@ -22,74 +22,23 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import java.util.EnumSet;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.explorer.XWikiExplorer;
-import com.xpn.xwiki.wysiwyg.client.widget.explorer.ds.WikiDataSource;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
- * Wizard step to provide an interface to selecting a wiki resource, using an {@link XWikiExplorer}. Implementing
- * classes will have to implement the {@link #onSubmit(AsyncCallback)} and {@link #onCancel(AsyncCallback)} to handle
- * selection validation and submit or cancel.
+ * Abstract {@link WizardStep} to implement basic selector functions (step names, directions, initialization),
+ * regardless of the actual selecting method.
  * 
  * @version $Id$
  */
 public abstract class AbstractSelectorWizardStep implements WizardStep
 {
     /**
-     * The xwiki tree explorer, used to select the page or file to link to.
-     */
-    private XWikiExplorer explorer;
-
-    /**
-     * The panel to hold the xwiki explorer.
-     */
-    private final Panel explorerPanel = new FlowPanel();
-
-    /**
-     * The link config edited by this dialog.
+     * The link config edited by this wizard step.
      */
     private LinkConfig linkData;
-
-    /**
-     * Builds a {@link AbstractSelectorWizardStep} from the passed settings.
-     * 
-     * @param addPage specifies whether the wiki explorer should show the option to add a page
-     * @param showAttachments specifies whether the wiki explorer should show the attached files for pages
-     * @param addAttachments specifies whether the wiki explorer should show the option to add an attachment
-     * @param defaultSelection the default selection of the wiki explorer displayed by this step
-     */
-    public AbstractSelectorWizardStep(boolean addPage, boolean showAttachments, boolean addAttachments,
-        String defaultSelection)
-    {
-        explorer = new XWikiExplorer();
-        explorer.setDisplayLinks(false);
-        // display the new page option
-        explorer.setDisplayAddPage(addPage);
-        explorer.setDisplayAddPageOnTop(false);
-        // no attachments here
-        explorer.setDisplayAttachments(showAttachments);
-        explorer.setDisplayAddAttachment(showAttachments && addAttachments);
-        explorer.setDisplayAttachmentsWhenEmpty(showAttachments && addAttachments);
-        explorer.setWidth("455px");
-        explorer.setHeight("305px");
-        WikiDataSource ds = new WikiDataSource();
-        explorer.setDataSource(ds);
-        explorer.setDefaultValue(defaultSelection);
-        // strangely enough, this sets the style on the tree wrapper, which contains the input too, even if explorer is
-        // a reference only to the tree
-        explorer.addStyleName("xExplorerPanel");
-        // we need to add the explorer in a wrapper, since the explorer creates its own wrapper around and adds the
-        // input to that wrapper. We use this panel to have a reference to the _whole_ generated UI, since the explorer
-        // reference would point only to the grid inside.
-        explorerPanel.add(explorer);
-    }
 
     /**
      * {@inheritDoc}
@@ -97,43 +46,15 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
     public void init(Object data, AsyncCallback< ? > cb)
     {
         linkData = (LinkConfig) data;
-        initializeExplorerSelection();
+        initializeSelection();
         cb.onSuccess(null);
     }
 
     /**
-     * Sets the initial explorer selection on {@link #init(Object, AsyncCallback)} time, to be overwritten by subclasses
-     * to perform specific actions. By default, the reference of the passed {@link LinkConfig}, if any, is set in the
-     * explorer.
+     * Initializes the selection on {@link #init(Object, AsyncCallback)} time.
      */
-    protected void initializeExplorerSelection()
+    protected void initializeSelection()
     {
-        if (!StringUtils.isEmpty(linkData.getReference())) {
-            explorer.setValue(linkData.getReference());
-        }
-        // else leave the tree where the last selection was
-    }
-
-    /**
-     * Invalidates the cache on the explorer, so that it will be reloaded on next display. To be used to request an
-     * update of the tree when new data is added to it.
-     */
-    protected void invalidateExplorerData()
-    {
-        // let's be silently safe about it, no calling function should fail because of this, at least for the moment
-        try {
-            explorer.invalidateCache();
-        } catch (Exception e) {
-            // nothing
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Widget display()
-    {
-        return explorerPanel;
     }
 
     /**
@@ -158,14 +79,6 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
     public EnumSet<NavigationDirection> getValidDirections()
     {
         return EnumSet.of(NavigationDirection.NEXT, NavigationDirection.PREVIOUS, NavigationDirection.CANCEL);
-    }
-
-    /**
-     * @return the wiki explorer used by this selector
-     */
-    public XWikiExplorer getExplorer()
-    {
-        return explorer;
     }
 
     /**

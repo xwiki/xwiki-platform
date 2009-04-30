@@ -26,25 +26,47 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
+import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
- * Specialized {@link AbstractSelectorWizardStep} to select a wiki page (existing or new).
+ * Specialized {@link AbstractExplorerWizardStep} to select a wiki page (existing or new).
  * 
  * @version $Id$
  */
-public class WikipageSelectorWizardStep extends AbstractSelectorWizardStep
+public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
 {
     /**
-     * Creates a wiki page selection wizard step with the specified default selection. The selection will be used to
-     * position the wiki page selection tree on the resource named by it on the first load. 
-     * 
-     * @param defaultSelection the default selection of the wiki explorer
+     * The resource edited currently (the wiki page for which this wysiwyg is instantiated).
      */
-    public WikipageSelectorWizardStep(String defaultSelection)
+    private ResourceName editedResource;
+
+    /**
+     * Creates a wiki page selection wizard step with the specified default selection. The selection will be used to
+     * position the wiki page selection tree on the resource named by it on the first load.
+     * 
+     * @param editedResource the currently edited resource
+     */
+    public WikipageExplorerWizardStep(ResourceName editedResource)
     {
         // build a standard selector which shows "Add page" and no attachments.
-        super(true, false, false, defaultSelection);
+        super(true, false, false, editedResource.toString());
+        this.editedResource = editedResource;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void initializeSelection()
+    {
+        if (!StringUtils.isEmpty(getLinkData().getReference())) {
+            // resolve the edited link to the currently edited page and then set the tree selection
+            ResourceName r = new ResourceName();
+            r.fromString(getLinkData().getReference());
+            getExplorer().setValue(r.resolveRelativeTo(editedResource).toString());
+        }
+        // else leave the tree where the last selection was        
     }
 
     /**

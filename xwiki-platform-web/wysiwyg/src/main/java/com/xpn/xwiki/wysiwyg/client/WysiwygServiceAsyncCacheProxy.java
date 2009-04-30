@@ -26,6 +26,7 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.Attachment;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
@@ -251,6 +252,17 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
         AsyncCallback<List<ImageConfig>> async)
     {
         service.getImageAttachments(wikiName, spaceName, pageName, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#getAttachments(String, String, String, AsyncCallback)
+     */
+    public void getAttachments(String wikiName, String spaceName, String pageName, 
+        AsyncCallback<List<Attachment>> async)
+    {
+        service.getAttachments(wikiName, spaceName, pageName, async);
     }
 
     /**

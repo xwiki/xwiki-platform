@@ -25,6 +25,7 @@ import java.util.Map;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStepProvider;
@@ -57,7 +58,7 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     /**
      * The resource currently edited by this WYSIWYG, used to determine the context in which link creation takes place.
      */
-    private String editedResource;
+    private Config config;
 
     /**
      * Builds a {@link LinkWizard} from the passed {@link Config}. The configuration is used to get WYSIWYG editor
@@ -68,7 +69,7 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     public LinkWizard(Config config)
     {
         super(Strings.INSTANCE.link(), Images.INSTANCE.link().createImage());
-        editedResource = config.getParameter("documentName");
+        this.config = config;
         this.setProvider(this);
     }
 
@@ -87,13 +88,13 @@ public class LinkWizard extends Wizard implements WizardStepProvider
                     step = new EmailAddressLinkWizardStep();
                     break;
                 case WIKIPAGE:
-                    step = new WikipageSelectorWizardStep(editedResource);
+                    step = new WikipageExplorerWizardStep(getEditedResource());
                     break;
                 case WIKIPAGECREATOR:
                     step = new CreateNewPageWizardStep();
                     break;
                 case ATTACHMENT:
-                    step = new AttachmentSelectorWizardStep(editedResource);
+                    step = dispatchAttachmentSelectorStep();
                     break;
                 case ATTACHUPLOAD:
                     step = new AttachmentUploadWizardStep();
@@ -115,6 +116,30 @@ public class LinkWizard extends Wizard implements WizardStepProvider
         }
         // return the found or newly created step
         return step;
+    }
+
+    /**
+     * @return the currently edited resource, from the configuration
+     */
+    private ResourceName getEditedResource()
+    {
+        return new ResourceName(config.getParameter("wiki"), config.getParameter("space"), config.getParameter("page"),
+            null);
+    }
+
+    /**
+     * @return the wizard step for attachments selector wrt the configuration parameters. If the {@code linkfiles}
+     *         parameter with the value {@code currentpage} is not found, then the selector will be enabled for the
+     *         whole wiki, otherwise only for the current page.
+     */
+    private WizardStep dispatchAttachmentSelectorStep()
+    {
+        String linkFiles = config.getParameter("linkfiles");
+        if ("currentpage".equals(linkFiles)) {
+            return new PageSelectorWizardStep(getEditedResource()); 
+        } else {
+            return new AttachmentSelectorWizardStep(getEditedResource());
+        }
     }
 
     /**

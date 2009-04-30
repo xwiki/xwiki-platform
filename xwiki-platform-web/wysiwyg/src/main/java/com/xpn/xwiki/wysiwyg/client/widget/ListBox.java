@@ -87,6 +87,18 @@ public class ListBox extends Composite implements SourcesChangeEvents, ClickList
     }
 
     /**
+     * Inserts an item before the specified position.
+     * 
+     * @param item the item to be inserted
+     * @param beforeIndex the index before which to insert the item
+     */
+    public void insertItem(ListItem item, int beforeIndex)
+    {
+        item.setSelected(false);
+        list.insert(item, beforeIndex);
+    }
+
+    /**
      * Removes an item from this list.
      * 
      * @param item the list item to be removed

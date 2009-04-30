@@ -115,10 +115,9 @@ $xwiki.getTextArea($tdoc.content)
         plugins: 'separator text valign list indent history format symbol link image table macro importer',
         syntax: "$doc.syntaxId",
         toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer | image | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol',
-        ## TODO: remove these when the image plugin will use the documentName for its initialization        
+        wiki: '${doc.wiki.replace("'", "\'")}'
         space: '${doc.space.replace("'", "\'")}',
         page: '${doc.name.replace("'", "\'")}',
-        documentName: '${doc.fullName.replace("'", "\'")}',
         debug: #if($request.debug)'true'#else'false'#end
     };
 #if($request.sync)

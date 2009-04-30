@@ -25,6 +25,7 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.Attachment;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
@@ -180,6 +181,16 @@ public interface WysiwygServiceAsync
      */
     void getImageAttachments(String wikiName, String spaceName, String pageName,
         AsyncCallback<List<ImageConfig>> async);
+
+    /**
+     * Returns all the attachments from the referred page.
+     * 
+     * @param wikiName the name of the wiki to get attachments from
+     * @param spaceName the name of the space to get attachments from
+     * @param pageName the name of the page to get attachments from
+     * @param async object used for asynchronous communication between server and client.
+     */
+    void getAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<Attachment>> async);
 
     /**
      * Makes a request to the server to get the descriptor for the specified macro.

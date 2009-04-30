@@ -221,9 +221,17 @@ public interface Strings extends Constants
 
     String linkNewPageError();
 
+    String selectorSelectFromCurrentPage();
+    
+    String selectorSelectFromAllPages();
+    
+    String linkErrorLoadingData();
+    
     String image();
 
     String fileUploadLabel();
+
+    String fileUploadNewFileLabel();    
 
     String fileUploadTitle();    
 

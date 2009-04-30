@@ -95,15 +95,16 @@
                method: 'get',
                        onSuccess: function(transport) {
                          $('userSuggest').value = "";
-                         $('groupSuggest').value = "";
-                                    
+                         $('groupSuggest').value = "";                                    
                          var nr = parseInt(transport.responseText);  
-                         if(nr == 0) $('errMsg').innerHTML = "$msg.get("duplicateuser")";
+                         if(nr == 0) $('errMsg').innerHTML = "$msg.get('rightsmanager.duplicateuser')";
                          else {
-                             var end = window.tabl.totalRows + nr;       
-                             var start = end - window.tabl.limit;
-                             if(start < 1)  start = 1;
-                             window.tabl.showRows(start, end); 
+                             // if the new total (saved + the one user or group just added) exceed the table limit
+                             // we ask for the "last page" (the bottom of the table), otherwise, we ask for the whole first page.
+                             var start = (window.tabl.totalRows + 1) > window.tabl.limit ? window.tabl.totalRows - window.tabl.limit + 2 : 0;
+                             // force fetching rows again in any case, to get the newly added user or group
+                             window.tabl.totalRows = -1 ;
+                             window.tabl.showRows(start, window.tabl.limit);
                          }                   
                        }
              });

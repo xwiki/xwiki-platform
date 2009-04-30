@@ -56,6 +56,11 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
      * The link reference prefix indicating that the link is targeting an attachment.
      */
     private static final String ATTACH = "attach:";
+    
+    /**
+     * The class attribute 'wikilink'.
+     */
+    private static final String WIKILINK = "wikilink";
 
     /**
      * The XHTML printer to use to output links as XHTML.
@@ -142,64 +147,93 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
         this.xhtmlPrinter.printXMLComment("startwikilink:" + this.xwikiSyntaxLinkRenderer.renderLinkReference(link),
             true);
 
+        if (link.isExternalLink()) {
+            beginExternalLink(link, isFreeStandingURI, parameters);
+        } else {
+            beginInternalLink(link, isFreeStandingURI, parameters);
+        }
+    }
+    
+    /**
+     * Start of an external link.
+     * 
+     * @param link the link definition (the reference)
+     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
+     */
+    private void beginExternalLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
         Map<String, String> spanAttributes = new LinkedHashMap<String, String>();
         Map<String, String> aAttributes = new LinkedHashMap<String, String>();
 
         // Add all parameters to the A attributes
         aAttributes.putAll(parameters);
+        
+        spanAttributes.put(CLASS, "wikiexternallink");
+        if (isFreeStandingURI) {
+            aAttributes.put(CLASS, "wikimodel-freestanding");
+        }
 
-        if (link.isExternalLink()) {
-            spanAttributes.put(CLASS, "wikiexternallink");
-            if (isFreeStandingURI) {
-                aAttributes.put(CLASS, "wikimodel-freestanding");
-            }
-
-            // href attribute
-            if (link.getType() == LinkType.INTERWIKI) {
-                // TODO: Resolve the Interwiki link
-            } else {
-                if ((link.getType() == LinkType.URI) && link.getReference().startsWith(ATTACH)) {
-                    // use the default attachment syntax parser to extract document name and attachment name
-                    Attachment attachment = this.attachmentParser.parse(link.getReference().substring(ATTACH.length()));
-                    aAttributes.put(HREF, this.documentAccessBridge.getAttachmentURL(attachment.getDocumentName(),
-                        attachment.getAttachmentName()));
-                } else {
-                    aAttributes.put(HREF, link.getReference());
-                }
-            }
-
-            this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
-            this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
+        // href attribute
+        if (link.getType() == LinkType.INTERWIKI) {
+            // TODO: Resolve the Interwiki link
         } else {
-            // This is a link to a document.
-
-            // Check for the document existence.
-            if (StringUtils.isEmpty(link.getReference()) || this.documentAccessBridge.exists(link.getReference())) {
-                spanAttributes.put(CLASS, "wikilink");
-                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "view", link
-                    .getQueryString(), link.getAnchor()));
-                this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
-                this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
+            if ((link.getType() == LinkType.URI) && link.getReference().startsWith(ATTACH)) {
+                // use the default attachment syntax parser to extract document name and attachment name
+                Attachment attachment = this.attachmentParser.parse(link.getReference().substring(ATTACH.length()));
+                aAttributes.put(HREF, this.documentAccessBridge.getAttachmentURL(attachment.getDocumentName(),
+                    attachment.getAttachmentName()));
             } else {
-                spanAttributes.put(CLASS, "wikicreatelink");
-
-                // Add the parent=<current document name> parameter to the query string of the generated URL so that
-                // the new document is created with the current page as its parent.
-                String queryString = link.getQueryString();
-                if (StringUtils.isBlank(queryString)) {
-                    DocumentName documentName = this.documentAccessBridge.getCurrentDocumentName();
-                    if (documentName != null) {
-                        queryString = "parent=" + this.documentNameSerializer.serialize(documentName);
-                    }
-                }
-
-                aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", queryString, link
-                    .getAnchor()));
-
-                this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
-                this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
+                aAttributes.put(HREF, link.getReference());
             }
         }
+        
+        this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
+        this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
+    }
+    
+    /**
+     * Start of an internal link.
+     * 
+     * @param link the link definition (the reference)
+     * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
+     * @param parameters a generic list of parameters. Example: style="background-color: blue"
+     */
+    private void beginInternalLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters) 
+    {
+        Map<String, String> spanAttributes = new LinkedHashMap<String, String>();
+        Map<String, String> aAttributes = new LinkedHashMap<String, String>();
+
+        // Add all parameters to the A attributes
+        aAttributes.putAll(parameters);
+        
+        if (StringUtils.isEmpty(link.getReference()) && link.getAnchor() != null) {            
+            spanAttributes.put(CLASS, WIKILINK);
+            aAttributes.put(HREF, "#" + link.getAnchor());
+        } else if (StringUtils.isEmpty(link.getReference()) || this.documentAccessBridge.exists(link.getReference())) {
+            spanAttributes.put(CLASS, WIKILINK);                
+            aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "view", link
+                .getQueryString(), link.getAnchor()));
+        } else {
+            spanAttributes.put(CLASS, "wikicreatelink");
+
+            // Add the parent=<current document name> parameter to the query string of the generated URL so that
+            // the new document is created with the current page as its parent.
+            String queryString = link.getQueryString();
+            if (StringUtils.isBlank(queryString)) {
+                DocumentName documentName = this.documentAccessBridge.getCurrentDocumentName();
+                if (documentName != null) {
+                    queryString = "parent=" + this.documentNameSerializer.serialize(documentName);
+                }
+            }
+
+            aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", queryString, link
+                .getAnchor()));
+
+        }
+        
+        this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
+        this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
     }
 
     /**

@@ -55,7 +55,7 @@ public class XWikiJaxRsApplication extends Application
                     Class< ? > resourceClass = this.getClass().getClassLoader().loadClass(resourceClassName);
                     jaxRsClasses.add(resourceClass);
 
-                    context.getLogger().log(Level.INFO, String.format("Added resource %s", resourceClassName));
+                    context.getLogger().log(Level.FINE, String.format("Added resource %s", resourceClassName));
                 } catch (ClassNotFoundException e) {
                     context.getLogger().log(Level.WARNING, String.format("Cannot load class %s", resourceClassName));
                 }
@@ -72,12 +72,14 @@ public class XWikiJaxRsApplication extends Application
                     Class< ? > providerClass = this.getClass().getClassLoader().loadClass(providerClassName);
                     jaxRsClasses.add(providerClass);
 
-                    context.getLogger().log(Level.INFO, String.format("Added provider %s", providerClassName));
+                    context.getLogger().log(Level.FINE, String.format("Added provider %s", providerClassName));
                 } catch (ClassNotFoundException e) {
                     context.getLogger().log(Level.WARNING, String.format("Cannot load class %s", providerClassName));
                 }
             }
         }
+        
+        context.getLogger().log(Level.INFO, "RESTful API subsystem initialized.");
     }
 
     @Override

@@ -33,8 +33,8 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2>
+<!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2>
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2></html>
+<html><!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2></html>

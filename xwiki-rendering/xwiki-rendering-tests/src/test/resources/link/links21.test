@@ -1,0 +1,9 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test anchor links targetting current document.
+.#-----------------------------------------------------
+[[label>>#name]]
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p><!--startwikilink:#name--><span class="wikilink"><a href="#name">label</a></span><!--stopwikilink--></p>

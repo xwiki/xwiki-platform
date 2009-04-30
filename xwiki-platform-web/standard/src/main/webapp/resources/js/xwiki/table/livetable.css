@@ -46,7 +46,7 @@
 	padding:0!important;
 	float: right;
 }
-.controlPagination a{
+.controlPagination div{
 	position:absolute;
 	top:0;
 	left:0;
@@ -55,22 +55,25 @@
 	overflow:hidden;
 	border:none;
 }
-.controlPagination a.prevPagination , .controlPagination a.noPrevPagination, .controlPagination a.nextPagination, .controlPagination a.noNextPagination {
-	background-image:url("$xwiki.getSkinFile('js/xwiki/table/img/navigation.png')");
+.controlPagination div.prevPagination , .controlPagination div.noPrevPagination, .controlPagination div.nextPagination, .controlPagination div.noNextPagination {
+	background-image:url("$xwiki.getSkinFile('icons/xwiki/pagination-controls.png')");
 	width: 21px;
 	height: 22px;
 }
-.controlPagination a.prevPagination {
+.controlPagination div.prevPagination:hover, .controlPagination div.nextPagination:hover {
+    cursor:pointer;
+}
+.controlPagination div.prevPagination {
 	background-position:left top;
 }
-.controlPagination a.noPrevPagination{
+.controlPagination div.noPrevPagination{
 	background-position:left bottom;
 }
-.controlPagination a.nextPagination {
+.controlPagination div.nextPagination {
 	background-position:right top;
 	left: 21px;
 }
-.controlPagination a.noNextPagination {
+.controlPagination div.noNextPagination {
 	background-position:right bottom;
 	left: 21px;
 }
@@ -126,7 +129,7 @@ thead.xwiki-grid-display-header th.desc {
 	background:#dddddd url("$xwiki.getSkinFile('icons/silk/bullet_arrow_down.gif')") no-repeat scroll right center;
 }
 thead.xwiki-grid-display-header th.asc {
-	background:#dddddd url("$xwiki.getSkinFile('icons/silk/bullet_arrow_up.png')") no-repeat scroll right center;
+	background:#dddddd url("$xwiki.getSkinFile('icons/silk/bullet_arrow_up.gif')") no-repeat scroll right center;
 }
 thead.xwiki-grid-display-header th.selected {
 	color:#4D4D4D;

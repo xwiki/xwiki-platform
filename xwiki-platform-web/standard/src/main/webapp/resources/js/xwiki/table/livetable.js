@@ -4,14 +4,14 @@
  * XWiki namespace
  */
 if (typeof XWiki == "undefined") {
-	XWiki = new Object();
+    XWiki = new Object();
 }
 
 /**
  * widgets namespace
  */
 if (typeof XWiki.widgets == "undefined") {
-	XWiki.widgets = new Object();
+    XWiki.widgets = new Object();
 }
 
 /**
@@ -35,7 +35,7 @@ XWiki.widgets.LiveTable = Class.create({
     * @todo Make this a valid ARIA grid: http://www.w3.org/TR/aria-role/#structural
     */
   initialize: function(url, domNodeName, handler, options)
-  {	
+  { 
     // id of the root element that encloses this livetable
     this.domNodeName = domNodeName;
 
@@ -45,21 +45,23 @@ XWiki.widgets.LiveTable = Class.create({
     this.displayNode = $(domNodeName + "-display") || $('display1');
 
     if (typeof options == "undefined") {
-	   options = {};
+       options = {};
     }
 
     this.limit = options.limit || 10;
     this.action = options.action || "view"; // FIXME check if this can be removed safely.
 
-    if ($(domNodeName + '-pagination')) {
-       this.paginator = new GridPagination(this, domNodeName + "-pagination", options.maxPages || 10);
+    // pagination
+    var paginationNodes = $(this.domNodeName).select(".xwiki-grid-pagination");
+    if (typeof paginationNodes != "undefined") {
+       this.paginator = new GridPagination(this, paginationNodes, options.maxPages || 10);
     }
     if ($(domNodeName + '-filters')) {
-		// Ideally we should pass domNodeName + "-filters" as the filter node instead of the whole display table,
-		// so that the filters elements (input/selects) are retrieved down this filter node
-		// But right now this would break the RMUI since the checkbox to switch from group view to user view
-		// in the rights UI is outside this element.
-		// FIXME
+      // Ideally we should pass domNodeName + "-filters" as the filter node instead of the whole display table,
+      // so that the filters elements (input/selects) are retrieved down this filter node
+      // But right now this would break the RMUI since the checkbox to switch from group view to user view
+      // in the rights UI is outside this element.
+      // FIXME
       this.filter = new GridFilter(this, this.displayNode.up("table"));
     }
     if ($(domNodeName + "-tagcloud"))
@@ -174,27 +176,27 @@ XWiki.widgets.LiveTable = Class.create({
     * @param limit Maximum number of rows to display.
     */
   displayRows: function(offset, limit)
-  {	
+  { 
     var f = offset + limit - 1;
     if (f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0) ? offset : 0;
     var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $msg.get('xe.pagination.results.of') <strong>" + this.totalRows + "</strong>";
     var msg = msg.toLowerCase();
-		
+        
     this.limitsDisplay.innerHTML = "$msg.get('xe.pagination.results') " + msg;
     this.clearDisplay();
 
     for (var i = off; i <= f; i++) {
       if (this.fetchedRows[i]) {
-		var elem = this.handler(this.fetchedRows[i], i, this);		
+        var elem = this.handler(this.fetchedRows[i], i, this);      
         this.displayNode.appendChild(elem);
         document.fire("xwiki:livetable:newrow", {
-	      "row":elem,
-	      "table":this
-	});
+          "row":elem,
+          "table":this
+    });
       }
     }
-    if (this.paginator) this.paginator.refreshPaginator();
+    if (this.paginator) this.paginator.refreshPagination();
   },
 
   /**
@@ -239,7 +241,7 @@ XWiki.widgets.LiveTable = Class.create({
       this.getRows(min, max - min + 1, offset, limit);
     }
  
-    if(this.paginator) this.paginator.refreshPaginator();
+    if(this.paginator) this.paginator.refreshPagination();
 
     return buff;
   },
@@ -291,7 +293,7 @@ XWiki.widgets.LiveTable = Class.create({
       this.showRows(newoffset, this.limit);
     }
                                      
-    if (this.paginator) this.paginator.refreshPaginator();
+    if (this.paginator) this.paginator.refreshPagination();
   },
 
   /**
@@ -346,47 +348,63 @@ XWiki.widgets.LiveTable = Class.create({
  * Helper class to display pagination
  */
 var GridPagination = Class.create({
-    initialize: function(table, domNode, max)
+    initialize: function(table, domNodes, max)
     {
       this.table = table;
-      this.domNode = $(domNode);
+      var self = this;
+      this.pagesNodes = [];
+      domNodes.each(function(elem){
+         self.pagesNodes.push(elem.down(".xwiki-grid-pagination-content"));
+      });
       this.max = max;
+      $(this.table.domNodeName).select("div.prevPagination").invoke("observe", "click", this.gotoPrevPage.bind(this));
+      $(this.table.domNodeName).select("div.nextPagination").invoke("observe", "click", this.gotoNextPage.bind(this));
     },
-    refreshPaginator: function()
+    refreshPagination: function()
     {
-      this.domNode.innerHTML = "";     
+      var self = this;
+      this.pagesNodes.each(function(elem){
+         elem.innerHTML = "";
+      });
       var pages = Math.ceil(this.table.totalRows / this.table.limit);
       var currentMax = (!this.max) ? pages : this.max;
       var currentPage = Math.floor( this.table.lastoffset / this.table.limit) + 1;
       var startPage = Math.floor(currentPage / currentMax) * currentMax - 1;
       // always display the first page
       if (startPage>1) {
-	     this.domNode.appendChild(this.createPageLink(1, false));
-	     if (startPage>2) {
-		    this.domNode.appendChild(document.createTextNode(" ... "));
+         this.pagesNodes.each(function(elem){
+             elem.insert(self.createPageLink(1, false));
+         });
+         if (startPage>2) {
+            this.pagesNodes.invoke("insert", " ... ");
          }
       }
       // display pages 
- 	  var i;
+      var i;
       for (i=(startPage<=0) ? 1 : startPage;i<=Math.min(startPage + currentMax + 1, pages);i++) {
          var selected = (currentPage == i) ? true : false
-         this.domNode.appendChild(this.createPageLink(i, selected));
-         this.domNode.appendChild(document.createTextNode(" "));
+         this.pagesNodes.each(function(elem){
+             elem.insert(self.createPageLink(i, selected));
+         });
+         this.pagesNodes.invoke("insert", " ");
       }
       // alwyas display the last page.
       if (i<pages) {
-	    if (i+1 < pages) {
-		  this.domNode.appendChild(document.createTextNode(" ... "));
+        if (i+1 < pages) {
+          this.pagesNodes.invoke("insert", " ... ");
         }
-        this.domNode.appendChild(this.createPageLink(pages, false));
+        //this.pagesNodes.invoke("insert", pageSpan.clone());
+        this.pagesNodes.each(function(elem){
+             elem.insert(self.createPageLink(pages, false));
+        });
       }
     },
     createPageLink:function(page, selected) {
-	    var pageSpan = new Element("span", {'class':'pagenumber'}).update(page);
-	    if (selected) {
-		   pageSpan.addClassName("selected");
+        var pageSpan = new Element("span", {'class':'pagenumber'}).update(page);
+        if (selected) {
+           pageSpan.addClassName("selected");
         }
-	    var self = this;
+        var self = this;
         pageSpan.observe("click", function(ev){
             self.gotoPage(ev.element().innerHTML);
         });
@@ -400,16 +418,16 @@ var GridPagination = Class.create({
       var currentPage = Math.floor( this.table.lastoffset / this.table.limit) + 1;
       var prevPage = currentPage - 1;
       if (prevPage > 0) {
-	  	this.table.showRows(((parseInt(prevPage) - 1) * this.table.limit) + 1, this.table.limit);
-	  }
+        this.table.showRows(((parseInt(prevPage) - 1) * this.table.limit) + 1, this.table.limit);
+      }
     },
     gotoNextPage: function() {
       var currentPage = Math.floor( this.table.lastoffset / this.table.limit) + 1;
       var pages = Math.ceil(this.table.totalRows / this.table.limit);
       var nextPage = currentPage + 1;
       if (nextPage <= pages) {
-	  	this.table.showRows(((parseInt(nextPage) - 1) * this.table.limit) + 1, this.table.limit);
-	  }
+        this.table.showRows(((parseInt(nextPage) - 1) * this.table.limit) + 1, this.table.limit);
+      }
     }
 });
 

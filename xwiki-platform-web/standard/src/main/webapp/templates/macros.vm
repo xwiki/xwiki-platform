@@ -1370,3 +1370,247 @@ $html
 #macro(editActionButton $action $resourceIdentifier)
 #submitButton("action_${action}", $msg.get("core.shortcuts.edit.${resourceIdentifier}"), $msg.get($resourceIdentifier))
 #end
+
+#**
+ * AJAX Live table that displays XWiki data.
+ *
+ * Example of usage, in syntax 2.0:
+ * <code>
+ * {{velocity}}
+ * #set($columns = [ "_avatar", "first_name", "last_name", "email"])
+ * #set($columnsProperties = {
+ *                  "first_name" : { "type" : "text" , "size" : 10, "link" : "view"}, 
+ *                  "last_name" : { "type" : "text" , "size" : 10, "link" : "view"},
+ *                  "email" : { "type" : "text" , "size" : 20, "link" : "editor"},
+ *                  "_avatar" : { "type" : "none" , "size" : 20, "link" : "none", "html" : "true", "sortable":false }
+ *                })
+ * #set($options = { "className":"XWiki.XWikiUsers",
+ *                    "translationPrefix" : "xe.index.users.",
+ *                    "tagCloud" : true,
+ *                    "rowCount": 15 })
+ * #livetable("userstable" $columns $columnsProperties $options)
+ * {{/velocity}}
+ * </code>
+ *
+ * @param divid the id of the table div
+ * @param collist the column list
+ * @param colprops the columns properties
+ * @param options the livetable options.
+ *#
+#macro(livetable $divid $collist $colprops $options)
+  ##
+  ## SX deps.
+  ##
+  #set($ok = $xwiki.jsfx.use("js/xwiki/table/livetable.js", true))
+  #set($ok = $xwiki.ssfx.use("js/xwiki/table/livetable.css", true))
+  ##
+  ## Options / defaults
+  ##
+  #if("$!options.translationPrefix" != "") #set($transprefix = $options.translationPrefix) #else #set($transprefix = "") #end
+  #if("$!options.selectedColumn" != "")  #set($selectedColumn = $options.selectedColumn) #end
+  #if("$!options.defaultOrder" == "desc") #set($defaultOrder = "desc") #else #set($defaultOrder = "asc") #end
+  #if("$!options.rowCount" != "") #set($count = $options.rowCount) #else #set($count = 15) #end
+  #if("$!options.maxPages" != "") #set($maxPages = $options.maxPages) #else #set($maxPages = 10) #end
+  #if("$!options.selectedColumn" != "") #set($selectedColumn = $options.selectedColumn) #end
+  #if("$!options.callback" != "") #set($callback = $options.callback) #end
+  #if("$!options.tagCloud" == "" || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
+  #set($classname = "$!options.className")
+  ##
+  ## Columns informations
+  ##
+  #set($collist2 = "")
+  #set($classparams = "")
+  #foreach($colname in $collist)
+    #if("$!selectedColumn" == "" && !$colname.startsWith("_"))
+      #set($selectedColumn = $colname)
+    #end
+    #set($collist2 = "${collist2},${colname}")
+    #set($propClassName = "")
+    #set($propClassName = $colprops.get($colname).get("class"))
+    #if($propClassName!="")
+      #set($classparams = "${classparams}&${colname}_class=${propClassName}")
+    #end
+  #end
+  #set($collist2 = $collist2.substring(1))
+  #if("$!options.url" != "")
+    #set($dataurl = $options.url)
+  #elseif("$!options.resultPage" != "")
+    #set($dataurl = $xwiki.getURL($options.resultPage,"view","xpage=plain&transprefix=${transprefix}&classname=${className}&collist=${collist2}${classparams}") )
+  #else
+    #set($dataurl = $xwiki.getURL("XWiki.LiveTableResults","view","xpage=plain&transprefix=${transprefix}&classname=${classname}&collist=${collist2}${classparams}"))
+  #end
+  ##
+  ## HTML Table
+  ##
+  #if($doc.syntaxId == "xwiki/2.0")
+{{html}}
+  #end
+  #if($tagcloud)
+    #set($ok = $xwiki.ssx.use("XWiki.TagCloud"))
+    <div id="${divid}-tagcloud">
+      <div class="xwiki-grid-tagcloud"></div>
+    </div>
+  #end
+  <table id="${divid}" class="xwiki-grid">
+    <tr>
+      <td class="xwiki-grid-pagination" colspan="2">
+        <span id="${divid}-limits" class="xwiki-grid-limits"></span>
+        <span id="${divid}-ajax-loader" class="xwiki-grid-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.grid.loading')" title="" />$msg.get("xe.grid.loading")</span>
+        <span class="controlPagination">
+          <div title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></div>
+          <div title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></div>
+        </span>
+        <span class="pagination">
+          <span id="${divid}-pagination-text" class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
+          <span id="${divid}-pagination" class="xwiki-grid-pagination-content" ></span>
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td class="xwiki-grid-display-container">
+        <table class="xwiki-grid-display">
+          <thead class="xwiki-grid-display-header">
+            <tr>
+            #foreach($colname in $collist)
+              #set($colprop = $colprops.get($colname))
+              #if("$!colprop.sortable" == "" || $colprop.sortable != false)
+                #set($isSortable = true)
+              #else
+                #set($isSortable = false)
+              #end
+              <th class="xwiki-grid-display-header-text #if($isSortable)sortable#end #if($colname == $selectedColumn) selected $defaultOrder #elseif($isSortable) asc #end" #if($isSortable)rel="${colname}"#end #if("$!colprop.type"=="hidden") style="display: none" #end>$msg.get("${transprefix}${colname}")</th>
+            #end
+            </tr>
+            <tr class="xwiki-grid-display-filters">
+            #foreach($colname in $collist)
+              #set($colprop = $colprops.get($colname))
+              #if("$!colprop.filterable" == "" || $colprop.filterable != false)
+                #set($isFilterable = true)
+              #else
+                #set($isFilterable = false)
+              #end
+              #if("$!colprop.type"=="list" && $isFilterable)
+                <td class="xwiki-grid-display-header-filter"> 
+                #if($colprop.get("class"))
+                  #set($propClassName = $colprop.get("class"))
+                #else
+                  #set($propClassName = $className)
+                #end
+                #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
+                #set($list = "")
+                #set($list = $class.get($colname).getListValues())
+                <select name='${colname}'><option value=''>none</option>
+                #set($map = $class.get($colname).getMapValues())
+                #foreach($listitem in $list)
+                  <option value="$listitem">$map.get($listitem).getValue()</option>
+                #end
+                </select>
+              </td>            
+              #elseif( ("$!colprop.type"=="text"||"$!colprop.type"=="number") && $isFilterable)
+                <td class="xwiki-grid-display-header-filter"><input name="${colname}" type="text" #if($colprop.size!="") size="${colprop.size}" #end  title='$msg.get("xe.search.filters.title") $msg.get("${transprefix}${colname}")' /></td>
+              #elseif("$!colprop.type"=="hidden")
+              #else
+              <td class="xwiki-grid-display-header-filter"></td>
+              #end
+            #end
+            </tr>
+          </thead>
+          <tbody id="${divid}-display" class="xwiki-grid-display-body"><tr><td>&nbsp;</td></tr></tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td class="xwiki-grid-pagination" colspan="2">
+        <span class="controlPagination">
+          <div title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></div>
+          <div title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></div>
+        </span>
+        <span class="pagination">
+          <span id="${divid}-pagination-text" class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
+          <span id="${divid}-pagination" class="xwiki-grid-pagination-content" ></span>
+        </span>
+      </td>
+    </tr>
+  </table>
+  <script type="text/javascript">
+  //<![CDATA[ 
+  #if($callback)
+    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{"maxPages":$maxPages});  
+  #else
+    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($collist $colprops) ,{"maxPages":$maxPages});
+  #end
+   //]]>
+  </script>
+  #if($doc.syntaxId == "xwiki/2.0")
+{{/html}} 
+  #end
+#end
+
+#**
+ * Internal macro - Used by the livetable macro to generate a JavaScript annonymous function
+ * that is passed to the LiveTable object constructor. This is function is dynamically written
+ * according to columns properties passed to the livetable macro.
+ *
+ * @param collist the list of columns
+ * @param colprops the columns properties
+ *
+ * @internal
+ *#
+#macro(livetablecallback $collist $colprops)
+function (row, i, table)
+{
+  // This callback method code has been generated from velocity. 
+  var tr = new Element("tr");
+  #foreach($colname in $collist)
+    // $colname
+    #set($colprop = $colprops.get($colname))
+    #if("$!colprop.type"!="hidden")
+      #if($colname.indexOf("doc.")==0)
+        #set($jscolname = $colname.replaceAll("doc.", "doc_"))
+      #else
+        #set($jscolname = $colname)
+      #end
+      #if("$!colprop.link"=="view"||"$!colprop.link"=="field"||"$!colprop.link"=="auto"||"$!colprop.link"=="editor")
+        var a = new Element("a");
+        #if("$!colprop.link"=="auto")
+          a.href = (row.${jscolname}_url=="") ? row.doc_url : row.${jscolname}_url; 
+        #elseif($colprop.link=="field")
+          a.href = (row.${jscolname}_url=="") ? "javascript:void(0)" : row.${jscolname}_url; 
+        #elseif($colprop.link=="editor")
+          #if($colprop.get("class"))
+            #set($propClassName = $colprop.get("class"))
+          #else
+            #set($propClassName = $className)
+          #end
+          a.href = "javascript:void()";
+        #else
+          a.href = row.doc_url; 
+        #end
+        #if($colprop.html && $colprop.html==true)
+          a.innerHTML = row.${jscolname};
+        #else
+          a.update(row.${jscolname});
+        #end
+        var fieldel = new Element("td");
+        fieldel.observe("click", function(event){
+          var tag = event.element().down("a");
+          editProperty(row.page, "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
+        }); 
+        fieldel.className = "${jscolname} link${colprop.link} type$!{colprop.type}";
+        fieldel.appendChild(a);
+        tr.appendChild(fieldel);
+      #else
+        var fieldel = document.createElement('td'); 
+        fieldel.className = "${jscolname} link${colprop.link} type$!{colprop.type}";
+        #if($colprop.html && $colprop.html==true)
+          fieldel.innerHTML = row.${jscolname};
+        #else
+          fieldel.update(row.${jscolname});
+        #end
+        tr.appendChild(fieldel);
+      #end
+    #end
+  #end
+  return tr;
+}
+#end

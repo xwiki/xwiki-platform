@@ -753,6 +753,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             getCommentsClass(context);
             getSkinClass(context);
             getGlobalRightsClass(context);
+            getSheetClass(context);
             getStatsService(context);
             if (context.getDatabase().equals(context.getMainXWiki())
                 && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
@@ -2682,6 +2683,42 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return bclass;
     }
 
+    /**
+     * Verify if the <code>XWiki.SheetClass</code> page exists and that it contains all the required configuration
+     * properties to make the sheet feature work properly. If some properties are missing they are created and saved in
+     * the database. SheetClass is used to a page as a sheet. When a page is tagged as a sheet and that page is included
+     * in another page using the include macro then editing it triggers automatic inline edition (for XWiki Syntax 2.0
+     * only - for XWiki Syntax 1.0 automatic inline edition is triggered using #includeForm). 
+     * 
+     * @param context the XWiki Context
+     * @return the SheetClass Base Class object containing the properties
+     * @throws XWikiException if an error happens during the save to the database
+     */
+    public BaseClass getSheetClass(XWikiContext context) throws XWikiException
+    {
+        XWikiDocument doc = getDocument(XWikiConstant.SHEET_CLASS, context);
+        boolean needsUpdate = doc.isNew();
+
+        BaseClass bclass = doc.getxWikiClass();
+        if (context.get("initdone") != null) {
+            return bclass;
+        }
+
+        bclass.setName(XWikiConstant.SHEET_CLASS);
+
+        needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
+
+        if (doc.isNew()) {
+            generatePageContent(doc, "Sheet Class");
+            doc.setContent(doc.getContent() + "\n\nClass that should be used to recognize sheet pages.");
+        }
+
+        if (needsUpdate) {
+            saveDocument(doc, context);
+        }
+        return bclass;
+    }
+    
     /**
      * Verify if the <code>XWiki.XWikiUsers</code> page exists and that it contains all the required configuration
      * properties to make the user feature work properly. If some properties are missing they are created and saved in

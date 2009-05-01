@@ -1530,6 +1530,16 @@ public class Document extends Api
         return this.doc.getChildren(getXWikiContext());
     }
 
+    /**
+     * @return "inline" if the document should be edited in inline mode by default or "edit" otherwise.
+     * 
+     * @throws XWikiException if an error happens when computing the edit mode
+     */
+    public String getDefaultEditMode() throws XWikiException
+    {
+        return this.doc.getDefaultEditMode(getXWikiContext());
+    }
+
     public String getDefaultEditURL() throws XWikiException
     {
         return this.doc.getDefaultEditURL(getXWikiContext());

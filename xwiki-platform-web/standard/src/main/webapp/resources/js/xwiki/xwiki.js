@@ -4,9 +4,10 @@
  *
  * @type object
  */
+
 if (typeof XWiki == "undefined") {
 
-    // This is very unlikely not to be the case, since xwiki.js is the first JS file in the stream, 
+    // This is very unlikely not to be the case, since xwiki.js is the first JS file in the stream,
     // but it might not be the case with custom skins, so let's not take the risk to erase other code.
     var XWiki = {};
 }
@@ -102,7 +103,7 @@ Object.extend(XWiki, {
       // Remove wiki from fullName.
       resource.fullName = fullName.substring(fullName.indexOf(this.constants.wikiSpaceSeparator) + 1, fullName.length);
       resource.prefixedFullName = fullName;
-    } 
+    }
     else {
       if (fullName.include(this.constants.spacePageSeparator)) {
         // Fallback on current wiki.
@@ -140,12 +141,12 @@ Object.extend(XWiki, {
         // Page name.
         resource.name = fullName.substring(fullName.indexOf(this.constants.spacePageSeparator) + 1, fullName.length);
       }
-    } 
+    }
     else {
       resource.space = resource.fullName;
       resource.prefixedSpace = resource.prefixedFullName;
     }
-    
+
     return resource;
   },
 
@@ -173,7 +174,7 @@ Object.extend(XWiki, {
         window.activeDocExtraTab.className="active";
         window.activeDocExtraPane.className="";
         tab.blur();
-        
+
         document.fire("xwiki:docextra:activated", {"id": extraID});
      };
 
@@ -216,16 +217,16 @@ Object.extend(XWiki, {
                     onComplete: function(transport){
                       insertTagSaveButton(extraID);
                       $("docextrapanes").className="";
-                      
+
                       // Let other know new content has been loaded
                       document.fire("xwiki:docextra:loaded", {
                         "id" : extraID,
                         "element": $(extraID + "pane")
                       });
-                      
+
                       // switch tab
                       dhtmlSwitch(extraID);
-                      
+
                       if (scrollToAnchor) {
                         // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
                         // prevents the anchor 'jump' after a click event but enable it
@@ -245,7 +246,7 @@ Object.extend(XWiki, {
         }
      }
   },
-  
+
   /**
    * Add click listeners on all rendereing error messages to let the user read the detailed error description.
    * If a content is passed, add click listener for errors reported in this content (usefull for AJAX requests response)
@@ -253,7 +254,7 @@ Object.extend(XWiki, {
    */
   makeRenderingErrorsExpandable: function(content) {
     if (typeof content == "undefined") {
-      content = document.body; 
+      content = document.body;
     }
     $(content).select(".xwikirenderingerror").each(function(error) {
         if(error.nextSibling.innerHTML !== "" && error.nextSibling.hasClassName("xwikirenderingerrordescription")) {
@@ -274,7 +275,7 @@ Object.extend(XWiki, {
    */
   fixLinksTargetAttribute: function(content) {
     if (typeof content == "undefined") {
-      content = document.body; 
+      content = document.body;
     }
     var anchors = content.select("a[rel]");
     for (var i = 0; i < anchors.length; i++) {
@@ -301,11 +302,12 @@ Object.extend(XWiki, {
    * It makes rendering errors expandable and fixes external links on the body content.
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
    */
-  initialize: function(){ 
+  initialize: function(){
     // Extra security to make sure we do not get initalized twice.
     // It would fire the custom dom:loaded event twice, which could make their observers misbehave.
     if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
       this.isInitialized = true;
+      document.fire("xwiki:dom:loading");
 
       this.makeRenderingErrorsExpandable();
       this.fixLinksTargetAttribute();
@@ -820,7 +822,6 @@ shortcut = {
                         alt  : { wanted:false, pressed:false},
                         meta : { wanted:false, pressed:false}	//Meta is Mac specific
                 };
-
                 if(e.ctrlKey)	modifiers.ctrl.pressed = true;
                 if(e.shiftKey)	modifiers.shift.pressed = true;
                 if(e.altKey)	modifiers.alt.pressed = true;
@@ -1013,4 +1014,3 @@ function BrowserDetect() {
     this.isIE4xMac = (this.isIE4x && this.isMac);
 }
 var browser = new BrowserDetect();
-

@@ -25,7 +25,7 @@
     #set ($discard = $docextras.add(["Comments", "comments", $msg.get("docextra.comments"), $doc.getObjects("XWiki.XWikiComments").size(), "commentsinline.vm", $msg.get("core.shortcuts.view.comments")]))
   #end
   #if($showattachments != false && $showattachments != "no" && $showattachments != "0" && $showattachments != "false")
-    $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', true)
+    $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${context.language}})
     $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     #set ($discard = $docextras.add(["Attachments", "attachments", $msg.get("docextra.attachments"), $doc.getAttachmentList().size(), "attachmentsinline.vm",$msg.get("core.shortcuts.view.attachments")]))
   #end

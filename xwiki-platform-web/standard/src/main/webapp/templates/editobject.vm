@@ -69,8 +69,8 @@
 #if("$!request.xpage" == 'editobject')
   $response.sendRedirect($doc.getURL('edit', 'editor=object'))
 #else
-  $xwiki.ssfx.use('js/xwiki/dataeditors/dataeditors.css', true)##
-  $xwiki.jsfx.use('js/xwiki/dataeditors/dataeditors.js', true)##
+  $xwiki.ssfx.use('js/xwiki/editors/dataeditors.css', true)##
+  $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   #set($formname = 'update')
   #set($saveaction = 'save')
   #set($hasCustomClass = ("$!{request.classname.trim()}" != ''))

@@ -1,6 +1,6 @@
 $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
-$xwiki.ssfx.use('js/xwiki/dataeditors/dataeditors.css', true)##
-$xwiki.jsfx.use('js/xwiki/dataeditors/dataeditors.js', true)##
+$xwiki.ssfx.use('js/xwiki/editors/dataeditors.css', true)##
+$xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #if("$!request.xpage" == 'editclass')
   $response.sendRedirect($doc.getURL('edit', 'editor=class'))
 #else

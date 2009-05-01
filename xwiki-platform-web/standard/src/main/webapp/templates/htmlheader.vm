@@ -62,6 +62,6 @@
        this will need to be removed -->
   <div class="UIApplication" style="overflow: auto">
 #end
-<!-- These elements will be closed in the footer vm file -->
+## These elements will be closed in the footer vm file
 <div id="xwikimaincontainer">
 <div id="xwikimaincontainerinner">

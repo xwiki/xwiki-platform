@@ -8,10 +8,9 @@
 ##
 $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
 $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
-#if((!$editor) || ($editor == ""))
+#if("$!editor" == '')
 #set($editor = $request.getParameter("editor"))
-#if((!$editor) || ($editor == ""))
-<!-- advanced: $doc.isAdvancedContent()  pref: $xwiki.getUserPreference("editor") -->
+#if("$!editor" == '')
 #if(($xwiki.getUserPreference("editor")=="Wysiwyg")&&($doc.SyntaxId!="xwiki/1.0"||!$doc.isAdvancedContent()))
 #set($editor="wysiwyg")
 #else
@@ -37,7 +36,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 ##
 ## Content
 ##
-#set($force = $!request.get("force"))
+#set($force = $!request.get('force'))
 #if (($tdoc.getLocked()==true)&&(!$force))
 <div class="layoutsection">
 #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")

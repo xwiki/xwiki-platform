@@ -68,3 +68,6 @@
 #body .fullScreenWrapper .buttons .buttonwrapper input {
   width: auto;
 }
+#xwikiobjects .fullScreenWrapper textarea:focus, #xwikiclassproperties .fullScreenWrapper textarea:focus {
+  background-color:#FFF;
+}

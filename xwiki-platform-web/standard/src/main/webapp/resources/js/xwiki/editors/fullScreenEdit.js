@@ -14,7 +14,6 @@ if (typeof(XWiki.editors) == 'undefined') {
  * Full screen editing for textarea.
  * 
  * TODO Make it work for textareas in inline editing
- * TODO Make it work for textareas in the object editor
  */
 XWiki.editors.FullScreenEditing = Class.create({
   // Some layout settings, to be customized for other skins
@@ -68,11 +67,9 @@ XWiki.editors.FullScreenEditing = Class.create({
       this.addWysiwyg10ContentButton(item);
     } else if (this.isWikiContent(item)) {
       this.addWikiContentButton(item);
-    }
-    /* Deactivating temporarily full screen edit for textareas other than wiki content */
-    /* else if (this.isWikiField(item)) {
+    } else if (this.isWikiField(item)) {
       this.addWikiFieldButton(item);
-    }*/
+    }
   },
   // Some simple functions that help deciding what kind of editor is the target element
   isWikiContent : function (textarea) {
@@ -283,7 +280,7 @@ XWiki.editors.FullScreenEditing = Class.create({
       targetElement._x_fullScreenActivator.replace(this.closeButton);
     }
     wrapper.insert(this.buttons.replace(this.buttonsPlaceholder).show());
-    var parent = $(targetElement.parentNode);
+    var parent = targetElement.up();
     targetElement._x_fullScreenActivator.hide();
     while (parent != document.body) {
       parent._originalStyle = {
@@ -298,12 +295,14 @@ XWiki.editors.FullScreenEditing = Class.create({
         'padding' : parent.style['padding'],
         'margin' : parent.style['margin']
       };
+      
       parent.setStyle({'overflow': "visible", 'position': "absolute", width: "100%", height: "100%", left: 0, top:0, right:0, bottom: 0, padding: 0, margin: 0});
+      
       parent.siblings().each(function(item) {
         item._originalDisplay = item.style['display'];
         item.setStyle({display: "none"});
       });
-      parent = parent.parentNode;
+      parent = parent.up();
     }
     document.body._originalStyle = {
       'overflow' : parent.style['overflow'],
@@ -322,7 +321,9 @@ XWiki.editors.FullScreenEditing = Class.create({
     // Maximize the targetElement
     this.resizeTextArea(targetElement);
     // IE6 has yet another bug, if we don't call this, then sometimes the toolbar will be invisible. Don't ask why.
-    this.toolbar.viewportOffset();
+    if (this.toolbar) {
+      this.toolbar.viewportOffset();
+    }
   },
   /** Restore the layout. */
   closeFullScreen : function() {
@@ -333,7 +334,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     // We're no longer interested in resize events
     Event.stopObserving(window, 'resize', this.resizeListener);
     // Restore the parent element (the wrapper)
-    targetElement.parentNode.removeClassName("fullScreenWrapper");
+    targetElement.up().removeClassName("fullScreenWrapper");
     // Restore the WYSIWYGs
     if (targetElement.hasClassName("xRichTextEditor")) {
       var iframe = targetElement.down(".gwt-RichTextArea");
@@ -346,13 +347,13 @@ XWiki.editors.FullScreenEditing = Class.create({
     }
 
     // Restore the previous layout
-    var parent = targetElement.parentNode;
+    var parent = targetElement.up();
     while (parent != document.body) {
       parent.setStyle(parent._originalStyle);
       parent.siblings().each(function(item) {
         item.style['display'] = item._originalDisplay;
       });
-      parent = parent.parentNode;
+      parent = parent.up();
     }
     document.body.setStyle(document.body._originalStyle);
     // Restore the toolbar and action buttons to their initial position
@@ -367,13 +368,14 @@ XWiki.editors.FullScreenEditing = Class.create({
       // Replace the Restore button in the toolbar with the Maximize one
       this.closeButton.replace(targetElement._x_fullScreenActivator);
     }
-    targetElement._x_fullScreenActivator.show();
     if (Prototype.Browser.IE) {
       // IE crashes if we try to resize this without a bit of delay.
       setTimeout(function() {
+        targetElement._x_fullScreenActivator.show();
         this.setStyle(this._originalStyle);
       }.bind(targetElement), 500);
     } else {
+      targetElement._x_fullScreenActivator.show();
       targetElement.setStyle(targetElement._originalStyle);
     }
     // No element is maximized anymore

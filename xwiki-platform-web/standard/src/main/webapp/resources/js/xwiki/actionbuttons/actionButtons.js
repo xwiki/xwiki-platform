@@ -1,9 +1,12 @@
 // ======================================
 // Form buttons: shortcuts, AJAX improvements and form validation
 // To be completed.
+
+// Make sure the XWiki 'namespace' exists.
 if (typeof(XWiki) == 'undefined') {
   XWiki = new Object();
 }
+// Make sure the actionButtons 'namespace' exists.
 if (typeof(XWiki.actionButtons) == 'undefined') {
   XWiki.actionButtons = new Object();
 }

@@ -8,6 +8,9 @@
   * meyerweb.com/eric/thoughts/2007/05/01/reset-reloaded/
 -------------------------------------------------------------- */
 
+* html {
+  overflow-y: auto;
+}
 html, body {
     height: 100%;
 }
@@ -2809,11 +2812,11 @@ div#xwikiclassproperties.accordion
 }
 
 .leftmenu2 {
-    text-align: center;
+    text-align: left;
     font-size: 1.4em;
     font-weight: bold;
     background-color: #f0f0ee;
-    padding: 8px 10px 2px;
+    padding: 2px;
     border-top: 1px solid #fff;
 }
 
@@ -2822,7 +2825,7 @@ div#xwikiclassproperties.accordion
 }
 
 #xwikieditcontent div div.leftmenu2 a img {
-    margin-left: 4px;
+    margin: 2px;
 }
 
 .bottombuttons input.button {

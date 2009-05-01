@@ -1,4 +1,4 @@
-$xwiki.jsfx.use('js/xwiki/viewers/attachments.js', true)
+$xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${context.language}})
 $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 #macro(dynamicsize $sz)
 #if($sz < 1024)
@@ -50,9 +50,9 @@ ${Msz}Mb##
             #if($listtool.size($fragments) == 2)
               #set($prefix=$listtool.get($fragments, 0))
               #set($suffix=$listtool.get($fragments, 1))
-              #set($davUrl="$prefix$webdavSignature$suffix")              
+              #set($davUrl="$prefix$webdavSignature$suffix")
               <a class="editlink hidden" href="$davUrl" onclick="if(XWiki && XWiki.WebDAV){XWiki.WebDAV.davEdit('$davUrl')}; return false;">$msg.get("webdaveditattachment")</a>
-            #end                    
+            #end
          </span>
 #end ## hasEdit
           <span class="version"><a href="$doc.getAttachmentURL(${attach.filename}, 'viewattachrev')" title="$msg.get('core.viewers.attachments.showHistory')">$attach.version</a></span>
@@ -70,7 +70,7 @@ ${Msz}Mb##
 if (XWiki && XWiki.WebDAV) { XWiki.WebDAV.displayDavLinks($('_attachments')); }
 // ]]>
 </script>
-#else
+#else ## No attachments
 <div>$msg.get('core.viewers.attachments.noAttachments')</div>
 #end
 #if($hasEdit || $hasAdmin)

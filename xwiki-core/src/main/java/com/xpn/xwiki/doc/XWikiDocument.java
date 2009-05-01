@@ -499,16 +499,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
     {
-        String renderedContent;
-
-        // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-        if (is10Syntax()) {
-            renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
-        } else {
-            renderedContent = performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0", true);
-        }
-
-        return renderedContent;
+        return getRenderedContent(getContent(), getSyntaxId(), context);
     }
 
     /**
@@ -4099,12 +4090,51 @@ public class XWikiDocument implements DocumentModelBridge
         return ((this.elements & element) == element);
     }
 
-    public String getDefaultEditURL(XWikiContext context) throws XWikiException
+    /**
+     * @return "inline" if the document should be edited in inline mode by default or "edit" otherwise.
+     * 
+     * @throws XWikiException if an error happens when computing the edit mode
+     */
+    public String getDefaultEditMode(XWikiContext context) throws XWikiException
     {
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
-        if (getContent().indexOf("includeForm(") != -1) {
+        if (is10Syntax()) {
+            if (getContent().indexOf("includeForm(") != -1) {
+                return "inline";
+            }
+        } else {
+            // Algorithm: look in all include macro and for all document included check if one of them
+            // has an SheetClass object attached to it. If so then the edit mode is inline.
+            
+            // Find all include macros and extract the document names
+            for (MacroBlock macroBlock : getXDOM().getChildrenByType(MacroBlock.class, false)) {
+                // TODO: Is there a good way not to hardcode the macro name? The macro itself shouldn't know
+                // its own name since it's a deployment time concern. 
+                if ("include".equals(macroBlock.getName())) {
+                    String documentName = macroBlock.getParameter("document");
+                    if (documentName != null) {
+                        XWikiDocument includedDocument = xwiki.getDocument(documentName, context);
+                        if (!includedDocument.isNew()) {
+                            if (includedDocument.getObject(XWikiConstant.SHEET_CLASS) != null) {
+                                return "inline";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return "edit";
+    }
+    
+    public String getDefaultEditURL(XWikiContext context) throws XWikiException
+    {
+        String editMode = getDefaultEditMode(context);
+        
+        if ("inline".equals(editMode)) {
             return getEditURL("inline", "", context);
         } else {
+            com.xpn.xwiki.XWiki xwiki = context.getWiki();
             String editor = xwiki.getEditorPreference(context);
             return getEditURL("edit", editor, context);
         }

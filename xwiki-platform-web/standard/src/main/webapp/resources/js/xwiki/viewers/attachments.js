@@ -1,64 +1,96 @@
+// Make sure the XWiki 'namespace' exists.
 if(typeof(XWiki) == 'undefined') {
   XWiki = new Object();
 }
+// Make sure the viewers 'namespace' exists.
 if(typeof(XWiki.viewers) == 'undefined') {
   XWiki.viewers = new Object();
 }
+/**
+ * Enhancements for the Attachment upload area: adding and removing file fields, resetting with the Cancel button,
+ * preventing submit if no files are selected.
+ */
 XWiki.viewers.Attachments = Class.create({
+  /** Counter for creating distinct upload field names. */
   counter : 1,
+  /** Constructor. Adds all the JS improvements of the Attachment area. */
   initialize : function() {
     if ($("attachform")) {
       // If the upload form is already visible, enhance it.
       this.prepareForm();
     } else {
-      // Otherwise, we watch the DOM changes to see when (and if) the form will be later added. This is needed for the AJAX loading of the document metadata tabs.
-      this.addDomUpdateListener();
+      // Otherwise, we wait for a notification for the AJAX loading of the Attachments metadata tab.
+      this.addTabLoadListener();
     }
   },
+  /** Enhance the upload form with JS behaviors. */
   prepareForm : function() {
     this.form = $("attachform").up("form");
+    this.defaultFileDiv = this.form.down("input[type='file']").up("div");
+    this.inputSize = this.form.down("input[type='file']").size;
     this.addInitialRemoveButton();
     this.addAddButton();
     this.blockEmptySubmit();
     this.resetOnCancel();
   },
+  /** By default the form contains one upload field. Add a "remove" button for this one, too. */
   addInitialRemoveButton : function() {
-    this.defaultFileDiv = this.form.down("input[type='file']").up("div");
     this.defaultFileDiv.appendChild(this.createRemoveButton());
   },
+  /** Add an "Add another file" button below the file fields. */
   addAddButton : function() {
-    var addButton = new Element("input", {type: "button", value: "Add another file", "class": "attachmentActionButton add-file-input"});
+    var addButton = new Element("input", {
+      type: "button",
+      value: "$msg.get('core.viewers.attachments.upload.addFileInput')",
+      className: "attachmentActionButton add-file-input"
+    });
     this.addDiv = new Element("div");
     this.addDiv.appendChild(addButton);
     Event.observe(addButton, 'click', this.addField.bindAsEventListener(this));
     this.defaultFileDiv.up().insertBefore(this.addDiv, this.defaultFileDiv.next());
   },
+  /** Add a submit listener that prevents submitting the form if no file was specified. */
   blockEmptySubmit : function() {
     Event.observe(this.form, 'submit', this.onSubmit.bindAsEventListener(this));
   },
+  /** Add a reset listener that resets the number of file fields to 1. */
   resetOnCancel : function() {
     Event.observe(this.form, 'reset', this.onReset.bindAsEventListener(this));
   },
-  addField : function() {
-    var fileInput = new Element("input", {type: "file", name : "filepath_" + this.counter, size: "40", "class": "uploadFileInput"});
+  /** Creates and inserts a new file input field. */
+  addField : function(event) {
+    var fileInput = new Element("input", {
+      type: "file",
+      name: "filepath_" + this.counter,
+      size: this.inputSize,
+      className: "uploadFileInput"
+    });
+    // For the moment, specifying a different name is not used anymore.
     var filenameInput = new Element("input", {type: "hidden", name : "filename_" + this.counter});
-    var containerDiv = new Element("div");
-    containerDiv.appendChild(filenameInput);
-    containerDiv.appendChild(fileInput);
     var removeButton = this.createRemoveButton();
-    containerDiv.appendChild(removeButton);
+    var containerDiv = new Element("div");
+    containerDiv.insert(filenameInput).insert(fileInput).insert(removeButton);
     this.addDiv.parentNode.insertBefore(containerDiv, this.addDiv);
-    this.addDiv.down('input').blur();
+    // Remove the focus border from the button
+    event.element().blur();
     this.counter++;
   },
+  /** Remove a file field when pressing the corresponding "Remove" button. */
+  removeField : function(event) {
+    event.element().up("div").remove();
+  },
+  /** Create a remove button that triggers {@link #removeField} when clicked. */
   createRemoveButton : function() {
-    var removeButton = new Element("input", {type: "button", value: "Remove", title: "Remove this file", "class": "attachmentActionButton remove-file-input"});
+    var removeButton = new Element("input", {
+      type: "button",
+      value: "$msg.get('core.viewers.attachments.upload.removeFileInput')",
+      title: "$msg.get('core.viewers.attachments.upload.removeFileInput.title')",
+      className: "attachmentActionButton remove-file-input"
+    });
     Event.observe(removeButton, "click", this.removeField.bindAsEventListener(this));
     return removeButton;
   },
-  removeField : function(event) {
-    Event.element(event).up("div").remove();
-  },
+  /** Form submit listener. It checks that at least one file item contains a filename. If not, cancel the submission. */
   onSubmit : function(event) {
     var hasFiles = false;
     this.form.getInputs("file").each(function(item) {
@@ -70,27 +102,29 @@ XWiki.viewers.Attachments = Class.create({
       event.stop();
     }
   },
+  /** Form reset listener. It resets the number of file fields to just one. */
   onReset : function(event) {
     this.form.getInputs("file").each(function(item) {
       item.up().remove();
     });
     this.counter = 1;
-    this.addField();
+    this.addField(event);
   },
-  addDomUpdateListener : function(event) {
-    this.ajaxListener = {
-      onComplete: function() {
-        this.domModified();
-      }.bind(this)
-    };
-    Ajax.Responders.register(this.ajaxListener);
-  },
-  domModified : function() {
-    if($("attachform")) {
-      Ajax.Responders.unregister(this.ajaxListener);
-      this.prepareForm();
-    }
+  /**
+   * Registers a listener that watches for the insertion of the Attachments tab and triggers the form enhancement.
+   * After that, the listener removes itself, since it is no longer needed.
+   */
+  addTabLoadListener : function(event) {
+    var listener = function(event) {
+      if (event.memo.id == 'Attachments') {
+        this.prepareForm();
+        document.stopObserving("xwiki:docextra:loaded", listener);
+        delete listener;
+      }
+    }.bindAsEventListener(this);
+    document.observe("xwiki:docextra:loaded", listener);
   }
 });
 
-document.observe("dom:loaded", function() { new XWiki.viewers.Attachments(); });
+// When the document is loaded, trigger the attachment form enhancements.
+document.observe("xwiki:dom:loaded", function() { new XWiki.viewers.Attachments(); });

@@ -1424,20 +1424,22 @@ $html
     #if("$!selectedColumn" == "" && !$colname.startsWith("_"))
       #set($selectedColumn = $colname)
     #end
-    #set($collist2 = "${collist2},${colname}")
-    #set($propClassName = "")
-    #set($propClassName = $colprops.get($colname).get("class"))
-    #if($propClassName!="")
-      #set($classparams = "${classparams}&${colname}_class=${propClassName}")
+    #if($colname != "_actions")
+      #set($collist2 = "${collist2},${colname}")
+      #set($propClassName = "")
+      #set($propClassName = $colprops.get($colname).get("class"))
+      #if($propClassName!="")
+        #set($classparams = "${classparams}&${colname}_class=${propClassName}")
+      #end
     #end
   #end
   #set($collist2 = $collist2.substring(1))
   #if("$!options.url" != "")
     #set($dataurl = $options.url)
   #elseif("$!options.resultPage" != "")
-    #set($dataurl = $xwiki.getURL($options.resultPage,"view","xpage=plain&transprefix=${transprefix}&classname=${className}&collist=${collist2}${classparams}") )
+    #set($dataurl = $xwiki.getURL($options.resultPage,"view","xpage=plain&transprefix=${transprefix}&classname=$!{className}&collist=${collist2}${classparams}") )
   #else
-    #set($dataurl = $xwiki.getURL("XWiki.LiveTableResults","view","xpage=plain&transprefix=${transprefix}&classname=${classname}&collist=${collist2}${classparams}"))
+    #set($dataurl = $xwiki.getURL("XWiki.LiveTableResults","view","xpage=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}${classparams}"))
   #end
   ##
   ## HTML Table
@@ -1473,18 +1475,20 @@ $html
             <tr>
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
-              #if("$!colprop.sortable" == "" || $colprop.sortable != false)
+              #if(("$!colprop.sortable" == "" || $colprop.sortable != false) && "$!colname" != "_actions")
                 #set($isSortable = true)
               #else
                 #set($isSortable = false)
               #end
+              #if($colname != "_actions" || $hasAdmin)
               <th class="xwiki-grid-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end" #if($isSortable)rel="${colname}"#end #if("$!colprop.type"=="hidden") style="display: none" #end>$msg.get("${transprefix}${colname}")</th>
+              #end
             #end
             </tr>
             <tr class="xwiki-grid-display-filters">
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
-              #if("$!colprop.filterable" == "" || $colprop.filterable != false)
+              #if(("$!colprop.filterable" == "" || $colprop.filterable != false) && "$!colname" != "_actions")
                 #set($isFilterable = true)
               #else
                 #set($isFilterable = false)
@@ -1505,11 +1509,11 @@ $html
                   <option value="$listitem">$map.get($listitem).getValue()</option>
                 #end
                 </select>
-              </td>            
+                </td>            
               #elseif( ("$!colprop.type"=="text"||"$!colprop.type"=="number") && $isFilterable)
                 <td class="xwiki-grid-display-header-filter"><input name="${colname}" type="text" #if($colprop.size!="") size="${colprop.size}" #end  title='$msg.get("xe.search.filters.title") $msg.get("${transprefix}${colname}")' /></td>
               #elseif("$!colprop.type"=="hidden")
-              #else
+              #elseif($colname != "_actions" || $hasAdmin)
               <td class="xwiki-grid-display-header-filter"></td>
               #end
             #end
@@ -1532,12 +1536,15 @@ $html
       </td>
     </tr>
   </table>
+  <div id="${divid}-inaccessible-docs" class="hidden">
+    #info($msg.get("rightsmanager.documentrequireviewrights"))
+  </div>
   <script type="text/javascript">
   //<![CDATA[ 
   #if($callback)
-    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{"maxPages":$maxPages});  
+    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{"maxPages":$maxPages, "limit":$count});  
   #else
-    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($collist $colprops) ,{"maxPages":$maxPages});
+    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix) ,{"maxPages":$maxPages, "limit":$count});
   #end
    //]]>
   </script>
@@ -1553,14 +1560,16 @@ $html
  *
  * @param collist the list of columns
  * @param colprops the columns properties
+ * @param transprefix the translation prefix
  *
  * @internal
  *#
-#macro(livetablecallback $collist $colprops)
+#macro(livetablecallback $divid $collist $colprops $transprefix)
 function (row, i, table)
 {
   // This callback method code has been generated from velocity. 
   var tr = new Element("tr");
+  if (row.doc_viewable) {
   #foreach($colname in $collist)
     // $colname
     #set($colprop = $colprops.get($colname))
@@ -1570,38 +1579,69 @@ function (row, i, table)
       #else
         #set($jscolname = $colname)
       #end
-      #if("$!colprop.link"=="view"||"$!colprop.link"=="field"||"$!colprop.link"=="auto"||"$!colprop.link"=="editor")
-        var a = new Element("a");
+      ## Is the td element bound to a link ?
+      #if("$!colprop.link" != "" && "$!colname" != "_actions")
+        #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
+        var td = new Element("td", {'class':"$tdClass"});
+        var link = #if("$!colprop.link" != "editor") new Element("a"); #else new Element("span"); #end
+        ## Automatic: the link url is in JSON results, with key column name + "_url"
         #if("$!colprop.link"=="auto")
-          a.href = (row.${jscolname}_url=="") ? row.doc_url : row.${jscolname}_url; 
+          link.href = (row.${jscolname}_url=="") ? row.doc_url : row.${jscolname}_url; 
         #elseif($colprop.link=="field")
-          a.href = (row.${jscolname}_url=="") ? "javascript:void(0)" : row.${jscolname}_url; 
+          if (row.${jscolname}_url != "") { 
+            link.href = row.${jscolname}_url;
+          }
+        ## Property editor
         #elseif($colprop.link=="editor")
           #if($colprop.get("class"))
             #set($propClassName = $colprop.get("class"))
           #else
             #set($propClassName = $className)
           #end
-          a.href = "javascript:void()";
+          td.observe("click", function(event){
+            var tag = event.element().down("span");
+            editProperty(row.page, "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
+          });
+        ## Author
+        #elseif($colprop.link == "author")
+          link.href = row.doc_author_url;
+        ## Space URL
+        #elseif($colprop.link == "space")
+          link.href = row.doc_space_url;
+        ## Wiki URL
+        #elseif($colprop.link == "wiki")
+          link.href = row.doc_wiki_url;
         #else
-          a.href = row.doc_url; 
+          link.href = row.doc_url;
         #end
         #if($colprop.html && $colprop.html==true)
-          a.innerHTML = row.${jscolname};
+          link.innerHTML = row.${jscolname};
         #else
-          a.update(row.${jscolname});
+          link.update(row.${jscolname});
         #end
-        var fieldel = new Element("td");
-        fieldel.observe("click", function(event){
-          var tag = event.element().down("a");
-          editProperty(row.page, "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
-        }); 
-        fieldel.className = "${jscolname} link${colprop.link} type$!{colprop.type}";
-        fieldel.appendChild(a);
-        tr.appendChild(fieldel);
+        td.appendChild(link);
+        tr.appendChild(td);
+      #elseif("$colname" == "_actions")
+        if(row.doc_hasadmin) {
+          var td = new Element("td", {'class':'actions'});
+          #foreach($action in $colprop.get("actions"))
+             #if($velocityCount > 1) 
+             td.insert(" ");
+             #end
+             #if($msg.get("xe.livetable.action.${action}") != "xe.livetable.action.${action}")
+               #set($text = $msg.get("xe.livetable.action.${action}"))
+             #elseif($msg.get("${transprefix}.actions.${action}") != "${transprefix}.actions.${action}")
+               #set($text = "${transprefix}.actions.${action}")
+             #else
+               #set($text = "$action")
+             #end
+             td.insert(new Element("a", {"href": row.doc_${action}_url, "class":"action action${action}"}).update("$text"));
+          #end
+          tr.appendChild(td);
+        }
       #else
-        var fieldel = document.createElement('td'); 
-        fieldel.className = "${jscolname} link${colprop.link} type$!{colprop.type}";
+        #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
+        var fieldel = new Element("td", {'class':"$tdClass"});
         #if($colprop.html && $colprop.html==true)
           fieldel.innerHTML = row.${jscolname};
         #else
@@ -1611,6 +1651,31 @@ function (row, i, table)
       #end
     #end
   #end
+  }
+  else {
+    var page = row.doc_fullname;
+    var dp = page.indexOf(':');
+    var p = page.indexOf('.');
+    var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);
+    var name = page.substring(p + 1);
+    #foreach($colname in $collist)
+      #if("$!colprop.type"!="hidden")
+        #if($colname.indexOf("doc.")==0)
+         #set($jscolname = $colname.replaceAll("doc.", "doc_"))
+        #else
+         #set($jscolname = $colname)
+        #end
+        #if($jscolname == "doc_name")
+          tr.insert(new Element("td").update(name + "*"));
+        #elseif($jscolname == "doc_space")
+          tr.insert(new Element("td").update(space));
+        #elseif($jscolname != "_actions")
+          tr.insert(new Element("td").update(" "));
+        #end
+      #end
+    #end
+    $('${divid}-inaccessible-docs').removeClassName('hidden');
+  }
   return tr;
 }
 #end

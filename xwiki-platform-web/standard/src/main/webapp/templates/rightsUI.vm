@@ -161,7 +161,7 @@
         saveUrl.replace(/&amp;/g, "&");
         window.currentUser = "$context.user";
         window.unregUser = "XWiki.XWikiGuest";
-        var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", displayUsersAndGroups);
+        var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", displayUsersAndGroups, {"filtersNode": $('usersandgroupstable')});
         #foreach($i in [0..$maxlevel])
         var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", saveUrl, "${r.get($i)}");
         #end

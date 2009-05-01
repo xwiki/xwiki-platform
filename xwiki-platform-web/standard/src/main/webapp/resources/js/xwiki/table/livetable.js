@@ -36,6 +36,10 @@ XWiki.widgets.LiveTable = Class.create({
     */
   initialize: function(url, domNodeName, handler, options)
   { 
+    if (!options) {
+      var options = {};
+    }
+	 
     // id of the root element that encloses this livetable
     this.domNodeName = domNodeName;
 
@@ -44,6 +48,12 @@ XWiki.widgets.LiveTable = Class.create({
     // fallback on the unique "display1" id for backward compatibility.
     this.displayNode = $(domNodeName + "-display") || $('display1');
 
+    // Node under which all forms controls (input, selects, etc.) will be filters for this table
+    this.filtersNode = options.filtersNode || $(domNodeName).down(".xwiki-grid-display-filters");
+
+    // Array of nodes under which pagination for this grid will be displayed.
+    this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-grid-pagination");
+
     if (typeof options == "undefined") {
        options = {};
     }
@@ -51,14 +61,13 @@ XWiki.widgets.LiveTable = Class.create({
     this.limit = options.limit || 10;
     this.action = options.action || "view"; // FIXME check if this can be removed safely.
 
-    // pagination
-    var paginationNodes = $(this.domNodeName).select(".xwiki-grid-pagination");
-    if (typeof paginationNodes != "undefined") {
-       this.paginator = new GridPagination(this, paginationNodes, options.maxPages || 10);
+    // Initialize pagination
+    if (typeof this.paginationNodes != "undefined") {
+       this.paginator = new GridPagination(this, this.paginationNodes, options.maxPages || 10);
     }
-	// filters
-    if ($(domNodeName).down(".xwiki-grid-display-filters")) {
-      this.filter = new GridFilter(this, $(domNodeName).down(".xwiki-grid-display-filters"));
+	// Initialize filters
+    if (this.filtersNode) {
+      this.filter = new GridFilter(this, this.filtersNode);
     }
     if ($(domNodeName + "-tagcloud"))
     {

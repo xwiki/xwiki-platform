@@ -201,6 +201,34 @@ tbody.xwiki-grid-display-body td:hover.typenone, tbody.xwiki-grid-display-body t
 	text-align: center;
 	padding-left: 0;
 }
+tbody.xwiki-grid-display-body td a.action {
+    color:#888888;
+	padding-left:20px;
+	background-repeat:no-repeat;
+	margin-right:5px;
+	padding-bottom:1px;
+}
+tbody.xwiki-grid-display-body td.actions {
+	text-align:right;
+}
+tbody.xwiki-grid-display-body td a.action:hover {
+    text-decoration:underline;
+}
+tbody.xwiki-grid-display-body td a.actioncopy {
+	background-image:url($xwiki.getSkinFile("icons/silk/page_white_copy.gif"));
+}
+tbody.xwiki-grid-display-body td a.actionrename {
+	background-image:url($xwiki.getSkinFile("icons/silk/textfield_rename.gif"));
+}
+tbody.xwiki-grid-display-body td a.actiondelete {
+	background-image:url($xwiki.getSkinFile("icons/silk/cross.gif"));
+}
+tbody.xwiki-grid-display-body td a.actionrights {
+	background-image:url($xwiki.getSkinFile("icons/silk/lock_edit.gif"));
+}
+tbody.xwiki-grid-display-body td a.actionedit {
+	background-image:url($xwiki.getSkinFile("icons/silk/page_white_edit.gif"));
+}
 /* </ Grid Body> */
 /* <Dialog Box> */
 div.dialog-loading{

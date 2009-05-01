@@ -1,11 +1,13 @@
 // ======================================
 // Full screen editing for page content
 // 
+// Make sure the XWiki 'namespace' exists.
 if (typeof(XWiki) == 'undefined') {
   XWiki = new Object();
 }
-if (typeof(XWiki.dataEditors) == 'undefined') {
-  XWiki.dataEditors = new Object();
+// Make sure the editors 'namespace' exists.
+if (typeof(XWiki.editors) == 'undefined') {
+  XWiki.editors = new Object();
 }
 
 /**
@@ -14,26 +16,31 @@ if (typeof(XWiki.dataEditors) == 'undefined') {
  * TODO Make it work for textareas in inline editing
  * TODO Make it work for textareas in the object editor
  */
-XWiki.dataEditors.FullScreenEditing = Class.create({
-  /** Some layout settings */
-  margin : 0, /** Maximized element margins */
-  buttonSize : 16, /** Full screen activator / deactivator button size */
+XWiki.editors.FullScreenEditing = Class.create({
+  // Some layout settings, to be customized for other skins
+  /** Maximized element margins */
+  margin : 0,
+  /** Full screen activator / deactivator button size */
+  buttonSize : 16,
   /**
    * Full screen control initialization
    * Identifies the elements that must be visible in full screen: the textarea or the rich text editor, along with their
    * toolbar and the form buttons.
-   * Creates Two buttons for closing the fullscreen: one (image) to insert in the toolbar, and one (plain form button)
+   * Creates two buttons for closing the fullscreen: one (image) to insert in the toolbar, and one (plain form button)
    * to add next to the form's action buttons.
    * Finally, the textareas and rich text editors in the form are equipped with their own fullscreen activators,
    * inserted in the corresponding toolbar, if there is any, or simply next to the textarea in the document
-   * (see the addBehavior function),
+   * (see the {@link #addBehavior} function),
    */
   initialize : function() {
     // The action buttons need to be visible in full screen
     this.buttons = $(document.body).down(".bottombuttons");
+    // If there are no buttons, at least the Exit FS button should be visible, so create an empty button container
     if (!this.buttons) {
       this.buttons = new Element("div", {"class" : "bottombuttons"}).update(new Element("div", {"class" : "buttons"}));
-      document.body.appendChild(this.buttons);
+      this.buttons._x_isCustom = true;
+      // It doesn't matter where the container is, it will only be needed in fullScreen.
+      document.body.appendChild(this.buttons.hide());
     }
     // When the full screen is activated, the buttons will be brought in the fullscreen, thus removed from their parent
     // element, where they are replaced by a placeholder, so that we know exactly where to put them back.
@@ -53,9 +60,7 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
       this.addBehavior(item);
     }.bind(this));
   },
-  /**
-   * According to the type of each element being maximized, a button in created and attached to it.
-   */
+  /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
     if (this.isWysiwyg20Content(item)) {
       this.addWysiwyg20ContentButton(item);
@@ -64,20 +69,46 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
     } else if (this.isWikiContent(item)) {
       this.addWikiContentButton(item);
     }
-    /* Deactivating temporarily full screen edit for textareas other than wiki content
-    else if (this.isWikiTextarea(textarea)) {
-      this.addWikiTextareaButton(textarea);
-    } */
+    /* Deactivating temporarily full screen edit for textareas other than wiki content */
+    /* else if (this.isWikiField(item)) {
+      this.addWikiFieldButton(item);
+    }*/
   },
+  // Some simple functions that help deciding what kind of editor is the target element
+  isWikiContent : function (textarea) {
+    // If the textarea is not visible, then the WYSIWYG editor is active.
+    return textarea.name == 'content' && textarea.visible();
+  },
+  isWysiwyg10Content : function (textarea) {
+    // If the textarea is not visible, then the WYSIWYG editor is active.
+    // In IE, the WYSIWYG is placed before its textarea.
+    return textarea.name == 'content' && (Prototype.Browser.IE ? textarea.previous(".mceEditorContainer") : textarea.next(".mceEditorContainer"));
+  },
+  isWysiwyg20Content : function (item) {
+    return item.hasClassName("xRichTextEditor") && item.up("#content_container");
+  },
+  isWikiField : function (textarea) {
+    // If the textarea is not visible, then the WYSIWYG editor is active.
+    return textarea.visible();
+  },
+  isWysiwyg10Field : function (textarea) {
+    return !textarea.visible() && textarea.name != 'content' && (Prototype.Browser.IE ? textarea.previous(".mceEditorContainer") : textarea.next(".mceEditorContainer"));
+  },
+  isWysiwyg20Field : function (item) {
+    return item.hasClassName("xRichTextEditor") && !item.up("#content_container");
+  },
+  /** Adds the fullscreen button in the Wiki editor toolbar. */
   addWikiContentButton : function (textarea) {
+    // Normally there should be a simple toolbar with basic actions
     if (this.toolbar) {
-      this.toolbar.appendChild(this.createOpenButton(textarea));
+      this.toolbar.insert({top: this.createOpenButton(textarea)});
     } else {
       this.addWikiTextareaButton(textarea);
     }
   },
+  /** Adds the fullscreen button in the TinyMCE WYSIWYG editor toolbar. */
   addWysiwyg10ContentButton : function (item) {
-    var container = item.next(".mceEditorContainer") || item.previous(".mceEditorContainer");
+    var container = (Prototype.Browser.IE ? item.previous(".mceEditorContainer") : item.next(".mceEditorContainer"));
     if (!container) {
       return false;
     }
@@ -85,33 +116,36 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
     if (!toolbar) {
       return false;
     }
-    // Create a tinymce-like toolbar to contain the fullscreen button
+    // Create a tinymce-like internal toolbar to contain the fullscreen button
     var newToolbar = new Element('span', {'class': 'mce_editor_fullscreentoolbar'});
+    var link = new Element('a', {'class' : 'mceButtonNormal'});
+    // Separator
     newToolbar.insert(new Element('img', {
        'class': 'mceSeparatorLine',
        height: 15,
        width: 1,
        src: toolbar.down('img.mceSeparatorLine').src
     }));
-    newToolbar.insert(this.createOpenButton(container));
+    newToolbar.insert(link.insert(this.createOpenButton(container)));
     toolbar.insert(newToolbar);
     return true;
   },
+  /** Adds the fullscreen button in the GWT WYSIWYGR editor menu. */
   addWysiwyg20ContentButton : function (item) {
     var toolbar = item.down(".gwt-MenuBar");
     // Sometimes the toolbar isn't loaded when this method executes (in IE). Schedule a periodical reatempt.
     if (!toolbar) {
       // Only schedule once
-      if (!item.__x_fullScreenLoader) {
-        item.__x_fullScreenLoader_iterations = 0;
-        item.__x_fullScreenLoader = new PeriodicalExecuter(function(item) {
+      if (!item._x_fullScreenLoader) {
+        item._x_fullScreenLoader_iterations = 0;
+        item._x_fullScreenLoader = new PeriodicalExecuter(function(item) {
           // Give up after 20 seconds
-          if (item.__x_fullScreenLoader_iteration > 100) {
-            item.__x_fullScreenLoader.stop();
-            item.__x_fullScreenLoader = false;
+          if (item._x_fullScreenLoader_iteration > 100) {
+            item._x_fullScreenLoader.stop();
+            item._x_fullScreenLoader = false;
             return;
           }
-          item.__x_fullScreenLoader_iteration++;
+          item._x_fullScreenLoader_iteration++;
           this.addWysiwyg20ContentButton(item);
         }.bind(this, item), 0.2);
       }
@@ -119,60 +153,50 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
     }
     toolbar.insert({"top" : this.createOpenButton(item)});
     this.toolbar = toolbar;
-    if (item.__x_fullScreenLoader) {
-      item.__x_fullScreenLoader.stop();
-      item.__x_fullScreenLoader = false;
+    if (item._x_fullScreenLoader) {
+      item._x_fullScreenLoader.stop();
+      item._x_fullScreenLoader = false;
     }
     return true;
   },
-  addWikiTextareaButton : function (textarea) {
-    Element.insert(textarea, {before: this.createOpenButton(textarea)});
+  addWikiFieldButton : function (textarea) {
+    Element.insert(textarea, {before: this.createOpenLink(textarea)});
   },
-  /**
-   * Some simple functions that help deciding what kind of editor is the target element
-   */
-  isWikiContent : function (textarea) {
-    // if the textarea is not visible, then the WYSIWIG editor is active.
-    return textarea.name == 'content' && textarea.visible();
-  },
-  isWysiwyg10Content : function (textarea) {
-    // if the textarea is not visible, then the WYSIWIG editor is active.
-    return textarea.name == 'content' && (textarea.next(".mceEditorContainer") || textarea.previous(".mceEditorContainer"));
-  },
-  isWysiwyg20Content : function (item) {
-    // return item.getAttribute("id") == "content_container";
-    return item.hasClassName("xRichTextEditor");
-  },
-  isWikiTextarea : function (textarea) {
-    // if the textarea is not visible, then the WYSIWIG editor is active.
-    return textarea.visible();
-  },
-  isWysiwygTextarea : function (textarea) {
-    return !textarea.visible() && textarea.next('.mceEditorContainer');
-  },
-  /**
-   * Creates a full screen activator button for the given element.
-   */
+  /** Creates a full screen activator button for the given element. */
   createOpenButton : function (targetElement) {
     // Create HTML element
-    var fullScreenButton = new Element('img', {
+    var fullScreenActivator = new Element('img', {
       'class': 'fullScreenEditButton',
       title: "$msg.get('core.editors.fullscreen.editFullScreen')",
       alt: "$msg.get('core.editors.fullscreen.editFullScreen')",
       src: "$xwiki.getSkinFile('icons/silk/arrow_out.gif')"
     });
     // Add functionality
-    fullScreenButton.observe('click', this.makeFullScreen.bindAsEventListener(this, targetElement));
-    fullScreenButton.observe('mousedown', this.preventDrag.bindAsEventListener(this));
-    // Set position
-    fullScreenButton.setStyle({
-      'left' : targetElement.positionedOffset().left + targetElement.getWidth() - this.buttonSize + 'px',
-      'top' : targetElement.positionedOffset().top - this.buttonSize + 'px'
-    });
+    fullScreenActivator.observe('click', this.makeFullScreen.bindAsEventListener(this, targetElement));
+    fullScreenActivator.observe('mousedown', this.preventDrag.bindAsEventListener(this));
     // Remember the button associated with each maximizable element
-    targetElement._fullScreenButton = fullScreenButton;
-    fullScreenButton._targetElement = targetElement;
-    return fullScreenButton;
+    targetElement._x_fullScreenActivator = fullScreenActivator;
+    fullScreenActivator._x_maximizedElement = targetElement;
+    return fullScreenActivator;
+  },
+  createOpenLink : function (targetElement) {
+    // Create HTML element
+    var fullScreenActivatorContainer = new Element('div', {
+      'class': 'fullScreenEditLinkContainer'
+    });
+    var fullScreenActivator = new Element('a', {
+      'class': 'fullScreenEditLink',
+      title: "$msg.get('core.editors.fullscreen.editFullScreen')"
+    });
+    fullScreenActivator.update("${msg.get('core.editors.fullscreen.editFullScreen')} &raquo;")
+    // Add functionality
+    fullScreenActivator.observe('click', this.makeFullScreen.bindAsEventListener(this, targetElement));
+    // Add it to the container
+    fullScreenActivatorContainer.update(fullScreenActivator);
+    // Remember the button associated with each maximizable element
+    targetElement._x_fullScreenActivator = fullScreenActivator;
+    fullScreenActivator._x_maximizedElement = targetElement;
+    return fullScreenActivatorContainer;
   },
   /**
    * Creates the full screen close buttons (which are generic, not attached to the maximized elements like the activators)
@@ -213,166 +237,175 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
 
   /**
     * How this works:
-    * - All the elements between the targetElement and the root element are set to position: static, so that the offset
-    *   parent of the targetElement will be the window.
-    * - Insert a wrapper around the targetElement, and make it full screen
+    * - All the elements between the targetElement and the root element are maximized, and all the other nodes are hidden
+    * - The parent element becomes a wrapper around the targetElement
     * - Move the toolbar (if it exists) and the action buttons in the wrapper
     * - Hide the overflows of the body element, so that a scrollbar doesn't appear
+    * - All the initial styles of the altered elements are remembered, so that they can be restored when exiting fullscreen
     */
   makeFullScreen : function (event, targetElement) {
     event.stop();
     // Remember the maximized element
     this.maximized = targetElement;
-    targetElement._originalStyle = targetElement.getAttribute('style');
+    // Remember the original dimensions of the maximized element
     targetElement._originalStyle = {
-      'width' : targetElement.getStyle('width'),
-      'height' : targetElement.getStyle('height')
+      'width' : targetElement.style['width'],
+      'height' : targetElement.style['height']
     };
-    // All the elements between the targetElement and the root element are set to position: static, so that the offset
-    // parent of the targetElement will be the window. Remember the previous settings in order to be able to restore the
-    // layout when exiting fullscreen.
     if (targetElement.hasClassName("xRichTextEditor")) {
       var iframe = targetElement.down(".gwt-RichTextArea");
       iframe._originalStyle = {
-        'width' : iframe.getStyle('width'),
-        'height' : iframe.getStyle('height')
+        'width' : iframe.style['width'],
+        'height' : iframe.style['height']
       };
     } else if (targetElement.hasClassName("mceEditorContainer")) {
       var iframe = targetElement.down(".mceEditorIframe");
       iframe._originalStyle = {
-        'width' : iframe.getStyle('width'),
-        'height' : iframe.getStyle('height')
+        'width' : iframe.style['width'],
+        'height' : iframe.style['height']
+      };
+      var tframe = targetElement.down(".mceEditorSource");
+      tframe._originalStyle = {
+        'width' : tframe.style['width'],
+        'height' : tframe.style['height']
       };
     }
-    var parent = $(targetElement.parentNode);
-    while (parent != document.body) {
-      parent._originalStyle = {'overflow' : parent.getStyle('overflow'), 'position' : parent.getStyle('position')};
-      parent.setStyle({'overflow': "visible", 'position': "static"});
-      parent = parent.parentNode;
-    }
-    document.body._originalStyle = {
-      'overflow' : parent.getStyle('overflow'),
-      'width' : parent.getStyle('width'),
-      'height' : parent.getStyle('height')
-    };
-    document.body.setStyle({'overflow' : 'hidden', 'width': '100%', 'height': '100%'});
-
-    // In IE, since position: fixed doesn't work, use position absolute, and scroll the window to the top.
-    if (Prototype.Browser.IE) {
-      document.body.scrollTo();
-    }
-    // Wrap the elements that should be visible in full screen in a div and maximize it
-    // This causes problems with the GWT editor.
-    // var wrapper = new Element('div', {"class" : "fullScreenWrapper"});
-    // Element.wrap(targetElement, wrapper);
+    // All the elements between the targetElement and the root element are set to position: static, so that the offset
+    // parent of the targetElement will be the window. Remember the previous settings in order to be able to restore the
+    // layout when exiting fullscreen.
     var wrapper = targetElement.up();
     wrapper.addClassName("fullScreenWrapper");
-    wrapper._originalPadding = wrapper.getStyle("paddingTop");
-    if ($("actionmenu")) {
-      wrapper.setStyle({"paddingTop" : $("actionmenu").getHeight() + "px"});
-    }
     if (this.toolbar) {
       if (this.toolbar.hasClassName("leftmenu2")) {
         wrapper.insert({"top" : this.toolbar.replace(this.toolbarPlaceholder)});
       }
       // Replace the Maximize button in the toolbar with the Restore one
-      targetElement._fullScreenButton.replace(this.closeButton);
+      targetElement._x_fullScreenActivator.replace(this.closeButton);
     }
-    wrapper.insert(this.buttons.replace(this.buttonsPlaceholder));
-    // Maximize the targetElement
-    this.resizeTextArea(targetElement);
+    wrapper.insert(this.buttons.replace(this.buttonsPlaceholder).show());
+    var parent = $(targetElement.parentNode);
+    targetElement._x_fullScreenActivator.hide();
+    while (parent != document.body) {
+      parent._originalStyle = {
+        'overflow' : parent.style['overflow'],
+        'position' : parent.style['position'],
+        'width' : parent.style['width'],
+        'height' : parent.style['height'],
+        'left' : parent.style['left'],
+        'right' : parent.style['right'],
+        'top' : parent.style['top'],
+        'bottom' : parent.style['bottom'],
+        'padding' : parent.style['padding'],
+        'margin' : parent.style['margin']
+      };
+      parent.setStyle({'overflow': "visible", 'position': "absolute", width: "100%", height: "100%", left: 0, top:0, right:0, bottom: 0, padding: 0, margin: 0});
+      parent.siblings().each(function(item) {
+        item._originalDisplay = item.style['display'];
+        item.setStyle({display: "none"});
+      });
+      parent = parent.parentNode;
+    }
+    document.body._originalStyle = {
+      'overflow' : parent.style['overflow'],
+      'width' : parent.style['width'],
+      'height' : parent.style['height']
+    };
+    document.body.setStyle({'overflow' : 'hidden', 'width': '100%', 'height': '100%'});
+
     // Make sure to resize the targetElement when the window dimensions are changed. Both document and window are monitored,
     // since different browsers send events to different elements.
     this.resizeListener = this.resizeTextArea.bind(this, targetElement);
-    // document.observe('resize', this.resizeListener);
     Event.observe(window, 'resize', this.resizeListener);
     // Show the exit buttons
     this.closeButton.show();
     this.actionCloseButtonWrapper.show();
+    // Maximize the targetElement
+    this.resizeTextArea(targetElement);
+    // IE6 has yet another bug, if we don't call this, then sometimes the toolbar will be invisible. Don't ask why.
+    this.toolbar.viewportOffset();
   },
-  /**
-   * Restore the layout.
-   */
+  /** Restore the layout. */
   closeFullScreen : function() {
     var targetElement = this.maximized;
     // Hide the exit buttons
     this.closeButton.hide();
     this.actionCloseButtonWrapper.hide();
     // We're no longer interested in resize events
-    document.stopObserving('resize', this.resizeListener);
     Event.stopObserving(window, 'resize', this.resizeListener);
+    // Restore the parent element (the wrapper)
+    targetElement.parentNode.removeClassName("fullScreenWrapper");
+    // Restore the WYSIWYGs
+    if (targetElement.hasClassName("xRichTextEditor")) {
+      var iframe = targetElement.down(".gwt-RichTextArea");
+      iframe.setStyle(iframe._originalStyle);
+    } else if (targetElement.hasClassName("mceEditorContainer")) {
+      var iframe = targetElement.down(".mceEditorIframe");
+      iframe.setStyle(iframe._originalStyle);
+      var tframe = targetElement.down(".mceEditorSource");
+      tframe.setStyle(tframe._originalStyle);
+    }
+
+    // Restore the previous layout
+    var parent = targetElement.parentNode;
+    while (parent != document.body) {
+      parent.setStyle(parent._originalStyle);
+      parent.siblings().each(function(item) {
+        item.style['display'] = item._originalDisplay;
+      });
+      parent = parent.parentNode;
+    }
+    document.body.setStyle(document.body._originalStyle);
     // Restore the toolbar and action buttons to their initial position
     this.buttonsPlaceholder.replace(this.buttons);
+    if (this.buttons._x_isCustom) {
+      this.buttons.hide();
+    }
     if (this.toolbar) {
       if (this.toolbar.hasClassName("leftmenu2")) {
         this.toolbarPlaceholder.replace(this.toolbar);
       }
       // Replace the Restore button in the toolbar with the Maximize one
-      this.closeButton.replace(targetElement._fullScreenButton);
+      this.closeButton.replace(targetElement._x_fullScreenActivator);
     }
-    // Remove the wrapper
-    // targetElement.parentNode.parentNode.replaceChild(targetElement, targetElement.parentNode);
-    targetElement.parentNode.removeClassName("fullScreenWrapper");
-    if (targetElement.hasClassName("xRichTextEditor")) {
-      var iframe = targetElement.down(".gwt-RichTextArea");
-      iframe.setStyle(iframe._originalStyle);
-      iframe.setStyle({width : "100%"});
-    } else if (targetElement.hasClassName("mceEditorContainer")) {
-      var iframe = targetElement.down(".mceEditorIframe");
-      iframe.setStyle(iframe._originalStyle);
-    }
-
-    // Restore the previous layout
-    var parent = targetElement.parentNode;
-    parent.setStyle({"paddingTop" : parent._originalPadding});
-    while (parent != document.body) {
-      parent.setStyle(parent._originalStyle);
-      parent = parent.parentNode;
-    }
-    document.body.setStyle(document.body._originalStyle);
-    document.body.setStyle({width : "auto", height: "auto"});
-    // targetElement.setStyle(targetElement._originalStyle)
-    if (Prototype.Browser.IE){
+    targetElement._x_fullScreenActivator.show();
+    if (Prototype.Browser.IE) {
       // IE crashes if we try to resize this without a bit of delay.
       setTimeout(function() {
-        this.setStyle({width : "100%", height: "auto"});
+        this.setStyle(this._originalStyle);
       }.bind(targetElement), 500);
     } else {
-      targetElement.setStyle({width : "100%", height: "auto"});
+      targetElement.setStyle(targetElement._originalStyle);
     }
     // No element is maximized anymore
     delete this.maximized;
   },
-  /**
-   * In full screen, when the containers's dimensions change, the maximized element must be resized accordingly.
-   */
+  /** In full screen, when the containers's dimensions change, the maximized element must be resized accordingly. */
   resizeTextArea : function(targetElement) {
     if (!this.maximized) {
       return;
     }
-    var topMargin = targetElement.positionedOffset().top;
-    // Window height - margin (for the toolbar) - styling padding - buttons
-    var newHeight = document.viewport.getHeight() - topMargin - this.margin - this.buttons.getHeight();
-    var newWidth = document.viewport.getWidth() - this.margin;
-    // More IE bugs: the textarea scrollbar is outside the visible area
-	  if (Prototype.Browser.IE && targetElement.tagName.toLowerCase() == "textarea") {
-      newWidth -= 24;
-    }
-    // IE under Wine doesn't work well, returning 0 for viewport.getWidth
+    // Compute the maximum space available for the textarea:
+    var newHeight = document.viewport.getHeight();
+    var newWidth = document.viewport.getWidth();
+    // Prototype fails to return the right viewport in IE6. This works:
     if(newWidth <= 0) {
-      targetElement.setStyle({'width' :  '100%', 'height' :  '100%'});
-    } else {
-      targetElement.setStyle({'width' :  newWidth + 'px', 'height' :  newHeight + 'px'});
-      if (targetElement.hasClassName("xRichTextEditor")) {
-        targetElement.down(".gwt-RichTextArea").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement.down(".xToolbar").getHeight() - targetElement.down(".gwt-MenuBar").getHeight() + 'px'});
-      } else if (targetElement.hasClassName("mceEditorContainer")) {
-        targetElement.down(".mceEditorIframe").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - this.toolbar.getHeight() + 'px'});
-      }
+      newWidth = document.body.clientWidth;
+      newHeight = document.body.clientHeight;
+    }
+    // Window width - styling padding
+    newWidth = newWidth - this.margin;
+    // Window height - margin (for the toolbar) - styling padding - buttons
+    newHeight = newHeight - targetElement.positionedOffset().top - this.margin - this.buttons.getHeight();
+    targetElement.setStyle({'width' :  newWidth + 'px', 'height' :  newHeight + 'px'});
+    // Resize the WYSIWYGs
+    if (targetElement.hasClassName("xRichTextEditor")) {
+      targetElement.down(".gwt-RichTextArea").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement.down(".xToolbar").getHeight() - targetElement.down(".gwt-MenuBar").getHeight() + 'px'});
+    } else if (targetElement.hasClassName("mceEditorContainer")) {
+      targetElement.down(".mceEditorIframe").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - this.toolbar.getHeight() + 'px'});
+      targetElement.down(".mceEditorSource").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - this.toolbar.getHeight() + 'px'});
     }
   },
-  /**
-   * onMouseDown handler that prevents dragging the button.
-   */
+  /** onMouseDown handler that prevents dragging the button. */
   preventDrag : function(event) {
     event.stop();
   }
@@ -383,8 +416,8 @@ XWiki.dataEditors.FullScreenEditing = Class.create({
 Event.observe(window, 'load', function() {
   if(Prototype.Browser.IE) {
     // In IE there is a race condition between the WYSIWYGs and this script. Allow the WYSIWYG to initialize before inserting buttons.
-    setTimeout("new XWiki.dataEditors.FullScreenEditing();", 500);
+    setTimeout("new XWiki.editors.FullScreenEditing();", 500);
   } else {
-    new XWiki.dataEditors.FullScreenEditing();
+    new XWiki.editors.FullScreenEditing();
   }
 });

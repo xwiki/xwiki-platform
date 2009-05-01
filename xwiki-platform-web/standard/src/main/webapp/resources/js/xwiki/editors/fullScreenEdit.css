@@ -1,28 +1,38 @@
 .fullScreenEditButton {
-  cursor: ne-resize;
-  position: absolute;
-  right: 1%;
-  top: -14px;
+  cursor: ne-resize !important;
+}
+.fullScreenEditLinkContainer {
+  text-transform: lowercase;
+  font-size: 80%;
+  color: #009;
+  cursor: pointer;
+  display: block;
+  margin-right: 10%;
+  margin-top: -1.4em;
+  text-align: right;
+}
+
+.fullScreenWrapper .fullScreenEditLinkContainer {
+  display: none;
 }
 .fullScreenCloseButton {
-  cursor: sw-resize;
+  cursor: sw-resize !important;
 }
 .leftmenu2 .fullScreenEditButton, .leftmenu2 .fullScreenCloseButton {
-  position: static;
-  margin-left: 4px;
+  margin: 2px;
+  float: right;
 }
 .mceToolbar .fullScreenEditButton, .mceToolbar .fullScreenCloseButton {
-  position: static;
-  margin-left: 3px;
-  margin-bottom: 2px;
+  padding: 2px;
+  width: 16px;
+  height: 16px;
 }
 .gwt-MenuBar .fullScreenEditButton, .gwt-MenuBar .fullScreenCloseButton {
-  position: static;
   float: right;
   margin: 5px;
 }
 
-.fullScreenWrapper {
+#body .fullScreenWrapper {
   z-index: 5;
   position: fixed !important;
   left: 0;
@@ -31,12 +41,13 @@
   bottom: 0;
   width: 100%;
   height: 100%;
-  padding: 0;
-  background-color : #FFF;
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: #FFF;
 }
 
 /* Comment this to make the version comment and minor edit checkbox visible in full screen */
-.fullScreenWrapper .metamodifs{
+.fullScreenWrapper .metamodifs {
   display: none !important;
 }
 
@@ -52,4 +63,8 @@
 /* Make sure gwt popup menus are visible in full screen: */
 .gwt-MenuBarPopup {
   z-index: 12;
+}
+/* This overrides a rule for the Object Editor that is supposed to resize text inputs. */
+#body .fullScreenWrapper .buttons .buttonwrapper input {
+  width: auto;
 }

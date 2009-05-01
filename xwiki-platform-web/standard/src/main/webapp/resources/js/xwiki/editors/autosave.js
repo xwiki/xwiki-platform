@@ -6,8 +6,9 @@ if (typeof(XWiki) == "undefined"
     console.warn("[Autosave feature] Required class missing: XWiki.actionButtons.AjaxSaveAndContinue");
   }
 } else {
-if (typeof(XWiki.dataEditors) == 'undefined') {
-  XWiki.dataEditors = new Object();
+// Make sure the editors 'namespace' exists.
+if (typeof(XWiki.editors) == 'undefined') {
+  XWiki.editors = new Object();
 }
 
 /**
@@ -17,7 +18,7 @@ if (typeof(XWiki.dataEditors) == 'undefined') {
  * TODO Support for the WYSIWYG editors
  * TODO Don't show in the class editor, if there is no class defined
  */
-XWiki.dataEditors.AutoSave = Class.create({
+XWiki.editors.AutoSave = Class.create({
   /** Is the autosave enabled ? */
   enabled: false,
   /** If enabled, how frequent are the savings */
@@ -228,6 +229,6 @@ XWiki.dataEditors.AutoSave = Class.create({
 
 // When the document is loaded, create the Autosave control
 document.observe("xwiki:dom:loaded", function() {
-  new XWiki.dataEditors.AutoSave();
+  new XWiki.editors.AutoSave();
 });
 }//XWiki.actionButtons.AjaxSaveAndContinue exists

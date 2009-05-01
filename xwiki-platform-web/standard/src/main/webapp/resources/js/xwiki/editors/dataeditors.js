@@ -1,5 +1,5 @@
 // ======================================
-// Object editor enhancements
+// Object and Class editor enhancements
 document.observe('dom:loaded', function() {
   // ------------------------------------
   // Ajax object deletion
@@ -94,11 +94,11 @@ document.observe('dom:loaded', function() {
 if (typeof(XWiki) == 'undefined') {
   XWiki = new Object();
 }
-if (typeof(XWiki.dataEditors) == 'undefined') {
-  XWiki.dataEditors = new Object();
+if (typeof(XWiki.editors) == 'undefined') {
+  XWiki.editors = new Object();
 }
 
-XWiki.dataEditors.XPropertyOrdering = Class.create({
+XWiki.editors.XPropertyOrdering = Class.create({
   initialize : function() {
     // Hide the property number, as ordering can be done by drag and drop
     $$('.xproperty-content').each(function(item) {
@@ -166,6 +166,6 @@ XWiki.dataEditors.XPropertyOrdering = Class.create({
 
 document.observe('dom:loaded', function() {
   if($('xclassContent')) {
-    new XWiki.dataEditors.XPropertyOrdering();
+    new XWiki.editors.XPropertyOrdering();
   }
 });

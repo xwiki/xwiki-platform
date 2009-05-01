@@ -30,12 +30,8 @@
 ## Edit mode
 ##
 #if($hasEdit && !$isReadOnly)
-## Check inline editing option
-#if($doc.content.indexOf("includeForm(")!=-1)
-#set($editaction = "inline")
-#else
-#set($editaction = "edit")
-#end
+## Compute the default edit mode
+#set($editaction = $doc.getDefaultEditMode())
 ##
 ## Create menu
 ##

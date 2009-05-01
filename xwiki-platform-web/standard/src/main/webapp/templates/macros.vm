@@ -1457,7 +1457,7 @@ $html
     <tr>
       <td class="xwiki-grid-pagination" colspan="2">
         <span id="${divid}-limits" class="xwiki-grid-limits"></span>
-        <span id="${divid}-ajax-loader" class="xwiki-grid-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />$msg.get("xe.grid.loading")</span>
+        <span id="${divid}-ajax-loader" class="xwiki-grid-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />$msg.get("xe.livetable.loading")</span>
         <span class="controlPagination">
           <div title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></div>
           <div title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></div>

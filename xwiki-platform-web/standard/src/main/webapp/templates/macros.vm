@@ -1457,7 +1457,7 @@ $html
     <tr>
       <td class="xwiki-grid-pagination" colspan="2">
         <span id="${divid}-limits" class="xwiki-grid-limits"></span>
-        <span id="${divid}-ajax-loader" class="xwiki-grid-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.grid.loading')" title="" />$msg.get("xe.grid.loading")</span>
+        <span id="${divid}-ajax-loader" class="xwiki-grid-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />$msg.get("xe.grid.loading")</span>
         <span class="controlPagination">
           <div title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></div>
           <div title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></div>
@@ -1628,10 +1628,10 @@ function (row, i, table)
              #if($velocityCount > 1) 
              td.insert(" ");
              #end
-             #if($msg.get("xe.livetable.action.${action}") != "xe.livetable.action.${action}")
-               #set($text = $msg.get("xe.livetable.action.${action}"))
-             #elseif($msg.get("${transprefix}.actions.${action}") != "${transprefix}.actions.${action}")
-               #set($text = "${transprefix}.actions.${action}")
+             #if($msg.get("xe.livetable._actions.${action}") != "xe.livetable._actions.${action}")
+               #set($text = $msg.get("xe.livetable._actions.${action}"))
+             #elseif($msg.get("${transprefix}._actions.${action}") != "${transprefix}._actions.${action}")
+               #set($text = "${transprefix}._actions.${action}")
              #else
                #set($text = "$action")
              #end

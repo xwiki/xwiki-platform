@@ -60,6 +60,8 @@
 }
 .fullScreenWrapper table.mceEditor {
   height: auto !important;
+  margin: 0 !important;
+  border: none !important;
 }
 * html .fullScreenWrapper {
   position: absolute !important;

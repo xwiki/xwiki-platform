@@ -12,8 +12,8 @@ if (typeof(XWiki.editors) == 'undefined') {
 
 /**
  * Full screen editing for textarea.
- * 
- * TODO Make it work for textareas in inline editing
+ *
+ * TODO Revisit once the new WYSIWYG supports inline editing.
  */
 XWiki.editors.FullScreenEditing = Class.create({
   // Some layout settings, to be customized for other skins
@@ -44,8 +44,6 @@ XWiki.editors.FullScreenEditing = Class.create({
     // When the full screen is activated, the buttons will be brought in the fullscreen, thus removed from their parent
     // element, where they are replaced by a placeholder, so that we know exactly where to put them back.
     this.buttonsPlaceholder = new Element("span");
-    // The editor toolbar needs to be visible in full screen. Might not exist at all.
-    this.toolbar = $(document.body).down(".leftmenu2") || $(document.body).down(".gwt-MenuBar") || $(document.body).down(".mceToolbar");
     // Placeholder for the toolbar, see above.
     this.toolbarPlaceholder = new Element("span");
     // The controls that will close the fullscreen
@@ -78,6 +76,8 @@ XWiki.editors.FullScreenEditing = Class.create({
       this.addWikiContentButton(item);
     } else if (this.isWikiField(item)) {
       this.addWikiFieldButton(item);
+    } else if (this.isWysiwyg10Field(item)) {
+      this.addWysiwyg10FieldButton(item);
     }
   },
   // Some simple functions that help deciding what kind of editor is the target element
@@ -105,9 +105,10 @@ XWiki.editors.FullScreenEditing = Class.create({
   },
   /** Adds the fullscreen button in the Wiki editor toolbar. */
   addWikiContentButton : function (textarea) {
+    textarea._toolbar = $(document.body).down(".leftmenu2");
     // Normally there should be a simple toolbar with basic actions
-    if (this.toolbar) {
-      this.toolbar.insert({top: this.createOpenButton(textarea)});
+    if (textarea._toolbar) {
+      textarea._toolbar.insert({top: this.createOpenButton(textarea)});
     } else {
       this.addWikiTextareaButton(textarea);
     }
@@ -134,6 +135,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     }));
     newToolbar.insert(link.insert(this.createOpenButton(container)));
     toolbar.insert(newToolbar);
+    container._toolbar = toolbar;
     return true;
   },
   /** Adds the fullscreen button in the GWT WYSIWYGR editor menu. */
@@ -158,7 +160,7 @@ XWiki.editors.FullScreenEditing = Class.create({
       return false;
     }
     toolbar.insert({"top" : this.createOpenButton(item)});
-    this.toolbar = toolbar;
+    item._toolbar = toolbar;
     if (item._x_fullScreenLoader) {
       item._x_fullScreenLoader.stop();
       item._x_fullScreenLoader = false;
@@ -167,6 +169,9 @@ XWiki.editors.FullScreenEditing = Class.create({
   },
   addWikiFieldButton : function (textarea) {
     Element.insert(textarea, {before: this.createOpenLink(textarea)});
+  },
+  addWysiwyg10FieldButton : function (textarea) {
+    this.addWysiwyg10ContentButton(textarea);
   },
   /** Creates a full screen activator button for the given element. */
   createOpenButton : function (targetElement) {
@@ -297,9 +302,10 @@ XWiki.editors.FullScreenEditing = Class.create({
     // layout when exiting fullscreen.
     var wrapper = targetElement.up();
     wrapper.addClassName("fullScreenWrapper");
-    if (this.toolbar) {
-      if (this.toolbar.hasClassName("leftmenu2")) {
-        wrapper.insert({"top" : this.toolbar.replace(this.toolbarPlaceholder)});
+    if(targetElement._toolbar) {
+      // The wiki editor has the toolbar outside the textarea element, unlike the other editors, which have it as a descendant
+      if (targetElement._toolbar.hasClassName("leftmenu2")) {
+        wrapper.insert({"top" : targetElement._toolbar.replace(this.toolbarPlaceholder)});
       }
       // Replace the Maximize button in the toolbar with the Restore one
       targetElement._x_fullScreenActivator.replace(this.closeButton);
@@ -346,8 +352,8 @@ XWiki.editors.FullScreenEditing = Class.create({
     // Maximize the targetElement
     this.resizeTextArea(targetElement);
     // IE6 has yet another bug, if we don't call this, then sometimes the toolbar will be invisible. Don't ask why.
-    if (this.toolbar) {
-      this.toolbar.viewportOffset();
+    if (targetElement._toolbar) {
+      targetElement._toolbar.viewportOffset();
     }
   },
   /** Restore the layout. */
@@ -386,9 +392,9 @@ XWiki.editors.FullScreenEditing = Class.create({
     if (this.buttons._x_isCustom) {
       this.buttons.hide();
     }
-    if (this.toolbar) {
-      if (this.toolbar.hasClassName("leftmenu2")) {
-        this.toolbarPlaceholder.replace(this.toolbar);
+    if (targetElement._toolbar) {
+      if (targetElement._toolbar.hasClassName("leftmenu2")) {
+        this.toolbarPlaceholder.replace(targetElement._toolbar);
       }
       // Replace the Restore button in the toolbar with the Maximize one
       this.closeButton.replace(targetElement._x_fullScreenActivator);
@@ -431,8 +437,8 @@ XWiki.editors.FullScreenEditing = Class.create({
     if (targetElement.hasClassName("xRichTextEditor")) {
       targetElement.down(".gwt-RichTextArea").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement.down(".xToolbar").getHeight() - targetElement.down(".gwt-MenuBar").getHeight() + 'px'});
     } else if (targetElement.hasClassName("mceEditorContainer")) {
-      targetElement.down(".mceEditorIframe").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - this.toolbar.getHeight() + 'px'});
-      targetElement.down(".mceEditorSource").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - this.toolbar.getHeight() + 'px'});
+      targetElement.down(".mceEditorIframe").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement._toolbar.getHeight() + 'px'});
+      targetElement.down(".mceEditorSource").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement._toolbar.getHeight() + 'px'});
     }
   },
   /** onMouseDown handler that prevents dragging the button. */

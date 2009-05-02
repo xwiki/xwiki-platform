@@ -64,7 +64,7 @@ public class Document extends Api
     protected XWikiDocument doc;
 
     /**
-     * Indicates if this API wraps a cloned XWikiDocument. 
+     * Indicates if this API wraps a cloned XWikiDocument.
      */
     protected boolean cloned = false;
 
@@ -86,9 +86,8 @@ public class Document extends Api
     }
 
     /**
-     * Get the XWikiDocument wrapped by this API.
-     * This function is accessible only if you have the programming rights give access to the priviledged API of the
-     * Document.
+     * Get the XWikiDocument wrapped by this API. This function is accessible only if you have the programming rights
+     * give access to the priviledged API of the Document.
      * 
      * @return The XWikiDocument wrapped by this API.
      */
@@ -159,8 +158,8 @@ public class Document extends Api
     }
 
     /**
-     * Get the name of the space of the document for exemple if the fullName of a document is "MySpace.Mydoc", the
-     * name is MySpace.
+     * Get the name of the space of the document for exemple if the fullName of a document is "MySpace.Mydoc", the name
+     * is MySpace.
      * 
      * @return The name of the space of the document.
      * @deprecated use {@link #getSpace()} instead of this function.
@@ -172,8 +171,7 @@ public class Document extends Api
     }
 
     /**
-     * Get the fullName of the document. 
-     * If a document is named "MyDoc" in space "MySpace", the fullname is
+     * Get the fullName of the document. If a document is named "MyDoc" in space "MySpace", the fullname is
      * "MySpace.MyDoc". In a wiki, all the documents have a different fullName.
      * 
      * @return fullName of the document.
@@ -184,10 +182,9 @@ public class Document extends Api
     }
 
     /**
-     * Get the complete fullName of the document.
-     * The real full name of the document containing the name of the wiki where the document is stored. 
-     * For a document stored in the wiki "xwiki", in space "MySpace", named "MyDoc", its complete full 
-     * name is "xwiki:MySpace.MyDoc".
+     * Get the complete fullName of the document. The real full name of the document containing the name of the wiki
+     * where the document is stored. For a document stored in the wiki "xwiki", in space "MySpace", named "MyDoc", its
+     * complete full name is "xwiki:MySpace.MyDoc".
      * 
      * @return The complete fullName of the document.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
@@ -198,7 +195,7 @@ public class Document extends Api
     }
 
     /**
-     * Get a Version object representing the current version of the document. 
+     * Get a Version object representing the current version of the document.
      * 
      * @return A Version object representing the current version of the document
      */
@@ -238,10 +235,9 @@ public class Document extends Api
     }
 
     /**
-     * Get document title.
-     * If a title has not been provided through the title field, it looks for a section title in 
-     * the document's content and if not found return the page name. The returned title is also 
-     * interpreted which means it's allowed to use Velocity, Groovy, etc syntax within a title.
+     * Get document title. If a title has not been provided through the title field, it looks for a section title in the
+     * document's content and if not found return the page name. The returned title is also interpreted which means it's
+     * allowed to use Velocity, Groovy, etc syntax within a title.
      * 
      * @return The document title.
      */
@@ -259,10 +255,9 @@ public class Document extends Api
     }
 
     /**
-     * Get fullName of the profile document of the author of the current version of the document.
-     * Example: XWiki.Admin.
+     * Get fullName of the profile document of the author of the current version of the document. Example: XWiki.Admin.
      * 
-     * @return The  fullName of the profile document of the author of the current version of the document.
+     * @return The fullName of the profile document of the author of the current version of the document.
      */
     public String getAuthor()
     {
@@ -270,8 +265,8 @@ public class Document extends Api
     }
 
     /**
-     * Get fullName of the profile document of the author of the last content modification in the document.
-     * Example: XWiki.Admin.
+     * Get fullName of the profile document of the author of the last content modification in the document. Example:
+     * XWiki.Admin.
      * 
      * @return The fullName of the profile document of the author of the last content modification in the document.
      */
@@ -281,8 +276,8 @@ public class Document extends Api
     }
 
     /**
-     * Get the date when the current document version has been created, i.e. the date of the last 
-     * modification of the document.
+     * Get the date when the current document version has been created, i.e. the date of the last modification of the
+     * document.
      * 
      * @return The date where the current document version has been created.
      */
@@ -302,8 +297,7 @@ public class Document extends Api
     }
 
     /**
-     * Get the date when the document has been created.
-     * return The date when the document has been created.
+     * Get the date when the document has been created. return The date when the document has been created.
      */
     public Date getCreationDate()
     {
@@ -341,10 +335,10 @@ public class Document extends Api
     }
 
     /**
-     * Get the Syntax id representing the syntax used for the document. For example "xwiki/1.0" represents
-     * the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax. 
-     *
-     * @return The syntax id representing the syntax used for the document. 
+     * Get the Syntax id representing the syntax used for the document. For example "xwiki/1.0" represents the first
+     * version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
+     * 
+     * @return The syntax id representing the syntax used for the document.
      */
     public String getSyntaxId()
     {
@@ -352,18 +346,16 @@ public class Document extends Api
     }
 
     /**
-     * Get the language of the document.
-     * If the document is a translation it returns the language set for it, otherwise, it returns the default
-     * language in the wiki where the document is stored.
+     * Get the language of the document. If the document is a translation it returns the language set for it, otherwise,
+     * it returns the default language in the wiki where the document is stored.
      * 
-     * @return The language of the document. 
+     * @return The language of the document.
      */
     public String getLanguage()
     {
         return this.doc.getLanguage();
     }
 
-    
     public String getTemplate()
     {
         return this.doc.getTemplate();
@@ -1008,8 +1000,8 @@ public class Document extends Api
         if (this.currentObj == null) {
             return this.doc.display(fieldname, mode, prefix, getXWikiContext());
         } else {
-            return this.doc.display(fieldname, mode, prefix, this.currentObj.getBaseObject(), getSyntaxId(), 
-            		getXWikiContext());
+            return this.doc.display(fieldname, mode, prefix, this.currentObj.getBaseObject(), getSyntaxId(),
+                getXWikiContext());
         }
     }
 
@@ -1022,11 +1014,10 @@ public class Document extends Api
     }
 
     /**
-     * Note: We've introduced this signature taking an extra syntaxId parameter to handle the case where Panels
-     * are written in a syntax other than the main document. The problem is that currently the displayPanel()
-     * velocity macro in macros.vm calls display() on the main document and not on the panel document. Thus if
-     * we don't tell what syntax to use the main document syntax will be used to display panels even if they're
-     * written in another syntax.
+     * Note: We've introduced this signature taking an extra syntaxId parameter to handle the case where Panels are
+     * written in a syntax other than the main document. The problem is that currently the displayPanel() velocity macro
+     * in macros.vm calls display() on the main document and not on the panel document. Thus if we don't tell what
+     * syntax to use the main document syntax will be used to display panels even if they're written in another syntax.
      */
     public String display(String fieldname, String type, Object obj, String syntaxId)
     {
@@ -1518,7 +1509,7 @@ public class Document extends Api
     {
         return this.doc.getWikiLinkedPages(getXWikiContext());
     }
-    
+
     /**
      * Get document children. Children are document with the current document as parent.
      * 
@@ -1615,8 +1606,9 @@ public class Document extends Api
     }
 
     /**
-     * @param syntaxId the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
-     *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
+     * @param syntaxId the Syntax id representing the syntax used for the current document. For example "xwiki/1.0"
+     *            represents the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki
+     *            Syntax.
      */
     public void setSyntaxId(String syntaxId)
     {
@@ -1941,7 +1933,9 @@ public class Document extends Api
      */
     public void rename(String newDocumentName) throws XWikiException
     {
-        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit", this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
+        if (hasAccessLevel("delete")
+            && this.context.getWiki().checkAccess("edit",
+                this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
             this.doc.rename(newDocumentName, getXWikiContext());
         }
     }

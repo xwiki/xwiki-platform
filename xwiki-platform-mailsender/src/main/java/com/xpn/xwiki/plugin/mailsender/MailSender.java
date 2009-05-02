@@ -121,6 +121,18 @@ public interface MailSender
         List<Attachment> attachments);
 
     /**
+     * Sends a raw message. The message can contain additional headers at the start, which are parsed and correctly sent
+     * as additional headers (Bcc, Subject, Reply-To, etc.). The actual message is treated as plain text.
+     * 
+     * @param from the sender
+     * @param to the receiver
+     * @param rawMessage the raw message, containing additional headers and the actual message
+     * @return 0 on success, -1 on failure. On failure the error message is stored in the XWiki context under the
+     *         "error" key.
+     */
+    int sendRawMessage(String from, String to, String rawMessage);
+
+    /**
      * Uses an XWiki document to build the message subject and context, based on variables stored in the
      * VelocityContext. Sends the email.
      * 

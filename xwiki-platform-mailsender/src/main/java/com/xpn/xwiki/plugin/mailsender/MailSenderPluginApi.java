@@ -112,6 +112,21 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     /**
      * {@inheritDoc}
      * 
+     * @see MailSender#sendRawMessage(String, String, String)
+     */
+    public int sendRawMessage(String from, String to, String rawMessage)
+    {
+        Mail email = new Mail();
+        email.setFrom(from);
+        email.setTo(to);
+
+        getProtectedPlugin().parseRawMessage(rawMessage, email);
+        return sendMail(email);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see MailSender#sendMessageFromTemplate(String, String, String, String, String, String, VelocityContext)
      */
     public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
@@ -119,9 +134,9 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     {
         try {
             return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, vcontext,
-                context);
+                this.context);
         } catch (Exception e) {
-            context.put("error", e.getMessage());
+            this.context.put("error", e.getMessage());
             LOG.error("sendMessageFromTemplate", e);
             return -1;
         }
@@ -146,9 +161,9 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     {
         int result = 0;
         try {
-            getProtectedPlugin().sendMail(mail, context);
+            getProtectedPlugin().sendMail(mail, this.context);
         } catch (Exception e) {
-            context.put("error", e.getMessage());
+            this.context.put("error", e.getMessage());
             LOG.error("Failed to send email [" + mail.toString() + "]", e);
             result = -1;
         }
@@ -175,9 +190,9 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     {
         int result = 0;
         try {
-            getProtectedPlugin().sendMail(mail, mailConfiguration, context);
+            getProtectedPlugin().sendMail(mail, mailConfiguration, this.context);
         } catch (Exception e) {
-            context.put("error", e.getMessage());
+            this.context.put("error", e.getMessage());
             LOG.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
                 + mailConfiguration.toString() + "]", e);
             result = -1;

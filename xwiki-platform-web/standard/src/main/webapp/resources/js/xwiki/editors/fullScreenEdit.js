@@ -229,7 +229,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     // Hide by default
     this.actionCloseButtonWrapper.hide();
     // Add it in the action bar
-    this.buttons.down(".buttons").insert(this.actionCloseButtonWrapper);
+    this.buttons.down(".buttons").insert({top: this.actionCloseButtonWrapper});
   },
 
   /**

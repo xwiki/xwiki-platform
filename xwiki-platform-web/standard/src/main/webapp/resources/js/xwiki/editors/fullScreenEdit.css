@@ -7,9 +7,13 @@
   color: #009;
   cursor: pointer;
   display: block;
-  margin-right: 10%;
   margin-top: -1.4em;
   text-align: right;
+}
+
+/* Matches the style of the new object editor */
+#xwikiobjects .fullScreenEditLinkContainer, #xwikiclassproperties .fullScreenEditLinkContainer {
+  margin-right: 10%;
 }
 
 .fullScreenWrapper .fullScreenEditLinkContainer {

@@ -58,6 +58,15 @@ XWiki.editors.FullScreenEditing = Class.create({
     $$('.xRichTextEditor').each(function(item) {
       this.addBehavior(item);
     }.bind(this));
+    // When comming back from preview, check if the user was in full screen before hitting preview, and if so restore
+    // that full screen
+    this.maximizedReference = $(document.body).down("input[name='x-maximized']");
+    if (this.maximizedReference && this.maximizedReference.value != "") {
+      var matches = $$(this.maximizedReference.value);
+      if (matches && matches.length > 0) {
+        this.makeFullScreen(false, matches[0]);
+      }
+    }
   },
   /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
@@ -241,7 +250,22 @@ XWiki.editors.FullScreenEditing = Class.create({
     * - All the initial styles of the altered elements are remembered, so that they can be restored when exiting fullscreen
     */
   makeFullScreen : function (event, targetElement) {
-    event.stop();
+    if (event) {
+      event.stop();
+    }
+    // Store the selector of the target element in the form, in the hidden input called 'x-maximized'.
+    // This is needed so that the full screen can be reactivated when comming back from preview, if it was activate before
+    // the user hit the preview button.
+    if (this.maximizedReference) {
+      if (targetElement.id) {
+        this.maximizedReference.value = '#'+ targetElement.id ;
+      } else if (targetElement.name) {
+        this.maximizedReference.value = targetElement.tagName + "[name='" + targetElement.name + "']" ;
+      } else if (targetElement.className) {
+        // No id, no name. This must be the GWT editor...
+        this.maximizedReference.value = targetElement.tagName + "." + targetElement.className ;
+      }
+    }
     // Remember the maximized element
     this.maximized = targetElement;
     // Remember the original dimensions of the maximized element
@@ -380,6 +404,9 @@ XWiki.editors.FullScreenEditing = Class.create({
     }
     // No element is maximized anymore
     delete this.maximized;
+    if (this.maximizedReference) {
+      this.maximizedReference.value = '';
+    }
   },
   /** In full screen, when the containers's dimensions change, the maximized element must be resized accordingly. */
   resizeTextArea : function(targetElement) {

@@ -32,6 +32,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #template("menuedit.vm")
 #if($editor == "wiki" || $editor == "wysiwyg")
 <form id="edit" method="post" action="$doc.getURL("preview")" >
+## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
+<div class="hidden"><input type="hidden" name="x-maximized" value="$!{request.get('x-maximized')}"/></div>
 #end
 ##
 ## Content

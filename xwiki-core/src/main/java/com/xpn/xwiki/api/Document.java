@@ -32,6 +32,8 @@ import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
@@ -58,6 +60,8 @@ import com.xpn.xwiki.util.Util;
 
 public class Document extends Api
 {
+    private static final Log LOG = LogFactory.getLog(Document.class);
+
     /**
      * The XWikiDocument object wrapped by this API.
      */
@@ -1523,7 +1527,6 @@ public class Document extends Api
 
     /**
      * @return "inline" if the document should be edited in inline mode by default or "edit" otherwise.
-     * 
      * @throws XWikiException if an error happens when computing the edit mode
      */
     public String getDefaultEditMode() throws XWikiException
@@ -2026,8 +2029,12 @@ public class Document extends Api
         try {
             getDoc().convertSyntax(targetSyntaxId, this.context);
         } catch (Exception ex) {
+            LOG.error("Failed to convert document [" + getPrefixedFullName() + "] to syntax [" + targetSyntaxId + "]",
+                ex);
+
             return false;
         }
+
         return true;
     }
 }

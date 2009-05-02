@@ -2750,11 +2750,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         bclass.setName(XWikiConstant.SHEET_CLASS);
 
+        // Note: Ideally we don't want a special field in the sheet class but XWiki classes must have at
+        // least one field or they're not saved. Thus we are introducing a "defaultEditMode" which will
+        // tell what edit mode to use. If empty it'll default to "inline".
         needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
 
         if (doc.isNew()) {
             generatePageContent(doc, "Sheet Class");
             doc.setContent(doc.getContent() + "\n\nClass that should be used to recognize sheet pages.");
+            doc.setParent("XWiki.XWikiClasses");
         }
 
         if (needsUpdate) {

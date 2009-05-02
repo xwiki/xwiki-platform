@@ -20,9 +20,11 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 
 import org.jmock.Mock;
@@ -47,7 +49,7 @@ public class MailSenderApiTest extends AbstractBridgedXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        
+
         this.mockXWiki = mock(XWiki.class);
         this.xwiki = (XWiki) this.mockXWiki.proxy();
         getContext().setWiki(this.xwiki);
@@ -116,5 +118,21 @@ public class MailSenderApiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(0, this.api.sendMail(mail, config));
 
         // TODO: Find a way to ensure that the SMTP From value has been used.
+    }
+
+    public void testSendRawMessage() throws MessagingException, IOException
+    {
+        assertEquals(0, this.api.sendRawMessage("john@acme.org", "peter@acme.org",
+            "Subject:Test subject\nFrom:steve@acme.org\nCc:adam@acme.org\nheader:value\n\nTest content"));
+        List<Message> inbox = Mailbox.get("peter@acme.org");
+        assertEquals(1, inbox.size());
+        Message message = inbox.get(0);
+        assertEquals("Test subject", message.getSubject());
+        assertEquals("steve@acme.org", message.getFrom()[0].toString());
+        assertEquals("Test content\r\n", message.getContent());
+        assertEquals("value", message.getHeader("header")[0]);
+
+        inbox = Mailbox.get("adam@acme.org");
+        assertEquals(1, inbox.size());
     }
 }

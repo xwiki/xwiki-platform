@@ -311,10 +311,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         boolean isVelocity = false;
 
         for (; i < array.length;) {
-            // Skip \s
-            for (; i < array.length && Character.isWhitespace(array[i]); ++i) {
-                velocityBlock.append(array[i]);
-            }
+            i = getMacroParametersSeparator(array, i, velocityBlock, context);
 
             if (i < array.length) {
                 // If ')' it's the end of parameters
@@ -339,6 +336,20 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         return i;
     }
 
+    private int getMacroParametersSeparator(char[] array, int currentIndex, StringBuffer velocityBlock,
+        VelocityFilterContext context)
+    {
+        int i = currentIndex;
+
+        i = getWhiteSpaces(array, i, velocityBlock, context);
+        if (array[i] == ',') {
+            velocityBlock.append(array[i++]);
+        }
+        i = getWhiteSpaces(array, i, velocityBlock, context);
+
+        return i;
+    }
+
     private int getMacroParameter(char[] array, int currentIndex, StringBuffer parameterBlock,
         VelocityFilterContext context)
     {
@@ -356,7 +367,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
             } else if (array[i] == '\'') {
                 i = getEscape(array, i, parameterBlock, '\'', context);
                 break;
-            } else if (Character.isWhitespace(array[i])) {
+            } else if (Character.isWhitespace(array[i]) || array[i] == ',') {
                 break;
             } else if (array[i] == ')') {
                 break;
@@ -613,6 +624,17 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         }
 
         context.setVelocity(isVelocity);
+
+        return i;
+    }
+
+    private int getWhiteSpaces(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
+    {
+        int i = currentIndex;
+
+        for (; i < array.length && Character.isWhitespace(array[i]); ++i) {
+            velocityBlock.append(array[i]);
+        }
 
         return i;
     }

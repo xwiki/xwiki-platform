@@ -46,7 +46,7 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      */
     public AbstractMacro(MacroDescriptor macroDescriptor)
     {
-        this.macroDescriptor = macroDescriptor;
+        setDescriptor(macroDescriptor);
     }
 
     /**
@@ -89,7 +89,7 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
     {
         return this.macroDescriptor;
     }
-
+    
     /**
      * {@inheritDoc}
      * 
@@ -101,5 +101,14 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
             return getPriority() - macro.getPriority();
         }
         return this.getClass().getSimpleName().compareTo(macro.getClass().getSimpleName());
+    }
+    
+    /**
+     * Allows macro classes extending other macro classes to override the macro descriptor with their own.
+     * @param descriptor the overriding descriptor to set 
+     */
+    protected void setDescriptor(MacroDescriptor descriptor)
+    {
+        this.macroDescriptor = descriptor;
     }
 }

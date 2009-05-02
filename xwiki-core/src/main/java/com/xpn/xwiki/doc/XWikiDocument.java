@@ -4108,8 +4108,15 @@ public class XWikiDocument implements DocumentModelBridge
                     if (documentName != null) {
                         XWikiDocument includedDocument = xwiki.getDocument(documentName, context);
                         if (!includedDocument.isNew()) {
-                            if (includedDocument.getObject(XWikiConstant.SHEET_CLASS) != null) {
-                                return "inline";
+                            BaseObject sheetClassObject = includedDocument.getObject(XWikiConstant.SHEET_CLASS);
+                            if (sheetClassObject != null) {
+                                // Use the user-defined default edit mode if set.
+                                String defaultEditMode = sheetClassObject.getStringValue("defaultEditMode");
+                                if (StringUtils.isBlank(defaultEditMode)) {
+                                    return "inline";
+                                } else {
+                                    return defaultEditMode;
+                                }
                             }
                         }
                     }

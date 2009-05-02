@@ -258,7 +258,8 @@ XWiki.editors.FullScreenEditing = Class.create({
     // the user hit the preview button.
     if (this.maximizedReference) {
       if (targetElement.id) {
-        this.maximizedReference.value = '#'+ targetElement.id ;
+        // Using #ID fails since the IDs for the textareas in inline editing contain the '.' character, which marks a classname
+        this.maximizedReference.value = targetElement.tagName + "[id='" + targetElement.id + "']";
       } else if (targetElement.name) {
         this.maximizedReference.value = targetElement.tagName + "[name='" + targetElement.name + "']" ;
       } else if (targetElement.className) {

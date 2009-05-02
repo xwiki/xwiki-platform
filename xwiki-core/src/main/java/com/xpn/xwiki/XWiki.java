@@ -2915,10 +2915,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8);
         needsUpdate |= bclass.addTextField("dateformat", "Date Format", 30);
 
+        // mail
         needsUpdate |= bclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
+        needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
         needsUpdate |= bclass.addTextField("smtp_server", "SMTP Server", 30);
         needsUpdate |= bclass.addTextField("smtp_port", "SMTP Port", 5);
-        needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
+        needsUpdate |= bclass.addTextField("smtp_server_username", "SMTP Server username (optional)", 30);
+        needsUpdate |= bclass.addTextField("smtp_server_password", "SMTP Server password (optional)", 30);
+        needsUpdate |= bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties for SMTP", 60, 6);
         needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);
@@ -3413,7 +3417,62 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      *             Plugin</a>
      */
     @Deprecated
-    public void sendMessage(String sender, String[] recipient, String message, XWikiContext context)
+    public void sendMessage(String sender, String[] recipients, String rawMessage, XWikiContext context)
+        throws XWikiException
+    {
+        LOG.trace("Entering sendMessage()");
+
+        // We'll be using the MailSender plugin, which has much more advanced capabilities (authentication, TLS).
+        // Since the plugin is in another module, and it depends on the core, we have to use it through reflection in
+        // order to avoid cyclic dependencies. This should be fixed once the mailsender becomes a clean component
+        // instead of a plugin.
+        Object mailSender;
+        Class mailSenderClass;
+        Method mailSenderSendRaw;
+
+        try {
+            mailSender = getPluginApi("mailsender", context);
+            mailSenderClass = Class.forName("com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi");
+
+            // public int sendRawMessage(String from, String to, String rawMessage)
+            mailSenderSendRaw = mailSenderClass.getMethod("sendRawMessage",
+               new Class[]{String.class, String.class, String.class});
+        } catch (Exception e) {
+            LOG.error("Problem getting MailSender via Reflection. Using the old sendMessage mechanism.", e);
+            sendMessageOld(sender, recipients, rawMessage, context);
+            return;
+        }
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Sending message = \"" + rawMessage + "\"");
+        }
+
+        String messageRecipients = StringUtils.join(recipients, ',');
+
+        try {
+            mailSenderSendRaw.invoke(mailSender, sender, messageRecipients, rawMessage);
+        } catch (InvocationTargetException ite) {
+            Throwable cause = ite.getCause();
+            if (cause instanceof XWikiException) {
+                throw (XWikiException)cause;
+            } else {
+                throw new RuntimeException(cause);
+            }
+        } catch (Exception e) {
+            // Probably either IllegalAccessException or IllegalArgumentException
+            // Shouldn't happen unless there were an incompatible code change
+            throw new RuntimeException(e);
+        }
+
+        LOG.info("Exiting sendMessage(). It seems everything went ok.");
+    }
+
+    /**
+     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *             Plugin</a>
+     */
+    @Deprecated
+    private void sendMessageOld(String sender, String[] recipient, String message, XWikiContext context)
         throws XWikiException
     {
         SMTPClient smtpc = null;

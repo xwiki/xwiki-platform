@@ -19,9 +19,12 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -76,30 +79,44 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
  */
 public class MailSenderPlugin extends XWikiDefaultPlugin
 {
-    /**
-     * Log object to log messages in this class.
-     */
+    /** Logging helper object. */
     private static final Log LOG = LogFactory.getLog(MailSenderPlugin.class);
 
+    /**
+     * Error code signaling that the mail template requested for
+     * {@link #sendMailFromTemplate(String, String, String, String, String, String, VelocityContext, XWikiContext)} was
+     * not found.
+     */
     public static int ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND = -2;
 
+    /** Generic error code for plugin failures. */
     public static int ERROR = -1;
 
+    /** The name of the Object Type holding mail templates. */
     public static final String EMAIL_XWIKI_CLASS_NAME = "XWiki.Mail";
 
+    /** The name of the plugin, used for accessing it from scripting environments. */
     public static final String ID = "mailsender";
 
     protected static final String URL_SEPARATOR = "/";
 
+    /** A pattern for determining if a line represents a SMTP header, conforming to RFC 2822. */
+    private static final Pattern SMTP_HEADER = Pattern.compile("^([\\x21-\\x7E&&[^\\x3A]]++):(.*+)$");
+
+    /** The name of the header that specifies the subject of the mail. */
+    private static final String SUBJECT = "Subject";
+
+    /** The name of the header that specifies the sender of the mail. */
+    private static final String FROM = "From";
+
     /**
-     * {@inheritDoc}
+     * Default plugin constructor.
      * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public MailSenderPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
-        init(context);
     }
 
     /**
@@ -130,6 +147,17 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.XWikiPluginInterface#getName()
+     */
+    @Override
+    public String getName()
+    {
+        return ID;
     }
 
     /**
@@ -279,9 +307,12 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
         // this will also check for email error
         InternetAddress from = new InternetAddress(mail.getFrom());
-        InternetAddress[] to = toInternetAddresses(mail.getTo());
-        InternetAddress[] cc = toInternetAddresses(mail.getCc());
-        InternetAddress[] bcc = toInternetAddresses(mail.getBcc());
+        InternetAddress[] to =
+            toInternetAddresses(mail.getTo() + "," + StringUtils.defaultString(mail.getHeader("To")));
+        InternetAddress[] cc =
+            toInternetAddresses(mail.getCc() + "," + StringUtils.defaultString(mail.getHeader("Cc")));
+        InternetAddress[] bcc =
+            toInternetAddresses(mail.getBcc() + "," + StringUtils.defaultString(mail.getHeader("Bcc")));
 
         if ((to == null) && (cc == null) && (bcc == null)) {
             LOG.info("No recipient -> skipping this email");
@@ -373,6 +404,87 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * Splits a raw mail into headers and the actual content, filling in a {@link Mail} object. This method should be
+     * compliant with RFC 2822 as much as possible. If the message accidentally starts with what looks like a mail
+     * header, then that line <strong>WILL</strong> be considered a header; no check on the semantics of the header is
+     * performed.
+     * 
+     * @param rawMessage the raw content of the message that should be parsed
+     * @param toMail the {@code Mail} to create
+     * @throws IllegalArgumentException if the target Mail or the content to parse are null or the empty string
+     */
+    protected void parseRawMessage(String rawMessage, Mail toMail)
+    {
+        // Sanity check
+        if (toMail == null) {
+            throw new IllegalArgumentException("The target Mail can't be null");
+        } else if (rawMessage == null) {
+            throw new IllegalArgumentException("rawMessage can't be null");
+        } else if (StringUtils.isBlank(rawMessage)) {
+            throw new IllegalArgumentException("rawMessage can't be empty");
+        }
+
+        try {
+            // The message is read line by line
+            BufferedReader input = new BufferedReader(new StringReader(rawMessage));
+            String line;
+            StringWriter result = new StringWriter();
+            PrintWriter output = new PrintWriter(result);
+            boolean headersFound = false;
+
+            line = input.readLine();
+            // Additional headers are at the start. Parse them and put them in the Mail object.
+            // Warning: no empty lines are allowed before the headers.
+            Matcher m = SMTP_HEADER.matcher(line);
+            while (line != null && m.matches()) {
+                String header = m.group(1);
+                String value = m.group(2);
+                line = input.readLine();
+                while (line != null && (line.startsWith(" ") || line.startsWith("\t"))) {
+                    value += line;
+                    line = input.readLine();
+                }
+                if (header.equals(SUBJECT)) {
+                    toMail.setSubject(value);
+                } else if (header.equals(FROM)) {
+                    toMail.setFrom(value);
+                } else {
+                    toMail.setHeader(header, value);
+                }
+                if (line != null) {
+                    m.reset(line);
+                }
+                headersFound = true;
+            }
+
+            // There should be one empty line here, separating the body from the headers.
+            if (headersFound && line != null && StringUtils.isBlank(line)) {
+                line = input.readLine();
+            } else {
+                if (headersFound) {
+                    LOG.warn("Mail body does not contain an empty line between the headers and the body.");
+                }
+            }
+
+            // If no text exists after the headers, return
+            if (line == null) {
+                toMail.setTextPart("");
+                return;
+            }
+
+            do {
+                // Mails always use \r\n as EOL
+                output.print(line + "\r\n");
+            } while ((line = input.readLine()) != null);
+
+            toMail.setTextPart(result.toString());
+        } catch (IOException ioe) {
+            // Can't really happen here
+            LOG.error("Unexpected IO exception while preparing a mail", ioe);
+        }
+    }
+
+    /**
      * Evaluates a String property containing Velocity
      * 
      * @param property The String property
@@ -397,12 +509,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     protected String getFileName(String path)
     {
         return path.substring(path.lastIndexOf(URL_SEPARATOR) + 1);
-    }
-
-    @Override
-    public String getName()
-    {
-        return ID;
     }
 
     /**
@@ -568,7 +674,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 }
 
                 try {
-
                     MimeMessage message = createMimeMessage(mail, session, context);
                     if (message == null) {
                         continue;

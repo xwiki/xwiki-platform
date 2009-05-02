@@ -92,7 +92,8 @@ public class TableRadeoxMacroConverter extends AbstractRadeoxMacroConverter
                 if (!token.endsWith("\\")) {
                     // If the cell data ends with \\, then it will be continued. Current data is stored in lastToken.
                     result.append(filterContext.addProtectedContent(nbLines == 1 ? "|=" : "|", false));
-                    result.append(token.trim());
+                    String value = token.trim();
+                    result.append(value.length() > 0 ? value : " ");
                     firstCell = false;
                 } else if (!tokenizer.hasMoreTokens()) {
                     // Remove backslashes from the end
@@ -100,7 +101,8 @@ public class TableRadeoxMacroConverter extends AbstractRadeoxMacroConverter
                         token = token.substring(0, token.length() - 1);
                     }
                     result.append(filterContext.addProtectedContent(nbLines == 1 ? "|=" : "|", false));
-                    result.append(token.trim());
+                    String value = token.trim();
+                    result.append(value.length() > 0 ? value : " ");
                 }
             } else if ("|".equals(token)) {
                 // Cell delimiter
@@ -112,7 +114,8 @@ public class TableRadeoxMacroConverter extends AbstractRadeoxMacroConverter
                 } else if (lastToken.endsWith("\\")) {
                     // The last cell wasn't added because it ended with a continuation mark (\\). Add it now.
                     result.append(filterContext.addProtectedContent(nbLines == 1 ? "|=" : "|", false));
-                    result.append(lastToken.trim());
+                    String value = lastToken.trim();
+                    result.append(value.length() > 0 ? value : " ");
                     firstCell = false;
                 }
             }

@@ -575,50 +575,119 @@ $xwiki.getUserName("xwiki:${username}")
 ### @param fname The name of the file
 ###
 #macro(mimetypeimg $mime $fname)
-  #set($idx = $fname.lastIndexOf("."))
+  #set($idx = $fname.lastIndexOf('.'))
   #set($idx = $idx + 1)
   #if(($idx != 0) && ($idx != -1))
     #set($ext = $fname.substring($idx))
   #else
-    #set($ext = "")
+    #set($ext = '')
   #end
-  #####    images
-  #if($mime.equals("image/svg"))<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="SVG" title="SVG"/>
-  #elseif($mime.equals("application/svg+xml"))<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="SVG" title="SVG"/>
-  #elseif($mime.startsWith("image/"))<img src="$xwiki.getSkinFile("mimetypes/jpg.png")" alt="Image" title="Image"/>
-  #####    text based
-  #elseif($mime.equals("text/plain"))<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="Text" title="Text"/>
-  #elseif($mime.equals("text/html"))<img src="$xwiki.getSkinFile("mimetypes/html.png")" alt="HTML" title="HTML"/>
-  #elseif($mime.equals("text/css"))<img src="$xwiki.getSkinFile("mimetypes/url.png")" alt="CSS" title="CSS"/>
-  #elseif($mime.startsWith("text/"))<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="Text" title="Text"/>
-  #####    documents
-  #elseif($mime.equals("application/xml"))<img src="$xwiki.getSkinFile("mimetypes/xml.png")" alt="XML" title="XML"/>
-  #elseif($mime.equals("application/pdf"))<img src="$xwiki.getSkinFile("mimetypes/pdf.png")" alt="PDF" title="PDF"/>
-  #elseif($mime.equals("application/postscript"))<img src="$xwiki.getSkinFile("mimetypes/ps.png")" alt="PS" title="PS"/>
-  #elseif($mime.equals("application/msword"))<img src="$xwiki.getSkinFile("mimetypes/word.png")" alt="Word" title="Word"/>
-  #elseif($mime.equals("application/powerpoint"))<img src="$xwiki.getSkinFile("mimetypes/ppt.png")" alt="PPT" title="PPT"/>
-  #elseif($mime.equals("application/x-shockwave-flash"))<img src="$xwiki.getSkinFile("mimetypes/swf.png")" alt="SWF" title="SWF"/>
-  #####    archives
-  #elseif($mime.equals("application/x-tar"))<img src="$xwiki.getSkinFile("mimetypes/tar.png")" alt="TAR" title="TAR"/>
-  #elseif($mime.equals("application/zip"))<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="ZIP" title="ZIP"/>
-  #elseif($mime.equals("application/x-gzip"))<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="GZ" title="GZ"/>
-  #elseif($mime.equals("application/java-archive"))<img src="$xwiki.getSkinFile("mimetypes/jar.png")" alt="JAR" title="JAR"/>
-  #####    media
-  #elseif($mime.startsWith("audio/"))<img src="$xwiki.getSkinFile("mimetypes/wav.png")" alt="Audio" title="Audio"/>
-  #elseif($mime.startsWith("video/"))<img src="$xwiki.getSkinFile("mimetypes/video.png")" alt="Video" title="Video"/>
-  #####    octet-streams extensions
-  #elseif($mime.equals("application/octet-stream"))
-    #if($ext.equals("xls"))<img src="$xwiki.getSkinFile("mimetypes/excel.png")" alt="XLS" title="XLS"/>
-    #elseif($ext.equals("bz") || $ext.equals("bz2") || $ext.equals("tbz"))<img src="$xwiki.getSkinFile("mimetypes/tar_bz.png")" alt="BZ" title="BZ"/>
-    #elseif($ext.equals("tgz"))<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="GZ" title="GZ"/>
-    #elseif($ext.equals("rar"))<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="RAR" title="RAR"/>
-    #elseif($ext.equals("odp") || $ext.equals("odt") || $ext.equals("odf") || $ext.equals("sxw") || $ext.equals("stw"))<img src="$xwiki.getSkinFile("mimetypes/openoffice.png")" alt="OpenOffice" title="OpenOffice"/>
-    #else<img src="$xwiki.getSkinFile("mimetypes/bin.png")" alt="BIN" title="BIN"/>
+  ## Map mimetypes to their corresponding icons
+  #if(!$mimetypeMap)
+    #set($mimetypeMap = $util.hashMap)
+    ## images
+    #set($discard = $mimetypeMap.put('image/svg+xml',                      ['vector', 'SVG']))
+    #set($discard = $mimetypeMap.put('application/svg+xml',                ['vector', 'SVG']))
+    #set($discard = $mimetypeMap.put('image/svg',                          ['vector', 'SVG']))
+    #set($discard = $mimetypeMap.put('image/svg+xml',                      ['vector', 'SVG']))
+    #set($discard = $mimetypeMap.put('image/',                             ['photo', 'Image']))
+    ## text
+    #set($discard = $mimetypeMap.put('text/html',                          ['html', 'HTML']))
+    #set($discard = $mimetypeMap.put('text/css',                           ['css', 'CSS']))
+    #set($discard = $mimetypeMap.put('text/',                              ['page_white_text', 'Text']))
+    ## documents
+    #set($discard = $mimetypeMap.put('application/xml',                    ['page_white_code', 'XML']))
+    #set($discard = $mimetypeMap.put('application/pdf',                    ['page_white_acrobat', 'PDF']))
+    #set($discard = $mimetypeMap.put('application/postscript',             ['page_red', 'PS']))
+    #set($discard = $mimetypeMap.put('application/msword',                 ['page_white_word', 'DOC']))
+    #set($discard = $mimetypeMap.put('application/powerpoint',             ['page_white_powerpoint', 'PPT']))
+    #set($discard = $mimetypeMap.put('application/vnd.ms-powerpoint',      ['page_white_powerpoint', 'PPT']))
+    #set($discard = $mimetypeMap.put('application/vnd.oasis.opendocument', ['page', 'OpenOffice']))
+    #set($discard = $mimetypeMap.put('application/x-shockwave-flash',      ['page_white_flash', 'SWF']))
+    ## archives
+    #set($discard = $mimetypeMap.put('application/x-tar',                  ['page_white_compressed', 'TAR']))
+    #set($discard = $mimetypeMap.put('application/x-gzip',                 ['page_white_compressed', 'GZ']))
+    #set($discard = $mimetypeMap.put('application/x-gtar',                 ['page_white_compressed', 'GZ']))
+    #set($discard = $mimetypeMap.put('application/zip',                    ['page_white_zip', 'ZIP']))
+    #set($discard = $mimetypeMap.put('application/java-archive',           ['cup', 'JAR']))
+    #set($discard = $mimetypeMap.put('audio/',                             ['music', 'Audio']))
+    #set($discard = $mimetypeMap.put('video/',                             ['film', 'Video']))
+  #end
+  #if(!$extensionMap)
+    ## Map extensions to their corresponding icons
+    #set($extensionMap = $util.hashMap)
+    ## media
+    #set($discard = $extensionMap.put('ogg',      ['music', 'Audio']))
+    #set($discard = $extensionMap.put('flac',     ['music', 'Audio']))
+    #set($discard = $extensionMap.put('ogv',      ['film', 'Video']))
+    #set($discard = $extensionMap.put('mk',       ['film', 'Video']))
+    #set($discard = $extensionMap.put('avi',      ['film', 'Video']))
+    #set($discard = $extensionMap.put('divx',     ['film', 'Video']))
+    #set($discard = $extensionMap.put('mov',      ['film', 'Video']))
+    #set($discard = $extensionMap.put('flv',      ['page_white_flash', 'SWF']))
+    #set($discard = $extensionMap.put('fla',      ['page_white_flash', 'SWF']))
+    #set($discard = $extensionMap.put('swf',      ['page_white_flash', 'SWF']))
+    ## office
+    #set($discard = $extensionMap.put('odp',      ['page', 'OpenOffice']))
+    #set($discard = $extensionMap.put('odt',      ['page', 'OpenOffice']))
+    #set($discard = $extensionMap.put('odf',      ['page', 'OpenOffice']))
+    #set($discard = $extensionMap.put('sxw',      ['page', 'OpenOffice']))
+    #set($discard = $extensionMap.put('stw',      ['page', 'OpenOffice']))
+    #set($discard = $extensionMap.put('ods',      ['page', 'OpenOffice']))
+    #set($discard = $extensionMap.put('xls',      ['page_white_excel', 'XLS']))
+    ## archives
+    #set($discard = $extensionMap.put('bz',       ['page_white_compressed', 'BZ']))
+    #set($discard = $extensionMap.put('bz2',      ['page_white_compressed', 'BZ']))
+    #set($discard = $extensionMap.put('tbz',      ['page_white_compressed', 'BZ']))
+    #set($discard = $extensionMap.put('gz',       ['page_white_compressed', 'GZ']))
+    #set($discard = $extensionMap.put('tgz',      ['page_white_compressed', 'GZ']))
+    #set($discard = $extensionMap.put('rar',      ['page_white_compressed', 'RAR']))
+    #set($discard = $extensionMap.put('7z',       ['page_white_zip', 'ZIP']))
+    ## development
+    #set($discard = $extensionMap.put('sql',      ['database', 'SQL']))
+    #set($discard = $extensionMap.put('php',      ['page_white_php', 'PHP']))
+    #set($discard = $extensionMap.put('c',        ['page_white_c', 'C']))
+    #set($discard = $extensionMap.put('cpp',      ['page_white_cplusplus', 'C++']))
+    #set($discard = $extensionMap.put('c++',      ['page_white_cplusplus', 'C++']))
+    #set($discard = $extensionMap.put('cs',       ['page_white_csharp', 'C#']))
+    #set($discard = $extensionMap.put('h',        ['page_white_h', 'H']))
+    #set($discard = $extensionMap.put('ruby',     ['page_white_ruby', 'RUBY']))
+    #set($discard = $extensionMap.put('java',     ['page_white_cup', 'JAVA']))
+    #set($discard = $extensionMap.put('js',       ['script', 'JS']))
+    #set($discard = $extensionMap.put('php',      ['page_white_php', 'PHP']))
+    #set($discard = $extensionMap.put('csproj',   ['page_white_visualstudio', 'VS']))
+    #set($discard = $extensionMap.put('sln',      ['page_white_visualstudio', 'VS']))
+    #set($discard = $extensionMap.put('res',      ['page_white_visualstudio', 'VS']))
+    ## data
+    #set($discard = $extensionMap.put('ics',      ['date', 'Calendar']))
+    #set($discard = $extensionMap.put('eml',      ['email', 'EMail']))
+    #set($discard = $extensionMap.put('vcf',      ['vcard', 'vCard']))
+    #set($discard = $extensionMap.put('vcard',    ['vcard', 'vCard']))
+    ## executables
+    #set($discard = $extensionMap.put('exe',      ['cog', 'EXE']))
+    #set($discard = $extensionMap.put('bat',      ['application_xp_terminal', 'Script']))
+    #set($discard = $extensionMap.put('sh',      ['application_xp_terminal', 'Script']))
+  #end
+  #if($mimetypeMap.containsKey($mime))
+    #set($image = $mimetypeMap.get($mime).get(0))
+    #set($text = $mimetypeMap.get($mime).get(1))
+  #elseif($extensionMap.containsKey($ext))
+    #set($image = $extensionMap.get($ext).get(0))
+    #set($text = $extensionMap.get($ext).get(1))
+  #else
+    #set($mimetypePrefix = $mime.indexOf('/'))
+    #set($mimetypePrefix = $mimetypePrefix + 1)
+    #set($mimetypePrefix = $mime.substring(0, $mimetypePrefix))
+    #if($mimetypeMap.containsKey($mimetypePrefix))
+      #set($image = $mimetypeMap.get($mimetypePrefix).get(0))
+      #set($text = $mimetypeMap.get($mimetypePrefix).get(1))
+    #else
+      #set($image = 'page_white')
+      #set($text = 'Attachment')
     #end
-  #elseif($mime.startsWith("application/"))<img src="$xwiki.getSkinFile("mimetypes/exec.png")" alt="Application" title="Application"/>
   #end
+  <img src="$xwiki.getSkinFile("icons/silk/${image}.gif")" alt="${text}" title="${text}"/>
 #end
-
 ###
 ###    packName
 ###

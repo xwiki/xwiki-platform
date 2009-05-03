@@ -1,8 +1,5 @@
 package com.xpn.xwiki.plugin.skinx;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.xpn.xwiki.XWikiContext;
 
 /**
@@ -22,9 +19,6 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
      */
     public static final String PLUGIN_NAME = "ssx";
 
-    /** Log helper for logging messages in this class. */
-    private static final Log LOG = LogFactory.getLog(CssSkinExtensionPlugin.class);
-
     /**
      * XWiki plugin constructor.
      * 
@@ -36,7 +30,21 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     public CssSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
         super(PLUGIN_NAME, className, context);
-        init(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * We must override this method since the plugin manager only calls it for classes that provide their own
+     * implementation, and not an inherited one.
+     * </p>
+     * 
+     * @see com.xpn.xwiki.plugin.XWikiPluginInterface#virtualInit(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public void virtualInit(XWikiContext context)
+    {
+        super.virtualInit(context);
     }
 
     /**
@@ -49,8 +57,7 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     {
         return "<link rel='stylesheet' type='text/css' href='"
             + context.getWiki().getURL(documentName, PLUGIN_NAME,
-                "language=" + context.getLanguage() + parametersAsQueryString(documentName, context), context)
-            + "'/>";
+                "language=" + context.getLanguage() + parametersAsQueryString(documentName, context), context) + "'/>";
     }
 
     /**

@@ -61,7 +61,11 @@
 ##
   #foreach ($version in $versions)
     #set($revinfo = $tdoc.getRevisionInfo($version))
-        <tr class="row#if($velocityCount % 2 == 0) even #else odd #end">
+    #if ($tdoc.getRCSVersion()==$version)
+        <tr class="currentversion odd">
+    #else
+         <tr class="row#if($velocityCount % 2 == 0) even #else odd #end">
+    #end
         #if ($totalVersions > 1)
           <td><input type="radio" name="rev1" value="$version" #if ($velocityCount==2) checked="checked" #end/></td>
           <td><input type="radio" name="rev2" value="$version" #if ($velocityCount==1) checked="checked" #end/></td>
@@ -73,7 +77,11 @@
           <td>$!{revinfo.comment}</td>
     #end
     #if($hasEdit || $hasAdmin)
+        #if ($tdoc.getRCSVersion()==$version)
+          <td><span class="currentversionlabel">$msg.get('core.viewers.history.currentVersion')</span></td>
+        #else
           <td class="xwikibuttonlink"><a href="$tdoc.getURL('rollback', "rev=$version$lang")" onclick="if (confirm('$msg.get('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get('core.viewers.history.rollback')</a></td>
+        #end
     #end
     #if($hasAdmin)
           <td class="xwikibuttonlink"><a href="$tdoc.getURL('deleteversions',"rev=$version$lang")" onclick="if (confirm('$msg.get('core.viewers.history.confirmDeleteSingle', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get('core.viewers.history.deleteSingle')</a></td>

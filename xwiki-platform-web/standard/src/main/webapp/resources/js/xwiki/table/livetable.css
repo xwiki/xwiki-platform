@@ -1,35 +1,35 @@
-/* <Grid Pagination Specific Style> Top, Bottom*/
-.xwiki-grid td.xwiki-grid-pagination {
+/* <Live Table Pagination Specific Style> Top, Bottom*/
+.xwiki-livetable td.xwiki-livetable-pagination {
 	color: #888;
 	font-size: 90%;
 	line-height: 22px;
 	border: 0px;
 }
-.xwiki-grid-loader , .xwiki-grid-loader img{
+.xwiki-livetable-loader , .xwiki-livetable-loader img{
 	float: left;
 } 
-.xwiki-grid-pagination .xwiki-grid-limits{
+.xwiki-livetable-pagination .xwiki-livetable-limits{
 	float: left;
 }
-.xwiki-grid-pagination .xwiki-grid-limits strong{
+.xwiki-livetable-pagination .xwiki-livetable-limits strong{
 	font-weight: normal;
 }
-.xwiki-grid-pagination .xwiki-grid-pagination-content, .xwiki-grid-pagination .xwiki-grid-pagination-text {
+.xwiki-livetable-pagination .xwiki-livetable-pagination-content, .xwiki-livetable-pagination .xwiki-livetable-pagination-text {
 	display: in-line;
 }
-.xwiki-grid-pagination span.pagenumber {
+.xwiki-livetable-pagination span.pagenumber {
 	color: #888;
 	cursor: pointer;
 }
-.xwiki-grid-pagination span.pagenumber:hover {
+.xwiki-livetable-pagination span.pagenumber:hover {
 	color: #4D4D4D;
 	text-decoration: underlined;
 }
-.xwiki-grid-pagination span.selected {
+.xwiki-livetable-pagination span.selected {
 	color: #4D4D4D;
 	font-weight: bold;
 }
-.xwiki-grid-pagination span.pagenumber:focus {
+.xwiki-livetable-pagination span.pagenumber:focus {
     outline: dotted 1px #000;
 }
 /* <Pagination>*/
@@ -78,39 +78,39 @@
 	left: 21px;
 }
 /* </ Pagination>*/
-/* </ Grid Pagination> */
-/* <Grid Containers> */
-table.xwiki-grid {
+/* </ Live Table Pagination> */
+/* <Live Table Containers> */
+table.xwiki-livetable {
 	width: 100%;
 	margin:0;
 }
-.xwiki-grid td.xwiki-grid-display-container{
+.xwiki-livetable td.xwiki-livetable-display-container{
 	margin: 0;
 	border-color: #ffffff;
 	padding: 0 0 0 4px;
 	width:auto;
 }
-.xwiki-grid td.xwiki-grid-display-container table.xwiki-grid-display{
+.xwiki-livetable td.xwiki-livetable-display-container table.xwiki-livetable-display{
 	margin:0px;
 	border-collapse:collapse;
 	width: 100%;
 }
-.xwiki-grid-display td { /* IE6 tr border-bottom fix*/
+.xwiki-livetable-display td { /* IE6 tr border-bottom fix*/
 	border-color: #ffffff;
 	border-bottom-color: #cccccc;
 }
-html>body .xwiki-grid-display td {
+html>body .xwiki-livetable-display td {
 	border: 0px;
 }
-/* </Grid Containers> */
-/* <Grid Header> */
-table.xwiki-grid table.xwiki-grid-display thead.xwiki-grid-display-header{
+/* </Live Table Containers> */
+/* <Live Table Header> */
+table.xwiki-livetable table.xwiki-livetable-display thead.xwiki-livetable-display-header{
 	border-bottom: 5px solid #dddddd;
 }
-thead.xwiki-grid-display-header tr.xwiki-grid-display-filters:hover , thead.xwiki-grid-display-header tr.rowHover.{ /* for IE6 tr:hover fix*/
+thead.xwiki-livetable-display-header tr.xwiki-livetable-display-filters:hover , thead.xwiki-livetable-display-header tr.rowHover.{ /* for IE6 tr:hover fix*/
 	background-color: #fff;
 }
-thead.xwiki-grid-display-header th.xwiki-grid-display-header-text {
+thead.xwiki-livetable-display-header th.xwiki-livetable-display-header-text {
 	background-color: #dddddd;
 	border: 0;
 	border-collapse:separate;
@@ -122,115 +122,115 @@ thead.xwiki-grid-display-header th.xwiki-grid-display-header-text {
 	/*cursor:pointer;*/
 	white-space:nowrap;
 }
-thead.xwiki-grid-display-header th.sortable a {
+thead.xwiki-livetable-display-header th.sortable a {
 	color: #4D4D4D;
 	text-decoration:none
 }
-thead.xwiki-grid-display-header th.sortable {
+thead.xwiki-livetable-display-header th.sortable {
 	cursor: pointer;
 }
-thead.xwiki-grid-display-header th.desc {
+thead.xwiki-livetable-display-header th.desc {
 	background:#dddddd url("$xwiki.getSkinFile('icons/silk/bullet_arrow_down.gif')") no-repeat scroll right center;
 }
-thead.xwiki-grid-display-header th.asc {
+thead.xwiki-livetable-display-header th.asc {
 	background:#dddddd url("$xwiki.getSkinFile('icons/silk/bullet_arrow_up.gif')") no-repeat scroll right center;
 }
-thead.xwiki-grid-display-header th.selected {
+thead.xwiki-livetable-display-header th.selected {
 	color:#4D4D4D;
 	background-color: lemonChiffon;
 }
-thead.xwiki-grid-display-header  td.xwiki-grid-display-header-filter{ /* IE6 padding fix */
+thead.xwiki-livetable-display-header  td.xwiki-livetable-display-header-filter{ /* IE6 padding fix */
 	padding: 1px;
 }
-html>body thead.xwiki-grid-display-header  td.xwiki-grid-display-header-filter{
+html>body thead.xwiki-livetable-display-header  td.xwiki-livetable-display-header-filter{
 	padding: 2px 5px 2px 0px;
 	border-color: transparent;
 }
-thead.xwiki-grid-display-header td.xwiki-grid-display-header-filter input,
-thead.xwiki-grid-display-header td.xwiki-grid-display-header-filter select{
+thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter input,
+thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter select{
 	width: 100%;
 	border:1px solid #DDDDDD;
 	color: #888;
 	margin: 0;
 	padding:0 0 0 2px;
 }
-/* </ Grid Header> */
-/* <Grid Body> */
-tbody.xwiki-grid-display-body tr {
+/* </ Live Table Header> */
+/* <Live Table Body> */
+tbody.xwiki-livetable-display-body tr {
 	border-bottom: 1px solid #cccccc;
 }
-tbody.xwiki-grid-display-body tr:hover , tbody.xwiki-grid-display-body tr.rowHover{ /* for IE6 tr:hover fix*/
+tbody.xwiki-livetable-display-body tr:hover , tbody.xwiki-livetable-display-body tr.rowHover{ /* for IE6 tr:hover fix*/
 	background-color: lemonChiffon;
 }
-tbody.xwiki-grid-display-body tr.rowHover td { /* IE6 tr border-bottom fix*/
+tbody.xwiki-livetable-display-body tr.rowHover td { /* IE6 tr border-bottom fix*/
 	border-left-color: lemonChiffon;
 	border-right-color: lemonChiffon;
 }
-tbody.xwiki-grid-display-body td{
+tbody.xwiki-livetable-display-body td{
 	color:#4D4D4D;
 	padding: 3px 2px 3px 4px;
 	background-image: none;	
 }
-tbody.xwiki-grid-display-body a, tbody.xwiki-grid-display-body a:hover{
+tbody.xwiki-livetable-display-body a, tbody.xwiki-livetable-display-body a:hover{
 	color: #00007e; 
 }
-tbody.xwiki-grid-display-body td.linkeditor, tbody.xwiki-grid-display-body td.editableCellHover.linkeditor a {
+tbody.xwiki-livetable-display-body td.linkeditor, tbody.xwiki-livetable-display-body td.editableCellHover.linkeditor a {
 	padding-right: 16px;
 	cursor:pointer;
 }
-tbody.xwiki-grid-display-body td:hover.linkeditor{  
+tbody.xwiki-livetable-display-body td:hover.linkeditor{  
 	background:lemonChiffon url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
 	cursor:pointer;
 }
-tbody.xwiki-grid-display-body td.linkeditor a.editableCellHover{ /* for IE6 td:hover fix and because IE6 doesn't support multiple class td.linkeditor.editableCellHover*/
+tbody.xwiki-livetable-display-body td.linkeditor a.editableCellHover{ /* for IE6 td:hover fix and because IE6 doesn't support multiple class td.linkeditor.editableCellHover*/
 	display: block;
 	background:lemonChiffon url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
 	cursor:pointer;
 	color:#4D4D4D;
 	padding-right: 16px;
 }
-tbody.xwiki-grid-display-body td.linkeditor a{
+tbody.xwiki-livetable-display-body td.linkeditor a{
 	color:#4D4D4D;
 	text-decoration: none;
 }
-tbody.xwiki-grid-display-body td:hover.linkview, tbody.xwiki-grid-display-body td.editableCellHover.linkview,
-tbody.xwiki-grid-display-body td:hover.typenone, tbody.xwiki-grid-display-body td.editableCellHover.typenone,
-tbody.xwiki-grid-display-body td.typenone, tbody.xwiki-grid-display-body td.linkview{
+tbody.xwiki-livetable-display-body td:hover.linkview, tbody.xwiki-livetable-display-body td.editableCellHover.linkview,
+tbody.xwiki-livetable-display-body td:hover.typenone, tbody.xwiki-livetable-display-body td.editableCellHover.typenone,
+tbody.xwiki-livetable-display-body td.typenone, tbody.xwiki-livetable-display-body td.linkview{
 	
 }
-tbody.xwiki-grid-display-body td:hover.typenumeric, tbody.xwiki-grid-display-body td.editableCellHover.typenumeric, tbody.xwiki-grid-display-body td.typenumeric {
+tbody.xwiki-livetable-display-body td:hover.typenumeric, tbody.xwiki-livetable-display-body td.editableCellHover.typenumeric, tbody.xwiki-livetable-display-body td.typenumeric {
 	text-align: right;
 }
-tbody.xwiki-grid-display-body td:hover.typenone, tbody.xwiki-grid-display-body td.editableCellHover.typenone, tbody.xwiki-grid-display-body td.typenone {
+tbody.xwiki-livetable-display-body td:hover.typenone, tbody.xwiki-livetable-display-body td.editableCellHover.typenone, tbody.xwiki-livetable-display-body td.typenone {
 	text-align: center;
 	padding-left: 0;
 }
-tbody.xwiki-grid-display-body td a.action {
+tbody.xwiki-livetable-display-body td a.action {
     color:#888888;
 	padding-left:20px;
 	background-repeat:no-repeat;
 	margin-right:5px;
 	padding-bottom:1px;
 }
-tbody.xwiki-grid-display-body td a.action:hover {
+tbody.xwiki-livetable-display-body td a.action:hover {
     text-decoration:underline;
 }
-tbody.xwiki-grid-display-body td a.actioncopy {
+tbody.xwiki-livetable-display-body td a.actioncopy {
 	background-image:url($xwiki.getSkinFile("icons/silk/page_white_copy.gif"));
 }
-tbody.xwiki-grid-display-body td a.actionrename {
+tbody.xwiki-livetable-display-body td a.actionrename {
 	background-image:url($xwiki.getSkinFile("icons/silk/textfield_rename.gif"));
 }
-tbody.xwiki-grid-display-body td a.actiondelete {
+tbody.xwiki-livetable-display-body td a.actiondelete {
 	background-image:url($xwiki.getSkinFile("icons/silk/cross.gif"));
 }
-tbody.xwiki-grid-display-body td a.actionrights {
+tbody.xwiki-livetable-display-body td a.actionrights {
 	background-image:url($xwiki.getSkinFile("icons/silk/lock_edit.gif"));
 }
-tbody.xwiki-grid-display-body td a.actionedit {
+tbody.xwiki-livetable-display-body td a.actionedit {
 	background-image:url($xwiki.getSkinFile("icons/silk/page_white_edit.gif"));
 }
-/* </ Grid Body> */
+/* </ Live Table Body> */
 /* <Dialog Box> */
 div.dialog-loading{
 	border: 1px solid #aaa;
@@ -270,7 +270,7 @@ div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfi
 }
 /* </Dialog Box> */
 /* <Tag Cloud> */
-.xwiki-grid-tagcloud-container{
+.xwiki-livetable-tagcloud-container{
 	border: 1px solid #ddd;
 	border-bottom: 5px solid #ddd;
 	background-color: transparent;
@@ -278,13 +278,13 @@ div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfi
 	position: relative;
 	margin-top:10px;
 }
-.xwiki-grid-tagcloud-container h2 {
+.xwiki-livetable-tagcloud-container h2 {
 	background: url($xwiki.getSkinFile('icons/silk/tag_yellow.gif')) no-repeat;
 	font-size: 1em;	
 	color: #888;
 	padding-left:25px;
 }
-.xwiki-grid-tagcloud-container h2 span{
+.xwiki-livetable-tagcloud-container h2 span{
 	color: #888;
 	font-size: 0.8em;
 	font-weight: normal;
@@ -292,31 +292,31 @@ div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfi
 	margin: 0 0 10px;
 	border: none;
 }
-.xwiki-grid-tagcloud-container div.clearfloats {
+.xwiki-livetable-tagcloud-container div.clearfloats {
 	background-color: transparent;
 	margin: 0;
 	overflow: hidden;
 }
-div.xwiki-grid-tagcloud {
+div.xwiki-livetable-tagcloud {
 }
-div.xwiki-grid-tagcloud ol.tagCloud {
+div.xwiki-livetable-tagcloud ol.tagCloud {
 	margin:0;
 }
-div.xwiki-grid-tagcloud ol.tagCloud li span{
+div.xwiki-livetable-tagcloud ol.tagCloud li span{
 	color: #ddd;
 	padding: 0px 3px 0px 3px;
 	border: 1px solid #fff;
 }
-div.xwiki-grid-tagcloud ol.tagCloud li.selectable span {
+div.xwiki-livetable-tagcloud ol.tagCloud li.selectable span {
 	cursor: pointer;
 	color: #4D4D4D;
 }
-div.xwiki-grid-tagcloud ol.tagCloud li.selected span {
+div.xwiki-livetable-tagcloud ol.tagCloud li.selected span {
 	background-color: lemonChiffon;
 	border-bottom:1px solid #DDDDDD;
 	border-top:1px solid #DDDDDD;
 }
-.xwiki-grid-tagcloud-tip .tippointer{
+.xwiki-livetable-tagcloud-tip .tippointer{
 	position: relative;
 	width: 0;
 	height: 0;
@@ -327,7 +327,7 @@ div.xwiki-grid-tagcloud ol.tagCloud li.selected span {
     border-left: 20px dotted transparent;
     border-bottom: 0px none;
 }
-.xwiki-grid-tagcloud-tip .tippointer div {
+.xwiki-livetable-tagcloud-tip .tippointer div {
 	position: absolute;
 	width: 0;
 	height: 0;
@@ -343,26 +343,26 @@ div.xwiki-grid-tagcloud ol.tagCloud li.selected span {
 /* <Compatibility> */
 /* This section contains rules for backward compatibility with the deprecated (since 1.9M2) ASSTable */
 /* TODO move the users and groups related styles in toucan/albatross skin files */
-div.xwiki-grid-pagination-content {
+div.xwiki-livetable-pagination-content {
 	background: url($xwiki.getSkinFile("icons/silk/page_white_copy.gif")) no-repeat;
 	padding-left:20px;
 	padding-bottom:2px;
 	display:inline;
 }
-div.xwiki-grid-pagination-content span.pagenumber {
+div.xwiki-livetable-pagination-content span.pagenumber {
 	display:inline;
 	color: #888;
 	cursor: pointer;
 }
-div.xwiki-grid-pagination-content span.pagenumber:hover {
+div.xwiki-livetable-pagination-content span.pagenumber:hover {
 	color: #4D4D4D;
 	text-decoration: underlined;
 }
-div.xwiki-grid-pagination-content span.selected {
+div.xwiki-livetable-pagination-content span.selected {
 	color: #4D4D4D;
 	font-weight: bold;
 }
-div.xwiki-grid-pagination-content span.pagenumber:focus {
+div.xwiki-livetable-pagination-content span.pagenumber:focus {
     outline: dotted 1px #000;
 }
 

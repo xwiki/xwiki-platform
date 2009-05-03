@@ -1449,13 +1449,13 @@ $html
   #end
   #if($tagcloud)
     #set($ok = $xwiki.ssx.use("XWiki.TagCloud"))
-    <div id="${divid}-tagcloud" class="xwiki-grid-tagcloud-tip hidden">
+    <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden">
       <div>
-        <div class="xwiki-grid-tagcloud-container">
+        <div class="xwiki-livetable-tagcloud-container">
           <h2>$msg.get("xe.livetable.tags.help")
 	        <span>$msg.get("xe.livetable.tags.help.cancel")</span>
           </h2>
-          <div class="xwiki-grid-tagcloud"></div>
+          <div class="xwiki-livetable-tagcloud"></div>
         </div>
         <div class="tippointer">
           <div></div>
@@ -1463,25 +1463,25 @@ $html
       </div>
     </div>
   #end
-  <table id="${divid}" class="xwiki-grid">
+  <table id="${divid}" class="xwiki-livetable">
     <tr>
-      <td class="xwiki-grid-pagination">
-        <span id="${divid}-limits" class="xwiki-grid-limits"></span>
-        <span id="${divid}-ajax-loader" class="xwiki-grid-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />$msg.get("xe.livetable.loading")</span>
+      <td class="xwiki-livetable-pagination">
+        <span id="${divid}-limits" class="xwiki-livetable-limits"></span>
+        <span id="${divid}-ajax-loader" class="xwiki-livetable-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />$msg.get("xe.livetable.loading")</span>
         <span class="controlPagination">
           <span title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></span>
           <span title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></span>
         </span>
         <span class="pagination">
-          <span class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
-          <span class="xwiki-grid-pagination-content" ></span>
+          <span class="xwiki-livetable-pagination-text">$msg.get("xe.pagination.page")</span>
+          <span class="xwiki-livetable-pagination-content" ></span>
         </span>
       </td>
     </tr>
     <tr>
-      <td class="xwiki-grid-display-container">
-        <table class="xwiki-grid-display">
-          <thead class="xwiki-grid-display-header">
+      <td class="xwiki-livetable-display-container">
+        <table class="xwiki-livetable-display">
+          <thead class="xwiki-livetable-display-header">
             <tr>
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
@@ -1491,7 +1491,7 @@ $html
                 #set($isSortable = false)
               #end
               #if($colname != "_actions" || $hasAdmin)
-              <th class="xwiki-grid-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end"  #if("$!colprop.type"=="hidden") style="display: none" #end>
+              <th class="xwiki-livetable-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end"  #if("$!colprop.type"=="hidden") style="display: none" #end>
                 #if($isSortable)<a rel="${colname}">#end
                 $msg.get("${transprefix}${colname}")
                 #if($isSortable)</a>#end
@@ -1499,7 +1499,7 @@ $html
               #end
             #end
             </tr>
-            <tr class="xwiki-grid-display-filters">
+            <tr class="xwiki-livetable-display-filters">
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
               #if(("$!colprop.filterable" == "" || $colprop.filterable != false) && "$!colname" != "_actions")
@@ -1508,7 +1508,7 @@ $html
                 #set($isFilterable = false)
               #end
               #if("$!colprop.type"=="list" && $isFilterable)
-                <td class="xwiki-grid-display-header-filter"> 
+                <td class="xwiki-livetable-display-header-filter"> 
                 #if($colprop.get("class"))
                   #set($propClassName = $colprop.get("class"))
                 #else
@@ -1525,27 +1525,27 @@ $html
                 </select>
                 </td>            
               #elseif( ("$!colprop.type"=="text"||"$!colprop.type"=="number") && $isFilterable)
-                <td class="xwiki-grid-display-header-filter"><input name="${colname}" type="text" #if("$!colprop.size"!="") size="${colprop.size}" #end  title='$msg.get("xe.search.filters.title") $msg.get("${transprefix}${colname}")' /></td>
+                <td class="xwiki-livetable-display-header-filter"><input name="${colname}" type="text" #if("!$colprop.size"!="") size="${colprop.size}" #end  title='$msg.get("xe.search.filters.title") $msg.get("${transprefix}${colname}")' /></td>
               #elseif("$!colprop.type"=="hidden")
               #elseif($colname != "_actions" || $hasAdmin)
-              <td class="xwiki-grid-display-header-filter"></td>
+              <td class="xwiki-livetable-display-header-filter"></td>
               #end
             #end
             </tr>
           </thead>
-          <tbody id="${divid}-display" class="xwiki-grid-display-body"><tr><td>&nbsp;</td></tr></tbody>
+          <tbody id="${divid}-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
         </table>
       </td>
     </tr>
     <tr>
-      <td class="xwiki-grid-pagination">
+      <td class="xwiki-livetable-pagination">
         <span class="controlPagination">
           <span title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></span>
           <span title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></span>
         </span>
         <span class="pagination">
-          <span class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
-          <span class="xwiki-grid-pagination-content" ></span>
+          <span class="xwiki-livetable-pagination-text">$msg.get("xe.pagination.page")</span>
+          <span class="xwiki-livetable-pagination-content" ></span>
         </span>
       </td>
     </tr>

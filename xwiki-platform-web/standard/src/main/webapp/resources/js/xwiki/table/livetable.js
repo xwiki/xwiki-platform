@@ -15,7 +15,7 @@ if (typeof XWiki.widgets == "undefined") {
 }
 
 /**
-  * The class representing an AJAX-populated live grid.
+  * The class representing an AJAX-populated live table.
   * It is (almost) independent of the underlying HTML markup, a function passed as an argument being
   * responsible with displaying the content corresponding to a row. Uses JSON for the response
   * encoding.
@@ -32,7 +32,7 @@ XWiki.widgets.LiveTable = Class.create({
     * <li>"limit" the maximum number of row entries in the table</li>
     * <li>"maxPages" the maximum number of pages to display at the same time in the pagination section.</li>
     * </ul>
-    * @todo Make this a valid ARIA grid: http://www.w3.org/TR/aria-role/#structural
+    * @todo Make this a valid ARIA table: http://www.w3.org/TR/aria-role/#structural
     */
   initialize: function(url, domNodeName, handler, options)
   { 
@@ -49,10 +49,10 @@ XWiki.widgets.LiveTable = Class.create({
     this.displayNode = $(domNodeName + "-display") || $('display1');
 
     // Node under which all forms controls (input, selects, etc.) will be filters for this table
-    this.filtersNode = options.filtersNode || $(domNodeName).down(".xwiki-grid-display-filters");
+    this.filtersNode = options.filtersNode || $(domNodeName).down(".xwiki-livetable-display-filters");
 
-    // Array of nodes under which pagination for this grid will be displayed.
-    this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-grid-pagination");
+    // Array of nodes under which pagination for this livetable will be displayed.
+    this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");
 
     if (typeof options == "undefined") {
        options = {};
@@ -63,15 +63,15 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Initialize pagination
     if (typeof this.paginationNodes != "undefined") {
-       this.paginator = new GridPagination(this, this.paginationNodes, options.maxPages || 10);
+       this.paginator = new LiveTablePagination(this, this.paginationNodes, options.maxPages || 10);
     }
 	// Initialize filters
     if (this.filtersNode) {
-      this.filter = new GridFilter(this, this.filtersNode);
+      this.filter = new LiveTableFilter(this, this.filtersNode);
     }
     if ($(domNodeName + "-tagcloud"))
     {
-       this.tagCloud = new GridTagCloud(this, domNodeName + "-tagcloud");
+       this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
     }
     this.loadingStatus = $(this.domNodeName + '-ajax-loader') || $('ajax-loader');
     this.limitsDisplay = $(this.domNodeName + '-limits') || new Element("div");
@@ -352,14 +352,14 @@ XWiki.widgets.LiveTable = Class.create({
 /**
  * Helper class to display pagination
  */
-var GridPagination = Class.create({
+var LiveTablePagination = Class.create({
     initialize: function(table, domNodes, max)
     {
       this.table = table;
       var self = this;
       this.pagesNodes = [];
       domNodes.each(function(elem){
-         self.pagesNodes.push(elem.down(".xwiki-grid-pagination-content"));
+         self.pagesNodes.push(elem.down(".xwiki-livetable-pagination-content"));
       });
       this.max = max;
       $(this.table.domNodeName).select("span.prevPagination").invoke("observe", "click", this.gotoPrevPage.bind(this));
@@ -440,7 +440,7 @@ var GridPagination = Class.create({
 /*
  * The class that deals with the filtering in a table
  */
-var GridFilter = Class.create({
+var LiveTableFilter = Class.create({
   initialize: function(table, filterNode)
   {
     this.table = table;
@@ -531,7 +531,7 @@ var GridFilter = Class.create({
 /**
  * Helper class to filter on tags/display tags matching filters.
  */
-var GridTagCloud = Class.create({
+var LiveTableTagCloud = Class.create({
    /**
     * Constructor.
     */
@@ -583,7 +583,7 @@ var GridTagCloud = Class.create({
    },
 
    displayTagCloud: function(){
-      this.domNode.down('.xwiki-grid-tagcloud').innerHTML = "";
+      this.domNode.down('.xwiki-livetable-tagcloud').innerHTML = "";
       var cloud = new Element("ol", {'class':'tagCloud'});
       var liClass;
       for (var i=0;i<this.tags.length;i++) {
@@ -622,7 +622,7 @@ var GridTagCloud = Class.create({
          tag.appendChild(document.createTextNode(" "));
          cloud.appendChild(tag);
       }
-      this.domNode.down('.xwiki-grid-tagcloud').appendChild(cloud);
+      this.domNode.down('.xwiki-livetable-tagcloud').appendChild(cloud);
    },
 
    getSelectedTags: function() {

@@ -1525,7 +1525,7 @@ $html
                 </select>
                 </td>            
               #elseif( ("$!colprop.type"=="text"||"$!colprop.type"=="number") && $isFilterable)
-                <td class="xwiki-grid-display-header-filter"><input name="${colname}" type="text" #if($colprop.size!="") size="${colprop.size}" #end  title='$msg.get("xe.search.filters.title") $msg.get("${transprefix}${colname}")' /></td>
+                <td class="xwiki-grid-display-header-filter"><input name="${colname}" type="text" #if("$!colprop.size"!="") size="${colprop.size}" #end  title='$msg.get("xe.search.filters.title") $msg.get("${transprefix}${colname}")' /></td>
               #elseif("$!colprop.type"=="hidden")
               #elseif($colname != "_actions" || $hasAdmin)
               <td class="xwiki-grid-display-header-filter"></td>

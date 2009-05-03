@@ -1412,6 +1412,10 @@ Zone for Comments, attachments, History...
     margin: 0;
 }
 
+#historyform .currentversion, #historyform .currentversion td {
+  background: #FFD;
+  font-weight: bold;
+}
 /* @end */
 /* @group Comments */
 /*

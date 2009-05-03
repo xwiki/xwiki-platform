@@ -350,7 +350,14 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         try {
             switch (event) {
                 case XWikiDocChangeNotificationInterface.EVENT_CHANGE:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
+                    if (olddoc==null || olddoc.isNew()) 
+                       addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE,
+                        "as_document_has_been_created", params, context);
+                    else if (newdoc==null || newdoc.isNew())
+                       addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE,
+                        "as_document_has_been_deleted", params, context);
+                    else
+                       addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
                         "as_document_has_been_updated", params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_NEW:

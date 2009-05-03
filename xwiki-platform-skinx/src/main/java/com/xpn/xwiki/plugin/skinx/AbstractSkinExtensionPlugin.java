@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.plexus.util.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -259,6 +259,10 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
         Map<String, Object> parameters = getParametersForResource(resource, context);
         StringBuilder query = new StringBuilder();
         for (Entry<String, Object> parameter : parameters.entrySet()) {
+            // Skip the parameter that forces the file extensions to be sent through the /skin/ action
+            if ("forceSkinAction".equals(parameter.getKey())) {
+                continue;
+            }
             query.append("&amp;");
             query.append(sanitize(parameter.getKey()));
             query.append("=");

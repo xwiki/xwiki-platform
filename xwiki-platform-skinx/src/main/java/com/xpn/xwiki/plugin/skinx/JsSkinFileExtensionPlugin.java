@@ -23,6 +23,8 @@ package com.xpn.xwiki.plugin.skinx;
 import java.util.Collections;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
@@ -40,7 +42,7 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
      * extension content.
      */
     public static final String PLUGIN_NAME = "jsfx";
-    
+
     /**
      * XWiki plugin constructor.
      * 
@@ -56,7 +58,7 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
      */
     @Override
@@ -64,7 +66,7 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     {
         return PLUGIN_NAME;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -85,11 +87,18 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     public String getLink(String filename, XWikiContext context)
     {
         boolean forceSkinAction = (Boolean) getParametersForResource(filename, context).get("forceSkinAction");
-        return "<script type='text/javascript' src='"
-            + context.getWiki().getSkinFile(filename, forceSkinAction, context)
-            + "'></script>";
+        StringBuilder result = new StringBuilder("<script type='text/javascript' src='");
+        result.append(context.getWiki().getSkinFile(filename, forceSkinAction, context));
+        if (forceSkinAction) {
+            String parameters = StringUtils.removeStart(parametersAsQueryString(filename, context), "&amp;");
+            if (!StringUtils.isEmpty(parameters)) {
+                result.append("?").append(parameters);
+            }
+        }
+        result.append("'></script>");
+        return result.toString();
     }
-    
+
     /**
      * {@inheritDoc}
      * <p>

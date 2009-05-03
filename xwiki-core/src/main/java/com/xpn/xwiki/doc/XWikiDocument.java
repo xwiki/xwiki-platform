@@ -3171,22 +3171,24 @@ public class XWikiDocument implements DocumentModelBridge
 
             List<String> result = new ArrayList<String>();
             for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class, true)) {
+                
+                // - Add each document pointed to by the include macro
+                // - Also add all the included pages found in the velocity macro when using the deprecated #include* macros
+                //   This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to play
+                //   nice with people migrating from 1.0 to 2.0 syntax
+
                 if (macroBlock.getName().equalsIgnoreCase("include")) {
                     String documentName = macroBlock.getParameters().get("document");
                     if (documentName.indexOf(".") == -1) {
                         documentName = getSpace() + "." + documentName;
                     }
                     result.add(documentName);
+                } else if (macroBlock.getName().equalsIgnoreCase("velocity") 
+                    && !StringUtils.isEmpty(macroBlock.getContent()))
+                {
+                    // Try to find matching content inside each velocity macro
+                    result.addAll(getIncludedPagesForXWiki10Syntax(macroBlock.getContent(), context));
                 }
-            }
-
-            // Also add all the included pages found in the velocity macro when using the deprecated #include* macros
-            // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to play
-            // nice
-            // with people migrating from 1.0 to 2.0 syntax
-            for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class, true)) {
-                // try to find matching content inside each velocity macro
-                result.addAll(getIncludedPagesForXWiki10Syntax(macroBlock.getContent(), context));
             }
 
             return result;

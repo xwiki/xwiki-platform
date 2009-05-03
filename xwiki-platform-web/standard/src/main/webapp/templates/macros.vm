@@ -1449,22 +1449,32 @@ $html
   #end
   #if($tagcloud)
     #set($ok = $xwiki.ssx.use("XWiki.TagCloud"))
-    <div id="${divid}-tagcloud">
-      <div class="xwiki-grid-tagcloud"></div>
+    <div id="${divid}-tagcloud" class="xwiki-grid-tagcloud-tip hidden">
+      <div>
+        <div class="xwiki-grid-tagcloud-container">
+          <h2>$msg.get("xe.livetable.tags.help")
+	        <span>$msg.get("xe.livetable.tags.help.cancel")</span>
+          </h2>
+          <div class="xwiki-grid-tagcloud"></div>
+        </div>
+        <div class="tippointer">
+          <div></div>
+        </div>
+      </div>
     </div>
   #end
   <table id="${divid}" class="xwiki-grid">
     <tr>
-      <td class="xwiki-grid-pagination" colspan="2">
+      <td class="xwiki-grid-pagination">
         <span id="${divid}-limits" class="xwiki-grid-limits"></span>
         <span id="${divid}-ajax-loader" class="xwiki-grid-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />$msg.get("xe.livetable.loading")</span>
         <span class="controlPagination">
-          <div title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></div>
-          <div title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></div>
+          <span title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></span>
+          <span title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></span>
         </span>
         <span class="pagination">
-          <span id="${divid}-pagination-text" class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
-          <span id="${divid}-pagination" class="xwiki-grid-pagination-content" ></span>
+          <span class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
+          <span class="xwiki-grid-pagination-content" ></span>
         </span>
       </td>
     </tr>
@@ -1481,7 +1491,11 @@ $html
                 #set($isSortable = false)
               #end
               #if($colname != "_actions" || $hasAdmin)
-              <th class="xwiki-grid-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end" #if($isSortable)rel="${colname}"#end #if("$!colprop.type"=="hidden") style="display: none" #end>$msg.get("${transprefix}${colname}")</th>
+              <th class="xwiki-grid-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end"  #if("$!colprop.type"=="hidden") style="display: none" #end>
+                #if($isSortable)<a rel="${colname}">#end
+                $msg.get("${transprefix}${colname}")
+                #if($isSortable)</a>#end
+              </th>
               #end
             #end
             </tr>
@@ -1524,14 +1538,14 @@ $html
       </td>
     </tr>
     <tr>
-      <td class="xwiki-grid-pagination" colspan="2">
+      <td class="xwiki-grid-pagination">
         <span class="controlPagination">
-          <div title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></div>
-          <div title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></div>
+          <span title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></span>
+          <span title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></span>
         </span>
         <span class="pagination">
-          <span id="${divid}-pagination-text" class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
-          <span id="${divid}-pagination" class="xwiki-grid-pagination-content" ></span>
+          <span class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
+          <span class="xwiki-grid-pagination-content" ></span>
         </span>
       </td>
     </tr>

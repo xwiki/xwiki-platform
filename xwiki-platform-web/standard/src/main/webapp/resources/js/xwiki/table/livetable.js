@@ -306,8 +306,8 @@ XWiki.widgets.LiveTable = Class.create({
    */
   getSortURLFragment:function() {
     var fragment = "&sort=";
-    if (typeof $(this.domNodeName).down("th.selected") != "undefined") {
-       fragment += $(this.domNodeName).down("th.selected").getAttribute('rel');
+    if (typeof $(this.domNodeName).down("th.selected a") != "undefined") {
+       fragment += $(this.domNodeName).down("th.selected a").getAttribute('rel');
     }
     fragment += "&dir=";
     if (typeof $(this.domNodeName).down("th.selected") != "undefined") {
@@ -362,8 +362,8 @@ var GridPagination = Class.create({
          self.pagesNodes.push(elem.down(".xwiki-grid-pagination-content"));
       });
       this.max = max;
-      $(this.table.domNodeName).select("div.prevPagination").invoke("observe", "click", this.gotoPrevPage.bind(this));
-      $(this.table.domNodeName).select("div.nextPagination").invoke("observe", "click", this.gotoNextPage.bind(this));
+      $(this.table.domNodeName).select("span.prevPagination").invoke("observe", "click", this.gotoPrevPage.bind(this));
+      $(this.table.domNodeName).select("span.nextPagination").invoke("observe", "click", this.gotoNextPage.bind(this));
     },
     refreshPagination: function()
     {
@@ -572,11 +572,13 @@ var GridTagCloud = Class.create({
     * This is the only hook the table will call us from.
     */
    updateTagCloud: function(tags, matchingTags) {
-      this.tags = tags;
-      this.matchingTags = matchingTags;
-      if(!this.map || this.map.length == 0) {
+      if (!this.hasTags && tags.length > 0) {
+        this.tags = tags;	 
         this.map = this.buildPopularityMap(this.tags);
-      }                                                      
+        this.hasTags = true;
+        this.domNode.removeClassName("hidden");
+      }
+      this.matchingTags = matchingTags;       
       this.displayTagCloud();
    },
 

@@ -46,7 +46,7 @@
 	padding:0!important;
 	float: right;
 }
-.controlPagination div{
+.controlPagination span{
 	position:absolute;
 	top:0;
 	left:0;
@@ -55,25 +55,25 @@
 	overflow:hidden;
 	border:none;
 }
-.controlPagination div.prevPagination , .controlPagination div.noPrevPagination, .controlPagination div.nextPagination, .controlPagination div.noNextPagination {
+.controlPagination span.prevPagination , .controlPagination span.noPrevPagination, .controlPagination span.nextPagination, .controlPagination span.noNextPagination {
 	background-image:url("$xwiki.getSkinFile('icons/xwiki/pagination-controls.png')");
 	width: 21px;
 	height: 22px;
 }
-.controlPagination div.prevPagination:hover, .controlPagination div.nextPagination:hover {
+.controlPagination span.prevPagination:hover, .controlPagination span.nextPagination:hover {
     cursor:pointer;
 }
-.controlPagination div.prevPagination {
+.controlPagination span.prevPagination {
 	background-position:left top;
 }
-.controlPagination div.noPrevPagination{
+.controlPagination span.noPrevPagination{
 	background-position:left bottom;
 }
-.controlPagination div.nextPagination {
+.controlPagination span.nextPagination {
 	background-position:right top;
 	left: 21px;
 }
-.controlPagination div.noNextPagination {
+.controlPagination span.noNextPagination {
 	background-position:right bottom;
 	left: 21px;
 }
@@ -110,7 +110,7 @@ table.xwiki-grid table.xwiki-grid-display thead.xwiki-grid-display-header{
 thead.xwiki-grid-display-header tr.xwiki-grid-display-filters:hover , thead.xwiki-grid-display-header tr.rowHover.{ /* for IE6 tr:hover fix*/
 	background-color: #fff;
 }
-thead.xwiki-grid-display-header th.xwiki-grid-display-header-text{
+thead.xwiki-grid-display-header th.xwiki-grid-display-header-text {
 	background-color: #dddddd;
 	border: 0;
 	border-collapse:separate;
@@ -121,6 +121,10 @@ thead.xwiki-grid-display-header th.xwiki-grid-display-header-text{
 	text-align:left;
 	/*cursor:pointer;*/
 	white-space:nowrap;
+}
+thead.xwiki-grid-display-header th.sortable a {
+	color: #4D4D4D;
+	text-decoration:none
 }
 thead.xwiki-grid-display-header th.sortable {
 	cursor: pointer;
@@ -208,9 +212,6 @@ tbody.xwiki-grid-display-body td a.action {
 	margin-right:5px;
 	padding-bottom:1px;
 }
-tbody.xwiki-grid-display-body td.actions {
-	text-align:right;
-}
 tbody.xwiki-grid-display-body td a.action:hover {
     text-decoration:underline;
 }
@@ -269,47 +270,53 @@ div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfi
 }
 /* </Dialog Box> */
 /* <Tag Cloud> */
-div.xwiki-grid-tagcloud ol.tagCloud {
-	margin:0;
-}
-div.xwiki-grid-tagcloud ol.tagCloud li span{
-	color: #ccc;
-	padding: 0px 3px 0px 3px;
-	border: 1px solid #fff;
-}
-div.xwiki-grid-tagcloud ol.tagCloud li.selectable span {
-	cursor: pointer;
-	color: #00007E;
-}
-div.xwiki-grid-tagcloud ol.tagCloud li.selected span {
-	background-color: lemonChiffon;
-	border: 1px solid #DDDDDD;
-}
-div.xwiki-grid-tagcloud {
-	float:left;
-	width:65%;
-}
-div.xwiki-grid-tagcloudcontrols {
-	float:right;
-	color:#888888;
-	font-size:90%;
-}
-div.xwiki-grid-tagcloudcontrols img {
-	margin-right:5px;
-}
-.xwiki-grid-tagcloud-container div.clearfloats {
-	background-color: transparent;
-	margin: 0;
-	overflow: hidden;
-}
 .xwiki-grid-tagcloud-container{
 	border: 1px solid #ddd;
 	border-bottom: 5px solid #ddd;
 	background-color: transparent;
 	padding: 10px;
 	position: relative;
+	margin-top:10px;
 }
-.tippointer{
+.xwiki-grid-tagcloud-container h2 {
+	background: url($xwiki.getSkinFile('icons/silk/tag_yellow.gif')) no-repeat;
+	font-size: 1em;	
+	color: #888;
+	padding-left:25px;
+}
+.xwiki-grid-tagcloud-container h2 span{
+	color: #888;
+	font-size: 0.8em;
+	font-weight: normal;
+	line-height: 2em;
+	margin: 0 0 10px;
+	border: none;
+}
+.xwiki-grid-tagcloud-container div.clearfloats {
+	background-color: transparent;
+	margin: 0;
+	overflow: hidden;
+}
+div.xwiki-grid-tagcloud {
+}
+div.xwiki-grid-tagcloud ol.tagCloud {
+	margin:0;
+}
+div.xwiki-grid-tagcloud ol.tagCloud li span{
+	color: #ddd;
+	padding: 0px 3px 0px 3px;
+	border: 1px solid #fff;
+}
+div.xwiki-grid-tagcloud ol.tagCloud li.selectable span {
+	cursor: pointer;
+	color: #4D4D4D;
+}
+div.xwiki-grid-tagcloud ol.tagCloud li.selected span {
+	background-color: lemonChiffon;
+	border-bottom:1px solid #DDDDDD;
+	border-top:1px solid #DDDDDD;
+}
+.xwiki-grid-tagcloud-tip .tippointer{
 	position: relative;
 	width: 0;
 	height: 0;
@@ -320,28 +327,16 @@ div.xwiki-grid-tagcloudcontrols img {
     border-left: 20px dotted transparent;
     border-bottom: 0px none;
 }
-
-.tippointer div {
+.xwiki-grid-tagcloud-tip .tippointer div {
 	position: absolute;
 	width: 0;
 	height: 0;
 	top: -20px;
 	left: -15px;
-	border-color: #DDDDDD transparent transparent;
-	border-style:solid;
-	border-width:15px 15px 0;
-}
-.xwiki-grid-tagcloud-container h2 {
-	font-size: 1em;	
-	color: #888;
-}
-.xwiki-grid-tagcloud-container h2 span{
-	color: #888;
-	font-size: 0.8em;
-	font-weight: normal;
-	line-height: 2em;
-	margin: 0 0 10px;
-	border: none;
+	border-top:15px solid #ddd;
+	border-right:15px dotted transparent;
+	border-left:15px dotted transparent;
+	border-bottom:0 none;
 }
 /* </Tag Cloud> */
 

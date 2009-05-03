@@ -23,6 +23,8 @@ package com.xpn.xwiki.plugin.skinx;
 import java.util.Collections;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
@@ -40,7 +42,7 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
      * extension content.
      */
     public static final String PLUGIN_NAME = "ssfx";
-    
+
     /**
      * XWiki plugin constructor.
      * 
@@ -56,7 +58,7 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
      */
     @Override
@@ -64,7 +66,7 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     {
         return PLUGIN_NAME;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -78,17 +80,25 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see SkinExtensionPlugin#getLink(String, XWikiContext)
      */
     @Override
     public String getLink(String filename, XWikiContext context)
     {
-        boolean forceSkinAction = (Boolean) getParametersForResource(filename, context).get("forceSkinAction");        
-        return "<link rel='stylesheet' type='text/css' href='"
-            + context.getWiki().getSkinFile(filename, forceSkinAction, context) + "'/>";
+        boolean forceSkinAction = (Boolean) getParametersForResource(filename, context).get("forceSkinAction");
+        StringBuilder result = new StringBuilder("<link rel='stylesheet' type='text/css' href='");
+        result.append(context.getWiki().getSkinFile(filename, forceSkinAction, context));
+        if (forceSkinAction) {
+            String parameters = StringUtils.removeStart(parametersAsQueryString(filename, context), "&amp;");
+            if (!StringUtils.isEmpty(parameters)) {
+                result.append("?").append(parameters);
+            }
+        }
+        result.append("'/>");
+        return result.toString();
     }
-    
+
     /**
      * {@inheritDoc}
      * <p>
@@ -103,7 +113,7 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     {
         return super.endParsing(content, context);
     }
-    
+
     /**
      * {@inheritDoc}
      * <p>

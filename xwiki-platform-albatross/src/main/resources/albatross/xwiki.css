@@ -111,3 +111,7 @@
     border: 1px solid;
     border-spacing: 10px;
 }
+#historyform .currentversion, #historyform .currentversion td {
+  background: #FFD;
+  font-weight: bold;
+}

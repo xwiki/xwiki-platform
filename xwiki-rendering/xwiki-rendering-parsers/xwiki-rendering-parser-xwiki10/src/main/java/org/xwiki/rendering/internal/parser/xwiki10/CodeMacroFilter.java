@@ -73,10 +73,12 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
     {
         StringBuffer result = new StringBuffer();
 
-        Matcher matcher = CODEMACRO_PATTERN.matcher(this.escapeFilter.filter(content, filterContext));
+        String escapedContent = this.escapeFilter.filter(content, filterContext);
+        
+        Matcher matcher = CODEMACRO_PATTERN.matcher(escapedContent);
         int currentIndex = 0;
         for (; matcher.find(); currentIndex = matcher.end()) {
-            String before = content.substring(currentIndex, matcher.start());
+            String before = escapedContent.substring(currentIndex, matcher.start());
 
             if (currentIndex > 0) {
                 before = CleanUtil.setLeadingNewLines(before, 2);
@@ -91,10 +93,10 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
         }
 
         if (currentIndex == 0) {
-            return this.unescapeFilter.filter(content, filterContext);
+            return content;
         }
 
-        result.append(CleanUtil.setLeadingNewLines(content.substring(currentIndex), 2));
+        result.append(CleanUtil.setLeadingNewLines(escapedContent.substring(currentIndex), 2));
 
         return this.unescapeFilter.filter(result.toString(), filterContext);
     }

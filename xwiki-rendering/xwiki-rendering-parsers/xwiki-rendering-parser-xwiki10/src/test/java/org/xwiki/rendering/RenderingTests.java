@@ -113,6 +113,7 @@ public class RenderingTests extends TestCase
 
         // Misc
         suite.addTestsFromResource("misc/misc1", false);
+        suite.addTestsFromResource("misc/misc2", false);
 
         return new RenderingPlexusTestSetup(suite);
     }

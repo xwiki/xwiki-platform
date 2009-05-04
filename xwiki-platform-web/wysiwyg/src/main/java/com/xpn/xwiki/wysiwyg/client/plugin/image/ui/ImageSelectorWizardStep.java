@@ -59,7 +59,8 @@ public class ImageSelectorWizardStep extends AbstractSelectorAggregatorWizardSte
     @Override
     protected WizardStep getAllPagesSelectorInstance()
     {
-        return new ImagesExplorerWizardStep(getEditedResource());
+        // create an explorer which does not show wiki selector, by default
+        return new ImagesExplorerWizardStep(getEditedResource(), false);
     }
 
     /**

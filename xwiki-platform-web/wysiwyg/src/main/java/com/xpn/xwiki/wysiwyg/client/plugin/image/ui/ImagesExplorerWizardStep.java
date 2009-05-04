@@ -72,6 +72,11 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     private ResourceName editedResource;
 
     /**
+     * Flag to mark whether this explorer should show the selector to choose an image from a different wiki or not.
+     */
+    private boolean displayWikiSelector;
+
+    /**
      * The main panel of this widget.
      */
     private final FlowPanel mainPanel = new FlowPanel();
@@ -88,12 +93,15 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      * 
      * @param editedResource the resource edited by the wizard in which this wizard step appears (the page currently
      *            edited with the wysiwyg)
+     * @param displayWikiSelector whether this explorer should show the selector to choose an image from a different
+     *            wiki or not
      */
-    public ImagesExplorerWizardStep(ResourceName editedResource)
+    public ImagesExplorerWizardStep(ResourceName editedResource, boolean displayWikiSelector)
     {
         this.editedResource = editedResource;
         // initialize selectors, mainPanel
         mainPanel.addStyleName("xImagesExplorer");
+        this.displayWikiSelector = displayWikiSelector;
         mainPanel.add(getSelectorsPanel(editedResource.getWiki(), editedResource.getSpace(), editedResource.getPage()));
     }
 
@@ -110,19 +118,9 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         wikiSelector = new WikiSelector();
         spaceSelector = new SpaceSelector(currentWiki);
         pageSelector = new PageSelector(currentWiki, currentSpace);
-        wikiSelector.setVisible(false);
-        WysiwygService.Singleton.getInstance().isMultiWiki(new AsyncCallback<Boolean>()
-        {
-            public void onFailure(Throwable caught)
-            {
-                throw new RuntimeException(caught.getMessage());
-            }
 
-            public void onSuccess(Boolean result)
-            {
-                wikiSelector.setVisible(result);
-            }
-        });
+        // hide this selector by default, until we get to update it from the server
+        wikiSelector.setVisible(false);
 
         wikiSelector.addChangeListener(this);
         spaceSelector.addChangeListener(this);
@@ -155,13 +153,55 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      * @param fileName the filename of the image to set as currently selected image
      * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
      */
-    public void setSelection(String wiki, final String space, final String page, final String fileName,
+    public void setSelection(final String wiki, final String space, final String page, final String fileName,
         final boolean forceRefresh)
     {
-        boolean isMultiWiki = wikiSelector.isVisible();
-        if (isMultiWiki) {
+        WysiwygService.Singleton.getInstance().isMultiWiki(new AsyncCallback<Boolean>()
+        {
+            public void onFailure(Throwable caught)
+            {
+                throw new RuntimeException(caught.getMessage());
+            }
+
+            public void onSuccess(Boolean result)
+            {
+                if (result) {
+                    setWikiSelection(wiki, space, page, fileName, forceRefresh);
+                } else {
+                    setSpaceSelection(space, page, fileName, forceRefresh);
+                }
+            }
+        });
+    }
+
+    /**
+     * Sets the selection on the specified wiki, triggering the space selector update accordingly.
+     * 
+     * @param selectedWiki the wiki to set as selected
+     * @param space the space to set as selected
+     * @param page the page to set as selected
+     * @param fileName the file to set as selected
+     * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
+     */
+    private void setWikiSelection(String selectedWiki, final String space, final String page, final String fileName,
+        final boolean forceRefresh)
+    {
+        if (!displayWikiSelector) {
+            // if the wiki selector doesn't need to be displayed, add the edited resource wiki as the default selected
+            // option so that it's always returned on getSelectedWiki()
+            wikiSelector.clear();
+            if (!StringUtils.isEmpty(editedResource.getWiki())) {
+                wikiSelector.addItem(editedResource.getWiki());
+                wikiSelector.setSelectedIndex(0);
+            }
+            // but keep it invisible
+            wikiSelector.setVisible(false);
+            // set the space selection further
+            setSpaceSelection(space, page, fileName, true);
+        } else {
+            wikiSelector.setVisible(true);
             if (forceRefresh) {
-                wikiSelector.refreshList(wiki, new AsyncCallback<List<String>>()
+                wikiSelector.refreshList(selectedWiki, new AsyncCallback<List<String>>()
                 {
                     public void onSuccess(List<String> result)
                     {
@@ -174,13 +214,11 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
                 });
             } else {
                 // just set the selection
-                if (!wikiSelector.getSelectedWiki().equals(wiki)) {
-                    wikiSelector.setSelectedWiki(wiki);
+                if (!wikiSelector.getSelectedWiki().equals(selectedWiki)) {
+                    wikiSelector.setSelectedWiki(selectedWiki);
                     setSpaceSelection(space, page, fileName, true);
                 }
             }
-        } else {
-            setSpaceSelection(space, page, fileName, forceRefresh);
         }
     }
 

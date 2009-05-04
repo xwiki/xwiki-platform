@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.link;
+package com.xpn.xwiki.wysiwyg.client.plugin.image;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,6 @@ import com.google.gwt.user.client.ui.UIObject;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MenuItemUIExtension;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
 import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
@@ -35,11 +34,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.MenuListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * Provides user interface for manipulating links through the WYSIWYG top-level menu.
+ * Provides user interface for manipulating images through the WYSIWYG top-level menu.
  * 
  * @version $Id$
  */
-public class LinkMenuExtension extends MenuItemUIExtension implements Updatable, MenuListener
+public class ImageMenuExtension extends MenuItemUIExtension implements Updatable, MenuListener
 {
     /**
      * Schedules menu updates and executes only the most recent one.
@@ -49,17 +48,17 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
     /**
      * The link plug-in associated with this menu extension.
      */
-    private final LinkPlugin plugin;
+    private final ImagePlugin plugin;
 
     /**
      * The list of menu options used to create links.
      */
-    private List<UIObject> createLinkMenus;
+    private List<UIObject> createImageMenus;
 
     /**
      * The list of menu options used to edit links or to remove them.
      */
-    private List<UIObject> editLinkMenus;
+    private List<UIObject> editImageMenus;
 
     /**
      * The submenu holding the various link options.
@@ -76,80 +75,53 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
      * 
      * @param plugin the plugin to use for the creation of this menu extension.
      */
-    public LinkMenuExtension(final LinkPlugin plugin)
+    public ImageMenuExtension(final ImagePlugin plugin)
     {
         super("menu");
         this.plugin = plugin;
 
-        MenuItem webPageLink = new MenuItem(Strings.INSTANCE.linkToWebPage(), new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                plugin.onLinkInsert(LinkType.EXTERNAL);
-            }
-        });
-
-        MenuItem emailLink = new MenuItem(Strings.INSTANCE.linkToEmail(), new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                plugin.onLinkInsert(LinkType.EMAIL);
-            }
-        });
-
-        MenuItem wikiPageLink =
-            new MenuItem(Strings.INSTANCE.linkToWikiPage(), new com.google.gwt.user.client.Command()
+        MenuItem insertImage =
+            new MenuItem(Strings.INSTANCE.imageInsertImage(), new com.google.gwt.user.client.Command()
             {
                 public void execute()
                 {
-                    plugin.onLinkInsert(LinkType.WIKIPAGE);
+                    plugin.onImage();
                 }
             });
-        
-        MenuItem attachmentLink =
-            new MenuItem(Strings.INSTANCE.linkToAttachment(), new com.google.gwt.user.client.Command()
+
+        createImageMenus = new ArrayList<UIObject>();
+        createImageMenus.add(insertImage);
+
+        MenuItem editImage = new MenuItem(Strings.INSTANCE.imageEditImage(), new com.google.gwt.user.client.Command()
+        {
+            public void execute()
+            {
+                plugin.onImage();
+            }
+        });
+
+        MenuItem removeImage =
+            new MenuItem(Strings.INSTANCE.imageRemoveImage(), new com.google.gwt.user.client.Command()
             {
                 public void execute()
                 {
-                    plugin.onLinkInsert(LinkType.ATTACHMENT);
+                    plugin.onImageRemove();
                 }
             });
 
-        createLinkMenus = new ArrayList<UIObject>();
-        createLinkMenus.add(webPageLink);
-        createLinkMenus.add(emailLink);
-        createLinkMenus.add(wikiPageLink);
-        createLinkMenus.add(attachmentLink);
-
-        MenuItem editLink = new MenuItem(Strings.INSTANCE.linkEdit(), new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                plugin.onLinkEdit();
-            }
-        });
-
-        MenuItem removeLink = new MenuItem(Strings.INSTANCE.unlink(), new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                plugin.onUnlink();
-            }
-        });
-
-        editLinkMenus = new ArrayList<UIObject>();
-        editLinkMenus.add(editLink);
-        editLinkMenus.add(removeLink);
+        editImageMenus = new ArrayList<UIObject>();
+        editImageMenus.add(editImage);
+        editImageMenus.add(removeImage);
 
         submenu = new MenuBar(true);
         submenu.setAnimationEnabled(false);
-        submenu.addAll(createLinkMenus);
+        submenu.addAll(createImageMenus);
 
-        menu = new MenuItem(Strings.INSTANCE.link(), submenu);
-        menu.setIcon(Images.INSTANCE.link().createElement());
+        menu = new MenuItem(Strings.INSTANCE.image(), submenu);
+        menu.setIcon(Images.INSTANCE.image().createElement());
         menu.addMenuListener(this);
 
-        addFeature(LinkPluginFactory.getInstance().getPluginName(), menu);
+        addFeature(ImagePluginFactory.getInstance().getPluginName(), menu);
     }
 
     /**
@@ -157,11 +129,11 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
      */
     public void destroy()
     {
-        createLinkMenus.clear();
-        createLinkMenus = null;
+        createImageMenus.clear();
+        createImageMenus = null;
 
-        editLinkMenus.clear();
-        editLinkMenus = null;
+        editImageMenus.clear();
+        editImageMenus = null;
 
         submenu.clearItems();
         submenu = null;
@@ -191,24 +163,24 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
      */
     public void update()
     {
-        // test first if unlink is enabled (i.e. we are inside a link)
-        if (plugin.getTextArea().getCommandManager().isEnabled(Command.UNLINK)) {
+        // test if the image command is executed
+        if (plugin.getTextArea().getCommandManager().isExecuted(Command.INSERT_IMAGE)) {
             // activate the edit submenu
-            if (submenu.getItem(0) != editLinkMenus.get(0)) {
+            if (submenu.getItem(0) != editImageMenus.get(0)) {
                 submenu.clearItems();
-                submenu.addAll(editLinkMenus);
+                submenu.addAll(editImageMenus);
             }
         } else {
-            // the create links list must be setup, and disabled if create link is not possible
-            if (submenu.getItem(0) != createLinkMenus.get(0)) {
+            // the create images list must be setup, and disabled if create image is not possible
+            if (submenu.getItem(0) != createImageMenus.get(0)) {
                 submenu.clearItems();
-                submenu.addAll(createLinkMenus);
+                submenu.addAll(createImageMenus);
             }
-            boolean canCreateLink = plugin.getTextArea().getCommandManager().isEnabled(Command.CREATE_LINK);
+            boolean canCreateImage = plugin.getTextArea().getCommandManager().isEnabled(Command.INSERT_IMAGE);
             // set enabling state of the menu items in the submenu
-            for (UIObject m : createLinkMenus) {
+            for (UIObject m : createImageMenus) {
                 if (m instanceof MenuItem) {
-                    ((MenuItem) m).setEnabled(canCreateLink);
+                    ((MenuItem) m).setEnabled(canCreateImage);
                 }
             }
         }

@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
+package com.xpn.xwiki.wysiwyg.client.widget;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.Attachment;
+import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
  * Widget to create an attachment preview. Can be subclasses with various implementations to generate the UI of this

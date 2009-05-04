@@ -1,68 +1,71 @@
-.xImagePreview {
-  width: 116px;
-  padding: 3px;
-  margin: 0px;
-  display: inline;
+.xImageConfig .gwt-Label {
+  font-weight: bold;
+  width: 300px;
+  padding: 5px;
+}
+
+.xImageConfig .gwt-TextBox { 
+  font-size: x-small;
+  margin: 0 5px;
+  width: 300px;
+}
+
+.xImagesSelector .xListItem {
+  display: inline-block;
+  width: 145px;
+  height: 105px;
+  /* we need to float, although inline-block should do it right, because IE cannot set inline-block 
+  on elements which are not native inline*/
   float: left;
 }
 
-.xImagePreview img {
-  height: 90px;
-  width: 110px;
-  display: block;
-  cursor: pointer;
-  border: solid 2px white;
+.xImagesSelector .clearfloats {
+  width: 1px;
+  height: 1px;
 }
 
-.xImagePreviewSelected img {
-  border: solid 2px #FFA500;
-}
-
-.xInsertImageButton {
-  font-size: xx-small;
-  margin-top: 3px;
-  width: 110px
-}
-
-.xImageDialogMain {
-  padding: 6px;
-}
-
-.xImageDialogMain .gwt-TabPanel {
+.xImagesSelector .xListItem .xImagePreview, .xImagesSelector .xListItem .xNewImagePreview {
+  display: inline-block;
+  margin: 5px;
+  width: 135px;
+  height: 95px;
   padding: 0;
+  background-color: #FFFFFF;
+  overflow-y: hidden;
+  cursor: pointer;
 }
 
-.xImageDialogMain .gwt-TabPanelBottom {
-  width: 385px;
+.xImagesSelector .xListItem .xNewImagePreview {
+  text-align: center;
+  vertical-align: bottom;
+  line-height: 2em;
 }
 
-.xImagesContainerPanel {
-  height: 200px;
-}
-
-.xImageChooser .gwt-Label,
-.xUploadForm .gwt-Label,
-.xSettingsPanel .xSettingsLabel {
-  font-weight: bold;
-  padding: 5px;  
-}
-
-.xSizePanel .gwt-Label,
-.xHAlignPanel .gwt-Label,
-.xVAlignPanel .gwt-Label,
-.xAltPanel .gwt-Label {
-  display: inline;
-  margin-left: 1em;
-  margin-right: 1em;
-}
-
-.xSizePanel input {
-  width: 3em;
-}
-
-.xAlignLabel,
-.xInsertButton,
-.xSizePanel,
-.xAltPanel {
+.xImagesSelector .xNewImagePreview .gwt-Label {
+  background-image: url(../images/bullet_add.gif);
+  padding-left: 20px;
   margin-top: 5px;
+  background-position: left center;
+  background-repeat: no-repeat;  
+}
+
+.xImagesSelector .xListItem-selected {
+  background-color: #D4E8FF;
+}
+
+.xPageChooser {
+  margin-top: 5px;
+}
+
+.xSelectorStep .xImagesSelector {
+  margin-top: 5px;  
+}
+
+.xSelectorStep .xImagesSelector .xListBox {
+  height: 315px;
+  overflow: auto;
+}
+
+.xSelectorStep .xImagesExplorer .xListBox {
+  height: 285px;
 }

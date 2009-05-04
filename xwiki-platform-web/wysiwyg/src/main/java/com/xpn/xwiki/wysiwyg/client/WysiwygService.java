@@ -29,11 +29,10 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
-import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.Attachment;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
+import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
  * The service interface used on the server.
@@ -189,29 +188,30 @@ public interface WysiwygService extends RemoteService
     LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor);
 
     /**
-     * Creates an attachment link from the given parameters. Note that the {@code attachmentName} name will be cleaned
-     * to match the attachment names cleaning rules, and the link reference and URL will be generated with the cleaned
-     * name. Also, this function will test the existence of this attachment for the specified document.
+     * Returns attachment information from the passed parameters, testing if the passed attachment exists. Note that the
+     * {@code attachmentName} name will be cleaned to match the attachment names cleaning rules, and the attachment
+     * reference and URL will be generated with the cleaned name. This function will be used as a method to test the
+     * correct upload of a file to a page.
      * 
      * @param wikiName the name of the wiki of the page the file is attached to
      * @param spaceName the name of the space of the page the file is attached to
      * @param pageName the name of the page the file is attached to
      * @param attachmentName the uncleaned name of the attachment, which is to be cleaned on the server
-     * @return a {@link LinkConfig} containing the reference and the URL of the attachment, or {@code null} in case the
+     * @return an {@link Attachment} containing the reference and the URL of the attachment, or {@code null} in case the
      *         attachment was not found
      */
-    LinkConfig getAttachmentLink(String wikiName, String spaceName, String pageName, String attachmentName);
+    Attachment getAttachment(String wikiName, String spaceName, String pageName, String attachmentName);
 
     /**
-     * Returns all the image attachments from the referred page. It can either get all the pictures in a page or in a
-     * space or in a wiki, depending on the values of its parameters. A null means a missing parameter on that position.
+     * Returns all the image attachments from the referred page.
      * 
      * @param wikiName the name of the wiki to get images from
      * @param spaceName the name of the space to get image attachments from
      * @param pageName the name of the page to get image attachments from
-     * @return list of the images
+     * @return list of the image attachments
+     * @throws XWikiGWTException if something goes wrong on the server
      */
-    List<ImageConfig> getImageAttachments(String wikiName, String spaceName, String pageName);
+    List<Attachment> getImageAttachments(String wikiName, String spaceName, String pageName) throws XWikiGWTException;
 
     /**
      * Returns all the attachments from the referred page.

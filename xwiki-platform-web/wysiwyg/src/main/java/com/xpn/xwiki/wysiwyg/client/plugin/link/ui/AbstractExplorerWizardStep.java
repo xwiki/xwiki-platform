@@ -22,15 +22,17 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.explorer.XWikiExplorer;
 import com.xpn.xwiki.wysiwyg.client.widget.explorer.ds.WikiDataSource;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
  * Wizard step to provide an interface to selecting a wiki resource, using an {@link XWikiExplorer}.
  * 
  * @version $Id$
  */
-public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardStep
+public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardStep<LinkConfig>
 {
     /**
      * The xwiki tree explorer, used to select the page or file to link to.

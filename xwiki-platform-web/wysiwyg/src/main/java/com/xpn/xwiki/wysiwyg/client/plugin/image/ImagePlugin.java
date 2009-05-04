@@ -26,14 +26,15 @@ import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.exec.InsertImageExecutable;
-import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageDialog;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
-import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardListener;
 
 /**
  * Rich text editor plug-in for inserting images, using a dialog to get image data settings from the user. It installs
@@ -41,22 +42,23 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupListener
+public class ImagePlugin extends AbstractPlugin implements ClickListener, WizardListener
 {
     /**
      * Image toolbar button.
      */
-    private PushButton image;
+    private PushButton imageButton;
 
     /**
-     * Dialog to get information about the inserted image from the user.
-     */
-    private ImageDialog imageDialog;
-
-    /**
-     * The toolbar extension used to add the link buttons to the toolbar.
+     * The toolbar extension used to add the link buttons to the toolbar. <br />
+     * TODO: move this in its own extension, just like {@link ImageMenuExtension}
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+
+    /**
+     * The menu extension of this plugin.
+     */
+    private ImageMenuExtension menuExtension;
 
     /**
      * Image medadata extractor, to handle the images metadata.
@@ -64,9 +66,14 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
     private ImageMetaDataExtractor metaDataExtractor;
 
     /**
-     * Behavior adjuster to handle the images correclty.
+     * Behavior adjuster to handle the images correctly.
      */
     private ImageBehaviorAdjuster behaviorAdjuster;
+
+    /**
+     * The image insert or edit wizard.
+     */
+    private ImageWizard imageWizard;
 
     /**
      * {@inheritDoc}
@@ -77,27 +84,34 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
     {
         super.init(wysiwyg, textArea, config);
 
+        // register the custom command
         textArea.getCommandManager().registerCommand(Command.INSERT_IMAGE, new InsertImageExecutable());
+
+        // add the toolbar extension
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_IMAGE)) {
-            image = new PushButton(Images.INSTANCE.image().createImage(), this);
-            image.setTitle(Strings.INSTANCE.image());
-            toolBarExtension.addFeature("image", image);
-        }
-
-        if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addClickListener(this);
+            imageButton = new PushButton(Images.INSTANCE.image().createImage(), this);
+            imageButton.setTitle(Strings.INSTANCE.imageTooltip());
+            toolBarExtension.addFeature("image", imageButton);
             getUIExtensionList().add(toolBarExtension);
-            // Create an image metadata extractor for this text area
-            metaDataExtractor = new ImageMetaDataExtractor();
-            // do the initial extracting on the loaded document
-            metaDataExtractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
-            getTextArea().getDocument().addInnerHTMLListener(metaDataExtractor);
 
-            // Create an image behavior adjuster for this text area
-            behaviorAdjuster = new ImageBehaviorAdjuster();
-            behaviorAdjuster.setTextArea(getTextArea());
-            getTextArea().addKeyboardListener(behaviorAdjuster);
+            // add the menu extension
+            menuExtension = new ImageMenuExtension(this);
+            getUIExtensionList().add(menuExtension);
+
+            imageWizard = new ImageWizard(getConfig());
+            imageWizard.addWizardListener(this);
         }
+
+        // Create an image metadata extractor for this text area
+        metaDataExtractor = new ImageMetaDataExtractor();
+        // do the initial extracting on the loaded document
+        metaDataExtractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
+        getTextArea().getDocument().addInnerHTMLListener(metaDataExtractor);
+
+        // Create an image behavior adjuster for this text area
+        behaviorAdjuster = new ImageBehaviorAdjuster();
+        behaviorAdjuster.setTextArea(getTextArea());
+        getTextArea().addKeyboardListener(behaviorAdjuster);
     }
 
     /**
@@ -107,27 +121,27 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
      */
     public void destroy()
     {
-        image.removeFromParent();
-        image.removeClickListener(this);
-        image = null;
+        if (imageButton != null) {
+            imageButton.removeFromParent();
+            imageButton.removeClickListener(this);
+            imageButton = null;
+        }
 
-        imageDialog.hide();
-        imageDialog.removeFromParent();
-        imageDialog = null;
+        toolBarExtension.clearFeatures();
 
-        if (toolBarExtension.getFeatures().length > 0) {
-            toolBarExtension.clearFeatures();
-            getTextArea().removeClickListener(this);
-            // If a metadata extractor was created and setup, remove it
-            if (metaDataExtractor != null) {
-                getTextArea().getDocument().removeInnerHTMLListener(metaDataExtractor);
-                metaDataExtractor = null;
-            }
-            // If a behavior adjuster was created and setup, remove it
-            if (behaviorAdjuster != null) {
-                getTextArea().removeKeyboardListener(behaviorAdjuster);
-                behaviorAdjuster = null;
-            }
+        if (menuExtension != null) {
+            menuExtension.destroy();
+        }
+
+        // If a metadata extractor was created and setup, remove it
+        if (metaDataExtractor != null) {
+            getTextArea().getDocument().removeInnerHTMLListener(metaDataExtractor);
+            metaDataExtractor = null;
+        }
+        // If a behavior adjuster was created and setup, remove it
+        if (behaviorAdjuster != null) {
+            getTextArea().removeKeyboardListener(behaviorAdjuster);
+            behaviorAdjuster = null;
         }
 
         super.destroy();
@@ -140,65 +154,55 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, PopupL
      */
     public void onClick(Widget sender)
     {
-        if (sender == image) {
-            onImage(true);
+        if (sender == imageButton) {
+            onImage();
         }
     }
 
     /**
-     * Function to handle the image event, either the image inserting start (when the button is clicked), either on the
-     * image inserting finish, when the image dialog is closed.
-     * 
-     * @param show whether the image dialog needs to be shown or not.
+     * Function to handle the image event, when the toolbar button is clicked or the menu command is issued: either
+     * create a new image, or edit an existing image.
      */
-    public void onImage(boolean show)
+    public void onImage()
     {
-        if (show) {
-            ImageConfig config = new ImageConfig();
-            String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
-            if (imageParam != null) {
-                config.fromJSON(imageParam);
-            } else {
-                // get selection, textify and set as the default alternative text
-                config.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
-            }
-            getImageDialog().setImageConfig(config);
-            getImageDialog().center();
+        ImageConfig config = new ImageConfig();
+        String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
+        if (imageParam != null) {
+            config.fromJSON(imageParam);
         } else {
-            String imageHTML = getImageDialog().getImageHTMLBlock();
-            getTextArea().setFocus(true);
-            if (imageHTML != null) {
-                getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageHTML);
-            }
+            // get selection, textify and set as the default alternative text
+            config.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
         }
+        imageWizard.start(ImageWizardSteps.IMAGESELECTOR.toString(), config);
     }
 
     /**
-     * Lazy creation of the image dialog, to optimize editor loading time.
-     * 
-     * @return the image dialog to be used for inserting the image.
+     * Removes the selection if the insert image command is executed.
      */
-    private ImageDialog getImageDialog()
+    public void onImageRemove()
     {
-        if (imageDialog == null) {
-            imageDialog =
-                new ImageDialog(getConfig().getParameter("wiki", "xwiki"), getConfig().getParameter("space", "Main"),
-                    getConfig().getParameter("page", "WebHome"));
-            imageDialog.addPopupListener(this);
+        if (getTextArea().getCommandManager().isExecuted(Command.INSERT_IMAGE)) {
+            getTextArea().setFocus(true);
+            getTextArea().getCommandManager().execute(Command.DELETE);
         }
-        return imageDialog;
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see PopupListener#onPopupClosed(SourcesPopupEvents, boolean)
      */
-    public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
+    public void onFinish(Wizard sender, Object result)
     {
-        if (sender == imageDialog && !autoClosed) {
-            onImage(false);
-        }
+        String imageHTML = ImageHTMLGenerator.getInstance().getAttachedImageHTML((ImageConfig) result);
+        getTextArea().setFocus(true);
+        getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageHTML);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void onCancel(Wizard sender)
+    {
+        // return the focus to the text area
+        getTextArea().setFocus(true);
     }
 }

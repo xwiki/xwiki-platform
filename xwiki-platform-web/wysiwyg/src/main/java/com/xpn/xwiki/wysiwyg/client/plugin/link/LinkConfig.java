@@ -102,8 +102,7 @@ public class LinkConfig implements IsSerializable
     private String page;
 
     /**
-     * The reference of the link, in the {@code wikiname}:{@code spacename}.{@code pagename}@{@code filename} form. 
-     * <br />
+     * The reference of the link, in the {@code wikiname:spacename.pagename} form. <br />
      * Note: this value should take priority over wiki, space, page set in this config: if the reference is set, that
      * this one should be used instead of generating another. Ideally, this should be set with the URL so that no
      * further computing is necessary for this link. If this and url are not set, they are to be computed from the wiki,

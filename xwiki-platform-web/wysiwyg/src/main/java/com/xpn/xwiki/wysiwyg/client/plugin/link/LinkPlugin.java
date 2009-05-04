@@ -34,6 +34,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.UnlinkExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
@@ -41,8 +42,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardListener;
 
 /**
- * Rich text editor plug-in for inserting links, using a dialog to get link settings from the user. It installs two
- * buttons in the toolbar, for its two actions: link and unlink.
+ * Rich text editor plug-in for inserting links, using a dialog to get link settings from the user. It installs a menu
+ * bar extension, with entries for all its actions.
  * 
  * @version $Id$
  */
@@ -222,10 +223,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
             String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
             if (imageParam != null) {
                 // it's an image selection, set the label readonly and put the image filename in the label text
-                ImageConfig imgConfig = new ImageConfig();
-                imgConfig.fromJSON(imageParam);
-                linkParam.setLabelText(imgConfig.getImageFileName());
-                linkParam.setReadOnlyLabel(true);
+                parseLabelFromImage(linkParam, imageParam);
             } else {
                 linkParam.setLabelText(wrappingAnchor.getInnerText());
             }
@@ -251,15 +249,27 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
         if (imageParam != null) {
             // it's an image selection, set the label readonly and put the image filename in the label text
-            ImageConfig imgConfig = new ImageConfig();
-            imgConfig.fromJSON(imageParam);
-            config.setLabelText(imgConfig.getImageFileName());
-            config.setReadOnlyLabel(true);
+            parseLabelFromImage(config, imageParam);
         } else {
             config.setLabelText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
             config.setReadOnlyLabel(false);
         }
         return config;
+    }
+
+    /**
+     * Helper method to parse an image execution String parameter and fill the passed {@link LinkConfig} from it. 
+     * @param linkConfig the link config to set the label to
+     * @param imageParam the image parameter, as returned by the command manager
+     */
+    protected void parseLabelFromImage(LinkConfig linkConfig, String imageParam)
+    {
+        ImageConfig imgConfig = new ImageConfig();
+        imgConfig.fromJSON(imageParam);
+        ResourceName imageResource = new ResourceName();
+        imageResource.fromString(imgConfig.getReference(), true);
+        linkConfig.setLabelText(imageResource.getFile());
+        linkConfig.setReadOnlyLabel(true);
     }
 
     /**

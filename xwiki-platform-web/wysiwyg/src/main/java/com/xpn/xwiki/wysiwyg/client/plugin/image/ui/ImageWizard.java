@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
+package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,44 +31,45 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStepProvider;
 
 /**
- * The link wizard, used to configure link parameters in a {@link com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig}
- * object, in successive steps. This class extends the {@link Wizard} class by encapsulating {@link WizardStepProvider}
- * behavior specific to links.
+ * The link wizard, used to configure image parameters in a
+ * {@link com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig} object, in successive steps. This class extends the
+ * {@link Wizard} class by encapsulating {@link WizardStepProvider} behavior specific to images.
  * 
  * @version $Id$
  */
-public class LinkWizard extends Wizard implements WizardStepProvider
+public class ImageWizard extends Wizard implements WizardStepProvider
 {
     /**
-     * Enumeration steps handled by this link wizard.
+     * Enumeration steps handled by this image wizard.
      */
-    public static enum LinkWizardSteps
+    public static enum ImageWizardSteps
     {
         /**
-         * Steps managed by this wizard.
+         * Steps managed by this wizard: the image selector, the image parameters step and the new image upload step.
          */
-        WEBPAGE, EMAIL, WIKIPAGE, WIKIPAGECREATOR, ATTACHMENT, ATTACHUPLOAD, WIKIPAGECONFIG
+        IMAGESELECTOR, IMAGECONFIG, IMAGEUPLOAD
     };
 
     /**
      * Map with the instantiated steps to return. Will be lazily initialized upon request.
      */
-    private Map<LinkWizardSteps, WizardStep> stepsMap = new HashMap<LinkWizardSteps, WizardStep>();
+    private Map<ImageWizardSteps, WizardStep> stepsMap = new HashMap<ImageWizardSteps, WizardStep>();
 
     /**
-     * The resource currently edited by this WYSIWYG, used to determine the context in which link creation takes place.
+     * The resource currently edited by this WYSIWYG, used to determine the context in which image insertion takes
+     * place.
      */
     private Config config;
 
     /**
-     * Builds a {@link LinkWizard} from the passed {@link Config}. The configuration is used to get WYSIWYG editor
-     * specific information for this wizard, such as the current page, etc.
+     * Builds a {@link ImageWizard} from the passed {@link Config}. The configuration is used to get WYSIWYG editor
+     * specific information for this wizard, such as the current page, configuration parameters.
      * 
-     * @param config the context configuration for this {@link LinkWizard}
+     * @param config the context configuration for this {@link ImageWizard}
      */
-    public LinkWizard(Config config)
+    public ImageWizard(Config config)
     {
-        super(Strings.INSTANCE.link(), Images.INSTANCE.link().createImage());
+        super(Strings.INSTANCE.imageTooltip(), Images.INSTANCE.image().createImage());
         this.config = config;
         this.setProvider(this);
     }
@@ -80,30 +81,18 @@ public class LinkWizard extends Wizard implements WizardStepProvider
      */
     public WizardStep getStep(String name)
     {
-        LinkWizardSteps requestedStep = parseStepName(name);
+        ImageWizardSteps requestedStep = parseStepName(name);
         WizardStep step = stepsMap.get(requestedStep);
         if (step == null) {
             switch (requestedStep) {
-                case EMAIL:
-                    step = new EmailAddressLinkWizardStep();
+                case IMAGESELECTOR:
+                    step = dispatchImageSelectorStep();
                     break;
-                case WIKIPAGE:
-                    step = new WikipageExplorerWizardStep(getEditedResource());
+                case IMAGECONFIG:
+                    step = new ImageConfigWizardStep();
                     break;
-                case WIKIPAGECREATOR:
-                    step = new CreateNewPageWizardStep();
-                    break;
-                case ATTACHMENT:
-                    step = dispatchAttachmentSelectorStep();
-                    break;
-                case ATTACHUPLOAD:
-                    step = new AttachmentUploadWizardStep();
-                    break;
-                case WIKIPAGECONFIG:
-                    step = new LinkConfigWizardStep();
-                    break;
-                case WEBPAGE:
-                    step = new WebPageLinkWizardStep();
+                case IMAGEUPLOAD:
+                    step = new ImageUploadWizardStep();
                     break;
                 default:
                     // nothing here, leave it null
@@ -128,33 +117,33 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     }
 
     /**
-     * @return the wizard step for attachments selector wrt the configuration parameters. If the {@code linkfiles}
+     * @return the wizard step for image selector wrt the configuration parameters. If the {@code insertimages}
      *         parameter with the value {@code currentpage} is not found, then the selector will be enabled for the
      *         whole wiki, otherwise only for the current page.
      */
-    private WizardStep dispatchAttachmentSelectorStep()
+    private WizardStep dispatchImageSelectorStep()
     {
-        String linkFiles = config.getParameter("linkfiles");
-        if ("currentpage".equals(linkFiles)) {
-            return new CurrentPageAttachmentSelectorWizardStep(getEditedResource()); 
+        String insertImages = config.getParameter("insertimages");
+        if ("currentpage".equals(insertImages)) {
+            return new CurrentPageImageSelectorWizardStep(getEditedResource());
         } else {
-            return new AttachmentSelectorWizardStep(getEditedResource());
+            return new ImageSelectorWizardStep(getEditedResource());
         }
     }
 
     /**
-     * Parses the specified step name in a {@link LinkWizardSteps} value.
+     * Parses the specified step name in a {@link ImageWizardSteps} value.
      * 
      * @param name the name of the step to parse
-     * @return the {@link LinkWizardSteps} {@code enum} value corresponding to the passed name, or {@code null} if no
+     * @return the {@link ImageWizardSteps} {@code enum} value corresponding to the passed name, or {@code null} if no
      *         such value exists.
      */
-    private LinkWizardSteps parseStepName(String name)
+    private ImageWizardSteps parseStepName(String name)
     {
         // let's be careful about this
-        LinkWizardSteps requestedStep = null;
+        ImageWizardSteps requestedStep = null;
         try {
-            requestedStep = LinkWizardSteps.valueOf(name);
+            requestedStep = ImageWizardSteps.valueOf(name);
         } catch (IllegalArgumentException e) {
             // nothing, just leave it null if it cannot be found in the enum
         }

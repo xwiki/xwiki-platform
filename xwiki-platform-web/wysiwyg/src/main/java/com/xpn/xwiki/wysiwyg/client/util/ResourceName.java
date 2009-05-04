@@ -180,9 +180,10 @@ public class ResourceName
      * wiki:Space.Page@attachment}) and stores it in the current object. <br />
      * 
      * @param reference the string form of a resource reference, {@code wiki:Space.Page@attachment}
+     * @param asFile the passed reference should be parsed as a reference to an attached file
      * @see #resolveRelativeTo(ResourceName)
      */
-    public void fromString(String reference)
+    public void fromString(String reference, boolean asFile)
     {
         clear();
         if (StringUtils.isEmpty(reference)) {
@@ -191,10 +192,13 @@ public class ResourceName
         } else {
             // follow the parsing order from the xhtml parser on the server
             String strippedRef = reference;
-            if (reference.startsWith("image:") || reference.startsWith("attach:")) {
+            if (asFile) {
+                if (strippedRef.startsWith("attach:")) {
+                    strippedRef = strippedRef.substring(7);
+                }
                 strippedRef = reference.substring(reference.indexOf(':') + 1);
                 // parse the file name
-                strippedRef = parseFileName(strippedRef);
+                strippedRef = parseFileName(strippedRef);                
             }
             parseReference(strippedRef);
         }
@@ -325,7 +329,7 @@ public class ResourceName
      * Creates the String representation of the resource, in the form {@code wiki:Space.Page@file}.
      * 
      * @return the string representation of this resource
-     * @see #fromString(String)
+     * @see #fromString(String, boolean)
      */
     public String toString()
     {

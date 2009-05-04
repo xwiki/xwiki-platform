@@ -17,35 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
+package com.xpn.xwiki.wysiwyg.client.widget.wizard.util;
 
 import java.util.EnumSet;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
- * Abstract {@link WizardStep} to implement basic selector functions (step names, directions, initialization),
+ * Abstract {@link WizardStep} to implement basic selector functions (storing edited data on
+ * {@link #init(Object, AsyncCallback)} and returning on {@link #getResult()}, step names, directions, initialization),
  * regardless of the actual selecting method.
  * 
+ * @param <T> the type of data edited by this wizard step
  * @version $Id$
  */
-public abstract class AbstractSelectorWizardStep implements WizardStep
+public abstract class AbstractSelectorWizardStep<T> implements WizardStep
 {
     /**
-     * The link config edited by this wizard step.
+     * The data edited by this wizard step.
      */
-    private LinkConfig linkData;
+    private T data;
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > cb)
     {
-        linkData = (LinkConfig) data;
+        this.data = (T) data;
         initializeSelection();
         cb.onSuccess(null);
     }
@@ -62,7 +64,10 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
      */
     public String getDirectionName(NavigationDirection direction)
     {
-        return Strings.INSTANCE.select();
+        if (direction == NavigationDirection.NEXT) {
+            return Strings.INSTANCE.select();
+        }
+        return null;
     }
 
     /**
@@ -70,7 +75,7 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
      */
     public Object getResult()
     {
-        return linkData;
+        return data;
     }
 
     /**
@@ -82,10 +87,10 @@ public abstract class AbstractSelectorWizardStep implements WizardStep
     }
 
     /**
-     * @return the {@link LinkConfig} configured by this {@link WizardStep}
+     * @return the data configured by this {@link WizardStep}
      */
-    public LinkConfig getLinkData()
+    public T getData()
     {
-        return linkData;
+        return data;
     }
 }

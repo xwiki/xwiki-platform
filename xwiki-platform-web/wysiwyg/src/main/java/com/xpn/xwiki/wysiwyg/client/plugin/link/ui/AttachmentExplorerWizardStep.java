@@ -57,12 +57,12 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
      */
     protected void initializeSelection()
     {
-        String reference = getLinkData().getReference();
+        String reference = getData().getReference();
         if (!StringUtils.isEmpty(reference)) {
             // resolve the reference of the edited link, relative to the edited resource
             ResourceName r = new ResourceName();
-            r.fromString(reference);
-            getExplorer().setValue(r.resolveRelativeTo(editedResource).toString());
+            r.fromString(reference, true);
+            getExplorer().setValue(r.resolveRelativeTo(editedResource).toString() + "#Attachments");
         }
         // else leave the selection where it was the last time
     }
@@ -110,16 +110,16 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
             Window.alert(Strings.INSTANCE.linkNoAttachmentSelectedError());
             async.onSuccess(false);
         } else if (getExplorer().isNewAttachment()) {
-            // prepare the link config for the uplaod attachment step
-            getLinkData().setWiki(getExplorer().getSelectedWiki());
-            getLinkData().setSpace(getExplorer().getSelectedSpace());
-            getLinkData().setPage(getExplorer().getSelectedPage());
+            // prepare the link config for the upload attachment step
+            getData().setWiki(getExplorer().getSelectedWiki());
+            getData().setSpace(getExplorer().getSelectedSpace());
+            getData().setPage(getExplorer().getSelectedPage());
             async.onSuccess(true);
         } else {
             String attachmentRef = "attach:" + getExplorer().getValue();
             String attachmentURL = getExplorer().getSelectedResourceURL();
-            getLinkData().setReference(attachmentRef);
-            getLinkData().setUrl(attachmentURL);
+            getData().setReference(attachmentRef);
+            getData().setUrl(attachmentURL);
             async.onSuccess(true);
         }
     }

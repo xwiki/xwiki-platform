@@ -20,24 +20,43 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.RadioButton;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
- * Builds the panel to set image parameters such as alignment, size and alternative text.
+ * Wizard step to configure the image parameters.
  * 
  * @version $Id$
  */
-public class ImageParametersPanel extends Composite
+public class ImageConfigWizardStep implements WizardStep, KeyboardListener, SourcesNavigationEvents
 {
+    /**
+     * The image data to be edited by this wizard step.
+     */
+    private ImageConfig imageData;
+
+    /**
+     * Collection of {@link NavigationListener}s, to be notified by navigation events from this step. Used to handle
+     * default buttons in this wizard step, by firing next event whenever enter key is hit in the step form.
+     */
+    private final NavigationListenerCollection navigationListeners = new NavigationListenerCollection();
+
     /**
      * List of radio buttons for the alignment setting.
      */
@@ -59,20 +78,19 @@ public class ImageParametersPanel extends Composite
     private TextBox altTextBox;
 
     /**
+     * The panel holding the input for the label of the built link.
+     */
+    private final Panel mainPanel = new FlowPanel();
+
+    /**
      * Default constructor.
      */
-    public ImageParametersPanel()
+    public ImageConfigWizardStep()
     {
-        Panel parametersPanel = new FlowPanel();
-        parametersPanel.addStyleName("xSettingsPanel");
-        Label parametersLabel = new Label(Strings.INSTANCE.imageSettingsLabel());
-        parametersPanel.add(parametersLabel);
-        parametersLabel.addStyleName("xSettingsLabel");
-        parametersPanel.add(getSizePanel());
-        parametersPanel.add(getAltTextPanel());
-        parametersPanel.add(getAlignmentPanel());
-
-        initWidget(parametersPanel);
+        mainPanel.addStyleName("xImageConfig");
+        mainPanel.add(getSizePanel());
+        mainPanel.add(getAltTextPanel());
+        mainPanel.add(getAlignmentPanel());
     }
 
     /**
@@ -81,24 +99,26 @@ public class ImageParametersPanel extends Composite
     private Panel getSizePanel()
     {
         widthBox = new TextBox();
+        widthBox.addKeyboardListener(this);
         heightBox = new TextBox();
-        Label sizeLabel = new Label(Strings.INSTANCE.imageSizeLabel());
+        heightBox.addKeyboardListener(this);
         FlowPanel sizePanel = new FlowPanel();
         sizePanel.addStyleName("xSizePanel");
-        sizePanel.add(sizeLabel);
+        sizePanel.add(new Label(Strings.INSTANCE.imageWidthLabel()));
         sizePanel.add(widthBox);
-        sizePanel.add(new Label("X"));
+        sizePanel.add(new Label(Strings.INSTANCE.imageHeightLabel()));
         sizePanel.add(heightBox);
 
         return sizePanel;
     }
 
     /**
-     * @return the panel holding the alternative settings for the image
+     * @return the panel holding the alternative text settings for the image
      */
     private Panel getAltTextPanel()
     {
         altTextBox = new TextBox();
+        altTextBox.addKeyboardListener(this);
         Label altTextLabel = new Label(Strings.INSTANCE.imageAltTextLabel());
         FlowPanel altTextPanel = new FlowPanel();
         altTextPanel.addStyleName("xAltPanel");
@@ -114,19 +134,15 @@ public class ImageParametersPanel extends Composite
     private Panel getAlignmentPanel()
     {
         Panel alignmentPanel = new FlowPanel();
-        Label alignmentLabel = new Label(Strings.INSTANCE.imageAlignmentLabel());
-        alignmentLabel.addStyleName("xAlignLabel");
         String alignRadioGroup = "alignment";
-        alignmentPanel.add(alignmentLabel);
-        // radio buttons for alignments
         alignmentPanel.add(getHorizontalAlignmentPanel(alignRadioGroup));
         alignmentPanel.add(getVerticalAlignmentPanel(alignRadioGroup));
         return alignmentPanel;
     }
 
     /**
-     * @return the panel holding the horizontal alignment settings for the image
      * @param alignRadioGroup the name of the alignment radio group.
+     * @return the panel holding the horizontal alignment settings for the image
      */
     private Panel getHorizontalAlignmentPanel(String alignRadioGroup)
     {
@@ -137,10 +153,13 @@ public class ImageParametersPanel extends Composite
         alignmentOptions = new ArrayList<RadioButton>();
         RadioButton leftRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignLeftLabel());
         leftRadio.setValue(ImageConfig.ImageAlignment.LEFT.toString());
+        leftRadio.addKeyboardListener(this);
         RadioButton centerRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignCenterLabel());
         centerRadio.setValue(ImageConfig.ImageAlignment.CENTER.toString());
+        centerRadio.addKeyboardListener(this);
         RadioButton rightRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignRightLabel());
         rightRadio.setValue(ImageConfig.ImageAlignment.RIGHT.toString());
+        rightRadio.addKeyboardListener(this);
         alignmentOptions.add(leftRadio);
         alignmentOptions.add(centerRadio);
         alignmentOptions.add(rightRadio);
@@ -152,8 +171,8 @@ public class ImageParametersPanel extends Composite
     }
 
     /**
-     * @return the panel holding the vertical alignment settings for the image
      * @param alignRadioGroup the name of the alignment radio group.
+     * @return the panel holding the vertical alignment settings for the image
      */
     private Panel getVerticalAlignmentPanel(String alignRadioGroup)
     {
@@ -163,10 +182,13 @@ public class ImageParametersPanel extends Composite
         vAlignPanel.add(vAlignLabel);
         RadioButton topRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignTopLabel());
         topRadio.setValue(ImageConfig.ImageAlignment.TOP.toString());
+        topRadio.addKeyboardListener(this);
         RadioButton middleRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignMiddleLabel());
         middleRadio.setValue(ImageConfig.ImageAlignment.MIDDLE.toString());
+        middleRadio.addKeyboardListener(this);
         RadioButton bottomRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignBottomLabel());
         bottomRadio.setValue(ImageConfig.ImageAlignment.BOTTOM.toString());
+        bottomRadio.addKeyboardListener(this);
         alignmentOptions.add(topRadio);
         alignmentOptions.add(middleRadio);
         alignmentOptions.add(bottomRadio);
@@ -197,7 +219,7 @@ public class ImageParametersPanel extends Composite
      */
     protected void setImageAlignment(ImageConfig.ImageAlignment alignment)
     {
-        String alignValue = alignment != null ? alignment.toString() : ""; 
+        String alignValue = alignment != null ? alignment.toString() : "";
         for (RadioButton rb : alignmentOptions) {
             if (rb.getValue().equals(alignValue)) {
                 rb.setChecked(true);
@@ -208,76 +230,146 @@ public class ImageParametersPanel extends Composite
     }
 
     /**
-     * @return the user set width for this image
+     * {@inheritDoc}
      */
-    public String getWidth()
+    public void init(Object data, AsyncCallback< ? > cb)
     {
-        return getValueOf(this.widthBox);
+        // store the data received as parameter
+        imageData = (ImageConfig) data;
+        // set the step configuration according to the received config data
+        widthBox.setText(imageData.getWidth());
+        heightBox.setText(imageData.getHeight());
+        setImageAlignment(imageData.getAlignment());
+        altTextBox.setText(imageData.getAltText());
+        cb.onSuccess(null);
     }
 
     /**
-     * @return the user set height for this image
+     * {@inheritDoc}
      */
-    public String getHeight()
+    public Widget display()
     {
-        return getValueOf(this.heightBox);
+        return mainPanel;
     }
 
     /**
-     * @return the specified alternative text
+     * {@inheritDoc}
      */
-    public String getAltText()
+    public void onSubmit(AsyncCallback<Boolean> async)
     {
-        return getValueOf(altTextBox);
+        imageData.setAltText(altTextBox.getText().trim());
+        imageData.setWidth(widthBox.getText().trim());
+        imageData.setHeight(heightBox.getText().trim());
+        ImageConfig.ImageAlignment alignment = getSelectedAlignment();
+        imageData.setAlignment(alignment);
+        async.onSuccess(true);
     }
 
     /**
-     * @param textbox the textbox to get value from
-     * @return the value of the specified text box, or null if no value was specified.
+     * {@inheritDoc}
      */
-    private String getValueOf(TextBox textbox)
+    public void onCancel(AsyncCallback<Boolean> async)
     {
-        String value = textbox.getText().trim();
-        if (value.length() == 0) {
-            return null;
-        }
-        return value;
+        async.onSuccess(true);
     }
 
     /**
-     * Handles showing the parameters panel. Currently we need to set the focus in the size input when this panel is
-     * shown.
+     * {@inheritDoc}
      */
-    public void onShow()
+    public Object getResult()
     {
-        widthBox.setFocus(true);
+        return imageData;
     }
 
     /**
-     * Reads and sets the parameters from the passed {@link ImageConfig}.
-     * 
-     * @param config the {@link ImageConfig} to get parameters from.
+     * {@inheritDoc}
      */
-    public void setParameters(ImageConfig config)
+    public String getNextStep()
     {
-        boolean isEditing = config.getImageFileName() != null;
-        if (config.getAltText() != null && !config.getAltText().equals(config.getImageFileName())) {
-            altTextBox.setText(config.getAltText());
-        } else if (isEditing) {
-            altTextBox.setText("");
+        // this is the last step in the wizard.
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getStepTitle()
+    {
+        return Strings.INSTANCE.imageConfigTitle();
+    }
+
+    /**
+     * {@inheritDoc}. Configure this as the last wizard step, by default, allowing to finish, cancel or go to previous
+     * step if the navigation stack is not empty at this point.
+     */
+    public EnumSet<NavigationDirection> getValidDirections()
+    {
+        return EnumSet.of(NavigationDirection.FINISH, NavigationDirection.CANCEL, NavigationDirection.PREVIOUS);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getDirectionName(NavigationDirection direction)
+    {
+        switch (direction) {
+            case FINISH:
+                return Strings.INSTANCE.imageCreateImageButton();
+            default:
+                return null;
         }
-        if (config.getWidth() != null) {
-            widthBox.setText(config.getWidth());
-        } else if (isEditing) {
-            widthBox.setText("");
+    }
+
+    /**
+     * @return the default navigation direction, to be fired automatically when enter is hit in an input in the form of
+     *         this configuration wizard step. To be overridden by subclasses to provide the specific direction to be
+     *         followed.
+     */
+    public NavigationDirection getDefaultDirection()
+    {
+        return NavigationDirection.FINISH;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addNavigationListener(NavigationListener listener)
+    {
+        navigationListeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeNavigationListener(NavigationListener listener)
+    {
+        navigationListeners.remove(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    {
+        if (keyCode == KEY_ENTER) {
+            // fire the event for the default direction
+            navigationListeners.fireNavigationEvent(getDefaultDirection());
         }
-        if (config.getHeight() != null) {
-            heightBox.setText(config.getHeight());
-        } else if (isEditing) {
-            heightBox.setText("");
-        }
-        if (config.getAlignment() != null || isEditing) {
-            setImageAlignment(config.getAlignment());
-        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onKeyUp(Widget sender, char keyCode, int modifiers)
+    {
+        // nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    {
+        // nothing
     }
 }

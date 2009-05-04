@@ -39,11 +39,11 @@
   background-color: #ffffff;
 }
 
-.xLinkStep .listGrid, .xExplorerPanel .listGrid {
+.xSelectorStep .listGrid, .xExplorerPanel .listGrid {
   border: none;
 }
 
-.xLinkStep .xListBox {
+.xSelectorStep .xListBox {
   height: 320px;
   overflow: auto;
 }

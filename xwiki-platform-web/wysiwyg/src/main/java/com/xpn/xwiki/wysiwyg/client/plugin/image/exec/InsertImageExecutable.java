@@ -100,43 +100,9 @@ public class InsertImageExecutable extends InsertHTMLExecutable
 
         // parse image and return stuff.
         ImageConfig config = new ImageConfig();
-        parseImageReference(startComment.getNodeValue().substring(11), config);
+        config.setReference(startComment.getNodeValue().substring(11));
         parseImageAttributes(selectedImageElement, config);
         return config.toJSON();
-    }
-
-    /**
-     * Parses an image reference, obtaining its source (wiki, space, page, filename).
-     * 
-     * @param reference image reference
-     * @param config the {@link ImageConfig} where to store the obtained information
-     */
-    private void parseImageReference(String reference, ImageConfig config)
-    {
-        String[] fileParts = reference.split("@");
-        String wikiRef = null;
-        if (fileParts.length >= 2) {
-            config.setImageFileName(fileParts[1]);
-            wikiRef = fileParts[0];
-        } else {
-            config.setImageFileName(reference);
-            // Nothing left to parse, return
-            return;
-        }
-        // Now parse what's left
-        String[] wikiParts = wikiRef.split(":");
-        String spaceReference = wikiRef;
-        if (wikiParts.length >= 2) {
-            config.setWiki(wikiParts[0]);
-            spaceReference = wikiParts[1];
-        }
-        String[] spaceParts = spaceReference.split("\\.");
-        String pageReference = spaceReference;
-        if (spaceParts.length >= 2) {
-            config.setSpace(spaceParts[0]);
-            pageReference = spaceParts[1];
-        }
-        config.setPage(pageReference);
     }
 
     /**

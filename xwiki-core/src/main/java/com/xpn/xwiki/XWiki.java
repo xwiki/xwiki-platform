@@ -2920,9 +2920,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
         needsUpdate |= bclass.addTextField("smtp_server", "SMTP Server", 30);
         needsUpdate |= bclass.addTextField("smtp_port", "SMTP Port", 5);
-        needsUpdate |= bclass.addTextField("smtp_server_username", "SMTP Server username (optional)", 30);
-        needsUpdate |= bclass.addTextField("smtp_server_password", "SMTP Server password (optional)", 30);
-        needsUpdate |= bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties for SMTP", 60, 6);
+        needsUpdate |= bclass.addTextField("smtp_server_username", "Server username (optional)", 30);
+        needsUpdate |= bclass.addTextField("smtp_server_password", "Server password (optional)", 30);
+        needsUpdate |= bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties", 60, 6);
         needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);

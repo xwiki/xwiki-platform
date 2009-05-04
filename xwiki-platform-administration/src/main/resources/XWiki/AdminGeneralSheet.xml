@@ -63,6 +63,6 @@
 #set($params.language = ['multilingual', 'languages' , 'default_language', 'dateformat'])
 #set($params.editor = ['editor', 'core.defaultDocumentSyntax'])
 #set($params.admin = ['admin_email'])
-#set($params.smtp = ['smtp_server', 'smtp_port'])
+#set($params.smtp = ['smtp_server', 'smtp_port', 'smtp_server_username', 'smtp_server_password', 'javamail_extra_props'])
 #includeForm('XWiki.AdminFieldsDisplaySheet')</content>
 </xwikidoc>

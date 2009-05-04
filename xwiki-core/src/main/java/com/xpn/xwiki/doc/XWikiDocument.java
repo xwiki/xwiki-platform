@@ -499,7 +499,34 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
     {
-        return getRenderedContent(getContent(), getSyntaxId(), context);
+        // Note: We are currently duplicating code from the other getRendered signature since there are
+        // some unresolved issues with saving/restoring the context in some cases (need to be investigated),
+        // for example in the Admin Import page.
+
+        String renderedContent;
+        Object isInRenderingEngine = context.get("isInRenderingEngine");
+
+        try {
+            // This tells display() methods that we are inside the rendering engine and thus
+            // that they can return wiki syntax and not HTML syntax (which is needed when
+            // outside the rendering engine, i.e. when we're inside templates using only
+            // Velocity for example).
+            context.put("isInRenderingEngine", true);
+
+            // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
+            if (is10Syntax()) {
+                renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
+            } else {
+                renderedContent = performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0", true);
+            }
+        } finally {
+            if (isInRenderingEngine != null) {
+                context.put("isInRenderingEngine", isInRenderingEngine);
+            } else {
+                context.remove("isInRenderingEngine");
+            }
+        }
+        return renderedContent;        
     }
 
     /**

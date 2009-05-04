@@ -320,7 +320,7 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
             initEditor();
             fillMenu();
             fillToolBar();
-            update();
+            ui.getTextArea().getCommandManager().execute(new Command("update"));
         }
     }
 

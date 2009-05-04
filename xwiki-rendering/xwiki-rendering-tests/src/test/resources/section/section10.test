@@ -1,6 +1,6 @@
 .#--------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that a header content can start on a new line
+.# Verify that end header is not matched as begin header
 .#--------------------------------------------------------------------------------
 = Title level 1 {{simplemacro}}{{/simplemacro}}=
 .#-----------------------------------------------------

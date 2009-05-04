@@ -67,6 +67,7 @@ public class MozillaSelection extends DefaultSelection
             .setStart(range.getStartContainer(), adjustOffset(range.getStartContainer(), range.getStartOffset()));
         nativeRange.setEnd(range.getEndContainer(), adjustOffset(range.getEndContainer(), range.getEndOffset()));
         getNativeSelection().addRange(nativeRange);
+        DOMUtils.getInstance().scrollIntoView(range);
     }
 
     /**

@@ -151,6 +151,7 @@ public class IESelection extends AbstractSelection
      */
     public void addRange(Range range)
     {
+        DOMUtils.getInstance().scrollIntoView(range);
         if (range.getStartContainer() == range.getEndContainer()
             && range.getStartContainer().getNodeType() == Node.ELEMENT_NODE
             && range.getStartOffset() == range.getEndOffset() - 1) {

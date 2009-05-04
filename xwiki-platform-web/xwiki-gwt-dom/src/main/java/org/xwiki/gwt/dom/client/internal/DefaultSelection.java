@@ -19,6 +19,7 @@
  */
 package org.xwiki.gwt.dom.client.internal;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.internal.mozilla.NativeRange;
@@ -72,6 +73,7 @@ public class DefaultSelection extends AbstractSelection
         nativeRange.setStart(range.getStartContainer(), range.getStartOffset());
         nativeRange.setEnd(range.getEndContainer(), range.getEndOffset());
         nativeSelection.addRange(nativeRange);
+        DOMUtils.getInstance().scrollIntoView(range);
     }
 
     /**

@@ -475,18 +475,14 @@ isc.XWEDataSource.addProperties({
 });
 
 /**
- * Overwrite init method of the general data source so that transformRequest adds a random parameter to each request to 
- * overcome IE cache. 
+ * Implement optional transformRequest callback to add a random parameter to each request to overcome IE cache. 
  */
 isc.XWEDataSource.addMethods({
-    init : function() {
-        this.transformRequest = function (dsRequest) {
-            if (dsRequest.originalData) {
-                dsRequest.originalData.r = "" + Math.floor(Math.random() * 1000000);
-            }
-            return dsRequest.data;
-        };	
-        this.Super("init", arguments);
+    transformRequest : function(dsRequest) {
+        if (dsRequest.originalData) {
+            dsRequest.originalData.r = "" + Math.floor(Math.random() * 1000000);
+        }
+        return dsRequest.data;
     }
 });
 
@@ -572,9 +568,8 @@ isc.XWESpaceDataSource.addMethods({
             if (dsRequest.originalData.parent == null) {
                 dsRequest.originalData.parent = "^(?!" + this.space + "\.).*$";
             }
-            return dsRequest.data;
+            return this.Super("transformRequest", arguments);
         };
-
         this.Super("init", arguments);
     }
 });

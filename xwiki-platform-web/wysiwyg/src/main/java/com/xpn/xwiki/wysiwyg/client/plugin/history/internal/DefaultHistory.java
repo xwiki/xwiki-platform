@@ -49,7 +49,7 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
      * The list of commands that should be ignored, meaning that they shouldn't generate history entries.
      */
     private static final List<Command> IGNORED_COMMANDS =
-        Arrays.asList(Command.UNDO, Command.REDO, new Command("submit"));
+        Arrays.asList(Command.UNDO, Command.REDO, new Command("submit"), new Command("update"));
 
     /**
      * The rich text area for which we record the history. Actions taken on this rich text area trigger the update of

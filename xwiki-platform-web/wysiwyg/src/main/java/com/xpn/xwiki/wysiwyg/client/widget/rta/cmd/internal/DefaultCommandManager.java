@@ -60,6 +60,7 @@ public class DefaultCommandManager extends AbstractCommandManager
 
         // Register custom executables.
         EXECUTABLES.put(Command.INSERT_HTML, new InsertHTMLExecutable());
+        EXECUTABLES.put(new Command("update"), new UpdateExecutable());
     }
 
     /**

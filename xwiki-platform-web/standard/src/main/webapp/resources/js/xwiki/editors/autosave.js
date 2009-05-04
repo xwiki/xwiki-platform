@@ -94,6 +94,11 @@ XWiki.editors.AutoSave = Class.create({
     this.form.observe("submit", function() {
       container.remove();
     });
+    // When hitting cancel, the form isn't submitted anymore, instead the location is changed directly. In order to fix
+    // the fastback problem above for Cancel, we need to also listen to this event:
+    document.observe("xwiki:actions:cancel", function() {
+      container.remove();
+    });
   },
 
   /**

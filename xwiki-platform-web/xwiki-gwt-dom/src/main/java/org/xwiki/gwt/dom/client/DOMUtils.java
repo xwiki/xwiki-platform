@@ -1248,4 +1248,31 @@ public abstract class DOMUtils
         }
         return node == null ? null : node.getPreviousSibling();
     }
+
+    /**
+     * Makes sure that a given DOM range is visible by scrolling it into view.
+     * 
+     * @param range a DOM range
+     */
+    public void scrollIntoView(Range range)
+    {
+        // Look for an element to scroll into view.
+        Node node = getFirstLeaf(range);
+        if (node == null) {
+            // The range is collapsed between nodes.
+            node = getNextLeaf(range);
+            if (node == null) {
+                // The range is collapsed at the end of the document body.
+                node = getPreviousLeaf(range);
+                // At this point, node cannot be null: if a range is collapsed at the same time at the end and at the
+                // start of the document body then the document is empty and thus the first leaf of the range is the
+                // BODY element.
+            }
+        }
+        if (node.getNodeType() != Node.ELEMENT_NODE) {
+            node = node.getParentNode();
+        }
+        // At this point, we should have an element to scroll into view.
+        ((Element) node).scrollIntoView();
+    }
 }

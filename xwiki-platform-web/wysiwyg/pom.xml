@@ -20,7 +20,8 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
@@ -175,7 +176,12 @@
           <logLevel>WARN</logLevel><!-- ERROR, WARN, INFO, TRACE, DEBUG, SPAM, ALL -->
           <style>${gwt.js.style}</style><!-- OBF[USCATED], PRETTY, DETAILED -->
           <noServer>false</noServer>
-          <extraJvmArgs>-Xmx1024m</extraJvmArgs>
+          <!--
+            In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
+            value of the DISPLAY variable." error message we have to run the GWT compiler with the headless AWT option.
+            See http://code.google.com/support/bin/answer.py?hl=en&answer=71442
+          -->
+          <extraJvmArgs>-Xmx1024m -Djava.awt.headless=true</extraJvmArgs>
           <gwtVersion>${gwt.version}</gwtVersion>
         </configuration>
         <executions>
@@ -192,8 +198,10 @@
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <archiveClasses>true</archiveClasses>
-          <!-- We exclude the temporary files used during GWT compiling and the SmartClient JavaScript files which are
-            provided by the web-standard war -->
+          <!--
+            We exclude the temporary files used during GWT compiling and the SmartClient JavaScript files which are
+            provided by the web-standard war
+          -->
           <warSourceExcludes>**/.gwt-tmp/**,**/sc/**</warSourceExcludes>
         </configuration>
       </plugin>
@@ -250,8 +258,10 @@
       <build>
         <plugins>
           <plugin>
-            <!-- GWT's hosted browser needs client sources. We include all the sources for now because we cannot filter
-              server sources. -->
+            <!--
+              GWT's hosted browser needs client sources. We include all the sources for now because we cannot filter
+              server sources.
+            -->
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
             <executions>
@@ -270,9 +280,11 @@
         </plugins>
       </build>
     </profile>
-    <!-- We have to define the following profiles because gwt-dev is platform dependent. These profiles set the value
-      of the ${platform} property which is used as a classifier for loading the proper gwt-dev jar. This jar is needed
-      by the GWT modules that have unit tests extending GWTTestCase. -->
+    <!--
+      We have to define the following profiles because gwt-dev is platform dependent. These profiles set the value of
+      the ${platform} property which is used as a classifier for loading the proper gwt-dev jar. This jar is needed by
+      the GWT modules that have unit tests extending GWTTestCase.
+    -->
     <profile>
       <id>gwt-dev-windows</id>
       <properties>

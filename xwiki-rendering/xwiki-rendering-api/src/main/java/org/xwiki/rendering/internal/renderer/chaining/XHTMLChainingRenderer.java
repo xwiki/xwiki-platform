@@ -65,7 +65,14 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     public XHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer,
         ListenerChain listenerChain)
     {
-        super(printer, listenerChain);
+        // If a XHTML Wiki printer is passed (this happens if the caller wants to use his own instance which could have
+        // already been used and thus have some state set - for ex if this XHTML renderer is called several times in a 
+        // row on some Blocks and he wants a continuity in white space handling) then extract the underlying WikiPrinter
+        // and use it. The XHTML Wiki printer should not be set since its underlying printer is reset in pushPrinter()
+        // in order for the XHTML wiki printer to always use the latest defined "normal" WikiPrinter (it would cause
+        // a cyclic dependency).
+        super(XHTMLWikiPrinter.class.isAssignableFrom(printer.getClass()) 
+            ? ((XHTMLWikiPrinter) printer).getWikiPrinter() : printer, listenerChain);
 
         this.linkRenderer = linkRenderer;
         this.imageRenderer = imageRenderer;

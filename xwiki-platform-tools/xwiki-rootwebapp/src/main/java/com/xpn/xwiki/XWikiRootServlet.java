@@ -67,7 +67,7 @@ public class XWikiRootServlet extends HttpServlet
      * </p>
      */
     @Override
-    protected void doGet(HttpServletRequest reqest, HttpServletResponse response) throws ServletException, IOException
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         response.sendRedirect(response.encodeRedirectURL(this.xwiki));
     }

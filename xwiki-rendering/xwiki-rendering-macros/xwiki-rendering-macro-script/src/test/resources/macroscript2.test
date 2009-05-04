@@ -1,5 +1,6 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Validate output=false option
 .#-----------------------------------------------------
 {{script output=false}}
 def list = ["one", "two"]

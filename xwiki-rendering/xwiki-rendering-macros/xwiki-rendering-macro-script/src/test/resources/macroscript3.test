@@ -1,0 +1,89 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Validate that inner macro is transformed also
+.#-----------------------------------------------------
+{{script}}
+{{script}}
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+{{/script}}
+{{/script}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [script] [] [
+{{script}}
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+{{/script}}
+]
+beginMacroMarkerStandalone [script] [] [
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+]
+beginParagraph
+onWord [def]
+onSpace
+onWord [list]
+onSpace
+onSpecialSymbol [=]
+onSpace
+onSpecialSymbol [[]
+onSpecialSymbol ["]
+onWord [one]
+onSpecialSymbol ["]
+onSpecialSymbol [,]
+onSpace
+onSpecialSymbol ["]
+onWord [two]
+onSpecialSymbol ["]
+onSpecialSymbol []]
+onNewLine
+onWord [list]
+onSpecialSymbol [.]
+onWord [each]
+onSpace
+onSpecialSymbol [{]
+onSpace
+onWord [item]
+onSpace
+onSpecialSymbol [-]
+onSpecialSymbol [>]
+onNewLine
+onSpace
+onSpace
+onWord [println]
+onSpace
+onSpecialSymbol ["]
+onSpecialSymbol [*]
+onSpace
+onSpecialSymbol [$]
+onSpecialSymbol [{]
+onWord [item]
+onSpecialSymbol [}]
+onSpecialSymbol ["]
+onNewLine
+onSpecialSymbol [}]
+endParagraph
+endMacroMarkerStandalone [script] [] [
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+]
+endMacroMarkerStandalone [script] [] [
+{{script}}
+def list = ["one", "two"]
+list.each { item ->
+  println "* ${item}"
+}
+{{/script}}
+]
+endDocument

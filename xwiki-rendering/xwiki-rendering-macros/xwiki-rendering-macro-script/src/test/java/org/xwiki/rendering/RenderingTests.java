@@ -39,6 +39,7 @@ public class RenderingTests extends TestCase
 
         suite.addTestsFromResource("macroscript1", true);
         suite.addTestsFromResource("macroscript2", true);
+        suite.addTestsFromResource("macroscript3", true);
 
         return new ScriptRenderingPlexusTestSetup(suite);
     }

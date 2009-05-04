@@ -1581,7 +1581,7 @@ $html
                 #if($colprop.get("class"))
                   #set($propClassName = $colprop.get("class"))
                 #else
-                  #set($propClassName = $className)
+                  #set($propClassName = $classname)
                 #end
                 #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
                 #set($list = "")

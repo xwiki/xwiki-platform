@@ -1,15 +1,19 @@
-.#-----------------------------------------------------
+.#----------------------------------------------------------------------------
 .input|xwiki/2.0
 .# Test with conditions:
 .# - standalone macro
 .# - wiki = true
 .# - clean = true
-.#-----------------------------------------------------
+.# Note that we have a link in wiki syntax in the input since we had some bug
+.# with using the HTML macro with wiki = true and a link (caused by a bug in
+.# our stack of printers and the mix between XHTML wiki printer and "normal"
+.# printers).
+.#----------------------------------------------------------------------------
 {{html wiki="true"}}
 <table>
 <tr>
 <td>
-* listitem
+* [[listitem]]
 </td>
 </tr>
 </table>
@@ -22,17 +26,17 @@ beginMacroMarkerStandalone [html] [wiki=true] [
 <table>
 <tr>
 <td>
-* listitem
+* [[listitem]]
 </td>
 </tr>
 </table>
 ]
-onRawText [<table><tbody><tr><td><ul><li>listitem</li></ul></td></tr></tbody></table>] [xhtml/1.0]
+onRawText [<table><tbody><tr><td><ul><li><!--startwikilink:listitem--><span class="wikicreatelink"><a href="/xwiki/bin/view/listitem?parent=xwiki:Space.Page"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></li></ul></td></tr></tbody></table>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 <table>
 <tr>
 <td>
-* listitem
+* [[listitem]]
 </td>
 </tr>
 </table>

@@ -66,6 +66,11 @@ public class XMLWikiPrinter implements WikiPrinter
         return this.xmlWriter;
     }
 
+    public WikiPrinter getWikiPrinter()
+    {
+        return this.wikiWriter.getWikiPrinter();
+    }
+
     public void setWikiPrinter(WikiPrinter printer)
     {
         this.wikiWriter.setWikiPrinter(printer);

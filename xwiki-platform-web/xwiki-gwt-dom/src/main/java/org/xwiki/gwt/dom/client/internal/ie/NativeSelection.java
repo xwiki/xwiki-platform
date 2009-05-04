@@ -61,6 +61,13 @@ public final class NativeSelection extends JavaScriptObject
         // gets focused to allow users to have a different selection than the stored one (by clicking inside the edited
         // document when it doesn't have the focus).
         document.body.attachEvent('onbeforeactivate', function(event) {
+            // In standards mode, the HTML element can gain focus separately from the BODY element without clearing its
+            // inner selection. For instance, by using the scroll bars we move the focus from the BODY element to the
+            // HTML element but the BODY element keeps its inner selection. In consequence, we don't have to restore
+            // the selection if the focus comes from the HTML element.
+            if (event.fromElement == document.documentElement) {
+                return;
+            }
             var range = 
     @org.xwiki.gwt.dom.client.internal.ie.NativeSelection::createRange(Lorg/xwiki/gwt/dom/client/Document;)(document);
             // Reset the bookmark to prevent redundant calls to this function.
@@ -72,6 +79,13 @@ public final class NativeSelection extends JavaScriptObject
 
         // Save the selection when the edited document is about to loose focus.
         document.body.attachEvent('onbeforedeactivate', function(event) {
+            // In standards mode, the HTML element can gain focus separately from the BODY element without clearing its
+            // inner selection. For instance, by using the scroll bars we move the focus from the BODY element to the
+            // HTML element but the BODY element keeps its inner selection. In consequence, we don't have to save the
+            // selection if the focus goes to the HTML element.
+            if (event.toElement == document.documentElement) {
+                return;
+            }
             document.body.__bookmark = undefined;
             var range = document.selection.createRange();
             // Check the type of the range and if the range is inside the edited document.

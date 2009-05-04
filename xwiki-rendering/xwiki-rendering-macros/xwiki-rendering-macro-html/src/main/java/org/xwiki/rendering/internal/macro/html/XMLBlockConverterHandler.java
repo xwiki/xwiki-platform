@@ -31,7 +31,7 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -87,19 +87,26 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
     private ParserUtils inlineConverter = new ParserUtils();
 
     /**
+     * To execute macro transformation when wiki=true.
+     */
+    private MacroTransformation macroTransformation;
+    
+    /**
      * @param wikiParser the parser to use to interpret the wiki syntax.
      * @param rendererFactory the factory that will allow us to create a XHTML renderer to use to convert the wiki 
      *        syntax into XHTML.
      * @param clean if true then the user has asked to clean up the HTML he entered
      * @param wiki if true then XML element contents contain wiki syntax
+     * @param macroTransformation the macro transformation to execute macros when wiki is set to true
      */
     public XMLBlockConverterHandler(Parser wikiParser, PrintRendererFactory rendererFactory, boolean clean, 
-        boolean wiki)
+        boolean wiki, MacroTransformation macroTransformation)
     {
         this.wikiParser = wikiParser;
         this.rendererFactory = rendererFactory;
         this.clean = clean;
         this.wiki = wiki;
+        this.macroTransformation = macroTransformation;
         
         this.printer = new DefaultWikiPrinter();
         this.xhtmlPrinter = new XHTMLWikiPrinter(this.printer);
@@ -131,7 +138,11 @@ public class XMLBlockConverterHandler extends DefaultHandler implements LexicalH
             XDOM dom;
             try {
                 dom = this.wikiParser.parse(new StringReader(content));
-            } catch (ParseException e) {
+                
+                // Also execute the macro transformations so that macros are executed
+                this.macroTransformation.transform(dom, this.wikiParser.getSyntax());
+                
+            } catch (Exception e) {
                 throw new SAXException("Failed to parse [" + content + "]", e);
             }
     

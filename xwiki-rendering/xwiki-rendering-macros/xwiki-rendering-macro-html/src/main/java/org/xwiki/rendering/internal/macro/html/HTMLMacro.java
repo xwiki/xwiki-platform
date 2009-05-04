@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.internal.parser.XWikiXHTMLWhitespaceXMLFilter;
+import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -172,7 +173,8 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             // an XML parser. We also use a XML parser if the user has asked to clean since it's the easiest way to
             // ignore XML declaration, doctype, html element and the first paragraph if in inline mode.
             if (parameters.getClean() || parameters.getWiki()) {
-                normalizedContent = parseXHTML(normalizedContent, parameters.getClean(), parameters.getWiki());
+                normalizedContent = parseXHTML(normalizedContent, parameters.getClean(), parameters.getWiki(),
+                    context.getMacroTransformation());
             }
 
             blocks = Arrays.asList((Block) new RawBlock(normalizedContent, XHTML_SYNTAX));
@@ -191,12 +193,14 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      * @return the output XHTML as a string containing the XWiki Syntax resolved as XHTML
      * @param clean if true then the user has asked to clean up the HTML he entered
      * @param wiki if true then XML element contents contain wiki syntax
+     * @param macroTransformation the macro transformation to execute macros when wiki is set to true
      * @throws MacroExecutionException in case there's a parsing problem
      */
-    private String parseXHTML(String xhtml, boolean clean, boolean wiki) throws MacroExecutionException
+    private String parseXHTML(String xhtml, boolean clean, boolean wiki, MacroTransformation macroTransformation) 
+        throws MacroExecutionException
     {
         XMLBlockConverterHandler handler =
-            new XMLBlockConverterHandler(this.wikiParser, this.rendererFactory, clean, wiki);
+            new XMLBlockConverterHandler(this.wikiParser, this.rendererFactory, clean, wiki, macroTransformation);
 
         try {
             XMLReader xr = this.xmlReaderFactory.createXMLReader();

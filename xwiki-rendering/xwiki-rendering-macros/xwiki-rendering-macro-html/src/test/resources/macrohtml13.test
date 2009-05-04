@@ -1,0 +1,13 @@
+.#---------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify macros inside macros work when wiki=true
+.#---------------------------------------------------------------
+{{html wiki="true"}}
+<p>hello</p><p>{{html}}world{{/html}}</p>
+{{/html}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:html|-|wiki="true"|-|
+<p>hello</p><p>{{html}}world{{/html}}</p>
+--><p>hello</p><p><!--startmacro:html|-||-|world--><p>world</p><!--stopmacro--></p><!--stopmacro-->

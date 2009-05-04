@@ -37,7 +37,7 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test the HTML Macro");
 
-        suite.addTestsFromResource("macrohtml1", true);
+/*        suite.addTestsFromResource("macrohtml1", true);
         suite.addTestsFromResource("macrohtml2", true);
         suite.addTestsFromResource("macrohtml3", true);
         suite.addTestsFromResource("macrohtml4", true);
@@ -48,7 +48,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrohtml9", true);
         suite.addTestsFromResource("macrohtml10", true);
         suite.addTestsFromResource("macrohtml11", true);
-        suite.addTestsFromResource("macrohtml12", true);
+        suite.addTestsFromResource("macrohtml12", true);*/
+        suite.addTestsFromResource("macrohtml13", true);
 
         return new RenderingPlexusTestSetup(suite);
     }

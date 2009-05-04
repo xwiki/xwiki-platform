@@ -66,13 +66,12 @@ import com.xpn.xwiki.gwt.api.server.XWikiServiceImpl;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
-import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.Attachment;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
+import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.server.sync.DefaultSyncEngine;
@@ -426,11 +425,11 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#getAttachmentLink(String, String, String, String)
+     * @see WysiwygService#getAttachment(String, String, String, String)
      */
-    public LinkConfig getAttachmentLink(String wikiName, String spaceName, String pageName, String attachmentName)
+    public Attachment getAttachment(String wikiName, String spaceName, String pageName, String attachmentName)
     {
-        LinkConfig linkConfig = new LinkConfig();
+        Attachment attach = new Attachment();
 
         XWikiContext context = getXWikiContext();
         // clean attachment filename to be synchronized with all attachment operations
@@ -456,10 +455,10 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         }
         // all right, now set the reference and url and return
         String attachmentReference = getAttachmentReference(docReference, cleanedFileName);
-        linkConfig.setReference(attachmentReference);
-        linkConfig.setUrl(doc.getAttachmentURL(cleanedFileName, context));
+        attach.setReference(attachmentReference);
+        attach.setDownloadUrl(doc.getAttachmentURL(cleanedFileName, context));
 
-        return linkConfig;
+        return attach;
     }
 
     /**
@@ -530,39 +529,21 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      * 
      * @see WysiwygService#getImageAttachments(String, String, String)
      */
-    public List<ImageConfig> getImageAttachments(String wikiName, String spaceName, String pageName)
+    public List<Attachment> getImageAttachments(String wikiName, String spaceName, String pageName)
+        throws XWikiGWTException
     {
-        XWikiContext context = getXWikiContext();
-        String database = context.getDatabase();
-        List<ImageConfig> imageAttachs = new ArrayList<ImageConfig>();
+        List<Attachment> imageAttachments = new ArrayList<Attachment>();
         try {
-            if (wikiName != null) {
-                context.setDatabase(wikiName);
-            }
-            // get the document referred by the parameters
-            // TODO: handle missing space name or missing page name
-            XWikiDocument doc = context.getWiki().getDocument(spaceName + "." + pageName, context);
-            // TODO: handle attachment sort
-            for (XWikiAttachment attach : doc.getAttachmentList()) {
-                if (attach.getMimeType(getXWikiContext()).startsWith("image/")) {
-                    ImageConfig img = new ImageConfig();
-                    img.setImageFileName(attach.getFilename());
-                    img.setImageURL(doc.getAttachmentURL(attach.getFilename(), context));
-                    img.setWiki(wikiName);
-                    img.setPage(doc.getName());
-                    img.setSpace(doc.getSpace());
-                    imageAttachs.add(img);
+            List<Attachment> allAttachments = getAttachments(wikiName, spaceName, pageName);
+            for (Attachment attachment : allAttachments) {
+                if (attachment.getMimeType().startsWith("image/")) {
+                    imageAttachments.add(attachment);
                 }
             }
-            return imageAttachs;
-        } catch (XWikiException e) {
-            LOG.error("Error while getting the image attachments list", e);
-        } finally {
-            if (wikiName != null) {
-                getXWikiContext().setDatabase(database);
-            }
+        } catch (XWikiGWTException e) {
+            throw getXWikiGWTException(e);
         }
-        return null;
+        return imageAttachments;
     }
 
     /**
@@ -585,6 +566,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                 currentAttach.setFilename(attach.getFilename());
                 currentAttach.setDownloadUrl(doc.getAttachmentURL(attach.getFilename(), context));
                 currentAttach.setReference(getAttachmentReference(docReference, attach.getFilename()));
+                currentAttach.setMimeType(attach.getMimeType(context));
                 attachments.add(currentAttach);
             }
         } catch (XWikiException e) {

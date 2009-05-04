@@ -44,11 +44,6 @@ public class ImageConfig implements IsSerializable
     }
 
     /**
-     * The name of the image file.
-     */
-    private String imageFileName;
-
-    /**
      * The URL to the image. This can be either a relative or an absolute URL.
      */
     private String imageURL;
@@ -67,6 +62,15 @@ public class ImageConfig implements IsSerializable
      * The name of the page where this image is located.
      */
     private String page;
+
+    /**
+     * The reference of the image, in the {@code wikiname:spacename.pagename@filename} form. <br />
+     * Note: this value should take priority over {@code wiki}, {@code space}, {@code page} and {@code imageFileName}
+     * set in this config: if the reference is set, that this one should be used instead of generating another. Ideally,
+     * this should be set with the URL so that no further computing is necessary for this image. If this and url are not
+     * set, they are to be computed from the {@code wiki}, {@code space}, {@code page}, {@code imageFileName} values.
+     */
+    private String reference;
 
     /**
      * The altText (alt string) of this image.
@@ -93,24 +97,6 @@ public class ImageConfig implements IsSerializable
      */
     public ImageConfig()
     {
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasImage#getImageFileName()
-     */
-    public String getImageFileName()
-    {
-        return imageFileName;
-    }
-
-    /**
-     * @param imageFileName the imageFileName to set
-     */
-    public void setImageFileName(String imageFileName)
-    {
-        this.imageFileName = imageFileName;
     }
 
     /**
@@ -186,6 +172,22 @@ public class ImageConfig implements IsSerializable
     }
 
     /**
+     * @return the reference
+     */
+    public String getReference()
+    {
+        return reference;
+    }
+
+    /**
+     * @param reference the reference to set
+     */
+    public void setReference(String reference)
+    {
+        this.reference = reference;
+    }
+
+    /**
      * @return the altText
      */
     public String getAltText()
@@ -255,8 +257,7 @@ public class ImageConfig implements IsSerializable
     public String toJSON()
     {
         String jsonString =
-            "{ " + formatValue("wiki", getWiki()) + formatValue("space", getSpace()) + formatValue("page", getPage())
-                + formatValue("filename", getImageFileName()) + formatValue("url", getImageURL())
+            "{ " + formatValue("reference", getReference()) + formatValue("url", getImageURL())
                 + formatValue("width", getWidth()) + formatValue("height", getHeight())
                 + formatValue("alttext", getAltText()) + formatValue("alignment", getAlignment());
         // Remove last comma
@@ -278,7 +279,7 @@ public class ImageConfig implements IsSerializable
      */
     private String formatValue(String key, Object value)
     {
-        return value != null ? key + ": '" + value + "', " : "";
+        return value != null ? key + ": '" + value.toString().replace("'", "\\'") + "', " : "";
     }
 
     /**
@@ -289,10 +290,7 @@ public class ImageConfig implements IsSerializable
     public void fromJSON(String json)
     {
         JavaScriptObject jsObj = JavaScriptObject.fromJson(json);
-        setWiki((String) jsObj.get("wiki"));
-        setSpace((String) jsObj.get("space"));
-        setPage((String) jsObj.get("page"));
-        setImageFileName((String) jsObj.get("filename"));
+        setReference((String) jsObj.get("reference"));
         setImageURL((String) jsObj.get("url"));
         setWidth((String) jsObj.get("width"));
         setHeight((String) jsObj.get("height"));

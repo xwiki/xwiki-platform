@@ -25,11 +25,10 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
-import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.Attachment;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
+import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
  * Cache proxy for {@link WysiwygServiceAsync}. This proxy is used to store on the client a set of values from the
@@ -235,12 +234,12 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#getAttachmentLink(String, String, String, String, AsyncCallback)
+     * @see WysiwygServiceAsync#getAttachment(String, String, String, String, AsyncCallback)
      */
-    public void getAttachmentLink(String wikiName, String spaceName, String pageName, String attachmentName,
-        AsyncCallback<LinkConfig> async)
+    public void getAttachment(String wikiName, String spaceName, String pageName, String attachmentName,
+        AsyncCallback<Attachment> async)
     {
-        service.getAttachmentLink(wikiName, spaceName, pageName, attachmentName, async);
+        service.getAttachment(wikiName, spaceName, pageName, attachmentName, async);
     }
 
     /**
@@ -249,7 +248,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * @see WysiwygServiceAsync#getImageAttachments(String, String, String, AsyncCallback)
      */
     public void getImageAttachments(String wikiName, String spaceName, String pageName,
-        AsyncCallback<List<ImageConfig>> async)
+        AsyncCallback<List<Attachment>> async)
     {
         service.getImageAttachments(wikiName, spaceName, pageName, async);
     }

@@ -53,20 +53,20 @@ public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
         super(true, false, false, editedResource.toString());
         this.editedResource = editedResource;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initializeSelection()
     {
-        if (!StringUtils.isEmpty(getLinkData().getReference())) {
+        if (!StringUtils.isEmpty(getData().getReference())) {
             // resolve the edited link to the currently edited page and then set the tree selection
             ResourceName r = new ResourceName();
-            r.fromString(getLinkData().getReference());
+            r.fromString(getData().getReference(), false);
             getExplorer().setValue(r.resolveRelativeTo(editedResource).toString());
         }
-        // else leave the tree where the last selection was        
+        // else leave the tree where the last selection was
     }
 
     /**
@@ -74,7 +74,7 @@ public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
      */
     public String getNextStep()
     {
-        if (getLinkData().getType() == LinkType.NEW_WIKIPAGE && StringUtils.isEmpty(getLinkData().getPage())) {
+        if (getData().getType() == LinkType.NEW_WIKIPAGE && StringUtils.isEmpty(getData().getPage())) {
             return LinkWizardSteps.WIKIPAGECREATOR.toString();
         } else {
             return LinkWizardSteps.WIKIPAGECONFIG.toString();
@@ -112,10 +112,10 @@ public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
             // commit the changes in the config
             if (getExplorer().isNewPage()) {
                 // if it's a new page to be created, set its parameters in the link config
-                getLinkData().setType(LinkType.NEW_WIKIPAGE);
-                getLinkData().setWiki(getExplorer().getSelectedWiki());
-                getLinkData().setSpace(getExplorer().getSelectedSpace());
-                getLinkData().setPage(getExplorer().getSelectedPage());
+                getData().setType(LinkType.NEW_WIKIPAGE);
+                getData().setWiki(getExplorer().getSelectedWiki());
+                getData().setSpace(getExplorer().getSelectedSpace());
+                getData().setPage(getExplorer().getSelectedPage());
                 // if the selected page is not set in the tree, i.e. the "New page..." option was chosen, return
                 if (StringUtils.isEmpty(getExplorer().getSelectedPage())) {
                     async.onSuccess(true);
@@ -123,11 +123,11 @@ public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
                 }
             } else {
                 // it's an existing page
-                getLinkData().setType(LinkType.WIKIPAGE);
+                getData().setType(LinkType.WIKIPAGE);
                 // set the page space wiki on nothing, since the link will have a reference
-                getLinkData().setWiki(null);
-                getLinkData().setSpace(null);
-                getLinkData().setPage(null);
+                getData().setWiki(null);
+                getData().setSpace(null);
+                getData().setPage(null);
             }
             // build the link url and reference from the parameters.
             // TODO: restrict this to new pages when the explorer will return the selected resource URL, and get the
@@ -138,8 +138,8 @@ public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
                 {
                     public void onSuccess(LinkConfig result)
                     {
-                        getLinkData().setUrl(result.getUrl());
-                        getLinkData().setReference(result.getReference());
+                        getData().setUrl(result.getUrl());
+                        getData().setReference(result.getReference());
                         async.onSuccess(true);
                     }
 

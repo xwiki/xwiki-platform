@@ -17,28 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
+package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorAggregatorWizardStep;
 
 /**
- * Wizard step to select the attachment to link to, by aggregating a page selector step and an explorer wizard step.
+ * Wizard step to select the image to insert, by aggregating a current page selector step and an "all pages" selector
+ * step.
  * 
  * @version $Id$
  */
-public class AttachmentSelectorWizardStep extends AbstractSelectorAggregatorWizardStep<LinkConfig>
+public class ImageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep<ImageConfig>
 {
     /**
-     * Builds an attachment selector step for the currently edited resource.
+     * Builds an image selector wizard step for the currently edited resource.
      * 
-     * @param editedResource the resource edited by this aggregator step
+     * @param editedResource the currently edited resource.
      */
-    public AttachmentSelectorWizardStep(ResourceName editedResource)
+    public ImageSelectorWizardStep(ResourceName editedResource)
     {
         super(editedResource);
     }
@@ -49,7 +50,7 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorAggregatorWiza
     @Override
     protected WizardStep getCurrentPageSelectorInstance()
     {
-        return new CurrentPageAttachmentSelectorWizardStep(getEditedResource());
+        return new CurrentPageImageSelectorWizardStep(getEditedResource());
     }
 
     /**
@@ -58,7 +59,7 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorAggregatorWiza
     @Override
     protected WizardStep getAllPagesSelectorInstance()
     {
-        return new AttachmentExplorerWizardStep(getEditedResource());
+        return new ImagesExplorerWizardStep(getEditedResource());
     }
 
     /**
@@ -78,12 +79,12 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorAggregatorWiza
         // check match on current page
         return !resource.matchesUpToPage(getEditedResource());
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public String getStepTitle()
     {
-        return Strings.INSTANCE.linkSelectAttachmentTitle();
-    }    
+        return Strings.INSTANCE.imageSelectImageTitle();
+    }
 }

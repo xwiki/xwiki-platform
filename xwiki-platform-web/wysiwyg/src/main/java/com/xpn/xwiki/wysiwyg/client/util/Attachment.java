@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.link;
+package com.xpn.xwiki.wysiwyg.client.util;
 
 /**
  * Configuration object for an attachment, to be used to transmit data about attachments from the server to the client.

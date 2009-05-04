@@ -25,31 +25,31 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.PageSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.SpaceSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.WikiSelector;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
- * Widget to display image previews and allow selection of an image, from a page, space or wiki.
+ * Wizard step to explore and select images from all the pages in the wiki.
  * 
  * @version $Id$
  */
-public class ImageSelector extends Composite implements ChangeListener, ClickListener
+public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageConfig> implements ChangeListener
 {
     /**
-     * Panel with the existing images previews.
+     * Loading class for the time to load the step to which it has been toggled.
      */
-    private FlowPanel imagesPanel;
+    private static final String STYLE_LOADING = "loading";
 
     /**
      * Selector for the wiki to get images from.
@@ -67,33 +67,34 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
     private PageSelector pageSelector;
 
     /**
-     * The selected image in this image selector.
+     * The current resource edited by this wizard step.
      */
-    private ImagePreviewWidget selectedImage;
+    private ResourceName editedResource;
 
     /**
-     * Builds an image selector panel with the specified wiki, space and page as start values.
-     * 
-     * @param currentWiki the current wiki
-     * @param currentSpace space of the starting page
-     * @param currentPage page name of the starting page
+     * The main panel of this widget.
      */
-    public ImageSelector(String currentWiki, String currentSpace, String currentPage)
+    private final FlowPanel mainPanel = new FlowPanel();
+
+    /**
+     * The image selector for the currently selected page in this wizard step. This will be instantiated every time the
+     * list of pages for a selected page needs to be displayed, and the functionality of this aggregator will be
+     * delegated to it.
+     */
+    private CurrentPageImageSelectorWizardStep pageWizardStep;
+
+    /**
+     * Builds an image explorer with the default selection on the passed resource.
+     * 
+     * @param editedResource the resource edited by the wizard in which this wizard step appears (the page currently
+     *            edited with the wysiwyg)
+     */
+    public ImagesExplorerWizardStep(ResourceName editedResource)
     {
-        Panel imageChooserPanel = new FlowPanel();
-        imageChooserPanel.addStyleName("xImageChooser");
-
-        Label chooseLabel = new Label(Strings.INSTANCE.fileChooseLabel());
-        imageChooserPanel.add(chooseLabel);
-        imageChooserPanel.add(getSelectorsPanel(currentWiki, currentSpace, currentPage));
-        ScrollPanel containerPanel = new ScrollPanel();
-        containerPanel.addStyleName("xImagesContainerPanel");
-        imagesPanel = new FlowPanel();
-        containerPanel.add(imagesPanel);
-        updateImagesPanel(currentWiki, currentSpace, currentPage, null);
-        imageChooserPanel.add(containerPanel);
-
-        initWidget(imageChooserPanel);
+        this.editedResource = editedResource;
+        // initialize selectors, mainPanel
+        mainPanel.addStyleName("xImagesExplorer");
+        mainPanel.add(getSelectorsPanel(editedResource.getWiki(), editedResource.getSpace(), editedResource.getPage()));
     }
 
     /**
@@ -126,13 +127,13 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
         wikiSelector.addChangeListener(this);
         spaceSelector.addChangeListener(this);
 
-        Button updateImagesListButton = new Button(Strings.INSTANCE.fileUpdateListButton());
+        Button updateImagesListButton = new Button(Strings.INSTANCE.imageUpdateListButton());
         updateImagesListButton.addClickListener(new ClickListener()
         {
             public void onClick(Widget sender)
             {
-                updateImagesPanel(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(), pageSelector
-                    .getSelectedPage(), selectedImage != null ? selectedImage.getImage().getImageFileName() : null);
+                initAndDisplayCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector
+                    .getSelectedSpace(), pageSelector.getSelectedPage(), null));
             }
         });
 
@@ -140,6 +141,7 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
         selectorsPanel.add(spaceSelector);
         selectorsPanel.add(pageSelector);
         selectorsPanel.add(updateImagesListButton);
+        selectorsPanel.addStyleName("xPageChooser");
 
         return selectorsPanel;
     }
@@ -233,8 +235,8 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
             {
                 public void onSuccess(List<String> result)
                 {
-                    updateImagesPanel(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(), pageSelector
-                        .getSelectedPage(), selectedFile);
+                    initAndDisplayCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector
+                        .getSelectedSpace(), pageSelector.getSelectedPage(), selectedFile));
                 }
 
                 public void onFailure(Throwable caught)
@@ -245,8 +247,8 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
             if (!selectedPage.equals(pageSelector.getSelectedPage())) {
                 pageSelector.setSelectedPage(selectedPage);
             }
-            updateImagesPanel(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(), pageSelector
-                .getSelectedPage(), selectedFile);
+            initAndDisplayCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(),
+                spaceSelector.getSelectedSpace(), pageSelector.getSelectedPage(), selectedFile));
         }
     }
 
@@ -284,86 +286,93 @@ public class ImageSelector extends Composite implements ChangeListener, ClickLis
     }
 
     /**
-     * Populates the images panel with the images in the passed map.
+     * Initializes and displays the page selector panel for the currently selected resource.
      * 
-     * @param images the list of images given by their URL and corresponding file names.
-     * @param selectedImage the currently selected image to set in the built image panel. If no image is to be selected,
-     *            this argument should be null.
+     * @param resource the resource to display the selector panel for
      */
-    public void populateImagesPanel(List<ImageConfig> images, String selectedImage)
+    protected void initAndDisplayCurrentPage(ResourceName resource)
     {
-        for (ImageConfig imageData : images) {
-            final ImagePreviewWidget imageWidget = new ImagePreviewWidget(imageData);
-            imageWidget.addClickListener(this);
-            imagesPanel.add(imageWidget);
-            if (imageData.getImageFileName().equals(selectedImage)) {
-                imageWidget.setSelected(true);
-                this.selectedImage = imageWidget;
-            }
+        pageWizardStep = new CurrentPageImageSelectorWizardStep(resource);
+        if (mainPanel.getWidgetCount() > 1) {
+            mainPanel.remove(1);
         }
-        // Add a div for float clear
-        Panel clearPanel = new FlowPanel();
-        clearPanel.addStyleName("clearfloats");
-        imagesPanel.add(clearPanel);
-    }
-
-    /**
-     * Fetches the new images list and repopulates the images panel with the new images.
-     * 
-     * @param selectedWiki the currently selected wiki
-     * @param selectedSpace the currently selected space
-     * @param selectedPage the currently selected page
-     * @param selectedImage the currently selected image, passed by its filename. If no image is to be selected, this
-     *            value should be null.
-     */
-    public void updateImagesPanel(String selectedWiki, String selectedSpace, String selectedPage,
-        final String selectedImage)
-    {
-        imagesPanel.clear();
-        // reset selection
-        this.selectedImage = null;
-        WysiwygService.Singleton.getInstance().getImageAttachments(selectedWiki, selectedSpace, selectedPage,
-            new AsyncCallback<List<ImageConfig>>()
+        mainPanel.addStyleName(STYLE_LOADING);
+        pageWizardStep.init(getData(), new AsyncCallback<Object>()
+        {
+            public void onSuccess(Object result)
             {
-                public void onFailure(Throwable caught)
-                {
-                    imagesPanel.add(new HTML(Strings.INSTANCE.fileListFetchError()));
-                }
+                mainPanel.removeStyleName(STYLE_LOADING);
+                mainPanel.add(pageWizardStep.display());
+            };
 
-                public void onSuccess(List<ImageConfig> result)
-                {
-                    populateImagesPanel(result, selectedImage);
-                }
-            });
-    }
-
-    /**
-     * @return the currently selected image from the image panel
-     */
-    public ImageConfig getSelectedImage()
-    {
-        if (selectedImage == null) {
-            return null;
-        }
-        return selectedImage.getImage();
+            public void onFailure(Throwable caught)
+            {
+                mainPanel.removeStyleName(STYLE_LOADING);
+                Label error = new Label(Strings.INSTANCE.linkErrorLoadingData());
+                error.addStyleName("errormessage");
+                mainPanel.add(error);
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see ClickListener#onClick(Widget)
      */
-    public void onClick(Widget sender)
+    public Widget display()
     {
-        if (sender instanceof ImagePreviewWidget) {
-            // update the current selection
-            // unselect the old image
-            if (selectedImage != null) {
-                selectedImage.setSelected(false);
-            }
-            // select the new image
-            selectedImage = (ImagePreviewWidget) sender;
-            selectedImage.setSelected(true);
+        return mainPanel;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNextStep()
+    {
+        return pageWizardStep.getNextStep();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getStepTitle()
+    {
+        return Strings.INSTANCE.imageSelectImageTitle();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void initializeSelection()
+    {
+        if (!StringUtils.isEmpty(getData().getReference()) || pageWizardStep == null) {
+            // if it's the first display (i.e. no pageWizardStep) or an image needs to be edited, refresh selectors and
+            // page list
+            ResourceName r = new ResourceName();
+            r.fromString(getData().getReference(), true);
+            ResourceName resolved = r.resolveRelativeTo(editedResource);
+            setSelection(resolved.getWiki(), resolved.getSpace(), resolved.getPage(), resolved.getFile(), true);
+        } else {
+            // just initialize the step for the space, page, wiki selection in the selectors. I.e. preserve last
+            // selection
+            initAndDisplayCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(),
+                spaceSelector.getSelectedSpace(), pageSelector.getSelectedPage(), null));
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onCancel(AsyncCallback<Boolean> async)
+    {
+        pageWizardStep.onCancel(async);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onSubmit(AsyncCallback<Boolean> async)
+    {
+        pageWizardStep.onSubmit(async);
     }
 }

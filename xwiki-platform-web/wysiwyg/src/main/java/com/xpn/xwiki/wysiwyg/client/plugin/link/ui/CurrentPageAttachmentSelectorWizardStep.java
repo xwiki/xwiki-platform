@@ -28,19 +28,22 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.Attachment;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
+import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
+import com.xpn.xwiki.wysiwyg.client.widget.AttachmentPreviewWidget;
 import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
  * Wizard step to select a file attached to a page.
  * 
  * @version $Id$
  */
-public class PageSelectorWizardStep extends AbstractSelectorWizardStep
+public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWizardStep<LinkConfig>
 {
     /**
      * Fake attachment preview widget to hold the option of attaching a new file.
@@ -92,10 +95,10 @@ public class PageSelectorWizardStep extends AbstractSelectorWizardStep
      * 
      * @param editedResource the currently edited resource (page for which editing is done)
      */
-    public PageSelectorWizardStep(ResourceName editedResource)
+    public CurrentPageAttachmentSelectorWizardStep(ResourceName editedResource)
     {
         this.editedResource = editedResource;
-        attachmentsList.addStyleName("xAttachmentsSelector");
+        mainPanel.addStyleName("xAttachmentsSelector");
         // create an empty attachments list
         mainPanel.add(attachmentsList);
         // put the new attachment option on top
@@ -153,9 +156,9 @@ public class PageSelectorWizardStep extends AbstractSelectorWizardStep
     private void fillAttachmentsList(List<Attachment> attachments)
     {
         String oldSelection = null;
-        if (!StringUtils.isEmpty(getLinkData().getReference())) {
+        if (!StringUtils.isEmpty(getData().getReference())) {
             ResourceName r = new ResourceName();
-            r.fromString(getLinkData().getReference());
+            r.fromString(getData().getReference(), true);
             oldSelection = r.getFile();
         } else if (attachmentsList.getSelectedItem() != null
             && !(attachmentsList.getSelectedItem().getWidget(0) instanceof NewAttachmentOptionWidget)) {
@@ -238,16 +241,16 @@ public class PageSelectorWizardStep extends AbstractSelectorWizardStep
         }
         if (selectedOption instanceof NewAttachmentOptionWidget) {
             // new file option, let's setup the attachment link data accordingly
-            getLinkData().setWiki(editedResource.getWiki());
-            getLinkData().setSpace(editedResource.getSpace());
-            getLinkData().setPage(editedResource.getPage());
+            getData().setWiki(editedResource.getWiki());
+            getData().setSpace(editedResource.getSpace());
+            getData().setPage(editedResource.getPage());
             async.onSuccess(true);
         } else {
             // existing file option, set up the LinkConfig
             String attachmentRef = "attach:" + selectedOption.getAttachment().getReference();
             String attachmentURL = selectedOption.getAttachment().getDownloadUrl();
-            getLinkData().setReference(attachmentRef);
-            getLinkData().setUrl(attachmentURL);
+            getData().setReference(attachmentRef);
+            getData().setUrl(attachmentURL);
             async.onSuccess(true);
         }
     }

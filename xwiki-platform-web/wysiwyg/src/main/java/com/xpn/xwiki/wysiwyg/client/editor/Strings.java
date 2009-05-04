@@ -226,8 +226,6 @@ public interface Strings extends Constants
     String selectorSelectFromAllPages();
     
     String linkErrorLoadingData();
-    
-    String image();
 
     String fileUploadLabel();
 
@@ -243,15 +241,31 @@ public interface Strings extends Constants
     
     String fileUploadSubmitError();
 
-    String imageInsertButton();
-
     String fileUploadNoPathError();
 
-    String fileUpdateListButton();
+    String image();
+    
+    String imageTooltip();
 
-    String imageSizeLabel();
+    String imageInsertImage();
 
-    String imageAlignmentLabel();
+    String imageEditImage();
+
+    String imageRemoveImage();
+    
+    String imageSelectImageTitle();
+    
+    String imageUploadNewFileLabel();
+
+    String imageConfigTitle();
+    
+    String imageCreateImageButton();
+
+    String imageUpdateListButton();
+    
+    String imageWidthLabel();
+    
+    String imageHeightLabel();
 
     String imageHorizontalAlignmentLabel();
 
@@ -272,10 +286,6 @@ public interface Strings extends Constants
     String imageSettingsLabel();
 
     String imageAltTextLabel();
-
-    String imageSelectTabTitle();
-
-    String imageSettingsTabTitle();
 
     String imageNoImageSelectedError();
 

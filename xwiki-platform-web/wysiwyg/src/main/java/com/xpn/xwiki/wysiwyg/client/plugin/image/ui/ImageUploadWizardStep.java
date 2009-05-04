@@ -17,67 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
+package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractFileUploadWizardStep;
 
 /**
- * Specific file upload wizard step to handle upload of a new file attachment in order to create a link to it.
+ * Specialized wizard step to upload an image.
  * 
  * @version $Id$
  */
-public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
+public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
 {
     /**
-     * The configuration data about the link handled by this wizard step.
+     * The image to configure with this {@code WizardStep}.
      */
-    private LinkConfig linkData;
+    private ImageConfig imageData;
 
     /**
      * {@inheritDoc}
      */
-    public String getNextStep()
-    {
-        return LinkWizardSteps.WIKIPAGECONFIG.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Object getResult()
-    {
-        return linkData;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void init(Object data, AsyncCallback< ? > cb)
-    {
-        linkData = (LinkConfig) data;
-        cb.onSuccess(null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */    
     @Override
     public String getPage()
     {
-        return linkData.getPage();
+        return imageData.getPage();
     }
 
     /**
      * {@inheritDoc}
-     */    
+     */
     @Override
     public String getSpace()
     {
-        return linkData.getSpace();
+        return imageData.getSpace();
     }
 
     /**
@@ -86,7 +61,7 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
     @Override
     public String getWiki()
     {
-        return linkData.getWiki();
+        return imageData.getWiki();
     }
 
     /**
@@ -95,8 +70,33 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
     @Override
     protected void onAttachmentUploaded(Attachment attach)
     {
-        // commit the attachment data in the link config
-        linkData.setReference("attach:" + attach.getReference());
-        linkData.setUrl(attach.getDownloadUrl());
+        // upload is done successfully, commit the data in the image config
+        imageData.setImageURL(attach.getDownloadUrl());
+        imageData.setReference(attach.getReference());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNextStep()
+    {
+        return ImageWizardSteps.IMAGECONFIG.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object getResult()
+    {
+        return imageData;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void init(Object data, AsyncCallback< ? > cb)
+    {
+        imageData = (ImageConfig) data;
+        cb.onSuccess(null);
     }
 }

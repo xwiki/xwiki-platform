@@ -55,9 +55,7 @@ public interface Strings extends Constants
 
     String format();
 
-    String formatInline();
-
-    String formatParagraph();
+    String formatPlainText();
 
     String formatHeader1();
 
@@ -146,7 +144,7 @@ public interface Strings extends Constants
     String chooseWiki();
 
     String chooseSpace();
-    
+
     String choosePage();
 
     String chooseAnchor();
@@ -158,7 +156,7 @@ public interface Strings extends Constants
     String link();
 
     String unlink();
-    
+
     String linkEdit();
 
     String linkCreateLinkButton();
@@ -168,13 +166,13 @@ public interface Strings extends Constants
     String linkToWebPage();
 
     String linkToWikiPage();
-    
+
     String linkToAttachment();
 
     String linkLabelLabel();
-    
+
     String linkTooltipLabel();
-    
+
     String linkOpenInNewWindowLabel();
 
     String linkWebPageLabel();
@@ -209,7 +207,7 @@ public interface Strings extends Constants
 
     String linkSelectAttachmentTitle();
 
-    String linkNoAttachmentSelectedError();    
+    String linkNoAttachmentSelectedError();
 
     String linkConfigTitle();
 
@@ -222,29 +220,29 @@ public interface Strings extends Constants
     String linkNewPageError();
 
     String selectorSelectFromCurrentPage();
-    
+
     String selectorSelectFromAllPages();
-    
+
     String linkErrorLoadingData();
 
     String fileUploadLabel();
 
-    String fileUploadNewFileLabel();    
+    String fileUploadNewFileLabel();
 
-    String fileUploadTitle();    
+    String fileUploadTitle();
 
     String fileChooseLabel();
 
     String fileListFetchError();
 
     String fileUploadSubmitLabel();
-    
+
     String fileUploadSubmitError();
 
     String fileUploadNoPathError();
 
     String image();
-    
+
     String imageTooltip();
 
     String imageInsertImage();
@@ -252,19 +250,19 @@ public interface Strings extends Constants
     String imageEditImage();
 
     String imageRemoveImage();
-    
+
     String imageSelectImageTitle();
-    
+
     String imageUploadNewFileLabel();
 
     String imageConfigTitle();
-    
+
     String imageCreateImageButton();
 
     String imageUpdateListButton();
-    
+
     String imageWidthLabel();
-    
+
     String imageHeightLabel();
 
     String imageHorizontalAlignmentLabel();
@@ -328,11 +326,11 @@ public interface Strings extends Constants
     String importerCancelButtonCaption();
 
     String wizardCancel();
-    
-    String wizardPrevious();    
-    
+
+    String wizardPrevious();
+
     String wizardNext();
-    
+
     String wizardFinish();
 
     String errorServerRequestFailed();

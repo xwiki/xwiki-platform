@@ -83,8 +83,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
             levels.setVisibleItemCount(1);
             levels.setTitle(Strings.INSTANCE.format());
 
-            levels.addItem(Strings.INSTANCE.formatInline(), "");
-            levels.addItem(Strings.INSTANCE.formatParagraph(), "p");
+            levels.addItem(Strings.INSTANCE.formatPlainText(), "p");
             levels.addItem(Strings.INSTANCE.formatHeader1(), "h1");
             levels.addItem(Strings.INSTANCE.formatHeader2(), "h2");
             levels.addItem(Strings.INSTANCE.formatHeader3(), "h3");
@@ -192,8 +191,12 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
                         return;
                     }
                 }
+                // Report plain text if there's no block formatting or the block formatting is unknown.
+                levels.setSelectedIndex(0);
+            } else {
+                // Report no block formatting if the selection includes multiple block formats.
+                levels.setSelectedIndex(-1);
             }
-            levels.setSelectedIndex(-1);
         }
     }
 }

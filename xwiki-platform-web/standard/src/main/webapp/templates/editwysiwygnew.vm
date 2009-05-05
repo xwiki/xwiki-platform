@@ -115,7 +115,7 @@ $xwiki.getTextArea($tdoc.content)
     var Wysiwyg0 = {
         hookId: 'content',
         inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",
-        plugins: 'submit separator text valign list indent history format symbol link image table macro importer',
+        plugins: 'submit line separator text valign list indent history format symbol link image table macro importer',
         syntax: "$doc.syntaxId",
         toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol',
         wiki: '${doc.wiki.replace("'", "\'")}',

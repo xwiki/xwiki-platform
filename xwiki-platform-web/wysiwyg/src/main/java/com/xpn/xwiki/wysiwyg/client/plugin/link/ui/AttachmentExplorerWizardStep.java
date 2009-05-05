@@ -48,7 +48,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
         // make this smaller, to fit the toggling bar for the AttachmentSelectorWizardStep
         // FIXME: so wrong to have this kind of setting here: this WS should be usable with or without the aggregating
         // step. Also having size information added in more than one single place is very very bad.
-        super(false, true, true, editedResource.toString(), 455, 280);
+        super(false, true, true, editedResource.toString() + "#Attachments", 455, 280);
         this.editedResource = editedResource;
     }
 
@@ -62,7 +62,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
             // resolve the reference of the edited link, relative to the edited resource
             ResourceName r = new ResourceName();
             r.fromString(reference, true);
-            getExplorer().setValue(r.resolveRelativeTo(editedResource).toString() + "#Attachments");
+            getExplorer().setValue(r.resolveRelativeTo(editedResource).toString());
         }
         // else leave the selection where it was the last time
     }
